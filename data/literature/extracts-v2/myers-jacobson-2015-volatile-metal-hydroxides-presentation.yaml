@@ -90,7 +90,19 @@ observations:
         pdf_page_index: 0
         table: Enthalpies of Formation
         note: row=CrO2(OH)2(g)
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fH
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Transpiration, Third
+      Law; printed source evidence: Transpiration, Third Law'
+    origin: myers-jacobson-2015-volatile-metal-hydroxides-presentation::myers_jacobson_2015_presentation_cro2oh2_delta_fh_298
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: myers-jacobson-2015-volatile-metal-hydroxides-presentation
   locator:
     page: 1
@@ -213,7 +225,19 @@ observations:
         pdf_page_index: 0
         table: Enthalpies of Formation
         note: row=Si(OH)4(g)
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fH
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Transpiration, Third
+      Law; printed source evidence: Transpiration, Third Law'
+    origin: myers-jacobson-2015-volatile-metal-hydroxides-presentation::myers_jacobson_2015_presentation_sioh4_delta_fh_298
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: myers-jacobson-2015-volatile-metal-hydroxides-presentation
   locator:
     page: 1
@@ -336,7 +360,19 @@ observations:
         pdf_page_index: 0
         table: Enthalpies of Formation
         note: row=SiO(OH)2(g)
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fH
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Transpiration, Second
+      Law; printed source evidence: Transpiration, Second Law'
+    origin: myers-jacobson-2015-volatile-metal-hydroxides-presentation::myers_jacobson_2015_presentation_siooh2_delta_fh_298
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: myers-jacobson-2015-volatile-metal-hydroxides-presentation
   locator:
     page: 1
@@ -459,7 +495,19 @@ observations:
         pdf_page_index: 0
         table: Enthalpies of Formation
         note: row=TiO(OH)2(g)
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fH
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Transpiration, Third
+      Law; printed source evidence: Transpiration, Third Law'
+    origin: myers-jacobson-2015-volatile-metal-hydroxides-presentation::myers_jacobson_2015_presentation_tiooh2_delta_fh_298
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: myers-jacobson-2015-volatile-metal-hydroxides-presentation
   locator:
     page: 1

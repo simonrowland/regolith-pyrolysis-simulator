@@ -82,6 +82,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - S
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: CASTEP DFT calculations
+      combined with a quasi-harmonic model.'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_absolute_standard_entropy_298
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - S
@@ -219,6 +231,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - S
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: CASTEP DFT calculations
+      combined with a quasi-harmonic model.'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_absolute_standard_entropy_29815
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - S
@@ -276,7 +300,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_dta_transition_temperature
-  experiment_id: 10.1016/j.jallcom.2021.160784::chatain-2021-nacro2-thermodynamics
+  experiment_id: 10.1016/j.jallcom.2021.160784::chatain-2021-nacro2-thermodynamics::method:dta_dsc
   identity:
     quantity:
       tag: value
@@ -355,6 +379,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_inferred: value=dta_dsc; evidence=source text names ''differential thermal analysis''; original_reason=source
+      method text: differential thermal analysis (DTA)'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_dta_transition_temperature
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: dta_dsc
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -498,7 +534,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - cp
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: DSC-111 heat-capacity
+      measurement followed by the authors'' polynomial fit.'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_experimental_cp_fit
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 14
@@ -610,7 +658,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Equations (6)–(8) for
+      formation Gibbs energy from heat-capacity measurements and reference thermodynamic data.'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_formation_gibbs_fit
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 15
@@ -725,6 +785,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fH
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_gross_formation_enthalpy_298
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fH
@@ -826,6 +897,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fH
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_jain_dft_formation_enthalpy_298
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fH
@@ -927,7 +1009,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - cp
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_previous_cp_iyer_fit
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 4
@@ -1015,7 +1108,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - cp
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_previous_cp_sreedharan_fit
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 4
@@ -1103,7 +1207,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: e.m.f. Me/In-In2O3/electrolyte/Na-Cr-NaCrO2/Me;
+      printed source evidence: e.m.f. Me/In-In2O3/electrolyte/Na-Cr-NaCrO2/Me'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref10_gibbs_fit
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 6
@@ -1113,7 +1229,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref11_i
-  experiment_id: 10.1016/j.jallcom.2021.160784::chatain-2021-nacro2-thermodynamics
+  experiment_id: 10.1016/j.jallcom.2021.160784::chatain-2021-nacro2-thermodynamics::method:knudsen_effusion
   identity:
     quantity:
       tag: value
@@ -1192,7 +1308,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=source
+      method text: Knudsen cell mass spectrometry (Thoria liners in Ni or stainless steel crucible)'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref11_i
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 6
@@ -1203,7 +1331,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref11_ii
-  experiment_id: 10.1016/j.jallcom.2021.160784::chatain-2021-nacro2-thermodynamics
+  experiment_id: 10.1016/j.jallcom.2021.160784::chatain-2021-nacro2-thermodynamics::method:knudsen_effusion
   identity:
     quantity:
       tag: value
@@ -1282,7 +1410,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=source
+      method text: Knudsen cell mass spectrometry (Thoria liners in Ni or stainless steel crucible)'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref11_ii
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 6
@@ -1372,7 +1512,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Knudsen-effusion mass-loss
+      (stainless steel crucible); printed source evidence: Knudsen-effusion mass-loss (stainless steel crucible)'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref12_kems_mass_loss_gibbs_fit
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 6
@@ -1461,7 +1613,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: e.m.f. Air, Pt/YDT*/Na(l),
+      O(Na); *Yttria doped Thoria; printed source evidence: e.m.f. Air, Pt/YDT*/Na(l), O(Na); *Yttria doped Thoria'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref3_gibbs_fit
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 6
@@ -1550,7 +1714,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: e.m.f. I. Ca,CaF2/CaF2/NaCrO2,Cr,Cr2O3,NaF;
+      II. NaCrO2,Cr,Cr2O3,NaF/CaF2/NiF2,Ni; printed source evidence: e.m.f. I. Ca,CaF2/CaF2/NaCrO2,Cr,Cr2O3,NaF; II. NaCrO2,Cr,Cr2O3,NaF/CaF2/NiF2,Ni'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref4_gibbs_fit_average
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 6
@@ -1640,7 +1816,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: e.m.f. I. Ca,CaF2/CaF2/NaCrO2,Cr,Cr2O3,NaF;
+      II. NaCrO2,Cr,Cr2O3,NaF/CaF2/NiF2,Ni; printed source evidence: e.m.f. I. Ca,CaF2/CaF2/NaCrO2,Cr,Cr2O3,NaF; II. NaCrO2,Cr,Cr2O3,NaF/CaF2/NiF2,Ni'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref4_gibbs_fit_i
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 6
@@ -1730,7 +1918,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: e.m.f. I. Ca,CaF2/CaF2/NaCrO2,Cr,Cr2O3,NaF;
+      II. NaCrO2,Cr,Cr2O3,NaF/CaF2/NiF2,Ni; printed source evidence: e.m.f. I. Ca,CaF2/CaF2/NaCrO2,Cr,Cr2O3,NaF; II. NaCrO2,Cr,Cr2O3,NaF/CaF2/NiF2,Ni'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref4_gibbs_fit_ii
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 6
@@ -1819,7 +2019,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: e.m.f. In, In2O3/YDT/Na,Na2O;
+      printed source evidence: e.m.f. In, In2O3/YDT/Na,Na2O'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref5_gibbs_fit
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 6
@@ -1908,7 +2120,20 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: e.m.f. Pt, NaCrO2,Cr2O3,Na2CrO4/15
+      YSZ*/O2 (air), Pt; *15 w% zirconia stabilised Yttria; printed source evidence: e.m.f. Pt, NaCrO2,Cr2O3,Na2CrO4/15 YSZ*/O2
+      (air), Pt; *15 w% zirconia stabilised Yttria'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref6_gibbs_fit
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 6
@@ -1997,7 +2222,20 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: e.m.f. I. Pt,NaCrO2,Cr,Cr2O3,NaF/CaF2/Co,CoF2,Pt;
+      II. Pt,NaCrO2,Cr,Cr2O3,NaF/CaF2/Ni,NiF2,Pt; printed source evidence: e.m.f. I. Pt,NaCrO2,Cr,Cr2O3,NaF/CaF2/Co,CoF2,Pt;
+      II. Pt,NaCrO2,Cr,Cr2O3,NaF/CaF2/Ni,NiF2,Pt'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref7_gibbs_fit_i
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 6
@@ -2087,7 +2325,20 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: e.m.f. I. Pt,NaCrO2,Cr,Cr2O3,NaF/CaF2/Co,CoF2,Pt;
+      II. Pt,NaCrO2,Cr,Cr2O3,NaF/CaF2/Ni,NiF2,Pt; printed source evidence: e.m.f. I. Pt,NaCrO2,Cr,Cr2O3,NaF/CaF2/Co,CoF2,Pt;
+      II. Pt,NaCrO2,Cr,Cr2O3,NaF/CaF2/Ni,NiF2,Pt'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref7_ii
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 6
@@ -2177,7 +2428,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: e.m.f. In, In2O3/YDT/Na,Cr,NaCrO2;
+      printed source evidence: e.m.f. In, In2O3/YDT/Na,Cr,NaCrO2'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref8_emf_gibbs_fit
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 6
@@ -2188,7 +2451,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref8_kems_gibbs_fit
-  experiment_id: 10.1016/j.jallcom.2021.160784::chatain-2021-nacro2-thermodynamics
+  experiment_id: 10.1016/j.jallcom.2021.160784::chatain-2021-nacro2-thermodynamics::method:knudsen_effusion
   identity:
     quantity:
       tag: value
@@ -2266,7 +2529,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=source
+      method text: Knudsen cell mass spectrometry (Mo crucible)'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref8_kems_gibbs_fit
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 6
@@ -2356,7 +2631,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: e.m.f. Pt/NaCrO2+Na2CrO4+Cr2O3/(1-x)ZrO2+xCaO/air/Pt;
+      printed source evidence: e.m.f. Pt/NaCrO2+Na2CrO4+Cr2O3/(1-x)ZrO2+xCaO/air/Pt'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_table1_ref9_gibbs_fit
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 6
@@ -2445,6 +2732,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - cp
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: CASTEP DFT calculations
+      combined with a quasi-harmonic model.'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_theoretical_cp_29815
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - cp
@@ -2581,7 +2880,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - cp
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: CASTEP DFT calculations
+      combined with a quasi-harmonic model.'
+    origin: chatain-2021-nacro2-thermodynamics::chatain_2021_theoretical_cp_fit
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: chatain-2021-nacro2-thermodynamics
   locator:
     page: 13

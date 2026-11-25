@@ -80,7 +80,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_sat
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: gail-2013-sio-nucleation-silicate-dust::gail_2013_ferguson_nuth_vapor_pressure_eq6
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: gail-2013-sio-nucleation-silicate-dust
   locator:
     page: 4
@@ -182,7 +193,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: gail-2013-sio-nucleation-silicate-dust::gail_2013_figure_2_vaporisation_coefficient
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: gail-2013-sio-nucleation-silicate-dust
   locator:
     page: 3
@@ -268,7 +290,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_sat
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: gail-2013-sio-nucleation-silicate-dust::gail_2013_figure_3_vapor_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: gail-2013-sio-nucleation-silicate-dust
   locator:
     page: 3
@@ -314,7 +347,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: gail-2013-sio-nucleation-silicate-dust::gail_2013_nuth_donn_average_rate_as_printed
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: gail-2013-sio-nucleation-silicate-dust
   locator:
     page: 5
@@ -372,7 +415,20 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Smoke onset was defined
+      as the instant when extinction of a 200 nm light beam traversing the condensation zone reached 1%; the nucleation rate
+      at onset was only crudely estimated.; printed source evidence: Smoke onset was defined as the instant when extinction
+      of a 200 nm light beam traversing the condensation zone reached 1%; the nucleation rate at onset was only crudely estimated.'
+    origin: gail-2013-sio-nucleation-silicate-dust::gail_2013_nuth_donn_smoke_onset_rate_range
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: gail-2013-sio-nucleation-silicate-dust
   locator:
     page: 4
@@ -475,7 +531,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_sat
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: gail-2013-sio-nucleation-silicate-dust::gail_2013_schick_vapor_pressure_eq7
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: gail-2013-sio-nucleation-silicate-dust
   locator:
     page: 4
@@ -537,7 +604,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: gail-2013-sio-nucleation-silicate-dust::gail_2013_sio_nucleation_rate_fit_eq16
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: gail-2013-sio-nucleation-silicate-dust
   locator:
     page: 5
@@ -644,7 +721,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_sat
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: gail-2013-sio-nucleation-silicate-dust::gail_2013_sio_vapor_pressure_fit_eq4
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: gail-2013-sio-nucleation-silicate-dust
   locator:
     page: 3
@@ -765,7 +853,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: gail-2013-sio-nucleation-silicate-dust::gail_2013_sio_vaporisation_coefficient_fit_eq3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: gail-2013-sio-nucleation-silicate-dust
   locator:
     page: 3

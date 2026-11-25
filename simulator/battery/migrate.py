@@ -35,8 +35,9 @@ pending. Missing class/pressure/phase/method
 remain unknown, never certified / liquid / knudsen_effusion. An explicit
 experiment-level ``ambient_pressure_evidence`` may supply 101325 Pa only for
 an otherwise missing total pressure on an open/flowing-gas furnace.
-Unknown rail spellings raise. Unmapped phase strings are ``State.unknown``
-on ``Species.phase`` and queued; they are never stored as gas.
+Unknown rail spellings raise. Unmapped or unprinted phases follow DP-016:
+row physics may infer a phase; otherwise the stored phase is ``unspecified``
+with a ``phase_inferred`` policy notice.
 """
 
 from __future__ import annotations
@@ -54,7 +55,7 @@ import unicodedata
 from collections import Counter, defaultdict
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field, fields, is_dataclass, replace
-from decimal import ROUND_HALF_UP, Decimal, InvalidOperation, localcontext
+from decimal import ROUND_DOWN, ROUND_HALF_UP, Decimal, InvalidOperation, localcontext
 from enum import Enum
 from fractions import Fraction
 from functools import lru_cache
@@ -85,7 +86,13 @@ from simulator.reference_data.robie_waldbaum_1968_usgs_b1259_loader import (
 )
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
 from simulator.battery.decimal_tokens import decimal_token as _dec_str
+from simulator.battery.uncertainty_conventions import (
+    UncertaintyConventionConflict,
+    printed_uncertainty_convention,
+    standard_uncertainty_width,
+)
 from simulator.battery import schema_gap as sg
+from simulator.battery.default_policy import resolve as resolve_default_policy
 from simulator.battery.source_declarations import (
     B677_SOURCE_ID,
     B2131_SOURCE_ID as _B2131_SOURCE_ID,
@@ -248,6 +255,7 @@ from simulator.battery.records import (
     Located,
     Locator,
     Notice,
+    NoticePolicy,
     Observation,
     PressureEnvironment,
     QuotedFrom,
@@ -499,21 +507,25 @@ PAGE_METHOD_CLASSES = frozenset(
     }
 )
 
-# Closed automatic phase map (v2.1 §Migration) plus reviewed extras.
-# Automatic: the three legacy extract strings only.
-# Reviewed identity: source already printed a closed Phase enum token
-# (g/cr/l/aq/glass/supercooled_l). These are identity, not heuristics —
-# a source that wrote "aq" is Phase.AQ. Chosen over queueing the 38 aq
-# rows: inventing an archival hole where the source used the closed
-# vocabulary is the wrong absence. glass/supercooled_l have no current
-# rows but are the same identity class.
-# Reviewed source spelling: solid_arsenolite (explicit extract + polymorph).
-# No title inference, no substring heuristics.
+# Exact source phase labels with one physical phase. Contextual inference is
+# handled separately and carries a row-level notice.
 # NTRS prints the sodium phase and sample form as liquid_sodium / Liquid sodium.
 PHASE_MAP: dict[str, Phase] = {
     "gas": Phase.G,
+    "vapor": Phase.G,
+    "vapour": Phase.G,
+    "g, singlet": Phase.G,
+    "g, triplet": Phase.G,
+    "g, doublet": Phase.G,
     "condensed_solid": Phase.CR,
+    "condensed": Phase.UNSPECIFIED,
+    "crystal": Phase.CR,
+    "graphite": Phase.CR,
     "condensed_liquid": Phase.L,
+    "liquid": Phase.L,
+    "melt": Phase.L,
+    "aq, 100 H2O": Phase.AQ,
+    "aq, 1000 H2O": Phase.AQ,
     "g": Phase.G,
     "cr": Phase.CR,
     "l": Phase.L,
@@ -530,6 +542,7 @@ PHASE_MAP: dict[str, Phase] = {
     "quenched peridotite glass": Phase.GLASS,
     "supercooled_l": Phase.SUPERCOOLED_L,
     "solid_arsenolite": Phase.CR,
+    "unspecified": Phase.UNSPECIFIED,
     "basaltic_silicate_melt": Phase.L,
     "silicate_melt_ferrobasalt_FCMAS": Phase.L,
     "silicate_melt_terrestrial_FMQ_and_lunar_IW_minus_1": Phase.L,
@@ -563,7 +576,8 @@ def phase_for_sample_form(form: str | None) -> Phase | None:
     token = form.strip().casefold()
     if not token:
         return None
-    return PHASE_MAP.get(token)
+    phase = PHASE_MAP.get(token)
+    return None if phase is Phase.UNSPECIFIED else phase
 
 
 # A form token condensed_solid is Phase.CR. A sample the source prints as
@@ -1390,6 +1404,14 @@ def to_plain(obj: object) -> object:
         return str(obj)
     if isinstance(obj, Path):
         return str(obj)
+    if isinstance(obj, NoticePolicy):
+        return {
+            "id": obj.id,
+            "version": obj.version,
+            "status": obj.status,
+            "value": to_plain(obj.value),
+            "units": obj.units,
+        }
     if isinstance(obj, State):
         payload: dict[str, object] = {"tag": obj.tag.value}
         if obj.value is not None:
@@ -3550,6 +3572,22 @@ def _notice_from_plain(payload: object) -> Notice:
     assert _is_mapping(payload)
     affected = tuple(Quantity(str(q)) for q in (payload.get("affected_quantities") or ()))
     dropped = payload.get("dropped")
+    policy_payload = payload.get("policy")
+    if policy_payload is not None:
+        if not _is_mapping(policy_payload):
+            raise TypeError("notice policy must be a mapping")
+        version = policy_payload["version"]
+        if isinstance(version, bool) or not isinstance(version, (int, str)):
+            raise TypeError("notice policy version must be an int or str")
+        policy = NoticePolicy(
+            id=str(policy_payload["id"]),
+            version=version,
+            status=str(policy_payload["status"]),
+            value=str(policy_payload["value"]),
+            units=str(policy_payload["units"]),
+        )
+    else:
+        policy = None
     return Notice(
         kind=NoticeKind(str(payload["kind"])),
         affected_quantities=affected,
@@ -3567,6 +3605,7 @@ def _notice_from_plain(payload: object) -> Notice:
         if payload.get("authority") is None
         else Authority(str(payload["authority"])),
         certification=payload.get("certification"),
+        policy=policy,
     )
 
 
@@ -10599,6 +10638,135 @@ def map_phase(raw: object) -> tuple[State[Phase], str | None]:
     )
 
 
+def _phase_policy_resolution(
+    inference: tuple[Phase, str] | None,
+    *,
+    quantity: Quantity | None,
+    origin: str,
+    original_reason: str,
+) -> tuple[Phase, Notice]:
+    # DP-016 uses only quantity definitions, printed labels, and printed
+    # transitions to identify a phase; absent that evidence, neither solid nor
+    # liquid has a physical basis, so the stored token remains unspecified.
+    phase, evidence = inference or (
+        Phase.UNSPECIFIED,
+        "row physics does not identify one phase",
+    )
+    policy_resolution = resolve_default_policy(
+        "DP-016", inferred_phase=phase.value
+    )
+    return phase, Notice(
+        kind=policy_resolution.flag,
+        affected_quantities=(() if quantity is None else (quantity,)),
+        reason=(
+            f"phase_inferred: value={phase.value}; evidence={evidence}; "
+            f"original_reason={original_reason}"
+        ),
+        origin=origin,
+        policy=NoticePolicy(**policy_resolution.payload["policy"]),
+    )
+
+
+def _phase_inference_from_evidence(
+    quantity: Quantity | None,
+    phase_raw: object,
+    *evidence: object,
+    temperature_K: Decimal | None = None,
+    transition_temperature_K: Decimal | None = None,
+    liquidus_temperature_K: Decimal | None = None,
+) -> tuple[Phase, str] | None:
+    """Resolve a phase only from a physical definition or row-level evidence."""
+
+    raw = str(phase_raw or "").strip().casefold()
+    raw_compact = re.sub(r"\s+", "", raw)
+    if raw == "crystalline" or raw.startswith("crystalline_"):
+        return Phase.CR, f"printed phase label {phase_raw!r} identifies a crystal"
+    if re.search(r"\b(?:g|gas)\s*,?\s*singlet\b", raw):
+        return Phase.G, f"printed phase label {phase_raw!r} identifies a gas singlet"
+    if quantity is Quantity.P_PARTIAL:
+        # A partial pressure is defined for a gas-phase species; this does not
+        # infer the condensed reservoir of a saturation-pressure observation.
+        return Phase.G, "partial pressure identifies the gas-phase species"
+    if (
+        quantity in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+        and temperature_K is not None
+        and liquidus_temperature_K is not None
+        and temperature_K > liquidus_temperature_K
+    ):
+        # Both printed temperatures are K. Strictly above liquidus is liquid;
+        # equality is coexistence and leaves the phase unspecified.
+        return Phase.L, (
+            f"printed T={temperature_K} K is above liquidus "
+            f"T={liquidus_temperature_K} K"
+        )
+
+    source_text = " ".join(
+        " ".join(item.replace("_", " ").split())
+        for item in evidence
+        if isinstance(item, str)
+    )
+    lowered = source_text.casefold()
+    if raw_compact in {"cr,l", "(c,l)"} or raw in {
+        "crystal <--> liquid",
+        "crystal <-> liquid",
+    }:
+        if temperature_K is not None and transition_temperature_K is not None:
+            # Both temperatures are in K. Below a printed melting boundary the
+            # stable side is crystal; above it the stable side is liquid. At
+            # equality the source names coexistence, so retain UNSPECIFIED.
+            if temperature_K < transition_temperature_K:
+                return Phase.CR, (
+                    f"row T={temperature_K} K is below printed transition "
+                    f"T={transition_temperature_K} K"
+                )
+            if temperature_K > transition_temperature_K:
+                return Phase.L, (
+                    f"row T={temperature_K} K is above printed transition "
+                    f"T={transition_temperature_K} K"
+                )
+        if re.search(r"\b(?:liquid|melt)\s+side\b|\babove\s+(?:the\s+)?(?:melting|liquidus)", lowered):
+            return Phase.L, f"source labels the liquid side of {phase_raw!r}: {source_text}"
+        if re.search(r"\b(?:crystal|solid)\s+side\b|\bbelow\s+(?:the\s+)?(?:melting|liquidus)", lowered):
+            return Phase.CR, f"source labels the crystal side of {phase_raw!r}: {source_text}"
+    partial_melt_or_crystal_assemblage = (
+        re.search(r"\b(?:partly|partially)\s+molten\b", lowered)
+        or re.search(
+            r"\b(?:mullite\b.*\bcristobalite|cristobalite\b.*\bmullite)\b",
+            lowered,
+        )
+    )
+    if (
+        quantity in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+        and not partial_melt_or_crystal_assemblage
+        and re.search(r"\b(?:melts?|molten|liquid|slags?)\b", lowered)
+    ):
+        return Phase.L, f"source describes the activity sample as a melt: {source_text}"
+    if (
+        quantity is Quantity.P_SAT
+        and re.search(r"\b(?:vapou?r pressure)\b", lowered)
+        and "over" in lowered
+        and "liquidus" in lowered
+        and "above" in lowered
+        and re.search(r"\b(?:melt|molten|slag)\b", lowered)
+    ):
+        return Phase.L, f"source places the vapour-pressure reservoir above liquidus: {source_text}"
+    return None
+
+
+def _phase_needs_default(phase: State[Phase]) -> bool:
+    if phase.is_value:
+        return phase.value is Phase.UNSPECIFIED
+    if not phase.is_unknown:
+        return False
+    return phase.reason in {
+        "source does not state phase",
+        "missing phase",
+        "sidecar does not state phase",
+    } or (
+        phase.reason or ""
+    ).startswith("phase string ")
+
+
 def _printed_phase_names_sample_source(raw: object) -> bool:
     """True when the printed phase names a condensed sample, not a species."""
 
@@ -12172,6 +12340,68 @@ _MASS_LOSS_YIELD_FIELDS = (
     "water_released_wt_pct_as_printed",
     "mass_loss_wt_pct_range",
 )
+
+
+def _mass_loss_fraction_from_printed_weights(
+    values: Mapping[str, Any],
+    derivation: object,
+    source_locator: Mapping[str, Any] | None = None,
+) -> Decimal | None:
+    """Reduce Mendybaev 2013 FUN Table 1 xi from its located gram weights."""
+    relation = derivation.get("relation") if isinstance(derivation, Mapping) else None
+    normalized_relation = " ".join(str(relation or "").casefold().split())
+    if normalized_relation != (
+        "(initial_weight_g - final_weight_g) / initial_weight_g"
+    ):
+        return None
+
+    fields = ("initial_weight_g", "final_weight_g")
+    located_parameters: dict[str, Decimal] = {}
+    raw_parameters = (
+        derivation.get("parameters") if isinstance(derivation, Mapping) else None
+    )
+    if isinstance(raw_parameters, (list, tuple)):
+        for item in raw_parameters:
+            if not isinstance(item, (list, tuple)) or len(item) != 2:
+                continue
+            name, payload = item
+            if name not in fields or not isinstance(payload, Mapping):
+                continue
+            state = payload.get("state")
+            locator = payload.get("locator")
+            if (
+                not isinstance(state, Mapping)
+                or state.get("tag") != "value"
+                or not isinstance(locator, Mapping)
+            ):
+                continue
+            amount = _as_dec_or_none(state.get("value"))
+            if amount is not None:
+                located_parameters[str(name)] = amount
+
+    amounts = {name: _as_dec_or_none(values.get(name)) for name in fields}
+    if (
+        set(located_parameters) != set(fields)
+        or any(amounts[name] != located_parameters[name] for name in fields)
+    ):
+        return None
+    initial, final = (amounts[name] for name in fields)
+    if (
+        initial is None
+        or final is None
+        or not initial.is_finite()
+        or not final.is_finite()
+        or initial <= 0
+        or not isinstance(source_locator, Mapping)
+    ):
+        return None
+
+    with localcontext() as context:
+        context.prec = 80
+        fraction = (initial - final) / initial
+        return fraction.quantize(Decimal("1e-40"), rounding=ROUND_DOWN)
+
+
 _MEASURED_OXYGEN_YIELD_FIELDS: tuple[tuple[str, Quantity], ...] = (
     ("mass_yield_percent", Quantity.YIELD_FRACTION),
     ("fraction_of_feedstock_oxygen_percent", Quantity.O2_YIELD),
@@ -13463,6 +13693,132 @@ def map_method(regime: object) -> State[MethodToken]:
     return State.of(token)
 
 
+def _method_text_value(candidate: object) -> str | None:
+    if isinstance(candidate, str):
+        return candidate if candidate.strip() else None
+    if isinstance(candidate, Mapping):
+        state = candidate.get("state")
+        if isinstance(state, Mapping) and state.get("tag") == "value":
+            value = state.get("value")
+            if isinstance(value, str) and value.strip():
+                return value
+    return None
+
+
+_METHOD_TEXT_EVIDENCE = (
+    ("electron microprobe analysis", MethodToken.ELECTRON_MICROPROBE),
+    ("electron microprobe", MethodToken.ELECTRON_MICROPROBE),
+    ("electron probe microanalysis", MethodToken.ELECTRON_MICROPROBE),
+    ("knudsen-cell", MethodToken.KNUDSEN_EFFUSION),
+    ("knudsen cell", MethodToken.KNUDSEN_EFFUSION),
+    ("knudsen effusion", MethodToken.KNUDSEN_EFFUSION),
+    ("kems", MethodToken.KNUDSEN_EFFUSION),
+    ("adiabatic calorimetry", MethodToken.ADIABATIC_CALORIMETRY),
+    ("drop calorimetry", MethodToken.DROP_CALORIMETRY),
+    ("solution calorimetry", MethodToken.SOLUTION_CALORIMETRY),
+    ("differential scanning calorimetry", MethodToken.DTA_DSC),
+    ("differential thermal analysis", MethodToken.DTA_DSC),
+    ("calorimetry", MethodToken.CALORIMETRY),
+)
+
+
+def _method_inference_from_evidence(
+    *candidates: object,
+) -> tuple[MethodToken, str] | None:
+    """Infer a closed method only when one explicit source phrase identifies it."""
+
+    for candidate in candidates:
+        candidate_text = _method_text_value(candidate)
+        if candidate_text is None:
+            continue
+        text = " ".join(candidate_text.casefold().split())
+        # A source-text acronym is evidence; the closed-looking regime token
+        # ``kems_effusion`` alone remains insufficient.
+        matches = [
+            (phrase, token)
+            for phrase, token in _METHOD_TEXT_EVIDENCE
+            if (
+                bool(re.search(r"\bkems\b", text))
+                if phrase == "kems"
+                else phrase in text
+            )
+        ]
+        longest_phrase = max((len(phrase) for phrase, _token in matches), default=0)
+        strongest_matches = [
+            (phrase, token)
+            for phrase, token in matches
+            if len(phrase) == longest_phrase
+        ]
+        tokens = {token for _phrase, token in strongest_matches}
+        if len(tokens) > 1:
+            return None
+        if len(tokens) == 1:
+            phrase, token = strongest_matches[0]
+            if any(
+                other_token is not token and other_phrase not in phrase
+                for other_phrase, other_token in matches
+            ):
+                return None
+            return token, f"source text names {phrase!r}"
+    return None
+
+
+# Figure-series labels b274 leaves on the registered experiment for that
+# technique. They are not a second method and must not conflict-split it.
+_FIGURE_REGIME_INHERITS_DECLARED = {
+    "mixed_kms_tms": MethodToken.KNUDSEN_EFFUSION,
+    "knudsen_mass_spectrometry": MethodToken.KNUDSEN_EFFUSION,
+    "transpiration_mass_spectrometry": MethodToken.TRANSPIRATION,
+}
+
+
+def _row_text_inherits_declared_method(
+    method_raw: str | None,
+    declared: State[MethodToken] | None,
+    *,
+    printed_only: bool,
+) -> bool:
+    """Whether row text keeps the registered experiment method.
+
+    A method_as_printed sentence that did not map or infer is the
+    registered experiment's description (Guo Table 5 quench_equilibration),
+    not a second technique. A regime or method claim still resolves on its
+    own. Hastie figure-series regimes inherit the registered technique:
+    knudsen effusion or transpiration.
+    """
+
+    if (
+        declared is None
+        or not declared.is_value
+        or declared.value is MethodToken.UNSPECIFIED
+        or not method_raw
+    ):
+        return False
+    if _FIGURE_REGIME_INHERITS_DECLARED.get(method_raw) is declared.value:
+        return True
+    return printed_only
+
+
+def _method_inference_notice(
+    method: MethodToken,
+    evidence: str,
+    original_reason: str,
+    quantity: Quantity | None,
+    origin: str,
+) -> Notice:
+    policy_resolution = resolve_default_policy("DP-107", inferred_method=method.value)
+    return Notice(
+        kind=NoticeKind.METHOD_INFERRED,
+        affected_quantities=(() if quantity is None else (quantity,)),
+        reason=(
+            f"method_inferred: value={method.value}; evidence={evidence}; "
+            f"original_reason={original_reason}"
+        ),
+        origin=origin,
+        policy=NoticePolicy(**policy_resolution.payload["policy"]),
+    )
+
+
 def evidence_for(
     method_class: object,
     *,
@@ -14348,19 +14704,91 @@ def _pressure_hit_is_model_calculation(
     )
 
 
-def _pressure_hit_is_chamber_condition(
+def _pressure_evidence_is_chamber_background(
+    evidence_text: str,
+    method: State[MethodToken] | None,
+    knudsen_cell: bool,
+) -> bool:
+    has_chamber_context = bool(
+        _PRESSURE_CHAMBER_RE.search(evidence_text)
+    )
+    if not has_chamber_context:
+        return False
+
+    is_closed_knudsen_method = (
+        method is not None
+        and method.is_value
+        and method.value is MethodToken.KNUDSEN_EFFUSION
+    )
+    if knudsen_cell and not is_closed_knudsen_method:
+        # A method-specific split can leave a Knudsen apparatus on an
+        # UNSPECIFIED row. The chamber reading remains background evidence;
+        # only the closed effusion token keeps it on the experiment for KEMS.
+        return True
+    if (
+        re.search(r"\bfurnace\b", evidence_text, re.IGNORECASE)
+        and re.search(r"\bvacuum\b", evidence_text, re.IGNORECASE)
+        and not is_closed_knudsen_method
+    ):
+        # A quoted furnace vacuum is background evidence for a non-Knudsen
+        # sibling, even when a method split copied it from the shared run.
+        return True
+    return False
+
+
+def _experiment_pressure_is_chamber_background(
+    experiment: Experiment,
+    method: State[MethodToken] | None,
+) -> bool:
+    pressure = experiment.pressure_environment.total_pressure_Pa
+    if pressure is None:
+        return False
+    evidence_text = " ".join(
+        (
+            pressure.locator.note or ""
+            if pressure.locator is not None
+            else "",
+            *(
+                pressure.inference.inputs
+                if pressure.inference is not None
+                else ()
+            ),
+        )
+    )
+    apparatus_text = _extract_text(to_plain(experiment.apparatus))
+    knudsen_cell = bool(
+        re.search(r"\bknudsen\b", apparatus_text, re.IGNORECASE)
+        and not re.search(
+            r"\b(?:not|non[- ])\s*knudsen\b",
+            apparatus_text,
+            re.IGNORECASE,
+        )
+    )
+    return _pressure_evidence_is_chamber_background(
+        evidence_text, method, knudsen_cell
+    )
+
+
+def _pressure_hit_is_not_in_cell_total(
     hit: LabHit,
     values: Mapping[str, Any],
     method: State[MethodToken] | None,
     knudsen_cell: bool,
 ) -> bool:
-    if not _PRESSURE_CHAMBER_RE.search(hit.path):
-        return False
-    if knudsen_cell and (method is None or not method.is_value):
-        # With no resolved method, an explicitly identified Knudsen cell means
-        # this chamber value cannot establish the in-cell total.
+    if (
+        hit.path.casefold().startswith("values.")
+        and hit.entry.printed.casefold() == "pressure_pa"
+        and str(values.get("quantity") or "").strip().casefold()
+        in {"partial_pressure", Quantity.P_PARTIAL.value}
+    ):
         return True
+
     mapping = hit.mapping or {}
+    mapping_text = _extract_text(mapping)
+    if _pressure_evidence_is_chamber_background(
+        f"{hit.path} {mapping_text}", method, knudsen_cell
+    ):
+        return True
     if str(mapping.get("kind") or "").casefold() in {
         "about_nominal", "approximate", "pump_ultimate", "ultimate_vacuum", "ultimate-vacuum"
     }:
@@ -17206,9 +17634,12 @@ def fe3_fe2_ratio_from_ferric_fraction(r: Decimal) -> Decimal | None:
 
 
 def _fe3_fe2_log10_uncertainty_from_ferric_fraction(
-    r: Decimal, sigma_r: Decimal
+    r: Decimal,
+    sigma_r: Decimal,
+    *,
+    printed_half_width: Decimal | None = None,
 ) -> tuple[Decimal | None, str | None]:
-    """Propagate a ferric-fraction standard uncertainty into log10(R)."""
+    """Propagate ferric uncertainty; validate the printed interval when given."""
 
     if (
         not r.is_finite()
@@ -17219,8 +17650,17 @@ def _fe3_fe2_log10_uncertainty_from_ferric_fraction(
     ):
         return None, "ferric_fraction_uncertainty_input_invalid"
     gap = Decimal(1) - r
-    two_sigma = Decimal(2) * sigma_r
-    if two_sigma >= r or two_sigma >= gap:
+    if printed_half_width is not None:
+        if (
+            not printed_half_width.is_finite()
+            or printed_half_width < 0
+            or printed_half_width >= r
+            or printed_half_width >= gap
+        ):
+            return None, "printed_uncertainty_outside_metric_domain"
+    elif Decimal(2) * sigma_r >= r or Decimal(2) * sigma_r >= gap:
+        # Non-printed callers have no original interval to check. Preserve
+        # their existing two-standard-uncertainty admissibility rule.
         return None, "ferric_fraction_uncertainty_linearization_invalid"
 
     # Premise: the print gives r = Fe3+/sumFe, while the stored value is
@@ -17231,8 +17671,8 @@ def _fe3_fe2_log10_uncertainty_from_ferric_fraction(
     # Unit check: r, R, sigma_r and sigma_R are dimensionless ratios, so both
     # sides are dimensionless (the final uncertainty is in dex). Sanity:
     # r=0.5 gives R=1 and sigma_R=4*sigma_r; as r->0, sigma_R->sigma_r.
-    # Refuse when a two-sigma span reaches either endpoint: log10(R) diverges
-    # at r=0 and r=1, so linearisation cannot represent that printed interval.
+    # The scorer has already kept a printed interval strictly inside (0, 1);
+    # the non-printed caller fallback above retains its prior sigma check.
     sigma_log10_r = sigma_r / (Decimal(10).ln() * r * gap)
     if not sigma_log10_r.is_finite():
         return None, "ferric_fraction_uncertainty_input_invalid"
@@ -20278,7 +20718,7 @@ def pressure_from_equipment(
         hit
         for hit in _hits_for(hits, field)
         if not _pressure_hit_is_model_calculation(hit, payload_values, payload_values)
-        and not _pressure_hit_is_chamber_condition(
+        and not _pressure_hit_is_not_in_cell_total(
             hit, payload_values, method, knudsen_cell
         )
     ]
@@ -24017,6 +24457,23 @@ def _quoted_atmosphere_values(
                         for formula, value in mole_percent.items()
                     )
                 )
+    # Located air or pure O2 has no ratio colon. Forward that printed
+    # label; the bare-log owner applies the printed total pressure.
+    # Unrecognised labels stay out, so they are not an unsupported gas.
+    if isinstance(mixture, Mapping):
+        state = mixture.get("state")
+        mixture_locator = mixture.get("locator")
+        raw_label = state.get("value") if isinstance(state, Mapping) else None
+        if (
+            isinstance(state, Mapping)
+            and str(state.get("tag") or "value") == "value"
+            and isinstance(mixture_locator, Mapping)
+            and mixture_locator
+            and isinstance(raw_label, str)
+            and raw_label.strip()
+            and _atmosphere_kind(raw_label.strip()) is not None
+        ):
+            candidates.append(raw_label.strip())
     return tuple(dict.fromkeys(candidates))
 
 
@@ -24690,6 +25147,13 @@ class Migrator:
         self._work_index_row: dict[str, Mapping[str, Any] | None] = {}
         self._obs_source: dict[str, str] = {}
         self._obs_row_index: dict[str, int] = {}
+        # Keep the evidence for a method inferred at experiment scope so each
+        # row that inherits it retains its own method_inferred flag.
+        self._inferred_method_evidence_by_experiment: dict[
+            str, tuple[MethodToken, str, str]
+        ] = {}
+        self._declared_experiment_methods: dict[str, State[MethodToken]] = {}
+        self._unstated_method_original_reason_by_experiment: dict[str, str] = {}
         self._author_derivations: dict[str, Derivation] = {}
         # Parents actually replaced by emitted children. Retarget uses this
         # exact map, never a prefix search.
@@ -24871,6 +25335,89 @@ class Migrator:
             return f"{work_id}::{fallback}::{distinguisher}"
         return f"{work_id}::{fallback}"
 
+    def _publish_experiment(self, experiment: Experiment) -> Experiment:
+        """Register an experiment for the store writer.
+
+        write_outputs emits experiments_by_work and no other experiment list.
+        An id left only in result.experiments is dropped on reload. Every
+        observation that names it then fails referential integrity, and asset
+        lineage fails with it: asset ids are read from the resolved work.
+        """
+
+        experiment_id = experiment.experiment_id
+        work_id = experiment.work_id or ""
+        self.result.experiments[experiment_id] = experiment
+        registered = self.result.experiments_by_work[work_id]
+        if experiment_id not in registered:
+            registered.append(experiment_id)
+        return experiment
+
+    @staticmethod
+    def _tokens_with_published_id(
+        tokens: tuple[str, ...] | None,
+        former_id: str,
+        published_id: str,
+    ) -> tuple[str, ...] | None:
+        if not tokens or former_id == published_id or former_id not in tokens:
+            return tokens
+        return tuple(
+            published_id if token == former_id else token for token in tokens
+        )
+
+    def _derivation_with_published_id(
+        self,
+        derivation: Derivation | None,
+        former_id: str,
+        published_id: str,
+    ) -> Derivation | None:
+        if derivation is None:
+            return None
+        inputs = self._tokens_with_published_id(
+            derivation.inputs, former_id, published_id
+        )
+        if inputs is derivation.inputs:
+            return derivation
+        return replace(derivation, inputs=inputs or ())
+
+    def _rekey_row_references(
+        self,
+        *,
+        former_id: str,
+        experiment_id: str,
+        observation_id: str,
+        derived_from: tuple[str, ...] | None,
+        source_derivation: Derivation | None,
+        value_derivation: Derivation | None,
+    ) -> tuple[tuple[str, ...] | None, Derivation | None, Derivation | None]:
+        """Publish one re-keyed experiment and retarget this row only.
+
+        Sibling rows that stayed on former_id keep that id. A corpus-wide
+        old-to-new rewrite would move them.
+        """
+
+        if experiment_id == former_id:
+            return derived_from, source_derivation, value_derivation
+        experiment = self.result.experiments.get(experiment_id)
+        if experiment is not None:
+            self._publish_experiment(experiment)
+        derived_from = self._tokens_with_published_id(
+            derived_from, former_id, experiment_id
+        )
+        source_derivation = self._derivation_with_published_id(
+            source_derivation, former_id, experiment_id
+        )
+        value_derivation = self._derivation_with_published_id(
+            value_derivation, former_id, experiment_id
+        )
+        registered = self._author_derivations.get(observation_id)
+        if registered is not None:
+            retargeted = self._derivation_with_published_id(
+                registered, former_id, experiment_id
+            )
+            if retargeted is not None and retargeted is not registered:
+                self._author_derivations[observation_id] = retargeted
+        return derived_from, source_derivation, value_derivation
+
     def _ensure_experiment(
         self,
         *,
@@ -24983,8 +25530,7 @@ class Migrator:
                 apparatus,
                 pressure_env,
             )
-            self.result.experiments[experiment_id] = merged
-            return merged
+            return self._publish_experiment(merged)
         if (
             isinstance(equipment, Mapping)
             and isinstance(equipment.get("chamber_pressure"), Mapping)
@@ -25041,9 +25587,7 @@ class Migrator:
             locator=locator or Locator(record=experiment_id),
             apparatus=apparatus,
         )
-        self.result.experiments[experiment_id] = experiment
-        self.result.experiments_by_work[work_id].append(experiment_id)
-        return experiment
+        return self._publish_experiment(experiment)
 
     def _land_experiment_oxygen_pressure(
         self, experiment_id: str, located: Located[Value]
@@ -25444,6 +25988,12 @@ class Migrator:
             # KEMS validity gates — never the pressure a prediction is made at.
             skip_identity_fill = _knudsen_effusion_chamber_background_not_for_identity(
                 effective_method
+            ) or (
+                pressure is not None
+                and pressure_source.startswith("experiment.")
+                and _experiment_pressure_is_chamber_background(
+                    experiment, effective_method
+                )
             )
             if pressure is None and not skip_identity_fill:
                 sweep = experiment.pressure_environment.sweep_gas
@@ -25514,6 +26064,209 @@ class Migrator:
                     )
         return known, tuple(provenance)
 
+    def _resolve_method_for_observation(
+        self,
+        *,
+        observation_id: str,
+        experiment_id: str,
+        method: State[MethodToken],
+        method_raw_candidates: tuple[object, ...],
+        printed_method_candidates: tuple[object, ...] = (),
+        method_evidence_candidates: tuple[object, ...],
+        evidence_candidates: tuple[object, ...],
+        quantity: Quantity | None,
+    ) -> tuple[State[MethodToken], Notice | None]:
+        experiment = self.result.experiments.get(experiment_id)
+        experiment_method = None if experiment is None else experiment.method
+        declared_experiment_method = self._declared_experiment_methods.get(
+            experiment_id
+        )
+        claim_raw = next(
+            (
+                text
+                for candidate in method_raw_candidates
+                if (text := _method_text_value(candidate)) is not None
+            ),
+            None,
+        )
+        printed_raw = next(
+            (
+                text
+                for candidate in printed_method_candidates
+                if (text := _method_text_value(candidate)) is not None
+            ),
+            None,
+        )
+        # A printed description is the method claim only when the row has no
+        # regime or method of its own. Callers pass both; this owner decides.
+        method_raw = claim_raw if claim_raw is not None else printed_raw
+        printed_only = claim_raw is None and printed_raw is not None
+        method_source_text = next(
+            (
+                text
+                for candidate in (
+                    *method_raw_candidates,
+                    *printed_method_candidates,
+                    *method_evidence_candidates,
+                    *evidence_candidates,
+                )
+                if (text := _method_text_value(candidate)) is not None
+            ),
+            None,
+        )
+
+        if (
+            declared_experiment_method is not None
+            and method.is_unknown
+            and method_raw is None
+            and declared_experiment_method.is_value
+            and declared_experiment_method.value is not MethodToken.UNSPECIFIED
+        ):
+            method = declared_experiment_method
+
+        method_notice: Notice | None = None
+        method_inferred_from_row = False
+        method_was_unspecified = (
+            method.is_value and method.value is MethodToken.UNSPECIFIED
+        )
+        if method.is_unknown:
+            method_token = map_method(method_raw) if method_raw is not None else None
+            if method_token is not None and method_token.is_value:
+                if method_token.value is MethodToken.UNSPECIFIED:
+                    method = State.unknown(
+                        f"source method text: {method_raw}"
+                    )
+                    method_was_unspecified = True
+                else:
+                    method = method_token
+                method_evidence = None
+            else:
+                inference_candidates = (
+                    (method_raw,)
+                    if method_raw is not None
+                    else (
+                        *method_evidence_candidates,
+                        *evidence_candidates,
+                    )
+                )
+                method_evidence = _method_inference_from_evidence(
+                    *inference_candidates
+                )
+            if method_evidence is not None:
+                method_token, evidence = method_evidence
+                method_inferred_from_row = True
+                original_reason = (
+                    f"source method text: {method_source_text}"
+                    if method_source_text is not None
+                    else method.reason or "source does not state method"
+                )
+                self._inferred_method_evidence_by_experiment[experiment_id] = (
+                    method_token,
+                    evidence,
+                    original_reason,
+                )
+                method = State.of(method_token)
+            elif _row_text_inherits_declared_method(
+                method_raw,
+                declared_experiment_method,
+                printed_only=printed_only,
+            ):
+                # Unmapped method_as_printed prose, and Hastie figure-series
+                # regimes b274 keeps on the registered technique, are not a
+                # second method.
+                method = declared_experiment_method
+                method_was_unspecified = False
+            elif method_source_text is not None and method.is_unknown:
+                method = State.unknown(
+                    f"source method text is not mapped: {method_source_text}"
+                )
+                method_was_unspecified = True
+            elif method.is_unknown:
+                # Method absence never prevents an engine call. Preserve the
+                # state's reason in the DP-106 notice instead of queueing it.
+                method_was_unspecified = True
+        if method_was_unspecified:
+            cached_reason = (
+                self._unstated_method_original_reason_by_experiment.get(
+                    experiment_id
+                )
+                if method_raw is None and method_source_text is None
+                else None
+            )
+            if method.reason:
+                original_reason = method.reason
+            elif cached_reason:
+                original_reason = cached_reason
+            elif (
+                observation_id in self.result.observations
+                and method_raw is None
+                and method_source_text is None
+            ):
+                # The first copy cached the original reason. Losing that cache
+                # must change this copy's payload so the duplicate guard fires.
+                original_reason = (
+                    "source does not state method; original method reason lost"
+                )
+            else:
+                original_reason = "source does not state method"
+            if method.is_unknown:
+                self._unstated_method_original_reason_by_experiment.setdefault(
+                    experiment_id, original_reason
+                )
+            printed_method = next(
+                (
+                    candidate.strip()
+                    for candidate in evidence_candidates[:2]
+                    if isinstance(candidate, str) and candidate.strip()
+                ),
+                None,
+            )
+            if printed_method is not None:
+                original_reason = (
+                    f"{original_reason}; printed source evidence: {printed_method}"
+                )
+            policy_resolution = resolve_default_policy("DP-106")
+            method = State.of(MethodToken(str(policy_resolution.value)))
+            method_notice = Notice(
+                kind=policy_resolution.flag,
+                affected_quantities=(() if quantity is None else (quantity,)),
+                reason=(
+                    f"method_unstated: default={method.value.value}; "
+                    f"original_reason={original_reason}"
+                ),
+                origin=observation_id,
+                policy=NoticePolicy(**policy_resolution.payload["policy"]),
+            )
+        elif method.is_value and method_inferred_from_row:
+            inferred = self._inferred_method_evidence_by_experiment.get(
+                experiment_id
+            )
+            if inferred is not None and inferred[0] is method.value:
+                method_notice = _method_inference_notice(
+                    inferred[0],
+                    inferred[1],
+                    inferred[2],
+                    quantity,
+                    observation_id,
+                )
+
+        if (
+            method.is_value
+            and experiment is not None
+            and experiment_method is not None
+            and (
+                experiment_method.is_unknown
+                or (
+                    experiment_method.is_value
+                    and experiment_method.value is MethodToken.UNSPECIFIED
+                )
+            )
+        ):
+            self.result.experiments[experiment_id] = replace(
+                experiment, method=method
+            )
+        return method, method_notice
+
     def _add_observation(
         self,
         observation: Observation,
@@ -25522,6 +26275,92 @@ class Migrator:
         source_row_index: int | None = None,
     ) -> None:
         identity = observation.identity
+        observation_notices = list(observation.notices)
+        if isinstance(identity, Identity) and identity.species is not None:
+            phase_state = identity.species.phase
+            if _phase_needs_default(phase_state):
+                quantity = (
+                    identity.quantity.value
+                    if identity.quantity.is_value
+                    else None
+                )
+                original_reason = (
+                    phase_state.reason
+                    if phase_state.is_unknown
+                    else "source explicitly leaves phase unspecified"
+                )
+                inference = _phase_inference_from_evidence(
+                    quantity,
+                    phase_state.reason,
+                )
+                # DP-016 preserves an unresolved row as unspecified; the
+                # notice keeps the physical evidence and original absence.
+                phase, phase_notice = _phase_policy_resolution(
+                    inference,
+                    quantity=quantity if isinstance(quantity, Quantity) else None,
+                    origin=observation.observation_id,
+                    original_reason=original_reason or "source does not state phase",
+                )
+                identity = replace(
+                    identity,
+                    species=replace(identity.species, phase=State.of(phase)),
+                )
+                if not any(
+                    notice.kind is NoticeKind.PHASE_INFERRED
+                    for notice in observation_notices
+                ):
+                    observation_notices.append(phase_notice)
+
+        experiment = self.result.experiments.get(observation.experiment_id)
+        if (
+            isinstance(identity, Identity)
+            and identity.species is not None
+            and identity.species.phase.is_unknown
+        ):
+            work_id = (
+                experiment.work_id
+                if experiment is not None and experiment.work_id
+                else observation.experiment_id.split("::", 1)[0]
+            )
+            self.result.add_queue(
+                work_id,
+                observation.locator,
+                ["phase"],
+                identity.species.phase.reason or "unknown phase",
+                source=source_key,
+                observation_id=observation.observation_id,
+            )
+        if (
+            experiment is not None
+            and not any(
+                notice.kind
+                in {NoticeKind.METHOD_UNSTATED, NoticeKind.METHOD_INFERRED}
+                for notice in observation_notices
+            )
+        ):
+            quantity = (
+                identity.quantity.value
+                if isinstance(identity, Identity) and identity.quantity.is_value
+                else None
+            )
+            _method, method_notice = self._resolve_method_for_observation(
+                observation_id=observation.observation_id,
+                experiment_id=observation.experiment_id,
+                method=experiment.method,
+                method_raw_candidates=(),
+                method_evidence_candidates=(),
+                evidence_candidates=(),
+                quantity=quantity if isinstance(quantity, Quantity) else None,
+            )
+            if method_notice is not None:
+                observation_notices.append(method_notice)
+            experiment = self.result.experiments.get(observation.experiment_id)
+        if identity is not observation.identity or tuple(observation_notices) != observation.notices:
+            observation = replace(
+                observation,
+                identity=identity,
+                notices=tuple(observation_notices),
+            )
         basis_state = (
             identity.valence_basis
             if isinstance(identity, Identity)
@@ -25907,10 +26746,13 @@ class Migrator:
                 self._amorphous_printed_sample_experiments.add(
                     experiment.experiment_id
                 )
-            self.result.experiments[experiment.experiment_id] = experiment
-            if experiment.experiment_id not in self.result.experiments_by_work[work.work_id]:
-                self.result.experiments_by_work[work.work_id].append(
-                    experiment.experiment_id
+            self._publish_experiment(experiment)
+            if (
+                method_raw is not None
+                and not (isinstance(method_raw, str) and not method_raw.strip())
+            ):
+                self._declared_experiment_methods[experiment.experiment_id] = (
+                    experiment.method
                 )
             experiment_refs[str(local_id)] = experiment.experiment_id
             experiment_refs[experiment.experiment_id] = experiment.experiment_id
@@ -26024,6 +26866,8 @@ class Migrator:
         self,
         experiment_id: str,
         printed: Located[Mapping[str, Any]],
+        *,
+        declared_experiment_id: str | None,
     ) -> bool:
         """True when ``printed`` restates the registry-declared sample map.
 
@@ -26034,9 +26878,15 @@ class Migrator:
         100 wt% non-oxide). A row printing a different map still attaches.
         """
 
-        if experiment_id not in self._registry_printed_composition_experiments:
+        registry_owner_id = (
+            declared_experiment_id
+            if declared_experiment_id
+            in self._registry_printed_composition_experiments
+            else experiment_id
+        )
+        if registry_owner_id not in self._registry_printed_composition_experiments:
             return False
-        experiment = self.result.experiments.get(experiment_id)
+        experiment = self.result.experiments.get(registry_owner_id)
         declared = None if experiment is None else experiment.sample.printed_composition
         if declared is None or not declared.state.is_value:
             return False
@@ -26888,6 +27738,14 @@ class Migrator:
                 token = janaf_extract_phase(source_id, unmapped_phase)
                 if token is not None:
                     phase, unmapped_phase = State.of(token), None
+        phase_was_unmapped = unmapped_phase is not None
+        phase_needs_resolution = _phase_needs_default(phase)
+        phase_original_reason = (
+            phase.reason
+            if phase.is_unknown
+            else "source explicitly leaves phase unspecified"
+        )
+        phase_resolution_evidence: str | None = None
         condensed_form = obs.get("condensed_form")
         if (
             source_id == "kems-ms2000-044"
@@ -26906,6 +27764,9 @@ class Migrator:
             # liquid melts. The K2O token also labels Plante partial-pressure
             # reservoirs, so keep this identity reading scoped to MS2000.
             phase, unmapped_phase = State.of(Phase.L), None
+            phase_resolution_evidence = (
+                "condensed_form.state=liquid_melt and basis=explicit_author"
+            )
         if q_token in {Quantity.P_PARTIAL, Quantity.P_SAT}:
             source_standard_state = obs.get("standard_state") or values.get(
                 "standard_state"
@@ -26977,30 +27838,90 @@ class Migrator:
                 assert phase_role_token is not None
                 phase = State.of(_PHASE_ROLE_THERMO_PHASE[phase_role_token])
                 unmapped_phase = None
+                phase_resolution_evidence = (
+                    f"printed phase role {phase_role_token.value!r} identifies "
+                    f"{phase.value.value!r}"
+                )
+        phase_flag_notice: Notice | None = None
+        if phase_needs_resolution:
+            transition_fields = (
+                "melting_temperature_K",
+                "melting_point_K",
+                "T_m_K",
+                "T_fus_K",
+                "liquidus_K",
+                "transition_temperature_K",
+                "transition_T_K",
+            )
+            phase_temperature_payload = {**obs, **values}
+            for field_name in transition_fields:
+                phase_temperature_payload.pop(field_name, None)
+            row_temperature = select_declared_source(
+                AXIS_TEMPERATURE_K, None, phase_temperature_payload
+            )
+            transition_temperatures = {
+                value
+                for row in (obs, values)
+                if isinstance(row, Mapping)
+                for field_name in transition_fields
+                if (value := _as_dec_or_none(row.get(field_name))) is not None
+                and value > 0
+            }
+            transition_temperature_K = (
+                next(iter(transition_temperatures))
+                if len(transition_temperatures) == 1
+                else None
+            )
+            liquidus_temperatures = {
+                value
+                for row in (obs, values)
+                if isinstance(row, Mapping)
+                if (value := _as_dec_or_none(row.get("liquidus_K"))) is not None
+                and value > 0
+            }
+            liquidus_temperature_K = (
+                next(iter(liquidus_temperatures))
+                if len(liquidus_temperatures) == 1
+                else None
+            )
+            phase_inference = _phase_inference_from_evidence(
+                q_token,
+                phase_raw,
+                phase_raw,
+                obs.get("note"),
+                values.get("note"),
+                values.get("phase_assignment_note"),
+                obs.get("standard_state_as_printed"),
+                values.get("standard_state_as_printed"),
+                temperature_K=(
+                    row_temperature.amount if row_temperature.available else None
+                ),
+                transition_temperature_K=transition_temperature_K,
+                liquidus_temperature_K=liquidus_temperature_K,
+            )
+            if phase_inference is None and phase_resolution_evidence is not None:
+                phase_inference = (
+                    phase.value if phase.is_value else Phase.UNSPECIFIED,
+                    phase_resolution_evidence,
+                )
+            if phase_inference is None and phase_provenance and phase.is_value:
+                phase_inference = (phase.value, phase_provenance)
+            quantity_for_notice = q_token if isinstance(q_token, Quantity) else None
+            inferred_phase, phase_flag_notice = _phase_policy_resolution(
+                phase_inference,
+                quantity=quantity_for_notice,
+                origin=obs_id,
+                original_reason=phase_original_reason or "source does not state phase",
+            )
+            phase = State.of(inferred_phase)
         if (
             (phase_raw is None or phase_raw == "")
             and measured_tabulated_gas_formula is None
             and phase_role_token is None
         ):
             measured.missing_phases += 1
-            self.result.add_queue(
-                work.work_id,
-                locator,
-                ["phase"],
-                transition_reason or "missing phase",
-                source=source_key,
-                observation_id=obs_id,
-            )
-        elif unmapped_phase:
+        elif phase_was_unmapped:
             measured.system_like_phases += 1
-            self.result.add_queue(
-                work.work_id,
-                locator,
-                ["phase"],
-                f"phase string {unmapped_phase!r} is not in the closed automatic map",
-                source=source_key,
-                observation_id=obs_id,
-            )
         raw_quantity = values.get("quantity") if isinstance(values, Mapping) else None
         exact_alias_gas_formula = (
             _extract_formula_token(values.get("gas_species"))
@@ -27595,6 +28516,7 @@ class Migrator:
 
         ident_kwargs: dict[str, Any] = {}
         q_token = quantity.value if quantity.is_value else None
+        mass_loss_fraction_from_weights: Decimal | None = None
         if q_token is Quantity.VALENCE_RATIO:
             raw_valence_quantity = values.get("quantity")
             try:
@@ -27642,6 +28564,31 @@ class Migrator:
             except (KeyError, TypeError, ValueError) as exc:
                 ident_kwargs["reaction"] = State.unknown(
                     f"source structured reaction is invalid: {exc}"
+                )
+        if (
+            q_token is Quantity.MASS_LOSS_FRACTION
+            and source_id == "mendybaev-2013-fun-cai-evaporation"
+        ):
+            source_derivation_payload = obs.get("derivation", values.get("derivation"))
+            mass_loss_fraction_from_weights = _mass_loss_fraction_from_printed_weights(
+                values,
+                source_derivation_payload,
+                source_locator=obs.get("locator") or locator,
+            )
+            for field_name in _MASS_LOSS_YIELD_FIELDS:
+                values.pop(field_name, None)
+            if mass_loss_fraction_from_weights is None:
+                self.result.add_queue(
+                    work.work_id,
+                    locator,
+                    ["values.initial_weight_g", "values.final_weight_g"],
+                    "Mendybaev mass_loss_fraction requires both located Table 1 gram weights; any stored scalar was ignored",
+                    source=source_key,
+                    observation_id=obs_id,
+                )
+            else:
+                values["mass_loss_fraction"] = format(
+                    mass_loss_fraction_from_weights, "f"
                 )
         value, exploded, value_sel = empty_value_from_payload(
             values, obs_type, obs.get("units"), quantity=quantity
@@ -28053,22 +29000,159 @@ class Migrator:
         experiment_id = declared_experiment_id or self._experiment_id(
             work.work_id, locator, source_id, distinguisher=distinguisher
         )
+        experiment_before_method_resolution = self.result.experiments.get(
+            experiment_id
+        )
         rail_raw = obs.get("rail") or values.get("rail")
         if rail_raw:
             canonicalize_rail(str(rail_raw))
-        method = map_method(obs.get("regime"))
-        if "regime" not in obs:
-            method = map_method(values.get("method"))
-        if method.is_unknown:
-            self.result.add_queue(
+        derivation_method_candidates = tuple(
+            derivation.get("method")
+            for derivation in (obs.get("derivation"), values.get("derivation"))
+            if isinstance(derivation, Mapping)
+        )
+        standard_state_raw = obs.get("standard_state")
+        if not isinstance(standard_state_raw, Mapping):
+            standard_state_raw = values.get("standard_state")
+        standard_state_state = (
+            standard_state_raw.get("state")
+            if isinstance(standard_state_raw, Mapping)
+            else None
+        )
+        standard_state_value = (
+            standard_state_state.get("value")
+            if isinstance(standard_state_state, Mapping)
+            and standard_state_state.get("tag") == "value"
+            else None
+        )
+        iron_saturation_composition = (
+            standard_state_value.get("iron_saturation_composition")
+            if isinstance(standard_state_value, Mapping)
+            else None
+        )
+        standard_state_method = (
+            iron_saturation_composition.get("method")
+            if isinstance(iron_saturation_composition, Mapping)
+            else None
+        )
+        method_raw_candidates = (
+            obs.get("regime"),
+            obs.get("method"),
+            obs.get("measured_by_as_printed"),
+            obs.get("method_text"),
+            obs.get("analytical_method"),
+            obs.get("method_detail_as_printed"),
+            values.get("method"),
+            values.get("measured_by_as_printed"),
+            values.get("method_text"),
+            values.get("analytical_method"),
+            values.get("method_detail_as_printed"),
+        )
+        printed_method_candidates = (
+            obs.get("method_as_printed"),
+            values.get("method_as_printed"),
+        )
+        method_evidence_candidates = (
+            *derivation_method_candidates,
+            standard_state_method,
+        )
+        method = State.unknown("source does not state method")
+        quantity_for_notice = q_token if isinstance(q_token, Quantity) else None
+        method, method_notice = self._resolve_method_for_observation(
+            observation_id=obs_id,
+            experiment_id=experiment_id,
+            method=method,
+            method_raw_candidates=method_raw_candidates,
+            printed_method_candidates=printed_method_candidates,
+            method_evidence_candidates=method_evidence_candidates,
+            evidence_candidates=(
+                obs.get("method_as_printed"),
+                values.get("method_as_printed"),
+                values.get("method_text"),
+                values.get("table_type"),
+                obs.get("note"),
+                values.get("note"),
+            ),
+            quantity=quantity_for_notice,
+        )
+        declared_experiment_method = self._declared_experiment_methods.get(
+            declared_experiment_id
+        )
+        experiment_method_is_unstated = (
+            declared_experiment_id is not None
+            and (
+                declared_experiment_method is None
+                or not declared_experiment_method.is_value
+            )
+        )
+        experiment_method_conflicts = (
+            experiment_before_method_resolution is not None
+            and experiment_before_method_resolution.method.is_value
+            and method.is_value
+            and experiment_before_method_resolution.method.value is not method.value
+        )
+        former_experiment_id = experiment_id
+        if method.is_value and (
+            experiment_method_is_unstated or experiment_method_conflicts
+        ):
+            # A shared experiment can group rows only while their typed method
+            # decisions agree. An unstated registry method cannot take the
+            # first row's method as its experiment-wide value.
+            self._inferred_method_evidence_by_experiment.pop(experiment_id, None)
+            if experiment_before_method_resolution is not None:
+                self.result.experiments[experiment_id] = (
+                    experiment_before_method_resolution
+                )
+            method_distinguisher = (
+                f"declared:{declared_experiment_id}::method:{method.value.value}"
+                if declared_experiment_id is not None
+                else f"method:{method.value.value}"
+            )
+            distinguisher = (
+                f"{distinguisher}::{method_distinguisher}"
+                if distinguisher
+                else method_distinguisher
+            )
+            experiment_id = self._experiment_id(
                 work.work_id,
                 locator,
-                ["method"],
-                method.reason or "unknown method",
-                source=source_key,
-                observation_id=obs_id,
+                source_id,
+                distinguisher=distinguisher,
             )
+            # Keep the declared run context on the method-specific experiment.
+            # Sibling rows share this id, so seed it once and preserve evidence
+            # (such as a printed oxygen pressure) already merged from earlier
+            # rows instead of resetting it from the registry on every row.
+            existing_method_experiment = self.result.experiments.get(experiment_id)
+            if existing_method_experiment is not None:
+                self.result.experiments[experiment_id] = replace(
+                    existing_method_experiment,
+                    method=method,
+                )
+            elif experiment_before_method_resolution is not None:
+                self.result.experiments[experiment_id] = replace(
+                    experiment_before_method_resolution,
+                    experiment_id=experiment_id,
+                    method=method,
+                )
+        (
+            derived_from,
+            source_derivation,
+            value_derivation,
+        ) = self._rekey_row_references(
+            former_id=former_experiment_id,
+            experiment_id=experiment_id,
+            observation_id=obs_id,
+            derived_from=derived_from,
+            source_derivation=source_derivation,
+            value_derivation=value_derivation,
+        )
         experiment = self.result.experiments.get(experiment_id)
+        migration_axis_notices = tuple(
+            notice
+            for notice in (phase_flag_notice, method_notice)
+            if notice is not None
+        )
         effective_method = (
             method
             if method.is_value
@@ -28353,7 +29437,9 @@ class Migrator:
                 locator=locator,
             )
             and not self._repeats_declared_sample_map(
-                experiment_id, row_sample.printed_composition
+                experiment_id,
+                row_sample.printed_composition,
+                declared_experiment_id=declared_experiment_id,
             )
         ):
             # An observation-level printed wt% map is the datum's composition.
@@ -28477,11 +29563,15 @@ class Migrator:
                     "composition": derived,
                     **point_conditions,
                 }
-        if declared_experiment_id is None or (
-            declared_experiment_id in self.result.experiments
-            and (
-                bool(obs.get("equipment"))
-                or row_sample.initial_composition is not None
+        if (
+            declared_experiment_id is None
+            or experiment_id != declared_experiment_id
+            or (
+                declared_experiment_id in self.result.experiments
+                and (
+                    bool(obs.get("equipment"))
+                    or row_sample.initial_composition is not None
+                )
             )
         ):
             self._ensure_experiment(
@@ -28843,6 +29933,22 @@ class Migrator:
                     quantity=q_token,
                 )
             )
+        if (
+            q_token is Quantity.MASS_LOSS_FRACTION
+            and source_id == "mendybaev-2013-fun-cai-evaporation"
+            and mass_loss_fraction_from_weights is not None
+        ):
+            # A gravimetric fraction declared from initial and final weights
+            # is normalized to the run's starting charge. Its identity is the
+            # experiment's located initial composition.
+            experiment = self.result.experiments.get(experiment_id)
+            initial = (
+                experiment.sample.initial_composition
+                if experiment is not None
+                else None
+            )
+            if initial is not None and initial.state.is_value:
+                ident_kwargs["composition"] = initial.state
         experiment_identity, experiment_provenance = self._experiment_identity_fields(
             experiment_id,
             ident_kwargs,
@@ -29319,7 +30425,11 @@ class Migrator:
                     source_derivation=source_derivation,
                     phase_provenance=phase_provenance,
                     identity_provenance=identity_provenance,
-                    notices=(*point_notices, *ambient_pressure_notices),
+                    notices=(
+                        *migration_axis_notices,
+                        *point_notices,
+                        *ambient_pressure_notices,
+                    ),
                     equipment=obs.get("equipment"),
                     parent_reason=hold_reason,
                     parent_values=values,
@@ -29447,6 +30557,7 @@ class Migrator:
                         phase_provenance=phase_provenance,
                         identity_provenance=identity_provenance,
                         notices=(
+                            *migration_axis_notices,
                             *(
                                 ()
                                 if total_iron_notice is None
@@ -29585,6 +30696,7 @@ class Migrator:
                     phase_provenance=phase_provenance,
                     identity_provenance=identity_provenance,
                     notices=(
+                        *migration_axis_notices,
                         *(
                             ()
                             if total_iron_notice is None
@@ -29784,6 +30896,7 @@ class Migrator:
                         source_derivation=source_derivation,
                         phase_provenance=sample_source_provenance,
                         notices=(
+                            *migration_axis_notices,
                             *(
                                 ()
                                 if total_iron_notice is None
@@ -29918,6 +31031,7 @@ class Migrator:
         if projection_notice is not None:
             observation_notices.append(projection_notice)
         observation_notices.extend(starting_bulk_notices)
+        observation_notices.extend(migration_axis_notices)
         observation_notices.extend(validity_notices)
         from simulator.battery.validity import comparison_method_cell_constant_cancels
 
@@ -30818,6 +31932,48 @@ class Migrator:
                 extra_unc = raw_item.get(_WIMPENNY_DELTA_2SIGMA_FIELD)
                 if extra_unc not in (None, ""):
                     extra_unc_k = 2
+            if q_token is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+                parent_uncertainty = uncertainty.verbatim
+                try:
+                    uncertainty_declares_convention = (
+                        printed_uncertainty_convention(parent_uncertainty) is not None
+                    )
+                except UncertaintyConventionConflict:
+                    uncertainty_declares_convention = False
+                    extra_unc = None
+                    extra_unc_k = None
+                    self.result.add_queue(
+                        work.work_id,
+                        point_locator,
+                        ["uncertainty"],
+                        "uncertainty_convention_conflict",
+                        source=source_key,
+                        observation_id=point_id,
+                    )
+                if extra_unc is None and uncertainty_declares_convention:
+                    standard_errors = raw_item.get("standard_errors")
+                    field_name = value_sel.field_name if value_sel is not None else None
+                    component = (
+                        _mass_percent_component_key(field_name)[0]
+                        if isinstance(field_name, str)
+                        else None
+                    )
+                    if isinstance(standard_errors, Mapping) and component is not None:
+                        extra_unc = standard_errors.get(component)
+                    if extra_unc is None and isinstance(uncertainty.verbatim, Mapping):
+                        zero_width_cells = uncertainty.verbatim.get("zero_width_cells")
+                        sample = raw_item.get("sample")
+                        if isinstance(zero_width_cells, list):
+                            extra_unc = next(
+                                (
+                                    cell.get("sigma")
+                                    for cell in zero_width_cells
+                                    if isinstance(cell, Mapping)
+                                    and cell.get("sample") == sample
+                                    and cell.get("formula") == component
+                                ),
+                                None,
+                            )
         else:
             if content_stable_id:
                 point_id = _exploded_point_id(parent_id, item, coord, raw_item, None)
@@ -31242,9 +32398,10 @@ class Migrator:
         if extra_unc is not None:
             verbatim = {"sigma": extra_unc, "parent": parent_id}
             if isinstance(uncertainty.verbatim, Mapping):
-                confidence_level = uncertainty.verbatim.get("confidence_level")
-                if confidence_level is not None:
-                    verbatim["confidence_level"] = confidence_level
+                for convention_key in ("confidence_level", "k", "kind"):
+                    convention_value = uncertainty.verbatim.get(convention_key)
+                    if convention_value is not None:
+                        verbatim[convention_key] = convention_value
             if extra_unc_k is not None:
                 verbatim["k"] = extra_unc_k
                 numeric_extra_unc = _as_dec_or_none(extra_unc)
@@ -31269,7 +32426,9 @@ class Migrator:
                 numeric_extra_unc = _as_dec_or_none(extra_unc)
                 if numeric_extra_unc is not None:
                     if extra_unc_k is not None:
-                        numeric_extra_unc /= Decimal(extra_unc_k)
+                        numeric_extra_unc = standard_uncertainty_width(
+                            numeric_extra_unc, Decimal(extra_unc_k)
+                        )
                     unc = replace(
                         unc,
                         value=_log_width_in_dex(
@@ -32154,6 +33313,15 @@ class Migrator:
             if oxygen_applied and refreshed_oxygen.state.is_value:
                 identity = replace(identity, fO2_Pa=refreshed_oxygen.state)
         child_notices = list(notices)
+        if printed_phase_kind in {"liquid", "two_phase"}:
+            # A printed point phase replaces the parent phase inference. Do
+            # not carry a parent policy notice onto a child whose phase is
+            # now source-labeled (or explicitly two-phase).
+            child_notices = [
+                notice
+                for notice in child_notices
+                if notice.kind is not NoticeKind.PHASE_INFERRED
+            ]
         if gas_volume_bases and isinstance(q_token_point, Quantity):
             child_notices.append(
                 Notice(
@@ -32522,15 +33690,6 @@ class Migrator:
         ):
             ident_kwargs["composition"] = State.unknown(composition_unknown_reason())
         identity = fill_identity(quantity, species, **ident_kwargs)
-        if species.phase.is_unknown:
-            self.result.add_queue(
-                work.work_id,
-                locator,
-                ["phase"],
-                species.phase.reason or "missing phase",
-                source=source_key,
-                observation_id=observation_id,
-            )
         if value.kind is ValueKind.UNAVAILABLE:
             q_label = (
                 quantity.value
@@ -33845,15 +35004,6 @@ class Migrator:
                 observation_id=observation.observation_id,
                 source=rel,
             )
-            if observation.identity.species.phase.is_unknown:
-                self.result.add_queue(
-                    work.work_id,
-                    observation.locator,
-                    ["phase"],
-                    observation.identity.species.phase.reason or "missing phase",
-                    source=rel,
-                    observation_id=observation.observation_id,
-                )
             if observation.value.kind is ValueKind.UNAVAILABLE:
                 q_label = (
                     observation.identity.quantity.value
@@ -33929,15 +35079,6 @@ class Migrator:
                 observation_id=observation.observation_id,
                 source=rel,
             )
-            if observation.identity.species.phase.is_unknown:
-                self.result.add_queue(
-                    work.work_id,
-                    observation.locator,
-                    ["phase"],
-                    observation.identity.species.phase.reason or "missing phase",
-                    source=rel,
-                    observation_id=observation.observation_id,
-                )
             if observation.value.kind is ValueKind.UNAVAILABLE:
                 q_label = (
                     observation.identity.quantity.value
@@ -34013,15 +35154,6 @@ class Migrator:
                 observation_id=observation.observation_id,
                 source=rel,
             )
-            if observation.identity.species.phase.is_unknown:
-                self.result.add_queue(
-                    work.work_id,
-                    observation.locator,
-                    ["phase"],
-                    observation.identity.species.phase.reason or "missing phase",
-                    source=rel,
-                    observation_id=observation.observation_id,
-                )
             if observation.value.kind is ValueKind.UNAVAILABLE:
                 q_label = (
                     observation.identity.quantity.value
@@ -34097,15 +35229,6 @@ class Migrator:
                 observation_id=observation.observation_id,
                 source=rel,
             )
-            if observation.identity.species.phase.is_unknown:
-                self.result.add_queue(
-                    work.work_id,
-                    observation.locator,
-                    ["phase"],
-                    observation.identity.species.phase.reason or "missing phase",
-                    source=rel,
-                    observation_id=observation.observation_id,
-                )
             if observation.value.kind is ValueKind.UNAVAILABLE:
                 q_label = (
                     observation.identity.quantity.value
@@ -34181,15 +35304,6 @@ class Migrator:
                 observation_id=observation.observation_id,
                 source=rel,
             )
-            if observation.identity.species.phase.is_unknown:
-                self.result.add_queue(
-                    work.work_id,
-                    observation.locator,
-                    ["phase"],
-                    observation.identity.species.phase.reason or "missing phase",
-                    source=rel,
-                    observation_id=observation.observation_id,
-                )
             if observation.value.kind is ValueKind.UNAVAILABLE:
                 q_label = (
                     observation.identity.quantity.value

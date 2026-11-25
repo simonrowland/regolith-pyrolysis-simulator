@@ -2171,7 +2171,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_10_xcro_over_xcro15_eq7
-  experiment_id: 10.1007/s11663-010-9383-3::wang-seetharaman-2010-cr-oxidation-original
+  experiment_id: 10.1007/s11663-010-9383-3::wang-seetharaman-2010-cr-oxidation-original::method:knudsen_effusion
   identity:
     quantity:
       tag: value
@@ -2280,6 +2280,18 @@ observations:
     reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
       composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_10_xcro_over_xcro15_eq7
+  - kind: method_inferred
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen-cell''; original_reason=source
+      method text: Knudsen-cell mass spectrometry; Cr(II)/Cr(III) ratio from Eq. (7)'
+    origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_10_xcro_over_xcro15_eq7
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -2727,7 +2739,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_1_xcro_over_xcro15_eq7
-  experiment_id: 10.1007/s11663-010-9383-3::wang-seetharaman-2010-cr-oxidation-original
+  experiment_id: 10.1007/s11663-010-9383-3::wang-seetharaman-2010-cr-oxidation-original::method:knudsen_effusion
   identity:
     quantity:
       tag: value
@@ -2836,6 +2848,18 @@ observations:
     reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
       composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_1_xcro_over_xcro15_eq7
+  - kind: method_inferred
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen-cell''; original_reason=source
+      method text: Knudsen-cell mass spectrometry; Cr(II)/Cr(III) ratio from Eq. (7)'
+    origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_1_xcro_over_xcro15_eq7
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -3283,7 +3307,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_2_xcro_over_xcro15_eq7
-  experiment_id: 10.1007/s11663-010-9383-3::wang-seetharaman-2010-cr-oxidation-original
+  experiment_id: 10.1007/s11663-010-9383-3::wang-seetharaman-2010-cr-oxidation-original::method:knudsen_effusion
   identity:
     quantity:
       tag: value
@@ -3392,6 +3416,18 @@ observations:
     reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
       composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_2_xcro_over_xcro15_eq7
+  - kind: method_inferred
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen-cell''; original_reason=source
+      method text: Knudsen-cell mass spectrometry; Cr(II)/Cr(III) ratio from Eq. (7)'
+    origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_2_xcro_over_xcro15_eq7
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -3839,7 +3875,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_3_xcro_over_xcro15_eq7
-  experiment_id: 10.1007/s11663-010-9383-3::wang-seetharaman-2010-cr-oxidation-original
+  experiment_id: 10.1007/s11663-010-9383-3::wang-seetharaman-2010-cr-oxidation-original::method:knudsen_effusion
   identity:
     quantity:
       tag: value
@@ -3948,6 +3984,18 @@ observations:
     reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
       composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_3_xcro_over_xcro15_eq7
+  - kind: method_inferred
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen-cell''; original_reason=source
+      method text: Knudsen-cell mass spectrometry; Cr(II)/Cr(III) ratio from Eq. (7)'
+    origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_3_xcro_over_xcro15_eq7
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -4395,7 +4443,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_4_xcro_over_xcro15_eq7
-  experiment_id: 10.1007/s11663-010-9383-3::wang-seetharaman-2010-cr-oxidation-original
+  experiment_id: 10.1007/s11663-010-9383-3::wang-seetharaman-2010-cr-oxidation-original::method:knudsen_effusion
   identity:
     quantity:
       tag: value
@@ -4504,6 +4552,18 @@ observations:
     reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
       composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_4_xcro_over_xcro15_eq7
+  - kind: method_inferred
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen-cell''; original_reason=source
+      method text: Knudsen-cell mass spectrometry; Cr(II)/Cr(III) ratio from Eq. (7)'
+    origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_4_xcro_over_xcro15_eq7
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -4951,7 +5011,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_5_xcro_over_xcro15_eq7
-  experiment_id: 10.1007/s11663-010-9383-3::wang-seetharaman-2010-cr-oxidation-original
+  experiment_id: 10.1007/s11663-010-9383-3::wang-seetharaman-2010-cr-oxidation-original::method:knudsen_effusion
   identity:
     quantity:
       tag: value
@@ -5060,6 +5120,18 @@ observations:
     reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
       composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_5_xcro_over_xcro15_eq7
+  - kind: method_inferred
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen-cell''; original_reason=source
+      method text: Knudsen-cell mass spectrometry; Cr(II)/Cr(III) ratio from Eq. (7)'
+    origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_5_xcro_over_xcro15_eq7
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -5507,7 +5579,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_6_xcro_over_xcro15_eq7
-  experiment_id: 10.1007/s11663-010-9383-3::wang-seetharaman-2010-cr-oxidation-original
+  experiment_id: 10.1007/s11663-010-9383-3::wang-seetharaman-2010-cr-oxidation-original::method:knudsen_effusion
   identity:
     quantity:
       tag: value
@@ -5616,6 +5688,18 @@ observations:
     reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
       composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_6_xcro_over_xcro15_eq7
+  - kind: method_inferred
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen-cell''; original_reason=source
+      method text: Knudsen-cell mass spectrometry; Cr(II)/Cr(III) ratio from Eq. (7)'
+    origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_6_xcro_over_xcro15_eq7
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -6063,7 +6147,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_7_xcro_over_xcro15_eq7
-  experiment_id: 10.1007/s11663-010-9383-3::wang-seetharaman-2010-cr-oxidation-original
+  experiment_id: 10.1007/s11663-010-9383-3::wang-seetharaman-2010-cr-oxidation-original::method:knudsen_effusion
   identity:
     quantity:
       tag: value
@@ -6172,6 +6256,18 @@ observations:
     reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
       composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_7_xcro_over_xcro15_eq7
+  - kind: method_inferred
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen-cell''; original_reason=source
+      method text: Knudsen-cell mass spectrometry; Cr(II)/Cr(III) ratio from Eq. (7)'
+    origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_7_xcro_over_xcro15_eq7
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -6619,7 +6715,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_8_xcro_over_xcro15_eq7
-  experiment_id: 10.1007/s11663-010-9383-3::wang-seetharaman-2010-cr-oxidation-original
+  experiment_id: 10.1007/s11663-010-9383-3::wang-seetharaman-2010-cr-oxidation-original::method:knudsen_effusion
   identity:
     quantity:
       tag: value
@@ -6728,6 +6824,18 @@ observations:
     reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
       composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_8_xcro_over_xcro15_eq7
+  - kind: method_inferred
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen-cell''; original_reason=source
+      method text: Knudsen-cell mass spectrometry; Cr(II)/Cr(III) ratio from Eq. (7)'
+    origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_8_xcro_over_xcro15_eq7
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -7175,7 +7283,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_9_xcro_over_xcro15_eq7
-  experiment_id: 10.1007/s11663-010-9383-3::wang-seetharaman-2010-cr-oxidation-original
+  experiment_id: 10.1007/s11663-010-9383-3::wang-seetharaman-2010-cr-oxidation-original::method:knudsen_effusion
   identity:
     quantity:
       tag: value
@@ -7284,6 +7392,18 @@ observations:
     reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
       composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_9_xcro_over_xcro15_eq7
+  - kind: method_inferred
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen-cell''; original_reason=source
+      method text: Knudsen-cell mass spectrometry; Cr(II)/Cr(III) ratio from Eq. (7)'
+    origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_9_xcro_over_xcro15_eq7
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio

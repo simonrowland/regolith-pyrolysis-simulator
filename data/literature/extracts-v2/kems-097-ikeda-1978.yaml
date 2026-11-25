@@ -11,12 +11,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'recrystallized_Al2O3_in_tungsten_Knudsen_cell' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -41,7 +40,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''recrystallized_Al2O3_in_tungsten_Knudsen_cell'' is not in the closed automatic map'
+    origin: kems-097-ikeda-1978::ikeda_1978_al2o3_third_law_table1_rxn1
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_third_law_thermochemistry'
+    origin: kems-097-ikeda-1978::ikeda_1978_al2o3_third_law_table1_rxn1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-097-ikeda-1978
   locator:
     published_page: 167
@@ -70,12 +90,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'recrystallized_Al2O3_in_tungsten_Knudsen_cell' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -100,7 +119,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''recrystallized_Al2O3_in_tungsten_Knudsen_cell'' is not in the closed automatic map'
+    origin: kems-097-ikeda-1978::ikeda_1978_al2o3_third_law_table1_rxn1
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_third_law_thermochemistry'
+    origin: kems-097-ikeda-1978::ikeda_1978_al2o3_third_law_table1_rxn1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-097-ikeda-1978
   locator:
     published_page: 167
@@ -129,12 +169,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'recrystallized_Al2O3_in_tungsten_Knudsen_cell' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -159,7 +198,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''recrystallized_Al2O3_in_tungsten_Knudsen_cell'' is not in the closed automatic map'
+    origin: kems-097-ikeda-1978::ikeda_1978_al2o3_third_law_table1_rxn1
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_third_law_thermochemistry'
+    origin: kems-097-ikeda-1978::ikeda_1978_al2o3_third_law_table1_rxn1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-097-ikeda-1978
   locator:
     published_page: 167
@@ -188,12 +248,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'recrystallized_Al2O3_in_tungsten_Knudsen_cell' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -218,7 +277,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''recrystallized_Al2O3_in_tungsten_Knudsen_cell'' is not in the closed automatic map'
+    origin: kems-097-ikeda-1978::ikeda_1978_al2o3_third_law_table1_rxn1
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_third_law_thermochemistry'
+    origin: kems-097-ikeda-1978::ikeda_1978_al2o3_third_law_table1_rxn1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-097-ikeda-1978
   locator:
     published_page: 167
@@ -247,12 +327,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'recrystallized_Al2O3_in_tungsten_Knudsen_cell' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -277,7 +356,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''recrystallized_Al2O3_in_tungsten_Knudsen_cell'' is not in the closed automatic map'
+    origin: kems-097-ikeda-1978::ikeda_1978_al2o3_third_law_table1_rxn1
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_third_law_thermochemistry'
+    origin: kems-097-ikeda-1978::ikeda_1978_al2o3_third_law_table1_rxn1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-097-ikeda-1978
   locator:
     published_page: 167
@@ -306,12 +406,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'recrystallized_Al2O3_in_tungsten_Knudsen_cell' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -336,7 +435,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''recrystallized_Al2O3_in_tungsten_Knudsen_cell'' is not in the closed automatic map'
+    origin: kems-097-ikeda-1978::ikeda_1978_al2o3_third_law_table1_rxn1
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_third_law_thermochemistry'
+    origin: kems-097-ikeda-1978::ikeda_1978_al2o3_third_law_table1_rxn1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-097-ikeda-1978
   locator:
     published_page: 167
@@ -365,12 +485,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'recrystallized_Al2O3_in_tungsten_Knudsen_cell' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -395,7 +514,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''recrystallized_Al2O3_in_tungsten_Knudsen_cell'' is not in the closed automatic map'
+    origin: kems-097-ikeda-1978::ikeda_1978_al2o3_third_law_table1_rxn1
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_third_law_thermochemistry'
+    origin: kems-097-ikeda-1978::ikeda_1978_al2o3_third_law_table1_rxn1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-097-ikeda-1978
   locator:
     published_page: 167
@@ -424,12 +564,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'recrystallized_Al2O3_in_tungsten_Knudsen_cell' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -454,7 +593,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''recrystallized_Al2O3_in_tungsten_Knudsen_cell'' is not in the closed automatic map'
+    origin: kems-097-ikeda-1978::ikeda_1978_al2o3_third_law_table1_rxn1
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_third_law_thermochemistry'
+    origin: kems-097-ikeda-1978::ikeda_1978_al2o3_third_law_table1_rxn1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-097-ikeda-1978
   locator:
     published_page: 167
@@ -483,12 +643,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'recrystallized_Al2O3_in_tungsten_Knudsen_cell' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -513,7 +672,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''recrystallized_Al2O3_in_tungsten_Knudsen_cell'' is not in the closed automatic map'
+    origin: kems-097-ikeda-1978::ikeda_1978_al2o3_third_law_table1_rxn1
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_third_law_thermochemistry'
+    origin: kems-097-ikeda-1978::ikeda_1978_al2o3_third_law_table1_rxn1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-097-ikeda-1978
   locator:
     published_page: 167
@@ -534,7 +714,7 @@ observations:
   provenance:
     printed_phase: recrystallized_Al2O3_in_tungsten_Knudsen_cell
 - observation_id: kems-097-ikeda-1978::ikeda_1978_al2o_psat_figs3to6_figure_only
-  experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978
+  experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978::method:knudsen_effusion
   identity:
     quantity:
       tag: unknown
@@ -592,12 +772,11 @@ observations:
     species:
       formula: Al2O
       phase:
-        tag: unknown
-        reason: phase string 'gas_phase_over_Al2O3_in_tungsten_cell' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -622,7 +801,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''gas_phase_over_Al2O3_in_tungsten_cell'' is not in the closed automatic map'
+    origin: kems-097-ikeda-1978::ikeda_1978_al2o_third_law_rxn3_average
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_third_law_thermochemistry'
+    origin: kems-097-ikeda-1978::ikeda_1978_al2o_third_law_rxn3_average
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-097-ikeda-1978
   locator:
     published_page: 167
@@ -633,7 +833,7 @@ observations:
   provenance:
     printed_phase: gas_phase_over_Al2O3_in_tungsten_cell
 - observation_id: kems-097-ikeda-1978::ikeda_1978_al_mo_al2o3_psat_fig4_figure_only
-  experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978
+  experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978::method:knudsen_effusion
   identity:
     quantity:
       tag: unknown
@@ -683,7 +883,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: kems-097-ikeda-1978::ikeda_1978_al_nb_al2o3_psat_fig6_figure_only
-  experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978
+  experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978::method:knudsen_effusion
   identity:
     quantity:
       tag: unknown
@@ -733,7 +933,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: kems-097-ikeda-1978::ikeda_1978_al_p_vs_dgf_fig7_figure_only
-  experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978
+  experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978::method:knudsen_effusion
   identity:
     quantity:
       tag: unknown
@@ -741,12 +941,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'recrystallized_Al2O3_in_W_Mo_Ta_Nb_cells' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -782,7 +981,18 @@ observations:
         pdf_page_index: 10
         figure: '7'
         note: P(Al) at 1920 K versus free energy of formation of presumed cell-metal oxides
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''recrystallized_Al2O3_in_W_Mo_Ta_Nb_cells'' is not in the closed automatic map'
+    origin: kems-097-ikeda-1978::ikeda_1978_al_p_vs_dgf_fig7_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-097-ikeda-1978
   locator:
     published_page: 168
@@ -803,7 +1013,7 @@ observations:
   provenance:
     printed_phase: recrystallized_Al2O3_in_W_Mo_Ta_Nb_cells
 - observation_id: kems-097-ikeda-1978::ikeda_1978_al_p_vs_dgf_fig7_model_quoted
-  experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978
+  experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978::method:knudsen_effusion
   identity:
     quantity:
       tag: unknown
@@ -811,12 +1021,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'recrystallized_Al2O3_in_W_Mo_Ta_Nb_cells' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -849,6 +1058,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''recrystallized_Al2O3_in_W_Mo_Ta_Nb_cells'' is not in the closed automatic map'
+    origin: kems-097-ikeda-1978::ikeda_1978_al_p_vs_dgf_fig7_model_quoted
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -873,7 +1093,7 @@ observations:
   provenance:
     printed_phase: recrystallized_Al2O3_in_W_Mo_Ta_Nb_cells
 - observation_id: kems-097-ikeda-1978::ikeda_1978_al_ta_al2o3_psat_fig5_figure_only
-  experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978
+  experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978::method:knudsen_effusion
   identity:
     quantity:
       tag: unknown
@@ -923,7 +1143,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: kems-097-ikeda-1978::ikeda_1978_al_w_al2o3_psat_fig3_figure_only
-  experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978
+  experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978::method:knudsen_effusion
   identity:
     quantity:
       tag: unknown
@@ -973,7 +1193,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: kems-097-ikeda-1978::ikeda_1978_alo_psat_figs3to6_figure_only
-  experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978
+  experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978::method:knudsen_effusion
   identity:
     quantity:
       tag: unknown
@@ -1031,12 +1251,11 @@ observations:
     species:
       formula: AlO
       phase:
-        tag: unknown
-        reason: phase string 'gas_phase_over_Al2O3_in_tungsten_cell' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1061,7 +1280,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''gas_phase_over_Al2O3_in_tungsten_cell'' is not in the closed automatic map'
+    origin: kems-097-ikeda-1978::ikeda_1978_alo_third_law_rxn2_average
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_third_law_thermochemistry'
+    origin: kems-097-ikeda-1978::ikeda_1978_alo_third_law_rxn2_average
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-097-ikeda-1978
   locator:
     published_page: 167
@@ -1072,7 +1312,7 @@ observations:
   provenance:
     printed_phase: gas_phase_over_Al2O3_in_tungsten_cell
 - observation_id: kems-097-ikeda-1978::ikeda_1978_kems_geometry_and_calibration
-  experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978
+  experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978::method:knudsen_effusion
   identity:
     quantity:
       tag: unknown
@@ -1080,12 +1320,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'recrystallized_Al2O3_in_refractory_metal_Knudsen_cell' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1110,7 +1349,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''recrystallized_Al2O3_in_refractory_metal_Knudsen_cell'' is not in the closed automatic map'
+    origin: kems-097-ikeda-1978::ikeda_1978_kems_geometry_and_calibration
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-097-ikeda-1978
   locator:
     published_page: 160
@@ -1122,7 +1372,7 @@ observations:
   provenance:
     printed_phase: recrystallized_Al2O3_in_refractory_metal_Knudsen_cell
 - observation_id: kems-097-ikeda-1978::ikeda_1978_o2_estimated_one_order_below_o
-  experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978
+  experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978::method:knudsen_effusion
   identity:
     quantity:
       tag: unknown
@@ -1175,7 +1425,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: kems-097-ikeda-1978::ikeda_1978_o2_estimated_one_order_below_o_model_quoted
-  experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978
+  experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978::method:knudsen_effusion
   identity:
     quantity:
       tag: unknown
@@ -1225,7 +1475,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: kems-097-ikeda-1978::ikeda_1978_o_ta_nb_true_absence
-  experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978
+  experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978::method:knudsen_effusion
   identity:
     quantity:
       tag: unknown
@@ -1271,7 +1521,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: kems-097-ikeda-1978::ikeda_1978_o_w_mo_psat_figs3_4_figure_only
-  experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978
+  experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978::method:knudsen_effusion
   identity:
     quantity:
       tag: unknown

@@ -79,6 +79,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=source
+      method text: Knudsen effusion mass spectrometry; Mg ion current converted to absolute partial pressure using the instrument
+      sensitivity constant.'
+    origin: gribchenkova-2017-al2o3-mgo::gribchenkova_2017_table1_MgAl2O4+Al2O3_pMg_peff
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -198,6 +211,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=source
+      method text: Knudsen effusion mass spectrometry; Mg ion current converted to absolute partial pressure using the instrument
+      sensitivity constant.'
+    origin: gribchenkova-2017-al2o3-mgo::gribchenkova_2017_table1_MgO+MgAl2O4_pMg_peff
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -317,6 +343,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=source
+      method text: Knudsen effusion mass spectrometry; Mg ion current converted to absolute partial pressure using the instrument
+      sensitivity constant.'
+    origin: gribchenkova-2017-al2o3-mgo::gribchenkova_2017_table1_MgO_pMg_peff
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial

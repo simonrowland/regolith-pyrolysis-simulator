@@ -106,7 +106,19 @@ observations:
         page: 6
         figure: '9'
         note: 24h O2 bar label
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Figure 9 prints the average
+      Cr content of the slag sample.'
+    origin: seetharaman-2013-cr-thin-film-volatilization::seetharaman2013_figure9_cr_24h_oxygen
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: seetharaman-2013-cr-thin-film-volatilization
   locator:
     page: 6
@@ -347,7 +359,19 @@ observations:
         page: 6
         figure: '9'
         note: 2h Ar bar label
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Figure 9 prints the average
+      Cr content of the slag sample.'
+    origin: seetharaman-2013-cr-thin-film-volatilization::seetharaman2013_figure9_cr_2h_argon
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: seetharaman-2013-cr-thin-film-volatilization
   locator:
     page: 6
@@ -589,6 +613,18 @@ observations:
         figure: '9'
         note: 4h Air bar label
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Figure 9 prints the average
+      Cr content of the slag sample.'
+    origin: seetharaman-2013-cr-thin-film-volatilization::seetharaman2013_figure9_cr_4h_air
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - equilibrium_phase_composition
@@ -849,7 +885,19 @@ observations:
         page: 6
         figure: '9'
         note: 6h O2 bar label
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Figure 9 prints the average
+      Cr content of the slag sample.'
+    origin: seetharaman-2013-cr-thin-film-volatilization::seetharaman2013_figure9_cr_6h_oxygen
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: seetharaman-2013-cr-thin-film-volatilization
   locator:
     page: 6
@@ -1090,7 +1138,19 @@ observations:
         page: 6
         figure: '9'
         note: 2h O2 bar label
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: The post-experiment WDS
+      result is an average for the slag film, not a phase-specific value.'
+    origin: seetharaman-2013-cr-thin-film-volatilization::seetharaman2013_prose_cr_loss_2h_oxygen
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: seetharaman-2013-cr-thin-film-volatilization
   locator:
     page: 6
@@ -1331,7 +1391,19 @@ observations:
         page: 5
         table: IV
         note: row=Matrix; column=Cr
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: The adjacent prose identifies
+      the Matrix as a glassy phase.'
+    origin: seetharaman-2013-cr-thin-film-volatilization::seetharaman2013_table4_matrix_cr
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: seetharaman-2013-cr-thin-film-volatilization
   locator:
     page: 5
@@ -1572,7 +1644,19 @@ observations:
         page: 5
         table: IV
         note: row=Spinel; column=Cr
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: The analyzed phase is
+      printed as Spinel; slag is its parent phase role.'
+    origin: seetharaman-2013-cr-thin-film-volatilization::seetharaman2013_table4_spinel_cr
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: seetharaman-2013-cr-thin-film-volatilization
   locator:
     page: 5

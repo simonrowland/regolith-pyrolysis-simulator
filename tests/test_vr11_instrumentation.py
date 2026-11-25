@@ -1348,8 +1348,10 @@ def test_evaporation_control_inputs_pack_batch_flux_key() -> None:
             "shadow_equal": True,
             "shadow_outcome": SHADOW_PROVED,
         },
+        melt_surface_area_m2=0.25,
     )
     assert controls[CONTROL_FLUX_PRESSURES_KEY] == {"Na": 5.0}
+    assert controls["melt_surface_area_m2"] == pytest.approx(0.25)
     # Reporting keeps live; the typed seam supplied the already batch-gated key.
     assert controls["vapor_pressures_Pa"] == {"Na": 5.0}
     assert controls["vapour_batch_flux_shadow_equal"] is True

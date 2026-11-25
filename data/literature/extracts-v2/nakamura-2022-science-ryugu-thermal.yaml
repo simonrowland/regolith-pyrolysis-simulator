@@ -11,12 +11,11 @@ observations:
     species:
       formula: Ryugu
       phase:
-        tag: unknown
-        reason: phase string 'Ryugu_sample_C0002' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -41,7 +40,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Ryugu_sample_C0002'' is not in the closed automatic map'
+    origin: nakamura-2022-science-ryugu-thermal::nakamura_2023_calculated_thermal_properties
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: author_calculation_from_measured_properties'
+    origin: nakamura-2022-science-ryugu-thermal::nakamura_2023_calculated_thermal_properties
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nakamura-2022-science-ryugu-thermal
   locator:
     published_page: 3
@@ -68,12 +88,11 @@ observations:
     species:
       formula: Ryugu
       phase:
-        tag: unknown
-        reason: phase string 'coarse_Ryugu_particles' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -94,7 +113,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''coarse_Ryugu_particles'' is not in the closed automatic map'
+    origin: nakamura-2022-science-ryugu-thermal::nakamura_2023_sample_provenance_and_density
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: dry_glove_box_mass_and_SR_CT_volume'
+    origin: nakamura-2022-science-ryugu-thermal::nakamura_2023_sample_provenance_and_density
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nakamura-2022-science-ryugu-thermal
   locator:
     published_page: 3
@@ -112,12 +152,11 @@ observations:
     species:
       formula: Ryugu
       phase:
-        tag: unknown
-        reason: phase string 'Ryugu_samples_A0026_and_C0002' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -137,7 +176,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Ryugu_samples_A0026_and_C0002'' is not in the closed automatic map'
+    origin: nakamura-2022-science-ryugu-thermal::nakamura_2023_table1_physical_properties
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mechanical_thermal_electrical_magnetic_measurements'
+    origin: nakamura-2022-science-ryugu-thermal::nakamura_2023_table1_physical_properties
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nakamura-2022-science-ryugu-thermal
   locator:
     published_page: 5
@@ -156,12 +216,11 @@ observations:
     species:
       formula: Ryugu
       phase:
-        tag: unknown
-        reason: phase string 'Ryugu_samples_A0026_and_C0002' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -181,7 +240,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Ryugu_samples_A0026_and_C0002'' is not in the closed automatic map'
+    origin: nakamura-2022-science-ryugu-thermal::nakamura_2023_table1_physical_properties
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mechanical_thermal_electrical_magnetic_measurements'
+    origin: nakamura-2022-science-ryugu-thermal::nakamura_2023_table1_physical_properties
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nakamura-2022-science-ryugu-thermal
   locator:
     published_page: 5
@@ -200,12 +280,11 @@ observations:
     species:
       formula: Ryugu
       phase:
-        tag: unknown
-        reason: phase string 'Ryugu_samples_A0026_and_C0002' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -225,7 +304,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Ryugu_samples_A0026_and_C0002'' is not in the closed automatic map'
+    origin: nakamura-2022-science-ryugu-thermal::nakamura_2023_table1_physical_properties
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mechanical_thermal_electrical_magnetic_measurements'
+    origin: nakamura-2022-science-ryugu-thermal::nakamura_2023_table1_physical_properties
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nakamura-2022-science-ryugu-thermal
   locator:
     published_page: 5
@@ -244,12 +344,11 @@ observations:
     species:
       formula: Ryugu
       phase:
-        tag: unknown
-        reason: phase string 'Ryugu_samples_A0026_and_C0002' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -269,7 +368,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Ryugu_samples_A0026_and_C0002'' is not in the closed automatic map'
+    origin: nakamura-2022-science-ryugu-thermal::nakamura_2023_table1_physical_properties
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mechanical_thermal_electrical_magnetic_measurements'
+    origin: nakamura-2022-science-ryugu-thermal::nakamura_2023_table1_physical_properties
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nakamura-2022-science-ryugu-thermal
   locator:
     published_page: 5
@@ -288,12 +408,11 @@ observations:
     species:
       formula: Ryugu
       phase:
-        tag: unknown
-        reason: phase string 'Ryugu_samples_A0026_and_C0002' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -313,7 +432,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Ryugu_samples_A0026_and_C0002'' is not in the closed automatic map'
+    origin: nakamura-2022-science-ryugu-thermal::nakamura_2023_table1_physical_properties
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mechanical_thermal_electrical_magnetic_measurements'
+    origin: nakamura-2022-science-ryugu-thermal::nakamura_2023_table1_physical_properties
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nakamura-2022-science-ryugu-thermal
   locator:
     published_page: 5
@@ -332,12 +472,11 @@ observations:
     species:
       formula: Ryugu
       phase:
-        tag: unknown
-        reason: phase string 'Ryugu_samples_A0026_and_C0002' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -357,7 +496,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Ryugu_samples_A0026_and_C0002'' is not in the closed automatic map'
+    origin: nakamura-2022-science-ryugu-thermal::nakamura_2023_table1_physical_properties
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mechanical_thermal_electrical_magnetic_measurements'
+    origin: nakamura-2022-science-ryugu-thermal::nakamura_2023_table1_physical_properties
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nakamura-2022-science-ryugu-thermal
   locator:
     published_page: 5
@@ -376,12 +536,11 @@ observations:
     species:
       formula: Ryugu
       phase:
-        tag: unknown
-        reason: phase string 'Ryugu_samples_A0026_and_C0002' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -401,7 +560,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Ryugu_samples_A0026_and_C0002'' is not in the closed automatic map'
+    origin: nakamura-2022-science-ryugu-thermal::nakamura_2023_table1_physical_properties
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mechanical_thermal_electrical_magnetic_measurements'
+    origin: nakamura-2022-science-ryugu-thermal::nakamura_2023_table1_physical_properties
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nakamura-2022-science-ryugu-thermal
   locator:
     published_page: 5
@@ -420,12 +600,11 @@ observations:
     species:
       formula: Ryugu
       phase:
-        tag: unknown
-        reason: phase string 'Ryugu_samples_A0026_and_C0002' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -445,7 +624,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Ryugu_samples_A0026_and_C0002'' is not in the closed automatic map'
+    origin: nakamura-2022-science-ryugu-thermal::nakamura_2023_table1_physical_properties
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mechanical_thermal_electrical_magnetic_measurements'
+    origin: nakamura-2022-science-ryugu-thermal::nakamura_2023_table1_physical_properties
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nakamura-2022-science-ryugu-thermal
   locator:
     published_page: 5
@@ -464,12 +664,11 @@ observations:
     species:
       formula: Ryugu
       phase:
-        tag: unknown
-        reason: phase string 'Ryugu_samples_A0026_and_C0002' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -489,7 +688,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Ryugu_samples_A0026_and_C0002'' is not in the closed automatic map'
+    origin: nakamura-2022-science-ryugu-thermal::nakamura_2023_table1_physical_properties
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mechanical_thermal_electrical_magnetic_measurements'
+    origin: nakamura-2022-science-ryugu-thermal::nakamura_2023_table1_physical_properties
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nakamura-2022-science-ryugu-thermal
   locator:
     published_page: 5
@@ -508,12 +728,11 @@ observations:
     species:
       formula: Ryugu
       phase:
-        tag: unknown
-        reason: phase string 'Ryugu_samples_A0026_and_C0002' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -533,7 +752,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Ryugu_samples_A0026_and_C0002'' is not in the closed automatic map'
+    origin: nakamura-2022-science-ryugu-thermal::nakamura_2023_table1_physical_properties
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mechanical_thermal_electrical_magnetic_measurements'
+    origin: nakamura-2022-science-ryugu-thermal::nakamura_2023_table1_physical_properties
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nakamura-2022-science-ryugu-thermal
   locator:
     published_page: 5
@@ -552,12 +792,11 @@ observations:
     species:
       formula: Ryugu
       phase:
-        tag: unknown
-        reason: phase string 'Ryugu_samples_A0026_and_C0002' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -577,7 +816,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Ryugu_samples_A0026_and_C0002'' is not in the closed automatic map'
+    origin: nakamura-2022-science-ryugu-thermal::nakamura_2023_table1_physical_properties
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mechanical_thermal_electrical_magnetic_measurements'
+    origin: nakamura-2022-science-ryugu-thermal::nakamura_2023_table1_physical_properties
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nakamura-2022-science-ryugu-thermal
   locator:
     published_page: 5
@@ -596,12 +856,11 @@ observations:
     species:
       formula: Ryugu
       phase:
-        tag: unknown
-        reason: phase string 'Ryugu_samples_A0026_and_C0002' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -621,7 +880,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Ryugu_samples_A0026_and_C0002'' is not in the closed automatic map'
+    origin: nakamura-2022-science-ryugu-thermal::nakamura_2023_table1_physical_properties
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mechanical_thermal_electrical_magnetic_measurements'
+    origin: nakamura-2022-science-ryugu-thermal::nakamura_2023_table1_physical_properties
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nakamura-2022-science-ryugu-thermal
   locator:
     published_page: 5
@@ -640,12 +920,11 @@ observations:
     species:
       formula: Ryugu
       phase:
-        tag: unknown
-        reason: phase string 'Ryugu_samples_A0026_and_C0002' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -665,7 +944,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Ryugu_samples_A0026_and_C0002'' is not in the closed automatic map'
+    origin: nakamura-2022-science-ryugu-thermal::nakamura_2023_table1_physical_properties
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mechanical_thermal_electrical_magnetic_measurements'
+    origin: nakamura-2022-science-ryugu-thermal::nakamura_2023_table1_physical_properties
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nakamura-2022-science-ryugu-thermal
   locator:
     published_page: 5
@@ -684,12 +984,11 @@ observations:
     species:
       formula: Ryugu
       phase:
-        tag: unknown
-        reason: phase string 'Ryugu_samples_A0026_and_C0002' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -709,7 +1008,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Ryugu_samples_A0026_and_C0002'' is not in the closed automatic map'
+    origin: nakamura-2022-science-ryugu-thermal::nakamura_2023_table1_physical_properties
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mechanical_thermal_electrical_magnetic_measurements'
+    origin: nakamura-2022-science-ryugu-thermal::nakamura_2023_table1_physical_properties
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nakamura-2022-science-ryugu-thermal
   locator:
     published_page: 5
@@ -728,12 +1048,11 @@ observations:
     species:
       formula: Ryugu
       phase:
-        tag: unknown
-        reason: phase string 'Ryugu_samples_A0026_and_C0002' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -753,7 +1072,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Ryugu_samples_A0026_and_C0002'' is not in the closed automatic map'
+    origin: nakamura-2022-science-ryugu-thermal::nakamura_2023_table1_physical_properties
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mechanical_thermal_electrical_magnetic_measurements'
+    origin: nakamura-2022-science-ryugu-thermal::nakamura_2023_table1_physical_properties
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nakamura-2022-science-ryugu-thermal
   locator:
     published_page: 5
@@ -772,12 +1112,11 @@ observations:
     species:
       formula: Ryugu
       phase:
-        tag: unknown
-        reason: phase string 'Ryugu_samples_A0026_and_C0002' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -797,7 +1136,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Ryugu_samples_A0026_and_C0002'' is not in the closed automatic map'
+    origin: nakamura-2022-science-ryugu-thermal::nakamura_2023_table1_physical_properties
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mechanical_thermal_electrical_magnetic_measurements'
+    origin: nakamura-2022-science-ryugu-thermal::nakamura_2023_table1_physical_properties
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nakamura-2022-science-ryugu-thermal
   locator:
     published_page: 5

@@ -529,8 +529,8 @@ experiments:
 - experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'mixed_kms_tms' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: unspecified
   sample: {}
   conditions:
     temperature_K:
@@ -561,6 +561,98 @@ experiments:
     note: Printed least-squares coefficients in Fig. 19 caption (report p. 45). Plate is PDF p. 70 / report p. 64. TMS+KMS
       equal-weight ensemble. Scatter on plates 7/8 (caption 5 / Series II) is the input, not a second independent fit. The
       Fig. 19 caption pools KMS and TMS without per-point sample labels; composition remains unknown.
+- experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983::declared:10.6028/nbs.ir.83-2731::experiment::plante-1983-model-assay::method:knudsen_effusion
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '4.75'
+          B2O3: '6.49'
+          CaO: '1.01'
+          Cs2O: '0.07'
+          Fe2O3: '11.49'
+          Li2O: '3.96'
+          MgO: '0.54'
+          MnO2: '3.57'
+          Na2O: '8.59'
+          NiO: '1.8'
+          Re2O7: '0.03'
+          RuO2: '0.11'
+          SiO2: '53.76'
+          SrO: '0.05'
+          ZrO2: '3.79'
+      locator:
+        published_page: 3
+        pdf_page_index: 9
+        table: '1'
+        note: SNW glass nominal vs analytical composition (Soper 1982)
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.6028/nbs.ir.83-2731
+  locator:
+    published_page: 3
+    pdf_page_index: 9
+    table: '1'
+    note: Model/assay registry; no shared physical bench or apparatus. Own-row evidence stays on each observation; apparatus
+      remains on kms/tms series.
+- experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983::declared:10.6028/nbs.ir.83-2731::experiment::plante-1983-model-assay::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.6028/nbs.ir.83-2731
+  locator:
+    published_page: 3
+    pdf_page_index: 9
+    table: '1'
+    note: Model/assay registry; no shared physical bench or apparatus. Own-row evidence stays on each observation; apparatus
+      remains on kms/tms series.
 benches:
 - id: 10.6028/nbs.ir.83-2731::bench::kms
   work_id: 10.6028/nbs.ir.83-2731

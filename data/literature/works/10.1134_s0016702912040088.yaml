@@ -180,8 +180,8 @@ experiments:
 - experiment_id: 10.1134/s0016702912040088::volovetskii-2012-iron-redox
   kind: literature
   method:
-    tag: unknown
-    reason: source does not state method
+    tag: value
+    value: mossbauer_spectroscopy
   sample:
     initial_composition:
       state:
@@ -241,6 +241,152 @@ experiments:
     published_page: 334
     pdf_page_index: 4
     table: '2'
+- experiment_id: 10.1134/s0016702912040088::volovetskii-2012-iron-redox::declared:10.1134/s0016702912040088::experiment::volovetskii_2012_table1_runs::method:mossbauer_spectroscopy
+  kind: literature
+  method:
+    tag: value
+    value: mossbauer_spectroscopy
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 6
+        published_page: 335
+        pdf_page_index: 5
+        section: Experimental Procedure
+        note: Total pressure is stated as 1 atm; converted using 1 atm = 101325 Pa.
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 6
+              published_page: 335
+              pdf_page_index: 5
+              section: Experimental Procedure
+              note: Total pressure is stated as 1 atm; converted using 1 atm = 101325 Pa.
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 6
+              published_page: 335
+              pdf_page_index: 5
+              section: Experimental Procedure
+              note: Total pressure is stated as 1 atm; converted using 1 atm = 101325 Pa.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        published_page: 335
+        pdf_page_index: 5
+        section: Experimental Procedure
+        note: The gas mixture is described but its proportions and flow are not tabulated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1134/s0016702912040088
+  locator:
+    page: 6
+    published_page: 335
+    pdf_page_index: 5
+    section: Experimental Procedure
+- experiment_id: 10.1134/s0016702912040088::volovetskii-2012-iron-redox::declared:10.1134/s0016702912040088::experiment::volovetskii_2012_table2_runs::method:mossbauer_spectroscopy
+  kind: literature
+  method:
+    tag: value
+    value: mossbauer_spectroscopy
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 6
+        published_page: 335
+        pdf_page_index: 5
+        section: Experimental Procedure
+        note: Total pressure is stated as 1 atm; converted using 1 atm = 101325 Pa.
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              page: 6
+              published_page: 335
+              pdf_page_index: 5
+              section: Experimental Procedure
+              note: Total pressure is stated as 1 atm; converted using 1 atm = 101325 Pa.
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 6
+              published_page: 335
+              pdf_page_index: 5
+              section: Experimental Procedure
+              note: Total pressure is stated as 1 atm; converted using 1 atm = 101325 Pa.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        published_page: 335
+        pdf_page_index: 5
+        section: Experimental Procedure
+        note: The gas mixture is described but its proportions and flow are not tabulated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1134/s0016702912040088
+  locator:
+    page: 6
+    published_page: 335
+    pdf_page_index: 5
+    section: Experimental Procedure
 context:
 - observation_id: volo12_table3_regressions
   type: recalculation_table

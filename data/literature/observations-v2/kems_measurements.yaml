@@ -11,8 +11,8 @@ observations:
     species:
       formula: Ca
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -82,7 +82,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: cao_p_ca_isothermal
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: cao_p_ca_isothermal
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: halwax_sergeev_mueller_schenk_2024
   locator:
     published_page: 826
@@ -109,8 +132,8 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -180,7 +203,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: cao_p_o2_isothermal
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: cao_p_o2_isothermal
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: halwax_sergeev_mueller_schenk_2024
   locator:
     published_page: 826
@@ -207,8 +253,8 @@ observations:
     species:
       formula: O
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -278,7 +324,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: cao_p_o_isothermal
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: cao_p_o_isothermal
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: halwax_sergeev_mueller_schenk_2024
   locator:
     published_page: 826
@@ -305,8 +374,8 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -376,7 +445,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: mgo_p_mg_isothermal
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: mgo_p_mg_isothermal
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: halwax_sergeev_mueller_schenk_2024
   locator:
     published_page: 826
@@ -403,8 +495,8 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -474,7 +566,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: mgo_p_o2_isothermal
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: mgo_p_o2_isothermal
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: halwax_sergeev_mueller_schenk_2024
   locator:
     published_page: 826
@@ -501,8 +616,8 @@ observations:
     species:
       formula: O
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: g
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -572,7 +687,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: mgo_p_o_isothermal
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: mgo_p_o_isothermal
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: halwax_sergeev_mueller_schenk_2024
   locator:
     published_page: 826

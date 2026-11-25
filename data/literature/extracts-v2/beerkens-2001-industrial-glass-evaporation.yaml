@@ -87,7 +87,18 @@ observations:
         pdf_page_index: 9
         table: '3'
         note: row_label=CO-pressure above melt; column_header=furnace burner arrangement no. 1
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: beerkens-2001-industrial-glass-evaporation::beerkens_2001_table3_furnace_1_co_partial_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: beerkens-2001-industrial-glass-evaporation
   locator:
     page: 10
@@ -287,7 +298,18 @@ observations:
         pdf_page_index: 9
         table: '3'
         note: row_label=CO-pressure above melt; column_header=furnace burner arrangement no. 2
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: beerkens-2001-industrial-glass-evaporation::beerkens_2001_table3_furnace_2_co_partial_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: beerkens-2001-industrial-glass-evaporation
   locator:
     page: 10
@@ -487,7 +509,18 @@ observations:
         pdf_page_index: 9
         table: '3'
         note: row_label=CO-pressure above melt; column_header=furnace burner arrangement no. 3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: beerkens-2001-industrial-glass-evaporation::beerkens_2001_table3_furnace_3_co_partial_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: beerkens-2001-industrial-glass-evaporation
   locator:
     page: 10
@@ -687,7 +720,18 @@ observations:
         pdf_page_index: 9
         table: '3'
         note: row_label=CO-pressure above melt; column_header=furnace burner arrangement no. 4
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: beerkens-2001-industrial-glass-evaporation::beerkens_2001_table3_furnace_4_co_partial_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: beerkens-2001-industrial-glass-evaporation
   locator:
     page: 10

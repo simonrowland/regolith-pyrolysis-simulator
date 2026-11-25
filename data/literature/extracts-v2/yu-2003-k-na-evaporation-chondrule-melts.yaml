@@ -81,7 +81,21 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 2 column “err”
+      is retained as sigma in per mil; the paper does not state the uncertainty convention for this column. Table 2a V-54
+      is the printed zero-time reference (δ41K=0, err=0.9). The paper states charges were quenched in vacuum or in air for
+      the 1 atm experiment, without row-specific quench assignment.'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: yu-2003-k-na-evaporation-chondrule-melts
   locator:
     page: 4
@@ -277,6 +291,20 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 2 column “err”
+      is retained as sigma in per mil; the paper does not state the uncertainty convention for this column. Table 2a V-54
+      is the printed zero-time reference (δ41K=0, err=0.9). The paper states charges were quenched in vacuum or in air for
+      the 1 atm experiment, without row-specific quench assignment.'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - isotope_delta
@@ -494,7 +522,21 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 2 column “err”
+      is retained as sigma in per mil; the paper does not state the uncertainty convention for this column. Table 2a V-54
+      is the printed zero-time reference (δ41K=0, err=0.9). The paper states charges were quenched in vacuum or in air for
+      the 1 atm experiment, without row-specific quench assignment.'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: yu-2003-k-na-evaporation-chondrule-melts
   locator:
     page: 4
@@ -689,7 +731,21 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 2 column “err”
+      is retained as sigma in per mil; the paper does not state the uncertainty convention for this column. Table 2a V-54
+      is the printed zero-time reference (δ41K=0, err=0.9). The paper states charges were quenched in vacuum or in air for
+      the 1 atm experiment, without row-specific quench assignment.'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: yu-2003-k-na-evaporation-chondrule-melts
   locator:
     page: 4
@@ -874,6 +930,20 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 2 column “err”
+      is retained as sigma in per mil; the paper does not state the uncertainty convention for this column. Table 2a V-54
+      is the printed zero-time reference (δ41K=0, err=0.9). The paper states charges were quenched in vacuum or in air for
+      the 1 atm experiment, without row-specific quench assignment.'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - isotope_delta
@@ -1080,7 +1150,21 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 2 column “err”
+      is retained as sigma in per mil; the paper does not state the uncertainty convention for this column. Table 2a V-54
+      is the printed zero-time reference (δ41K=0, err=0.9). The paper states charges were quenched in vacuum or in air for
+      the 1 atm experiment, without row-specific quench assignment.'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: yu-2003-k-na-evaporation-chondrule-melts
   locator:
     page: 4
@@ -1265,6 +1349,20 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 2 column “err”
+      is retained as sigma in per mil; the paper does not state the uncertainty convention for this column. Table 2a V-54
+      is the printed zero-time reference (δ41K=0, err=0.9). The paper states charges were quenched in vacuum or in air for
+      the 1 atm experiment, without row-specific quench assignment.'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - isotope_delta
@@ -1471,7 +1569,21 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 2 column “err”
+      is retained as sigma in per mil; the paper does not state the uncertainty convention for this column. Table 2a V-54
+      is the printed zero-time reference (δ41K=0, err=0.9). The paper states charges were quenched in vacuum or in air for
+      the 1 atm experiment, without row-specific quench assignment.'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: yu-2003-k-na-evaporation-chondrule-melts
   locator:
     page: 4
@@ -1655,7 +1767,21 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 2 column “err”
+      is retained as sigma in per mil; the paper does not state the uncertainty convention for this column. Table 2a V-54
+      is the printed zero-time reference (δ41K=0, err=0.9). The paper states charges were quenched in vacuum or in air for
+      the 1 atm experiment, without row-specific quench assignment.'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: yu-2003-k-na-evaporation-chondrule-melts
   locator:
     page: 4
@@ -1851,6 +1977,20 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 2 column “err”
+      is retained as sigma in per mil; the paper does not state the uncertainty convention for this column. Table 2a V-54
+      is the printed zero-time reference (δ41K=0, err=0.9). The paper states charges were quenched in vacuum or in air for
+      the 1 atm experiment, without row-specific quench assignment.'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - isotope_delta
@@ -2058,6 +2198,20 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 2 column “err”
+      is retained as sigma in per mil; the paper does not state the uncertainty convention for this column. Table 2a V-54
+      is the printed zero-time reference (δ41K=0, err=0.9). The paper states charges were quenched in vacuum or in air for
+      the 1 atm experiment, without row-specific quench assignment.'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - isotope_delta
@@ -2265,6 +2419,20 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 2 column “err”
+      is retained as sigma in per mil; the paper does not state the uncertainty convention for this column. Table 2a V-54
+      is the printed zero-time reference (δ41K=0, err=0.9). The paper states charges were quenched in vacuum or in air for
+      the 1 atm experiment, without row-specific quench assignment.'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - isotope_delta
@@ -2482,7 +2650,21 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 2 column “err”
+      is retained as sigma in per mil; the paper does not state the uncertainty convention for this column. Table 2a V-54
+      is the printed zero-time reference (δ41K=0, err=0.9). The paper states charges were quenched in vacuum or in air for
+      the 1 atm experiment, without row-specific quench assignment.'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: yu-2003-k-na-evaporation-chondrule-melts
   locator:
     page: 4
@@ -2645,6 +2827,20 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 2 column “err”
+      is retained as sigma in per mil; the paper does not state the uncertainty convention for this column. Table 2a V-54
+      is the printed zero-time reference (δ41K=0, err=0.9). The paper states charges were quenched in vacuum or in air for
+      the 1 atm experiment, without row-specific quench assignment.'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - isotope_delta
@@ -2852,6 +3048,20 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 2 column “err”
+      is retained as sigma in per mil; the paper does not state the uncertainty convention for this column. Table 2a V-54
+      is the printed zero-time reference (δ41K=0, err=0.9). The paper states charges were quenched in vacuum or in air for
+      the 1 atm experiment, without row-specific quench assignment.'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - isotope_delta
@@ -3058,7 +3268,21 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 2 column “err”
+      is retained as sigma in per mil; the paper does not state the uncertainty convention for this column. Table 2a V-54
+      is the printed zero-time reference (δ41K=0, err=0.9). The paper states charges were quenched in vacuum or in air for
+      the 1 atm experiment, without row-specific quench assignment.'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: yu-2003-k-na-evaporation-chondrule-melts
   locator:
     page: 4
@@ -3243,6 +3467,20 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 2 column “err”
+      is retained as sigma in per mil; the paper does not state the uncertainty convention for this column. Table 2a V-54
+      is the printed zero-time reference (δ41K=0, err=0.9). The paper states charges were quenched in vacuum or in air for
+      the 1 atm experiment, without row-specific quench assignment.'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - isotope_delta
@@ -3450,6 +3688,20 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 2 column “err”
+      is retained as sigma in per mil; the paper does not state the uncertainty convention for this column. Table 2a V-54
+      is the printed zero-time reference (δ41K=0, err=0.9). The paper states charges were quenched in vacuum or in air for
+      the 1 atm experiment, without row-specific quench assignment.'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - isotope_delta
@@ -3656,7 +3908,21 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 2 column “err”
+      is retained as sigma in per mil; the paper does not state the uncertainty convention for this column. Table 2a V-54
+      is the printed zero-time reference (δ41K=0, err=0.9). The paper states charges were quenched in vacuum or in air for
+      the 1 atm experiment, without row-specific quench assignment.'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: yu-2003-k-na-evaporation-chondrule-melts
   locator:
     page: 4
@@ -3840,7 +4106,21 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 2 column “err”
+      is retained as sigma in per mil; the paper does not state the uncertainty convention for this column. Table 2a V-54
+      is the printed zero-time reference (δ41K=0, err=0.9). The paper states charges were quenched in vacuum or in air for
+      the 1 atm experiment, without row-specific quench assignment.'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: yu-2003-k-na-evaporation-chondrule-melts
   locator:
     page: 4
@@ -4025,6 +4305,20 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 2 column “err”
+      is retained as sigma in per mil; the paper does not state the uncertainty convention for this column. Table 2a V-54
+      is the printed zero-time reference (δ41K=0, err=0.9). The paper states charges were quenched in vacuum or in air for
+      the 1 atm experiment, without row-specific quench assignment.'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - isotope_delta
@@ -4231,7 +4525,21 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 2 column “err”
+      is retained as sigma in per mil; the paper does not state the uncertainty convention for this column. Table 2a V-54
+      is the printed zero-time reference (δ41K=0, err=0.9). The paper states charges were quenched in vacuum or in air for
+      the 1 atm experiment, without row-specific quench assignment.'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: yu-2003-k-na-evaporation-chondrule-melts
   locator:
     page: 4
@@ -4415,7 +4723,21 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 2 column “err”
+      is retained as sigma in per mil; the paper does not state the uncertainty convention for this column. Table 2a V-54
+      is the printed zero-time reference (δ41K=0, err=0.9). The paper states charges were quenched in vacuum or in air for
+      the 1 atm experiment, without row-specific quench assignment.'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: yu-2003-k-na-evaporation-chondrule-melts
   locator:
     page: 4
@@ -4599,7 +4921,21 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 2 column “err”
+      is retained as sigma in per mil; the paper does not state the uncertainty convention for this column. Table 2a V-54
+      is the printed zero-time reference (δ41K=0, err=0.9). The paper states charges were quenched in vacuum or in air for
+      the 1 atm experiment, without row-specific quench assignment.'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: yu-2003-k-na-evaporation-chondrule-melts
   locator:
     page: 4
@@ -4783,7 +5119,21 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 2 column “err”
+      is retained as sigma in per mil; the paper does not state the uncertainty convention for this column. Table 2a V-54
+      is the printed zero-time reference (δ41K=0, err=0.9). The paper states charges were quenched in vacuum or in air for
+      the 1 atm experiment, without row-specific quench assignment.'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: yu-2003-k-na-evaporation-chondrule-melts
   locator:
     page: 4
@@ -4968,6 +5318,20 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 2 column “err”
+      is retained as sigma in per mil; the paper does not state the uncertainty convention for this column. Table 2a V-54
+      is the printed zero-time reference (δ41K=0, err=0.9). The paper states charges were quenched in vacuum or in air for
+      the 1 atm experiment, without row-specific quench assignment.'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - isotope_delta
@@ -5175,6 +5539,20 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 2 column “err”
+      is retained as sigma in per mil; the paper does not state the uncertainty convention for this column. Table 2a V-54
+      is the printed zero-time reference (δ41K=0, err=0.9). The paper states charges were quenched in vacuum or in air for
+      the 1 atm experiment, without row-specific quench assignment.'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - isotope_delta
@@ -5382,6 +5760,20 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 2 column “err”
+      is retained as sigma in per mil; the paper does not state the uncertainty convention for this column. Table 2a V-54
+      is the printed zero-time reference (δ41K=0, err=0.9). The paper states charges were quenched in vacuum or in air for
+      the 1 atm experiment, without row-specific quench assignment.'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - isotope_delta
@@ -5588,7 +5980,21 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 2 column “err”
+      is retained as sigma in per mil; the paper does not state the uncertainty convention for this column. Table 2a V-54
+      is the printed zero-time reference (δ41K=0, err=0.9). The paper states charges were quenched in vacuum or in air for
+      the 1 atm experiment, without row-specific quench assignment.'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: yu-2003-k-na-evaporation-chondrule-melts
   locator:
     page: 4
@@ -5772,7 +6178,21 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 2 column “err”
+      is retained as sigma in per mil; the paper does not state the uncertainty convention for this column. Table 2a V-54
+      is the printed zero-time reference (δ41K=0, err=0.9). The paper states charges were quenched in vacuum or in air for
+      the 1 atm experiment, without row-specific quench assignment.'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: yu-2003-k-na-evaporation-chondrule-melts
   locator:
     page: 4
@@ -5957,6 +6377,20 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 2 column “err”
+      is retained as sigma in per mil; the paper does not state the uncertainty convention for this column. Table 2a V-54
+      is the printed zero-time reference (δ41K=0, err=0.9). The paper states charges were quenched in vacuum or in air for
+      the 1 atm experiment, without row-specific quench assignment.'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - isotope_delta
@@ -6164,6 +6598,20 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 2 column “err”
+      is retained as sigma in per mil; the paper does not state the uncertainty convention for this column. Table 2a V-54
+      is the printed zero-time reference (δ41K=0, err=0.9). The paper states charges were quenched in vacuum or in air for
+      the 1 atm experiment, without row-specific quench assignment.'
+    origin: yu-2003-k-na-evaporation-chondrule-melts::yu_2003_table2_isotope_delta_41k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - isotope_delta

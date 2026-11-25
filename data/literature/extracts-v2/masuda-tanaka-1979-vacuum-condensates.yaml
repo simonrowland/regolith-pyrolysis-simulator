@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/masuda-tanaka-1979-vacuum-condensates.yaml
 observations:
 - observation_id: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_ba::points:h=36dc727f3cd7
-  experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization
+  experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::masuda-tanaka-1979-vacuum-condensates::declared:10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization::method:vacuum_chamber_pyrolysis
   identity:
     quantity:
       tag: value
@@ -11,12 +11,11 @@ observations:
     species:
       formula: Ba
       phase:
-        tag: unknown
-        reason: phase string 'post-run residue; phase not stated' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -61,7 +60,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''post-run residue; phase not stated'' is not in the closed automatic map'
+    origin: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_ba
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: masuda-tanaka-1979-vacuum-condensates
   locator:
     page: 5
@@ -146,7 +157,7 @@ observations:
   provenance:
     printed_phase: post-run residue; phase not stated
 - observation_id: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_ce::points:h=23497e511490
-  experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization
+  experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::masuda-tanaka-1979-vacuum-condensates::declared:10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization::method:vacuum_chamber_pyrolysis
   identity:
     quantity:
       tag: value
@@ -154,12 +165,11 @@ observations:
     species:
       formula: Ce
       phase:
-        tag: unknown
-        reason: phase string 'post-run residue; phase not stated' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -204,7 +214,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''post-run residue; phase not stated'' is not in the closed automatic map'
+    origin: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_ce
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: masuda-tanaka-1979-vacuum-condensates
   locator:
     page: 5
@@ -289,7 +311,7 @@ observations:
   provenance:
     printed_phase: post-run residue; phase not stated
 - observation_id: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_dy::points:h=f65772290366
-  experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization
+  experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::masuda-tanaka-1979-vacuum-condensates::declared:10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization::method:vacuum_chamber_pyrolysis
   identity:
     quantity:
       tag: value
@@ -297,12 +319,11 @@ observations:
     species:
       formula: Dy
       phase:
-        tag: unknown
-        reason: phase string 'post-run residue; phase not stated' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -347,7 +368,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''post-run residue; phase not stated'' is not in the closed automatic map'
+    origin: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_dy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: masuda-tanaka-1979-vacuum-condensates
   locator:
     page: 5
@@ -432,7 +465,7 @@ observations:
   provenance:
     printed_phase: post-run residue; phase not stated
 - observation_id: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_er::points:h=bbebad893276
-  experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization
+  experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::masuda-tanaka-1979-vacuum-condensates::declared:10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization::method:vacuum_chamber_pyrolysis
   identity:
     quantity:
       tag: value
@@ -440,12 +473,11 @@ observations:
     species:
       formula: Er
       phase:
-        tag: unknown
-        reason: phase string 'post-run residue; phase not stated' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -490,7 +522,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''post-run residue; phase not stated'' is not in the closed automatic map'
+    origin: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_er
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: masuda-tanaka-1979-vacuum-condensates
   locator:
     page: 5
@@ -575,7 +619,7 @@ observations:
   provenance:
     printed_phase: post-run residue; phase not stated
 - observation_id: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_eu::points:h=fb902ba5b857
-  experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization
+  experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::masuda-tanaka-1979-vacuum-condensates::declared:10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization::method:vacuum_chamber_pyrolysis
   identity:
     quantity:
       tag: value
@@ -583,12 +627,11 @@ observations:
     species:
       formula: Eu
       phase:
-        tag: unknown
-        reason: phase string 'post-run residue; phase not stated' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -633,7 +676,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''post-run residue; phase not stated'' is not in the closed automatic map'
+    origin: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_eu
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: masuda-tanaka-1979-vacuum-condensates
   locator:
     page: 5
@@ -718,7 +773,7 @@ observations:
   provenance:
     printed_phase: post-run residue; phase not stated
 - observation_id: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_gd::points:h=1e583dae5ea6
-  experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization
+  experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::masuda-tanaka-1979-vacuum-condensates::declared:10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization::method:vacuum_chamber_pyrolysis
   identity:
     quantity:
       tag: value
@@ -726,12 +781,11 @@ observations:
     species:
       formula: Gd
       phase:
-        tag: unknown
-        reason: phase string 'post-run residue; phase not stated' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -776,7 +830,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''post-run residue; phase not stated'' is not in the closed automatic map'
+    origin: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_gd
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: masuda-tanaka-1979-vacuum-condensates
   locator:
     page: 5
@@ -861,7 +927,7 @@ observations:
   provenance:
     printed_phase: post-run residue; phase not stated
 - observation_id: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_la::points:h=cf413f080dec
-  experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization
+  experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::masuda-tanaka-1979-vacuum-condensates::declared:10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization::method:vacuum_chamber_pyrolysis
   identity:
     quantity:
       tag: value
@@ -869,12 +935,11 @@ observations:
     species:
       formula: La
       phase:
-        tag: unknown
-        reason: phase string 'post-run residue; phase not stated' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -919,7 +984,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''post-run residue; phase not stated'' is not in the closed automatic map'
+    origin: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_la
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: masuda-tanaka-1979-vacuum-condensates
   locator:
     page: 5
@@ -1004,7 +1081,7 @@ observations:
   provenance:
     printed_phase: post-run residue; phase not stated
 - observation_id: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_lu::points:h=6b7b191760a7
-  experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization
+  experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::masuda-tanaka-1979-vacuum-condensates::declared:10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization::method:vacuum_chamber_pyrolysis
   identity:
     quantity:
       tag: value
@@ -1012,12 +1089,11 @@ observations:
     species:
       formula: Lu
       phase:
-        tag: unknown
-        reason: phase string 'post-run residue; phase not stated' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1062,7 +1138,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''post-run residue; phase not stated'' is not in the closed automatic map'
+    origin: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_lu
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: masuda-tanaka-1979-vacuum-condensates
   locator:
     page: 5
@@ -1147,7 +1235,7 @@ observations:
   provenance:
     printed_phase: post-run residue; phase not stated
 - observation_id: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_nd::points:h=343ea9c4f972
-  experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization
+  experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::masuda-tanaka-1979-vacuum-condensates::declared:10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization::method:vacuum_chamber_pyrolysis
   identity:
     quantity:
       tag: value
@@ -1155,12 +1243,11 @@ observations:
     species:
       formula: Nd
       phase:
-        tag: unknown
-        reason: phase string 'post-run residue; phase not stated' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1205,7 +1292,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''post-run residue; phase not stated'' is not in the closed automatic map'
+    origin: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_nd
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: masuda-tanaka-1979-vacuum-condensates
   locator:
     page: 5
@@ -1290,7 +1389,7 @@ observations:
   provenance:
     printed_phase: post-run residue; phase not stated
 - observation_id: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_rb::points:h=18ce5c440433
-  experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization
+  experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::masuda-tanaka-1979-vacuum-condensates::declared:10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization::method:vacuum_chamber_pyrolysis
   identity:
     quantity:
       tag: value
@@ -1298,12 +1397,11 @@ observations:
     species:
       formula: Rb
       phase:
-        tag: unknown
-        reason: phase string 'post-run residue; phase not stated' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1348,7 +1446,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''post-run residue; phase not stated'' is not in the closed automatic map'
+    origin: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_rb
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: masuda-tanaka-1979-vacuum-condensates
   locator:
     page: 5
@@ -1433,7 +1543,7 @@ observations:
   provenance:
     printed_phase: post-run residue; phase not stated
 - observation_id: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_sm::points:h=4e04580ad65d
-  experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization
+  experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::masuda-tanaka-1979-vacuum-condensates::declared:10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization::method:vacuum_chamber_pyrolysis
   identity:
     quantity:
       tag: value
@@ -1441,12 +1551,11 @@ observations:
     species:
       formula: Sm
       phase:
-        tag: unknown
-        reason: phase string 'post-run residue; phase not stated' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1491,7 +1600,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''post-run residue; phase not stated'' is not in the closed automatic map'
+    origin: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_sm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: masuda-tanaka-1979-vacuum-condensates
   locator:
     page: 5
@@ -1576,7 +1697,7 @@ observations:
   provenance:
     printed_phase: post-run residue; phase not stated
 - observation_id: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_sr::points:h=d18e67699119
-  experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization
+  experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::masuda-tanaka-1979-vacuum-condensates::declared:10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization::method:vacuum_chamber_pyrolysis
   identity:
     quantity:
       tag: value
@@ -1584,12 +1705,11 @@ observations:
     species:
       formula: Sr
       phase:
-        tag: unknown
-        reason: phase string 'post-run residue; phase not stated' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1634,7 +1754,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''post-run residue; phase not stated'' is not in the closed automatic map'
+    origin: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_sr
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: masuda-tanaka-1979-vacuum-condensates
   locator:
     page: 5
@@ -1719,7 +1851,7 @@ observations:
   provenance:
     printed_phase: post-run residue; phase not stated
 - observation_id: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_yb::points:h=405d151c41b6
-  experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization
+  experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::masuda-tanaka-1979-vacuum-condensates::declared:10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization::method:vacuum_chamber_pyrolysis
   identity:
     quantity:
       tag: value
@@ -1727,12 +1859,11 @@ observations:
     species:
       formula: Yb
       phase:
-        tag: unknown
-        reason: phase string 'post-run residue; phase not stated' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1777,7 +1908,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''post-run residue; phase not stated'' is not in the closed automatic map'
+    origin: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_yb
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: masuda-tanaka-1979-vacuum-condensates
   locator:
     page: 5

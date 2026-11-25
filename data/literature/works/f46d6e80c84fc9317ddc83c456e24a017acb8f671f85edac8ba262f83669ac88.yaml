@@ -276,8 +276,8 @@ experiments:
 - experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor
   kind: literature
   method:
-    tag: unknown
-    reason: source does not state method
+    tag: value
+    value: unspecified
   sample: {}
   conditions:
     temperature_K:
@@ -307,6 +307,206 @@ experiments:
     pdf_page_index: 2
     table: '1'
     note: row_label=CaO; column_header=Condensed phases  $\Delta G^{\circ}_{1873}$ , kJ/mol
+- experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::allen-snow-1955::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88
+  locator:
+    page: 1
+    published_page: 82
+    pdf_page_index: 0
+    section: Introduction
+- experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::ban-ya-1980-fig2a::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88
+  locator:
+    page: 3
+    published_page: 84
+    pdf_page_index: 2
+    figure: '2'
+    note: panel=a
+- experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::fujita-1968-fig2b::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88
+  locator:
+    page: 3
+    published_page: 84
+    pdf_page_index: 2
+    figure: '2'
+    note: panel=b
+- experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::oelsen-maetz-1941::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88
+  locator:
+    page: 1
+    published_page: 82
+    pdf_page_index: 0
+    section: Introduction
+- experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::shornikov-2019-model-curves::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88
+  locator:
+    page: 3
+    published_page: 84
+    pdf_page_index: 2
+    figure: '2'
+- experiment_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::shornikov-2019-ca-feo-vapor::declared:f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88::experiment::shugurov-2005::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: f46d6e80c84fc9317ddc83c456e24a017acb8f671f85edac8ba262f83669ac88
+  locator:
+    page: 2
+    published_page: 83
+    pdf_page_index: 1
+    section: Introduction
 context:
 - observation_id: shornikov_2019_cafeo2_sintering_temperature_range_srikanth_bazhin
   type: thermodynamic_example

@@ -308,6 +308,7 @@ def test_lange_split_comparator_quotes_migrate_with_their_typed_payloads(
 
 
 def test_lange_quoted_cp_points_reach_scorer_with_notice(tmp_path: Path) -> None:
+    from simulator.battery.engine_capability import engine_covers_quantity
     from simulator.battery.score import (
         SCORE_ENGINE_SET,
         ScoreContext,
@@ -348,7 +349,19 @@ def test_lange_quoted_cp_points_reach_scorer_with_notice(tmp_path: Path) -> None
         context,
         engines=SCORE_ENGINE_SET,
     )
-    assert len(residuals) == len(quote_ids) * len(SCORE_ENGINE_SET)
+    expected_pairs = {
+        (observation_id, engine)
+        for observation_id, observation in observations.items()
+        for engine in SCORE_ENGINE_SET
+        if observation.identity.quantity.is_value
+        and engine_covers_quantity(engine, observation.identity.quantity.value)
+    }
+    assert {
+        (row.reference, row.candidate_request.engine)
+        for row in residuals
+        if row.candidate_request is not None
+    } == expected_pairs
+    assert all(row.candidate_request is not None for row in residuals)
     assert all(row.numeric is not None or row.refusal is not None for row in residuals)
     assert all(
         any(

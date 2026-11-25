@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/jayasuriya-2004-iron-mossbauer.yaml
 observations:
 - observation_id: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_42k_1pct::T=1673.15:h=6961c11eda4c
-  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct
+  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct::method:unspecified
   identity:
     quantity:
       tag: value
@@ -92,7 +92,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer spectroscopy,
+      fitting method A at 4.2 K'
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_42k_1pct
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
     page: 6
@@ -276,7 +288,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_42k_1pct::T=1682.15:h=01c415b649f2
-  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct
+  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct::method:unspecified
   identity:
     quantity:
       tag: value
@@ -365,6 +377,18 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer spectroscopy,
+      fitting method A at 4.2 K'
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_42k_1pct
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - fe3_fe2_ratio
@@ -560,7 +584,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_42k_1pct::T=1682.15:h=7ada62bc3297
-  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct
+  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct::method:unspecified
   identity:
     quantity:
       tag: value
@@ -649,6 +673,18 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer spectroscopy,
+      fitting method A at 4.2 K'
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_42k_1pct
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - fe3_fe2_ratio
@@ -844,7 +880,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_42k_1pct::T=1682.15:h=a13c2021cd3d
-  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct
+  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct::method:unspecified
   identity:
     quantity:
       tag: value
@@ -932,7 +968,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer spectroscopy,
+      fitting method A at 4.2 K'
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_42k_1pct
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
     page: 6
@@ -1122,7 +1170,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_42k_1pct::T=1682.15:h=b95ff7ff5c58
-  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct
+  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1211,6 +1259,18 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer spectroscopy,
+      fitting method A at 4.2 K'
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_42k_1pct
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - fe3_fe2_ratio
@@ -1406,7 +1466,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_42k_1pct::T=1682.15:h=c01c0119ca50
-  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct
+  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1495,6 +1555,18 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer spectroscopy,
+      fitting method A at 4.2 K'
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_42k_1pct
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - fe3_fe2_ratio
@@ -1690,7 +1762,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1673.15:h=4badd318356b
-  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct
+  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1779,7 +1851,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer spectroscopy,
+      fitting method A, room temperature'
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
     page: 6
@@ -1964,7 +2048,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=18843d3a76e0
-  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct
+  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct::method:unspecified
   identity:
     quantity:
       tag: value
@@ -2053,6 +2137,18 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer spectroscopy,
+      fitting method A, room temperature'
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - fe3_fe2_ratio
@@ -2248,7 +2344,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=1d19fb5ffbb4
-  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct
+  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct::method:unspecified
   identity:
     quantity:
       tag: value
@@ -2337,6 +2433,18 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer spectroscopy,
+      fitting method A, room temperature'
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - fe3_fe2_ratio
@@ -2532,7 +2640,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=370e7e24c9fb
-  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct
+  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct::method:unspecified
   identity:
     quantity:
       tag: value
@@ -2621,6 +2729,18 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer spectroscopy,
+      fitting method A, room temperature'
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - fe3_fe2_ratio
@@ -2816,7 +2936,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=446b26076db6
-  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct
+  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct::method:unspecified
   identity:
     quantity:
       tag: value
@@ -2905,6 +3025,18 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer spectroscopy,
+      fitting method A, room temperature'
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - fe3_fe2_ratio
@@ -3100,7 +3232,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=4f41da0bb1fd
-  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct
+  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct::method:unspecified
   identity:
     quantity:
       tag: value
@@ -3189,6 +3321,18 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer spectroscopy,
+      fitting method A, room temperature'
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - fe3_fe2_ratio
@@ -3384,7 +3528,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=52973296ac71
-  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct
+  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct::method:unspecified
   identity:
     quantity:
       tag: value
@@ -3473,6 +3617,18 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer spectroscopy,
+      fitting method A, room temperature'
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - fe3_fe2_ratio
@@ -3668,7 +3824,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=5abed069dd36
-  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct
+  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct::method:unspecified
   identity:
     quantity:
       tag: value
@@ -3757,6 +3913,18 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer spectroscopy,
+      fitting method A, room temperature'
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - fe3_fe2_ratio
@@ -3952,7 +4120,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=6878785f3dca
-  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct
+  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct::method:unspecified
   identity:
     quantity:
       tag: value
@@ -4040,7 +4208,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer spectroscopy,
+      fitting method A, room temperature'
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
     page: 6
@@ -4230,7 +4410,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=6d7c12f79953
-  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct
+  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct::method:unspecified
   identity:
     quantity:
       tag: value
@@ -4319,6 +4499,18 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer spectroscopy,
+      fitting method A, room temperature'
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - fe3_fe2_ratio
@@ -4514,7 +4706,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=75525bfef32b
-  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct
+  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct::method:unspecified
   identity:
     quantity:
       tag: value
@@ -4603,6 +4795,18 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer spectroscopy,
+      fitting method A, room temperature'
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - fe3_fe2_ratio
@@ -4798,7 +5002,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=ab812444def1
-  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct
+  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct::method:unspecified
   identity:
     quantity:
       tag: value
@@ -4887,6 +5091,18 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer spectroscopy,
+      fitting method A, room temperature'
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - fe3_fe2_ratio
@@ -5082,7 +5298,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=b44407e9e857
-  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct
+  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct::method:unspecified
   identity:
     quantity:
       tag: value
@@ -5171,6 +5387,18 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer spectroscopy,
+      fitting method A, room temperature'
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - fe3_fe2_ratio
@@ -5349,7 +5577,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=ba516537ebb5
-  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct
+  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct::method:unspecified
   identity:
     quantity:
       tag: value
@@ -5438,6 +5666,18 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer spectroscopy,
+      fitting method A, room temperature'
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - fe3_fe2_ratio
@@ -5633,7 +5873,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=cd3c5bb102b9
-  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct
+  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct::method:unspecified
   identity:
     quantity:
       tag: value
@@ -5721,7 +5961,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer spectroscopy,
+      fitting method A, room temperature'
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
     page: 6
@@ -5911,7 +6163,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=d6af67d8a508
-  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct
+  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct::method:unspecified
   identity:
     quantity:
       tag: value
@@ -5999,7 +6251,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer spectroscopy,
+      fitting method A, room temperature'
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
     page: 6
@@ -6189,7 +6453,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct::T=1682.15:h=d7b42462271f
-  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct
+  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_1pct::method:unspecified
   identity:
     quantity:
       tag: value
@@ -6278,6 +6542,18 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer spectroscopy,
+      fitting method A, room temperature'
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_1pct
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - fe3_fe2_ratio
@@ -6473,7 +6749,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe::T=1682.15:h=0096e21fd51d
-  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_high_fe
+  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_high_fe::method:unspecified
   identity:
     quantity:
       tag: value
@@ -6562,6 +6838,18 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer spectroscopy,
+      fitting method A, room temperature'
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - fe3_fe2_ratio
@@ -6753,7 +7041,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe::T=1682.15:h=1591c9c52136
-  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_high_fe
+  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_high_fe::method:unspecified
   identity:
     quantity:
       tag: value
@@ -6841,7 +7129,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer spectroscopy,
+      fitting method A, room temperature'
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
     page: 7
@@ -7027,7 +7327,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe::T=1682.15:h=23e1a97228d1
-  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_high_fe
+  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_high_fe::method:unspecified
   identity:
     quantity:
       tag: value
@@ -7115,7 +7415,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer spectroscopy,
+      fitting method A, room temperature'
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
     page: 7
@@ -7301,7 +7613,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe::T=1682.15:h=53737f184d45
-  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_high_fe
+  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_high_fe::method:unspecified
   identity:
     quantity:
       tag: value
@@ -7390,6 +7702,18 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer spectroscopy,
+      fitting method A, room temperature'
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - fe3_fe2_ratio
@@ -7581,7 +7905,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe::T=1682.15:h=5728057f8e1a
-  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_high_fe
+  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_high_fe::method:unspecified
   identity:
     quantity:
       tag: value
@@ -7669,7 +7993,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer spectroscopy,
+      fitting method A, room temperature'
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
     page: 7
@@ -7855,7 +8191,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe::T=1682.15:h=6e35a813dfe0
-  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_high_fe
+  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_high_fe::method:unspecified
   identity:
     quantity:
       tag: value
@@ -7944,6 +8280,18 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer spectroscopy,
+      fitting method A, room temperature'
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - fe3_fe2_ratio
@@ -8135,7 +8483,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe::T=1682.15:h=89576db964ae
-  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_high_fe
+  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_high_fe::method:unspecified
   identity:
     quantity:
       tag: value
@@ -8223,7 +8571,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer spectroscopy,
+      fitting method A, room temperature'
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
     page: 7
@@ -8409,7 +8769,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe::T=1682.15:h=8e556c97b6ed
-  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_high_fe
+  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_high_fe::method:unspecified
   identity:
     quantity:
       tag: value
@@ -8498,6 +8858,18 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer spectroscopy,
+      fitting method A, room temperature'
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - fe3_fe2_ratio
@@ -8689,7 +9061,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe::T=1682.15:h=9fcdfe6af77f
-  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_high_fe
+  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_high_fe::method:unspecified
   identity:
     quantity:
       tag: value
@@ -8778,6 +9150,18 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer spectroscopy,
+      fitting method A, room temperature'
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - fe3_fe2_ratio
@@ -8969,7 +9353,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe::T=1682.15:h=b5bd1bbebe8e
-  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_high_fe
+  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_high_fe::method:unspecified
   identity:
     quantity:
       tag: value
@@ -9058,6 +9442,18 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer spectroscopy,
+      fitting method A, room temperature'
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - fe3_fe2_ratio
@@ -9249,7 +9645,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe::T=1682.15:h=b931af42c583
-  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_high_fe
+  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_high_fe::method:unspecified
   identity:
     quantity:
       tag: value
@@ -9338,6 +9734,18 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer spectroscopy,
+      fitting method A, room temperature'
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - fe3_fe2_ratio
@@ -9529,7 +9937,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe::T=1682.15:h=beb9fba086d1
-  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_high_fe
+  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_high_fe::method:unspecified
   identity:
     quantity:
       tag: value
@@ -9617,7 +10025,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer spectroscopy,
+      fitting method A, room temperature'
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
     page: 7
@@ -9803,7 +10223,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe::T=1682.15:h=c461113c65e3
-  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_high_fe
+  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_high_fe::method:unspecified
   identity:
     quantity:
       tag: value
@@ -9891,7 +10311,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer spectroscopy,
+      fitting method A, room temperature'
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jayasuriya-2004-iron-mossbauer
   locator:
     page: 7
@@ -10077,7 +10509,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe::T=1682.15:h=e34a63c8762a
-  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_high_fe
+  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_high_fe::method:unspecified
   identity:
     quantity:
       tag: value
@@ -10166,6 +10598,18 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer spectroscopy,
+      fitting method A, room temperature'
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - fe3_fe2_ratio
@@ -10357,7 +10801,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe::T=1682.15:h=ed66821a944c
-  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_high_fe
+  experiment_id: 969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::jayasuriya-2004-iron-mossbauer::declared:969f2b22817a66ec32c1f2d4408de8c89201ec1e1ef5202c351f41543ae17721::experiment::jayasuriya_2004_adeu_high_fe::method:unspecified
   identity:
     quantity:
       tag: value
@@ -10446,6 +10890,18 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer spectroscopy,
+      fitting method A, room temperature'
+    origin: jayasuriya-2004-iron-mossbauer::jayasuriya_2004_rt_high_fe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - fe3_fe2_ratio

@@ -11,12 +11,11 @@ observations:
     species:
       formula: Cd
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -35,7 +34,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_cd_equilibrium_comparator
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: boulliung-2025-mercury-volatile-metals-magmatic
   locator:
     pdf_page_index: 20
@@ -51,12 +61,11 @@ observations:
     species:
       formula: Hg
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -77,6 +86,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_cd_tl_author_partial_pressures
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -109,12 +129,11 @@ observations:
     species:
       formula: Hg
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -133,7 +152,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_halogen_atmosphere_measurements
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: boulliung-2025-mercury-volatile-metals-magmatic
   locator:
     pdf_page_index: 16
@@ -150,12 +180,11 @@ observations:
     species:
       formula: Hg
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -179,6 +208,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_hg_equilibrium_partial_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -248,12 +288,11 @@ observations:
     species:
       formula: Hg
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -277,6 +316,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_hg_equilibrium_partial_pressure_1400c
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -340,7 +390,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_hg_retention_1300c
-  experiment_id: 10.1016/j.chemgeo.2025.123018::experiment::ssas-hg-volatile-series
+  experiment_id: 10.1016/j.chemgeo.2025.123018::boulliung-2025-mercury-volatile-metals-magmatic::declared:10.1016/j.chemgeo.2025.123018::experiment::ssas-hg-volatile-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -348,12 +398,11 @@ observations:
     species:
       formula: Hg
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -375,7 +424,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_hg_retention_1300c
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Direct Mercury Analyzer'
+    origin: boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_hg_retention_1300c
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: boulliung-2025-mercury-volatile-metals-magmatic
   locator:
     pdf_page_index: 13
@@ -432,12 +502,11 @@ observations:
     species:
       formula: Hg
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -458,6 +527,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_hsc_gas_speciation
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -489,12 +569,11 @@ observations:
     species:
       formula: Tl
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -513,7 +592,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_tl_equilibrium_comparator
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: boulliung-2025-mercury-volatile-metals-magmatic
   locator:
     pdf_page_index: 20
@@ -529,12 +619,11 @@ observations:
     species:
       formula: Hg
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -553,7 +642,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_volatile_metal_measured_retention
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: boulliung-2025-mercury-volatile-metals-magmatic
   locator:
     pdf_page_index: 20

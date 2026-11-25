@@ -47,6 +47,10 @@ from simulator.lab_geometry import (
     require_lab_pipe_diameter,
     require_lab_pipe_length,
 )
+from simulator.crucible_geometry import (
+    MELT_DENSITY_KG_M3 as CRUCIBLE_MELT_DENSITY_KG_M3,
+    size_crucible_geometry,
+)
 from simulator.feedstock_composition import normalized_feedstock_component_masses_kg
 from simulator.physical_constants import (
     CELSIUS_TO_KELVIN_OFFSET,
@@ -161,7 +165,9 @@ class EquipmentDesigner:
     """
 
     # Melt physical properties
-    MELT_DENSITY_KG_M3 = 2700.0     # Basaltic melt ~2500-2900
+    # Kept as a class-level compatibility override; the sizing owner defines
+    # the default value.
+    MELT_DENSITY_KG_M3 = CRUCIBLE_MELT_DENSITY_KG_M3
     MELT_CP_J_KG_K = 1200.0          # Heat capacity of silicate melt
     # provenance: melt emissivity — REF-047 coefficient_note; engineering default for hot silicates.
     MELT_EMISSIVITY = 0.85            # Radiative emissivity
@@ -305,28 +311,30 @@ class EquipmentDesigner:
         return design
 
     def size_crucible(self, mass_kg: float) -> CrucibleSpec:
-        """
-        Size the crucible for the batch.
-
-        Volume = mass / density                                [EQ-1]
-        Geometry: height = 1.5 × diameter (cylindrical)
-        Add 20% freeboard for bubbling/stirring
-        """
-        V_melt = mass_kg / self.MELT_DENSITY_KG_M3
-        V_total = V_melt * 1.20  # 20% freeboard
-
-        # Cylinder: V = π/4 × d² × h, with h = 1.5d
-        # → V = π/4 × d² × 1.5d = 1.5π/4 × d³
-        d = (V_total * 4.0 / (1.5 * math.pi)) ** (1.0/3.0)
-        h = 1.5 * d
-
-        return CrucibleSpec(
-            volume_m3=V_total,
-            diameter_m=d,
-            height_m=h,
-            melt_surface_area_m2=math.pi * (d/2)**2,
-            freeboard_pct=20.0,
+        """Return the established equipment spec from shared EQ-1 geometry."""
+        geometry = size_crucible_geometry(
+            mass_kg, self.MELT_DENSITY_KG_M3
         )
+        return CrucibleSpec(
+            volume_m3=geometry.volume_m3,
+            diameter_m=geometry.diameter_m,
+            height_m=geometry.height_m,
+            melt_surface_area_m2=geometry.melt_surface_area_m2,
+            freeboard_pct=geometry.freeboard_pct,
+        )
+
+    @staticmethod
+    def radiative_loss_area_m2(mass_kg: float) -> float:
+        """Crucible surface EQ-2 uses for radiative loss.
+
+        One owner of the rough-cylinder estimate. A 1-tonne charge is
+        0.2 m². This is not a printed melt face and not the opening
+        from ``size_crucible``. It is not the radiating area of a
+        sample under 1 kg. The power-driven pellet path refuses this
+        value there instead of taking it as a default.
+        """
+
+        return 0.2 * (mass_kg / 1000.0) ** 0.67
 
     def size_solar_concentrator(self, mass_kg: float,
                                   peak_T_C: float) -> ConcentratorSpec:
@@ -348,9 +356,9 @@ class EquipmentDesigner:
         # Heating power
         P_heat_W = mass_kg * self.MELT_CP_J_KG_K * dT_dt
 
-        # Radiative loss from crucible surface
-        # Estimate surface area from mass (rough cylinder)
-        A_surface = 0.2 * (mass_kg / 1000.0) ** 0.67  # m²
+        # Radiative loss from the crucible surface. The area estimate
+        # has one owner; this sizer does not keep a second copy.
+        A_surface = self.radiative_loss_area_m2(mass_kg)
         P_rad_W = (STEFAN_BOLTZMANN * self.MELT_EMISSIVITY
                     * A_surface * T_K**4)
 

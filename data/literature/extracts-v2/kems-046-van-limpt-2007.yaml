@@ -11,12 +11,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -35,7 +34,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_boron_operating_conditions_and_uncertainties
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: transpiration_evaporation'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_boron_operating_conditions_and_uncertainties
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-046-van-limpt-2007
   locator:
     page: 183
@@ -54,12 +74,11 @@ observations:
     species:
       formula: K
       phase:
-        tag: unknown
-        reason: phase string 'alkali_lime_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -80,7 +99,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''alkali_lime_silicate_melt'' is not in the closed automatic map'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_fig15_potassium_activity_measured
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: transpiration_evaporation'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_fig15_potassium_activity_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-046-van-limpt-2007
   locator:
     page: 172
@@ -135,12 +175,11 @@ observations:
     species:
       formula: K
       phase:
-        tag: unknown
-        reason: phase string 'alkali_lime_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -161,7 +200,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''alkali_lime_silicate_melt'' is not in the closed automatic map'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_fig15_potassium_activity_measured
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: transpiration_evaporation'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_fig15_potassium_activity_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-046-van-limpt-2007
   locator:
     page: 172
@@ -216,12 +276,11 @@ observations:
     species:
       formula: K
       phase:
-        tag: unknown
-        reason: phase string 'alkali_lime_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -242,7 +301,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''alkali_lime_silicate_melt'' is not in the closed automatic map'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_fig15_potassium_activity_measured
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: transpiration_evaporation'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_fig15_potassium_activity_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-046-van-limpt-2007
   locator:
     page: 172
@@ -297,12 +377,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -321,7 +400,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_fig45_naoh_saturation_measured
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: transpiration_evaporation'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_fig45_naoh_saturation_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-046-van-limpt-2007
   locator:
     page: 154
@@ -332,7 +432,7 @@ observations:
   provenance:
     printed_phase: silicate_melt
 - observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_measured::T=1573.15:h=d7cea0bc6a14
-  experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
+  experiment_id: 10.6100/ir630685::kems-046-van-limpt-2007::declared:10.6100/ir630685::experiment::sodium-disilicate-transpiration::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -340,12 +440,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'sodium_disilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -366,7 +465,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''sodium_disilicate_melt'' is not in the closed automatic map'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_measured
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: transpiration_evaporation'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-046-van-limpt-2007
   locator:
     page: 156
@@ -413,7 +533,7 @@ observations:
   provenance:
     printed_phase: sodium_disilicate_melt
 - observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_measured::T=1573.15:h=de5c41eaa19d
-  experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
+  experiment_id: 10.6100/ir630685::kems-046-van-limpt-2007::declared:10.6100/ir630685::experiment::sodium-disilicate-transpiration::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -421,12 +541,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'sodium_disilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -447,7 +566,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''sodium_disilicate_melt'' is not in the closed automatic map'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_measured
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: transpiration_evaporation'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-046-van-limpt-2007
   locator:
     page: 156
@@ -494,7 +634,7 @@ observations:
   provenance:
     printed_phase: sodium_disilicate_melt
 - observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_measured::T=1673.15:h=ba080dd9fd64
-  experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
+  experiment_id: 10.6100/ir630685::kems-046-van-limpt-2007::declared:10.6100/ir630685::experiment::sodium-disilicate-transpiration::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -502,12 +642,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'sodium_disilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -528,7 +667,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''sodium_disilicate_melt'' is not in the closed automatic map'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_measured
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: transpiration_evaporation'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-046-van-limpt-2007
   locator:
     page: 156
@@ -575,7 +735,7 @@ observations:
   provenance:
     printed_phase: sodium_disilicate_melt
 - observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_measured::T=1735.15:h=71003fc4a080
-  experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
+  experiment_id: 10.6100/ir630685::kems-046-van-limpt-2007::declared:10.6100/ir630685::experiment::sodium-disilicate-transpiration::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -583,12 +743,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'sodium_disilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -609,7 +768,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''sodium_disilicate_melt'' is not in the closed automatic map'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_measured
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: transpiration_evaporation'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-046-van-limpt-2007
   locator:
     page: 156
@@ -656,7 +836,7 @@ observations:
   provenance:
     printed_phase: sodium_disilicate_melt
 - observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_measured::T=1735.15:h=81052be4d82c
-  experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
+  experiment_id: 10.6100/ir630685::kems-046-van-limpt-2007::declared:10.6100/ir630685::experiment::sodium-disilicate-transpiration::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -664,12 +844,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'sodium_disilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -690,7 +869,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''sodium_disilicate_melt'' is not in the closed automatic map'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_measured
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: transpiration_evaporation'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-046-van-limpt-2007
   locator:
     page: 156
@@ -737,7 +937,7 @@ observations:
   provenance:
     printed_phase: sodium_disilicate_melt
 - observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_measured::T=1735.15:h=fcf10aea322b
-  experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
+  experiment_id: 10.6100/ir630685::kems-046-van-limpt-2007::declared:10.6100/ir630685::experiment::sodium-disilicate-transpiration::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -745,12 +945,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'sodium_disilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -771,7 +970,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''sodium_disilicate_melt'' is not in the closed automatic map'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_measured
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: transpiration_evaporation'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-046-van-limpt-2007
   locator:
     page: 156
@@ -818,7 +1038,7 @@ observations:
   provenance:
     printed_phase: sodium_disilicate_melt
 - observation_id: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_model_output::T=1735.15:h=02d8f9bd07ef
-  experiment_id: 10.6100/ir630685::experiment::glass-transpiration-series
+  experiment_id: 10.6100/ir630685::kems-046-van-limpt-2007::declared:10.6100/ir630685::experiment::glass-transpiration-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -826,12 +1046,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'sodium_disilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -861,7 +1080,28 @@ observations:
         figure: '4.6'
         note: figure reading; thermochemical-model marker kept separate from measured marker
         source_path: corpus/raw/kems-046-van-limpt-2007/ocr-mineru/p121-p160/out/kems-046-van-limpt-2007-p121-p160/vlm/kems-046-van-limpt-2007-p121-p160.md
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''sodium_disilicate_melt'' is not in the closed automatic map'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_model_output
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: transpiration_evaporation'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_fig46_elemental_sodium_model_output
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-046-van-limpt-2007
   locator:
     page: 156
@@ -916,12 +1156,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'alkali_free_borosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -942,7 +1181,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''alkali_free_borosilicate_melt'' is not in the closed automatic map'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_fig48_boron_evaporation_measured
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: transpiration_evaporation'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_fig48_boron_evaporation_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-046-van-limpt-2007
   locator:
     page: 161
@@ -997,12 +1257,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1021,7 +1280,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_setup_c_and_sodium_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: transpiration_evaporation'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_setup_c_and_sodium_conditions
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-046-van-limpt-2007
   locator:
     page: 127
@@ -1032,7 +1312,7 @@ observations:
   provenance:
     printed_phase: silicate_melt
 - observation_id: kems-046-van-limpt-2007::van_limpt_2007_sodium_transpiration_operating_window
-  experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
+  experiment_id: 10.6100/ir630685::kems-046-van-limpt-2007::declared:10.6100/ir630685::experiment::sodium-disilicate-transpiration::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1040,12 +1320,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_sodium_disilicate' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1067,7 +1346,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_sodium_disilicate'' is not in the closed automatic map'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_sodium_transpiration_operating_window
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: transpiration_evaporation'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_sodium_transpiration_operating_window
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-046-van-limpt-2007
   locator:
     page: 153
@@ -1094,12 +1394,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1118,7 +1417,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_table42_float_and_tableware_compositions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: transpiration_evaporation'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_table42_float_and_tableware_compositions
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-046-van-limpt-2007
   locator:
     page: 141
@@ -1136,12 +1456,11 @@ observations:
     species:
       formula: K
       phase:
-        tag: unknown
-        reason: phase string 'alkali_lime_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1160,7 +1479,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''alkali_lime_silicate_melt'' is not in the closed automatic map'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_table42_potassium_bearing_glasses
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: transpiration_evaporation'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_table42_potassium_bearing_glasses
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-046-van-limpt-2007
   locator:
     page: 172
@@ -1179,12 +1519,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'alkali_lean_borosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1203,7 +1542,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''alkali_lean_borosilicate_melt'' is not in the closed automatic map'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_table43_borosilicate_compositions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: transpiration_evaporation'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_table43_borosilicate_compositions
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-046-van-limpt-2007
   locator:
     page: 141
@@ -1213,7 +1573,7 @@ observations:
   provenance:
     printed_phase: alkali_lean_borosilicate_melt
 - observation_id: kems-046-van-limpt-2007::van_limpt_2007_table44_sodium_mass_balance::T=1627.15:h=c3363335aa25
-  experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
+  experiment_id: 10.6100/ir630685::kems-046-van-limpt-2007::declared:10.6100/ir630685::experiment::sodium-disilicate-transpiration::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1221,12 +1581,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1247,7 +1606,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_table44_sodium_mass_balance
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: transpiration_evaporation'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_table44_sodium_mass_balance
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-046-van-limpt-2007
   locator:
     page: 158
@@ -1290,7 +1670,7 @@ observations:
   provenance:
     printed_phase: silicate_melt
 - observation_id: kems-046-van-limpt-2007::van_limpt_2007_table44_sodium_mass_balance::T=1629.15:h=e1531318d76b
-  experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
+  experiment_id: 10.6100/ir630685::kems-046-van-limpt-2007::declared:10.6100/ir630685::experiment::sodium-disilicate-transpiration::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1298,12 +1678,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1324,7 +1703,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_table44_sodium_mass_balance
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: transpiration_evaporation'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_table44_sodium_mass_balance
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-046-van-limpt-2007
   locator:
     page: 158
@@ -1367,7 +1767,7 @@ observations:
   provenance:
     printed_phase: silicate_melt
 - observation_id: kems-046-van-limpt-2007::van_limpt_2007_table44_sodium_mass_balance::T=1689.15:h=2f44afb961d8
-  experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
+  experiment_id: 10.6100/ir630685::kems-046-van-limpt-2007::declared:10.6100/ir630685::experiment::sodium-disilicate-transpiration::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1375,12 +1775,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1401,7 +1800,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_table44_sodium_mass_balance
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: transpiration_evaporation'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_table44_sodium_mass_balance
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-046-van-limpt-2007
   locator:
     page: 158
@@ -1444,7 +1864,7 @@ observations:
   provenance:
     printed_phase: silicate_melt
 - observation_id: kems-046-van-limpt-2007::van_limpt_2007_table44_sodium_mass_balance::T=1710.15:h=d483eec90ed7
-  experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
+  experiment_id: 10.6100/ir630685::kems-046-van-limpt-2007::declared:10.6100/ir630685::experiment::sodium-disilicate-transpiration::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1452,12 +1872,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1478,7 +1897,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_table44_sodium_mass_balance
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: transpiration_evaporation'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_table44_sodium_mass_balance
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-046-van-limpt-2007
   locator:
     page: 158
@@ -1521,7 +1961,7 @@ observations:
   provenance:
     printed_phase: silicate_melt
 - observation_id: kems-046-van-limpt-2007::van_limpt_2007_table44_sodium_mass_balance::T=1712.15:h=7f8ea303e2ee
-  experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
+  experiment_id: 10.6100/ir630685::kems-046-van-limpt-2007::declared:10.6100/ir630685::experiment::sodium-disilicate-transpiration::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1529,12 +1969,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1555,7 +1994,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_table44_sodium_mass_balance
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: transpiration_evaporation'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_table44_sodium_mass_balance
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-046-van-limpt-2007
   locator:
     page: 158
@@ -1598,7 +2058,7 @@ observations:
   provenance:
     printed_phase: silicate_melt
 - observation_id: kems-046-van-limpt-2007::van_limpt_2007_table44_sodium_mass_balance::T=1727.15:h=4068e4804bb5
-  experiment_id: 10.6100/ir630685::experiment::sodium-disilicate-transpiration
+  experiment_id: 10.6100/ir630685::kems-046-van-limpt-2007::declared:10.6100/ir630685::experiment::sodium-disilicate-transpiration::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1606,12 +2066,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1632,7 +2091,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_table44_sodium_mass_balance
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: transpiration_evaporation'
+    origin: kems-046-van-limpt-2007::van_limpt_2007_table44_sodium_mass_balance
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-046-van-limpt-2007
   locator:
     page: 158

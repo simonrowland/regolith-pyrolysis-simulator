@@ -136,6 +136,112 @@ experiments:
     pdf_page_index: 2
     section: The proper way of determining true evaporation coefficients
   bench_id: 7ec3fe9fa2b6061b03cb4605140886a7244d4b260743cae7b2f7fc6336d49fe0::bench::nasa-glenn-vacuum-tga
+- experiment_id: 7ec3fe9fa2b6061b03cb4605140886a7244d4b260743cae7b2f7fc6336d49fe0::ta-mendybaev-2020-lpsc::declared:7ec3fe9fa2b6061b03cb4605140886a7244d4b260743cae7b2f7fc6336d49fe0::experiment::sio2-knudsen-ir-cell-1800C::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Pure SiO2 or SiO2 + 1 wt% Ir
+      locator:
+        pdf_page_index: 2
+    form:
+      state:
+        tag: value
+        value: Ir cell with 1 mm diameter orifice
+      locator:
+        pdf_page_index: 2
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2073.15'
+          approximate: false
+      locator:
+        pdf_page_index: 2
+        note: 'DERIVED: 1800 C + 273.15 = 2073.15 K; same conditions as loop arm'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source prints 5x10^-6 torr or less; no scalar total-pressure value in Pa
+      locator:
+        pdf_page_index: 2
+        note: 5x10^-6 torr or less as printed; retained as typed absence rather than inferred Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: vacuum
+      locator:
+        pdf_page_index: 2
+        section: The proper way of determining true evaporation coefficients
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 7ec3fe9fa2b6061b03cb4605140886a7244d4b260743cae7b2f7fc6336d49fe0
+  locator:
+    pdf_page_index: 2
+  bench_id: 7ec3fe9fa2b6061b03cb4605140886a7244d4b260743cae7b2f7fc6336d49fe0::bench::nasa-glenn-vacuum-tga
+- experiment_id: 7ec3fe9fa2b6061b03cb4605140886a7244d4b260743cae7b2f7fc6336d49fe0::ta-mendybaev-2020-lpsc::declared:7ec3fe9fa2b6061b03cb4605140886a7244d4b260743cae7b2f7fc6336d49fe0::experiment::sio2-langmuir-ir-loop-1800C::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: SiO2 powder 99.995% pure with 1 wt% ultrafine-grained Ir metal
+      locator:
+        pdf_page_index: 2
+        paragraph: As a starting material in Langmuir experiments
+    form:
+      state:
+        tag: value
+        value: Loaded onto 2.5 mm diameter Ir-wire loop
+      locator:
+        pdf_page_index: 2
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2073.15'
+          approximate: false
+      locator:
+        pdf_page_index: 2
+        note: 'DERIVED: 1800 C + 273.15 = 2073.15 K'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source prints 5x10^-6 torr or less; no scalar total-pressure value in Pa
+      locator:
+        pdf_page_index: 2
+        note: 5x10^-6 torr or less as printed; retained as typed absence rather than inferred Pa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: vacuum
+      locator:
+        pdf_page_index: 2
+        section: The proper way of determining true evaporation coefficients
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 7ec3fe9fa2b6061b03cb4605140886a7244d4b260743cae7b2f7fc6336d49fe0
+  locator:
+    pdf_page_index: 2
+    section: The proper way of determining true evaporation coefficients
+  bench_id: 7ec3fe9fa2b6061b03cb4605140886a7244d4b260743cae7b2f7fc6336d49fe0::bench::nasa-glenn-vacuum-tga
 benches:
 - id: 7ec3fe9fa2b6061b03cb4605140886a7244d4b260743cae7b2f7fc6336d49fe0::bench::nasa-glenn-vacuum-tga
   work_id: 7ec3fe9fa2b6061b03cb4605140886a7244d4b260743cae7b2f7fc6336d49fe0

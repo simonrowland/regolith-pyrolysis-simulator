@@ -11,12 +11,11 @@ observations:
     species:
       formula: Ag
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Ag-In' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -41,6 +40,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Ag-In'' is not in the closed automatic map'
+    origin: kems-127-qi-1989::qi_1989_fig8_ag_in_activities_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -73,12 +83,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Ag-Ga' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -103,6 +112,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Ag-Ga'' is not in the closed automatic map'
+    origin: kems-127-qi-1989::qi_1989_fig9_ag_ga_activities_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -135,12 +155,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Ag-Ga' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -165,7 +184,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Ag-Ga'' is not in the closed automatic map'
+    origin: kems-127-qi-1989::qi_1989_gamma0_Ga_in_Ag
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-127-qi-1989
   locator:
     published_page: 575
@@ -184,12 +214,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Ag-In' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -214,7 +243,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Ag-In'' is not in the closed automatic map'
+    origin: kems-127-qi-1989::qi_1989_gamma0_T_equations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-127-qi-1989
   locator:
     published_page: 575
@@ -233,12 +273,11 @@ observations:
     species:
       formula: Ag
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Ag-In_and_Ag-Ga' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -263,7 +302,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Ag-In_and_Ag-Ga'' is not in the closed automatic map'
+    origin: kems-127-qi-1989::qi_1989_gamma0_T_equations_Ag
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-127-qi-1989
   locator:
     published_page: 575
@@ -282,12 +332,11 @@ observations:
     species:
       formula: Ag
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Ag-In_and_Ag-Ga' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -311,7 +360,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Ag-In_and_Ag-Ga'' is not in the closed automatic map'
+    origin: kems-127-qi-1989::qi_1989_kems_geometry_and_calibration
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-127-qi-1989
   locator:
     published_page: 576
@@ -322,7 +382,7 @@ observations:
   provenance:
     printed_phase: liquid_Ag-In_and_Ag-Ga
 - observation_id: kems-127-qi-1989::qi_1989_table1_ionization_potentials_crc
-  experiment_id: 10.2320/matertrans1989.30.575::kems-127-qi-1989
+  experiment_id: 10.2320/matertrans1989.30.575::kems-127-qi-1989::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -330,12 +390,11 @@ observations:
     species:
       formula: Ag
       phase:
-        tag: unknown
-        reason: phase string 'literature_IP' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -358,7 +417,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''literature_IP'' is not in the closed automatic map'
+    origin: kems-127-qi-1989::qi_1989_table1_ionization_potentials_crc
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_compilation'
+    origin: kems-127-qi-1989::qi_1989_table1_ionization_potentials_crc
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-127-qi-1989
   locator:
     published_page: 577
@@ -377,12 +457,11 @@ observations:
     species:
       formula: Ag
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_Ag-In_and_Ag-Ga' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -405,7 +484,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_Ag-In_and_Ag-Ga'' is not in the closed automatic map'
+    origin: kems-127-qi-1989::qi_1989_table1_ionization_potentials_this_work
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-127-qi-1989
   locator:
     published_page: 577
@@ -416,7 +506,7 @@ observations:
   provenance:
     printed_phase: vapor_over_Ag-In_and_Ag-Ga
 - observation_id: kems-127-qi-1989::qi_1989_table2_second_law_deltaH298
-  experiment_id: 10.2320/matertrans1989.30.575::kems-127-qi-1989
+  experiment_id: 10.2320/matertrans1989.30.575::kems-127-qi-1989::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -424,12 +514,11 @@ observations:
     species:
       formula: Ag
       phase:
-        tag: unknown
-        reason: phase string 'pure_liquid_metals' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -454,7 +543,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''pure_liquid_metals'' is not in the closed automatic map'
+    origin: kems-127-qi-1989::qi_1989_table2_second_law_deltaH298
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_third_law_thermochemistry'
+    origin: kems-127-qi-1989::qi_1989_table2_second_law_deltaH298
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-127-qi-1989
   locator:
     published_page: 577
@@ -473,12 +583,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Ag-In' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -504,7 +613,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Ag-In'' is not in the closed automatic map'
+    origin: kems-127-qi-1989::qi_1989_table3_ag_in_ion_ratio_fits
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-127-qi-1989
   locator:
     published_page: 578
@@ -523,12 +643,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Ag-In' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -554,7 +673,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Ag-In'' is not in the closed automatic map'
+    origin: kems-127-qi-1989::qi_1989_table3_ag_in_ion_ratio_fits
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-127-qi-1989
   locator:
     published_page: 578
@@ -573,12 +703,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Ag-In' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -604,7 +733,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Ag-In'' is not in the closed automatic map'
+    origin: kems-127-qi-1989::qi_1989_table3_ag_in_ion_ratio_fits
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-127-qi-1989
   locator:
     published_page: 578
@@ -623,12 +763,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Ag-In' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -654,7 +793,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Ag-In'' is not in the closed automatic map'
+    origin: kems-127-qi-1989::qi_1989_table3_ag_in_ion_ratio_fits
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-127-qi-1989
   locator:
     published_page: 578
@@ -673,12 +823,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Ag-In' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -704,7 +853,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Ag-In'' is not in the closed automatic map'
+    origin: kems-127-qi-1989::qi_1989_table3_ag_in_ion_ratio_fits
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-127-qi-1989
   locator:
     published_page: 578
@@ -723,12 +883,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Ag-In' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -754,7 +913,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Ag-In'' is not in the closed automatic map'
+    origin: kems-127-qi-1989::qi_1989_table3_ag_in_ion_ratio_fits
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-127-qi-1989
   locator:
     published_page: 578
@@ -773,12 +943,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Ag-In' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -804,7 +973,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Ag-In'' is not in the closed automatic map'
+    origin: kems-127-qi-1989::qi_1989_table3_ag_in_ion_ratio_fits
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-127-qi-1989
   locator:
     published_page: 578
@@ -823,12 +1003,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Ag-Ga' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -854,7 +1033,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Ag-Ga'' is not in the closed automatic map'
+    origin: kems-127-qi-1989::qi_1989_table4_ag_ga_ion_ratio_fits
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-127-qi-1989
   locator:
     published_page: 578
@@ -873,12 +1063,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Ag-Ga' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -904,7 +1093,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Ag-Ga'' is not in the closed automatic map'
+    origin: kems-127-qi-1989::qi_1989_table4_ag_ga_ion_ratio_fits
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-127-qi-1989
   locator:
     published_page: 578
@@ -923,12 +1123,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Ag-Ga' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -954,7 +1153,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Ag-Ga'' is not in the closed automatic map'
+    origin: kems-127-qi-1989::qi_1989_table4_ag_ga_ion_ratio_fits
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-127-qi-1989
   locator:
     published_page: 578
@@ -973,12 +1183,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Ag-Ga' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1004,7 +1213,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Ag-Ga'' is not in the closed automatic map'
+    origin: kems-127-qi-1989::qi_1989_table4_ag_ga_ion_ratio_fits
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-127-qi-1989
   locator:
     published_page: 578
@@ -1023,12 +1243,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Ag-Ga' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1054,7 +1273,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Ag-Ga'' is not in the closed automatic map'
+    origin: kems-127-qi-1989::qi_1989_table4_ag_ga_ion_ratio_fits
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-127-qi-1989
   locator:
     published_page: 578
@@ -1073,12 +1303,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Ag-Ga' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1104,7 +1333,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Ag-Ga'' is not in the closed automatic map'
+    origin: kems-127-qi-1989::qi_1989_table4_ag_ga_ion_ratio_fits
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-127-qi-1989
   locator:
     published_page: 578
@@ -1123,12 +1363,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Ag-Ga' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1154,7 +1393,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Ag-Ga'' is not in the closed automatic map'
+    origin: kems-127-qi-1989::qi_1989_table4_ag_ga_ion_ratio_fits
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-127-qi-1989
   locator:
     published_page: 578
@@ -1173,12 +1423,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Ag-Ga' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1204,7 +1453,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Ag-Ga'' is not in the closed automatic map'
+    origin: kems-127-qi-1989::qi_1989_table4_ag_ga_ion_ratio_fits
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-127-qi-1989
   locator:
     published_page: 578
@@ -1223,12 +1483,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Ag-Ga' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1254,7 +1513,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Ag-Ga'' is not in the closed automatic map'
+    origin: kems-127-qi-1989::qi_1989_table4_ag_ga_ion_ratio_fits
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-127-qi-1989
   locator:
     published_page: 578
@@ -1273,12 +1543,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Ag-Ga' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1304,7 +1573,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Ag-Ga'' is not in the closed automatic map'
+    origin: kems-127-qi-1989::qi_1989_table4_ag_ga_ion_ratio_fits
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-127-qi-1989
   locator:
     published_page: 578

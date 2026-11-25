@@ -40,6 +40,7 @@ from simulator.battery.enums import (
     BenchAbsenceReason,
     BenchIdentityBasis,
     CellMaterial,
+    DEFAULT_POLICY_NOTICE_KINDS,
     Engine,
     EvidenceClass,
     ExecutionState,
@@ -674,13 +675,13 @@ class Species:
 
 
 def phase_token(species: Species) -> Phase | None:
-    """Closed Phase token when the axis is a value; None for unknown / n/a."""
+    """Closed physical phase; ``unspecified`` is an unresolved axis."""
 
     phase = species.phase
     if isinstance(phase, Phase):
-        return phase
+        return None if phase is Phase.UNSPECIFIED else phase
     if isinstance(phase, State) and phase.is_value:
-        return phase.value
+        return None if phase.value is Phase.UNSPECIFIED else phase.value
     return None
 
 
@@ -1013,6 +1014,31 @@ class Derivation:
 
 
 @dataclass(frozen=True)
+class NoticePolicy:
+    id: str
+    version: str | int
+    status: str
+    value: str
+    units: str
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.id, str) or not self.id.startswith("DP-"):
+            raise ValueError("notice policy id must be a DP id")
+        if (
+            isinstance(self.version, bool)
+            or not isinstance(self.version, (str, int))
+            or not str(self.version)
+            or not isinstance(self.value, str)
+            or not self.value
+            or not isinstance(self.units, str)
+            or not self.units
+        ):
+            raise ValueError("notice policy requires id, version, value, and units")
+        if self.status not in {"canonical", "proposed", "rejected"}:
+            raise ValueError("notice policy status is not recognized")
+
+
+@dataclass(frozen=True)
 class Notice:
     kind: NoticeKind
     affected_quantities: tuple[Quantity, ...]
@@ -1027,16 +1053,22 @@ class Notice:
     authority: Authority | None = None
     certification: str | None = None
     fo2_mode: Fo2Mode | None = None
+    policy: NoticePolicy | None = None
 
     def __post_init__(self) -> None:
         if not self.affected_quantities:
-            # These row labels may survive a typed quantity_unknown refusal.
+            # Row-level migration facts remain useful when quantity is unknown.
             if self.kind not in {
                 NoticeKind.FIGURE_ONLY,
                 NoticeKind.VALIDATION_HARD_ISSUE_LABEL,
                 NoticeKind.ADMISSION_FROM_LEGACY_TOKEN,
+                NoticeKind.METHOD_UNSTATED,
+                NoticeKind.METHOD_INFERRED,
+                NoticeKind.PHASE_INFERRED,
             }:
                 raise ValueError("Notice.affected_quantities is required")
+        if self.policy is not None and not isinstance(self.policy, NoticePolicy):
+            raise TypeError("Notice.policy must be NoticePolicy or absent")
         if not self.reason:
             raise ValueError("Notice.reason is required")
         if not self.origin:
@@ -1050,6 +1082,14 @@ class Notice:
                 raise ValueError(
                     "reference_phase_by_convention requires certification"
                 )
+        if self.policy is not None:
+            if not isinstance(self.policy, NoticePolicy):
+                raise TypeError("Notice.policy must be NoticePolicy or absent")
+            if self.kind not in DEFAULT_POLICY_NOTICE_KINDS:
+                raise ValueError("policy notice kind must name a default-policy flag")
+        if self.kind in {NoticeKind.ASSUMED_PRESSURE, NoticeKind.METHOD_IMPLIED}:
+            if self.policy is None:
+                raise ValueError(f"{self.kind.value} requires policy metadata")
         if self.original is not None:
             object.__setattr__(self, "original", as_decimal(self.original))
         if self.dropped_mass_fraction is not None:
@@ -1883,8 +1923,10 @@ class Observation:
 
 @dataclass(frozen=True)
 class CandidateRequest:
+    """Requested engine comparison; quantity is None when identity is unknown."""
+
     experiment_id: str
-    quantity: Quantity
+    quantity: Quantity | None
     engine: Engine
     channel: str
 
@@ -1989,6 +2031,7 @@ def union_notices(*groups: tuple[Notice, ...] | None) -> tuple[Notice, ...]:
                 notice.dropped,
                 notice.dropped_mass_fraction,
                 notice.fo2_mode,
+                notice.policy,
             )
             if fingerprint in seen:
                 continue

@@ -312,7 +312,7 @@ def test_isolated_migration_maps_quantities_temperatures_and_unprinted_pressure(
     )
     assert oxide_point_count == 147
     assert len(result.observations) == 334
-    assert len(result.queue) == 210
+    assert len(result.queue) == 172
     assert not any("temperature_K" in entry.axes for entry in result.queue)
     printed_value_count = sum(
         len(source["values"].get("points", [])) or 1

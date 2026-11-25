@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/zhang-2011-boron-sodium-f-free-evaporation.yaml
 observations:
 - observation_id: zhang-2011-boron-sodium-f-free-evaporation::zhang_2011_cs3_1300c_measured_flux
-  experiment_id: 10.2355/isijinternational.51.80::experiment::zhang_2011_cs3_tga_series
+  experiment_id: 10.2355/isijinternational.51.80::zhang-2011-boron-sodium-f-free-evaporation::declared:10.2355/isijinternational.51.80::experiment::zhang_2011_cs3_tga_series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -100,7 +100,18 @@ observations:
         page: 8
         table: '6'
         note: Measured flux; CS-3 row at 1300 C
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermogravimetric_analysis'
+    origin: zhang-2011-boron-sodium-f-free-evaporation::zhang_2011_cs3_1300c_measured_flux
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: zhang-2011-boron-sodium-f-free-evaporation
   locator:
     page: 8
@@ -292,7 +303,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: zhang-2011-boron-sodium-f-free-evaporation::zhang_2011_cs3_1350c_measured_flux
-  experiment_id: 10.2355/isijinternational.51.80::experiment::zhang_2011_cs3_tga_series
+  experiment_id: 10.2355/isijinternational.51.80::zhang-2011-boron-sodium-f-free-evaporation::declared:10.2355/isijinternational.51.80::experiment::zhang_2011_cs3_tga_series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -389,7 +400,18 @@ observations:
         page: 8
         table: '6'
         note: Measured flux; CS-3 row at 1350 C
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermogravimetric_analysis'
+    origin: zhang-2011-boron-sodium-f-free-evaporation::zhang_2011_cs3_1350c_measured_flux
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: zhang-2011-boron-sodium-f-free-evaporation
   locator:
     page: 8
@@ -581,7 +603,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: zhang-2011-boron-sodium-f-free-evaporation::zhang_2011_cs3_1400c_measured_flux
-  experiment_id: 10.2355/isijinternational.51.80::experiment::zhang_2011_cs3_tga_series
+  experiment_id: 10.2355/isijinternational.51.80::zhang-2011-boron-sodium-f-free-evaporation::declared:10.2355/isijinternational.51.80::experiment::zhang_2011_cs3_tga_series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -678,7 +700,18 @@ observations:
         page: 8
         table: '6'
         note: Measured flux; CS-3 row at 1400 C
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermogravimetric_analysis'
+    origin: zhang-2011-boron-sodium-f-free-evaporation::zhang_2011_cs3_1400c_measured_flux
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: zhang-2011-boron-sodium-f-free-evaporation
   locator:
     page: 8
@@ -870,7 +903,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: zhang-2011-boron-sodium-f-free-evaporation::zhang_2011_cs3zro2_1300c_measured_flux
-  experiment_id: 10.2355/isijinternational.51.80::experiment::zhang_2011_cs3zro2_tga_series
+  experiment_id: 10.2355/isijinternational.51.80::zhang-2011-boron-sodium-f-free-evaporation::declared:10.2355/isijinternational.51.80::experiment::zhang_2011_cs3zro2_tga_series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -969,7 +1002,18 @@ observations:
         page: 8
         table: '6'
         note: Measured flux; CS-3 plus ZrO2 row at 1300 C
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermogravimetric_analysis'
+    origin: zhang-2011-boron-sodium-f-free-evaporation::zhang_2011_cs3zro2_1300c_measured_flux
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: zhang-2011-boron-sodium-f-free-evaporation
   locator:
     page: 8
@@ -1179,7 +1223,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: zhang-2011-boron-sodium-f-free-evaporation::zhang_2011_cs3zro2_1350c_measured_flux
-  experiment_id: 10.2355/isijinternational.51.80::experiment::zhang_2011_cs3zro2_tga_series
+  experiment_id: 10.2355/isijinternational.51.80::zhang-2011-boron-sodium-f-free-evaporation::declared:10.2355/isijinternational.51.80::experiment::zhang_2011_cs3zro2_tga_series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1278,7 +1322,18 @@ observations:
         page: 8
         table: '6'
         note: Measured flux; CS-3 plus ZrO2 row at 1350 C
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermogravimetric_analysis'
+    origin: zhang-2011-boron-sodium-f-free-evaporation::zhang_2011_cs3zro2_1350c_measured_flux
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: zhang-2011-boron-sodium-f-free-evaporation
   locator:
     page: 8
@@ -1488,7 +1543,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: zhang-2011-boron-sodium-f-free-evaporation::zhang_2011_cs3zro2_1400c_measured_flux
-  experiment_id: 10.2355/isijinternational.51.80::experiment::zhang_2011_cs3zro2_tga_series
+  experiment_id: 10.2355/isijinternational.51.80::zhang-2011-boron-sodium-f-free-evaporation::declared:10.2355/isijinternational.51.80::experiment::zhang_2011_cs3zro2_tga_series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1587,7 +1642,18 @@ observations:
         page: 8
         table: '6'
         note: Measured flux; CS-3 plus ZrO2 row at 1400 C
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermogravimetric_analysis'
+    origin: zhang-2011-boron-sodium-f-free-evaporation::zhang_2011_cs3zro2_1400c_measured_flux
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: zhang-2011-boron-sodium-f-free-evaporation
   locator:
     page: 8
@@ -1797,7 +1863,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: zhang-2011-boron-sodium-f-free-evaporation::zhang_2011_cs4_1300c_measured_flux
-  experiment_id: 10.2355/isijinternational.51.80::experiment::zhang_2011_cs4_tga_series
+  experiment_id: 10.2355/isijinternational.51.80::zhang-2011-boron-sodium-f-free-evaporation::declared:10.2355/isijinternational.51.80::experiment::zhang_2011_cs4_tga_series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1894,7 +1960,18 @@ observations:
         page: 8
         table: '6'
         note: Measured flux; CS-4 row at 1300 C
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermogravimetric_analysis'
+    origin: zhang-2011-boron-sodium-f-free-evaporation::zhang_2011_cs4_1300c_measured_flux
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: zhang-2011-boron-sodium-f-free-evaporation
   locator:
     page: 8
@@ -2086,7 +2163,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: zhang-2011-boron-sodium-f-free-evaporation::zhang_2011_cs4_1350c_measured_flux
-  experiment_id: 10.2355/isijinternational.51.80::experiment::zhang_2011_cs4_tga_series
+  experiment_id: 10.2355/isijinternational.51.80::zhang-2011-boron-sodium-f-free-evaporation::declared:10.2355/isijinternational.51.80::experiment::zhang_2011_cs4_tga_series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -2183,7 +2260,18 @@ observations:
         page: 8
         table: '6'
         note: Measured flux; CS-4 row at 1350 C
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermogravimetric_analysis'
+    origin: zhang-2011-boron-sodium-f-free-evaporation::zhang_2011_cs4_1350c_measured_flux
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: zhang-2011-boron-sodium-f-free-evaporation
   locator:
     page: 8
@@ -2375,7 +2463,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: zhang-2011-boron-sodium-f-free-evaporation::zhang_2011_cs4_1400c_measured_flux
-  experiment_id: 10.2355/isijinternational.51.80::experiment::zhang_2011_cs4_tga_series
+  experiment_id: 10.2355/isijinternational.51.80::zhang-2011-boron-sodium-f-free-evaporation::declared:10.2355/isijinternational.51.80::experiment::zhang_2011_cs4_tga_series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -2472,7 +2560,18 @@ observations:
         page: 8
         table: '6'
         note: Measured flux; CS-4 row at 1400 C
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermogravimetric_analysis'
+    origin: zhang-2011-boron-sodium-f-free-evaporation::zhang_2011_cs4_1400c_measured_flux
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: zhang-2011-boron-sodium-f-free-evaporation
   locator:
     page: 8

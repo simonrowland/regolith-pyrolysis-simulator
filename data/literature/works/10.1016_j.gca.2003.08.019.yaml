@@ -157,21 +157,12 @@ experiments:
   locator:
     published_page: 1386
     section: 2.1 H2-Pyrolysis
-  apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: stainless steel (316 grade) reactor tube; open-system fixed-bed H2-pyrolysis
-      locator:
-        published_page: 1386
-        pdf_page_index: 2
-        paragraph: catalyst-loaded samples (50-300 mg) were initially heated in a stainless steel (316 grade) reactor tube
   bench_id: 10.1016/j.gca.2003.08.019::bench::h2-pyrolysis-reactor
 - experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'stepped_combustion_classification' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: unspecified
   sample: {}
   conditions:
     temperature_K:
@@ -244,6 +235,140 @@ experiments:
               note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
         output_unit: Pa
         references: []
+- experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca::declared:10.1016/j.gca.2003.08.019::experiment::murchison-h2-pyrolysis-series::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.00005'
+          interval_high: '0.0003'
+          approximate: false
+      locator:
+        published_page: 1386
+        section: 2.1 H2-Pyrolysis
+        note: 50-300 mg solvent-extracted sample; unit conversion only
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '50'
+            locator:
+              published_page: 1386
+              section: 2.1 H2-Pyrolysis
+              note: 50-300 mg solvent-extracted sample; unit conversion only
+        - - original_high
+          - state:
+              tag: value
+              value: '300'
+            locator:
+              published_page: 1386
+              section: 2.1 H2-Pyrolysis
+              note: 50-300 mg solvent-extracted sample; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 1386
+              section: 2.1 H2-Pyrolysis
+              note: 50-300 mg solvent-extracted sample; unit conversion only
+        output_unit: kg
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value: Crushed whole Murchison meteorite, solvent-extracted and catalyst-impregnated
+      locator:
+        published_page: 1386
+        section: 2.1 H2-Pyrolysis
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 1386
+        section: 2.1 H2-Pyrolysis
+        note: Program has 220 C and 520 C endpoints, not one run temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '15000000'
+          approximate: false
+      locator:
+        published_page: 1386
+        section: 2.1 H2-Pyrolysis
+        note: 15 MPa hydrogen; unit conversion only
+      inference:
+        relation: MPa_to_Pa
+        inputs:
+        - P_Pa = P_MPa × 1e6
+        - original_unit=MPa
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '15'
+            locator:
+              published_page: 1386
+              section: 2.1 H2-Pyrolysis
+              note: 15 MPa hydrogen; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              published_page: 1386
+              section: 2.1 H2-Pyrolysis
+              note: 15 MPa hydrogen; unit conversion only
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: hydrogen
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 1386
+        section: 2.1 H2-Pyrolysis
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2003.08.019
+  locator:
+    published_page: 1386
+    section: 2.1 H2-Pyrolysis
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: stainless steel (316 grade) reactor tube; open-system fixed-bed H2-pyrolysis
+      locator:
+        published_page: 1386
+        pdf_page_index: 2
+        paragraph: catalyst-loaded samples (50-300 mg) were initially heated in a stainless steel (316 grade) reactor tube
+  bench_id: 10.1016/j.gca.2003.08.019::bench::h2-pyrolysis-reactor
 benches:
 - id: 10.1016/j.gca.2003.08.019::bench::h2-pyrolysis-reactor
   work_id: 10.1016/j.gca.2003.08.019

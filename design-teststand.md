@@ -63,9 +63,9 @@ and what area faced the chamber. They do not appear in the gas balance.
 A null area is a typed omission. It is not replaced by a 1 g default or by
 an inferred pellet face. The existing gram-lab area bridge returns no area
 when the field is null; this note does not retune that bridge. Applying
-equipment geometry refuses `exposed_melt_area_not_printed` instead of
-writing `size_crucible`'s face onto that melt. A printed positive area
-is installed there, before the C0 exit forecast. A present value that
+equipment geometry applies DP-007's sample-mass-sized `size_crucible` face
+with a `knob_defaulted` flag, keeping the result out of the clean headline.
+A printed positive area is installed there, before the C0 exit forecast. A present value that
 is not a finite positive declared scalar refuses
 `invalid_lab_geometry_positive_value`. That includes a binary scalar
 and an integer `float()` cannot convert. Numeric strings stay admitted.
@@ -249,10 +249,11 @@ is the per-step function.
   when any element is Poiseuille or Beskok-Karniadakis, because `S_eff`
   is then not the constant in the closed form.
 
-`_step_one_hour` calls this with `dt_s=3600` and `form="steady_state"`
-after the existing lab-schedule write and the C2A Knudsen adjustment.
-3600 s is the hour the process already steps. This change does not add a
-substep, an Euler march, or a dt setting. The evolved non-condensable
+`_step_one_hour` calls `_apply_teststand_chamber_pressure` with
+`form="steady_state"` after the existing lab-schedule write and the C2A
+Knudsen adjustment. The one-hour step passes the literal `dt_s=3600`.
+A shorter process step passes that step's `process_dt`. The hook does
+not add a substep or an Euler march. The evolved non-condensable
 moles for that call are
 
 ```
@@ -370,10 +371,11 @@ specified. The achieved-pressure schedule remains the runtime boundary.
 Implemented: the driver split, the schema fields, the steady solve
 (nominal pump or speed curve; series of certified elements), the analytic
 exponential for a pressure-independent `S_eff`, regime notices and typed
-refusals, the hour hook at `steady_state` with `dt_s=3600`, the Robinot
-preset filled only with what the paper prints, and the
-`exposed_melt_area_not_printed` refusal when equipment geometry would
-otherwise adopt `size_crucible`'s face for a gram-lab sample with no
+refusals, the process hook at `steady_state` with the step's `dt_s`
+(the literal 3600 on the hour), the Robinot preset filled only with
+what the paper prints, and the
+DP-007's sample-mass-sized `size_crucible` face with a `knob_defaulted`
+flag, kept out of the clean headline, when a gram-lab sample has no
 printed area. A printed positive area is that face, including for the
 C0 forecast inside campaign start. A non-positive present value, a
 binary scalar, or an integer `float()` cannot convert refuses

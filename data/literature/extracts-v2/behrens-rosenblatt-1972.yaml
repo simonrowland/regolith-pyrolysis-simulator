@@ -77,7 +77,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_sat
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: behrens-rosenblatt-1972::NIST_BR72_arsenolite_As4O6
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: behrens-rosenblatt-1972
   locator:
     note: NIST Antoine table for diarsenic trioxide, row 369.29–421.69 K, citing Behrens and Rosenblatt 1972

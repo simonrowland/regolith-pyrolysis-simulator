@@ -49,6 +49,7 @@ from simulator.physical_constants import (
     MELT_DISSOCIATION_PO2_MIN_BAR,
     PA_PER_BAR,
 )
+from simulator.policy.default_policy import DP_019_VACUUM_BOUNDARY_BAR
 from simulator.melt_backend.base import (
     ANTOINE_FALLBACK_SOURCE_PREFIX,
     REDOX_MODE_NOT_AN_INPUT,
@@ -203,7 +204,9 @@ _IMCC_OUT_OF_BASIS_CODES = frozenset(
     }
 )
 
-_DEFAULT_PRESSURE_BAR = 1.0e-6
+# Gram-scale reference charge when an analytical Knudsen source omits mass.
+# It sets the physical scale of the loader cutoff and its trace-tail bounds.
+DEFAULT_ANALYTICAL_KNUDSEN_CHARGE_KG = 1e-3
 _DEFAULT_FO2_LOG = -9.0
 _WT_PCT_SUM_TOLERANCE = 1.0e-9
 
@@ -447,8 +450,17 @@ def _call_cached_backend_equilibrate(
         raise caught_thermoengine[0]
     if handle.name == "thermoengine":
         _reraise_cached_thermoengine_refusal(payload)
+    if isinstance(payload, Mapping):
+        mask_hit = payload.get("mask_hit")
+    else:
+        mask_hit = getattr(payload, "mask_hit", None)
+    if not isinstance(mask_hit, str):
+        mask_hit = None
     if isinstance(payload, list):
         payload = equilibrium_cache_from_value(payload, engine_id=handle.name)
+        if mask_hit is not None and isinstance(payload, Mapping):
+            payload = dict(payload)
+            payload["mask_hit"] = mask_hit
     if isinstance(payload, Mapping):
         if handle.name == "internal-analytical":
             return SimpleNamespace(**payload)
@@ -624,6 +636,10 @@ class EquilibrateCell:
     liquid_composition_wt_pct: dict[str, float] = field(default_factory=dict)
     fe_redox_split: dict[str, float] = field(default_factory=dict)
     backend_failure_disposition: str | None = None
+    # Class string when the refusal mask returned this cell. None on a
+    # live engine call. A default keeps payloads written before the field.
+    # Score JSON omits it: a mask hit must not change the payload.
+    mask_hit: str | None = None
 
     def to_cache_payload(self) -> str:
         """Serialize the cell without losing its Python value types."""
@@ -802,6 +818,11 @@ class EquilibrateCell:
                 if payload.get("backend_failure_disposition") is None
                 else str(payload.get("backend_failure_disposition"))
             ),
+            mask_hit=(
+                None
+                if payload.get("mask_hit") is None
+                else str(payload.get("mask_hit"))
+            ),
         )
 
     def to_engine_cache_value(self) -> Any:
@@ -876,19 +897,25 @@ class EquilibrateCell:
 
     @classmethod
     def from_hot(cls, payload: Any) -> "EquilibrateCell":
+        if isinstance(payload, Mapping):
+            mask_hit = payload.get("mask_hit")
+        else:
+            mask_hit = getattr(payload, "mask_hit", None)
         if isinstance(payload, Mapping) and "cell" in payload:
             cell = cls.from_engine_cache_value(payload["cell"])
             cell.activities_standard_state = payload["activities_standard_state"]
-            return cell
-        if isinstance(payload, Mapping) and "refusal_cell" in payload:
+        elif isinstance(payload, Mapping) and "refusal_cell" in payload:
             cell = cls.from_engine_cache_value(payload["refusal_cell"])
             cell.refusal_reason = payload["refusal_reason"]
             cell.engine_reason = payload["reason"]
             cell.exit_signal = payload["exit_signal"]
             cell.exit_code = payload["exit_code"]
             cell.engine_annotation = payload["engine_annotation"]
-            return cell
-        return cls.from_engine_cache_value(payload)
+        else:
+            cell = cls.from_engine_cache_value(payload)
+        if isinstance(mask_hit, str):
+            cell.mask_hit = mask_hit
+        return cell
 
     @classmethod
     def from_engine_cache_value(cls, payload: Any) -> "EquilibrateCell":
@@ -3993,6 +4020,7 @@ def internal_analytical_residue_vapor_pressure(
     from types import SimpleNamespace
 
     from simulator.engine_cache import _configured_engine_cache_path, cached_engine_call, record_engine_open
+    from simulator.fe_redox import _engine_fe_speciation
     from simulator.melt_backend.base import equilibrium_cache_from_value, equilibrium_to_hot
 
     record_engine_open("internal-analytical", core)
@@ -4016,6 +4044,13 @@ def internal_analytical_residue_vapor_pressure(
             raise _InternalAnalyticalInputRefusal(
                 2, reason_code, str(exc)
             ) from exc
+        q, activity = _engine_fe_speciation(result)
+        speciation = _finite_component_map({
+            "fe3_over_sum_fe": q,
+            "activity_used_for_pressure": activity,
+        })
+        if speciation:
+            result.fe_redox_split = speciation
         return result
 
     def solve():
@@ -4753,6 +4788,15 @@ class _IsolatedCellWorker:
             self.engine, normalize_engine_settings(self.engine, self.engine_settings),
         )
         result = cached_engine_call(self.engine, request, solve)
+        # EquilibrateCell.from_hot/as_payload keeps cell fields. A mask
+        # flag on a mapping or on a list subclass has to be copied back
+        # after that projection.
+        if isinstance(result, Mapping):
+            mask_hit = result.get("mask_hit")
+        else:
+            mask_hit = getattr(result, "mask_hit", None)
+        if not isinstance(mask_hit, str):
+            mask_hit = None
         if isinstance(result, list) or (isinstance(result, Mapping) and ("refusal_cell" in result or "cell" in result)):
             result = EquilibrateCell.from_hot(result).as_payload()
         if not isinstance(result, dict):
@@ -4770,6 +4814,8 @@ class _IsolatedCellWorker:
             cpu_s=time.process_time() - started_cpu,
             hostname=_hostname(),
         )
+        if mask_hit is not None:
+            result["mask_hit"] = mask_hit
         return result
 
 
@@ -5465,7 +5511,7 @@ def _equilibrate_cell_uncached(
     temperature_C = float(temperature_K) - CELSIUS_TO_KELVIN_OFFSET
     fo2_log = _fo2_log_for_request(handle, po2)
     if physical_pressure_bar is None:
-        physical_pressure_bar = _DEFAULT_PRESSURE_BAR
+        physical_pressure_bar = DP_019_VACUUM_BOUNDARY_BAR
     else:
         physical_pressure_bar = float(physical_pressure_bar)
     pressure_bar = physical_pressure_bar
@@ -5595,6 +5641,11 @@ def _equilibrate_cell_uncached(
                 if diagnostics.get("backend_failure_disposition") is None
                 else str(diagnostics.get("backend_failure_disposition"))
             ),
+            mask_hit=(
+                getattr(result, "mask_hit", None)
+                if isinstance(getattr(result, "mask_hit", None), str)
+                else None
+            ),
         )
         return cell
     except Exception as exc:  # noqa: BLE001 - typed refusal, never a hang/crash
@@ -5622,6 +5673,11 @@ def _equilibrate_cell_uncached(
                 None
                 if getattr(exc, "failure_disposition", None) is None
                 else str(getattr(exc, "failure_disposition"))
+            ),
+            mask_hit=(
+                getattr(exc, "mask_hit", None)
+                if isinstance(getattr(exc, "mask_hit", None), str)
+                else None
             ),
         )
         return cell
@@ -6214,7 +6270,7 @@ def build_report(
                 "engine_default": grid.engine_default_po2,
                 "commanded": list(grid.commanded_po2_bar),
             },
-            "pressure_bar": _DEFAULT_PRESSURE_BAR,
+            "pressure_bar": DP_019_VACUUM_BOUNDARY_BAR,
         },
         "pots": [
             {

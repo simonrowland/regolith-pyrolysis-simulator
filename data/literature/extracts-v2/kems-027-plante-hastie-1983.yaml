@@ -11,12 +11,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -41,7 +40,28 @@ observations:
         published_page: 44
         pdf_page_index: 50
         section: 8. Figure Captions
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_alpha_absence_audited
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_alpha_absence_audited
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 44
@@ -57,12 +77,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -90,7 +109,28 @@ observations:
         published_page: 44
         pdf_page_index: 50
         note: §8 figure captions and all numbered tables; no evaporation/condensation coefficient
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''SNW_alkali_bearing_glass'' is not in the closed automatic map'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_alpha_true_absence
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_alpha_true_absence
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 44
@@ -108,12 +148,11 @@ observations:
     species:
       formula: CsBO2
       phase:
-        tag: unknown
-        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -239,6 +278,18 @@ observations:
     reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
       composition evolves during vaporization'
     origin: kems-027-plante-hastie-1983::plante_hastie_1983_csbo2_activity_1200K
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''SNW_alkali_bearing_glass'' is not in the closed automatic map'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_csbo2_activity_1200K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 36
@@ -335,12 +386,11 @@ observations:
     species:
       formula: CsBO2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -450,6 +500,18 @@ observations:
     reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
       composition evolves during vaporization'
     origin: kems-027-plante-hastie-1983::plante_hastie_1983_csbo2_activity_quoted
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_csbo2_activity_quoted
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity
@@ -578,6 +640,16 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_csbo2_fit_quoted
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -591,7 +663,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_csbo2_ideal_model_quoted
-  experiment_id: 10.6028/nbs.ir.83-2731::experiment::plante-1983-model-assay
+  experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983::declared:10.6028/nbs.ir.83-2731::experiment::plante-1983-model-assay::method:unspecified
   identity:
     quantity:
       tag: value
@@ -599,12 +671,11 @@ observations:
     species:
       formula: CsBO2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -670,6 +741,29 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_csbo2_ideal_model_quoted
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_csbo2_ideal_model_quoted
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity
@@ -753,7 +847,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Detection bound, not
+      a measured pressure point. No conversion or fabricated lower temperature bound.'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_detection_limits_quoted
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 35
@@ -1168,6 +1273,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -1317,6 +1433,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -1466,6 +1593,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -1615,6 +1753,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -1764,6 +1913,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -1913,6 +2073,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -2062,6 +2233,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -2211,6 +2393,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -2357,6 +2550,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -2503,6 +2707,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -2649,6 +2864,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -2795,6 +3021,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -2941,6 +3178,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -3087,6 +3335,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -3233,6 +3492,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -3379,6 +3649,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -3526,6 +3807,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -3677,6 +3969,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -3828,6 +4131,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -3979,6 +4293,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -4130,6 +4455,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -4281,6 +4617,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -4432,6 +4779,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -4583,6 +4941,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -4734,6 +5103,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -4792,7 +5172,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig20_21_model_proxy
-  experiment_id: 10.6028/nbs.ir.83-2731::experiment::plante-1983-model-assay
+  experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983::declared:10.6028/nbs.ir.83-2731::experiment::plante-1983-model-assay::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -4800,12 +5180,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4836,7 +5215,28 @@ observations:
         figure: '20'
         note: Figs 20–21 thermodynamic estimates; a=x; pO2=0.02 atm. Not measurements. The printed temperature axis is °C,
           with a secondary 10^4/T (K) axis.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''SNW_alkali_bearing_glass'' is not in the closed automatic map'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig20_21_model_proxy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermodynamic_estimate'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig20_21_model_proxy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 45
@@ -4856,12 +5256,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4882,7 +5281,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''SNW_alkali_bearing_glass'' is not in the closed automatic map'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_kms_pt_cell_geometry
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-027-plante-hastie-1983
   locator:
     figure: '2'
@@ -4901,12 +5311,11 @@ observations:
     species:
       formula: LiBO2
       phase:
-        tag: unknown
-        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5032,6 +5441,18 @@ observations:
     reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
       composition evolves during vaporization'
     origin: kems-027-plante-hastie-1983::plante_hastie_1983_libo2_activity_approx
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''SNW_alkali_bearing_glass'' is not in the closed automatic map'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_libo2_activity_approx
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 16
@@ -5119,12 +5540,11 @@ observations:
     species:
       formula: LiBO2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5234,6 +5654,18 @@ observations:
     reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
       composition evolves during vaporization'
     origin: kems-027-plante-hastie-1983::plante_hastie_1983_libo2_activity_quoted
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_libo2_activity_quoted
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity
@@ -5354,6 +5786,16 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_libo2_fit_quoted
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -5375,12 +5817,11 @@ observations:
     species:
       formula: NaBO2
       phase:
-        tag: unknown
-        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5507,6 +5948,18 @@ observations:
     reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
       composition evolves during vaporization'
     origin: kems-027-plante-hastie-1983::plante_hastie_1983_nabo2_activity_approx
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''SNW_alkali_bearing_glass'' is not in the closed automatic map'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_nabo2_activity_approx
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 16
@@ -5597,12 +6050,11 @@ observations:
     species:
       formula: NaBO2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5712,6 +6164,18 @@ observations:
     reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
       composition evolves during vaporization'
     origin: kems-027-plante-hastie-1983::plante_hastie_1983_nabo2_activity_quoted
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_nabo2_activity_quoted
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity
@@ -5832,6 +6296,16 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_nabo2_fit_quoted
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -6300,7 +6774,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_offgas_model_quoted
-  experiment_id: 10.6028/nbs.ir.83-2731::experiment::plante-1983-model-assay
+  experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983::declared:10.6028/nbs.ir.83-2731::experiment::plante-1983-model-assay::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -6308,12 +6782,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6334,6 +6807,27 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_offgas_model_quoted
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_offgas_model_quoted
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -6500,7 +6994,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_table1_snw_glass_composition
-  experiment_id: 10.6028/nbs.ir.83-2731::experiment::plante-1983-model-assay
+  experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983::declared:10.6028/nbs.ir.83-2731::experiment::plante-1983-model-assay::method:knudsen_effusion
   identity:
     quantity:
       tag: unknown
@@ -6508,12 +7002,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6569,7 +7062,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''SNW_alkali_bearing_glass'' is not in the closed automatic map'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_table1_snw_glass_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 3
@@ -6933,12 +7437,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'SNW_alkali_bearing_glass' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6998,7 +7501,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''SNW_alkali_bearing_glass'' is not in the closed automatic map'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_table3_mass_loss
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 15
@@ -7078,7 +7592,7 @@ observations:
   provenance:
     printed_phase: SNW_alkali_bearing_glass
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_table4_offgas_cec_model
-  experiment_id: 10.6028/nbs.ir.83-2731::experiment::plante-1983-model-assay
+  experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983::declared:10.6028/nbs.ir.83-2731::experiment::plante-1983-model-assay::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -7086,12 +7600,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'industrial_offgas_model' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7125,7 +7638,28 @@ observations:
         pdf_page_index: 39
         table: '4'
         note: NASA CEC 76 model of industrial off-gas at 1 atm; not a glass measurement
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''industrial_offgas_model'' is not in the closed automatic map'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_table4_offgas_cec_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: transpiration_mass_spectrometry'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_table4_offgas_cec_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 33
@@ -7136,7 +7670,7 @@ observations:
   provenance:
     printed_phase: industrial_offgas_model
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_thermodynamic_figures_quoted
-  experiment_id: 10.6028/nbs.ir.83-2731::experiment::plante-1983-model-assay
+  experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983::declared:10.6028/nbs.ir.83-2731::experiment::plante-1983-model-assay::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -7144,12 +7678,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7171,6 +7704,27 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_thermodynamic_figures_quoted
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_thermodynamic_figures_quoted
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement

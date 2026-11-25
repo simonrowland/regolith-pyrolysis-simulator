@@ -116,6 +116,92 @@ experiments:
     page: 1
     pdf_page_index: 0
     section: Method
+- experiment_id: 7b4ab140fedc8a71057ac025318e343ac90e589e512a91fc9c1f80c1b25912d2::tatsumi-2004-iron-condensation::declared:7b4ab140fedc8a71057ac025318e343ac90e589e512a91fc9c1f80c1b25912d2::experiment::tatsumi-2004-fe-mo-1020c::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.00001'
+          interval_high: '0.0001'
+          approximate: true
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Method
+        note: Printed 10^-5~10^-4 Pa. Decade bounds stored in pascal with no unit conversion.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Method
+        note: Chamber evacuated by a turbo molecular pump. No sweep gas is printed.
+    regime:
+      regime_class:
+        tag: value
+        value: molecular
+  work_id: 7b4ab140fedc8a71057ac025318e343ac90e589e512a91fc9c1f80c1b25912d2
+  locator:
+    page: 1
+    pdf_page_index: 0
+    section: Method
+- experiment_id: 7b4ab140fedc8a71057ac025318e343ac90e589e512a91fc9c1f80c1b25912d2::tatsumi-2004-iron-condensation::declared:7b4ab140fedc8a71057ac025318e343ac90e589e512a91fc9c1f80c1b25912d2::experiment::tatsumi-2004-fe-mo-415c::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.00001'
+          interval_high: '0.0001'
+          approximate: true
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Method
+        note: Printed 10^-5~10^-4 Pa. Decade bounds stored in pascal with no unit conversion.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 1
+        pdf_page_index: 0
+        section: Method
+        note: Chamber evacuated by a turbo molecular pump. No sweep gas is printed.
+    regime:
+      regime_class:
+        tag: value
+        value: molecular
+  work_id: 7b4ab140fedc8a71057ac025318e343ac90e589e512a91fc9c1f80c1b25912d2
+  locator:
+    page: 1
+    pdf_page_index: 0
+    section: Method
 context:
 - observation_id: tatsumi_2004_cited_coefficient_comparisons
   type: quoted_comparison

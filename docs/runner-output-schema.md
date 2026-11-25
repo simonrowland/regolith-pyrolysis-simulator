@@ -8,6 +8,10 @@ stream's `per_hour_summary` frames; the schema is asserted in
 
 **Schema version:** `1.10.0`
 
+`run_metadata.runtime_notices` is optional. When runtime geometry uses an
+approved default, the notice records its typed kind, original reason, and
+policy payload. DP-007 carries the runtime-sized crucible face area in m².
+
 Schema 1.10.0 adds the unconditional `activity_sources` sibling map to the
 vapor-pressure source report. Per-species source entries remain their original
 scalar source strings. The activity map records the rung, citation or `ideal`,

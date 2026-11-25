@@ -22,6 +22,7 @@ from simulator.battery.enums import (
 )
 from simulator.battery.identity import Identity
 from simulator.battery.records import Execution, Residual, Species
+from simulator.source_ids import HASHIMOTO_SOURCE_ID
 
 from . import factories as F
 
@@ -104,6 +105,7 @@ def test_species_filter_keeps_element_retention_row_once(
     retention = replace(
         mn,
         observation_id="mn-retention",
+        source_id=HASHIMOTO_SOURCE_ID,
         identity=replace(
             mn.identity,
             quantity=Quantity.ELEMENT_RETENTION_RATIO,
@@ -142,6 +144,10 @@ def test_species_filter_keeps_element_retention_row_once(
         )
         is Rail.RESIDUE_COMPOSITION
     )
+
+    def injected_retention_predictor(*_args, **_kwargs):
+        raise AssertionError("the compile double owns the injected row")
+
     count, metadata = score_mod._score_store_to_jsonl(
         context,
         tmp_path / "retention.jsonl",
@@ -150,10 +156,24 @@ def test_species_filter_keeps_element_retention_row_once(
         rail=Rail.RESIDUE_COMPOSITION,
         species_formulas=formulas,
         include_diagnostics=False,
+        predict=injected_retention_predictor,
     )
 
     assert calls == ["mn-retention"]
     assert count == metadata.selected_reference_count == 1
+
+    calls.clear()
+    skipped, _skipped_metadata = score_mod._score_store_to_jsonl(
+        context,
+        tmp_path / "retention-uncovered.jsonl",
+        root=score_mod.REPO_ROOT,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        rail=Rail.RESIDUE_COMPOSITION,
+        species_formulas=formulas,
+        include_diagnostics=False,
+    )
+    assert calls == []
+    assert skipped == 0
 
 
 def test_species_scoring_keeps_full_context_and_emits_identical_rows(

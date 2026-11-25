@@ -11,12 +11,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -101,7 +100,30 @@ observations:
         published_page: 309
         pdf_page_index: 3
         figure: '2'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid CaO-Al2O3 melt; original_reason=phase
+      string ''liquid CaO-Al2O3 melt'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig2_alumina_activity_gibbs_duhem
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: gibbs_duhem_integration'
+    origin: kems-051-allibert-1981::allibert_1981_fig2_alumina_activity_gibbs_duhem
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 309
@@ -175,12 +197,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -265,7 +286,30 @@ observations:
         published_page: 309
         pdf_page_index: 3
         figure: '2'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid CaO-Al2O3 melt; original_reason=phase
+      string ''liquid CaO-Al2O3 melt'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig2_alumina_activity_gibbs_duhem
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: gibbs_duhem_integration'
+    origin: kems-051-allibert-1981::allibert_1981_fig2_alumina_activity_gibbs_duhem
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 309
@@ -339,12 +383,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -429,7 +472,30 @@ observations:
         published_page: 309
         pdf_page_index: 3
         figure: '2'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid CaO-Al2O3 melt; original_reason=phase
+      string ''liquid CaO-Al2O3 melt'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig2_alumina_activity_gibbs_duhem
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: gibbs_duhem_integration'
+    origin: kems-051-allibert-1981::allibert_1981_fig2_alumina_activity_gibbs_duhem
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 309
@@ -503,12 +569,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -593,7 +658,30 @@ observations:
         published_page: 309
         pdf_page_index: 3
         figure: '2'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid CaO-Al2O3 melt; original_reason=phase
+      string ''liquid CaO-Al2O3 melt'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig2_alumina_activity_gibbs_duhem
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: gibbs_duhem_integration'
+    origin: kems-051-allibert-1981::allibert_1981_fig2_alumina_activity_gibbs_duhem
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 309
@@ -667,12 +755,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -757,7 +844,30 @@ observations:
         published_page: 309
         pdf_page_index: 3
         figure: '2'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid CaO-Al2O3 melt; original_reason=phase
+      string ''liquid CaO-Al2O3 melt'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig2_alumina_activity_gibbs_duhem
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: gibbs_duhem_integration'
+    origin: kems-051-allibert-1981::allibert_1981_fig2_alumina_activity_gibbs_duhem
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 309
@@ -831,12 +941,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -921,7 +1030,30 @@ observations:
         published_page: 309
         pdf_page_index: 3
         figure: '2'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid CaO-Al2O3 melt; original_reason=phase
+      string ''liquid CaO-Al2O3 melt'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig2_alumina_activity_gibbs_duhem
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: gibbs_duhem_integration'
+    origin: kems-051-allibert-1981::allibert_1981_fig2_alumina_activity_gibbs_duhem
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 309
@@ -995,12 +1127,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1085,7 +1216,30 @@ observations:
         published_page: 309
         pdf_page_index: 3
         figure: '2'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid CaO-Al2O3 melt; original_reason=phase
+      string ''liquid CaO-Al2O3 melt'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig2_alumina_activity_gibbs_duhem
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: gibbs_duhem_integration'
+    origin: kems-051-allibert-1981::allibert_1981_fig2_alumina_activity_gibbs_duhem
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 309
@@ -1159,12 +1313,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1249,7 +1402,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: gibbs_duhem_integration_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -1324,12 +1500,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1414,7 +1589,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: gibbs_duhem_integration_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -1489,12 +1687,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1579,7 +1776,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: gibbs_duhem_integration_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -1654,12 +1874,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1744,7 +1963,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: gibbs_duhem_integration_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -1819,12 +2061,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1909,7 +2150,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: gibbs_duhem_integration_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -1984,12 +2248,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2074,7 +2337,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: gibbs_duhem_integration_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -2149,12 +2435,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2239,7 +2524,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: gibbs_duhem_integration_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -2314,12 +2622,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2404,7 +2711,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: gibbs_duhem_integration_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -2479,12 +2809,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2569,7 +2898,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: gibbs_duhem_integration_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -2644,12 +2996,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2734,7 +3085,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: gibbs_duhem_integration_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -2809,12 +3183,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2899,7 +3272,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: gibbs_duhem_integration_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -2974,12 +3370,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3064,7 +3459,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: gibbs_duhem_integration_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -3139,12 +3557,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3229,7 +3646,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: gibbs_duhem_integration_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -3304,12 +3744,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3394,7 +3833,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: gibbs_duhem_integration_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -3469,12 +3931,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3559,7 +4020,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: gibbs_duhem_integration_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -3634,12 +4118,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3724,7 +4207,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: gibbs_duhem_integration_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -3799,12 +4305,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3889,7 +4394,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: gibbs_duhem_integration_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -3964,12 +4492,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4054,7 +4581,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: gibbs_duhem_integration_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -4129,12 +4679,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4219,7 +4768,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: gibbs_duhem_integration_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -4294,12 +4866,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4384,7 +4955,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: gibbs_duhem_integration_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -4459,12 +5053,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4549,7 +5142,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: gibbs_duhem_integration_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -4624,12 +5240,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4714,7 +5329,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: gibbs_duhem_integration_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -4789,12 +5427,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4879,7 +5516,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: gibbs_duhem_integration_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -4954,12 +5614,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5044,7 +5703,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: gibbs_duhem_integration_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_alumina_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -5119,12 +5801,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5209,7 +5890,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_effusion_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -5284,12 +5988,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5374,7 +6077,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_effusion_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -5449,12 +6175,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5539,7 +6264,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_effusion_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -5614,12 +6362,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5704,7 +6451,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_effusion_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -5779,12 +6549,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5869,7 +6638,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_effusion_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -5944,12 +6736,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6034,7 +6825,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_effusion_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -6109,12 +6923,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6199,7 +7012,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_effusion_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -6274,12 +7110,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6364,7 +7199,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_effusion_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -6439,12 +7297,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6529,7 +7386,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_effusion_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -6604,12 +7484,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6694,7 +7573,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_effusion_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -6769,12 +7671,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6859,7 +7760,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_effusion_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -6934,12 +7858,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7024,7 +7947,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_effusion_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -7099,12 +8045,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7189,7 +8134,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_effusion_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -7264,12 +8232,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7354,7 +8321,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_effusion_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -7429,12 +8419,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7519,7 +8508,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_effusion_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -7594,12 +8606,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7684,7 +8695,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_effusion_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -7759,12 +8793,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7849,7 +8882,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_effusion_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -7924,12 +8980,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8014,7 +9069,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_effusion_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -8089,12 +9167,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8179,7 +9256,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_effusion_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -8254,12 +9354,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8344,7 +9443,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_effusion_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -8419,12 +9541,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8509,7 +9630,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_effusion_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -8584,12 +9728,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8674,7 +9817,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_effusion_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -8749,12 +9915,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8839,7 +10004,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_effusion_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -8914,12 +10102,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3 melt activity curves' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9004,7 +10191,30 @@ observations:
         published_page: 311
         pdf_page_index: 5
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3 melt activity curves;
+      original_reason=phase string ''CaO-Al2O3 melt activity curves'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_effusion_plus_literature_temperature_combination'
+    origin: kems-051-allibert-1981::allibert_1981_fig6_log_activity_temperature_curves
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 311
@@ -10262,8 +11472,8 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CaO + melt' is bulk_composition_in_two_phase_region
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -10373,6 +11583,18 @@ observations:
     reason: printed phase 'CaO + melt' is a two-phase assemblage; the bulk composition is not the liquid composition
     origin: kems-051-allibert-1981::allibert_1981_table2_alumina_activity_kems::points:h=ddc54294f9b3
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CaO + melt'' is bulk_composition_in_two_phase_region'
+    origin: kems-051-allibert-1981::allibert_1981_table2_alumina_activity_kems::points:h=ddc54294f9b3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 309
@@ -11635,8 +12857,8 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CaO + melt' is bulk_composition_in_two_phase_region
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -11748,6 +12970,18 @@ observations:
     reason: printed phase 'CaO + melt' is a two-phase assemblage; the bulk composition is not the liquid composition
     origin: kems-051-allibert-1981::allibert_1981_table2_cao_activity_kems::points:h=fd9b3f39b252
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CaO + melt'' is bulk_composition_in_two_phase_region'
+    origin: kems-051-allibert-1981::allibert_1981_table2_cao_activity_kems::points:h=fd9b3f39b252
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 309
@@ -11813,12 +13047,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'solid-state electrochemical cells with CaF2 electrolyte' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11847,7 +13080,28 @@ observations:
         published_page: 310
         pdf_page_index: 4
         table: III
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid-state electrochemical cells with CaF2 electrolyte'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_table3_delta_mu_cao_from_emf
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: solid_state_emf'
+    origin: kems-051-allibert-1981::allibert_1981_table3_delta_mu_cao_from_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 310
@@ -11885,12 +13139,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'solid-state electrochemical cells with CaF2 electrolyte' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11919,7 +13172,28 @@ observations:
         published_page: 310
         pdf_page_index: 4
         table: III
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid-state electrochemical cells with CaF2 electrolyte'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_table3_delta_mu_cao_from_emf
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: solid_state_emf'
+    origin: kems-051-allibert-1981::allibert_1981_table3_delta_mu_cao_from_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 310
@@ -11957,12 +13231,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'solid-state electrochemical cells with CaF2 electrolyte' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11991,7 +13264,28 @@ observations:
         published_page: 310
         pdf_page_index: 4
         table: III
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid-state electrochemical cells with CaF2 electrolyte'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_table3_delta_mu_cao_from_emf
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: solid_state_emf'
+    origin: kems-051-allibert-1981::allibert_1981_table3_delta_mu_cao_from_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 310
@@ -12029,12 +13323,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'solid-state electrochemical cells with CaF2 electrolyte' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12063,7 +13356,28 @@ observations:
         published_page: 310
         pdf_page_index: 4
         table: III
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid-state electrochemical cells with CaF2 electrolyte'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_table3_delta_mu_cao_from_emf
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: solid_state_emf'
+    origin: kems-051-allibert-1981::allibert_1981_table3_delta_mu_cao_from_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 310
@@ -12101,12 +13415,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'solid-state electrochemical cells with CaF2 electrolyte' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12135,7 +13448,28 @@ observations:
         published_page: 310
         pdf_page_index: 4
         table: III
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid-state electrochemical cells with CaF2 electrolyte'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_table3_delta_mu_cao_from_emf
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: solid_state_emf'
+    origin: kems-051-allibert-1981::allibert_1981_table3_delta_mu_cao_from_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 310
@@ -12173,12 +13507,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'solid-state electrochemical cells with CaF2 electrolyte' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12207,7 +13540,28 @@ observations:
         published_page: 310
         pdf_page_index: 4
         table: III
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid-state electrochemical cells with CaF2 electrolyte'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_table3_delta_mu_cao_from_emf
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: solid_state_emf'
+    origin: kems-051-allibert-1981::allibert_1981_table3_delta_mu_cao_from_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 310
@@ -12245,12 +13599,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'solid-state electrochemical cells with CaF2 electrolyte' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12278,7 +13631,28 @@ observations:
         published_page: 310
         pdf_page_index: 4
         table: III
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid-state electrochemical cells with CaF2 electrolyte'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_table3_emf_solid_cells
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: solid_state_emf'
+    origin: kems-051-allibert-1981::allibert_1981_table3_emf_solid_cells
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 310
@@ -12296,12 +13670,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'solid-state electrochemical cells with CaF2 electrolyte' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12329,7 +13702,28 @@ observations:
         published_page: 310
         pdf_page_index: 4
         table: III
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid-state electrochemical cells with CaF2 electrolyte'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_table3_emf_solid_cells
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: solid_state_emf'
+    origin: kems-051-allibert-1981::allibert_1981_table3_emf_solid_cells
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 310
@@ -12347,12 +13741,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'solid-state electrochemical cells with CaF2 electrolyte' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12380,7 +13773,28 @@ observations:
         published_page: 310
         pdf_page_index: 4
         table: III
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid-state electrochemical cells with CaF2 electrolyte'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_table3_emf_solid_cells
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: solid_state_emf'
+    origin: kems-051-allibert-1981::allibert_1981_table3_emf_solid_cells
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 310
@@ -12398,12 +13812,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'solid-state electrochemical cells with CaF2 electrolyte' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12431,7 +13844,28 @@ observations:
         published_page: 310
         pdf_page_index: 4
         table: III
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid-state electrochemical cells with CaF2 electrolyte'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_table3_emf_solid_cells
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: solid_state_emf'
+    origin: kems-051-allibert-1981::allibert_1981_table3_emf_solid_cells
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 310
@@ -12449,12 +13883,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'solid-state electrochemical cells with CaF2 electrolyte' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12482,7 +13915,28 @@ observations:
         published_page: 310
         pdf_page_index: 4
         table: III
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid-state electrochemical cells with CaF2 electrolyte'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_table3_emf_solid_cells
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: solid_state_emf'
+    origin: kems-051-allibert-1981::allibert_1981_table3_emf_solid_cells
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 310
@@ -12500,12 +13954,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'solid-state electrochemical cells with CaF2 electrolyte' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12533,7 +13986,28 @@ observations:
         published_page: 310
         pdf_page_index: 4
         table: III
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid-state electrochemical cells with CaF2 electrolyte'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_table3_emf_solid_cells
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: solid_state_emf'
+    origin: kems-051-allibert-1981::allibert_1981_table3_emf_solid_cells
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 310
@@ -12551,12 +14025,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'solid calcium aluminates' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12585,7 +14058,28 @@ observations:
         published_page: 310
         pdf_page_index: 4
         table: IV
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid calcium aluminates'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_table4_gibbs_energies_from_emf
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: solid_state_emf'
+    origin: kems-051-allibert-1981::allibert_1981_table4_gibbs_energies_from_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 310
@@ -12622,12 +14116,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'solid calcium aluminates' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12656,7 +14149,28 @@ observations:
         published_page: 310
         pdf_page_index: 4
         table: IV
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid calcium aluminates'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_table4_gibbs_energies_from_emf
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: solid_state_emf'
+    origin: kems-051-allibert-1981::allibert_1981_table4_gibbs_energies_from_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 310
@@ -12693,12 +14207,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'solid calcium aluminates' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12727,7 +14240,28 @@ observations:
         published_page: 310
         pdf_page_index: 4
         table: IV
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid calcium aluminates'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_table4_gibbs_energies_from_emf
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: solid_state_emf'
+    origin: kems-051-allibert-1981::allibert_1981_table4_gibbs_energies_from_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 310
@@ -12764,12 +14298,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'solid calcium aluminates' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12798,7 +14331,28 @@ observations:
         published_page: 310
         pdf_page_index: 4
         table: IV
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid calcium aluminates'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_table4_gibbs_energies_from_emf
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: solid_state_emf'
+    origin: kems-051-allibert-1981::allibert_1981_table4_gibbs_energies_from_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 310
@@ -12835,13 +14389,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid melt plus solid CaO-Al2O3 interoxide phases in three-phase equilibrium' is not in the
-          closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12873,7 +14425,28 @@ observations:
         published_page: 312
         pdf_page_index: 6
         table: V
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid melt plus solid CaO-Al2O3 interoxide phases in three-phase equilibrium'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_table5_three_phase_equilibria
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: phase_diagram_activity_calculation'
+    origin: kems-051-allibert-1981::allibert_1981_table5_three_phase_equilibria
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 312
@@ -12957,13 +14530,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid melt plus solid CaO-Al2O3 interoxide phases in three-phase equilibrium' is not in the
-          closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12995,7 +14566,28 @@ observations:
         published_page: 312
         pdf_page_index: 6
         table: V
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid melt plus solid CaO-Al2O3 interoxide phases in three-phase equilibrium'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_table5_three_phase_equilibria
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: phase_diagram_activity_calculation'
+    origin: kems-051-allibert-1981::allibert_1981_table5_three_phase_equilibria
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 312
@@ -13079,13 +14671,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid melt plus solid CaO-Al2O3 interoxide phases in three-phase equilibrium' is not in the
-          closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13117,7 +14707,28 @@ observations:
         published_page: 312
         pdf_page_index: 6
         table: V
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid melt plus solid CaO-Al2O3 interoxide phases in three-phase equilibrium'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_table5_three_phase_equilibria
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: phase_diagram_activity_calculation'
+    origin: kems-051-allibert-1981::allibert_1981_table5_three_phase_equilibria
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 312
@@ -13201,13 +14812,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid melt plus solid CaO-Al2O3 interoxide phases in three-phase equilibrium' is not in the
-          closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13239,7 +14848,28 @@ observations:
         published_page: 312
         pdf_page_index: 6
         table: V
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid melt plus solid CaO-Al2O3 interoxide phases in three-phase equilibrium'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_table5_three_phase_equilibria
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: phase_diagram_activity_calculation'
+    origin: kems-051-allibert-1981::allibert_1981_table5_three_phase_equilibria
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 312
@@ -13323,13 +14953,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid melt plus solid CaO-Al2O3 interoxide phases in three-phase equilibrium' is not in the
-          closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13361,7 +14989,28 @@ observations:
         published_page: 312
         pdf_page_index: 6
         table: V
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid melt plus solid CaO-Al2O3 interoxide phases in three-phase equilibrium'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_table5_three_phase_equilibria
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: phase_diagram_activity_calculation'
+    origin: kems-051-allibert-1981::allibert_1981_table5_three_phase_equilibria
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 312
@@ -13445,13 +15094,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid melt plus solid CaO-Al2O3 interoxide phases in three-phase equilibrium' is not in the
-          closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13483,7 +15130,28 @@ observations:
         published_page: 312
         pdf_page_index: 6
         table: V
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid melt plus solid CaO-Al2O3 interoxide phases in three-phase equilibrium'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_table5_three_phase_equilibria
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: phase_diagram_activity_calculation'
+    origin: kems-051-allibert-1981::allibert_1981_table5_three_phase_equilibria
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 312
@@ -13567,13 +15235,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid melt plus solid CaO-Al2O3 interoxide phases in three-phase equilibrium' is not in the
-          closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13605,7 +15271,28 @@ observations:
         published_page: 312
         pdf_page_index: 6
         table: V
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid melt plus solid CaO-Al2O3 interoxide phases in three-phase equilibrium'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_table5_three_phase_equilibria
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: phase_diagram_activity_calculation'
+    origin: kems-051-allibert-1981::allibert_1981_table5_three_phase_equilibria
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 312
@@ -13689,13 +15376,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid melt plus solid CaO-Al2O3 interoxide phases in three-phase equilibrium' is not in the
-          closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13727,7 +15412,28 @@ observations:
         published_page: 312
         pdf_page_index: 6
         table: V
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid melt plus solid CaO-Al2O3 interoxide phases in three-phase equilibrium'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_table5_three_phase_equilibria
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: phase_diagram_activity_calculation'
+    origin: kems-051-allibert-1981::allibert_1981_table5_three_phase_equilibria
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 312
@@ -13811,13 +15517,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid melt plus solid CaO-Al2O3 interoxide phases in three-phase equilibrium' is not in the
-          closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13849,7 +15553,28 @@ observations:
         published_page: 312
         pdf_page_index: 6
         table: V
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid melt plus solid CaO-Al2O3 interoxide phases in three-phase equilibrium'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_table5_three_phase_equilibria
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: phase_diagram_activity_calculation'
+    origin: kems-051-allibert-1981::allibert_1981_table5_three_phase_equilibria
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 312
@@ -13933,13 +15658,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid melt plus solid CaO-Al2O3 interoxide phases in three-phase equilibrium' is not in the
-          closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13971,7 +15694,28 @@ observations:
         published_page: 312
         pdf_page_index: 6
         table: V
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid melt plus solid CaO-Al2O3 interoxide phases in three-phase equilibrium'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_table5_three_phase_equilibria
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: phase_diagram_activity_calculation'
+    origin: kems-051-allibert-1981::allibert_1981_table5_three_phase_equilibria
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 312
@@ -14055,13 +15799,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid melt plus solid CaO-Al2O3 interoxide phases in three-phase equilibrium' is not in the
-          closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -14093,7 +15835,28 @@ observations:
         published_page: 312
         pdf_page_index: 6
         table: V
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid melt plus solid CaO-Al2O3 interoxide phases in three-phase equilibrium'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_table5_three_phase_equilibria
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: phase_diagram_activity_calculation'
+    origin: kems-051-allibert-1981::allibert_1981_table5_three_phase_equilibria
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 312
@@ -14177,13 +15940,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid melt plus solid CaO-Al2O3 interoxide phases in three-phase equilibrium' is not in the
-          closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -14215,7 +15976,28 @@ observations:
         published_page: 312
         pdf_page_index: 6
         table: V
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid melt plus solid CaO-Al2O3 interoxide phases in three-phase equilibrium'' is not in the closed automatic map'
+    origin: kems-051-allibert-1981::allibert_1981_table5_three_phase_equilibria
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: phase_diagram_activity_calculation'
+    origin: kems-051-allibert-1981::allibert_1981_table5_three_phase_equilibria
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-051-allibert-1981
   locator:
     published_page: 312

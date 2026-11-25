@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/sato-1976-lunar-fo2-apollo-17.yaml
 observations:
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_12009_35::T=1273.15:h=a0869fe3e258
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -11,12 +11,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -40,6 +39,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_12009_35
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - fugacity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_12009_35
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -100,7 +122,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_12009_35::T=1323.15:h=846ee6cd4a3d
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -108,12 +130,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -137,6 +158,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_12009_35
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - fugacity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_12009_35
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -197,7 +241,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_12009_35::T=1373.15:h=9d6347f506e9
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -205,12 +249,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -234,6 +277,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_12009_35
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - fugacity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_12009_35
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -294,7 +360,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_12009_35::T=1423.15:h=cfb1923ca475
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -302,12 +368,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -331,6 +396,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_12009_35
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - fugacity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_12009_35
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -391,7 +479,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_12009_35::T=1473.15:h=1a5522d30110
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -399,12 +487,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -428,6 +515,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_12009_35
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - fugacity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_12009_35
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -488,7 +598,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_12053_89::T=1273.15:h=4d6ac9266601
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -496,12 +606,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -525,6 +634,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_12053_89
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - fugacity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_12053_89
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -585,7 +717,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_12053_89::T=1323.15:h=29bf118c7a88
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -593,12 +725,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -622,6 +753,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_12053_89
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - fugacity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_12053_89
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -682,7 +836,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_12053_89::T=1373.15:h=c344d3145508
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -690,12 +844,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -719,6 +872,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_12053_89
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - fugacity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_12053_89
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -779,7 +955,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_12053_89::T=1423.15:h=d2b40353f765
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -787,12 +963,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -816,6 +991,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_12053_89
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - fugacity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_12053_89
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -876,7 +1074,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_12053_89::T=1473.15:h=a205436216a9
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -884,12 +1082,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -913,6 +1110,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_12053_89
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - fugacity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_12053_89
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -981,12 +1201,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1009,6 +1228,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_15058_81
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -1077,12 +1308,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1105,6 +1335,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_15058_81
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -1173,12 +1415,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1201,6 +1442,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_15058_81
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -1269,12 +1522,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1297,6 +1549,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_15058_81
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -1365,12 +1629,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1393,6 +1656,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_15058_81
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -1453,7 +1728,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_15595_25::T=1273.15:h=469bfe64ea1b
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1461,12 +1736,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1490,6 +1764,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_15595_25
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - fugacity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_15595_25
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -1550,7 +1847,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_15595_25::T=1323.15:h=5c21282f0d6f
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1558,12 +1855,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1587,6 +1883,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_15595_25
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - fugacity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_15595_25
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -1647,7 +1966,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_15595_25::T=1373.15:h=caf0cc3485e4
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1655,12 +1974,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1684,6 +2002,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_15595_25
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - fugacity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_15595_25
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -1744,7 +2085,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_15595_25::T=1423.15:h=c39268533d7e
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1752,12 +2093,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1781,6 +2121,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_15595_25
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - fugacity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_15595_25
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -1841,7 +2204,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_15595_25::T=1473.15:h=53bb03331040
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1849,12 +2212,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1878,6 +2240,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_15595_25
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - fugacity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_15595_25
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -1946,12 +2331,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1974,6 +2358,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_70017_31
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -2042,12 +2438,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2070,6 +2465,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_70017_31
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -2138,12 +2545,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2166,6 +2572,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_70017_31
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -2234,12 +2652,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2262,6 +2679,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_70017_31
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -2330,12 +2759,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2358,6 +2786,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_70017_31
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -2426,12 +2866,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2454,6 +2893,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_74275_39
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -2522,12 +2973,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2550,6 +3000,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_74275_39
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -2618,12 +3080,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2646,6 +3107,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_74275_39
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -2714,12 +3187,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2742,6 +3214,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_74275_39
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -2810,12 +3294,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2838,6 +3321,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_74275_39
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -2898,7 +3393,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_12009_35::T=1273.15:h=b21e6f70ecf6
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -2906,12 +3401,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2935,6 +3429,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_12009_35
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - fugacity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_12009_35
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -2995,7 +3512,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_12009_35::T=1323.15:h=3b558151e8c4
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -3003,12 +3520,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3032,6 +3548,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_12009_35
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - fugacity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_12009_35
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -3092,7 +3631,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_12009_35::T=1373.15:h=5883397a53f9
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -3100,12 +3639,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3129,6 +3667,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_12009_35
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - fugacity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_12009_35
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -3189,7 +3750,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_12009_35::T=1423.15:h=1e1dbad4f297
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -3197,12 +3758,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3226,6 +3786,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_12009_35
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - fugacity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_12009_35
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -3286,7 +3869,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_12009_35::T=1473.15:h=f81755941118
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -3294,12 +3877,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3323,6 +3905,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_12009_35
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - fugacity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_12009_35
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -3383,7 +3988,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_12053_89::T=1273.15:h=b21e6f70ecf6
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -3391,12 +3996,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3420,6 +4024,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_12053_89
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - fugacity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_12053_89
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -3480,7 +4107,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_12053_89::T=1323.15:h=a4c67bc7e168
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -3488,12 +4115,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3517,6 +4143,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_12053_89
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - fugacity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_12053_89
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -3577,7 +4226,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_12053_89::T=1373.15:h=5c96e865c6ca
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -3585,12 +4234,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3614,6 +4262,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_12053_89
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - fugacity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_12053_89
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -3674,7 +4345,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_12053_89::T=1423.15:h=c5d415429811
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -3682,12 +4353,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3711,6 +4381,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_12053_89
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - fugacity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_12053_89
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -3771,7 +4464,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_12053_89::T=1473.15:h=a0f98f4611d0
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -3779,12 +4472,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3808,6 +4500,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_12053_89
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - fugacity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_12053_89
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -3868,7 +4583,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_15595_25::T=1273.15:h=b21e6f70ecf6
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -3876,12 +4591,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3905,6 +4619,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_15595_25
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - fugacity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_15595_25
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -3965,7 +4702,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_15595_25::T=1323.15:h=1f03233c1100
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -3973,12 +4710,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4002,6 +4738,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_15595_25
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - fugacity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_15595_25
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -4062,7 +4821,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_15595_25::T=1373.15:h=891e8370e808
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -4070,12 +4829,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4099,6 +4857,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_15595_25
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - fugacity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_15595_25
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -4159,7 +4940,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_15595_25::T=1423.15:h=2fe2549a33f3
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -4167,12 +4948,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4196,6 +4976,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_15595_25
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - fugacity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_15595_25
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -4256,7 +5059,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_15595_25::T=1473.15:h=d3697b91be3d
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -4264,12 +5067,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4293,6 +5095,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_15595_25
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - fugacity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_15595_25
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -4361,12 +5186,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4389,6 +5213,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_70017_31
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -4457,12 +5293,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4485,6 +5320,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_70017_31
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -4553,12 +5400,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4581,6 +5427,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_70017_31
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -4649,12 +5507,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4677,6 +5534,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_70017_31
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -4745,12 +5614,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4773,6 +5641,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_70017_31
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -4841,12 +5721,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4869,6 +5748,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_74275_39
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -4937,12 +5828,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4965,6 +5855,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_74275_39
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -5033,12 +5935,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5061,6 +5962,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_74275_39
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -5129,12 +6042,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5157,6 +6069,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_74275_39
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -5225,12 +6149,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5253,6 +6176,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - fugacity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table1_added_fe_74275_39
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - fugacity
@@ -5313,7 +6248,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_12009::T=1273.15:h=6c140db91365
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -5321,12 +6256,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5405,6 +6339,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_12009
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_12009
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -5468,7 +6425,7 @@ observations:
     output_unit: dimensionless
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_12009::T=1323.15:h=6c140db91365
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -5476,12 +6433,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5560,6 +6516,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_12009
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_12009
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -5623,7 +6602,7 @@ observations:
     output_unit: dimensionless
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_12009::T=1373.15:h=6c140db91365
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -5631,12 +6610,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5715,6 +6693,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_12009
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_12009
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -5778,7 +6779,7 @@ observations:
     output_unit: dimensionless
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_12009::T=1423.15:h=8420aa1d6df6
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -5786,12 +6787,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5870,6 +6870,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_12009
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_12009
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -5933,7 +6956,7 @@ observations:
     output_unit: dimensionless
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_12009::T=1473.15:h=e2f738185b6a
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -5941,12 +6964,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6025,6 +7047,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_12009
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_12009
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -6088,7 +7133,7 @@ observations:
     output_unit: dimensionless
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_12053::T=1273.15:h=6c140db91365
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -6096,12 +7141,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6180,6 +7224,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_12053
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_12053
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -6243,7 +7310,7 @@ observations:
     output_unit: dimensionless
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_12053::T=1323.15:h=6c140db91365
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -6251,12 +7318,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6335,6 +7401,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_12053
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_12053
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -6398,7 +7487,7 @@ observations:
     output_unit: dimensionless
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_12053::T=1373.15:h=86e0578aa756
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -6406,12 +7495,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6490,6 +7578,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_12053
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_12053
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -6553,7 +7664,7 @@ observations:
     output_unit: dimensionless
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_12053::T=1423.15:h=86e0578aa756
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -6561,12 +7672,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6645,6 +7755,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_12053
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_12053
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -6708,7 +7841,7 @@ observations:
     output_unit: dimensionless
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_12053::T=1473.15:h=70190b16062a
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -6716,12 +7849,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6800,6 +7932,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_12053
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_12053
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -6863,7 +8018,7 @@ observations:
     output_unit: dimensionless
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_15595::T=1273.15:h=6c140db91365
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -6871,12 +8026,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6955,6 +8109,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_15595
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_15595
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -7018,7 +8195,7 @@ observations:
     output_unit: dimensionless
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_15595::T=1323.15:h=e2f738185b6a
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -7026,12 +8203,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7110,6 +8286,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_15595
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_15595
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -7173,7 +8372,7 @@ observations:
     output_unit: dimensionless
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_15595::T=1373.15:h=2cb3ecae7ee1
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -7181,12 +8380,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7265,6 +8463,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_15595
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_15595
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -7328,7 +8549,7 @@ observations:
     output_unit: dimensionless
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_15595::T=1423.15:h=8e6bba59b543
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -7336,12 +8557,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7420,6 +8640,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_15595
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_15595
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -7483,7 +8726,7 @@ observations:
     output_unit: dimensionless
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_15595::T=1473.15:h=cdf0ede7e422
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -7491,12 +8734,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7575,6 +8817,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_15595
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_15595
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -7646,12 +8911,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7730,6 +8994,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_70017
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -7801,12 +9077,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7885,6 +9160,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_70017
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -7956,12 +9243,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8040,6 +9326,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_70017
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -8111,12 +9409,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8195,6 +9492,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_70017
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -8266,12 +9575,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8350,6 +9658,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_70017
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -8421,12 +9741,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8505,6 +9824,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_74275
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -8576,12 +9907,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8660,6 +9990,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_74275
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -8731,12 +10073,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8815,6 +10156,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_74275
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -8886,12 +10239,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8970,6 +10322,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_74275
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -9041,12 +10405,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9125,6 +10488,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table2_74275
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -9188,7 +10563,7 @@ observations:
     output_unit: dimensionless
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12009::T=1248.15:h=88c5f8f9c90e
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -9196,12 +10571,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9280,6 +10654,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12009
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12009
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -9343,7 +10740,7 @@ observations:
     output_unit: dimensionless
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12009::T=1273.15:h=53ab4faa5355
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -9351,12 +10748,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9435,6 +10831,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12009
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12009
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -9498,7 +10917,7 @@ observations:
     output_unit: dimensionless
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12009::T=1298.15:h=88c5f8f9c90e
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -9506,12 +10925,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9590,6 +11008,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12009
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12009
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -9653,7 +11094,7 @@ observations:
     output_unit: dimensionless
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12009::T=1323.15:h=53ab4faa5355
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -9661,12 +11102,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9745,6 +11185,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12009
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12009
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -9808,7 +11271,7 @@ observations:
     output_unit: dimensionless
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12009::T=1373.15:h=53ab4faa5355
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -9816,12 +11279,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9900,6 +11362,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12009
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12009
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -9963,7 +11448,7 @@ observations:
     output_unit: dimensionless
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12009::T=1423.15:h=f6bc1e64c3e2
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -9971,12 +11456,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10055,6 +11539,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12009
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12009
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -10118,7 +11625,7 @@ observations:
     output_unit: dimensionless
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12009::T=1473.15:h=4063701605cc
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -10126,12 +11633,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10210,6 +11716,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12009
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12009
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -10273,7 +11802,7 @@ observations:
     output_unit: dimensionless
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12053::T=1248.15:h=88c5f8f9c90e
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -10281,12 +11810,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10365,6 +11893,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12053
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12053
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -10428,7 +11979,7 @@ observations:
     output_unit: dimensionless
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12053::T=1273.15:h=dbfe2be4668d
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -10436,12 +11987,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10520,6 +12070,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12053
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12053
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -10583,7 +12156,7 @@ observations:
     output_unit: dimensionless
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12053::T=1298.15:h=88c5f8f9c90e
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -10591,12 +12164,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10675,6 +12247,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12053
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12053
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -10738,7 +12333,7 @@ observations:
     output_unit: dimensionless
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12053::T=1323.15:h=dbfe2be4668d
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -10746,12 +12341,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10830,6 +12424,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12053
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12053
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -10893,7 +12510,7 @@ observations:
     output_unit: dimensionless
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12053::T=1373.15:h=06dd4a2a6774
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -10901,12 +12518,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10985,6 +12601,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12053
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12053
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -11048,7 +12687,7 @@ observations:
     output_unit: dimensionless
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12053::T=1423.15:h=064b3217b218
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -11056,12 +12695,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11140,6 +12778,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12053
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12053
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -11203,7 +12864,7 @@ observations:
     output_unit: dimensionless
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12053::T=1473.15:h=064b3217b218
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -11211,12 +12872,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11295,6 +12955,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12053
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_12053
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -11358,7 +13041,7 @@ observations:
     output_unit: dimensionless
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_15595::T=1248.15:h=88c5f8f9c90e
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -11366,12 +13049,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11450,6 +13132,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_15595
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_15595
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -11513,7 +13218,7 @@ observations:
     output_unit: dimensionless
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_15595::T=1273.15:h=f6bc1e64c3e2
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -11521,12 +13226,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11605,6 +13309,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_15595
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_15595
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -11668,7 +13395,7 @@ observations:
     output_unit: dimensionless
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_15595::T=1298.15:h=88c5f8f9c90e
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -11676,12 +13403,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11760,6 +13486,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_15595
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_15595
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -11823,7 +13572,7 @@ observations:
     output_unit: dimensionless
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_15595::T=1323.15:h=13caab35bd94
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -11831,12 +13580,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11915,6 +13663,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_15595
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_15595
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -11978,7 +13749,7 @@ observations:
     output_unit: dimensionless
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_15595::T=1373.15:h=b5bf0352b4fa
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -11986,12 +13757,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12070,6 +13840,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_15595
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_15595
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -12133,7 +13926,7 @@ observations:
     output_unit: dimensionless
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_15595::T=1423.15:h=13caab35bd94
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -12141,12 +13934,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12225,6 +14017,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_15595
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_15595
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -12288,7 +14103,7 @@ observations:
     output_unit: dimensionless
     references: []
 - observation_id: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_15595::T=1473.15:h=f6bc1e64c3e2
-  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values
+  experiment_id: 6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::sato-1976-lunar-fo2-apollo-17::declared:6066b9ad1acdca9fb4e452dca98725d9fb6883429d6d1f5083f61da5718913a1::experiment::sato1973_quoted_values::method:unspecified
   identity:
     quantity:
       tag: value
@@ -12296,12 +14111,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12380,6 +14194,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_15595
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_15595
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -12451,12 +14288,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12535,6 +14371,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_70017
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -12616,12 +14464,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12700,6 +14547,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_70017
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -12781,12 +14640,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12865,6 +14723,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_70017
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -12946,12 +14816,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13030,6 +14899,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_70017
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -13111,12 +14992,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13195,6 +15075,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_70017
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -13276,12 +15168,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13360,6 +15251,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_70017
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -13441,12 +15344,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13525,6 +15427,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_70017
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -13606,12 +15520,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13690,6 +15603,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_74275
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -13771,12 +15696,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13855,6 +15779,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_74275
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -13936,12 +15872,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -14020,6 +15955,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_74275
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -14101,12 +16048,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -14185,6 +16131,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_74275
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -14266,12 +16224,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -14350,6 +16307,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_74275
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -14431,12 +16400,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -14515,6 +16483,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_74275
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -14596,12 +16576,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -14680,6 +16659,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: sato-1976-lunar-fo2-apollo-17::sato_1976_table3_74275
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity

@@ -118,6 +118,94 @@ experiments:
         published_page: 15
         pdf_page_index: 2
         section: Experimental
+- experiment_id: 10.1111/j.1945-5100.1979.tb00475.x::masuda-tanaka-1979-vacuum-condensates::declared:10.1111/j.1945-5100.1979.tb00475.x::experiment::jb1_electron_bombardment_vaporization::method:vacuum_chamber_pyrolysis
+  kind: literature
+  method:
+    tag: value
+    value: vacuum_chamber_pyrolysis
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: no_per_run_charge_mass_published
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+        note: The sample was usually approximately 100 mg; no charge mass is assigned to each run.
+    printed_composition:
+      state:
+        tag: unknown
+        reason: table1_starting_reference_is_incomplete_for_bulk_composition
+      locator:
+        page: 5
+        published_page: 17
+        pdf_page_index: 4
+        table: '1'
+        note: JB-1 row gives trace elements and selected major oxides only; the complete starting composition is not printed
+          here.
+    form:
+      state:
+        tag: value
+        value: material remaining in Ta crucible after interrupted vaporization
+      locator:
+        page: 5
+        published_page: 17
+        pdf_page_index: 4
+        table: '1'
+        note: 9-26-5 residue, La row; interrupted evaporation.
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: during_vaporization_pressure_not_measured
+      locator:
+        page: 2
+        published_page: 14
+        pdf_page_index: 1
+        section: Experimental
+        note: The bell jar was evacuated to (2–5) × 10^-5 Torr prior to vaporization; pressure rose by orders of magnitude
+          during vaporization and was not measured above the crucible or collector.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: no_sweep_gas_reported
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure_during_vaporization_not_measured
+  work_id: 10.1111/j.1945-5100.1979.tb00475.x
+  locator:
+    page: 3
+    published_page: 15
+    pdf_page_index: 2
+    section: Experimental
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: not_published
+  bench_id: 10.1111/j.1945-5100.1979.tb00475.x::bench::electron_bombardment_system
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: electron bombardment of a Ta crucible using a W filament
+      locator:
+        page: 3
+        published_page: 15
+        pdf_page_index: 2
+        section: Experimental
 benches:
 - id: 10.1111/j.1945-5100.1979.tb00475.x::bench::electron_bombardment_system
   work_id: 10.1111/j.1945-5100.1979.tb00475.x

@@ -100,6 +100,74 @@ experiments:
     pdf_page_index: 2
     figure: '1'
     note: panel=c
+- experiment_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d::shornikov-2000-na-zno-phosphate-vaporization::declared:80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d::experiment::shilov-1998-fig1d::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  locator:
+    page: 3
+    published_page: 60
+    pdf_page_index: 2
+    figure: '1'
+    note: panel=d
+- experiment_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d::shornikov-2000-na-zno-phosphate-vaporization::declared:80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d::experiment::shornikov-2000-fig1c::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d
+  locator:
+    page: 3
+    published_page: 60
+    pdf_page_index: 2
+    figure: '1'
+    note: panel=c
 context:
 - observation_id: shornikov_2000_apparatus
   type: thermodynamic_example

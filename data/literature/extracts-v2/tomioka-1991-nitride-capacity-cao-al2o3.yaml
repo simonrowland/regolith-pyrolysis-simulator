@@ -101,7 +101,18 @@ observations:
         pdf_page_index: 5
         section: 3.6 Activity Coefficient of AlN
         note: Replotted by Ozturk and Turkdogan from Rein and Chipman; X_Al2O3 = 0.3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_alumina_activity_1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tomioka-1991-nitride-capacity-cao-al2o3
   locator:
     published_page: 1320
@@ -220,7 +231,18 @@ observations:
         pdf_page_index: 5
         section: 3.6 Activity Coefficient of AlN
         note: Replotted by Ozturk and Turkdogan from Rein and Chipman; X_Al2O3 = 0.3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_alumina_activity_2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tomioka-1991-nitride-capacity-cao-al2o3
   locator:
     published_page: 1320
@@ -339,7 +361,18 @@ observations:
         pdf_page_index: 5
         section: 3.6 Activity Coefficient of AlN
         note: Replotted by Ozturk and Turkdogan from Rein and Chipman; X_Al2O3 = 0.3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_alumina_activity_3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tomioka-1991-nitride-capacity-cao-al2o3
   locator:
     published_page: 1320
@@ -458,7 +491,18 @@ observations:
         pdf_page_index: 5
         section: 3.6 Activity Coefficient of AlN
         note: Replotted by Ozturk and Turkdogan from Rein and Chipman; X_Al2O3 = 0.3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_alumina_activity_4
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tomioka-1991-nitride-capacity-cao-al2o3
   locator:
     published_page: 1320
@@ -577,7 +621,18 @@ observations:
         pdf_page_index: 5
         section: 3.6 Activity Coefficient of AlN
         note: Replotted by Ozturk and Turkdogan from Rein and Chipman; Al2O3-saturated composition
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_alumina_activity_5
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tomioka-1991-nitride-capacity-cao-al2o3
   locator:
     published_page: 1320
@@ -696,7 +751,18 @@ observations:
         pdf_page_index: 5
         section: 3.6 Activity Coefficient of AlN
         note: Replotted by Ozturk and Turkdogan from Rein and Chipman; Al2O3-saturated composition
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_alumina_activity_6
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tomioka-1991-nitride-capacity-cao-al2o3
   locator:
     published_page: 1320
@@ -815,7 +881,18 @@ observations:
         pdf_page_index: 5
         section: 3.6 Activity Coefficient of AlN
         note: Replotted by Ozturk and Turkdogan from Rein and Chipman; Al2O3-saturated composition
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_alumina_activity_7
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tomioka-1991-nitride-capacity-cao-al2o3
   locator:
     published_page: 1320
@@ -844,12 +921,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 (crucible-saturated)' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -869,7 +945,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid CaO-Al2O3 (crucible-saturated)'' is not in the closed automatic map'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tomioka-1991-nitride-capacity-cao-al2o3
   locator:
     published_page: 1319
@@ -896,12 +993,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 (crucible-saturated)' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -921,7 +1017,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid CaO-Al2O3 (crucible-saturated)'' is not in the closed automatic map'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tomioka-1991-nitride-capacity-cao-al2o3
   locator:
     published_page: 1319
@@ -948,12 +1065,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 (crucible-saturated)' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -973,7 +1089,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid CaO-Al2O3 (crucible-saturated)'' is not in the closed automatic map'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tomioka-1991-nitride-capacity-cao-al2o3
   locator:
     published_page: 1319
@@ -1000,12 +1137,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 (crucible-saturated)' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1025,7 +1161,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid CaO-Al2O3 (crucible-saturated)'' is not in the closed automatic map'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tomioka-1991-nitride-capacity-cao-al2o3
   locator:
     published_page: 1319
@@ -1052,12 +1209,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 (crucible-saturated)' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1077,7 +1233,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid CaO-Al2O3 (crucible-saturated)'' is not in the closed automatic map'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tomioka-1991-nitride-capacity-cao-al2o3
   locator:
     published_page: 1319
@@ -1104,12 +1281,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 (crucible-saturated)' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1129,7 +1305,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid CaO-Al2O3 (crucible-saturated)'' is not in the closed automatic map'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tomioka-1991-nitride-capacity-cao-al2o3
   locator:
     published_page: 1319
@@ -1156,12 +1353,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 (crucible-saturated)' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1181,7 +1377,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid CaO-Al2O3 (crucible-saturated)'' is not in the closed automatic map'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tomioka-1991-nitride-capacity-cao-al2o3
   locator:
     published_page: 1319
@@ -1208,12 +1425,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 (crucible-saturated)' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1233,7 +1449,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid CaO-Al2O3 (crucible-saturated)'' is not in the closed automatic map'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tomioka-1991-nitride-capacity-cao-al2o3
   locator:
     published_page: 1319
@@ -1260,12 +1497,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 (crucible-saturated)' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1285,7 +1521,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid CaO-Al2O3 (crucible-saturated)'' is not in the closed automatic map'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tomioka-1991-nitride-capacity-cao-al2o3
   locator:
     published_page: 1319
@@ -1312,12 +1569,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 (crucible-saturated)' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1337,7 +1593,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid CaO-Al2O3 (crucible-saturated)'' is not in the closed automatic map'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tomioka-1991-nitride-capacity-cao-al2o3
   locator:
     published_page: 1319
@@ -1364,12 +1641,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 (crucible-saturated)' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1389,7 +1665,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid CaO-Al2O3 (crucible-saturated)'' is not in the closed automatic map'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tomioka-1991-nitride-capacity-cao-al2o3
   locator:
     published_page: 1319
@@ -1416,12 +1713,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 (crucible-saturated)' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1441,7 +1737,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid CaO-Al2O3 (crucible-saturated)'' is not in the closed automatic map'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tomioka-1991-nitride-capacity-cao-al2o3
   locator:
     published_page: 1319
@@ -1468,12 +1785,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 (crucible-saturated)' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1493,7 +1809,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid CaO-Al2O3 (crucible-saturated)'' is not in the closed automatic map'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tomioka-1991-nitride-capacity-cao-al2o3
   locator:
     published_page: 1319
@@ -1520,12 +1857,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 (crucible-saturated)' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1545,7 +1881,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid CaO-Al2O3 (crucible-saturated)'' is not in the closed automatic map'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tomioka-1991-nitride-capacity-cao-al2o3
   locator:
     published_page: 1319
@@ -1572,12 +1929,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 (crucible-saturated)' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1597,7 +1953,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid CaO-Al2O3 (crucible-saturated)'' is not in the closed automatic map'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tomioka-1991-nitride-capacity-cao-al2o3
   locator:
     published_page: 1319
@@ -1624,12 +2001,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 (crucible-saturated)' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1649,7 +2025,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid CaO-Al2O3 (crucible-saturated)'' is not in the closed automatic map'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tomioka-1991-nitride-capacity-cao-al2o3
   locator:
     published_page: 1319
@@ -1676,12 +2073,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 (crucible-saturated)' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1701,7 +2097,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid CaO-Al2O3 (crucible-saturated)'' is not in the closed automatic map'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tomioka-1991-nitride-capacity-cao-al2o3
   locator:
     published_page: 1319
@@ -1728,12 +2145,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 (crucible-saturated)' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1753,7 +2169,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid CaO-Al2O3 (crucible-saturated)'' is not in the closed automatic map'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tomioka-1991-nitride-capacity-cao-al2o3
   locator:
     published_page: 1319
@@ -1780,12 +2217,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 (crucible-saturated)' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1805,7 +2241,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid CaO-Al2O3 (crucible-saturated)'' is not in the closed automatic map'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tomioka-1991-nitride-capacity-cao-al2o3
   locator:
     published_page: 1319
@@ -1832,12 +2289,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 (crucible-saturated)' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1857,7 +2313,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid CaO-Al2O3 (crucible-saturated)'' is not in the closed automatic map'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tomioka-1991-nitride-capacity-cao-al2o3
   locator:
     published_page: 1319
@@ -1884,12 +2361,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 (crucible-saturated)' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1909,7 +2385,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid CaO-Al2O3 (crucible-saturated)'' is not in the closed automatic map'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tomioka-1991-nitride-capacity-cao-al2o3
   locator:
     published_page: 1319
@@ -1936,12 +2433,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 (crucible-saturated)' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1961,7 +2457,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid CaO-Al2O3 (crucible-saturated)'' is not in the closed automatic map'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tomioka-1991-nitride-capacity-cao-al2o3
   locator:
     published_page: 1319
@@ -1988,12 +2505,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 (crucible-saturated)' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2013,7 +2529,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid CaO-Al2O3 (crucible-saturated)'' is not in the closed automatic map'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tomioka-1991-nitride-capacity-cao-al2o3
   locator:
     published_page: 1319
@@ -2040,12 +2577,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 (crucible-saturated)' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2065,7 +2601,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid CaO-Al2O3 (crucible-saturated)'' is not in the closed automatic map'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tomioka-1991-nitride-capacity-cao-al2o3
   locator:
     published_page: 1319
@@ -2092,12 +2649,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 (crucible-saturated)' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2117,7 +2673,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid CaO-Al2O3 (crucible-saturated)'' is not in the closed automatic map'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tomioka-1991-nitride-capacity-cao-al2o3
   locator:
     published_page: 1319
@@ -2144,12 +2721,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 (crucible-saturated)' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2169,7 +2745,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid CaO-Al2O3 (crucible-saturated)'' is not in the closed automatic map'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tomioka-1991-nitride-capacity-cao-al2o3
   locator:
     published_page: 1319
@@ -2196,12 +2793,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 (crucible-saturated)' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2221,7 +2817,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid CaO-Al2O3 (crucible-saturated)'' is not in the closed automatic map'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tomioka-1991-nitride-capacity-cao-al2o3
   locator:
     published_page: 1319
@@ -2248,12 +2865,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 (crucible-saturated)' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2273,7 +2889,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid CaO-Al2O3 (crucible-saturated)'' is not in the closed automatic map'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tomioka-1991-nitride-capacity-cao-al2o3
   locator:
     published_page: 1319
@@ -2300,12 +2937,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 (crucible-saturated)' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2325,7 +2961,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid CaO-Al2O3 (crucible-saturated)'' is not in the closed automatic map'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tomioka-1991-nitride-capacity-cao-al2o3
   locator:
     published_page: 1319
@@ -2352,12 +3009,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'liquid CaO-Al2O3 (crucible-saturated)' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2377,7 +3033,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid CaO-Al2O3 (crucible-saturated)'' is not in the closed automatic map'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tomioka-1991-nitride-capacity-cao-al2o3::tomioka_1991_table1_nitride_capacity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tomioka-1991-nitride-capacity-cao-al2o3
   locator:
     published_page: 1319

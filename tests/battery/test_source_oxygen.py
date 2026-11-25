@@ -356,7 +356,8 @@ def test_linked_oxygen_is_below_printed_controls_in_the_scorer(
     assert residual.numeric is not None
     assert candidate is not None
     assert len(compared) == 2
-    selected_pa = Decimal(str(requests[0].po2_bar)) * Decimal("1e5")
+    assert resolved.pressure_pa is not None
+    selected_pa = resolved.pressure_pa
     assert all(identity.fO2_Pa == State.of(selected_pa) for identity in compared)
     selected = candidate.provenance["selected_oxygen_condition"]
     assert Decimal(selected["value_Pa"]) == selected_pa

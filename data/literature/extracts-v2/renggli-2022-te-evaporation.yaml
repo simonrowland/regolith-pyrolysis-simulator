@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/renggli-2022-te-evaporation.yaml
 observations:
 - observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1141.15:row=te_868a:h=d0e1e08b779b
-  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  experiment_id: 10.1016/j.gca.2022.10.032::renggli-2022-te-evaporation::declared:10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -61,6 +61,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Te concentration in recovered
+      glass after 15 min, reported as µg/g, numerically equivalent to ppm. Table values are in the series; uncertainties are
+      retained there. The source-defined isotope ratios, fTe and log(fTe) are preserved in sibling context because no compatible
+      source-field token exists in this extract.'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -151,7 +165,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1141.15:row=te_868c:h=ebec65d54ae5
-  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  experiment_id: 10.1016/j.gca.2022.10.032::renggli-2022-te-evaporation::declared:10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -209,6 +223,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Te concentration in recovered
+      glass after 15 min, reported as µg/g, numerically equivalent to ppm. Table values are in the series; uncertainties are
+      retained there. The source-defined isotope ratios, fTe and log(fTe) are preserved in sibling context because no compatible
+      source-field token exists in this extract.'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -299,7 +327,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1285.15:row=te_1012a:h=fad919b3fa26
-  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  experiment_id: 10.1016/j.gca.2022.10.032::renggli-2022-te-evaporation::declared:10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -357,6 +385,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Te concentration in recovered
+      glass after 15 min, reported as µg/g, numerically equivalent to ppm. Table values are in the series; uncertainties are
+      retained there. The source-defined isotope ratios, fTe and log(fTe) are preserved in sibling context because no compatible
+      source-field token exists in this extract.'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -447,7 +489,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1285.15:row=te_1012b:h=e7893255bad5
-  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  experiment_id: 10.1016/j.gca.2022.10.032::renggli-2022-te-evaporation::declared:10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -505,6 +547,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Te concentration in recovered
+      glass after 15 min, reported as µg/g, numerically equivalent to ppm. Table values are in the series; uncertainties are
+      retained there. The source-defined isotope ratios, fTe and log(fTe) are preserved in sibling context because no compatible
+      source-field token exists in this extract.'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -595,7 +651,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1285.15:row=te_1012c:h=95581101cf08
-  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  experiment_id: 10.1016/j.gca.2022.10.032::renggli-2022-te-evaporation::declared:10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -653,6 +709,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Te concentration in recovered
+      glass after 15 min, reported as µg/g, numerically equivalent to ppm. Table values are in the series; uncertainties are
+      retained there. The source-defined isotope ratios, fTe and log(fTe) are preserved in sibling context because no compatible
+      source-field token exists in this extract.'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -743,7 +813,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1285.15:row=te_1012d:h=be010ec2baab
-  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  experiment_id: 10.1016/j.gca.2022.10.032::renggli-2022-te-evaporation::declared:10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -801,6 +871,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Te concentration in recovered
+      glass after 15 min, reported as µg/g, numerically equivalent to ppm. Table values are in the series; uncertainties are
+      retained there. The source-defined isotope ratios, fTe and log(fTe) are preserved in sibling context because no compatible
+      source-field token exists in this extract.'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -891,7 +975,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1285.15:row=te_1012e:h=7da7a871922e
-  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  experiment_id: 10.1016/j.gca.2022.10.032::renggli-2022-te-evaporation::declared:10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -949,6 +1033,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Te concentration in recovered
+      glass after 15 min, reported as µg/g, numerically equivalent to ppm. Table values are in the series; uncertainties are
+      retained there. The source-defined isotope ratios, fTe and log(fTe) are preserved in sibling context because no compatible
+      source-field token exists in this extract.'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -1039,7 +1137,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1285.15:row=te_1012f:h=cbd2cd1d9a07
-  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  experiment_id: 10.1016/j.gca.2022.10.032::renggli-2022-te-evaporation::declared:10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1097,6 +1195,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Te concentration in recovered
+      glass after 15 min, reported as µg/g, numerically equivalent to ppm. Table values are in the series; uncertainties are
+      retained there. The source-defined isotope ratios, fTe and log(fTe) are preserved in sibling context because no compatible
+      source-field token exists in this extract.'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -1187,7 +1299,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1454.15:row=te_1181a:h=f39bca2ddd97
-  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  experiment_id: 10.1016/j.gca.2022.10.032::renggli-2022-te-evaporation::declared:10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1245,6 +1357,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Te concentration in recovered
+      glass after 15 min, reported as µg/g, numerically equivalent to ppm. Table values are in the series; uncertainties are
+      retained there. The source-defined isotope ratios, fTe and log(fTe) are preserved in sibling context because no compatible
+      source-field token exists in this extract.'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -1335,7 +1461,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1454.15:row=te_1181b:h=0cdd034c42b8
-  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  experiment_id: 10.1016/j.gca.2022.10.032::renggli-2022-te-evaporation::declared:10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1393,6 +1519,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Te concentration in recovered
+      glass after 15 min, reported as µg/g, numerically equivalent to ppm. Table values are in the series; uncertainties are
+      retained there. The source-defined isotope ratios, fTe and log(fTe) are preserved in sibling context because no compatible
+      source-field token exists in this extract.'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -1483,7 +1623,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1454.15:row=te_1181c:h=96a1c129d870
-  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  experiment_id: 10.1016/j.gca.2022.10.032::renggli-2022-te-evaporation::declared:10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1541,6 +1681,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Te concentration in recovered
+      glass after 15 min, reported as µg/g, numerically equivalent to ppm. Table values are in the series; uncertainties are
+      retained there. The source-defined isotope ratios, fTe and log(fTe) are preserved in sibling context because no compatible
+      source-field token exists in this extract.'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -1631,7 +1785,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1454.15:row=te_1181d:h=01610f9a2f8a
-  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  experiment_id: 10.1016/j.gca.2022.10.032::renggli-2022-te-evaporation::declared:10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1689,6 +1843,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Te concentration in recovered
+      glass after 15 min, reported as µg/g, numerically equivalent to ppm. Table values are in the series; uncertainties are
+      retained there. The source-defined isotope ratios, fTe and log(fTe) are preserved in sibling context because no compatible
+      source-field token exists in this extract.'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -1779,7 +1947,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1454.15:row=te_1181e:h=fe3965530c9a
-  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  experiment_id: 10.1016/j.gca.2022.10.032::renggli-2022-te-evaporation::declared:10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1837,6 +2005,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Te concentration in recovered
+      glass after 15 min, reported as µg/g, numerically equivalent to ppm. Table values are in the series; uncertainties are
+      retained there. The source-defined isotope ratios, fTe and log(fTe) are preserved in sibling context because no compatible
+      source-field token exists in this extract.'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -1927,7 +2109,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1454.15:row=te_1181f:h=9dfb3480b852
-  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  experiment_id: 10.1016/j.gca.2022.10.032::renggli-2022-te-evaporation::declared:10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1985,6 +2167,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Te concentration in recovered
+      glass after 15 min, reported as µg/g, numerically equivalent to ppm. Table values are in the series; uncertainties are
+      retained there. The source-defined isotope ratios, fTe and log(fTe) are preserved in sibling context because no compatible
+      source-field token exists in this extract.'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -2075,7 +2271,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1454.15:row=te_1181f:h=e601b6bdde2a
-  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  experiment_id: 10.1016/j.gca.2022.10.032::renggli-2022-te-evaporation::declared:10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -2133,6 +2329,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Te concentration in recovered
+      glass after 15 min, reported as µg/g, numerically equivalent to ppm. Table values are in the series; uncertainties are
+      retained there. The source-defined isotope ratios, fTe and log(fTe) are preserved in sibling context because no compatible
+      source-field token exists in this extract.'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -2223,7 +2433,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1469.15:row=te_1196a:h=2d9e7528c1bb
-  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  experiment_id: 10.1016/j.gca.2022.10.032::renggli-2022-te-evaporation::declared:10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -2281,6 +2491,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Te concentration in recovered
+      glass after 15 min, reported as µg/g, numerically equivalent to ppm. Table values are in the series; uncertainties are
+      retained there. The source-defined isotope ratios, fTe and log(fTe) are preserved in sibling context because no compatible
+      source-field token exists in this extract.'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -2371,7 +2595,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1469.15:row=te_1196c:h=893d8185986c
-  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  experiment_id: 10.1016/j.gca.2022.10.032::renggli-2022-te-evaporation::declared:10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -2429,6 +2653,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Te concentration in recovered
+      glass after 15 min, reported as µg/g, numerically equivalent to ppm. Table values are in the series; uncertainties are
+      retained there. The source-defined isotope ratios, fTe and log(fTe) are preserved in sibling context because no compatible
+      source-field token exists in this extract.'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -2519,7 +2757,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1547.15:row=te_1274a:h=eb2b1e7b83f3
-  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  experiment_id: 10.1016/j.gca.2022.10.032::renggli-2022-te-evaporation::declared:10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -2577,6 +2815,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Te concentration in recovered
+      glass after 15 min, reported as µg/g, numerically equivalent to ppm. Table values are in the series; uncertainties are
+      retained there. The source-defined isotope ratios, fTe and log(fTe) are preserved in sibling context because no compatible
+      source-field token exists in this extract.'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -2667,7 +2919,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1547.15:row=te_1274b:h=89884bd58d09
-  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  experiment_id: 10.1016/j.gca.2022.10.032::renggli-2022-te-evaporation::declared:10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -2725,6 +2977,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Te concentration in recovered
+      glass after 15 min, reported as µg/g, numerically equivalent to ppm. Table values are in the series; uncertainties are
+      retained there. The source-defined isotope ratios, fTe and log(fTe) are preserved in sibling context because no compatible
+      source-field token exists in this extract.'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -2815,7 +3081,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1547.15:row=te_1274c:h=917a39ae8fb0
-  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  experiment_id: 10.1016/j.gca.2022.10.032::renggli-2022-te-evaporation::declared:10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -2873,6 +3139,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Te concentration in recovered
+      glass after 15 min, reported as µg/g, numerically equivalent to ppm. Table values are in the series; uncertainties are
+      retained there. The source-defined isotope ratios, fTe and log(fTe) are preserved in sibling context because no compatible
+      source-field token exists in this extract.'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -2963,7 +3243,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1547.15:row=te_1274d:h=b4b7afeb5a5f
-  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  experiment_id: 10.1016/j.gca.2022.10.032::renggli-2022-te-evaporation::declared:10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -3021,6 +3301,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Te concentration in recovered
+      glass after 15 min, reported as µg/g, numerically equivalent to ppm. Table values are in the series; uncertainties are
+      retained there. The source-defined isotope ratios, fTe and log(fTe) are preserved in sibling context because no compatible
+      source-field token exists in this extract.'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -3111,7 +3405,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1547.15:row=te_1274e:h=bc2dbc367643
-  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  experiment_id: 10.1016/j.gca.2022.10.032::renggli-2022-te-evaporation::declared:10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -3169,6 +3463,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Te concentration in recovered
+      glass after 15 min, reported as µg/g, numerically equivalent to ppm. Table values are in the series; uncertainties are
+      retained there. The source-defined isotope ratios, fTe and log(fTe) are preserved in sibling context because no compatible
+      source-field token exists in this extract.'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -3259,7 +3567,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1547.15:row=te_1274f:h=19f3b4608757
-  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  experiment_id: 10.1016/j.gca.2022.10.032::renggli-2022-te-evaporation::declared:10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -3317,6 +3625,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Te concentration in recovered
+      glass after 15 min, reported as µg/g, numerically equivalent to ppm. Table values are in the series; uncertainties are
+      retained there. The source-defined isotope ratios, fTe and log(fTe) are preserved in sibling context because no compatible
+      source-field token exists in this extract.'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -3407,7 +3729,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1574.15:row=te_1301c:h=d6633b33746d
-  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  experiment_id: 10.1016/j.gca.2022.10.032::renggli-2022-te-evaporation::declared:10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -3465,6 +3787,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Te concentration in recovered
+      glass after 15 min, reported as µg/g, numerically equivalent to ppm. Table values are in the series; uncertainties are
+      retained there. The source-defined isotope ratios, fTe and log(fTe) are preserved in sibling context because no compatible
+      source-field token exists in this extract.'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -3555,7 +3891,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1626.15:row=te_1353a:h=0237d70d6690
-  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  experiment_id: 10.1016/j.gca.2022.10.032::renggli-2022-te-evaporation::declared:10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -3613,6 +3949,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Te concentration in recovered
+      glass after 15 min, reported as µg/g, numerically equivalent to ppm. Table values are in the series; uncertainties are
+      retained there. The source-defined isotope ratios, fTe and log(fTe) are preserved in sibling context because no compatible
+      source-field token exists in this extract.'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -3703,7 +4053,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1626.15:row=te_1353b:h=49318c5b02d5
-  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  experiment_id: 10.1016/j.gca.2022.10.032::renggli-2022-te-evaporation::declared:10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -3761,6 +4111,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Te concentration in recovered
+      glass after 15 min, reported as µg/g, numerically equivalent to ppm. Table values are in the series; uncertainties are
+      retained there. The source-defined isotope ratios, fTe and log(fTe) are preserved in sibling context because no compatible
+      source-field token exists in this extract.'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -3851,7 +4215,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1626.15:row=te_1353b:h=a3bd1655f277
-  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  experiment_id: 10.1016/j.gca.2022.10.032::renggli-2022-te-evaporation::declared:10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -3909,6 +4273,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Te concentration in recovered
+      glass after 15 min, reported as µg/g, numerically equivalent to ppm. Table values are in the series; uncertainties are
+      retained there. The source-defined isotope ratios, fTe and log(fTe) are preserved in sibling context because no compatible
+      source-field token exists in this extract.'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -3999,7 +4377,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1626.15:row=te_1353c:h=7d2f8afc2a9c
-  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  experiment_id: 10.1016/j.gca.2022.10.032::renggli-2022-te-evaporation::declared:10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -4057,6 +4435,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Te concentration in recovered
+      glass after 15 min, reported as µg/g, numerically equivalent to ppm. Table values are in the series; uncertainties are
+      retained there. The source-defined isotope ratios, fTe and log(fTe) are preserved in sibling context because no compatible
+      source-field token exists in this extract.'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -4147,7 +4539,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1626.15:row=te_1353d:h=85d631bca0e6
-  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  experiment_id: 10.1016/j.gca.2022.10.032::renggli-2022-te-evaporation::declared:10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -4205,6 +4597,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Te concentration in recovered
+      glass after 15 min, reported as µg/g, numerically equivalent to ppm. Table values are in the series; uncertainties are
+      retained there. The source-defined isotope ratios, fTe and log(fTe) are preserved in sibling context because no compatible
+      source-field token exists in this extract.'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -4295,7 +4701,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1626.15:row=te_1353e:h=521ab228dd32
-  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  experiment_id: 10.1016/j.gca.2022.10.032::renggli-2022-te-evaporation::declared:10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -4353,6 +4759,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Te concentration in recovered
+      glass after 15 min, reported as µg/g, numerically equivalent to ppm. Table values are in the series; uncertainties are
+      retained there. The source-defined isotope ratios, fTe and log(fTe) are preserved in sibling context because no compatible
+      source-field token exists in this extract.'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -4443,7 +4863,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1626.15:row=te_1353f:h=dd617767b8cd
-  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  experiment_id: 10.1016/j.gca.2022.10.032::renggli-2022-te-evaporation::declared:10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -4501,6 +4921,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Te concentration in recovered
+      glass after 15 min, reported as µg/g, numerically equivalent to ppm. Table values are in the series; uncertainties are
+      retained there. The source-defined isotope ratios, fTe and log(fTe) are preserved in sibling context because no compatible
+      source-field token exists in this extract.'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -4591,7 +5025,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1681.15:row=te_1408a:h=d189c872e3b1
-  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  experiment_id: 10.1016/j.gca.2022.10.032::renggli-2022-te-evaporation::declared:10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -4649,6 +5083,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Te concentration in recovered
+      glass after 15 min, reported as µg/g, numerically equivalent to ppm. Table values are in the series; uncertainties are
+      retained there. The source-defined isotope ratios, fTe and log(fTe) are preserved in sibling context because no compatible
+      source-field token exists in this extract.'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -4739,7 +5187,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1681.15:row=te_1408c:h=7e2d7ee2d7b4
-  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  experiment_id: 10.1016/j.gca.2022.10.032::renggli-2022-te-evaporation::declared:10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -4797,6 +5245,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Te concentration in recovered
+      glass after 15 min, reported as µg/g, numerically equivalent to ppm. Table values are in the series; uncertainties are
+      retained there. The source-defined isotope ratios, fTe and log(fTe) are preserved in sibling context because no compatible
+      source-field token exists in this extract.'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -4887,7 +5349,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1681.15:row=te_1408c:h=cb5617d63850
-  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  experiment_id: 10.1016/j.gca.2022.10.032::renggli-2022-te-evaporation::declared:10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -4945,6 +5407,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Te concentration in recovered
+      glass after 15 min, reported as µg/g, numerically equivalent to ppm. Table values are in the series; uncertainties are
+      retained there. The source-defined isotope ratios, fTe and log(fTe) are preserved in sibling context because no compatible
+      source-field token exists in this extract.'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -5035,7 +5511,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1732.15:row=te_1459c:h=5e40ed73fcc6
-  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  experiment_id: 10.1016/j.gca.2022.10.032::renggli-2022-te-evaporation::declared:10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -5093,6 +5569,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Te concentration in recovered
+      glass after 15 min, reported as µg/g, numerically equivalent to ppm. Table values are in the series; uncertainties are
+      retained there. The source-defined isotope ratios, fTe and log(fTe) are preserved in sibling context because no compatible
+      source-field token exists in this extract.'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -5183,7 +5673,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: renggli-2022-te-evaporation::renggli_2022_table1_residue_te::T=1732.15:row=te_1459c:h=611eae02b854
-  experiment_id: 10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series
+  experiment_id: 10.1016/j.gca.2022.10.032::renggli-2022-te-evaporation::declared:10.1016/j.gca.2022.10.032::experiment::renggli-te-evaporation-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -5241,6 +5731,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Te concentration in recovered
+      glass after 15 min, reported as µg/g, numerically equivalent to ppm. Table values are in the series; uncertainties are
+      retained there. The source-defined isotope ratios, fTe and log(fTe) are preserved in sibling context because no compatible
+      source-field token exists in this extract.'
+    origin: renggli-2022-te-evaporation::renggli_2022_table1_residue_te
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition

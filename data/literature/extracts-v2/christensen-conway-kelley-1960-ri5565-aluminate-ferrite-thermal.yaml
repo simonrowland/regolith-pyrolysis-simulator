@@ -79,6 +79,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_entropy_of_fusion_1620
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - entropy_of_fusion
@@ -265,6 +276,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_fusion_temperature_1620
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -450,6 +472,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_heat_of_fusion_1620
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -642,7 +675,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - S
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_king_standard_entropy_29815
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 12
@@ -767,7 +811,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_measured_cr_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 12
@@ -893,7 +948,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_measured_cr_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 12
@@ -1019,7 +1085,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_measured_cr_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 12
@@ -1145,7 +1222,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_measured_cr_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 12
@@ -1271,7 +1359,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_measured_cr_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 12
@@ -1397,7 +1496,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_measured_cr_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 12
@@ -1523,7 +1633,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_measured_cr_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 12
@@ -1649,7 +1770,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_measured_cr_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 12
@@ -1775,7 +1907,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_measured_cr_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 12
@@ -1901,7 +2044,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_measured_cr_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 12
@@ -2027,7 +2181,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_measured_cr_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 12
@@ -2153,7 +2318,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_measured_cr_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 12
@@ -2279,7 +2455,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_measured_cr_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 12
@@ -2405,7 +2592,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_measured_cr_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 12
@@ -2531,7 +2729,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_measured_cr_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 12
@@ -2657,7 +2866,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_measured_cr_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 12
@@ -2783,7 +3003,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_measured_cr_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 12
@@ -2909,7 +3140,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_measured_cr_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 12
@@ -3035,7 +3277,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_measured_cr_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 12
@@ -3161,7 +3414,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_measured_cr_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 12
@@ -3287,7 +3551,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_measured_cr_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 12
@@ -3413,7 +3688,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_measured_cr_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 12
@@ -3539,7 +3825,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_measured_cr_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 12
@@ -3665,7 +3962,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_measured_cr_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 12
@@ -3791,7 +4099,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_measured_cr_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 12
@@ -3917,7 +4236,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_measured_cr_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 12
@@ -4042,7 +4372,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_measured_liquid_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 12
@@ -4167,7 +4508,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_measured_liquid_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 12
@@ -4292,7 +4644,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_measured_liquid_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 12
@@ -4417,7 +4780,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_measured_liquid_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 12
@@ -4542,7 +4916,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_measured_liquid_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 12
@@ -4600,12 +4985,11 @@ observations:
     species:
       formula: NaFeO2
       phase:
-        tag: unknown
-        reason: phase string 'in melting range' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4668,7 +5052,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - H_minus_H298
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''in melting range'' is not in the closed automatic map'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_melting_range_heat_content
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_melting_range_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 12
@@ -4726,12 +5133,11 @@ observations:
     species:
       formula: NaFeO2
       phase:
-        tag: unknown
-        reason: phase string 'in melting range' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4794,7 +5200,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - H_minus_H298
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''in melting range'' is not in the closed automatic map'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_melting_range_heat_content
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_melting_range_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 12
@@ -4852,12 +5281,11 @@ observations:
     species:
       formula: NaFeO2
       phase:
-        tag: unknown
-        reason: phase string 'in melting range' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4920,7 +5348,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - H_minus_H298
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''in melting range'' is not in the closed automatic map'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_melting_range_heat_content
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_melting_range_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 12
@@ -4978,12 +5429,11 @@ observations:
     species:
       formula: NaFeO2
       phase:
-        tag: unknown
-        reason: phase string 'in melting range' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5046,7 +5496,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - H_minus_H298
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''in melting range'' is not in the closed automatic map'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_melting_range_heat_content
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_melting_range_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 12
@@ -5104,12 +5577,11 @@ observations:
     species:
       formula: NaFeO2
       phase:
-        tag: unknown
-        reason: phase string 'in melting range' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5172,7 +5644,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - H_minus_H298
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''in melting range'' is not in the closed automatic map'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_melting_range_heat_content
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_melting_range_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 12
@@ -5230,12 +5725,11 @@ observations:
     species:
       formula: NaFeO2
       phase:
-        tag: unknown
-        reason: phase string 'in melting range' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5298,7 +5792,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - H_minus_H298
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''in melting range'' is not in the closed automatic map'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_melting_range_heat_content
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_melting_range_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 12
@@ -5356,12 +5873,11 @@ observations:
     species:
       formula: NaFeO2
       phase:
-        tag: unknown
-        reason: phase string 'in melting range' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5424,7 +5940,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - H_minus_H298
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''in melting range'' is not in the closed automatic map'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_melting_range_heat_content
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table7_melting_range_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 12
@@ -5549,7 +6088,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - S
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_l_entropy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -5780,7 +6330,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - S
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_l_entropy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -6011,7 +6572,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - S
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_l_entropy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -6242,7 +6814,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - S
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_l_entropy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -6473,7 +7056,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - S
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_l_entropy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -6704,7 +7298,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_l_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -6935,7 +7540,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_l_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -7166,7 +7782,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_l_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -7397,7 +8024,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_l_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -7628,7 +8266,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_l_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -7859,7 +8508,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - S
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_α_entropy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -8072,7 +8732,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - S
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_α_entropy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -8285,7 +8956,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - S
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_α_entropy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -8498,7 +9180,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - S
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_α_entropy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -8711,7 +9404,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - S
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_α_entropy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -8924,7 +9628,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - S
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_α_entropy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -9131,7 +9846,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_α_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -9343,7 +10069,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_α_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -9555,7 +10292,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_α_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -9767,7 +10515,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_α_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -9979,7 +10738,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_α_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -10191,7 +10961,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_α_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -10397,7 +11178,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - S
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_β_entropy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -10628,7 +11420,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - S
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_β_entropy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -10859,7 +11662,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - S
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_β_entropy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -11090,7 +11904,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - S
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_β_entropy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -11321,7 +12146,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - S
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_β_entropy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -11552,7 +12388,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - S
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_β_entropy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -11783,7 +12630,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_β_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -12014,7 +12872,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_β_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -12245,7 +13114,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_β_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -12476,7 +13356,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_β_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -12707,7 +13598,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_β_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -12938,7 +13840,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_β_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -13169,7 +14082,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - S
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_γ_entropy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -13400,7 +14324,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - S
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_γ_entropy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -13631,7 +14566,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - S
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_γ_entropy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -13862,7 +14808,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - S
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_γ_entropy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -14093,7 +15050,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - S
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_γ_entropy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -14324,7 +15292,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - S
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_γ_entropy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -14555,7 +15534,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_γ_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -14786,7 +15776,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_γ_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -15017,7 +16018,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_γ_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -15248,7 +16260,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_γ_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -15479,7 +16502,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_γ_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -15710,7 +16744,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_table8_γ_heat_content
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -15943,6 +16988,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_transition_1270
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -16129,6 +17185,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_transition_870
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -16273,7 +17340,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_transition_enthalpy_1270
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13
@@ -16413,7 +17490,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal::cck60_nafeo2_transition_enthalpy_870
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
   locator:
     page: 13

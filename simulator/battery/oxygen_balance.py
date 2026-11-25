@@ -12,10 +12,14 @@ from simulator.battery.records import Located, Notice
 from simulator.physical_constants import GAS_CONSTANT
 from simulator.vacuum_oxygen_balance import (
     OxygenBalanceBracketBoundary,
+    PressureLawChannelDiagnostic,
+    PressureLawExponentMismatch,
     _OXYGEN_GAS_ALPHA,
     _OXYGEN_GAS_ALPHA_SOURCE,
     _VacuumOxygenBalance,
     _VacuumOxygenChannel,
+    PressureEvaluation,
+    RESIDUE_PRESSURE_LAW_REDOX_ACTIVE,
 )
 
 # Battery callers still import the shared channel types from this module.
@@ -38,6 +42,7 @@ OXYGEN_BALANCE_EFFUSION_ENGINES: frozenset[Engine] = frozenset(
 )
 OXYGEN_BALANCE_NOTICE_PREFIX = "fo2_oxygen_balance_effusion_solved:"
 _MODELLED_REACTIVE_CELL = frozenset({CellMaterial.W, CellMaterial.MO})
+_CHROMIUM_OXYGEN_PER_CR_CANDIDATES = (1.0, 1.5, 3.0)
 
 
 def _cell_material_class(
@@ -106,6 +111,44 @@ def _cell_oxygen_class(
 def _net_evaporation_pressure_Pa(pressure_Pa: float, background_pressure_Pa: float) -> float:
     """HKL driving pressure; zero background preserves the vacuum expression."""
     return max(0.0, pressure_Pa - background_pressure_Pa)
+
+
+def _channel_parent_oxygen_demand(
+    channel: _VacuumOxygenChannel,
+    model_pressures: Mapping[str, float],
+) -> float:
+    """Return melt oxygen demand using this evaluation's Fe or Cr valence."""
+    if channel.species == "CrO2" and channel.redox_metal_atoms > 0.0:
+        o_bar_cr = _chromium_oxygen_per_cr_from_valence(
+            getattr(model_pressures, "cr_valence", None)
+        )
+        if o_bar_cr is not None:
+            return o_bar_cr * channel.redox_metal_atoms
+    # o_bar_M = sum_v x_v * v/2 is O atoms per metal atom. Fe(g) releases
+    # o_bar and FeO(g) releases o_bar - 1. No q keeps formula stoichiometry.
+    q = getattr(model_pressures, "fe3_over_sum_fe", None)
+    if (
+        q is None
+        or channel.oxygen_per_metal_atom is None
+        or channel.redox_metal_atoms <= 0.0
+    ):
+        return channel.parent_oxygen_demand
+    return float(channel.oxygen_per_metal_atom(float(q))) * channel.redox_metal_atoms
+
+
+def _chromium_oxygen_per_cr_from_valence(
+    reported_cr_valence: object | None,
+) -> float | None:
+    """Convert reported mean Cr valence to O atoms/Cr; None stays unknown."""
+    if isinstance(reported_cr_valence, bool) or reported_cr_valence is None:
+        return None
+    try:
+        valence = float(reported_cr_valence)
+    except (TypeError, ValueError, OverflowError):
+        return None
+    if not math.isfinite(valence) or valence <= 0.0:
+        return None
+    return valence / 2.0
 
 
 def _solve_vacuum_oxygen_balance(
@@ -177,6 +220,20 @@ def _solve_vacuum_oxygen_balance(
             raise ValueError(f"alpha must be non-negative for {channel.species!r}")
         if channel.alpha == 0.0:
             continue
+        # Kress has d ln r/d ln pO2=c=0.196 for r=X_Fe2O3/X_FeO and
+        # q=2r/(1+2r), hence dq/d ln pO2=c*q*(1-q). In the dilute-Fe limit
+        # total melt moles are constant to O(x_Fe), X_FeO is proportional to
+        # 1-q, and d ln a_FeO/d ln pO2=-c*q.
+        # (A) For FeO(l)=Fe(g)+1/2 O2, p_Fe=K*a_FeO*pO2**-1/2, so the
+        # redox-active Fe pressure-law exponent is -1/2-c*q.
+        # (B) The demand-weighted Fe(g) term has slope
+        # d ln[(1+q/2)*p_Fe]/d ln pO2 = -1/2-c*q+c*q*(1-q)/(2+q)
+        # = -1/2-c*q*(1+2*q)/(2+q), first order -1/2-0.098*q. It is
+        # negative throughout q in [0,1]: q=0 gives -1/2 and q=1 gives
+        # -1/2-c. FeO(g) adds the residual term -q*J_FeO/2 because its
+        # oxygen atom leaves with the gas while o_bar=1+q/2 is demanded.
+        # These are distinct slopes: (A) is the diagnostic expectation;
+        # (B) bounds the Fe(g) demand term in the root residual.
         signed_weight = (
             channel.oxygen_atoms - channel.parent_oxygen_demand
         ) / math.sqrt(channel.molar_mass_kg_per_mol)
@@ -230,9 +287,14 @@ def _solve_vacuum_oxygen_balance(
                     f"pressure model returned invalid {channel.species!r} pressure"
                 )
             pressures[channel.species] = pressure
+            demand = _channel_parent_oxygen_demand(channel, model_pressures)
+            if not math.isfinite(demand) or demand < 0.0:
+                raise ValueError(
+                    f"parent oxygen demand is invalid for {channel.species!r}"
+                )
             flux = molar_flux(channel, pressure)
             oxygen_flux += channel.oxygen_atoms * flux
-            parent_flux += channel.parent_oxygen_demand * flux
+            parent_flux += demand * flux
         return (
             oxygen_flux - parent_flux,
             pressures,
@@ -241,13 +303,23 @@ def _solve_vacuum_oxygen_balance(
             parent_activities,
         )
 
-    f_low = evaluate(low)[0]
+    low_model_pressures = pressure_model(low)
+    low_evaluation = evaluate(low, low_model_pressures)
+    f_low = low_evaluation[0]
     f_high = evaluate(high)[0]
+    low_demands = {
+        channel.species: _channel_parent_oxygen_demand(channel, low_model_pressures)
+        for channel in active_channels
+    }
     bracket_boundary: OxygenBalanceBracketBoundary | None = None
     parent_channels = [channel for channel in active_channels if channel.parent_oxygen_demand > 0.0]
     zero_oxygen_boundary = background_pressure_Pa == 0.0 and all(
-        channel.oxygen_atoms >= channel.parent_oxygen_demand and channel.pO2_exponent >= 0.0
-        and (channel.oxygen_atoms == channel.parent_oxygen_demand or channel.pO2_exponent > 0.0)
+        channel.oxygen_atoms >= low_demands[channel.species]
+        and channel.pO2_exponent >= 0.0
+        and (
+            channel.oxygen_atoms == low_demands[channel.species]
+            or channel.pO2_exponent > 0.0
+        )
         for channel in parent_channels
     ) and all(
         channel.pO2_exponent > 0.0
@@ -283,15 +355,40 @@ def _solve_vacuum_oxygen_balance(
             maxiter=200,
         )
 
-    residual, pressures, oxygen_flux, parent_flux, _root_activities = evaluate(root)
+    root_model_pressures = pressure_model(root)
+    residual, pressures, oxygen_flux, parent_flux, _root_activities = evaluate(
+        root, root_model_pressures,
+    )
+    root_demands = {
+        channel.species: _channel_parent_oxygen_demand(
+            channel, root_model_pressures,
+        )
+        for channel in active_channels
+    }
+    root_q = getattr(root_model_pressures, "fe3_over_sum_fe", None)
+    root_q = None if root_q is None else float(root_q)
     pressure_law_exponent_diagnostics: dict[str, dict[str, object]] = {}
+    pressure_law_diagnostics: list[PressureLawChannelDiagnostic] = []
+    redox_active = bool(getattr(pressure_model, "declares_redox_active", False))
     if bracket_boundary != "lower":
         probe_low = max(low, root - 0.1)
         probe_high = root + 0.1
-        lower_evaluation = evaluate(probe_low)
-        upper_evaluation = evaluate(probe_high)
-        lower_pressures, lower_activities = lower_evaluation[1], lower_evaluation[4]
-        upper_pressures, upper_activities = upper_evaluation[1], upper_evaluation[4]
+        lower_model_pressures = pressure_model(probe_low)
+        upper_model_pressures = pressure_model(probe_high)
+        (
+            _low_residual,
+            lower_pressures,
+            _low_oxygen,
+            _low_parent,
+            lower_activities,
+        ) = evaluate(probe_low, lower_model_pressures)
+        (
+            _high_residual,
+            upper_pressures,
+            _high_oxygen,
+            _high_parent,
+            upper_activities,
+        ) = evaluate(probe_high, upper_model_pressures)
         for channel in active_channels:
             pressure = pressures[channel.species]
             if pressure <= 1.0e-300:
@@ -299,6 +396,25 @@ def _solve_vacuum_oxygen_balance(
             lower_pressure = lower_pressures[channel.species]
             upper_pressure = upper_pressures[channel.species]
             if lower_pressure <= 0.0 or upper_pressure <= 0.0:
+                lower_omissions = getattr(
+                    lower_model_pressures, "below_threshold_omissions", {}
+                )
+                upper_omissions = getattr(
+                    upper_model_pressures, "below_threshold_omissions", {}
+                )
+                lower_omission_proven = (
+                    isinstance(lower_omissions, Mapping)
+                    and channel.species in lower_omissions
+                )
+                upper_omission_proven = (
+                    isinstance(upper_omissions, Mapping)
+                    and channel.species in upper_omissions
+                )
+                if (
+                    (lower_pressure > 0.0 or lower_omission_proven)
+                    and (upper_pressure > 0.0 or upper_omission_proven)
+                ):
+                    continue
                 raise ValueError(
                     f"pressure law for {channel.species!r} is not positive around the root"
                 )
@@ -342,8 +458,26 @@ def _solve_vacuum_oxygen_balance(
                 "corrected_fixed_parent_activity_slope": corrected_slope,
                 "parent_activity_reported": parent_activity_reported,
             }
+            if redox_active:
+                expected_exponent = channel.pO2_exponent
+                if channel.oxygen_per_metal_atom is not None and root_q is not None:
+                    from simulator.fe_redox import KRESS91_LN_FO2_COEFFICIENT
+
+                    expected_exponent -= KRESS91_LN_FO2_COEFFICIENT * root_q
+                pressure_law_diagnostics.append(
+                    PressureLawChannelDiagnostic(
+                        species=channel.species,
+                        declared=channel.pO2_exponent,
+                        observed=raw_total_slope,
+                        expected=expected_exponent,
+                        reason=RESIDUE_PRESSURE_LAW_REDOX_ACTIVE,
+                    )
+                )
+                flags = getattr(pressure_model, "engine_flags", None)
+                if isinstance(flags, set):
+                    flags.add(RESIDUE_PRESSURE_LAW_REDOX_ACTIVE)
             if abs(corrected_slope - channel.pO2_exponent) > 1.0e-6:
-                raise ValueError(
+                raise PressureLawExponentMismatch(
                     f"pressure law exponent mismatch for {channel.species!r}: "
                     f"declared {channel.pO2_exponent}, "
                     f"observed {corrected_slope} "
@@ -353,17 +487,39 @@ def _solve_vacuum_oxygen_balance(
         on_accepted_evaluation(root)
 
     if zero_oxygen_boundary:
-        residual, pressures, oxygen_flux, parent_flux, _root_activities = evaluate(
-            root,
+        boundary_pressures = PressureEvaluation(
             {
                 channel.species: (
-                    0.0
-                    if channel.pO2_exponent > 0.0
-                    else pressures[channel.species]
+                    0.0 if channel.pO2_exponent > 0.0 else pressures[channel.species]
                 )
                 for channel in active_channels
             },
+            fe3_over_sum_fe=getattr(low_model_pressures, "fe3_over_sum_fe", None),
+            fe_activity=getattr(low_model_pressures, "fe_activity", None),
+            speciation_source=getattr(low_model_pressures, "speciation_source", None),
+            below_threshold_omissions=getattr(
+                low_model_pressures, "below_threshold_omissions", None
+            ),
         )
+        reported_cr_valence = getattr(low_model_pressures, "cr_valence", None)
+        if reported_cr_valence is not None:
+            boundary_pressures.cr_valence = reported_cr_valence
+        boundary_pressures.parent_activities = getattr(
+            low_model_pressures, "parent_activities", {}
+        )
+        (
+            residual,
+            pressures,
+            oxygen_flux,
+            parent_flux,
+            _root_activities,
+        ) = evaluate(root, boundary_pressures)
+        root_demands = {
+            channel.species: _channel_parent_oxygen_demand(
+                channel, boundary_pressures,
+            )
+            for channel in active_channels
+        }
     relative_residual = abs(residual) / max(oxygen_flux, parent_flux, 1.0e-300)
     fluxes = {
         channel.species: molar_flux(channel, pressures[channel.species])
@@ -381,6 +537,8 @@ def _solve_vacuum_oxygen_balance(
             channel.species: channel.alpha_source for channel in active_channels
         },
         pressure_law_exponent_diagnostics=pressure_law_exponent_diagnostics,
+        pressure_law_diagnostics=tuple(pressure_law_diagnostics),
+        parent_oxygen_demand_at_root=root_demands,
     )
 
 

@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/kems-011-wetzel-gail-2013.yaml
 observations:
 - observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_sio_alpha_extrapolation_quoted
-  experiment_id: 10.1051/0004-6361/201220803::experiment::sio-film-measurement-series
+  experiment_id: 10.1051/0004-6361/201220803::kems-011-wetzel-gail-2013::declared:10.1051/0004-6361/201220803::experiment::sio-film-measurement-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -11,12 +11,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'solid_SiO' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -40,7 +39,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid_SiO'' is not in the closed automatic map'
+    origin: kems-011-wetzel-gail-2013::wetzel_gail_2013_sio_alpha_extrapolation_quoted
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: dust_growth_model_input'
+    origin: kems-011-wetzel-gail-2013::wetzel_gail_2013_sio_alpha_extrapolation_quoted
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-011-wetzel-gail-2013
   locator:
     page: 7
@@ -59,7 +79,7 @@ observations:
   provenance:
     printed_phase: solid_SiO
 - observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_sio_alpha_fit_quoted
-  experiment_id: 10.1051/0004-6361/201220803::experiment::sio-film-measurement-series
+  experiment_id: 10.1051/0004-6361/201220803::kems-011-wetzel-gail-2013::declared:10.1051/0004-6361/201220803::experiment::sio-film-measurement-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -67,12 +87,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'solid_SiO' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -92,7 +111,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid_SiO'' is not in the closed automatic map'
+    origin: kems-011-wetzel-gail-2013::wetzel_gail_2013_sio_alpha_fit_quoted
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_fit_used_for_dust_growth'
+    origin: kems-011-wetzel-gail-2013::wetzel_gail_2013_sio_alpha_fit_quoted
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-011-wetzel-gail-2013
   locator:
     page: 7
@@ -102,7 +142,7 @@ observations:
   provenance:
     printed_phase: solid_SiO
 - observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_sio_growth_alpha_arrhenius
-  experiment_id: 10.1051/0004-6361/201220803::experiment::sio-film-measurement-series
+  experiment_id: 10.1051/0004-6361/201220803::kems-011-wetzel-gail-2013::declared:10.1051/0004-6361/201220803::experiment::sio-film-measurement-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -147,7 +187,17 @@ observations:
         line_range: 317-329
         note: growth coefficient α(T) for solid SiO condensation/growth from lab measurements
         source_path: text/kems-011-wetzel-gail-2013/mineru/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: solid_SiO_growth_coefficient'
+    origin: kems-011-wetzel-gail-2013::wetzel_gail_2013_sio_growth_alpha_arrhenius
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-011-wetzel-gail-2013
   locator:
     equation: '8'
@@ -158,7 +208,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_sio_growth_class_b1
-  experiment_id: 10.1051/0004-6361/201220803::experiment::sio-film-measurement-series
+  experiment_id: 10.1051/0004-6361/201220803::kems-011-wetzel-gail-2013::declared:10.1051/0004-6361/201220803::experiment::sio-film-measurement-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -200,7 +250,17 @@ observations:
         figure: 4a
         paragraph: SiO film growth Arrhenius α(T)
         source_path: text/kems-011-wetzel-gail-2013/mineru/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: solid_SiO_growth_coefficient'
+    origin: kems-011-wetzel-gail-2013::wetzel_gail_2013_sio_growth_class_b1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-011-wetzel-gail-2013
   locator:
     figure: 4a
@@ -210,7 +270,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_sio_ta_knudsen_geometry_partial
-  experiment_id: 10.1051/0004-6361/201220803::experiment::sio-film-measurement-series
+  experiment_id: 10.1051/0004-6361/201220803::kems-011-wetzel-gail-2013::declared:10.1051/0004-6361/201220803::experiment::sio-film-measurement-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -218,12 +278,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'solid_SiO_source' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -242,7 +301,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid_SiO_source'' is not in the closed automatic map'
+    origin: kems-011-wetzel-gail-2013::wetzel_gail_2013_sio_ta_knudsen_geometry_partial
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: solid_SiO_growth_coefficient'
+    origin: kems-011-wetzel-gail-2013::wetzel_gail_2013_sio_ta_knudsen_geometry_partial
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-011-wetzel-gail-2013
   locator:
     section: 2.1. Experimental setup
@@ -252,7 +332,7 @@ observations:
   provenance:
     printed_phase: solid_SiO_source
 - observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_table1_quoted_model
-  experiment_id: 10.1051/0004-6361/201220803::experiment::sio-film-measurement-series
+  experiment_id: 10.1051/0004-6361/201220803::kems-011-wetzel-gail-2013::declared:10.1051/0004-6361/201220803::experiment::sio-film-measurement-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -260,12 +340,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -293,7 +372,28 @@ observations:
       evidence:
         page: 4
         table: '1'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO'' is not in the closed automatic map'
+    origin: kems-011-wetzel-gail-2013::wetzel_gail_2013_table1_quoted_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_parameters'
+    origin: kems-011-wetzel-gail-2013::wetzel_gail_2013_table1_quoted_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-011-wetzel-gail-2013
   locator:
     page: 4
@@ -302,7 +402,7 @@ observations:
   provenance:
     printed_phase: amorphous_SiO
 - observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_table1_quoted_model_gibbs
-  experiment_id: 10.1051/0004-6361/201220803::experiment::sio-film-measurement-series
+  experiment_id: 10.1051/0004-6361/201220803::kems-011-wetzel-gail-2013::declared:10.1051/0004-6361/201220803::experiment::sio-film-measurement-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -310,12 +410,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -337,6 +436,27 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO'' is not in the closed automatic map'
+    origin: kems-011-wetzel-gail-2013::wetzel_gail_2013_table1_quoted_model_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_parameters'
+    origin: kems-011-wetzel-gail-2013::wetzel_gail_2013_table1_quoted_model_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -349,7 +469,7 @@ observations:
   provenance:
     printed_phase: amorphous_SiO
 - observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_table2_quoted_model
-  experiment_id: 10.1051/0004-6361/201220803::experiment::sio-film-measurement-series
+  experiment_id: 10.1051/0004-6361/201220803::kems-011-wetzel-gail-2013::declared:10.1051/0004-6361/201220803::experiment::sio-film-measurement-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -357,12 +477,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -390,7 +509,28 @@ observations:
       evidence:
         page: 4
         table: '2'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO'' is not in the closed automatic map'
+    origin: kems-011-wetzel-gail-2013::wetzel_gail_2013_table2_quoted_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_parameters'
+    origin: kems-011-wetzel-gail-2013::wetzel_gail_2013_table2_quoted_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-011-wetzel-gail-2013
   locator:
     page: 4
@@ -399,7 +539,7 @@ observations:
   provenance:
     printed_phase: amorphous_SiO
 - observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_table2_quoted_model_gibbs
-  experiment_id: 10.1051/0004-6361/201220803::experiment::sio-film-measurement-series
+  experiment_id: 10.1051/0004-6361/201220803::kems-011-wetzel-gail-2013::declared:10.1051/0004-6361/201220803::experiment::sio-film-measurement-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -407,12 +547,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -434,6 +573,27 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO'' is not in the closed automatic map'
+    origin: kems-011-wetzel-gail-2013::wetzel_gail_2013_table2_quoted_model_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_parameters'
+    origin: kems-011-wetzel-gail-2013::wetzel_gail_2013_table2_quoted_model_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -446,7 +606,7 @@ observations:
   provenance:
     printed_phase: amorphous_SiO
 - observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_table3_quoted_model
-  experiment_id: 10.1051/0004-6361/201220803::experiment::sio-film-measurement-series
+  experiment_id: 10.1051/0004-6361/201220803::kems-011-wetzel-gail-2013::declared:10.1051/0004-6361/201220803::experiment::sio-film-measurement-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -454,12 +614,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -487,7 +646,28 @@ observations:
       evidence:
         page: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO'' is not in the closed automatic map'
+    origin: kems-011-wetzel-gail-2013::wetzel_gail_2013_table3_quoted_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_parameters'
+    origin: kems-011-wetzel-gail-2013::wetzel_gail_2013_table3_quoted_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-011-wetzel-gail-2013
   locator:
     page: 5
@@ -496,7 +676,7 @@ observations:
   provenance:
     printed_phase: amorphous_SiO
 - observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_table3_quoted_model_gibbs
-  experiment_id: 10.1051/0004-6361/201220803::experiment::sio-film-measurement-series
+  experiment_id: 10.1051/0004-6361/201220803::kems-011-wetzel-gail-2013::declared:10.1051/0004-6361/201220803::experiment::sio-film-measurement-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -504,12 +684,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'amorphous_SiO' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -587,6 +766,27 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''amorphous_SiO'' is not in the closed automatic map'
+    origin: kems-011-wetzel-gail-2013::wetzel_gail_2013_table3_quoted_model_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_parameters'
+    origin: kems-011-wetzel-gail-2013::wetzel_gail_2013_table3_quoted_model_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -599,7 +799,7 @@ observations:
   provenance:
     printed_phase: amorphous_SiO
 - observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_table4_quoted_model
-  experiment_id: 10.1051/0004-6361/201220803::experiment::sio-film-measurement-series
+  experiment_id: 10.1051/0004-6361/201220803::kems-011-wetzel-gail-2013::declared:10.1051/0004-6361/201220803::experiment::sio-film-measurement-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -607,12 +807,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'circumstellar_dust_model' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -640,7 +839,28 @@ observations:
       evidence:
         page: 7
         table: '4'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''circumstellar_dust_model'' is not in the closed automatic map'
+    origin: kems-011-wetzel-gail-2013::wetzel_gail_2013_table4_quoted_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_parameters'
+    origin: kems-011-wetzel-gail-2013::wetzel_gail_2013_table4_quoted_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-011-wetzel-gail-2013
   locator:
     page: 7
@@ -649,7 +869,7 @@ observations:
   provenance:
     printed_phase: circumstellar_dust_model
 - observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_table4_quoted_model_gibbs
-  experiment_id: 10.1051/0004-6361/201220803::experiment::sio-film-measurement-series
+  experiment_id: 10.1051/0004-6361/201220803::kems-011-wetzel-gail-2013::declared:10.1051/0004-6361/201220803::experiment::sio-film-measurement-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -657,12 +877,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'circumstellar_dust_model' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -684,6 +903,27 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''circumstellar_dust_model'' is not in the closed automatic map'
+    origin: kems-011-wetzel-gail-2013::wetzel_gail_2013_table4_quoted_model_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_parameters'
+    origin: kems-011-wetzel-gail-2013::wetzel_gail_2013_table4_quoted_model_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -696,7 +936,7 @@ observations:
   provenance:
     printed_phase: circumstellar_dust_model
 - observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_table5_quoted_model
-  experiment_id: 10.1051/0004-6361/201220803::experiment::sio-film-measurement-series
+  experiment_id: 10.1051/0004-6361/201220803::kems-011-wetzel-gail-2013::declared:10.1051/0004-6361/201220803::experiment::sio-film-measurement-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -704,12 +944,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'circumstellar_dust_model' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -736,7 +975,28 @@ observations:
       evidence:
         page: 8
         table: '5'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''circumstellar_dust_model'' is not in the closed automatic map'
+    origin: kems-011-wetzel-gail-2013::wetzel_gail_2013_table5_quoted_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_parameters'
+    origin: kems-011-wetzel-gail-2013::wetzel_gail_2013_table5_quoted_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-011-wetzel-gail-2013
   locator:
     page: 8
@@ -745,7 +1005,7 @@ observations:
   provenance:
     printed_phase: circumstellar_dust_model
 - observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_table5_quoted_model_gibbs
-  experiment_id: 10.1051/0004-6361/201220803::experiment::sio-film-measurement-series
+  experiment_id: 10.1051/0004-6361/201220803::kems-011-wetzel-gail-2013::declared:10.1051/0004-6361/201220803::experiment::sio-film-measurement-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -753,12 +1013,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'circumstellar_dust_model' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -779,6 +1038,27 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''circumstellar_dust_model'' is not in the closed automatic map'
+    origin: kems-011-wetzel-gail-2013::wetzel_gail_2013_table5_quoted_model_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_parameters'
+    origin: kems-011-wetzel-gail-2013::wetzel_gail_2013_table5_quoted_model_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -791,7 +1071,7 @@ observations:
   provenance:
     printed_phase: circumstellar_dust_model
 - observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_table6_quoted_model
-  experiment_id: 10.1051/0004-6361/201220803::experiment::sio-film-measurement-series
+  experiment_id: 10.1051/0004-6361/201220803::kems-011-wetzel-gail-2013::declared:10.1051/0004-6361/201220803::experiment::sio-film-measurement-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -799,12 +1079,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'circumstellar_dust_model' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -831,7 +1110,28 @@ observations:
       evidence:
         page: 8
         table: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''circumstellar_dust_model'' is not in the closed automatic map'
+    origin: kems-011-wetzel-gail-2013::wetzel_gail_2013_table6_quoted_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_parameters'
+    origin: kems-011-wetzel-gail-2013::wetzel_gail_2013_table6_quoted_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-011-wetzel-gail-2013
   locator:
     page: 8
@@ -840,7 +1140,7 @@ observations:
   provenance:
     printed_phase: circumstellar_dust_model
 - observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_table6_quoted_model_gibbs
-  experiment_id: 10.1051/0004-6361/201220803::experiment::sio-film-measurement-series
+  experiment_id: 10.1051/0004-6361/201220803::kems-011-wetzel-gail-2013::declared:10.1051/0004-6361/201220803::experiment::sio-film-measurement-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -848,12 +1148,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'circumstellar_dust_model' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -874,6 +1173,27 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''circumstellar_dust_model'' is not in the closed automatic map'
+    origin: kems-011-wetzel-gail-2013::wetzel_gail_2013_table6_quoted_model_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_parameters'
+    origin: kems-011-wetzel-gail-2013::wetzel_gail_2013_table6_quoted_model_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement

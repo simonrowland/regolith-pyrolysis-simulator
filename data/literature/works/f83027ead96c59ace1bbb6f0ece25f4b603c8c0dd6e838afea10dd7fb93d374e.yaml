@@ -95,6 +95,70 @@ experiments:
     page: 66
     pdf_page_index: 65
     table: '1.8'
+- experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::declared:f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1::method:electron_microprobe
+  kind: literature
+  method:
+    tag: value
+    value: electron_microprobe
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e
+  locator:
+    page: 66
+    pdf_page_index: 65
+    table: '1.8'
+- experiment_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report::declared:f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e::experiment::haskin-1990-lunar-molten-regolith-electrolysis-nasa-report-a12_1cb::method:electron_microprobe
+  kind: literature
+  method:
+    tag: value
+    value: electron_microprobe
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: f83027ead96c59ace1bbb6f0ece25f4b603c8c0dd6e838afea10dd7fb93d374e
+  locator:
+    page: 66
+    pdf_page_index: 65
+    table: '1.8'
 context:
 - observation_id: haskin-1990-lunar-molten-regolith-electrolysis-nasa-report_figure_1_21_deferred
   type: figure_record

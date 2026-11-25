@@ -82,6 +82,17 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: archakov-1999-titania-slag-evaporation::archakov_1999_melting_point_tio2_37_60
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - transition_temperature

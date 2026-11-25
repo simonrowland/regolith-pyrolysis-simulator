@@ -4,6 +4,7 @@ from pathlib import Path
 
 import yaml
 
+from simulator.battery.enums import NoticeKind
 from simulator.battery.migrate import Migrator
 
 
@@ -39,7 +40,9 @@ def test_costa_2015_quoted_formation_enthalpy_migrates_as_one_point() -> None:
     assert observation.uncertainty.verbatim == "±8.21 kJ/mol"
     assert extract["species"]["Yb2SiO5"]["observations"][0]["values"]["sigma"] == "8.21"
     assert observation.evidence.class_.value.value == "quoted_attributed"
-    assert observation.notices == ()
+    assert tuple(notice.kind for notice in observation.notices) == (
+        NoticeKind.METHOD_UNSTATED,
+    )
 
     species = extract["species"]["Yb2SiO5"]
     assert len(species["observations"]) == 1

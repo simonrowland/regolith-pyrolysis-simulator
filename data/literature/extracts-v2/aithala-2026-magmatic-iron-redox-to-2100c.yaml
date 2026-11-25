@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/aithala-2026-magmatic-iron-redox-to-2100c.yaml
 observations:
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_1800_30_wdsepma_composition
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-1800-30
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-1800-30::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -11,12 +11,11 @@ observations:
     species:
       formula: silicate_melt
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -61,7 +60,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_1800_30_wdsepma_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: WDS EPMA'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_1800_30_wdsepma_composition
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 14
@@ -330,7 +350,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_1800_30_xanes
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-1800-30
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-1800-30::method:xanes_spectroscopy
   identity:
     quantity:
       tag: value
@@ -723,7 +743,7 @@ observations:
   provenance:
     printed_phase: quenched silicate glass
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_1900_30_wdsepma_composition
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-1900-30
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-1900-30::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -731,12 +751,11 @@ observations:
     species:
       formula: silicate_melt
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -781,7 +800,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_1900_30_wdsepma_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: WDS EPMA'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_1900_30_wdsepma_composition
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 14
@@ -1050,7 +1090,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_1900_30_xanes
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-1900-30
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-1900-30::method:xanes_spectroscopy
   identity:
     quantity:
       tag: value
@@ -1443,7 +1483,7 @@ observations:
   provenance:
     printed_phase: quenched silicate glass
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2000_10_wdsepma_composition
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-2000-10
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-2000-10::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1451,12 +1491,11 @@ observations:
     species:
       formula: silicate_melt
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1501,7 +1540,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2000_10_wdsepma_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: WDS EPMA'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2000_10_wdsepma_composition
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 14
@@ -1791,7 +1851,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2000_10_xanes
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-2000-10
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-2000-10::method:xanes_spectroscopy
   identity:
     quantity:
       tag: value
@@ -2209,7 +2269,7 @@ observations:
   provenance:
     printed_phase: quenched silicate glass
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2000_120_wdsepma_composition
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-2000-120
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-2000-120::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2217,12 +2277,11 @@ observations:
     species:
       formula: silicate_melt
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2267,7 +2326,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2000_120_wdsepma_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: WDS EPMA'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2000_120_wdsepma_composition
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 14
@@ -2536,7 +2616,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2000_120_xanes
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-2000-120
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-2000-120::method:xanes_spectroscopy
   identity:
     quantity:
       tag: value
@@ -2932,7 +3012,7 @@ observations:
   provenance:
     printed_phase: quenched silicate glass
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2000_30_wdsepma_composition
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-2000-30
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-2000-30::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2940,12 +3020,11 @@ observations:
     species:
       formula: silicate_melt
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2990,7 +3069,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2000_30_wdsepma_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: WDS EPMA'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2000_30_wdsepma_composition
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 14
@@ -3280,7 +3380,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2000_30_xanes
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-2000-30
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-2000-30::method:xanes_spectroscopy
   identity:
     quantity:
       tag: value
@@ -3695,7 +3795,7 @@ observations:
   provenance:
     printed_phase: quenched silicate glass
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2100_30_wdsepma_composition
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-2100-30
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-2100-30::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -3703,12 +3803,11 @@ observations:
     species:
       formula: silicate_melt
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3753,7 +3852,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2100_30_wdsepma_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: WDS EPMA'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2100_30_wdsepma_composition
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 14
@@ -4022,7 +4142,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2100_30_xanes
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-2100-30
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-2100-30::method:xanes_spectroscopy
   identity:
     quantity:
       tag: value
@@ -4415,7 +4535,7 @@ observations:
   provenance:
     printed_phase: quenched silicate glass
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_121
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-121
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-121::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -4423,12 +4543,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4448,7 +4567,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_121
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_121
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 16
@@ -4473,7 +4613,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_121
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_20424
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-20424
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-20424::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -4481,12 +4621,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4506,7 +4645,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_20424
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_20424
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 16
@@ -4531,7 +4691,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_20424
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_3114
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-3114
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-3114::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -4539,12 +4699,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4564,7 +4723,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_3114
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_3114
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 16
@@ -4589,7 +4769,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_3114
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_780_u_105
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-780_u_105
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-780_u_105::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -4597,12 +4777,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4622,7 +4801,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_780_u_105
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_780_u_105
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 16
@@ -4647,7 +4847,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_780_u_105
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_780_u_111
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-780_u_111
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-780_u_111::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -4655,12 +4855,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4680,7 +4879,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_780_u_111
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_780_u_111
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 16
@@ -4705,7 +4925,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_780_u_111
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_cam_49
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-cam_49
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-cam_49::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -4713,12 +4933,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4738,7 +4957,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_cam_49
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_cam_49
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 16
@@ -4763,7 +5003,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_cam_49
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_daf
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-daf
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-daf::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -4771,12 +5011,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4796,7 +5035,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_daf
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_daf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 16
@@ -4821,7 +5081,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_daf
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_daf20
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-daf20
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-daf20::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -4829,12 +5089,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4854,7 +5113,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_daf20
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_daf20
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 16
@@ -4879,7 +5159,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_daf20
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_daf5
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-daf5
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-daf5::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -4887,12 +5167,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4912,7 +5191,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_daf5
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_daf5
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 16
@@ -4937,7 +5237,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_daf5
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_daf_bm
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-daf_bm
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-daf_bm::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -4945,12 +5245,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4970,7 +5269,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_daf_bm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_daf_bm
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 16
@@ -4995,7 +5315,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_daf_bm
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafa22
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafa22
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafa22::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -5003,12 +5323,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5028,7 +5347,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafa22
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafa22
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 16
@@ -5053,7 +5393,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_dafa22
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafa30
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafa30
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafa30::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -5061,12 +5401,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5086,7 +5425,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafa30
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafa30
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 16
@@ -5111,7 +5471,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_dafa30
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafl
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafl
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafl::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -5119,12 +5479,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5144,7 +5503,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafl
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafl
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 16
@@ -5169,7 +5549,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_dafl
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafm15
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafm15
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafm15::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -5177,12 +5557,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5202,7 +5581,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafm15
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafm15
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 16
@@ -5227,7 +5627,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_dafm15
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafm20
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafm20
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafm20::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -5235,12 +5635,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5260,7 +5659,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafm20
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafm20
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 16
@@ -5285,7 +5705,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_dafm20
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafn15_dafsk25
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafn15_dafsk25
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafn15_dafsk25::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -5293,12 +5713,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5318,7 +5737,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafn15_dafsk25
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafn15_dafsk25
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 16
@@ -5343,7 +5783,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_dafn15_dafsk25
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafn8_hafsk13
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafn8_hafsk13
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafn8_hafsk13::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -5351,12 +5791,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5376,7 +5815,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafn8_hafsk13
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafn8_hafsk13
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 16
@@ -5401,7 +5861,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_dafn8_hafsk13
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafol20
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafol20
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafol20::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -5409,12 +5869,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5434,7 +5893,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafol20
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafol20
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 16
@@ -5459,7 +5939,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_dafol20
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafol40
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafol40
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafol40::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -5467,12 +5947,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5492,7 +5971,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafol40
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafol40
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 16
@@ -5517,7 +6017,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_dafol40
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafp05
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafp05
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafp05::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -5525,12 +6025,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5550,7 +6049,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafp05
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafp05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 16
@@ -5575,7 +6095,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_dafp05
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafp10
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafp10
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafp10::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -5583,12 +6103,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5608,7 +6127,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafp10
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafp10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 16
@@ -5633,7 +6173,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_dafp10
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafp15
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafp15
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafp15::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -5641,12 +6181,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5666,7 +6205,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafp15
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafp15
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 16
@@ -5691,7 +6251,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_dafp15
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafp20
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafp20
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafp20::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -5699,12 +6259,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5724,7 +6283,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafp20
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafp20
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 16
@@ -5749,7 +6329,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_dafp20
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafs
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafs
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafs::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -5757,12 +6337,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5782,7 +6361,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 17
@@ -5807,7 +6407,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_dafs
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafsa15
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafsa15
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafsa15::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -5815,12 +6415,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5840,7 +6439,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafsa15
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafsa15
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 17
@@ -5865,7 +6485,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_dafsa15
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafsa23
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafsa23
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafsa23::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -5873,12 +6493,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5898,7 +6517,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafsa23
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafsa23
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 17
@@ -5923,7 +6563,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_dafsa23
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafsm13
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafsm13
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafsm13::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -5931,12 +6571,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5956,7 +6595,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafsm13
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafsm13
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 17
@@ -5981,7 +6641,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_dafsm13
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafsm21
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafsm21
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafsm21::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -5989,12 +6649,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6014,7 +6673,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafsm21
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafsm21
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 17
@@ -6039,7 +6719,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_dafsm21
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafsn15_dafsk25
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafsn15_dafsk25
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafsn15_dafsk25::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -6047,12 +6727,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6072,7 +6751,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafsn15_dafsk25
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafsn15_dafsk25
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 17
@@ -6097,7 +6797,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_dafsn15_dafsk25
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafsp08
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafsp08
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafsp08::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -6105,12 +6805,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6130,7 +6829,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafsp08
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafsp08
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 17
@@ -6155,7 +6875,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_dafsp08
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafst15
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafst15
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafst15::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -6163,12 +6883,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6188,7 +6907,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafst15
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafst15
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 17
@@ -6213,7 +6953,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_dafst15
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafst25
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafst25
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-dafst25::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -6221,12 +6961,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6246,7 +6985,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafst25
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_dafst25
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 17
@@ -6271,7 +7031,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_dafst25
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_daft10
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-daft10
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-daft10::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -6279,12 +7039,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6304,7 +7063,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_daft10
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_daft10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 17
@@ -6329,7 +7109,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_daft10
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_daft20
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-daft20
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-daft20::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -6337,12 +7117,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6362,7 +7141,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_daft20
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_daft20
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 17
@@ -6387,7 +7187,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_daft20
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_daft30
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-daft30
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-daft30::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -6395,12 +7195,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6420,7 +7219,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_daft30
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_daft30
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 17
@@ -6445,7 +7265,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_daft30
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_das20f
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-das20f
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-das20f::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -6453,12 +7273,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6478,7 +7297,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_das20f
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_das20f
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 16
@@ -6503,7 +7343,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_das20f
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_das40f
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-das40f
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-das40f::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -6511,12 +7351,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6536,7 +7375,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_das40f
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_das40f
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 16
@@ -6561,7 +7421,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_das40f
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_das60f
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-das60f
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-das60f::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -6569,12 +7429,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6594,7 +7453,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_das60f
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_das60f
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 16
@@ -6619,7 +7499,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_das60f
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_das80f
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-das80f
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-das80f::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -6627,12 +7507,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6652,7 +7531,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_das80f
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_das80f
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 16
@@ -6677,7 +7577,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_das80f
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_haf
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-haf
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-haf::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -6685,12 +7585,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6710,7 +7609,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_haf
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_haf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 17
@@ -6735,7 +7655,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_haf
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_hafc11
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-hafc11
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-hafc11::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -6743,12 +7663,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6768,7 +7687,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_hafc11
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_hafc11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 17
@@ -6793,7 +7733,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_hafc11
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_hafc11s
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-hafc11s
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-hafc11s::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -6801,12 +7741,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6826,7 +7765,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_hafc11s
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_hafc11s
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 17
@@ -6851,7 +7811,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_hafc11s
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_hafc16
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-hafc16
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-hafc16::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -6859,12 +7819,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6884,7 +7843,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_hafc16
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_hafc16
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 17
@@ -6909,7 +7889,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_hafc16
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_hafc16s
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-hafc16s
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-hafc16s::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -6917,12 +7897,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6942,7 +7921,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_hafc16s
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_hafc16s
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 17
@@ -6967,7 +7967,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_hafc16s
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_hafc5
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-hafc5
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-hafc5::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -6975,12 +7975,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7000,7 +7999,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_hafc5
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_hafc5
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 17
@@ -7025,7 +8045,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_hafc5
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_hafc5s
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-hafc5s
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-hafc5s::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -7033,12 +8053,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7058,7 +8077,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_hafc5s
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_hafc5s
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 17
@@ -7083,7 +8123,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_hafc5s
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_hafs
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-hafs
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-hafs::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -7091,12 +8131,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7116,7 +8155,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_hafs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_hafs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 17
@@ -7141,7 +8201,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_hafs
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_hrf10
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-hrf10
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-hrf10::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -7149,12 +8209,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7174,7 +8233,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_hrf10
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_hrf10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 17
@@ -7199,7 +8279,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_hrf10
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_hrf20
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-hrf20
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-hrf20::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -7207,12 +8287,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7232,7 +8311,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_hrf20
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_hrf20
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 17
@@ -7257,7 +8357,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_hrf20
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_hrf5
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-hrf5
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-hrf5::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -7265,12 +8365,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7290,7 +8389,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_hrf5
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_hrf5
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 17
@@ -7315,7 +8435,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_hrf5
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_humphrey
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-humphrey
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-humphrey::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -7323,12 +8443,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7349,7 +8468,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_humphrey
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_humphrey
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 16
@@ -7374,7 +8514,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_humphrey
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_ic_2
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-ic_2
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-ic_2::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -7382,12 +8522,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7407,7 +8546,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_ic_2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_ic_2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 16
@@ -7432,7 +8592,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_ic_2
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_jdfd_2
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-jdfd_2
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-jdfd_2::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -7440,12 +8600,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7465,7 +8624,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_jdfd_2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_jdfd_2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 16
@@ -7490,7 +8670,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_jdfd_2
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_mas
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-mas
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-mas::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -7498,12 +8678,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7523,7 +8702,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_mas
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_mas
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 16
@@ -7548,7 +8748,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_mas
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_nic_8
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-nic_8
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-nic_8::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -7556,12 +8756,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7581,7 +8780,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_nic_8
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_nic_8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 16
@@ -7606,7 +8826,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_nic_8
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_nmf
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-nmf
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-nmf::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -7614,12 +8834,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7639,7 +8858,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_nmf
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_nmf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 16
@@ -7664,7 +8904,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_nmf
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_nzc
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-nzc
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-nzc::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -7672,12 +8912,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7697,7 +8936,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_nzc
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_nzc
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 16
@@ -7722,7 +8982,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_nzc
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_saf
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-saf
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-saf::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -7730,12 +8990,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7755,7 +9014,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_saf
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_saf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 17
@@ -7780,7 +9060,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_saf
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_safm10
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-safm10
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-safm10::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -7788,12 +9068,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7813,7 +9092,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_safm10
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_safm10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 17
@@ -7838,7 +9138,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_safm10
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_safm15
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-safm15
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-safm15::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -7846,12 +9146,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7871,7 +9170,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_safm15
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_safm15
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 17
@@ -7896,7 +9216,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_safm15
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_safm5
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-s5-safm5
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-s5-safm5::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -7904,12 +9224,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7929,7 +9248,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_safm5
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_s5_safm5
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 17
@@ -7954,7 +9294,7 @@ observations:
   provenance:
     series_id: aithala_2026_s5_safm5
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf231_moessbauer
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf231
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-vf231::method:unspecified
   identity:
     quantity:
       tag: value
@@ -8059,6 +9399,17 @@ observations:
     - fe3_fe2_ratio
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf231_moessbauer
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf231_moessbauer
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -8340,7 +9691,7 @@ observations:
   provenance:
     printed_phase: quenched silicate glass
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf231_wdsepma_composition
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf231
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-vf231::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -8348,12 +9699,11 @@ observations:
     species:
       formula: silicate_melt
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8398,7 +9748,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf231_wdsepma_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: WDS EPMA'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf231_wdsepma_composition
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 14
@@ -8667,7 +10038,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf231_xanes
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf231
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-vf231::method:xanes_spectroscopy
   identity:
     quantity:
       tag: value
@@ -9057,7 +10428,7 @@ observations:
   provenance:
     printed_phase: quenched silicate glass
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf267_moessbauer
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf267
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-vf267::method:unspecified
   identity:
     quantity:
       tag: value
@@ -9162,6 +10533,17 @@ observations:
     - fe3_fe2_ratio
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf267_moessbauer
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf267_moessbauer
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -9443,7 +10825,7 @@ observations:
   provenance:
     printed_phase: quenched silicate glass
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf267_wdsepma_composition
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf267
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-vf267::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -9451,12 +10833,11 @@ observations:
     species:
       formula: silicate_melt
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9501,7 +10882,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf267_wdsepma_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: WDS EPMA'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf267_wdsepma_composition
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 14
@@ -9770,7 +11172,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf268_moessbauer
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf268
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-vf268::method:unspecified
   identity:
     quantity:
       tag: value
@@ -9875,6 +11277,17 @@ observations:
     - fe3_fe2_ratio
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf268_moessbauer
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf268_moessbauer
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -10156,7 +11569,7 @@ observations:
   provenance:
     printed_phase: quenched silicate glass
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf268_wdsepma_composition
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf268
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-vf268::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -10164,12 +11577,11 @@ observations:
     species:
       formula: silicate_melt
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10214,7 +11626,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf268_wdsepma_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: WDS EPMA'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf268_wdsepma_composition
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 14
@@ -10483,7 +11916,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf268_xanes
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf268
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-vf268::method:xanes_spectroscopy
   identity:
     quantity:
       tag: value
@@ -10873,7 +12306,7 @@ observations:
   provenance:
     printed_phase: quenched silicate glass
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf270_moessbauer
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf270
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-vf270::method:unspecified
   identity:
     quantity:
       tag: value
@@ -10978,6 +12411,17 @@ observations:
     - fe3_fe2_ratio
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf270_moessbauer
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf270_moessbauer
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -11259,7 +12703,7 @@ observations:
   provenance:
     printed_phase: quenched silicate glass
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf270_wdsepma_composition
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf270
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-vf270::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -11267,12 +12711,11 @@ observations:
     species:
       formula: silicate_melt
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11317,7 +12760,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf270_wdsepma_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: WDS EPMA'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf270_wdsepma_composition
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 14
@@ -11586,7 +13050,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf270_xanes
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf270
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-vf270::method:xanes_spectroscopy
   identity:
     quantity:
       tag: value
@@ -11976,7 +13440,7 @@ observations:
   provenance:
     printed_phase: quenched silicate glass
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf271_wdsepma_composition
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf271
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-vf271::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -11984,12 +13448,11 @@ observations:
     species:
       formula: silicate_melt
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12034,7 +13497,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf271_wdsepma_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: WDS EPMA'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf271_wdsepma_composition
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 14
@@ -12345,7 +13829,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf271_xanes
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf271
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-vf271::method:xanes_spectroscopy
   identity:
     quantity:
       tag: value
@@ -12779,7 +14263,7 @@ observations:
   provenance:
     printed_phase: quenched silicate glass
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf274_moessbauer
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf274
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-vf274::method:unspecified
   identity:
     quantity:
       tag: value
@@ -12884,6 +14368,17 @@ observations:
     - fe3_fe2_ratio
     reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
     origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf274_moessbauer
+  - kind: method_unstated
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Mössbauer'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf274_moessbauer
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -13165,7 +14660,7 @@ observations:
   provenance:
     printed_phase: quenched silicate glass
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf274_wdsepma_composition
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf274
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-vf274::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -13173,12 +14668,11 @@ observations:
     species:
       formula: silicate_melt
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13223,7 +14717,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf274_wdsepma_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: WDS EPMA'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf274_wdsepma_composition
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 14
@@ -13492,7 +15007,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf274_xanes
-  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf274
+  experiment_id: 10.7185/geochemlet.2617::aithala-2026-magmatic-iron-redox-to-2100c::declared:10.7185/geochemlet.2617::experiment::aithala-2026-vf274::method:xanes_spectroscopy
   identity:
     quantity:
       tag: value

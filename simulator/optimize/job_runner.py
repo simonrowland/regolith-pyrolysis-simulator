@@ -15,6 +15,7 @@ from typing import Any, Callable
 from uuid import uuid4
 
 from simulator.optimize.evalspec import current_code_version
+from simulator.optimize.save_bundle import OPTIMIZER_CACHE_NAME
 
 
 STATUS_QUEUED = "QUEUED"
@@ -26,7 +27,6 @@ SUCCESS_STATUSES = {STATUS_SUCCEEDED, STATUS_COMPLETED_NO_FEASIBLE_WINNER}
 TERMINAL_STATUSES = SUCCESS_STATUSES | {STATUS_FAILED}
 META_NAME = ".job_meta.json"
 LOG_NAME = "job.log"
-CACHE_NAME = "cache.sqlite"
 STATUS_MARKER_NAME = "job_status.json"
 
 
@@ -431,7 +431,7 @@ class OptimizerJobRunner:
         return self._now_factory().astimezone(UTC)
 
     def _has_stored_results(self, job_id: str) -> bool:
-        cache_path = self.jobs_root / job_id / CACHE_NAME
+        cache_path = self.jobs_root / job_id / OPTIMIZER_CACHE_NAME
         if not cache_path.is_file():
             return False
         try:

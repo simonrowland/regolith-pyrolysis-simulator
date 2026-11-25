@@ -153,7 +153,7 @@ def _cro2_train_sim():
 
 
 def _bypass_analytic_depletion(sim):
-    sim._apply_analytic_evaporation_depletion = lambda flux: flux
+    sim._apply_analytic_evaporation_depletion = lambda flux, **kwargs: flux
     sim.campaign_mgr.check_endpoint = lambda *args, **kwargs: False
 
 
@@ -1528,7 +1528,7 @@ def test_condensation_residual_drives_overhead_partial_pressures(monkeypatch):
     monkeypatch.setattr(
         sim.condensation_model,
         "route",
-        lambda _flux, _melt: CondensationRouteResult(
+        lambda _flux, _melt, **kwargs: CondensationRouteResult(
             remaining_by_species={"Fe": 0.25, "FeO": 0.75},
             condensed_by_stage_species={
                 "stage_1_fe_condenser": {"Fe": 0.75, "FeO": 0.25},
@@ -1666,7 +1666,7 @@ def test_condensation_residual_ignores_prior_holdup_drain_credit(monkeypatch):
     monkeypatch.setattr(
         sim.condensation_model,
         "route",
-        lambda _flux, _melt: CondensationRouteResult(
+        lambda _flux, _melt, **kwargs: CondensationRouteResult(
             remaining_by_species={"Fe": residual_kg},
             wall_deposit_by_species={"Fe": retained_wall_kg},
             wall_deposit_fraction_by_species={
@@ -1754,7 +1754,7 @@ def test_next_tick_p_bulk_uses_upstream_headspace_after_near_total_capture(
     monkeypatch.setattr(
         sim.condensation_model,
         "route",
-        lambda _flux, _melt: CondensationRouteResult(
+        lambda _flux, _melt, **kwargs: CondensationRouteResult(
             remaining_by_species={"Fe": residual_kg},
             condensed_by_stage_species={
                 "stage_1_fe_condenser": {"Fe": evolved_kg - residual_kg},
@@ -1858,7 +1858,7 @@ def test_uncommitted_evaporation_transition_is_removed_from_tick_flux(
     monkeypatch.setattr(
         sim.condensation_model,
         "route",
-        lambda _flux, _melt: CondensationRouteResult(
+        lambda _flux, _melt, **kwargs: CondensationRouteResult(
             remaining_by_species={"Fe": 1.0},
             condensed_by_stage_species={},
         ),

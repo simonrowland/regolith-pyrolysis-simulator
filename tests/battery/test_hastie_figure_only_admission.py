@@ -1,9 +1,11 @@
-"""Hastie Fig. 4 evidence keeps typed refusals when method inputs are missing."""
+"""Hastie method evidence stays row-specific and preserves typed refusals."""
 
 from __future__ import annotations
 
 from dataclasses import replace
 from pathlib import Path
+
+import pytest
 
 from simulator.battery.enums import (
     AdmissionStatus,
@@ -171,7 +173,7 @@ def test_hastie_figure_rows_without_supported_inputs_keep_typed_refusals(
         regime = effusion_regime_unverified(
             experiment, Quantity.P_PARTIAL, observation=row
         )
-        assert regime.reason is RefusalReason.METHOD_UNKNOWN
+        assert regime.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
 
         for engine in SCORING_ENGINES:
             prediction = predict_with_engine(engine, row, experiment=experiment)
@@ -270,7 +272,7 @@ def test_hastie_fig5_points_use_the_printed_initial_glass_proxy(tmp_path) -> Non
     assert all(components == proxy_compositions[0] for components in proxy_compositions)
 
 
-def test_hastie_fig4_rows_refuse_when_method_and_pressure_sum_are_missing(
+def test_hastie_fig4_rows_keep_knudsen_method_but_refuse_missing_pressure_sum(
     tmp_path,
 ) -> None:
     works, experiments, observations = _hastie_store(tmp_path)
@@ -297,24 +299,22 @@ def test_hastie_fig4_rows_refuse_when_method_and_pressure_sum_are_missing(
                 if check.name == "in_cell_partial_pressure_sum"
             )
             assert not gates.passed
-            assert gates.reason is RefusalReason.METHOD_UNKNOWN
+            assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
             assert gates.primary_check == "in_cell_partial_pressure_sum"
             assert [
                 check.name for check in gates.checks if not check.passed
-            ] == ["in_cell_partial_pressure_sum", "method"]
-            method_check = next(
-                check for check in gates.checks if check.name == "method"
-            )
-            assert not method_check.passed
-            assert method_check.detail["reason"] == experiment.method.reason
-            assert (
-                _missing_apparatus_fact(
-                    method_check,
-                    allow_calibration=False,
-                    allow_unknown_method=True,
-                )
-                == "method_unknown"
-            )
+            ] == ["in_cell_partial_pressure_sum"]
+            assert [check.name for check in gates.checks] == [
+                "in_cell_partial_pressure_sum",
+                "kems_calibration",
+                "geometry_determinants",
+            ]
+            assert not any(check.name == "method" for check in gates.checks)
+            assert experiment.method == State.of(MethodToken.KNUDSEN_EFFUSION)
+            assert {notice.kind for notice in row.notices} == {
+                NoticeKind.ADMISSION_DEFAULTED,
+                NoticeKind.SOURCE_DISAGREEMENT,
+            }
             assert not pressure_sum_check.passed
             assert (
                 pressure_sum_check.detail["reason"]
@@ -342,25 +342,27 @@ def test_hastie_fig4_rows_refuse_when_method_and_pressure_sum_are_missing(
                 prediction=prediction,
                 point_observations=point_observations,
             )
-            assert residual.status is ResidualStatus.REFUSED
-            assert residual.numeric is None
-            assert residual.refusal is not None
-            assert residual.refusal.reason is RefusalReason.METHOD_UNKNOWN
-            assert residual.refusal.detail["primary_check"] == (
-                "in_cell_partial_pressure_sum"
-            )
-            assert residual.refusal.detail["checks"] == [
-                "in_cell_partial_pressure_sum",
-                "method",
-            ]
-            assert residual.refusal.detail["missing_facts"] == {
-                "method": experiment.method.reason,
-                "in_cell_partial_pressure_sum": pressure_sum_check.detail["reason"],
+            assert residual.status in {
+                ResidualStatus.MATCH,
+                ResidualStatus.MISMATCH,
             }
-            assert not any(
+            assert residual.numeric is not None
+            assert residual.refusal is None
+            assert len(apparatus_notices) == 2
+            assert all(
                 notice.kind is NoticeKind.UNVERIFIED_APPARATUS
                 for notice in apparatus_notices
-            ), (row.observation_id, gates.checks, apparatus_notices)
+            )
+            assert any(
+                notice.reason.startswith(
+                    "apparatus_unverified:in_cell_partial_pressure_sum;"
+                )
+                for notice in apparatus_notices
+            )
+            assert any(
+                notice.reason.startswith("calibration_not_grounded:")
+                for notice in apparatus_notices
+            )
             assert any(
                 notice.kind is NoticeKind.FIGURE_ONLY
                 for notice in residual.notices
@@ -370,10 +372,41 @@ def test_hastie_fig4_rows_refuse_when_method_and_pressure_sum_are_missing(
                 and INITIAL_CHARGE_ONLY_PROXY_NOTICE in notice.reason
                 for notice in residual.notices
             )
-            assert not any(
+            assert any(
                 notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+                and notice.reason.startswith(
+                    "apparatus_unverified:in_cell_partial_pressure_sum;"
+                )
                 for notice in residual.notices
             )
+            assert any(
+                notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+                and notice.reason.startswith("calibration_not_grounded:")
+                for notice in residual.notices
+            )
+
+
+def test_hastie_fig4_method_pin_mutation_rejects_unspecified(
+    tmp_path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import simulator.battery.migrate as migration_module
+
+    original_map_method = migration_module.map_method
+
+    def legacy_unspecified_regime(raw):
+        if raw == "kems_effusion":
+            return State.of(MethodToken.UNSPECIFIED)
+        return original_map_method(raw)
+
+    monkeypatch.setattr(migration_module, "map_method", legacy_unspecified_regime)
+    _works, experiments, observations = _hastie_store(tmp_path)
+    rows = _fig4_sio_points(observations)
+    with pytest.raises(AssertionError):
+        assert all(
+            experiments[row.experiment_id].method
+            == State.of(MethodToken.KNUDSEN_EFFUSION)
+            for row in rows
+        )
 
 
 def test_hastie_evidence_unknown_pressure_keeps_method_unknown_refusal(
@@ -406,4 +439,4 @@ def test_hastie_evidence_unknown_pressure_keeps_method_unknown_refusal(
 
     assert residual.numeric is None
     assert residual.refusal is not None
-    assert residual.refusal.reason is RefusalReason.METHOD_UNKNOWN
+    assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED

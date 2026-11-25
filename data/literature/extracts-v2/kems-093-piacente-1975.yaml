@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/kems-093-piacente-1975.yaml
 observations:
 - observation_id: kems-093-piacente-1975::piacente_1975_eq4_fayalite_mechanism_mueller
-  experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975
+  experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -11,12 +11,11 @@ observations:
     species:
       formula: Fe2SiO4
       phase:
-        tag: unknown
-        reason: phase string 'fayalite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -38,7 +37,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''fayalite'' is not in the closed automatic map'
+    origin: kems-093-piacente-1975::piacente_1975_eq4_fayalite_mechanism_mueller
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: literature_mechanism'
+    origin: kems-093-piacente-1975::piacente_1975_eq4_fayalite_mechanism_mueller
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-093-piacente-1975
   locator:
     published_page: 295
@@ -56,12 +76,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'olivine_in_alumina' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -81,7 +100,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''olivine_in_alumina'' is not in the closed automatic map'
+    origin: kems-093-piacente-1975::piacente_1975_fe_alumina_discarded
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-093-piacente-1975
   locator:
     published_page: 290
@@ -141,7 +171,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: kems-093-piacente-1975::piacente_1975_fe_conclusions_mean
-  experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975
+  experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -149,12 +179,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'olivine_10pct_fayalite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -179,7 +208,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''olivine_10pct_fayalite'' is not in the closed automatic map'
+    origin: kems-093-piacente-1975::piacente_1975_fe_conclusions_mean
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_second_law'
+    origin: kems-093-piacente-1975::piacente_1975_fe_conclusions_mean
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-093-piacente-1975
   locator:
     published_page: 297
@@ -198,12 +248,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_olivine_in_thoria' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -233,7 +282,18 @@ observations:
         published_page: 291
         pdf_page_index: 3
         figure: '2'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_olivine_in_thoria'' is not in the closed automatic map'
+    origin: kems-093-piacente-1975::piacente_1975_fe_fig2_thoria_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-093-piacente-1975
   locator:
     published_page: 291
@@ -251,12 +311,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_olivine_in_thoria' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -287,7 +346,18 @@ observations:
         published_page: 291
         pdf_page_index: 3
         figure: '2'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_olivine_in_thoria'' is not in the closed automatic map'
+    origin: kems-093-piacente-1975::piacente_1975_fe_fig2_thoria_figure_only_quoted
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-093-piacente-1975
   locator:
     published_page: 291
@@ -305,12 +375,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_olivine_in_zirconia' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -340,7 +409,18 @@ observations:
         published_page: 293
         pdf_page_index: 5
         figure: '3'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_olivine_in_zirconia'' is not in the closed automatic map'
+    origin: kems-093-piacente-1975::piacente_1975_fe_fig3_zirconia_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-093-piacente-1975
   locator:
     published_page: 293
@@ -358,12 +438,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_olivine_in_zirconia' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -394,7 +473,18 @@ observations:
         published_page: 293
         pdf_page_index: 5
         figure: '3'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_olivine_in_zirconia'' is not in the closed automatic map'
+    origin: kems-093-piacente-1975::piacente_1975_fe_fig3_zirconia_figure_only_quoted
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-093-piacente-1975
   locator:
     published_page: 293
@@ -412,12 +502,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_olivine_in_rhenium' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -447,7 +536,18 @@ observations:
         published_page: 294
         pdf_page_index: 6
         figure: '4'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_olivine_in_rhenium'' is not in the closed automatic map'
+    origin: kems-093-piacente-1975::piacente_1975_fe_fig4_rhenium_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-093-piacente-1975
   locator:
     published_page: 294
@@ -465,12 +565,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_olivine_in_rhenium' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -501,7 +600,18 @@ observations:
         published_page: 294
         pdf_page_index: 6
         figure: '4'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_olivine_in_rhenium'' is not in the closed automatic map'
+    origin: kems-093-piacente-1975::piacente_1975_fe_fig4_rhenium_figure_only_quoted
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-093-piacente-1975
   locator:
     published_page: 294
@@ -519,12 +629,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_olivine_10pct_fayalite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -557,7 +666,18 @@ observations:
         published_page: 295
         pdf_page_index: 7
         figure: '5'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_olivine_10pct_fayalite'' is not in the closed automatic map'
+    origin: kems-093-piacente-1975::piacente_1975_fe_fig5_psat_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-093-piacente-1975
   locator:
     published_page: 295
@@ -575,12 +695,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_olivine_10pct_fayalite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -614,7 +733,18 @@ observations:
         published_page: 295
         pdf_page_index: 7
         figure: '5'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_olivine_10pct_fayalite'' is not in the closed automatic map'
+    origin: kems-093-piacente-1975::piacente_1975_fe_fig5_psat_figure_only_quoted
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-093-piacente-1975
   locator:
     published_page: 295
@@ -632,12 +762,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_olivine_vs_pure_Fe' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -667,7 +796,18 @@ observations:
         published_page: 296
         pdf_page_index: 8
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_olivine_vs_pure_Fe'' is not in the closed automatic map'
+    origin: kems-093-piacente-1975::piacente_1975_fe_fig6_vs_pure_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-093-piacente-1975
   locator:
     published_page: 296
@@ -685,12 +825,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_olivine_vs_pure_Fe' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -722,7 +861,18 @@ observations:
         published_page: 296
         pdf_page_index: 8
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_olivine_vs_pure_Fe'' is not in the closed automatic map'
+    origin: kems-093-piacente-1975::piacente_1975_fe_fig6_vs_pure_figure_only_quoted
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-093-piacente-1975
   locator:
     published_page: 296
@@ -732,7 +882,7 @@ observations:
   provenance:
     printed_phase: vapor_over_olivine_vs_pure_Fe
 - observation_id: kems-093-piacente-1975::piacente_1975_fe_table1_second_law::points:h=05c8afc6ffd0
-  experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975
+  experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -740,12 +890,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'olivine_10pct_fayalite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -774,7 +923,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''olivine_10pct_fayalite'' is not in the closed automatic map'
+    origin: kems-093-piacente-1975::piacente_1975_fe_table1_second_law
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_second_law'
+    origin: kems-093-piacente-1975::piacente_1975_fe_table1_second_law
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-093-piacente-1975
   locator:
     published_page: 292
@@ -795,7 +965,7 @@ observations:
   provenance:
     printed_phase: olivine_10pct_fayalite
 - observation_id: kems-093-piacente-1975::piacente_1975_fe_table1_second_law::points:h=b6bce851a1c3
-  experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975
+  experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -803,12 +973,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'olivine_10pct_fayalite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -837,7 +1006,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''olivine_10pct_fayalite'' is not in the closed automatic map'
+    origin: kems-093-piacente-1975::piacente_1975_fe_table1_second_law
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_second_law'
+    origin: kems-093-piacente-1975::piacente_1975_fe_table1_second_law
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-093-piacente-1975
   locator:
     published_page: 292
@@ -858,7 +1048,7 @@ observations:
   provenance:
     printed_phase: olivine_10pct_fayalite
 - observation_id: kems-093-piacente-1975::piacente_1975_fe_table1_second_law::points:h=d44f0bcc9ead
-  experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975
+  experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -866,12 +1056,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'olivine_10pct_fayalite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -900,7 +1089,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''olivine_10pct_fayalite'' is not in the closed automatic map'
+    origin: kems-093-piacente-1975::piacente_1975_fe_table1_second_law
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_second_law'
+    origin: kems-093-piacente-1975::piacente_1975_fe_table1_second_law
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-093-piacente-1975
   locator:
     published_page: 292
@@ -929,12 +1139,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_olivine_in_rhenium_above_melting' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -957,7 +1166,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_olivine_in_rhenium_above_melting'' is not in the closed automatic map'
+    origin: kems-093-piacente-1975::piacente_1975_feo_highT_re_detected_not_tabulated
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-093-piacente-1975
   locator:
     published_page: 293
@@ -975,12 +1195,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'olivine_10pct_fayalite_Knudsen' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1007,7 +1226,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''olivine_10pct_fayalite_Knudsen'' is not in the closed automatic map'
+    origin: kems-093-piacente-1975::piacente_1975_kems_geometry_and_calibration
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-093-piacente-1975
   locator:
     published_page: 289
@@ -1077,12 +1307,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_olivine_10pct_fayalite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1113,7 +1342,18 @@ observations:
         pdf_page_index: 3
         figure: '2'
         note: also Fig. 3 p.293, Fig. 4 p.294, Fig. 5 p.295
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_olivine_10pct_fayalite'' is not in the closed automatic map'
+    origin: kems-093-piacente-1975::piacente_1975_mg_fig2_4_5_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-093-piacente-1975
   locator:
     published_page: 291
@@ -1132,12 +1372,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_olivine_10pct_fayalite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1169,7 +1408,18 @@ observations:
         pdf_page_index: 3
         figure: '2'
         note: also Fig. 3 p.293, Fig. 4 p.294, Fig. 5 p.295
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_olivine_10pct_fayalite'' is not in the closed automatic map'
+    origin: kems-093-piacente-1975::piacente_1975_mg_fig2_4_5_figure_only_quoted
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-093-piacente-1975
   locator:
     published_page: 291
@@ -1188,12 +1438,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_olivine_10pct_fayalite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1217,7 +1466,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_olivine_10pct_fayalite'' is not in the closed automatic map'
+    origin: kems-093-piacente-1975::piacente_1975_mg_fraction_of_total_P
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-093-piacente-1975
   locator:
     published_page: 296
@@ -1227,7 +1487,7 @@ observations:
   provenance:
     printed_phase: vapor_over_olivine_10pct_fayalite
 - observation_id: kems-093-piacente-1975::piacente_1975_mg_table1_second_law::points:h=0b3490fe223a
-  experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975
+  experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1235,12 +1495,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'olivine_10pct_fayalite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1269,7 +1528,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''olivine_10pct_fayalite'' is not in the closed automatic map'
+    origin: kems-093-piacente-1975::piacente_1975_mg_table1_second_law
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_second_law'
+    origin: kems-093-piacente-1975::piacente_1975_mg_table1_second_law
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-093-piacente-1975
   locator:
     published_page: 292
@@ -1288,7 +1568,7 @@ observations:
   provenance:
     printed_phase: olivine_10pct_fayalite
 - observation_id: kems-093-piacente-1975::piacente_1975_mg_table1_second_law::points:h=5ef6dbf83f1c
-  experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975
+  experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1296,12 +1576,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'olivine_10pct_fayalite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1330,7 +1609,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''olivine_10pct_fayalite'' is not in the closed automatic map'
+    origin: kems-093-piacente-1975::piacente_1975_mg_table1_second_law
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_second_law'
+    origin: kems-093-piacente-1975::piacente_1975_mg_table1_second_law
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-093-piacente-1975
   locator:
     published_page: 292
@@ -1349,7 +1649,7 @@ observations:
   provenance:
     printed_phase: olivine_10pct_fayalite
 - observation_id: kems-093-piacente-1975::piacente_1975_mg_table1_second_law::points:h=91e552ad0561
-  experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975
+  experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1357,12 +1657,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'olivine_10pct_fayalite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1391,7 +1690,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''olivine_10pct_fayalite'' is not in the closed automatic map'
+    origin: kems-093-piacente-1975::piacente_1975_mg_table1_second_law
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_second_law'
+    origin: kems-093-piacente-1975::piacente_1975_mg_table1_second_law
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-093-piacente-1975
   locator:
     published_page: 292
@@ -1418,12 +1738,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_olivine_in_alumina_thoria_zirconia' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1443,7 +1762,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_olivine_in_alumina_thoria_zirconia'' is not in the closed automatic map'
+    origin: kems-093-piacente-1975::piacente_1975_o2_absent_oxide_cells
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-093-piacente-1975
   locator:
     published_page: 292
@@ -1511,12 +1841,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_olivine_in_rhenium' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1547,7 +1876,18 @@ observations:
         pdf_page_index: 6
         figure: '4'
         note: also Fig. 5 p.295
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_olivine_in_rhenium'' is not in the closed automatic map'
+    origin: kems-093-piacente-1975::piacente_1975_o2_fig4_5_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-093-piacente-1975
   locator:
     published_page: 294
@@ -1566,12 +1906,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_olivine_in_rhenium' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1603,7 +1942,18 @@ observations:
         pdf_page_index: 6
         figure: '4'
         note: also Fig. 5 p.295
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_olivine_in_rhenium'' is not in the closed automatic map'
+    origin: kems-093-piacente-1975::piacente_1975_o2_fig4_5_figure_only_quoted
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-093-piacente-1975
   locator:
     published_page: 294
@@ -1622,12 +1972,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_olivine_in_platinum' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1650,7 +1999,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_olivine_in_platinum'' is not in the closed automatic map'
+    origin: kems-093-piacente-1975::piacente_1975_o2_platinum_insufficient
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-093-piacente-1975
   locator:
     published_page: 292
@@ -1660,7 +2020,7 @@ observations:
   provenance:
     printed_phase: vapor_over_olivine_in_platinum
 - observation_id: kems-093-piacente-1975::piacente_1975_o2_table1_second_law::points:h=fccb16dee7e6
-  experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975
+  experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1668,12 +2028,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'olivine_10pct_fayalite_in_rhenium' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1700,7 +2059,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''olivine_10pct_fayalite_in_rhenium'' is not in the closed automatic map'
+    origin: kems-093-piacente-1975::piacente_1975_o2_table1_second_law
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_second_law'
+    origin: kems-093-piacente-1975::piacente_1975_o2_table1_second_law
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-093-piacente-1975
   locator:
     published_page: 292
@@ -1777,12 +2157,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_olivine_10pct_fayalite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1813,7 +2192,18 @@ observations:
         pdf_page_index: 3
         figure: '2'
         note: also Fig. 3 p.293, Fig. 4 p.294, Fig. 5 p.295
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_olivine_10pct_fayalite'' is not in the closed automatic map'
+    origin: kems-093-piacente-1975::piacente_1975_sio_fig2_4_5_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-093-piacente-1975
   locator:
     published_page: 291
@@ -1832,12 +2222,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_olivine_10pct_fayalite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1869,7 +2258,18 @@ observations:
         pdf_page_index: 3
         figure: '2'
         note: also Fig. 3 p.293, Fig. 4 p.294, Fig. 5 p.295
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_olivine_10pct_fayalite'' is not in the closed automatic map'
+    origin: kems-093-piacente-1975::piacente_1975_sio_fig2_4_5_figure_only_quoted
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-093-piacente-1975
   locator:
     published_page: 291
@@ -1888,12 +2288,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_olivine_vs_cristobalite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1923,7 +2322,18 @@ observations:
         published_page: 296
         pdf_page_index: 8
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_olivine_vs_cristobalite'' is not in the closed automatic map'
+    origin: kems-093-piacente-1975::piacente_1975_sio_fig6_vs_cristobalite_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-093-piacente-1975
   locator:
     published_page: 296
@@ -1941,12 +2351,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_olivine_vs_cristobalite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1978,7 +2387,18 @@ observations:
         published_page: 296
         pdf_page_index: 8
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_olivine_vs_cristobalite'' is not in the closed automatic map'
+    origin: kems-093-piacente-1975::piacente_1975_sio_fig6_vs_cristobalite_figure_only_quoted
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-093-piacente-1975
   locator:
     published_page: 296
@@ -1988,7 +2408,7 @@ observations:
   provenance:
     printed_phase: vapor_over_olivine_vs_cristobalite
 - observation_id: kems-093-piacente-1975::piacente_1975_sio_table1_second_law::points:h=15db566b8842
-  experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975
+  experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1996,12 +2416,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'olivine_10pct_fayalite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2030,7 +2449,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''olivine_10pct_fayalite'' is not in the closed automatic map'
+    origin: kems-093-piacente-1975::piacente_1975_sio_table1_second_law
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_second_law'
+    origin: kems-093-piacente-1975::piacente_1975_sio_table1_second_law
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-093-piacente-1975
   locator:
     published_page: 292
@@ -2049,7 +2489,7 @@ observations:
   provenance:
     printed_phase: olivine_10pct_fayalite
 - observation_id: kems-093-piacente-1975::piacente_1975_sio_table1_second_law::points:h=88e03fc699e2
-  experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975
+  experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2057,12 +2497,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'olivine_10pct_fayalite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2091,7 +2530,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''olivine_10pct_fayalite'' is not in the closed automatic map'
+    origin: kems-093-piacente-1975::piacente_1975_sio_table1_second_law
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_second_law'
+    origin: kems-093-piacente-1975::piacente_1975_sio_table1_second_law
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-093-piacente-1975
   locator:
     published_page: 292
@@ -2110,7 +2570,7 @@ observations:
   provenance:
     printed_phase: olivine_10pct_fayalite
 - observation_id: kems-093-piacente-1975::piacente_1975_sio_table1_second_law::points:h=cc60f00c28c0
-  experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975
+  experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2118,12 +2578,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'olivine_10pct_fayalite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2152,7 +2611,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''olivine_10pct_fayalite'' is not in the closed automatic map'
+    origin: kems-093-piacente-1975::piacente_1975_sio_table1_second_law
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_second_law'
+    origin: kems-093-piacente-1975::piacente_1975_sio_table1_second_law
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-093-piacente-1975
   locator:
     published_page: 292

@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/berry-2018-morb-iron-redox.yaml
 observations:
 - observation_id: berry-2018-morb-iron-redox::berry_2018_natural_glass_jdf_d2_fe3_sumfe::points:row=jdf-d2:h=945921f28c84
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_natural_morb_calibrations
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_natural_morb_calibrations::method:unspecified
   identity:
     quantity:
       tag: value
@@ -97,7 +97,19 @@ observations:
         published_page: 118
         pdf_page_index: 4
         section: Results
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Linear centroid calibration
+      against Mössbauer-calibrated standards.'
+    origin: berry-2018-morb-iron-redox::berry_2018_natural_glass_jdf_d2_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 5
@@ -187,7 +199,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_natural_glass_vg2_fe3_sumfe::points:row=vg2:h=9058f6be7f42
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_natural_morb_calibrations
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_natural_morb_calibrations::method:unspecified
   identity:
     quantity:
       tag: value
@@ -281,7 +293,19 @@ observations:
         published_page: 118
         pdf_page_index: 4
         section: Results
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Linear centroid calibration
+      against Mössbauer-calibrated standards.'
+    origin: berry-2018-morb-iron-redox::berry_2018_natural_glass_vg2_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 5
@@ -371,7 +395,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_natural_morb_centroid_mean_n19_fe3_sumfe::points:row=n=19-natural-morb-glasses,-centroid-calibration:h=bec71ef78e5e
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_natural_morb_calibrations
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_natural_morb_calibrations::method:unspecified
   identity:
     quantity:
       tag: value
@@ -465,7 +489,19 @@ observations:
         published_page: 118
         pdf_page_index: 4
         section: Results
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Linear centroid calibration
+      against Mössbauer-calibrated standards.'
+    origin: berry-2018-morb-iron-redox::berry_2018_natural_morb_centroid_mean_n19_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 5
@@ -555,7 +591,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_natural_morb_centroid_mean_n42_fe3_sumfe::points:row=n=42-natural-morb-glasses,-centroid-calibration:h=84fdb481e0a4
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_natural_morb_calibrations
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_natural_morb_calibrations::method:unspecified
   identity:
     quantity:
       tag: value
@@ -649,7 +685,19 @@ observations:
         published_page: 118
         pdf_page_index: 4
         section: Results
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Linear centroid calibration
+      against Mössbauer-calibrated standards.'
+    origin: berry-2018-morb-iron-redox::berry_2018_natural_morb_centroid_mean_n42_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 5
@@ -739,7 +787,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_natural_morb_edge_mean_n19_fe3_sumfe::points:row=n=19-natural-morb-glasses,-edge-calibration:h=5688af1aabd9
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_natural_morb_calibrations
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_natural_morb_calibrations::method:unspecified
   identity:
     quantity:
       tag: value
@@ -833,7 +881,19 @@ observations:
         published_page: 118
         pdf_page_index: 4
         section: Results
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Linear absorption-edge
+      calibration against Mössbauer-calibrated standards.'
+    origin: berry-2018-morb-iron-redox::berry_2018_natural_morb_edge_mean_n19_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 5
@@ -923,7 +983,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_natural_morb_polynomial_mean_n42_fe3_sumfe::points:row=n=42-natural-morb-glasses,-polynomial-calibration:h=cf4d77084a4b
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_natural_morb_calibrations
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_natural_morb_calibrations::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1017,7 +1077,18 @@ observations:
         published_page: 118
         pdf_page_index: 4
         section: Results
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Polynomial centroid calibration.'
+    origin: berry-2018-morb-iron-redox::berry_2018_natural_morb_polynomial_mean_n42_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 5
@@ -1108,7 +1179,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_fit_fe3_sumfe::T=1673.15:h=0345df3d73a7
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1214,7 +1285,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_fit_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -1494,7 +1576,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_fit_fe3_sumfe::T=1673.15:h=072e6e72ec87
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1600,7 +1682,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_fit_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -1880,7 +1973,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_fit_fe3_sumfe::T=1673.15:h=2114dabf8f68
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1986,7 +2079,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_fit_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -2266,7 +2370,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_fit_fe3_sumfe::T=1673.15:h=41c64052b9db
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -2372,7 +2476,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_fit_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -2652,7 +2767,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_fit_fe3_sumfe::T=1673.15:h=42010440f79a
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -2758,7 +2873,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_fit_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -3038,7 +3164,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_fit_fe3_sumfe::T=1673.15:h=489be6d76048
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -3144,7 +3270,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_fit_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -3424,7 +3561,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_fit_fe3_sumfe::T=1673.15:h=4dac6c926da2
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -3530,7 +3667,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_fit_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -3810,7 +3958,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_fit_fe3_sumfe::T=1673.15:h=7bb3b3cbc35c
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -3916,7 +4064,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_fit_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -4196,7 +4355,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_fit_fe3_sumfe::T=1673.15:h=7ed4585b69fc
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -4302,7 +4461,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_fit_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -4582,7 +4752,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_fit_fe3_sumfe::T=1673.15:h=a648615f115d
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -4688,7 +4858,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_fit_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -4968,7 +5149,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_fit_fe3_sumfe::T=1673.15:h=d2e3e356561b
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -5074,7 +5255,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_fit_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -5354,7 +5546,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_fit_fe3_sumfe::T=1673.15:h=e40ae36c2dc3
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -5460,7 +5652,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_fit_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -5740,7 +5943,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_fit_fe3_sumfe::T=1673.15:h=f7a8f57f1022
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -5846,7 +6049,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_fit_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -6126,7 +6340,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_model_a_fe3_sumfe::T=1673.15:h=0c09ecc11f0e
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -6236,7 +6450,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_model_a_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -6490,7 +6715,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_model_a_fe3_sumfe::T=1673.15:h=2fd112e40396
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -6600,7 +6825,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_model_a_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -6854,7 +7090,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_model_a_fe3_sumfe::T=1673.15:h=331f22c49edb
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -6964,7 +7200,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_model_a_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -7218,7 +7465,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_model_a_fe3_sumfe::T=1673.15:h=629624abb74c
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -7328,7 +7575,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_model_a_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -7582,7 +7840,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_model_a_fe3_sumfe::T=1673.15:h=65101144fde5
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -7692,7 +7950,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_model_a_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -7946,7 +8215,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_model_a_fe3_sumfe::T=1673.15:h=88ebe7f8e97a
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -8056,7 +8325,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_model_a_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -8310,7 +8590,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_model_a_fe3_sumfe::T=1673.15:h=ac2b3c09abcf
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -8420,7 +8700,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_model_a_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -8674,7 +8965,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_model_a_fe3_sumfe::T=1673.15:h=bc1cea330d52
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -8784,7 +9075,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_model_a_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -9038,7 +9340,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_model_a_fe3_sumfe::T=1673.15:h=ee1f36922d19
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -9148,7 +9450,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_model_a_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -9402,7 +9715,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_model_a_fe3_sumfe::T=1673.15:h=ef12ea5ad7a3
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -9512,7 +9825,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_model_a_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -9766,7 +10090,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_model_a_fe3_sumfe::T=1673.15:h=f2ee88254432
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -9876,7 +10200,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_model_a_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -10130,7 +10465,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_model_a_fe3_sumfe::T=1673.15:h=f4a08a6e8137
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -10240,7 +10575,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_model_a_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -10494,7 +10840,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_model_a_fe3_sumfe::T=1673.15:h=fe98103e5a71
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -10604,7 +10950,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_model_a_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -10858,7 +11215,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_295K_fe3_sumfe::T=1673.15:h=18323a619a0e
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -10967,7 +11324,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_295K_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -11221,7 +11589,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_295K_fe3_sumfe::T=1673.15:h=24998699e051
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -11330,7 +11698,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_295K_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -11584,7 +11963,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_295K_fe3_sumfe::T=1673.15:h=3d0af842a396
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -11692,7 +12071,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_295K_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -11939,7 +12329,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_295K_fe3_sumfe::T=1673.15:h=7782d96f153b
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -12048,7 +12438,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_295K_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -12302,7 +12703,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_295K_fe3_sumfe::T=1673.15:h=9567e5bdab5c
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -12411,7 +12812,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_295K_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -12665,7 +13077,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_295K_fe3_sumfe::T=1673.15:h=9cb2cc5253d8
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -12774,7 +13186,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_295K_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -13028,7 +13451,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_295K_fe3_sumfe::T=1673.15:h=a1bb493eeabb
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -13136,7 +13559,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_295K_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -13383,7 +13817,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_295K_fe3_sumfe::T=1673.15:h=bd484c38a326
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -13491,7 +13925,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_295K_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -13738,7 +14183,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_295K_fe3_sumfe::T=1673.15:h=c8e525266d6c
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -13847,7 +14292,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_295K_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -14101,7 +14557,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_295K_fe3_sumfe::T=1673.15:h=cc6f61c7b6b8
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -14210,7 +14666,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_295K_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -14464,7 +14931,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_295K_fe3_sumfe::T=1673.15:h=d9e12124cbe2
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -14573,7 +15040,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_295K_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -14827,7 +15305,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_295K_fe3_sumfe::T=1673.15:h=ddb96f0927a1
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -14936,7 +15414,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_295K_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -15190,7 +15679,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_295K_fe3_sumfe::T=1673.15:h=f30c91fa4ced
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -15299,7 +15788,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_295K_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -15553,7 +16053,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_77p5K_fe3_sumfe::T=1673.15:h=18277e83ac4c
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -15662,7 +16162,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_77p5K_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -15916,7 +16427,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_77p5K_fe3_sumfe::T=1673.15:h=244e4b646c90
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -16025,7 +16536,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_77p5K_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -16279,7 +16801,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_77p5K_fe3_sumfe::T=1673.15:h=2bca097e68ae
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -16387,7 +16909,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_77p5K_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -16634,7 +17167,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_77p5K_fe3_sumfe::T=1673.15:h=3d0af842a396
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -16742,7 +17275,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_77p5K_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -16989,7 +17533,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_77p5K_fe3_sumfe::T=1673.15:h=52db87393c68
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -17098,7 +17642,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_77p5K_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -17352,7 +17907,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_77p5K_fe3_sumfe::T=1673.15:h=649d90c035b4
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -17460,7 +18015,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_77p5K_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -17707,7 +18273,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_77p5K_fe3_sumfe::T=1673.15:h=9cb2cc5253d8
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -17816,7 +18382,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_77p5K_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -18070,7 +18647,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_77p5K_fe3_sumfe::T=1673.15:h=a1bb493eeabb
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -18178,7 +18755,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_77p5K_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -18425,7 +19013,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_77p5K_fe3_sumfe::T=1673.15:h=a3db539e65d7
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -18534,7 +19122,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_77p5K_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -18788,7 +19387,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_77p5K_fe3_sumfe::T=1673.15:h=b9a544484853
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -18896,7 +19495,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_77p5K_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -19143,7 +19753,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_77p5K_fe3_sumfe::T=1673.15:h=c213f2c2d3ef
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -19251,7 +19861,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_77p5K_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -19498,7 +20119,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_77p5K_fe3_sumfe::T=1673.15:h=e60bee091485
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -19606,7 +20227,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_77p5K_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6
@@ -19853,7 +20485,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_77p5K_fe3_sumfe::T=1673.15:h=fa750476cdfe
-  experiment_id: 10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs
+  experiment_id: 10.1016/j.epsl.2017.11.032::berry-2018-morb-iron-redox::declared:10.1016/j.epsl.2017.11.032::experiment::berry_2018_synthetic_morb_table2_runs::method:unspecified
   identity:
     quantity:
       tag: value
@@ -19961,7 +20593,18 @@ observations:
         published_page: 119
         pdf_page_index: 5
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2018-morb-iron-redox::berry_2018_table2_mossbauer_77p5K_fe3_sumfe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2018-morb-iron-redox
   locator:
     page: 6

@@ -11,12 +11,11 @@ observations:
     species:
       formula: calibration_reference_gases
       phase:
-        tag: unknown
-        reason: phase string 'calibration_gas' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -37,7 +36,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''calibration_gas'' is not in the closed automatic map'
+    origin: lpsc-2019-2641::lpsc_2019_2641_flow_calibration_range
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: qms_calibration'
+    origin: lpsc-2019-2641::lpsc_2019_2641_flow_calibration_range
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: lpsc-2019-2641
   locator:
     pdf_page_index: 1
@@ -54,12 +74,11 @@ observations:
     species:
       formula: Murchison_CM2_meteorite
       phase:
-        tag: unknown
-        reason: phase string 'powdered_Murchison_CM2_meteorite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -83,7 +102,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''powdered_Murchison_CM2_meteorite'' is not in the closed automatic map'
+    origin: lpsc-2019-2641::lpsc_2019_2641_murchison_heating_program
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: continuously_pumped_qms_evolved_gas_analysis'
+    origin: lpsc-2019-2641::lpsc_2019_2641_murchison_heating_program
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: lpsc-2019-2641
   locator:
     pdf_page_index: 2
@@ -100,12 +140,11 @@ observations:
     species:
       formula: Murchison_CM2_meteorite
       phase:
-        tag: unknown
-        reason: phase string 'powdered_Murchison_CM2_meteorite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -129,7 +168,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''powdered_Murchison_CM2_meteorite'' is not in the closed automatic map'
+    origin: lpsc-2019-2641::lpsc_2019_2641_murchison_major_gas_release_patterns
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: continuously_pumped_qms_evolved_gas_analysis'
+    origin: lpsc-2019-2641::lpsc_2019_2641_murchison_major_gas_release_patterns
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: lpsc-2019-2641
   locator:
     pdf_page_index: 2
@@ -147,12 +207,11 @@ observations:
     species:
       formula: Murchison_CM2_meteorite
       phase:
-        tag: unknown
-        reason: phase string 'powdered_Murchison_CM2_meteorite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -176,7 +235,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''powdered_Murchison_CM2_meteorite'' is not in the closed automatic map'
+    origin: lpsc-2019-2641::lpsc_2019_2641_murchison_minor_gas_release_patterns
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: continuously_pumped_qms_evolved_gas_analysis'
+    origin: lpsc-2019-2641::lpsc_2019_2641_murchison_minor_gas_release_patterns
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: lpsc-2019-2641
   locator:
     pdf_page_index: 2

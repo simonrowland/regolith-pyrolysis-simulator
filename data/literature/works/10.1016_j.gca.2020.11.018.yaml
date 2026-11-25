@@ -114,6 +114,172 @@ experiments:
         pdf_page_index: 7
         table: '2'
   bench_id: 10.1016/j.gca.2020.11.018::bench::oxford_end_loaded_piston_cylinder
+- experiment_id: 10.1016/j.gca.2020.11.018::thomas-wood-2021-chlorine-silicate-melts::declared:10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series::method:piston_cylinder
+  kind: literature
+  method:
+    tag: value
+    value: piston_cylinder
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: CMAS An50Di28Fo22 or natural Icelandic basalt; row-specific composition is retained in Table 2 observation
+          points
+      locator:
+        published_page: 3
+        pdf_page_index: 4
+        table: '1'
+    form:
+      state:
+        tag: value
+        value: Powdered silicate mixed with Ag/AgCl/AgI buffer inside Pt ± graphite or Re assemblies
+      locator:
+        published_page: 3
+        pdf_page_index: 4
+        section: 2. Experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 6
+        pdf_page_index: 7
+        table: '2'
+        note: Table 2 contains row-specific temperatures from 1200 to 1500 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 6
+        pdf_page_index: 7
+        table: '2'
+        note: Table 2 contains row-specific pressures from 0.5 to 2.0 GPa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 3
+        pdf_page_index: 4
+        section: 2.1 Experimental procedure
+        note: Piston-cylinder charge; no sweep gas is used
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2020.11.018
+  locator:
+    published_page: 3
+    pdf_page_index: 4
+    section: 2. Experimental methodology
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: CaF2 pressure medium, graphite furnace, MgO spacers, alumina thermocouple sheath
+      locator:
+        published_page: 3
+        pdf_page_index: 4
+        section: 2.1 Experimental procedure
+  fO2_control:
+    channel:
+      tag: value
+      value: buffer
+    buffer:
+      state:
+        tag: value
+        value: CCO or Re-ReO2, as printed per Table 2 row
+      locator:
+        published_page: 6
+        pdf_page_index: 7
+        table: '2'
+  bench_id: 10.1016/j.gca.2020.11.018::bench::oxford_end_loaded_piston_cylinder
+- experiment_id: 10.1016/j.gca.2020.11.018::thomas-wood-2021-chlorine-silicate-melts::declared:10.1016/j.gca.2020.11.018::experiment::table2_anhydrous_chlorine_series::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: CMAS An50Di28Fo22 or natural Icelandic basalt; row-specific composition is retained in Table 2 observation
+          points
+      locator:
+        published_page: 3
+        pdf_page_index: 4
+        table: '1'
+    form:
+      state:
+        tag: value
+        value: Powdered silicate mixed with Ag/AgCl/AgI buffer inside Pt ± graphite or Re assemblies
+      locator:
+        published_page: 3
+        pdf_page_index: 4
+        section: 2. Experimental procedure
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 6
+        pdf_page_index: 7
+        table: '2'
+        note: Table 2 contains row-specific temperatures from 1200 to 1500 °C
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 6
+        pdf_page_index: 7
+        table: '2'
+        note: Table 2 contains row-specific pressures from 0.5 to 2.0 GPa
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 3
+        pdf_page_index: 4
+        section: 2.1 Experimental procedure
+        note: Piston-cylinder charge; no sweep gas is used
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2020.11.018
+  locator:
+    published_page: 3
+    pdf_page_index: 4
+    section: 2. Experimental methodology
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: CaF2 pressure medium, graphite furnace, MgO spacers, alumina thermocouple sheath
+      locator:
+        published_page: 3
+        pdf_page_index: 4
+        section: 2.1 Experimental procedure
+  fO2_control:
+    channel:
+      tag: value
+      value: buffer
+    buffer:
+      state:
+        tag: value
+        value: CCO or Re-ReO2, as printed per Table 2 row
+      locator:
+        published_page: 6
+        pdf_page_index: 7
+        table: '2'
+  bench_id: 10.1016/j.gca.2020.11.018::bench::oxford_end_loaded_piston_cylinder
 benches:
 - id: 10.1016/j.gca.2020.11.018::bench::oxford_end_loaded_piston_cylinder
   work_id: 10.1016/j.gca.2020.11.018

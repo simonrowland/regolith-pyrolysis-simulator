@@ -30,6 +30,13 @@ def test_chromia_fusion_matches_printed_janaf_1800_k_rows():
     assert janaf_fusion_energy("Cr2O3", Decimal("1800")).delta_g_fus_kJ_per_mol == Decimal("37.801")
 
 
+def test_sro_fusion_uses_printed_janaf_crystal_liquid_pair():
+    # O-014 prints its crystal <--> liquid transition at 2938 K.
+    fusion = janaf_fusion_energy("SrO", Decimal("2000"))
+    assert (fusion.crystal_table, fusion.liquid_table) == ("O-013", "O-014")
+    assert fusion.accepted_melting_temperature_K == Decimal("2938")
+
+
 @pytest.mark.parametrize("oxide", ["FeO", "Cr2O3", "TiO2", "Al2O3", "SiO2(II)"])
 def test_fusion_correction_vanishes_at_its_table_crossing(oxide):
     fusion = janaf_fusion_energy(oxide, Decimal("1773.15"))

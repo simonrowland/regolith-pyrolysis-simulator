@@ -2,14 +2,15 @@
 
 from collections import Counter, defaultdict
 from copy import deepcopy
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 from pathlib import Path
 import re
 
 import pytest
 import yaml
 
-from simulator.battery.enums import Quantity, ValueKind
+from simulator.battery.enums import Quantity, UncertaintyKind, ValueKind
+from simulator.battery import migrate as migrate_module
 from simulator.battery.migrate import Migrator
 
 
@@ -20,19 +21,19 @@ TABLE1_SAMPLES = [
     "SC7", "SC2", "SC16", "SC6", "SC3", "SC15", "SC10", "SC9",
 ]
 TABLE1_RENDER = """
-EM.MgO 24.4~0.3|25.3~0.4|26.1~0.5|29.7~0.2|32.6~0.1|35.2~0.1|42.7~0.1|43.2~0.1|44.9~0.1|43.0~0.1|42.7~0.1|37.2~0.1|30.8~0.2|26.7~0.2|26.0~0.1|0.001
+EM.MgO 24.4~0.3|25.3~0.4|26.1~0.5|29.7~0.2|32.6~0.1|35.2~0.1|42.7~0.1|43.2~0.1|44.9~0.1|43.0~0.1|42.7~0.1|37.2~0.1|30.8~0.2|26.7~0.2|26.0~0.1|0.001~0.000
 EM.Al2O3 2.73~0.08|2.64~0.07|2.90~0.09|3.61~0.04|3.34~0.02|4.00~0.02|5.60~0.02|6.75~0.04|6.69~0.05|8.49~0.07|8.65~0.05|13.8~0.1|17.4~0.2|20.2~0.2|22.3~0.2|53.0~0.1
-EM.SiO2 35.1~0.2|34.8~0.2|36.2~0.1|40.5~0.1|40.6~0.1|44.9|46.7|45.0|43.0|41.9|41.7|37.3~0.1|36.7~0.1|35.4~0.1|32.2~0.1|4.33~0.01
+EM.SiO2 35.1~0.2|34.8~0.2|36.2~0.1|40.5~0.1|40.6~0.1|44.9~0.0|46.7~0.0|45.0~0.0|43.0~0.0|41.9~0.0|41.7~0.0|37.3~0.1|36.7~0.1|35.4~0.1|32.2~0.1|4.33~0.01
 EM.CaO 2.24~0.08|2.08~0.06|2.27~0.08|2.58~0.03|2.70~0.01|3.09~0.01|4.00~0.01|4.79~0.03|4.88~0.02|6.29~0.03|6.59~0.03|11.2~0.1|14.5~0.1|17.0~0.2|18.7~0.2|41.1~0.1
 EM.TiO2 0.097~0.004|0.097~0.003|0.106~0.004|0.141~0.002|0.150~0.001|0.173~0.001|0.218~0.002|0.252~0.002|0.260~0.002|0.311~0.002|0.325~0.002|0.506~0.004|0.597~0.006|0.681~0.004|0.779~0.004|1.57~0.01
-EM.FeO 35.5~0.3|35.2~0.4|32.4~0.4|23.5~0.2|20.6~0.2|12.6|0.808~0.003|0.069~0.002|0.284~0.002|0.012~0.002|0.007~0.001|0.015~0.002|0.007~0.002|0.005~0.002|0.013~0.002|0.003~0.002
+EM.FeO 35.5~0.3|35.2~0.4|32.4~0.4|23.5~0.2|20.6~0.2|12.6~0.0|0.808~0.003|0.069~0.002|0.284~0.002|0.012~0.002|0.007~0.001|0.015~0.002|0.007~0.002|0.005~0.002|0.013~0.002|0.003~0.002
 IM.MgO 24.0~0.4|25.3~1.8|23.8~1.5|28.1~0.2|33.7~0.2|34.1~0.2|39.6~0.4|42.0~0.2|43.3~0.7|41.7~0.2|40.3~0.5|36.4~0.9|30.2~0.2|24.4~0.1|25.2~0.5|0.00244~0.00022
-IM.Al2O3 2.28~0.15|2.51~0.49|3.26~0.19|3.61~0.23|3.95~0.26|5.26~0.05|6.90~0.40|7.16~0.25|7.41~0.21|9.29~0.17|9.91~0.57|14.2|18.48~0.55|21.1~0.7|23.9~0.5|55.3~1.7
-IM.SiO2 35.1|34.6|36.1|40.1|40.3|44.4|46.3|44.8|42.7|41.7|41.4|37.0|36.4|34.9|31.8|4.20~0.01
+IM.Al2O3 2.28~0.15|2.51~0.49|3.26~0.19|3.61~0.23|3.95~0.26|5.26~0.05|6.90~0.40|7.16~0.25|7.41~0.21|9.29~0.17|9.91~0.57|14.2~0.0|18.48~0.55|21.1~0.7|23.9~0.5|55.3~1.7
+IM.SiO2 35.1~0.0|34.6~0.0|36.1~0.0|40.1~0.0|40.3~0.0|44.4~0.0|46.3~0.0|44.8~0.0|42.7~0.0|41.7~0.0|41.4~0.0|37.0~0.0|36.4~0.0|34.9~0.0|31.8~0.0|4.20~0.01
 IM.CaO 1.72~0.13|2.23~0.55|2.49~0.01|2.87~0.17|2.91~0.15|3.70~0.27|5.29~0.09|5.20~0.07|5.31~0.43|6.41~0.37|7.27~0.15|11.1~0.9|13.39~0.67|17.4~0.8|17.1~0.7|36.4~1.7
 IM.TiO2 0.090~0.010|0.084~0.022|0.094~0.018|0.167~0.007|0.163~0.011|0.202~0.032|0.286~0.010|0.270~0.010|0.264~0.032|0.302~0.019|0.365~0.014|0.462~0.039|0.493~0.037|0.652~0.026|0.647~0.027|1.11~0.07
-IM.FeO 36.7~0.3|34.9~0.8|34.0~1.4|24.1~0.2|18.2~0.3|11.3|0.803~0.033|0.114~0.014|0.259~0.009|0.059~0.023|0.076~0.016|0.073~0.027|0.055~0.030|0.0853~0.0087|0.080~0.020|0.066~0.016
-IM.WO3 0.010~0.002|0.201~0.010|0.096~0.008|0.729~0.070|0.592~0.074|0.781|0.357~0.030|0.174~0.007|0.355~0.006|0.119~0.013|0.092~0.006|0.119~0.017|0.061~0.002|0.069~0.003|0.103~0.011|0.061~0.010
+IM.FeO 36.7~0.3|34.9~0.8|34.0~1.4|24.1~0.2|18.2~0.3|11.3~0.0|0.803~0.033|0.114~0.014|0.259~0.009|0.059~0.023|0.076~0.016|0.073~0.027|0.055~0.030|0.0853~0.0087|0.080~0.020|0.066~0.016
+IM.WO3 0.010~0.002|0.201~0.010|0.096~0.008|0.729~0.070|0.592~0.074|0.781~0.000|0.357~0.030|0.174~0.007|0.355~0.006|0.119~0.013|0.092~0.006|0.119~0.017|0.061~0.002|0.069~0.003|0.103~0.011|0.061~0.010
 REE.La 80.3~4.1|97~18|100~13|123~7|121~6|152~2|293~27|237~11|247~1|293~12|401~32|539~6|640~41|975~53|914~89|2128~131
 REE.Ce 88.2~3.1|112~21|114~19|128~5|117~5|135~4|158~15|73.2~3.5|85.4~1.3|10.3~0.4|7.47~0.56|5.20~0.49|1.10~0.51|0.289~0.036|1.87~0.38|0.83~0.18
 REE.Pr 83.8~4.9|101~18|108~16|126~7|122~6|154~6|285~26|225~10|231~2|263~12|362~28|429~10|500~37|744~44|643~65|1182~89
@@ -105,6 +106,52 @@ def assert_table1_grid_matches_render(extract: dict, rendered: dict[str, list[st
         row["values"]["analytical_method"]: row["values"]["series"]
         for row in table1
     }
+    electron_probe = next(
+        row for row in table1
+        if row["values"]["analytical_method"] == "electron microprobe"
+    )
+    ion_probe = next(
+        row for row in table1
+        if row["values"]["analytical_method"] == "ion microprobe"
+    )
+    assert len(electron_probe["values"]["series"]) == 16
+    assert electron_probe["uncertainty"]["confidence_level"] == "one_sigma"
+    assert electron_probe["uncertainty"]["locator"]["page"] == 5
+    assert electron_probe["uncertainty"]["locator"]["published_page"] == 483
+    assert electron_probe["uncertainty"]["locator"]["pdf_page_index"] == 4
+    assert ion_probe["uncertainty"]["confidence_level"] == "one_sigma"
+    assert ion_probe["uncertainty"]["locator"]["page"] == 5
+    assert ion_probe["uncertainty"]["locator"]["published_page"] == 483
+    assert ion_probe["uncertainty"]["locator"]["pdf_page_index"] == 4
+    assert "±1σ standard errors" in ion_probe["uncertainty"]["note"]
+    zero_widths = {
+        (cell["sample"], cell["formula"]): cell["sigma"]
+        for cell in electron_probe["uncertainty"]["zero_width_cells"]
+    }
+    assert zero_widths == {
+        ("SC4", "SiO2"): "0.0", ("SC14", "SiO2"): "0.0",
+        ("SC1", "SiO2"): "0.0", ("SC7", "SiO2"): "0.0",
+        ("SC2", "SiO2"): "0.0", ("SC16", "SiO2"): "0.0",
+        ("SC4", "FeO"): "0.0", ("SC9", "MgO"): "0.000",
+    }
+    ion_probe = next(
+        row for row in table1
+        if row["values"]["analytical_method"] == "ion microprobe"
+    )
+    ion_zero_widths = {
+        (cell["sample"], cell["formula"]): cell["sigma"]
+        for cell in ion_probe["uncertainty"]["zero_width_cells"]
+    }
+    expected_ion_zero_widths = {
+        (sample, formula): error
+        for label, expected_cells in rendered.items()
+        if label.startswith("IM.")
+        for formula in (label.split(".", maxsplit=1)[1],)
+        for sample, raw_cell in zip(TABLE1_SAMPLES, expected_cells, strict=True)
+        for _value, error in (split_value_and_error(raw_cell),)
+        if error == "0.0" or error == "0.000"
+    }
+    assert ion_zero_widths == expected_ion_zero_widths
     for label, expected_cells in rendered.items():
         group, formula = label.split(".", maxsplit=1)
         if group == "REE":
@@ -124,12 +171,32 @@ def assert_table1_grid_matches_render(extract: dict, rendered: dict[str, list[st
         assert len(expected_cells) == len(TABLE1_SAMPLES)
         for sample, raw_cell in zip(TABLE1_SAMPLES, expected_cells, strict=True):
             expected_value, expected_error = split_value_and_error(raw_cell)
-            point = next(point for point in points if point["sample"] == sample)
+            matching_points = [
+                point for point in points
+                if point["sample"] == sample and value_field in point
+            ]
+            assert len(matching_points) == 1, (label, sample)
+            point = matching_points[0]
             assert point[value_field] == expected_value, (label, sample)
-            if error_field is not None:
+            if group == "EM":
+                assert expected_error is not None
+                assert point.get("standard_errors", {}).get(
+                    formula, zero_widths.get((sample, formula))
+                ) == expected_error, (label, sample)
+                page = 4 if TABLE1_SAMPLES.index(sample) < 8 else 5
+                assert point["locator"]["page"] == page, (label, sample)
+                assert point["locator"]["published_page"] == page + 478, (label, sample)
+                assert point["locator"]["pdf_page_index"] == page - 1, (label, sample)
+                assert point["locator"]["table"] == "1", (label, sample)
+                assert point["locator"]["row"] == sample, (label, sample)
+            elif error_field is not None:
                 assert point.get(error_field) == expected_error, (label, sample)
             else:
-                assert point.get("standard_errors", {}).get(formula) == expected_error, (label, sample)
+                assert point.get("standard_errors", {}).get(
+                    formula, ion_zero_widths.get((sample, formula))
+                ) == expected_error, (label, sample)
+                if group == "IM":
+                    assert "sigma" not in point, (label, sample)
 
 
 def test_rendered_table_grids_and_cell_mutations() -> None:
@@ -144,6 +211,27 @@ def test_rendered_table_grids_and_cell_mutations() -> None:
 
     changed_extract = deepcopy(extract)
     changed_extract["species"]["SiO2"]["observations"][0]["values"]["series"][0]["MgO_wt_pct"] = "999"
+    with pytest.raises(AssertionError):
+        assert_table1_grid_matches_render(changed_extract, rendered)
+    changed_extract = deepcopy(extract)
+    changed_extract["species"]["SiO2"]["observations"][0]["values"]["series"][0]["standard_errors"]["MgO"] = "9.9"
+    with pytest.raises(AssertionError):
+        assert_table1_grid_matches_render(changed_extract, rendered)
+    changed_extract = deepcopy(extract)
+    changed_extract["species"]["SiO2"]["observations"][0]["uncertainty"]["zero_width_cells"][0]["sigma"] = "9.9"
+    with pytest.raises(AssertionError):
+        assert_table1_grid_matches_render(changed_extract, rendered)
+    changed_extract = deepcopy(extract)
+    ion_probe = next(
+        row for row in changed_extract["species"]["SiO2"]["observations"]
+        if row["values"].get("analytical_method") == "ion microprobe"
+        and row["values"].get("quantity") == "residue_composition_vs_time"
+    )
+    missing_error_point = next(
+        point for point in ion_probe["values"]["series"]
+        if point["sample"] == "SC12"
+    )
+    missing_error_point["sigma"] = "0.0"
     with pytest.raises(AssertionError):
         assert_table1_grid_matches_render(changed_extract, rendered)
 
@@ -176,10 +264,44 @@ def test_table2_and_table4_rendered_rows_are_bound_to_samples() -> None:
             observation = mass_loss_observation(source, sample)
             point = observation["values"]["points"][0]
             assert point["sample"] == sample
+            initial = point["initial_mass_mg_as_printed"]
+            final = point["final_mass_mg_as_printed"]
+            printed_percent = point["mass_loss_wt_pct_as_printed"]
             assert [
-                point["T_C"], point["time_min"], point["initial_mass_mg_as_printed"],
-                point["final_mass_mg_as_printed"], point["mass_loss_wt_pct"],
+                point["T_C"], point["time_min"], initial["value"],
+                final["value"], printed_percent["value"],
             ] == expected
+            assert observation["units"] == "fraction"
+            assert printed_percent["units"] == "wt%"
+            assert printed_percent["locator"]["column"] == "% evaporated"
+            for cell, column in (
+                (initial, "Initial wt. (mg)"),
+                (final, "Final wt. (mg)"),
+                (printed_percent, "% evaporated"),
+            ):
+                assert cell["units"] in {"mg", "wt%"}
+                assert cell["locator"]["page"] == 6
+                assert cell["locator"]["published_page"] == 484
+                assert cell["locator"]["pdf_page_index"] == 5
+                assert cell["locator"]["table"] == "2"
+                assert cell["locator"]["row"] == sample
+                assert cell["locator"]["column"] == column
+            recomputed = (Decimal(initial["value"]) - Decimal(final["value"])) / Decimal(initial["value"])
+            assert Decimal(point["mass_loss_fraction"]) == recomputed
+            if sample == "SC1":
+                assert abs(recomputed * 100 - Decimal(printed_percent["value"])) == Decimal(
+                    "0.06027223230490018148820327"
+                )
+            else:
+                assert (recomputed * 100).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP) == Decimal(
+                    printed_percent["value"]
+                )
+            assert point["derivation"]["relation"] == (
+                "(initial_mass_mg_as_printed - final_mass_mg_as_printed) "
+                "/ initial_mass_mg_as_printed"
+            )
+            assert point["derivation"]["inputs"]["initial_mass_mg_as_printed"]["value"] == initial["value"]
+            assert point["derivation"]["inputs"]["final_mass_mg_as_printed"]["value"] == final["value"]
             assert point["locator"]["page"] == 6
             assert point["locator"]["pdf_page_index"] == 5
             assert point["locator"]["table"] == "2"
@@ -199,12 +321,13 @@ def test_table2_and_table4_rendered_rows_are_bound_to_samples() -> None:
     with pytest.raises(AssertionError):
         assert_mass_loss_grid_matches_render(extract, changed_render)
     changed_extract = deepcopy(extract)
-    mass_loss_observation(changed_extract, "SC2")["values"]["points"][0]["mass_loss_wt_pct"] = "999"
+    mass_loss_observation(changed_extract, "SC1")["values"]["points"][0]["mass_loss_fraction"] = "0.5729"
     with pytest.raises(AssertionError):
         assert_mass_loss_grid_matches_render(changed_extract, printed_rows)
 
     sc1 = mass_loss_observation(extract, "SC1")["values"]["points"][0]
-    assert "Table 1 prints 57.35; values disagree; the source does not reconcile them" in sc1["locator"]["note"]
+    assert "Table 2 prints 57.29 wt%; mass ratio from the printed masses is 57.35027223230490018148820327 wt%" in sc1["locator"]["note"]
+    assert "Table 1 reports 57.35 wt%; the source does not reconcile the Table 2 discrepancy" in sc1["locator"]["note"]
     assert sc1["locator"]["note"].endswith("physical PDF page 4, published page 482, Table 1, row SC1.")
 
     rendered = cells_by_label(TABLE4_RENDER)
@@ -224,6 +347,30 @@ def test_table2_and_table4_rendered_rows_are_bound_to_samples() -> None:
 
 
 def test_migrated_species_temperature_and_point_conditions() -> None:
+    extract = yaml.safe_load(EXTRACT.read_text())
+    mass_loss_fraction_by_sample = {
+        point["sample"]: (
+            Decimal(point["initial_mass_mg_as_printed"]["value"])
+            - Decimal(point["final_mass_mg_as_printed"]["value"])
+        ) / Decimal(point["initial_mass_mg_as_printed"]["value"])
+        for observation in extract["species"]["SiO2"]["observations"]
+        if observation["values"].get("quantity") == "mass_loss_fraction"
+        for point in observation["values"]["points"]
+    }
+    expected_electron_probe_cells = {
+        (sample, formula): split_value_and_error(raw_cell)
+        for label, cells in cells_by_label(TABLE1_RENDER).items()
+        if label.startswith("EM.")
+        for formula in (label.split(".", maxsplit=1)[1],)
+        for sample, raw_cell in zip(TABLE1_SAMPLES, cells, strict=True)
+    }
+    expected_ion_probe_cells = {
+        (sample, formula): split_value_and_error(raw_cell)
+        for label, cells in cells_by_label(TABLE1_RENDER).items()
+        if label.startswith("IM.")
+        for formula in (label.split(".", maxsplit=1)[1],)
+        for sample, raw_cell in zip(TABLE1_SAMPLES, cells, strict=True)
+    }
     migrator = Migrator(root=ROOT, index={}, aliases={})
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
@@ -242,6 +389,15 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
     }
     actual_by_quantity: dict[Quantity, Counter[str]] = defaultdict(Counter)
     actual_by_sample: dict[tuple[Quantity, str], Counter[str]] = defaultdict(Counter)
+    migrated_mass_loss_samples: set[str] = set()
+    migrated_electron_probe_cells: set[tuple[str, str]] = set()
+    migrated_ion_probe_cells: set[tuple[str, str]] = set()
+    electron_probe_prefix = (
+        f"{extract['source_id']}::wang_2001_table1_electron_microprobe_residue_compositions::"
+    )
+    ion_probe_prefix = (
+        f"{extract['source_id']}::wang_2001_table1_ion_microprobe_residue_compositions::"
+    )
     temperature_c = {
         "SC1": "1800", "SC2": "1800", "SC3": "1800", "SC4": "1800",
         "SC5": "1800", "SC6": "2000", "SC7": "2000", "SC8": "2000",
@@ -258,6 +414,24 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
         sample = match.group(1) if match else None
         assert sample is not None, note
         actual_by_sample[(quantity, sample)][formula] += 1
+        if row.observation_id.startswith(electron_probe_prefix):
+            expected_sigma = expected_electron_probe_cells[(sample, formula)][1]
+            assert expected_sigma is not None
+            assert row.uncertainty.kind is UncertaintyKind.PRINTED
+            assert isinstance(row.uncertainty.verbatim, dict)
+            assert row.uncertainty.verbatim["sigma"] == expected_sigma
+            assert row.uncertainty.verbatim["confidence_level"] == "one_sigma"
+            migrated_electron_probe_cells.add((sample, formula))
+        elif row.observation_id.startswith(ion_probe_prefix):
+            expected_sigma = expected_ion_probe_cells[(sample, formula)][1]
+            if expected_sigma is None:
+                assert row.uncertainty.kind is UncertaintyKind.NONE
+            else:
+                assert row.uncertainty.kind is UncertaintyKind.PRINTED
+                assert isinstance(row.uncertainty.verbatim, dict)
+                assert row.uncertainty.verbatim["sigma"] == expected_sigma
+                assert row.uncertainty.verbatim["confidence_level"] == "one_sigma"
+            migrated_ion_probe_cells.add((sample, formula))
 
         expected_temperature = Decimal(temperature_c[sample]) + Decimal("273.15")
         assert row.identity.temperature_K.value == expected_temperature, (quantity, sample, formula)
@@ -271,6 +445,19 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
         for name in required_conditions:
             assert name in conditions and conditions[name].locator is not None, (quantity, sample, formula, name)
         assert all(condition.locator is not None for condition in conditions.values())
+        if (
+            row.observation_id.startswith(electron_probe_prefix)
+            and sample == "SC12"
+            and formula == "MgO"
+        ):
+            assert conditions["printed_composition"].state.value == {
+                "MgO": "24.4",
+                "Al2O3": "2.73",
+                "SiO2": "35.1",
+                "CaO": "2.24",
+                "TiO2": "0.097",
+                "FeO": "35.5",
+            }
         pressure = conditions["total_pressure_Pa"]
         assert pressure.state.is_value
         assert pressure.state.value.kind is ValueKind.POINT
@@ -280,6 +467,9 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
         if quantity is Quantity.MASS_LOSS_FRACTION:
             assert formula == "unknown"
             assert row.identity.species.phase.value == "l"
+            assert row.value.kind is ValueKind.POINT
+            assert row.value.point == mass_loss_fraction_by_sample[sample]
+            migrated_mass_loss_samples.add(sample)
             assert conditions["printed_composition"].state.value == {
                 "MgO": "24.8",
                 "Al2O3": "2.46",
@@ -291,6 +481,9 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
 
     for quantity, expected in expected_by_quantity.items():
         assert actual_by_quantity[quantity] == Counter(expected)
+    assert migrated_mass_loss_samples == set(mass_loss_fraction_by_sample)
+    assert migrated_electron_probe_cells == set(expected_electron_probe_cells)
+    assert migrated_ion_probe_cells == set(expected_ion_probe_cells)
     component_formulas = ("MgO", "Al2O3", "SiO2", "CaO", "TiO2", "FeO")
     trace_formulas = "La Ce Pr Nd Sm Eu Gd Tb Dy Ho Er Tm Yb Lu".split()
     for sample in TABLE1_SAMPLES:
@@ -305,3 +498,269 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
             assert actual_by_sample[(Quantity.ISOTOPE_DELTA, sample)] == Counter({"O": 2, "Mg": 2, "Si": 2})
         else:
             assert actual_by_sample[(Quantity.ISOTOPE_DELTA, sample)] == Counter()
+
+
+def test_residue_component_errors_without_parent_convention_keep_green_behavior(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    extract = yaml.safe_load(EXTRACT.read_text())
+    ion_probe = next(
+        row
+        for row in extract["species"]["SiO2"]["observations"]
+        if row["observation_id"]
+        == "wang_2001_table1_ion_microprobe_residue_compositions"
+    )
+    del ion_probe["uncertainty"]
+    original_load_yaml = migrate_module.load_yaml
+
+    def load_mutated_extract(path: Path):
+        if Path(path) == EXTRACT:
+            return extract
+        return original_load_yaml(path)
+
+    monkeypatch.setattr(migrate_module, "load_yaml", load_mutated_extract)
+    migrator = Migrator(root=ROOT, index={}, aliases={})
+    migrator._migrate_extract(EXTRACT)
+    migrator.finalize()
+
+    observations = tuple(migrator.result.observations.values())
+    ion_prefix = (
+        f"{extract['source_id']}::wang_2001_table1_ion_microprobe_residue_compositions::"
+    )
+    ion_records = [row for row in observations if row.observation_id.startswith(ion_prefix)]
+    assert len(ion_records) == 112
+    assert all(row.uncertainty.kind is UncertaintyKind.NONE for row in ion_records)
+
+    electron_prefix = (
+        f"{extract['source_id']}::wang_2001_table1_electron_microprobe_residue_compositions::"
+    )
+    electron_records = [
+        row for row in observations if row.observation_id.startswith(electron_prefix)
+    ]
+    expected_electron_errors = {
+        (sample, formula): split_value_and_error(raw_cell)[1]
+        for label, cells in cells_by_label(TABLE1_RENDER).items()
+        if label.startswith("EM.")
+        for formula in (label.split(".", maxsplit=1)[1],)
+        for sample, raw_cell in zip(TABLE1_SAMPLES, cells, strict=True)
+    }
+    assert len(electron_records) == 96
+    for row in electron_records:
+        match = re.search(r"row=(SC\d+)(?!\d)", row.locator.note or "")
+        assert match is not None
+        sample = match.group(1)
+        expected_sigma = expected_electron_errors[(sample, row.identity.species.formula)]
+        assert expected_sigma is not None
+        assert row.uncertainty.kind is UncertaintyKind.PRINTED
+        assert row.uncertainty.verbatim is not None
+        assert row.uncertainty.verbatim["sigma"] == expected_sigma
+        assert row.uncertainty.verbatim["confidence_level"] == "one_sigma"
+
+
+@pytest.mark.parametrize(
+    ("declaration", "expected_token", "expected_sigma", "expected_band"),
+    [
+        (
+            {"k": 2},
+            "two_sigma",
+            Decimal("0.2"),
+            Decimal("0.2") * Decimal("1.959963984540054"),
+        ),
+        (
+            {"kind": "two_sigma"},
+            "two_sigma",
+            Decimal("0.2"),
+            Decimal("0.2") * Decimal("1.959963984540054"),
+        ),
+        (
+            {"confidence_level": "two_sigma", "k": 2},
+            "two_sigma",
+            Decimal("0.2"),
+            Decimal("0.2") * Decimal("1.959963984540054"),
+        ),
+        (
+            {"confidence_level": "one_sigma", "kind": "replicate_error"},
+            "one_sigma",
+            Decimal("0.4"),
+            Decimal("0.7839855938160216"),
+        ),
+        (
+            {"kind": "one_sigma"},
+            "one_sigma",
+            Decimal("0.4"),
+            Decimal("0.7839855938160216"),
+        ),
+        (
+            {"confidence_level": "ci95", "k": "1.96"},
+            "ci95",
+            # Agreement keeps CI95 as the label but uses the printed 1.96 divisor.
+            Decimal("0.4") / Decimal("1.96"),
+            Decimal("0.4") / Decimal("1.96") * Decimal("1.959963984540054"),
+        ),
+        ({"confidence_level": "not_stated"}, None, None, None),
+        ({"kind": "printed"}, None, None, None),
+        ({"k": "Infinity"}, "conflict", None, None),
+        ({"k": "NaN"}, "conflict", None, None),
+        ({"k": 0}, "conflict", None, None),
+        ({"confidence_level": "unknown convention"}, "conflict", None, None),
+        ({"confidence_level": "ci95", "k": 3}, "conflict", None, None),
+        ({"kind": "ci95", "k": 3}, "conflict", None, None),
+        ({"confidence_level": "range_half_width", "kind": "two_sigma"}, "conflict", None, None),
+    ],
+)
+def test_residue_component_parent_convention_controls_width_lookup(
+    monkeypatch: pytest.MonkeyPatch,
+    declaration: dict[str, object],
+    expected_token: str | None,
+    expected_sigma: Decimal | None,
+    expected_band: Decimal | None,
+) -> None:
+    extract = yaml.safe_load(EXTRACT.read_text())
+    ion_probe = next(
+        row
+        for row in extract["species"]["SiO2"]["observations"]
+        if row["observation_id"]
+        == "wang_2001_table1_ion_microprobe_residue_compositions"
+    )
+    ion_probe["uncertainty"] = declaration
+    original_load_yaml = migrate_module.load_yaml
+
+    def load_mutated_extract(path: Path):
+        if Path(path) == EXTRACT:
+            return extract
+        return original_load_yaml(path)
+
+    monkeypatch.setattr(migrate_module, "load_yaml", load_mutated_extract)
+    migrator = Migrator(root=ROOT, index={}, aliases={})
+    migrator._migrate_extract(EXTRACT)
+    migrator.finalize()
+
+    row = next(
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.observation_id.endswith("122b3beaa55d")
+    )
+    if expected_token == "conflict":
+        assert any(
+            item.observation_id == row.observation_id
+            and item.why == "uncertainty_convention_conflict"
+            for item in migrator.result.queue
+        )
+        from simulator.battery.score import _printed_uncertainty_band, point_magnitude
+
+        magnitude = point_magnitude(row.value)
+        assert magnitude is not None
+        resolution = _printed_uncertainty_band(
+            Quantity.RESIDUE_COMPONENT_COMPOSITION,
+            row.uncertainty,
+            magnitude,
+            source_observation=row,
+        )
+        assert resolution.band is None
+        assert resolution.refusal is not None
+        assert resolution.refusal["reason"] == "uncertainty_convention_conflict"
+    elif expected_token is not None:
+        assert row.uncertainty.kind is UncertaintyKind.PRINTED
+        assert row.uncertainty.verbatim is not None
+        assert row.uncertainty.verbatim["sigma"] == "0.4"
+        for key, value in declaration.items():
+            assert row.uncertainty.verbatim[key] == value
+        from simulator.battery.score import (
+            _printed_uncertainty_band,
+            _stated_printed_confidence_level,
+            point_magnitude,
+        )
+
+        assert _stated_printed_confidence_level(row.uncertainty) == expected_token
+        magnitude = point_magnitude(row.value)
+        assert magnitude is not None
+        resolution = _printed_uncertainty_band(
+            Quantity.RESIDUE_COMPONENT_COMPOSITION,
+            row.uncertainty,
+            magnitude,
+            source_observation=row,
+        )
+        assert resolution.band is not None
+        assert resolution.notice is None
+        assert resolution.standard_uncertainty == expected_sigma
+        assert resolution.standard_uncertainty_unit == "mass_percent"
+        assert resolution.band.value == expected_band
+        assert resolution.band.unit == "mass_percent"
+        expected_rule = {
+            "one_sigma": "printed_1sigma:",
+            "two_sigma": "printed_2sigma:",
+            "ci95": "printed_2sigma:",
+        }[expected_token]
+        assert resolution.band.rule.startswith(expected_rule)
+    else:
+        assert row.uncertainty.verbatim is None or "sigma" not in row.uncertainty.verbatim
+
+
+def test_convention_resolver_checks_every_field_pair_and_token() -> None:
+    from simulator.battery.uncertainty_conventions import (
+        UncertaintyConventionConflict,
+        printed_uncertainty_convention,
+    )
+
+    factors = {
+        "one_sigma": Decimal(1),
+        "two_sigma": Decimal(2),
+        "ci95": Decimal("1.959963984540054"),
+        "range_half_width": None,
+    }
+    fields = ("confidence_level", "kind")
+    for first_field in fields:
+        for second_field in fields:
+            if first_field == second_field:
+                continue
+            for first_token, first_factor in factors.items():
+                for second_token, second_factor in factors.items():
+                    declaration = {
+                        first_field: first_token,
+                        second_field: second_token,
+                    }
+                    conflict = (
+                        first_factor is None
+                        and second_factor is not None
+                    ) or (
+                        second_factor is None
+                        and first_factor is not None
+                    ) or (
+                        first_factor is not None
+                        and second_factor is not None
+                        and abs(first_factor - second_factor) > Decimal("0.001")
+                    )
+                    if conflict:
+                        with pytest.raises(UncertaintyConventionConflict):
+                            printed_uncertainty_convention(declaration)
+                    else:
+                        resolved = printed_uncertainty_convention(declaration)
+                        assert resolved is not None
+                        if first_factor is not None:
+                            assert abs(resolved[1] - first_factor) <= Decimal("0.001")
+    with pytest.raises(UncertaintyConventionConflict):
+        printed_uncertainty_convention({"kind": "ci95", "k": 3})
+    assert printed_uncertainty_convention({"confidence_level": "95%"}) == (
+        "ci95",
+        Decimal("1.959963984540054"),
+    )
+    for descriptive_kind in (
+        "absolute",
+        "categorical",
+        "derived",
+        "point",
+        "printed",
+        "read",
+        "replicate_error",
+        "standard_deviation",
+        "none",
+    ):
+        assert printed_uncertainty_convention(
+            {"kind": descriptive_kind, "confidence_level": "not_stated"}
+        ) is None
+    assert printed_uncertainty_convention(
+        {
+            "kind": "standard_deviation",
+            "confidence_level": "not_stated",
+        }
+    ) is None

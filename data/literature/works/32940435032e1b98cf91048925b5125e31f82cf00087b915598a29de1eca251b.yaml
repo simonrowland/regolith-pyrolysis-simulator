@@ -625,6 +625,40 @@ experiments:
     pdf_page_index: 16
     table: Summary of “Invariant”\* Situations in the System Manganese Oxide—SiO₂ in Air
     note: Sosman (1955) attribution in Table 2 footnote
+- experiment_id: 32940435032e1b98cf91048925b5125e31f82cf00087b915598a29de1eca251b::muan-1959-manganese-silica-air::declared:32940435032e1b98cf91048925b5125e31f82cf00087b915598a29de1eca251b::experiment::muan1959-table2-row-16::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 32940435032e1b98cf91048925b5125e31f82cf00087b915598a29de1eca251b
+  locator:
+    page: 17
+    published_page: 313
+    pdf_page_index: 16
+    table: Summary of “Invariant”\* Situations in the System Manganese Oxide—SiO₂ in Air
+    note: Sosman (1955) attribution in Table 2 footnote
 context:
 - observation_id: muan1959_fig1_phase_relations
   type: figure_context

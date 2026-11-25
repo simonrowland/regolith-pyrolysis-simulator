@@ -100,6 +100,77 @@ experiments:
     section: Introduction and Petrography
     source_path: corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
   bench_id: 3cd13f4643f5203d2814509b33698274c14c1cbbc3fc24d4120b308862417814::bench::handbook-entry-no-thermal-run
+- experiment_id: 3cd13f4643f5203d2814509b33698274c14c1cbbc3fc24d4120b308862417814::lpi-compendium-65701::declared:3cd13f4643f5203d2814509b33698274c14c1cbbc3fc24d4120b308862417814::experiment::handbook-characterization::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.171'
+          approximate: false
+      locator:
+        pdf_page_index: 1
+        section: Introduction and Petrography
+        note: Printed 171 g characterization mass (not a thermal-run charge); unit conversion only.
+        source_path: corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '171'
+            locator:
+              pdf_page_index: 1
+              section: Introduction and Petrography
+              note: Printed 171 g characterization mass (not a thermal-run charge); unit conversion only.
+              source_path: corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              pdf_page_index: 1
+              section: Introduction and Petrography
+              note: Printed 171 g characterization mass (not a thermal-run charge); unit conversion only.
+              source_path: corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
+        output_unit: kg
+        references: []
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 3cd13f4643f5203d2814509b33698274c14c1cbbc3fc24d4120b308862417814
+  locator:
+    pdf_page_index: 1
+    section: Introduction and Petrography
+    source_path: corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
+  bench_id: 3cd13f4643f5203d2814509b33698274c14c1cbbc3fc24d4120b308862417814::bench::handbook-entry-no-thermal-run
 benches:
 - id: 3cd13f4643f5203d2814509b33698274c14c1cbbc3fc24d4120b308862417814::bench::handbook-entry-no-thermal-run
   work_id: 3cd13f4643f5203d2814509b33698274c14c1cbbc3fc24d4120b308862417814

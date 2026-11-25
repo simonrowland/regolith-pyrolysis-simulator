@@ -31,7 +31,11 @@ from simulator.fe_redox import (
     KRESS91_INV_T_COEFFICIENT_K,
     KRESS91_LN_FO2_COEFFICIENT,
 )
+from simulator.physical_constants import MELT_DISSOCIATION_PO2_MIN_BAR
 from simulator.melt_backend.base import InternalAnalyticalBackend
+from simulator.metal_saturation_floor import (
+    melt_metal_saturation_floor_log10_fO2_bar,
+)
 from simulator.runner import (
     RUNNER_MASS_BALANCE_LIMIT_PCT as MASS_BALANCE_MAX_PCT,
     build_per_hour_summary,
@@ -140,13 +144,17 @@ def test_quenched_redox_reference_survives_pressure_cycle() -> None:
     sim.melt.oxygen_reservoir.reference_T_K = 1873.15
     sim._sync_oxygen_reservoir_mirror()
     assert sim._apply_fe_redox_respeciation()["status"] == "ok"
+    published = sim._current_melt_redox_fO2_log()
+    assert published == pytest.approx(
+        sim._ledger_consistent_melt_fO2_log(1873.15)
+    )
     before = copy.deepcopy(sim.atom_ledger.mol_by_account())
     transition_count = len(sim.atom_ledger.transitions)
     sim.melt.temperature_C = 1000.0
     for pressure in (10.0, 0.2, 10.0):
         sim.melt.p_total_mbar = pressure
         sim._re_reference_melt_fO2_to_temperature(gate_authority=None)
-        assert sim._current_melt_redox_fO2_log() == -2.1
+        assert sim._current_melt_redox_fO2_log() == published
         assert sim.melt.oxygen_reservoir.reference_T_K == 1873.15
     assert len(sim.atom_ledger.transitions) == transition_count
     assert sim.atom_ledger.mol_by_account() == before
@@ -286,8 +294,6 @@ def test_default_lunar_redox_runaway_acceptance() -> None:
     session = run._start_session()
     sim = session.simulator
     hot_hours = set()
-    c6_releases = []
-    c6_solid_refusal_seen = False
     initial_iron_atoms = math.fsum(
         sim.atom_ledger.atom_moles_by_account(account).get("Fe", 0.0)
         for account in sim.atom_ledger.mol_by_account()
@@ -317,23 +323,20 @@ def test_default_lunar_redox_runaway_acceptance() -> None:
                         for account in ("process.overhead_gas", "reservoir.fo2_buffer")
                     )
                     if o2 > 0.0:
-                        c6_releases.append(o2)
                         transition.validate_conservation(sim.species_formula_registry)
                         ferric_debit = _cleaned_melt_debit_mol(sim, transition, "Fe2O3")
                         # Fe2O3 -> 2 FeO + 1/2 O2; mol O2 = mol Fe2O3 / 2.
                         assert o2 == pytest.approx(ferric_debit / 2.0, abs=1e-12)
-            for diagnostic in sim._fe_redox_respeciation_diagnostics_this_hr:
-                if diagnostic.get("reason") == "fe_redox_respeciation_not_liquid":
-                    c6_solid_refusal_seen = True
         transition_count = len(sim.atom_ledger.transitions)
     assert sim.is_complete()
     assert hot_hours == {167, 168}
-    # The d-019/t-1567 diagnosis found that the old Kress floor treated a
-    # 0.14 wt% SiO2 solid residue as liquid. The MAGEMin silica-domain gate
-    # correctly refuses that extrapolation, so C6 leaves Fe2O3 unreduced and
-    # releases no respeciation O2.
-    assert c6_solid_refusal_seen
-    assert not c6_releases
+    # The silica-domain refusal used to be the residue of the fO2 crash
+    # (b-1282): log10 fO2 near -19 flashed the oxides down to ~0.14 wt%
+    # SiO2, and C6 then correctly refused that extrapolation. The reducing
+    # step now stops at the ferric inventory, so this default run is not
+    # required to observe fe_redox_respeciation_not_liquid. That gate stays
+    # owned by test_fe_redox_respeciation_skips_below_liquid_calibration_band.
+    # Any C6 release recorded above already matches Fe2O3 -> 2 FeO + 1/2 O2.
     final_iron_atoms = math.fsum(
         sim.atom_ledger.atom_moles_by_account(account).get("Fe", 0.0)
         for account in sim.atom_ledger.mol_by_account()
@@ -424,7 +427,11 @@ def test_step_orders_passive_exchange_sources_native_split_and_evaporation(
     monkeypatch.setattr(sim, "_apply_native_fe_saturation_split", fake_native_split)
     monkeypatch.setattr(sim, "_get_equilibrium", fake_equilibrium)
     monkeypatch.setattr(sim, "_calculate_evaporation", fake_evaporation)
-    monkeypatch.setattr(sim, "_apply_analytic_evaporation_depletion", lambda flux: flux)
+    monkeypatch.setattr(
+        sim,
+        "_apply_analytic_evaporation_depletion",
+        lambda flux, dt_hr=1.0: flux,
+    )
     monkeypatch.setattr(sim, "_configure_condensation_operating_conditions", lambda flux: None)
     monkeypatch.setattr(sim, "_apply_lab_surface_temperatures", lambda *, sample_time_h: None)
     monkeypatch.setattr(sim, "_route_to_condensation", fake_route)
@@ -668,23 +675,43 @@ def test_melt_fO2_log_is_live_in_vapor_pressure_producer(monkeypatch) -> None:
     assert seen_control_inputs[-1]["intrinsic_fO2_log"] == pytest.approx(-6.25)
 
 
-def test_reductant_source_term_lowers_fO2_and_raises_native_drive() -> None:
+def test_reductant_source_term_books_ferric_and_publishes_the_ledger(
+    monkeypatch,
+) -> None:
+    from engines.builtin.fe_redox_respeciation import fe2o3_mol_for_ferric_o2
+
     sim = _make_sim()
     sim.melt.temperature_C = 1600.0
+    temperature_K = 1873.15
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
     sim._sync_oxygen_reservoir_mirror()
-    before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
-    before_native = sim._compute_fe_redox_split_diagnostic()["native_fe_frac"]
+    # 4 mol Fe2O3 books 2 mol O2, so the 1 mol sink is inside the couple.
+    sim.atom_ledger.load_external_mol(
+        "process.cleaned_melt",
+        {"Fe2O3": 4.0},
+        source="test ferric inventory for an in-inventory reductant sink",
+        material_origin="feedstock",
+    )
+    monkeypatch.setattr(
+        sim,
+        "_melt_redox_temperature_shift_is_liquid",
+        lambda *_args, **_kwargs: True,
+    )
+    before_fe2o3 = sim.atom_ledger.mol_by_account("process.cleaned_melt")["Fe2O3"]
 
     sim._apply_oxygen_reservoir_redox_source_terms(
         {"test_reductant_sink": -1.0},
         exchange_direction="redox_source:test_reductant_sink",
+        temperature_K=temperature_K,
     )
 
-    after_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
-    after_native = sim._compute_fe_redox_split_diagnostic()["native_fe_frac"]
-    assert after_fO2 < before_fO2
-    assert after_native > before_native
+    published = sim._ledger_consistent_melt_fO2_log(temperature_K)
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(
+        published
+    )
+    assert sim.atom_ledger.mol_by_account("process.cleaned_melt")["Fe2O3"] == (
+        pytest.approx(before_fe2o3 - fe2o3_mol_for_ferric_o2(1.0))
+    )
 
 
 def _configure_o2_bubbler(
@@ -716,6 +743,60 @@ def _seed_o2_bubbler_redox_state(
     )
 
 
+def _plant_fO2_above_metal_saturation_floor(
+    sim: PyrolysisSimulator,
+    margin_dex: float,
+) -> float:
+    """Publish log10(fO2/bar) margin_dex above the production metal floor.
+
+    d-469 raises a planted value that sits below the condensed-metal
+    couple. The plant here is the production resolver's floor plus the
+    margin, so that floor does not bind and the test still sees the
+    move it is about.
+    """
+
+    temperature_K = float(sim.melt.temperature_C) + 273.15
+    floor_log, metal = melt_metal_saturation_floor_log10_fO2_bar(
+        temperature_K,
+        sim._melt_metal_saturation_activities(temperature_K),
+    )
+    if floor_log is None or metal is None:
+        raise AssertionError(
+            "this feedstock at the current temperature has no "
+            "condensed-metal saturation floor"
+        )
+    planted = float(floor_log) + float(margin_dex)
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = planted
+    sim.melt.oxygen_reservoir.reference_T_K = temperature_K
+    sim._sync_oxygen_reservoir_mirror()
+    return planted
+
+
+@pytest.mark.parametrize(
+    ("pressure_mbar", "expected_fO2_log"),
+    [
+        (1.0e-323, -326.0051853474518),
+        (2.5e-321, -323.602064826276),
+    ],
+    ids=("quotient-underflows", "quotient-is-positive-subnormal"),
+)
+def test_controlled_o2_bubbler_log_accepts_positive_subnormal_pressure(
+    pressure_mbar: float,
+    expected_fO2_log: float,
+) -> None:
+    sim = _make_sim()
+    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+    sim.melt.pO2_mbar = pressure_mbar
+
+    if pressure_mbar == 2.5e-321:
+        assert pressure_mbar / 1000.0 > 0.0
+
+    target, source = sim._o2_bubbler_target_fO2_log(None)
+
+    assert target == pytest.approx(expected_fO2_log, rel=0.0, abs=1e-10)
+    assert source == "controlled_o2_pO2_mbar"
+
+
 def test_o2_bubbler_cannot_exceed_total_pressure_or_double_book_passthrough() -> None:
     sim = _make_sim()
     _seed_o2_bubbler_redox_state(sim, fO2_log=-10.0)
@@ -738,6 +819,11 @@ def test_o2_bubbler_cannot_exceed_total_pressure_or_double_book_passthrough() ->
 
 def test_o2_bubbler_reoxidizes_by_kress91_capacity_math() -> None:
     sim = _make_sim()
+    # The 0.5 dex step is the Kress check. At the default vacuum
+    # pressure the effervescence ceiling sits less than 0.5 dex above
+    # the Fe metal-saturation floor, so that step clips. 10 mbar puts
+    # log10(P/bar) = -2 above it.
+    sim.melt.p_total_mbar = 10.0
     _seed_o2_bubbler_redox_state(sim, fO2_log=-10.0)
     before = sim._current_melt_redox_fO2_log()
     T_K = sim.melt.temperature_C + 273.15
@@ -746,6 +832,7 @@ def test_o2_bubbler_reoxidizes_by_kress91_capacity_math() -> None:
         T_K=T_K,
     )
     delta_log10 = 0.5
+    assert before + delta_log10 < sim._melt_redox_fO2_upper_bound_log()
     expected_absorbed_mol = capacity * math.log(10.0) * delta_log10
     _configure_o2_bubbler(
         sim,
@@ -1211,8 +1298,13 @@ def test_o2_bubbler_raised_fo2_is_visible_to_equilibrium_path(
     sim = _make_sim()
     sim.melt.campaign = CampaignPhase.C4
     sim.melt.campaign_hour = 1
-    _seed_o2_bubbler_redox_state(sim, fO2_log=-10.0)
-    target = -9.75
+    sim.melt.temperature_C = 1600.0
+    # Ceiling log10(0.01) = -2 leaves room for a 0.25 dex raise above
+    # the metal floor. The planted state is that floor plus 0.10 dex.
+    sim.melt.p_total_mbar = 10.0
+    planted = _plant_fO2_above_metal_saturation_floor(sim, 0.10)
+    target = planted + 0.25
+    assert target < sim._melt_redox_fO2_upper_bound_log()
     _configure_o2_bubbler(
         sim,
         rate_kg_per_hr=1.0,
@@ -1246,7 +1338,7 @@ def test_o2_bubbler_raised_fo2_is_visible_to_equilibrium_path(
     assert seen_fO2
     # 2026-07-11 0.5.10 E-MOVE: with ledger-backed respeciation monkeypatched
     # away, the bubbler request is not enough to raise the active melt fO2.
-    assert seen_fO2[-1] == pytest.approx(-10.0)
+    assert seen_fO2[-1] == pytest.approx(planted)
 
 
 @pytest.mark.parametrize(
@@ -1331,12 +1423,23 @@ def test_redox_source_treats_denormal_capacity_as_no_melt_redox_capacity(
         exchange_direction="redox_source:evaporative_loss",
     )
 
-    # Reservoir untouched (the term cannot be absorbed) and diagnosed as the honest root
-    # cause, not a downstream candidate-fO2 artifact.
+    # The term is not integrated. Re-reference still publishes the metal
+    # floor of the sentinel: a lunar melt cannot keep log10(fO2) = -1614.
+    # The skip reason, the empty refusal, and a zero applied delta stay.
+    unfloored = -1614.1695751928787
+    notices = [
+        notice
+        for notice in sim._melt_metal_saturation_floor_notices
+        if notice.get("unfloored_log10_fO2_bar") == pytest.approx(unfloored)
+    ]
+    assert len(notices) == 1
+    notice = notices[0]
+    assert str(notice["kind"]).startswith("melt_fO2_metal_saturation_floor:")
     assert math.isfinite(reservoir.melt_intrinsic_fO2_log)
     assert reservoir.melt_intrinsic_fO2_log == pytest.approx(
-        -1614.1695751928787
+        float(notice["floor_log10_fO2_bar"])
     )
+    assert reservoir.melt_intrinsic_fO2_log > -30.0
     assert reservoir.redox_source_terms_applied is False
     assert reservoir.redox_source_skip_reason == "no_melt_redox_capacity"
     assert reservoir.redox_source_skipped_terms_mol_o2_equiv == pytest.approx(
@@ -1445,22 +1548,36 @@ def test_c3_na_source_term_comes_from_committed_transition() -> None:
     assert reservoir.redox_source_terms_mol_o2_equiv[label] == pytest.approx(
         expected_source
     )
-    # Continuous freeze-gate liquid_fraction (0.5.9 / 6d72725) gives real mush
-    # capacity at 1150 C for lunar mare (solidus ~916 C, liquidus ~1370 C), so
-    # the committed C3-Na O2-equiv source term applies through the integrator
-    # (delta_ln = n_O2 / C_m). The bbf0134 inversion to no_melt_redox_capacity
-    # was an env-dependent retune (floor fallback when MAGEMin was unavailable);
-    # with a real liquidus curve the applied path is the correct invariant.
-    assert reservoir.melt_redox_capacity_mol_per_ln_fO2 > OXYGEN_RESERVOIR_NOOP_MOL
-    assert reservoir.redox_source_delta_ln_fO2 == pytest.approx(
-        expected_source / reservoir.melt_redox_capacity_mol_per_ln_fO2
+    # Lunar mare loads no Fe2O3. The source term is still -1/2 mol O2 per
+    # mol FeO the shuttle debited, but the tangent stops when that ferric
+    # O2 is absent: fO2 does not walk, and the capacity becomes the noop.
+    # The fO2 diagnostic's native fraction therefore stays put. The Fe
+    # metal is the ledger credit, not a fO2 move.
+    assert reservoir.melt_redox_capacity_mol_per_ln_fO2 <= (
+        OXYGEN_RESERVOIR_NOOP_MOL
     )
-    assert reservoir.redox_source_terms_applied is True
-    assert reservoir.redox_source_skipped_terms_mol_o2_equiv == {}
-    assert reservoir.melt_intrinsic_fO2_log < before_fO2
-    assert sim._compute_fe_redox_split_diagnostic()["native_fe_frac"] > before_native
-    assert breakdown["ferric_divergence"]["status"] == "ok"
-    assert breakdown["ferric_divergence"]["sampling_context"] == (
+    assert reservoir.redox_source_delta_ln_fO2 == pytest.approx(0.0)
+    assert reservoir.redox_source_terms_applied is False
+    assert reservoir.redox_source_skip_reason == "ferric_couple_exhausted"
+    assert label in reservoir.redox_source_skipped_terms_mol_o2_equiv
+    assert reservoir.melt_intrinsic_fO2_log == pytest.approx(before_fO2)
+    assert _transition_account_species_mol(
+        sim,
+        transition,
+        side="credits",
+        account="process.metal_phase",
+        species="Fe",
+    ) > 0.0
+    assert sim._compute_fe_redox_split_diagnostic()["native_fe_frac"] == (
+        pytest.approx(before_native)
+    )
+    # Held fO2 keeps the Kress implied ferric fraction. The shuttle has
+    # already removed FeO, so the ledger fraction no longer matches it.
+    divergence = breakdown["ferric_divergence"]
+    assert divergence["status"] == "warning"
+    assert divergence["warning"] is True
+    assert divergence["delta_abs"] > divergence["warning_threshold_abs"]
+    assert divergence["sampling_context"] == (
         "current_ledger_vs_current_reservoir"
     )
 
@@ -1504,8 +1621,8 @@ def test_c3_na_source_terms_preserve_same_hour_exchange_observables() -> None:
 
     # Same-hour exchange observables must survive the subsequent C3-Na source
     # term: k_O / tau / exchange mol / headspace pO2 are frozen from the
-    # earlier passive exchange; only exchange_direction is composed with the
-    # applied redox-source label.
+    # earlier passive exchange. The direction gains the skipped ferric
+    # label; the exchange mol itself is not rewritten.
     assert reservoir["k_O_m_s"] == pytest.approx(k_O_m_s)
     assert reservoir["tau_hr"] == pytest.approx(tau_hr)
     assert reservoir["exchange_o2_mol"] == pytest.approx(exchange_o2_mol)
@@ -1515,11 +1632,16 @@ def test_c3_na_source_terms_preserve_same_hour_exchange_observables() -> None:
         transport_pO2
     )
     assert reservoir["exchange_direction"].split("|")[0] == exchange_direction
-    assert label in reservoir["exchange_direction"].split("|")
     assert label in reservoir["redox_source_terms_mol_o2_equiv"]
-    assert label in reservoir["redox_source_applied_terms_mol_o2_equiv"]
-    assert reservoir["redox_source_skipped_terms_mol_o2_equiv"] == {}
-    assert reservoir["redox_source_terms_applied"] is True
+    assert label not in reservoir["redox_source_applied_terms_mol_o2_equiv"]
+    assert label in reservoir["redox_source_skipped_terms_mol_o2_equiv"]
+    assert reservoir["redox_source_skipped_reasons_by_label"][label] == (
+        "ferric_couple_exhausted"
+    )
+    assert reservoir["redox_source_terms_applied"] is False
+    assert f"{label}:skipped:ferric_couple_exhausted" in (
+        reservoir["exchange_direction"].split("|")
+    )
 
 
 def test_c3_k_source_term_comes_from_committed_transition() -> None:
@@ -1682,11 +1804,18 @@ def test_mre_source_term_comes_from_committed_anode_o2_transition() -> None:
     assert sim.atom_ledger.mol_by_account("process.overhead_gas").get(
         "O2", 0.0
     ) == pytest.approx(0.0)
-    assert breakdown["redox_source_terms_applied"] is True
-    assert breakdown["applied_terms_mol_o2_equiv_by_label"][label] == pytest.approx(
-        -anode_o2_mol
+    # The anode O2 is on the ledger. Mare has no Fe2O3, so the tangent
+    # does not walk fO2 for that reducing term.
+    assert breakdown["redox_source_terms_applied"] is False
+    assert breakdown["skipped_terms_mol_o2_equiv_by_label"][label] == (
+        pytest.approx(-anode_o2_mol)
     )
-    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log < before_fO2
+    assert breakdown["skipped_reasons_by_label"][label] == (
+        "ferric_couple_exhausted"
+    )
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(
+        before_fO2
+    )
 
 
 # Mg=12 is the original scale; 50/100 kg are production-scale doses where
@@ -2275,7 +2404,14 @@ def test_sio_evaporative_o_loss_source_term_from_committed_transition() -> None:
     assert breakdown["terms_mol_o2_equiv_by_label"][label] == pytest.approx(
         -o2_mol
     )
-    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log < before_fO2
+    # SiO's overhead O2 is reducing. With no Fe2O3 booked, the tangent
+    # stops and does not publish a lower fO2. The overhead credit remains.
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(
+        before_fO2
+    )
+    assert breakdown["skipped_reasons_by_label"][label] == (
+        "ferric_couple_exhausted"
+    )
     assert sim.atom_ledger.mol_by_account("process.overhead_gas").get(
         "O2", 0.0
     ) == pytest.approx(before_overhead_o2_mol + o2_mol)
@@ -2493,8 +2629,18 @@ def test_exchange_target_cannot_exceed_controlled_total_pressure() -> None:
 @pytest.mark.parametrize(
     ("buffer_o2_mol", "expected_unbacked_o2_mol", "expected_fO2_log"),
     [
-        (0.0, 0.0015952259282159419, -1.0),
-        (1.0e-6, 0.001594225928215942, -1.0000000153832351),
+        # Both remainders are the production resolver on the capped tree.
+        # 636308c53e drives the exchange from the overhead ledger partial,
+        # not from the 1.5 mbar CONTROLLED_O2 setpoint. This plant drains
+        # the headspace first, so that partial is 0 and the logarithm
+        # uses the numerical floor. The buffer clamp is unchanged, and
+        # the effervescence cap does not bind below log10(0.0015).
+        (0.0, 0.006996955022607205, -1.0),
+        # 1e-6 mol is a reducing exchange. Lunar mare loads no Fe2O3, so
+        # the tangent holds fO2. The old fO2 receipt
+        # (-1.0000000153832351) was the uncapped Euler step. The mol
+        # remainder is the same ledger-drive step minus this buffer.
+        (1.0e-6, 0.006995955022607205, -1.0),
     ],
 )
 def test_melt_to_headspace_exchange_reports_unbacked_buffer_oxygen(
@@ -2567,10 +2713,8 @@ def test_melt_to_headspace_exchange_reports_unbacked_buffer_oxygen(
         assert len(sim.atom_ledger.transitions) == before_transition_count
     else:
         assert len(sim.atom_ledger.transitions) == before_transition_count + 1
-    # Resolver-measured receipt: the 1e-6 mol buffer case was run through
-    # sim._apply_oxygen_reservoir_exchange() on the r3 candidate; its returned
-    # state had log10(fO2) = -1.0000000153832351. This pins the resolver result
-    # without restating the production capacity/conversion formula.
+    # Empty ferric inventory: the reducing exchange moves the ledger and
+    # leaves fO2 at the value set above. The unbacked-mol pin is the clamp.
     assert reservoir.melt_intrinsic_fO2_log == pytest.approx(
         expected_fO2_log,
         rel=0.0,
@@ -2608,9 +2752,14 @@ def test_melt_to_headspace_exchange_reports_unbacked_buffer_oxygen(
         assert exchange["exchange_clamped"] is True
 
 
-def test_headspace_exchange_cannot_instantly_erase_reductant_dose() -> None:
+def test_headspace_exchange_cannot_instantly_erase_reductant_dose(
+    monkeypatch,
+) -> None:
+    from engines.builtin.fe_redox_respeciation import fe2o3_mol_for_ferric_o2
+
     sim = _make_sim()
     sim.melt.temperature_C = 1600.0
+    temperature_K = 1873.15
     sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
     sim.melt.pO2_mbar = 1.5
     sim.melt.p_total_mbar = 1.5
@@ -2618,12 +2767,34 @@ def test_headspace_exchange_cannot_instantly_erase_reductant_dose() -> None:
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -8.0
     sim._sync_oxygen_reservoir_mirror()
     before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+    # The 1 mol sink is inside the ferric couple. The dose books that
+    # O2 and publishes the ledger; the exchange must not restore the
+    # pre-dose fO2.
+    sim.atom_ledger.load_external_mol(
+        "process.cleaned_melt",
+        {"Fe2O3": 4.0},
+        source="test ferric inventory for a reductant dose the exchange must not erase",
+        material_origin="feedstock",
+    )
+    monkeypatch.setattr(
+        sim,
+        "_melt_redox_temperature_shift_is_liquid",
+        lambda *_args, **_kwargs: True,
+    )
+    before_fe2o3 = sim.atom_ledger.mol_by_account("process.cleaned_melt")["Fe2O3"]
 
     sim._apply_oxygen_reservoir_redox_source_terms(
         {"test_reductant_sink": -1.0},
         exchange_direction="redox_source:test_reductant_sink",
+        temperature_K=temperature_K,
     )
     reduced_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+    assert reduced_fO2 == pytest.approx(
+        sim._ledger_consistent_melt_fO2_log(temperature_K)
+    )
+    assert sim.atom_ledger.mol_by_account("process.cleaned_melt")["Fe2O3"] == (
+        pytest.approx(before_fe2o3 - fe2o3_mol_for_ferric_o2(1.0))
+    )
     sim.atom_ledger.load_external_mol(
         "process.overhead_gas",
         {"O2": 0.05},
@@ -2655,8 +2826,9 @@ def test_managed_o2_floor_holds_fo2_without_real_o2_inventory() -> None:
     sim.melt.pO2_mbar = 1.5
     sim.melt.p_total_mbar = 1.5
     sim._overhead_headspace_config["enabled"] = True
-    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
-    sim._sync_oxygen_reservoir_mirror()
+    # Above the metal floor, still far below log10(0.0015 bar), so the
+    # managed claim still wants to oxidize and the floor does not bind.
+    _plant_fO2_above_metal_saturation_floor(sim, 0.10)
     before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
     before_o2 = sim.atom_ledger.mol_by_account("process.overhead_gas").get(
         "O2",
@@ -2713,8 +2885,7 @@ def test_managed_o2_floor_mutation_proof_unbacked_dn_would_move_fo2() -> None:
     sim.melt.pO2_mbar = 1.5
     sim.melt.p_total_mbar = 1.5
     sim._overhead_headspace_config["enabled"] = True
-    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
-    sim._sync_oxygen_reservoir_mirror()
+    _plant_fO2_above_metal_saturation_floor(sim, 0.10)
     before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
 
     reservoir = sim._apply_oxygen_reservoir_exchange()
@@ -2739,8 +2910,7 @@ def test_headspace_to_melt_clamp_advances_fo2_only_with_ledger_o2() -> None:
     sim.melt.pO2_mbar = 1.5
     sim.melt.p_total_mbar = 1.5
     sim._overhead_headspace_config["enabled"] = True
-    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
-    sim._sync_oxygen_reservoir_mirror()
+    _plant_fO2_above_metal_saturation_floor(sim, 0.10)
     sim.atom_ledger.load_external_mol(
         "process.overhead_gas",
         {"O2": 1.0e-6},
@@ -2982,8 +3152,7 @@ def test_pn2_sweep_without_o2_does_not_phantom_oxidize_melt() -> None:
     sim.melt.pO2_mbar = 1.5
     sim.melt.p_total_mbar = 10.0
     sim._overhead_headspace_config["enabled"] = True
-    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
-    sim._sync_oxygen_reservoir_mirror()
+    _plant_fO2_above_metal_saturation_floor(sim, 0.10)
     before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
 
     reservoir = sim._apply_oxygen_reservoir_exchange()
@@ -3193,6 +3362,175 @@ def test_native_fe_split_updates_fO2_to_saturation_boundary() -> None:
     assert after["native_fe_frac"] <= 2.0e-12
 
 
+def test_native_fe_precipitation_hour_conserves_oxygen() -> None:
+    """Precipitation O2 equals the melt O that left, from the unfloored base.
+
+    The pre-split exchange and respeciation must leave the planted deficit
+    in place. Sizing the credit on that deficit and then climbing again
+    from the metal line would land about (floor - base) dex above the line.
+    """
+
+    sim = _make_sim()
+    sim.melt.temperature_C = 1600.0
+    sim.melt.p_total_mbar = 10.0
+    temperature_K = 1600.0 + 273.15
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -12.0
+    sim.melt.oxygen_reservoir.reference_T_K = temperature_K
+    sim._sync_oxygen_reservoir_mirror()
+
+    sim._apply_oxygen_reservoir_exchange()
+    sim._apply_fe_redox_respeciation(update_reservoir_state=False)
+    base_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+    floor_log, metal = melt_metal_saturation_floor_log10_fO2_bar(
+        temperature_K,
+        sim._melt_metal_saturation_activities(temperature_K),
+    )
+    assert floor_log is not None and metal is not None
+    assert base_fO2 < float(floor_log) - 1.0e-3
+
+    def _oxygen_snapshot() -> tuple[dict[str, float], dict[str, float]]:
+        balances = sim.atom_ledger.mol_by_account()
+        o2_mol = {
+            account: float(species.get("O2", 0.0) or 0.0)
+            for account, species in balances.items()
+        }
+        oxygen_atoms = {
+            account: float(
+                sim.atom_ledger.atom_moles_by_account(account).get("O", 0.0)
+            )
+            for account in balances
+        }
+        return o2_mol, oxygen_atoms
+
+    o2_before, oxygen_before = _oxygen_snapshot()
+
+    split = sim._apply_native_fe_saturation_split()
+
+    o2_after, oxygen_after = _oxygen_snapshot()
+    o2_accounts = set(o2_before) | set(o2_after)
+    oxygen_accounts = set(oxygen_before) | set(oxygen_after)
+    o2_deltas = {
+        account: o2_after.get(account, 0.0) - o2_before.get(account, 0.0)
+        for account in sorted(o2_accounts)
+        if o2_after.get(account, 0.0) != o2_before.get(account, 0.0)
+    }
+    oxygen_deltas = {
+        account: oxygen_after.get(account, 0.0) - oxygen_before.get(account, 0.0)
+        for account in sorted(oxygen_accounts)
+        if oxygen_after.get(account, 0.0) != oxygen_before.get(account, 0.0)
+    }
+    # FeO(l) = Fe + 1/2 O2. The vapor leg credits its O2 on
+    # reservoir.fo2_buffer, not only on process.overhead_gas. Every
+    # account's O2 is the released oxygen. Total O is unchanged.
+    o2_released = math.fsum(
+        o2_after.get(account, 0.0) - o2_before.get(account, 0.0)
+        for account in o2_accounts
+    )
+    melt_o_drop = oxygen_before.get("process.cleaned_melt", 0.0) - oxygen_after.get(
+        "process.cleaned_melt", 0.0
+    )
+    total_o_before = math.fsum(oxygen_before.values())
+    total_o_after = math.fsum(oxygen_after.get(account, 0.0) for account in oxygen_accounts)
+    assert split["native_fe_event"] == "native_fe_partitioned_saturation"
+    assert o2_released > 0.0
+    assert total_o_after == pytest.approx(total_o_before, rel=1.0e-12, abs=0.0), oxygen_deltas
+    assert melt_o_drop == pytest.approx(2.0 * o2_released, rel=1.0e-12, abs=0.0), {
+        "o2_mol": o2_deltas,
+        "oxygen_atoms": oxygen_deltas,
+    }
+
+    booked = float(
+        sim._redox_source_terms_this_hr["redox_source:native_fe_saturation_split"]
+    )
+    assert 0.0 < booked <= o2_released * (1.0 + 1.0e-12)
+    published = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+    line = sim._fe_metal_line_log10_fO2(temperature_K)
+    assert line is not None
+    # The extent is the Fe that reaches the line, not a fixed-fO2 lever
+    # that keeps climbing. Landing above the line is the oxidizing cross.
+    assert published == pytest.approx(float(line), abs=1.0e-6)
+    assert published <= float(line) + 1.0e-6
+    assert published < sim._melt_redox_fO2_upper_bound_log() - 1.0
+
+
+def test_native_fe_precipitation_from_far_below_lands_on_the_fe_line() -> None:
+    """Dust ferric iron does not publish a sub-guard fO2 or cross the Fe line.
+
+    q near 0 sends the Kress inverse below log10(1e-30 bar). That log is
+    not stored. One precipitation step stops on the Fe line of the melt
+    after the debit, conserves oxygen, and stays below the effervescence
+    ceiling. Crossing the line toward the ceiling is the forbidden move.
+    """
+
+    sim = _make_sim()
+    sim.melt.temperature_C = 1750.0
+    sim.melt.p_total_mbar = 10.0
+    temperature_K = 1750.0 + 273.15
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
+    sim.melt.oxygen_reservoir.reference_T_K = temperature_K
+    sim._sync_oxygen_reservoir_mirror()
+    melt = sim.atom_ledger.project_account_mol("process.cleaned_melt")
+    feo = float(melt.get("FeO", 0.0) or 0.0)
+    sim.atom_ledger.load_external_mol(
+        "process.cleaned_melt",
+        {"Fe2O3": feo * 1.0e-12},
+        source="test dust ferric below the float guard",
+        material_origin="feedstock",
+    )
+    sim._project_cleaned_melt_from_atom_ledger()
+    unfloored, _floor, mode = sim._ledger_consistent_melt_fO2_and_floor(
+        temperature_K,
+    )
+    guard = math.log10(MELT_DISSOCIATION_PO2_MIN_BAR)
+    assert mode == "below_float_guard"
+    assert math.isfinite(unfloored)
+    assert unfloored >= guard
+
+    def _oxygen_snapshot() -> tuple[dict[str, float], dict[str, float]]:
+        balances = sim.atom_ledger.mol_by_account()
+        o2_mol = {
+            account: float(species.get("O2", 0.0) or 0.0)
+            for account, species in balances.items()
+        }
+        oxygen_atoms = {
+            account: float(
+                sim.atom_ledger.atom_moles_by_account(account).get("O", 0.0)
+            )
+            for account in balances
+        }
+        return o2_mol, oxygen_atoms
+
+    o2_before, oxygen_before = _oxygen_snapshot()
+    split = sim._apply_native_fe_saturation_split()
+    o2_after, oxygen_after = _oxygen_snapshot()
+    o2_accounts = set(o2_before) | set(o2_after)
+    oxygen_accounts = set(oxygen_before) | set(oxygen_after)
+    o2_released = math.fsum(
+        o2_after.get(account, 0.0) - o2_before.get(account, 0.0)
+        for account in o2_accounts
+    )
+    melt_o_drop = oxygen_before.get("process.cleaned_melt", 0.0) - oxygen_after.get(
+        "process.cleaned_melt", 0.0
+    )
+    total_o_before = math.fsum(oxygen_before.values())
+    total_o_after = math.fsum(
+        oxygen_after.get(account, 0.0) for account in oxygen_accounts
+    )
+    published = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+    line = sim._fe_metal_line_log10_fO2(temperature_K)
+    ceiling = sim._melt_redox_fO2_upper_bound_log()
+
+    assert split["native_fe_event"] == "native_fe_partitioned_saturation"
+    assert line is not None
+    assert published == pytest.approx(float(line), abs=1.0e-6)
+    assert published <= float(line) + 1.0e-6
+    assert published > guard
+    assert published < ceiling - 1.0
+    assert o2_released > 0.0
+    assert total_o_after == pytest.approx(total_o_before, rel=1.0e-12, abs=0.0)
+    assert melt_o_drop == pytest.approx(2.0 * o2_released, rel=1.0e-12, abs=0.0)
+
+
 def test_native_fe_partition_vacuum_exceeds_pn2_and_small_pool_vaporizes() -> None:
     sim = _make_sim()
     sim.melt.temperature_C = 1700.0
@@ -3242,11 +3580,10 @@ def test_pn2_native_fe_partition_e2e_drains_tap_and_reports_stage3_fe_wt() -> No
     assert snapshot.overhead.composition["N2"] == pytest.approx(10.0)
     assert partition["native_fe_pool_mol"] > 0.0
     assert partition["native_fe_tap_mol"] > partition["native_fe_vapor_mol"]
-    # 2026-09-22 03616bb20 corrected Chapman-Enskog's pressure prefactor
-    # from the bar form used with P[atm] to 0.0018583*sqrt(2). The resulting
-    # finite-series-resistance escape fraction moved with D_AB.
+    # fraction = vapor/pool. The pool is the Fe that reaches the metal
+    # line, so a pasted lever-pool receipt is not the fraction.
     assert partition["native_fe_vapor_escape_fraction_of_pool"] == pytest.approx(
-        0.0019750990648993625,
+        partition["native_fe_vapor_mol"] / partition["native_fe_pool_mol"],
         rel=0.0,
         abs=1.0e-15,
     )

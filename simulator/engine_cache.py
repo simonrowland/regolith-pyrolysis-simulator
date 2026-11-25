@@ -11,6 +11,27 @@ are expired and re-warmed (expire --species, t-1915). Species expiry and
 version prune are manual tools in scripts/engine_cache_sync.py. Bump the
 chemistry version only for a change that moves every output of the engine.
 The cache accumulates; never expire rows that do not need it.
+
+Refusal masks are a separate table, not a key dimension. A request whose
+coarse cell was learned from a deterministic refusal returns that typed
+refusal, flagged ``mask_hit``, without calling the engine, when that key
+has no stored row. A stored exact output or cacheable-refusal row wins
+over a mask cell. One live key in 32 is solved again. A different outcome
+deletes that cell and records a ``false_mask`` witness. That cell stays
+mixed until ``clear-mask``: a later refusal does not teach it again. The
+teaching request is one ``landed`` audit row per cell, replaced when that
+cell is taught again. ``clear-mask`` drops one engine's cells and audit
+rows for one class, and this process's memory of that file. Merge copies
+output rows only, not mask tables. A readonly cache cannot write the
+witness, but a contradiction seen in this process is not served again.
+The in-process counter is the one the score reads.
+
+A coarse-cell index sits beside the key, not in it. The optimizer passes
+coarsened requests for the xx_coarse, coarse, and medium presets. An exact
+miss during one of those passes may return any stored result in that cell,
+flagged neighbour_hit with the preset name, and the scope counts that hit
+for the run. fine passes and battery scoring do not take that lookup and
+do not write cells. A read-only open with no index is an exact miss.
 """
 
 from __future__ import annotations
@@ -462,7 +483,7 @@ def cacheable_refusal(result) -> bool:
 
 ENGINE_CHEMISTRY_VERSION = {
     "openimcc": 1,
-    "internal-analytical": 3,
+    "internal-analytical": 4,
     "vaporock": 1,
     "magemin": 4,
     "alphamelts": 4,
@@ -485,6 +506,7 @@ ENGINE_CHEMISTRY_VERSION = {
 # thermoengine v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)
 # internal-analytical v2: 2026-11-17 stateless activity rewrite changed repeated-call vapor pressures (0e9b03818f)
 # internal-analytical v3: 2026-11-18 b265 e7fbd4c052 onto b-1244 71806e046 - vapour-rail continuation notice, wall-saturation thermo and evaporation drive
+# internal-analytical v4: 2026-11-23 Markova car 2 - preserve the Fe speciation consumed by residue oxygen balance. If b-1124's v4 also lands, the train re-bumps to max+1.
 # magemin v4: 2026-11-18 MAGEMin pin unchanged, b265 e7fbd4c052 onto b-1244 71806e046 - positive SiO2 outside [30, 80] wt% is predicted and flagged; Fe-free cells leave fO2 indeterminate
 # alphamelts v4: 2026-11-18 alphaMELTS binary pin unchanged, b265 e7fbd4c052 onto b-1244 71806e046 - subfloor oxygen extrapolation notice and freeze-gate cooling path
 # thermoengine v4: 2026-11-18 ThermoEngine pin unchanged, b265 e7fbd4c052 onto b-1244 71806e046 - same subfloor oxygen extrapolation notice
@@ -667,6 +689,12 @@ OPENIMCC_CANONICAL_OUTPUT_SHA256 = "2eafdcb2139bb1cce9309ceff1aa0b981b609f305406
 
 _TABLE = "engine_outputs"
 _SPECIES_TABLE = "engine_output_species"
+_MASK_TABLE = "engine_refusal_mask"
+_MASK_AUDIT_TABLE = "engine_refusal_audit"
+# Not a key dimension and not a schema-version bump. Created on the first
+# optimizer store. A file without it still opens; lookup treats that as a miss.
+_NEIGHBOUR_TABLE = "engine_neighbour_cells"
+_COARSE_NEIGHBOUR_PRESETS = frozenset({"xx_coarse", "coarse", "medium"})
 _CACHE_SCHEMA_VERSION = 4
 _V3_OUTPUT_COLUMNS = (
     "key", "value", "engine", "chem_version", "source_box", "row_seq", "provenance_id",
@@ -742,6 +770,10 @@ _COUNTER_NAMES = (
 _MEMORY_CACHE_MAXSIZE = 65536
 _MEMORY_CACHE: OrderedDict[tuple[str, bytes, bool], Any] = OrderedDict()
 _MEMORY_CACHE_PID = os.getpid()
+# Cells a live sample contradicted in this process. The file may still
+# hold the row when it is readonly. Lookup and the in-process replay
+# both treat a denied cell as absent until clear-mask forgets the file.
+_MASK_DENY: set[tuple[str, str, str, bytes]] = set()
 _RUNTIME_BACKENDS: dict[str, Any] = {}
 
 
@@ -824,9 +856,11 @@ _ENGINE_CACHE_PATH_OVERRIDE: ContextVar[str | None | object] = ContextVar(
 # Set by the pytest fixture from the runner environment. None outside pytest,
 # so scoring scripts keep the process mode and are not treated as test doubles.
 _RUNNER_CACHE_SNAPSHOT: tuple[str | None, str] | None = None
-# Paths that are the wrong schema or not a sqlite file. The process does not
-# open them again. Migration stays a manual command.
-_SCHEMA_MISMATCH_DISABLED: set[str] = set()
+# Paths this process will not open again. The value is the not_stored
+# reason. ``schema_mismatch`` is a wrong schema or a non-sqlite file.
+# ``unopenable`` is a path sqlite cannot open. A lock is not recorded:
+# the next call opens again. Migration stays a manual command.
+_DISABLED_CACHE_PATHS: dict[str, str] = {}
 _MISSING = object()
 
 ENGINE_SETTINGS_PREDICTION_NEUTRAL_REASONS = {
@@ -1357,17 +1391,77 @@ def _value_is_double(value: Any, seen: set[int], depth: int) -> bool:
     return _instance_is_double(value, seen)
 
 
+def _sqlite_error_is_lock(exc: BaseException) -> bool:
+    """True when the open failed because the database is locked or busy.
+
+    That failure is retried. It is not a reason to disable the path.
+    """
+
+    message = str(exc).lower()
+    return "locked" in message or "busy" in message
+
+
 def _cache_open_is_schema_mismatch(exc: BaseException) -> bool:
     """True when the file itself is stale, wrong-schema, or not sqlite.
 
-    ``OperationalError`` (locked, busy) is not this: that open can be
-    retried. An exact ``DatabaseError`` is "file is not a database" or a
-    malformed image. Schema mismatch is the typed wrong-schema refusal.
+    A locked or busy ``OperationalError`` is not this: that open is
+    retried. A path sqlite cannot open is not this either: that is
+    ``_cache_open_is_unopenable``. An exact ``DatabaseError`` is "file is
+    not a database" or a malformed image. Schema mismatch is the typed
+    wrong-schema refusal.
     """
 
     if isinstance(exc, EngineCacheSchemaMismatch):
         return True
     return type(exc) is sqlite3.DatabaseError
+
+
+def _cache_open_is_unopenable(exc: BaseException, path: Path) -> bool:
+    """True when sqlite cannot open this path at all.
+
+    Mode 000 raises ``unable to open database file``. A directory does too
+    on a writable open. A read-only URI open of a directory is reported by
+    some sqlite builds as ``disk I/O error`` instead. A directory cannot
+    become a database by retrying. A locked or busy file is not this.
+    """
+
+    if type(exc) is not sqlite3.OperationalError:
+        return False
+    if _sqlite_error_is_lock(exc):
+        return False
+    if "unable to open database file" in str(exc).lower():
+        return True
+    try:
+        return path.is_dir()
+    except OSError:
+        return False
+
+
+def _remember_disabled_cache_path(path_value: str, reason: str) -> tuple[str, bool]:
+    """Disable this path for the process. Return its identity and whether it is new."""
+
+    identity = _cache_path_identity(path_value) or path_value
+    with _LOCK:
+        first = identity not in _DISABLED_CACHE_PATHS
+        if first:
+            _DISABLED_CACHE_PATHS[identity] = reason
+    return identity, first
+
+
+def _disabled_cache_reason(path_value: str) -> str | None:
+    identity = _cache_path_identity(path_value)
+    if identity is None:
+        return None
+    with _LOCK:
+        return _DISABLED_CACHE_PATHS.get(identity)
+
+
+def _count_disabled_cache_open(engine_id: str, reason: str) -> None:
+    with _LOCK:
+        counts = _counter_bucket(engine_id)
+        counts["misses"] += 1
+        name = f"not_stored:{reason}"
+        counts[name] = counts.get(name, 0) + 1
 
 
 def _disable_schema_mismatch(path_value: str, exc: BaseException) -> None:
@@ -1378,10 +1472,7 @@ def _disable_schema_mismatch(path_value: str, exc: BaseException) -> None:
     expected and found schema, and ``scripts/engine_cache_sync.py migrate``.
     """
 
-    identity = _cache_path_identity(path_value) or path_value
-    with _LOCK:
-        first = identity not in _SCHEMA_MISMATCH_DISABLED
-        _SCHEMA_MISMATCH_DISABLED.add(identity)
+    identity, first = _remember_disabled_cache_path(path_value, "schema_mismatch")
     if not first:
         return
     if isinstance(exc, EngineCacheSchemaMismatch):
@@ -1403,21 +1494,22 @@ def _disable_schema_mismatch(path_value: str, exc: BaseException) -> None:
     )
 
 
-def _schema_mismatch_disabled(path_value: str) -> bool:
-    identity = _cache_path_identity(path_value)
-    if identity is None:
-        return False
-    with _LOCK:
-        return identity in _SCHEMA_MISMATCH_DISABLED
+def _disable_unopenable(path_value: str, exc: BaseException) -> None:
+    """Stop opening this path, and say so once.
 
+    A cache sqlite cannot open must not stop the run and must not be
+    retried on every call. The notice names the path and sqlite's reason.
+    A lock is not this path.
+    """
 
-def _count_schema_mismatch(engine_id: str) -> None:
-    with _LOCK:
-        counts = _counter_bucket(engine_id)
-        counts["misses"] += 1
-        counts["not_stored:schema_mismatch"] = (
-            counts.get("not_stored:schema_mismatch", 0) + 1
-        )
+    identity, first = _remember_disabled_cache_path(path_value, "unopenable")
+    if not first:
+        return
+    logging.getLogger(__name__).warning(
+        "engine_cache_unopenable path=%s reason=%s",
+        identity,
+        exc,
+    )
 
 
 def _solve_is_test_double(solve: Any) -> bool:
@@ -1670,7 +1762,9 @@ def _check_cache_schema(connection: sqlite3.Connection, *, allow_empty: bool = F
         for table, columns, _ in _CACHE_TABLE_DEFINITIONS
     }
     expected_tables = set(expected_columns)
-    optional_tables = {_SYNC_WATERMARKS_TABLE}
+    optional_tables = {
+        _SYNC_WATERMARKS_TABLE, _MASK_TABLE, _MASK_AUDIT_TABLE, _NEIGHBOUR_TABLE,
+    }
     own_transaction = not connection.in_transaction
     if own_transaction:
         connection.execute("BEGIN")
@@ -1859,7 +1953,7 @@ def _connect(path: Path, *, readonly: bool) -> sqlite3.Connection | None:
                         connection.execute("PRAGMA journal_mode=WAL")
                     break
                 except sqlite3.OperationalError as exc:
-                    if "locked" not in str(exc).lower() and "busy" not in str(exc).lower():
+                    if not _sqlite_error_is_lock(exc):
                         connection.close()
                         raise
                     if time.monotonic() >= deadline:
@@ -1872,6 +1966,9 @@ def _connect(path: Path, *, readonly: bool) -> sqlite3.Connection | None:
         raise
     _CONNECTIONS[key] = connection
     _BLOOMS[connection] = _build_bloom(connection)
+    # A new connection is a new view of the file. The presence memo is
+    # per connection generation so a reopened file is checked again.
+    _note_new_species_presence_connection()
     return connection
 
 
@@ -1940,6 +2037,156 @@ def _is_refusal(result: Any) -> bool:
     )
 
 
+# Process memo of HOT keys whose species side row is known to exist.
+# A warm score hits each key once on disk and then again after the
+# 65536-entry result cache evicts it. The memo is what makes the
+# existence check once per key per connection, not once per hit.
+_SPECIES_PRESENT: set[bytes] = set()
+_SPECIES_PRESENT_GENERATION = 0
+_SPECIES_PRESENT_SEEN_PID = 0
+_SPECIES_PRESENT_SEEN_GENERATION = 0
+# Indexed existence checks actually run. A memo hit does not increment.
+_SPECIES_PRESENCE_CHECKS = 0
+
+
+def _note_new_species_presence_connection() -> None:
+    global _SPECIES_PRESENT_GENERATION
+    _SPECIES_PRESENT_GENERATION += 1
+
+
+def _species_present_keys() -> set[bytes]:
+    """Keys known to have a species side row for the open connection."""
+
+    global _SPECIES_PRESENT_SEEN_PID, _SPECIES_PRESENT_SEEN_GENERATION
+    pid = os.getpid()
+    generation = _SPECIES_PRESENT_GENERATION
+    if (
+        pid != _SPECIES_PRESENT_SEEN_PID
+        or generation != _SPECIES_PRESENT_SEEN_GENERATION
+    ):
+        _SPECIES_PRESENT.clear()
+        _SPECIES_PRESENT_SEEN_PID = pid
+        _SPECIES_PRESENT_SEEN_GENERATION = generation
+    return _SPECIES_PRESENT
+
+
+def _is_blake2b_cache_key(key: bytes) -> bool:
+    """True for the flag ``species_from_natural_key`` treats as unreadable.
+
+    That function owns the flag's meaning (None, not an empty set). The
+    byte test stays here as well so a store of a natural key that named
+    nothing does not unpack the key to decide it needs no marker. The
+    two agree: flag 0xff at byte 3, and only there.
+    """
+
+    return len(key) >= _ENGINE_CACHE_KEY_PREFIX_BYTES and key[3] == 0xFF
+
+
+def _record_output_species(
+    connection: sqlite3.Connection,
+    source_box: str,
+    row_seq: int,
+    digest: bytes,
+    species: frozenset[str],
+) -> None:
+    """Write the side rows a store writes for one request.
+
+    ``species`` is the set ``cache_request_species`` returned. An empty
+    set on a blake2b key is a request that named nothing: one side row
+    whose species text is empty marks it known-empty. expire --species
+    matches stored names, and ``_casefolded_species_name`` rejects the
+    empty string, so that marker is not a species and the row survives.
+    A natural key that named nothing stays with no side row, because
+    ``species_from_natural_key`` can still read it. Callers pass None
+    by not calling this, which leaves a loaded blake2b key unknown.
+    """
+
+    if species:
+        _write_output_species(connection, source_box, row_seq, species)
+        return
+    if _is_blake2b_cache_key(digest):
+        # Same flag ``species_from_natural_key`` treats as unreadable.
+        # Without this row the key is indistinguishable from a migrated
+        # digest, and the next expire --species would delete a request
+        # that named nothing.
+        connection.execute(
+            f"INSERT INTO {_SPECIES_TABLE}(source_box, row_seq, species) VALUES (?,?,?)",
+            (source_box, row_seq, ""),
+        )
+
+
+def _species_side_row_present(
+    connection: sqlite3.Connection, source_box: str, row_seq: int
+) -> bool:
+    """One indexed probe. The primary key leads with (source_box, row_seq)."""
+
+    global _SPECIES_PRESENCE_CHECKS
+    _SPECIES_PRESENCE_CHECKS += 1
+    found = connection.execute(
+        f"SELECT 1 FROM {_SPECIES_TABLE} WHERE source_box=? AND row_seq=? LIMIT 1",
+        (source_box, row_seq),
+    ).fetchone()
+    return found is not None
+
+
+def _backfill_input_species_on_hit(
+    connection: sqlite3.Connection,
+    cache_key: bytes,
+    source_box: str,
+    row_seq: int,
+    request: Any,
+    *,
+    readonly: bool,
+) -> bool:
+    """Record the request's species when this HOT row has no side row.
+
+    Returns False only when a writable hit failed to write, so the caller
+    does not keep the result in the process cache and the next hit retries.
+    A read-only cache never writes. The cached value is not consulted:
+    a refusal hit carries no input composition, and species come from
+    ``request``, which is the value that formed the key. A request that
+    is not a mapping, or whose species fields cannot be read, is left
+    unknown rather than marked known-empty.
+    """
+
+    present = _species_present_keys()
+    if cache_key in present:
+        return True
+    if _species_side_row_present(connection, source_box, row_seq):
+        present.add(cache_key)
+        return True
+    if readonly or not isinstance(request, Mapping):
+        return True
+    try:
+        species = cache_request_species(request)
+    except EngineCacheSpeciesError:
+        return True
+    if not species and not _is_blake2b_cache_key(cache_key):
+        return True
+    try:
+        if connection.in_transaction:
+            connection.commit()
+        connection.execute("BEGIN IMMEDIATE")
+        _record_output_species(connection, source_box, row_seq, cache_key, species)
+        connection.commit()
+    except sqlite3.IntegrityError:
+        # The empty marker's primary key lost a race. The row is known.
+        try:
+            connection.rollback()
+        except sqlite3.Error:
+            pass
+        present.add(cache_key)
+        return True
+    except sqlite3.Error:
+        try:
+            connection.rollback()
+        except sqlite3.Error:
+            pass
+        return False
+    present.add(cache_key)
+    return True
+
+
 def _insert_cache_row_if_absent(
     connection: sqlite3.Connection,
     digest: bytes,
@@ -1954,15 +2201,11 @@ def _insert_cache_row_if_absent(
 ) -> tuple[bool, bool]:
     """Insert one output only when absent; report whether existing bytes conflict.
 
-    ``species`` is recorded only for a new row. None leaves the side table
-    alone so a merge can copy the source rows, and so a loaded blake2b key
-    stays species-unknown: this loader did not see the request. An empty
-    set on a blake2b key is a request that named nothing. One side row with
-    an empty species text marks it known-empty. expire --species matches
-    stored names, and ``_casefolded_species_name`` rejects the empty string,
-    so that marker is not a species and the row survives. A natural key
-    that named nothing has flag 0x00 and stays with no side row, because
-    ``species_from_natural_key`` can still read it.
+    ``species`` is recorded only for a new row, by ``_record_output_species``.
+    None leaves the side table alone so a merge can copy the source rows,
+    and so a loaded blake2b key stays species-unknown: this loader did not
+    see the request. A hit of that row records the species once the
+    request is in hand.
     """
     row = connection.execute(
         f"SELECT value, provenance_id FROM {_TABLE} WHERE key=?", (digest,)
@@ -1992,21 +2235,8 @@ def _insert_cache_row_if_absent(
             provenance_id,
         ),
     )
-    if species:
-        _write_output_species(connection, source_box, row_seq, species)
-    elif (
-        species is not None
-        and len(digest) >= _ENGINE_CACHE_KEY_PREFIX_BYTES
-        and digest[3] == 0xFF
-    ):
-        # Same flag ``species_from_natural_key`` treats as unreadable.
-        # Without this row the key is indistinguishable from a migrated
-        # digest, and the next expire --species would delete a request
-        # that named nothing.
-        connection.execute(
-            f"INSERT INTO {_SPECIES_TABLE}(source_box, row_seq, species) VALUES (?,?,?)",
-            (source_box, row_seq, ""),
-        )
+    if species is not None:
+        _record_output_species(connection, source_box, row_seq, digest, species)
     return True, False
 
 
@@ -2149,111 +2379,959 @@ def _store_cold(
         connection.execute("DELETE FROM cold.engine_values WHERE row_seq=?", (row_seq,))
 
 
-def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
-    """Serve or store one engine result.
+@dataclass(frozen=True)
+class _NeighbourScope:
+    lookup_preset: str | None
+    coarsen: Callable[[Any], Mapping[str, Any]]
+    # Caller-owned. A neighbour return increments ``hits`` for this run.
+    counter: Any = None
 
-    This is the open/lookup seam. Engines are stateless, and the key is
-    engine + chemistry version + request, so a cached value is the engine's
-    answer. Serving it in tests is valid. CI uses the runner file read-only
-    by default. Only ``engine_cache_off`` tests opt out.
+
+_NEIGHBOUR_SCOPE: ContextVar[_NeighbourScope | None] = ContextVar(
+    "engine_neighbour_scope", default=None,
+)
+
+
+class _NeighbourList(list):
+    """A list hot value plus the coarse preset that supplied it.
+
+    Equilibrium decoders accept a list of a fixed length. A subclass is
+    still a list, so that length is unchanged. The preset is an attribute,
+    not an element, and it is not stored.
     """
 
-    if _CACHE_BYPASSED.get():
-        return live_hot(solve())
-    path_value = _configured_engine_cache_path()
-    if not path_value:
-        return live_hot(solve())
-    # A wrong-schema or non-sqlite file stays closed for this process.
-    # The run solves uncached. Do not migrate it from this path.
-    if _schema_mismatch_disabled(path_value):
-        _count_schema_mismatch(engine_id)
-        return live_hot(solve())
-    readonly = _engine_cache_is_readonly(path_value)
-    if (
-        engine_id in ENGINE_CHEMISTRY_VERSION
-        and _active_cache_is_runner_file(path_value)
-        and _solve_is_test_double(solve)
-    ):
-        # One check, before lookup. A double is a mock, a test-module
-        # callable, or an adapter method that is no longer the class-body
-        # function. Real adapter functions are compiled from their packages,
-        # so this cannot flag them. The check stops at the outer function:
-        # a monkeypatch of a dependency that solve calls (engines,
-        # melt_backend, openimcc) is not walked. Those tests opt out with
-        # engine_cache_off so a warm runner row cannot hide the patch.
-        # Do not serve or store a double in the runner file. A test-owned
-        # file is unchanged: cache tests store synthetic solves there.
+    neighbour_hit: str
+
+
+class _NeighbourDict(dict):
+    """A mapping hot value plus the coarse preset that supplied it.
+
+    The preset is an attribute, not a key. A gas partial-pressure map is
+    the returned value; an extra key would be read as a species. Equality
+    and ``dict()`` still see only the stored items.
+    """
+
+    neighbour_hit: str
+
+
+@contextmanager
+def optimizer_neighbour_scope(
+    preset: str | None,
+    coarsen: Callable[[Any], Mapping[str, Any]] | None,
+    counter: Any = None,
+) -> Iterator[Any]:
+    """Record coarse cells for one optimizer pass, and maybe serve one.
+
+    ``coarsen`` returns preset name to coarsened request. This module packs
+    that request; it does not snap values. Lookup and the index run only
+    for xx_coarse, coarse, and medium. fine, a missing preset, and battery
+    scoring do not enter, so they neither coarsen nor write cells. A
+    neighbour return increments ``counter.hits`` when the caller passed one.
+    """
+
+    lookup = preset if preset in _COARSE_NEIGHBOUR_PRESETS else None
+    if lookup is None or coarsen is None:
+        yield counter
+        return
+    token = _NEIGHBOUR_SCOPE.set(_NeighbourScope(lookup, coarsen, counter))
+    try:
+        yield counter
+    finally:
+        _NEIGHBOUR_SCOPE.reset(token)
+
+
+def _scope_neighbour_cells(request: Any) -> tuple[str | None, dict[str, bytes]]:
+    scope = _NEIGHBOUR_SCOPE.get()
+    if scope is None or scope.lookup_preset is None:
+        return None, {}
+    try:
+        coarsened = scope.coarsen(request)
+    except (TypeError, ValueError):
+        return scope.lookup_preset, {}
+    cells: dict[str, bytes] = {}
+    if isinstance(coarsened, Mapping):
+        for name, value in coarsened.items():
+            if name not in _COARSE_NEIGHBOUR_PRESETS or value is None:
+                continue
+            try:
+                cells[str(name)] = pack(value, key=True)
+            except (TypeError, ValueError):
+                continue
+    return scope.lookup_preset, cells
+
+
+def _flag_neighbour_hit(value: Any, preset: str) -> Any | None:
+    """Copy the hot value and name the preset. The stored bytes stay exact.
+
+    The preset is an attribute. Putting it in the mapping would change a
+    gas partial-pressure result, and putting it in the list would change
+    a fixed-length equilibrium record. A value that is neither is solved
+    instead of returned without a flag.
+    """
+
+    if isinstance(value, Mapping):
+        flagged = _NeighbourDict(value)
+        flagged.neighbour_hit = preset
+        return flagged
+    if isinstance(value, list):
+        flagged = _NeighbourList(value)
+        flagged.neighbour_hit = preset
+        return flagged
+    return None
+
+
+def _ensure_neighbour_table(connection: sqlite3.Connection) -> None:
+    connection.execute(
+        f"CREATE TABLE IF NOT EXISTS {_NEIGHBOUR_TABLE} ("
+        "engine TEXT NOT NULL, chem_version TEXT NOT NULL, preset TEXT NOT NULL, "
+        "cell BLOB NOT NULL, key BLOB NOT NULL, "
+        "PRIMARY KEY(engine, chem_version, preset, cell)"
+        ") WITHOUT ROWID"
+    )
+
+
+def _read_neighbour(
+    connection: sqlite3.Connection | None,
+    *,
+    engine_id: str,
+    chem_version: str | int,
+    preset: str,
+    cell: bytes,
+    exact_key: bytes,
+    counts: dict[str, int],
+) -> Any | None:
+    if connection is None or preset not in _COARSE_NEIGHBOUR_PRESETS:
+        return None
+    try:
+        row = connection.execute(
+            f"SELECT key FROM {_NEIGHBOUR_TABLE} "
+            "WHERE engine=? AND chem_version=? AND preset=? AND cell=?",
+            (engine_id, str(chem_version), preset, cell),
+        ).fetchone()
+    except sqlite3.OperationalError as exc:
+        if "no such table" in str(exc).lower():
+            return None
+        counts["read_error"] += 1
+        return None
+    except sqlite3.Error:
+        counts["read_error"] += 1
+        return None
+    if row is None or bytes(row[0]) == exact_key:
+        return None
+    try:
+        stored = connection.execute(
+            f"SELECT value, provenance_id FROM {_TABLE} WHERE key=?",
+            (row[0],),
+        ).fetchone()
+    except sqlite3.Error:
+        counts["read_error"] += 1
+        return None
+    if stored is None:
+        return None
+    try:
+        value = _decode_hot(stored[0], _read_provenance(connection, stored[1]))
+    except (TypeError, ValueError, UnicodeDecodeError, sqlite3.Error):
+        counts["read_error"] += 1
+        return None
+    return _flag_neighbour_hit(value, preset)
+
+
+def _index_neighbour_cells(
+    connection: sqlite3.Connection,
+    engine_id: str,
+    chem_version: str | int,
+    exact_key: bytes,
+    request: Any,
+) -> bool:
+    """Point each coarse cell at this exact key. The first store wins until replaced.
+
+    A later store in the same cell replaces the pointer so an expired key
+    does not stick. The exact row is already in this transaction. A failure
+    here rolls back only the index.
+    """
+
+    _lookup, cells = _scope_neighbour_cells(request)
+    if not cells:
+        return True
+    try:
+        connection.execute("SAVEPOINT engine_neighbour")
+        _ensure_neighbour_table(connection)
+        connection.executemany(
+            f"INSERT OR REPLACE INTO {_NEIGHBOUR_TABLE} "
+            "(engine, chem_version, preset, cell, key) VALUES (?,?,?,?,?)",
+            [
+                (engine_id, str(chem_version), preset, cell, exact_key)
+                for preset, cell in cells.items()
+            ],
+        )
+        connection.execute("RELEASE engine_neighbour")
+    except Exception:
+        try:
+            connection.execute("ROLLBACK TO engine_neighbour")
+            connection.execute("RELEASE engine_neighbour")
+        except sqlite3.Error:
+            pass
+        return False
+    return True
+
+
+def not_stored_refusal_label(solved: Any, hot: Any) -> str | None:
+    """Token for ``not_stored:refusal:<token>`` on a returned miss.
+
+    None when the value is not an uncacheable refusal. Readonly mode does
+    not consult this: it counts ``not_stored:readonly`` and returns. A caller
+    that has the solved value can still ask what the writable branch would
+    have counted. ``cacheable=False`` is a different counter and is not
+    labeled here.
+    """
+
+    if isinstance(solved, EngineCacheValue) and not solved.cacheable:
+        return None
+    wrapped_refusal = (
+        isinstance(solved, EngineCacheValue) and solved.refusal_reason is not None
+    )
+    refusal_not_cacheable = (
+        wrapped_refusal and not cacheable_refusal(solved)
+    ) or (
+        _is_refusal(hot) and not cacheable_refusal(hot)
+    )
+    if not refusal_not_cacheable:
+        return None
+    refusal_reason = (
+        solved.refusal_reason if wrapped_refusal
+        else hot.get("refusal_reason") if isinstance(hot, Mapping)
+        else getattr(hot, "refusal_reason", None)
+    )
+    return str(refusal_reason) if refusal_reason is not None else "untyped"
+
+
+# Coarse preset of ControlQuantization (simulator/reduced_real_determinism.py):
+# t_k 1 K, pressure 0.001 bar, log fO2 0.01, composition 3 significant figures.
+# This leaf cannot import that module. No module already imports both, and
+# a caller that forgot to register a quantizer would skip the mask. The
+# copy stays. The property test sweeps these functions against the owner's
+# _quantize and _sigfig. _sigfig_snap is a different rule and stays there.
+_MASK_T_QUANTUM = 1.0
+_MASK_T_DECIMALS = 0
+_MASK_PRESSURE_QUANTUM = 0.001
+_MASK_PRESSURE_DECIMALS = 3
+_MASK_LOG_FO2_QUANTUM = 0.01
+_MASK_LOG_FO2_DECIMALS = 2
+_MASK_COMPOSITION_SIG_FIGS = 3
+_MASK_COMPOSITION_FIELDS = frozenset({
+    "composition_wt_pct", "composition_mol", "composition_kg", "composition",
+})
+_MASK_TEMPERATURE_FIELDS = frozenset({"temperature_K", "temperature_C"})
+_MASK_PRESSURE_FIELDS = frozenset({"pressure_bar", "physical_pressure_bar"})
+_MASK_LOG_FO2_FIELDS = frozenset({"fO2_log"})
+# po2_bar is the nested number. po2 and vapor_transport_pO2_bar are the
+# names the battery puts on the request. Same significant-figure bucket.
+_MASK_PO2_FIELDS = frozenset({
+    "po2_bar", "po2", "vapor_transport_pO2_bar",
+})
+_MASK_EXACT_SUBTREES = frozenset({"engine_settings"})
+# One live solve out of this many exact keys, chosen from the key bytes.
+# The same key always verifies or never verifies.
+MASK_VERIFY_EVERY = 32
+# Classes the phase-A probe replayed identically. alphaMELTS ValueError
+# costs 19 µs. A battery-shaped coarsen plus lookup was not under that,
+# so the class is left unmasked. tests/t1917_mask_probe.py exits 2 if
+# this set disagrees with a fresh measurement. Timeouts and untyped
+# refusals stay out: a load-dependent miss must not become a cell.
+MASKABLE_REFUSAL_CLASSES = frozenset({
+    ("alphamelts", "refusal:engine_crash"),
+    ("internal-analytical", "refusal:unavailable"),
+    ("thermoengine", "refusal:unavailable"),
+    ("thermoengine", "exception:ThermoEngineFO2OmittedError"),
+    ("thermoengine", "exception:ThermoEngineNonFiniteField"),
+    ("thermoengine", "exception:ThermoEngineOutOfDomainError"),
+})
+
+
+class _MaskReplay:
+    """In-process copy of a mask outcome. Emitting it does not call the engine."""
+
+    __slots__ = ("refusal_class", "recipe")
+
+    def __init__(self, refusal_class: str, recipe: Mapping[str, Any]) -> None:
+        self.refusal_class = refusal_class
+        self.recipe = recipe
+
+
+def _build_value_error(recipe: Mapping[str, Any]) -> BaseException:
+    args = recipe.get("args")
+    if not isinstance(args, list):
+        raise TypeError("ValueError mask recipe has no args")
+    return ValueError(*args)
+
+
+_MASK_EXCEPTION_BUILDERS: dict[str, Callable[[Mapping[str, Any]], BaseException]] = {
+    "ValueError": _build_value_error,
+}
+
+
+def register_mask_exception(
+    type_name: str, builder: Callable[[Mapping[str, Any]], BaseException],
+) -> None:
+    """Teach the mask how to raise one exception type without importing it.
+
+    The cache leaf cannot import engine adapters. The adapter registers a
+    builder when it is imported. A cell whose type has no builder is not a
+    hit: the engine still runs.
+    """
+
+    if not isinstance(type_name, str) or not type_name.isidentifier():
+        raise ValueError(f"mask exception type must be an identifier, got {type_name!r}")
+    _MASK_EXCEPTION_BUILDERS[type_name] = builder
+
+
+# Shared request-cell rounding primitives. Optimizer coarsening imports these
+# from this standard-library leaf; each caller keeps its own cell policy.
+def _mask_quantize(value: float | None, quantum: float, digits: int) -> float | None:
+    if value is None:
+        return None
+    number = float(value)
+    if not math.isfinite(number):
+        return None
+    bucket = round(number / quantum) * quantum
+    return round(bucket, digits)
+
+
+def _mask_sigfig(value: float | None, sig_figs: int) -> float | None:
+    if value is None:
+        return None
+    number = float(value)
+    if not math.isfinite(number):
+        return None
+    if number == 0.0:
+        return 0.0
+    digits = sig_figs - int(math.floor(math.log10(abs(number)))) - 1
+    return round(number, digits)
+
+
+def _mask_number(value: object) -> bool:
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+
+def _coarsen_composition(value: Any) -> Any:
+    if _mask_number(value):
+        return _mask_sigfig(float(value), _MASK_COMPOSITION_SIG_FIGS)
+    if isinstance(value, Mapping):
+        if any(not isinstance(key, str) for key in value):
+            raise TypeError("composition names must be strings")
+        return {key: _coarsen_composition(item) for key, item in value.items()}
+    return value
+
+
+def _coarsen_request(value: Any, field: str | None = None) -> Any:
+    if field in _MASK_EXACT_SUBTREES:
+        return value
+    if isinstance(value, Mapping):
+        if any(not isinstance(key, str) for key in value):
+            raise TypeError("mask cell names must be strings")
+        if field in _MASK_COMPOSITION_FIELDS:
+            return {key: _coarsen_composition(item) for key, item in value.items()}
+        return {
+            key: _coarsen_request(item, key) for key, item in value.items()
+        }
+    if isinstance(value, (list, tuple)) and not isinstance(value, (str, bytes)):
+        items = [_coarsen_request(item) for item in value]
+        return tuple(items) if isinstance(value, tuple) else items
+    if field in _MASK_TEMPERATURE_FIELDS and _mask_number(value):
+        return _mask_quantize(float(value), _MASK_T_QUANTUM, _MASK_T_DECIMALS)
+    if field in _MASK_PRESSURE_FIELDS and _mask_number(value):
+        return _mask_quantize(
+            float(value), _MASK_PRESSURE_QUANTUM, _MASK_PRESSURE_DECIMALS,
+        )
+    if field in _MASK_LOG_FO2_FIELDS and _mask_number(value):
+        return _mask_quantize(
+            float(value), _MASK_LOG_FO2_QUANTUM, _MASK_LOG_FO2_DECIMALS,
+        )
+    if field in _MASK_PO2_FIELDS and _mask_number(value):
+        return _mask_sigfig(float(value), _MASK_COMPOSITION_SIG_FIGS)
+    return value
+
+
+def refusal_mask_cell(request: Any) -> bytes | None:
+    """Packed coarse cell for one request, or None when it cannot be named."""
+
+    try:
+        return pack(_coarsen_request(request), key=True)
+    except (TypeError, ValueError):
+        return None
+
+
+def mask_verify_selected(cache_key: bytes) -> bool:
+    """True for the deterministic live sample of this exact cache key."""
+
+    digest = hashlib.blake2b(
+        cache_key, digest_size=8, person=b"t1917maskverify",
+    ).digest()
+    return int.from_bytes(digest, "little") % MASK_VERIFY_EVERY == 0
+
+
+class _MaskedList(list):
+    """Production list hot plus the mask class.
+
+    ``equilibrium_cache_from_value`` accepts a list of length 11 or 12.
+    A subclass is still a list, so that decoder keeps working. Callers
+    read ``mask_hit`` off the object. The stored recipe stays a plain list.
+    """
+
+    mask_hit: str
+
+
+def _replayable(recipe: Mapping[str, Any]) -> bool:
+    kind = recipe.get("kind")
+    if kind == "refusal":
+        hot = recipe.get("hot")
+        return isinstance(hot, (Mapping, list))
+    if kind == "exception":
+        return str(recipe.get("type")) in _MASK_EXCEPTION_BUILDERS
+    return False
+
+
+def _flag_refusal_hot(hot: Any, refusal_class: str) -> Any:
+    if isinstance(hot, Mapping):
+        flagged = dict(hot)
+        flagged["mask_hit"] = refusal_class
+        return flagged
+    if isinstance(hot, list):
+        flagged = _MaskedList(hot)
+        flagged.mask_hit = refusal_class
+        return flagged
+    raise TypeError("refusal mask recipe has no mapping or list")
+
+
+def _emit_mask(recipe: Mapping[str, Any], refusal_class: str) -> Any:
+    if recipe.get("kind") == "exception":
+        builder = _MASK_EXCEPTION_BUILDERS.get(str(recipe.get("type")))
+        if builder is None:
+            raise TypeError(f"no mask builder for {recipe.get('type')!r}")
+        exc = builder(recipe)
+        try:
+            exc.mask_hit = refusal_class  # type: ignore[attr-defined]
+        except AttributeError:
+            pass
+        raise exc
+    return _flag_refusal_hot(recipe.get("hot"), refusal_class)
+
+
+def _observed_mask_class(solved: Any, hot: Any, exc: BaseException | None) -> str | None:
+    if exc is not None:
+        return "exception:" + _not_stored_exception_label(exc)
+    label = not_stored_refusal_label(solved, hot)
+    if label is None:
+        return None
+    return "refusal:" + label
+
+
+def _mask_matches(
+    recipe: Mapping[str, Any],
+    refusal_class: str,
+    solved: Any,
+    hot: Any,
+    exc: BaseException | None,
+) -> bool:
+    if _observed_mask_class(solved, hot, exc) != refusal_class:
+        return False
+    if recipe.get("kind") != "exception":
+        return True
+    if exc is None or type(exc).__name__ != recipe.get("type"):
+        return False
+    if "cause" in recipe:
+        cause = getattr(exc, "cause", None)
+        token = getattr(cause, "value", None)
+        if not isinstance(token, str):
+            token = cause if isinstance(cause, str) else None
+        return token == recipe.get("cause")
+    return tuple(exc.args) == tuple(recipe.get("args") or ())
+
+
+def _plain_exception_args(exc: BaseException) -> list[Any] | None:
+    args: list[Any] = []
+    for arg in exc.args:
+        if isinstance(arg, bool) or arg is None or isinstance(arg, (str, int, float)):
+            if isinstance(arg, float) and not math.isfinite(arg):
+                return None
+            args.append(arg)
+            continue
+        return None
+    return args
+
+
+def _mask_recipe(
+    refusal_class: str, solved: Any, hot: Any, exc: BaseException | None,
+) -> dict[str, Any] | None:
+    if exc is not None:
+        name = type(exc).__name__
+        if refusal_class != f"exception:{name}":
+            return None
+        if name not in _MASK_EXCEPTION_BUILDERS:
+            return None
+        args = _plain_exception_args(exc)
+        if args is None:
+            return None
+        recipe: dict[str, Any] = {"kind": "exception", "type": name, "args": args}
+        cause = getattr(exc, "cause", None)
+        if cause is not None:
+            token = getattr(cause, "value", None)
+            if not isinstance(token, str):
+                return None
+            recipe["cause"] = token
+        return recipe
+    if isinstance(hot, Mapping):
+        payload: Any = dict(hot)
+        payload.pop("mask_hit", None)
+    elif isinstance(hot, list):
+        # The compact scorer list from equilibrium_to_hot. A subclass's
+        # mask_hit attribute is not an element and is not stored.
+        payload = list(hot)
+    else:
+        return None
+    try:
+        frozen = unpack(pack({"kind": "refusal", "hot": payload}))
+    except (TypeError, ValueError):
+        return None
+    if not isinstance(frozen, Mapping) or not _replayable(frozen):
+        return None
+    return dict(frozen)
+
+
+def _ensure_mask_tables(connection: sqlite3.Connection) -> None:
+    connection.execute(
+        f"CREATE TABLE IF NOT EXISTS {_MASK_TABLE} ("
+        "engine TEXT NOT NULL, chem_version TEXT NOT NULL, cell BLOB NOT NULL, "
+        "refusal_class TEXT NOT NULL, outcome BLOB NOT NULL, "
+        "PRIMARY KEY (engine, chem_version, cell)) WITHOUT ROWID"
+    )
+    connection.execute(
+        f"CREATE TABLE IF NOT EXISTS {_MASK_AUDIT_TABLE} ("
+        "key BLOB NOT NULL, disposition TEXT NOT NULL, engine TEXT NOT NULL, "
+        "refusal_class TEXT NOT NULL, chem_version TEXT NOT NULL, "
+        "cell BLOB NOT NULL, observed TEXT NOT NULL, "
+        "PRIMARY KEY (key, disposition)) WITHOUT ROWID"
+    )
+
+
+def _select_mask(
+    connection: sqlite3.Connection, engine: str, version: str, cell: bytes,
+) -> tuple[str, Mapping[str, Any]] | None:
+    try:
+        row = connection.execute(
+            f"SELECT refusal_class, outcome FROM {_MASK_TABLE} "
+            "WHERE engine=? AND chem_version=? AND cell=?",
+            (engine, version, cell),
+        ).fetchone()
+    except sqlite3.OperationalError as exc:
+        if "no such table" in str(exc).lower():
+            return None
+        raise
+    if row is None:
+        return None
+    try:
+        recipe = unpack(bytes(row[1]))
+    except (TypeError, ValueError):
+        return None
+    if not isinstance(recipe, Mapping) or not _replayable(recipe):
+        return None
+    return str(row[0]), recipe
+
+
+def _add_counter(engine_id: str, name: str) -> None:
+    bucket = _counter_bucket(engine_id)
+    bucket[name] = bucket.get(name, 0) + 1
+
+
+def _mask_deny_key(
+    path_value: str, engine: str, version: str, cell: bytes,
+) -> tuple[str, str, str, bytes]:
+    try:
+        resolved = str(Path(path_value).expanduser().resolve())
+    except OSError:
+        resolved = str(path_value)
+    return (resolved, engine, version, cell)
+
+
+def _deny_mask_cell(
+    path_value: str, engine: str, version: str, cell: bytes,
+) -> None:
+    with _LOCK:
+        _MASK_DENY.add(_mask_deny_key(path_value, engine, version, cell))
+
+
+def _mask_cell_denied(
+    path_value: str, engine: str, version: str, cell: bytes,
+) -> bool:
+    with _LOCK:
+        return _mask_deny_key(path_value, engine, version, cell) in _MASK_DENY
+
+
+def _drop_mask_memory(path_value: str) -> None:
+    with _LOCK:
+        for memory_key in tuple(_MEMORY_CACHE):
+            if memory_key[0] == path_value and isinstance(
+                _MEMORY_CACHE[memory_key], _MaskReplay,
+            ):
+                del _MEMORY_CACHE[memory_key]
+
+
+def _learn_mask_cell(
+    connection: sqlite3.Connection,
+    *,
+    engine: str,
+    version: str,
+    cell: bytes,
+    refusal_class: str,
+    recipe: Mapping[str, Any],
+    cache_key: bytes,
+) -> None:
+    """Learn one cell and keep the teaching request as the landed audit row.
+
+    A ``false_mask`` witness for this engine, chemistry version, and cell
+    means the cell is mixed. Learn commits and returns without writing:
+    the keys that were not sampled must not be refused again. ``clear-mask``
+    deletes that witness. Older landed rows for a cell that is still being
+    taught expire here. The new teaching row stays. False-mask rows are
+    not deleted.
+    """
+
+    outcome = pack(dict(recipe))
+    with _LOCK:
+        connection.execute("BEGIN IMMEDIATE")
+        try:
+            _ensure_mask_tables(connection)
+            mixed = connection.execute(
+                f"SELECT 1 FROM {_MASK_AUDIT_TABLE} "
+                "WHERE engine=? AND chem_version=? AND cell=? "
+                "AND disposition='false_mask' LIMIT 1",
+                (engine, version, cell),
+            ).fetchone()
+            if mixed is not None:
+                connection.commit()
+                return
+            connection.execute(
+                f"DELETE FROM {_MASK_AUDIT_TABLE} "
+                "WHERE engine=? AND refusal_class=? AND chem_version=? "
+                "AND cell=? AND disposition='landed'",
+                (engine, refusal_class, version, cell),
+            )
+            connection.execute(
+                f"INSERT OR REPLACE INTO {_MASK_TABLE} "
+                "(engine, chem_version, cell, refusal_class, outcome) "
+                "VALUES (?, ?, ?, ?, ?)",
+                (engine, version, cell, refusal_class, outcome),
+            )
+            connection.execute(
+                f"INSERT OR REPLACE INTO {_MASK_AUDIT_TABLE} "
+                "(key, disposition, engine, refusal_class, chem_version, cell, observed) "
+                "VALUES (?, 'landed', ?, ?, ?, ?, ?)",
+                (cache_key, engine, refusal_class, version, cell, refusal_class),
+            )
+            connection.commit()
+        except BaseException:
+            try:
+                connection.rollback()
+            except sqlite3.Error:
+                pass
+            raise
+
+
+def _unmask_cell(
+    connection: sqlite3.Connection,
+    *,
+    engine: str,
+    version: str,
+    cell: bytes,
+    refusal_class: str,
+    cache_key: bytes,
+    observed: str,
+    path_value: str,
+) -> None:
+    with _LOCK:
+        connection.execute("BEGIN IMMEDIATE")
+        try:
+            _ensure_mask_tables(connection)
+            connection.execute(
+                f"DELETE FROM {_MASK_TABLE} "
+                "WHERE engine=? AND chem_version=? AND cell=?",
+                (engine, version, cell),
+            )
+            connection.execute(
+                f"INSERT OR REPLACE INTO {_MASK_AUDIT_TABLE} "
+                "(key, disposition, engine, refusal_class, chem_version, cell, observed) "
+                "VALUES (?, 'false_mask', ?, ?, ?, ?, ?)",
+                (cache_key, engine, refusal_class, version, cell, observed),
+            )
+            connection.commit()
+        except BaseException:
+            try:
+                connection.rollback()
+            except sqlite3.Error:
+                pass
+            raise
+    _drop_mask_memory(path_value)
+
+
+def _try_mask_write(engine_id: str, write: Callable[[], None]) -> None:
+    """A mask bookkeeping failure must not replace the engine outcome."""
+
+    try:
+        write()
+    except Exception:
         with _LOCK:
-            counts = _counter_bucket(engine_id)
-            counts["misses"] += 1
-            counts["not_stored:double"] = counts.get("not_stored:double", 0) + 1
-        return live_hot(solve())
-    source_box = _cache_environment_setting("REGOLITH_ENGINE_CACHE_BOX", "") or ""
-    if not readonly:
-        if not source_box.strip():
-            raise ValueError("REGOLITH_ENGINE_CACHE_BOX must be set in read-write mode")
-        if source_box not in ENGINE_CACHE_BOX_RANGES:
-            raise ValueError(f"engine cache box {source_box!r} has no configured row range")
-    chem_version = ENGINE_CHEMISTRY_VERSION[engine_id]
-    cache_key = engine_cache_key(engine_id, chem_version, request)
-    memory_key = (path_value, cache_key, readonly)
+            _add_counter(engine_id, "mask_error")
+
+
+def _try_learn_mask(
+    connection: sqlite3.Connection | None,
+    *,
+    readonly: bool,
+    engine_id: str,
+    version: str,
+    request: Any,
+    cache_key: bytes,
+    solved: Any,
+    hot: Any,
+    exc: BaseException | None,
+) -> None:
+    if readonly or connection is None:
+        return
+    if exc is not None and not isinstance(exc, Exception):
+        return
+    refusal_class = _observed_mask_class(solved, hot, exc)
+    if refusal_class is None:
+        return
+    if (engine_id, refusal_class) not in MASKABLE_REFUSAL_CLASSES:
+        return
+    recipe = _mask_recipe(refusal_class, solved, hot, exc)
+    if recipe is None or not _replayable(recipe):
+        return
+    cell = refusal_mask_cell(request)
+    if cell is None:
+        return
+
+    def write() -> None:
+        _learn_mask_cell(
+            connection,
+            engine=engine_id,
+            version=version,
+            cell=cell,
+            refusal_class=refusal_class,
+            recipe=recipe,
+            cache_key=cache_key,
+        )
+
+    _try_mask_write(engine_id, write)
+
+
+def _remember_mask(
+    memory_key: tuple[str, bytes, bool],
+    refusal_class: str,
+    recipe: Mapping[str, Any],
+) -> None:
     with _LOCK:
         _prepare_memory_cache()
-        counts = _counter_bucket(engine_id)
-        if memory_key in _MEMORY_CACHE:
-            result = _MEMORY_CACHE[memory_key]
-            _MEMORY_CACHE.move_to_end(memory_key)
-            counts["hits"] += 1
-            return result
+        _remember_memory_value(
+            memory_key, _MaskReplay(refusal_class, dict(recipe)),
+        )
 
-    path = _expanded_cache_path(path_value)
-    try:
-        connection = _connect(path, readonly=readonly)
-    except (sqlite3.Error, OSError, EngineCacheSchemaMismatch) as exc:
-        if _cache_open_is_schema_mismatch(exc):
-            # One notice per path. Later calls skip the open entirely.
-            _disable_schema_mismatch(path_value, exc)
-            _count_schema_mismatch(engine_id)
-            return live_hot(solve())
-        with _LOCK:
-            counts = _counter_bucket(engine_id)
-            counts["read_error"] += 1
-            counts["misses"] += 1
-            counts["not_stored:readonly"] = counts.get("not_stored:readonly", 0) + 1
-        return live_hot(solve())
-    with _LOCK:
+def _flag_live(hot: Any, exc: BaseException | None, refusal_class: str) -> Any:
+    if exc is not None:
         try:
-            row = None if connection is None or _definitely_absent(connection, cache_key) else connection.execute(
-                f"SELECT value, provenance_id FROM {_TABLE} WHERE key=?", (cache_key,)
-            ).fetchone()
-        except sqlite3.Error:
-            counts["read_error"] += 1
-            row = None
-        if row is not None:
-            try:
-                result = _decode_hot(row[0], _read_provenance(connection, row[1]))
-            except (TypeError, ValueError, UnicodeDecodeError):
-                counts["read_error"] += 1
-                row = None
-            else:
-                counts["hits"] += 1
-                _remember_memory_value(memory_key, result)
-                return result
-        counts["misses"] += 1
+            exc.mask_hit = refusal_class  # type: ignore[attr-defined]
+        except AttributeError:
+            pass
+        raise exc
+    if isinstance(hot, (Mapping, list)):
+        return _flag_refusal_hot(hot, refusal_class)
+    return hot
 
+
+def _capture_solve(solve: Any) -> tuple[Any, Any, BaseException | None]:
     try:
         solved = solve()
-        hot = live_hot(solved)
     except BaseException as exc:
-        # A raise used to count a miss and then leave no bucket. That is
-        # the openimcc / magemin / thermoengine gap: the call recomputes
-        # on every run and the summary cannot say why.
+        return None, None, exc
+    return solved, live_hot(solved), None
+
+
+def _lookup_refusal_mask(
+    connection: sqlite3.Connection | None,
+    engine_id: str,
+    version: str,
+    request: Any,
+    path_value: str,
+) -> tuple[tuple[str, Mapping[str, Any], bytes] | None, bool]:
+    """Return the learned mask and whether a neighbour lookup is safe."""
+
+    if connection is None:
+        return None, False
+    cell = refusal_mask_cell(request)
+    if cell is None:
+        return None, True
+    # A contradiction already seen in this process wins over the file.
+    # Readonly cannot delete the row, and a failed delete must not either.
+    if _mask_cell_denied(path_value, engine_id, version, cell):
+        return None, False
+    try:
+        selected = _select_mask(connection, engine_id, version, cell)
+    except sqlite3.Error:
         with _LOCK:
-            bucket = _counter_bucket(engine_id)
-            label = _not_stored_exception_label(exc)
-            name = f"not_stored:exception:{label}"
-            bucket[name] = bucket.get(name, 0) + 1
-        raise
+            _counter_bucket(engine_id)["read_error"] += 1
+        return None, False
+    if selected is None:
+        return None, True
+    refusal_class, recipe = selected
+    return (refusal_class, recipe, cell), False
+
+
+def _serve_mask_without_engine(
+    engine_id: str,
+    refusal_class: str,
+    recipe: Mapping[str, Any],
+    memory_key: tuple[str, bytes, bool],
+) -> Any:
+    _remember_mask(memory_key, refusal_class, recipe)
+    with _LOCK:
+        _add_counter(engine_id, f"mask_hit:{refusal_class}")
+    return _emit_mask(recipe, refusal_class)
+
+
+def _serve_verified_mask(
+    engine_id: str,
+    refusal_class: str,
+    recipe: Mapping[str, Any],
+    memory_key: tuple[str, bytes, bool],
+    solved: Any,
+    hot: Any,
+    exc: BaseException | None,
+) -> Any:
+    live_recipe = _mask_recipe(refusal_class, solved, hot, exc)
+    remembered = recipe
+    if live_recipe is not None and _replayable(live_recipe):
+        remembered = live_recipe
+    _remember_mask(memory_key, refusal_class, remembered)
+    with _LOCK:
+        _add_counter(engine_id, f"mask_hit:{refusal_class}")
+        _add_counter(engine_id, f"mask_verify:{refusal_class}")
+    return _flag_live(hot, exc, refusal_class)
+
+
+def _reject_false_mask(
+    connection: sqlite3.Connection,
+    readonly: bool,
+    engine_id: str,
+    version: str,
+    cell: bytes,
+    refusal_class: str,
+    cache_key: bytes,
+    path_value: str,
+    solved: Any,
+    hot: Any,
+    exc: BaseException | None,
+) -> None:
+    observed = _observed_mask_class(solved, hot, exc) or "accepted"
+    # Deny before the write. A readonly file cannot record the witness,
+    # and a failed delete must not keep serving the cell in this process.
+    _deny_mask_cell(path_value, engine_id, version, cell)
+    if not readonly:
+        def write() -> None:
+            _unmask_cell(
+                connection,
+                engine=engine_id,
+                version=version,
+                cell=cell,
+                refusal_class=refusal_class,
+                cache_key=cache_key,
+                observed=observed,
+                path_value=path_value,
+            )
+        _try_mask_write(engine_id, write)
+    _drop_mask_memory(path_value)
+    with _LOCK:
+        _add_counter(engine_id, f"mask_false:{refusal_class}")
+
+
+def _count_exception_and_learn(
+    connection: sqlite3.Connection | None,
+    *,
+    readonly: bool,
+    engine_id: str,
+    chem_version: str | int,
+    request: Any,
+    cache_key: bytes,
+    exc: BaseException,
+) -> None:
+    with _LOCK:
+        bucket = _counter_bucket(engine_id)
+        label = _not_stored_exception_label(exc)
+        name = f"not_stored:exception:{label}"
+        bucket[name] = bucket.get(name, 0) + 1
+    _try_learn_mask(
+        connection,
+        readonly=readonly,
+        engine_id=engine_id,
+        version=str(chem_version),
+        request=request,
+        cache_key=cache_key,
+        solved=None,
+        hot=None,
+        exc=exc,
+    )
+
+
+def _finish_cache_miss(
+    *,
+    engine_id: str,
+    request: Any,
+    solve: Any,
+    readonly: bool,
+    connection: sqlite3.Connection | None,
+    path: Path,
+    source_box: str,
+    chem_version: str | int,
+    cache_key: bytes,
+    memory_key: tuple[str, bytes, bool],
+    precomputed: tuple[Any, Any, BaseException | None] | None,
+) -> Any:
+    """Count one real miss and store it, or return the named not-stored bucket.
+
+    A mask short-circuit does not come here. A sample that disagreed already
+    holds the live result in ``precomputed`` and must not solve again.
+    """
+
+    with _LOCK:
+        _counter_bucket(engine_id)["misses"] += 1
+    if precomputed is None:
+        try:
+            solved = solve()
+            hot = live_hot(solved)
+            exc = None
+        except BaseException as raised:
+            _count_exception_and_learn(
+                connection,
+                readonly=readonly,
+                engine_id=engine_id,
+                chem_version=chem_version,
+                request=request,
+                cache_key=cache_key,
+                exc=raised,
+            )
+            raise
+    else:
+        solved, hot, exc = precomputed
+        if exc is not None:
+            _count_exception_and_learn(
+                connection,
+                readonly=readonly,
+                engine_id=engine_id,
+                chem_version=chem_version,
+                request=request,
+                cache_key=cache_key,
+                exc=exc,
+            )
+            raise exc
     if readonly or connection is None:
         # Readonly state takes precedence: a refusal or uncacheable value
         # cannot be stored either way, so count this miss in one bucket.
@@ -2268,27 +3346,23 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
                 "not_stored:cacheable_false", 0
             ) + 1
         return hot
-    wrapped_refusal = (
-        isinstance(solved, EngineCacheValue)
-        and solved.refusal_reason is not None
-    )
-    refusal_not_cacheable = (
-        wrapped_refusal and not cacheable_refusal(solved)
-    ) or (
-        _is_refusal(hot) and not cacheable_refusal(hot)
-    )
-    if refusal_not_cacheable:
-        refusal_reason = (
-            solved.refusal_reason if wrapped_refusal
-            else hot.get("refusal_reason") if isinstance(hot, Mapping)
-            else getattr(hot, "refusal_reason", None)
-        )
-        reason_label = str(refusal_reason) if refusal_reason is not None else "untyped"
+    reason_label = not_stored_refusal_label(solved, hot)
+    if reason_label is not None:
         with _LOCK:
             counter = f"not_stored:refusal:{reason_label}"
             counts = _counter_bucket(engine_id)
             counts[counter] = counts.get(counter, 0) + 1
-    if refusal_not_cacheable:
+        _try_learn_mask(
+            connection,
+            readonly=readonly,
+            engine_id=engine_id,
+            version=str(chem_version),
+            request=request,
+            cache_key=cache_key,
+            solved=solved,
+            hot=hot,
+            exc=None,
+        )
         return hot
     try:
         if not isinstance(solved, EngineCacheValue) and (
@@ -2342,6 +3416,14 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
                 # Build id is forensic only and is written with the COLD value.
                 # The hit path above returns before this call.
                 _store_cold(connection, path, int(stored_seq[0]), cold_values, engine_id)
+            # The exact key is unchanged. The cell pointer is a side row,
+            # written only while the optimizer scope is active.
+            if not _index_neighbour_cells(
+                connection, engine_id, chem_version, cache_key, request,
+            ):
+                index_name = "neighbour_index_error"
+                index_counts = _counter_bucket(engine_id)
+                index_counts[index_name] = index_counts.get(index_name, 0) + 1
             connection.commit()
             if inserted:
                 _record_bloom_key(connection, cache_key)
@@ -2366,6 +3448,198 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
         _prepare_memory_cache()
         _remember_memory_value(memory_key, hot)
     return hot
+
+
+def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
+    """Serve or store one engine result.
+
+    This is the open/lookup seam. Engines are stateless, and the key is
+    engine + chemistry version + request, so a cached value is the engine's
+    answer. Serving it in tests is valid. CI uses the runner file read-only
+    by default. Only ``engine_cache_off`` tests opt out. A stored exact
+    output or cacheable-refusal row wins over a mask cell. The mask applies
+    only to a key that has no exact row. A HOT hit with no species side row
+    backfills the request species through the store's writer. A read-only
+    cache does not write, and a refusal-mask hit has no output species row.
+    """
+
+    if _CACHE_BYPASSED.get():
+        return live_hot(solve())
+    path_value = _configured_engine_cache_path()
+    if not path_value:
+        return live_hot(solve())
+    # A wrong-schema, non-sqlite, or unopenable path stays closed for this
+    # process. The run solves uncached. Do not migrate it from this path.
+    # A lock is not recorded here, so the next call opens again. This check
+    # precedes memory hits so a disabled cache cannot serve a mask replay.
+    disabled = _disabled_cache_reason(path_value)
+    if disabled is not None:
+        _count_disabled_cache_open(engine_id, disabled)
+        return live_hot(solve())
+    readonly = _engine_cache_is_readonly(path_value)
+    if (
+        engine_id in ENGINE_CHEMISTRY_VERSION
+        and _active_cache_is_runner_file(path_value)
+        and _solve_is_test_double(solve)
+    ):
+        # One check, before lookup. A double is a mock, a test-module
+        # callable, or an adapter method that is no longer the class-body
+        # function. Real adapter functions are compiled from their packages,
+        # so this cannot flag them. The check stops at the outer function:
+        # a monkeypatch of a dependency that solve calls (engines,
+        # melt_backend, openimcc) is not walked. Those tests opt out with
+        # engine_cache_off so a warm runner row cannot hide the patch.
+        # Do not serve or store a double in the runner file. A test-owned
+        # file is unchanged: cache tests store synthetic solves there.
+        with _LOCK:
+            counts = _counter_bucket(engine_id)
+            counts["misses"] += 1
+            counts["not_stored:double"] = counts.get("not_stored:double", 0) + 1
+        return live_hot(solve())
+    source_box = _cache_environment_setting("REGOLITH_ENGINE_CACHE_BOX", "") or ""
+    if not readonly:
+        if not source_box.strip():
+            raise ValueError("REGOLITH_ENGINE_CACHE_BOX must be set in read-write mode")
+        if source_box not in ENGINE_CACHE_BOX_RANGES:
+            raise ValueError(f"engine cache box {source_box!r} has no configured row range")
+    chem_version = ENGINE_CHEMISTRY_VERSION[engine_id]
+    cache_key = engine_cache_key(engine_id, chem_version, request)
+    memory_key = (path_value, cache_key, readonly)
+    with _LOCK:
+        _prepare_memory_cache()
+        counts = _counter_bucket(engine_id)
+        if memory_key in _MEMORY_CACHE:
+            result = _MEMORY_CACHE[memory_key]
+            _MEMORY_CACHE.move_to_end(memory_key)
+            if isinstance(result, _MaskReplay):
+                # A repeated key in this process does not re-verify.
+                # The counter is the one the score reads. A cell this
+                # process already contradicted is not served from memory.
+                cell = refusal_mask_cell(request)
+                denied = (
+                    cell is not None
+                    and _mask_cell_denied(
+                        path_value, engine_id, str(chem_version), cell,
+                    )
+                )
+                if denied:
+                    del _MEMORY_CACHE[memory_key]
+                else:
+                    _add_counter(engine_id, f"mask_hit:{result.refusal_class}")
+                    return _emit_mask(result.recipe, result.refusal_class)
+            else:
+                counts["hits"] += 1
+                return result
+
+    path = _expanded_cache_path(path_value)
+    try:
+        connection = _connect(path, readonly=readonly)
+    except (sqlite3.Error, OSError, EngineCacheSchemaMismatch) as exc:
+        if _cache_open_is_schema_mismatch(exc):
+            # One notice per path. Later calls skip the open entirely.
+            _disable_schema_mismatch(path_value, exc)
+            _count_disabled_cache_open(engine_id, "schema_mismatch")
+            return live_hot(solve())
+        if _cache_open_is_unopenable(exc, path):
+            # One notice per path. Later calls skip the open entirely.
+            _disable_unopenable(path_value, exc)
+            _count_disabled_cache_open(engine_id, "unopenable")
+            return live_hot(solve())
+        with _LOCK:
+            counts = _counter_bucket(engine_id)
+            counts["read_error"] += 1
+            counts["misses"] += 1
+            counts["not_stored:readonly"] = counts.get("not_stored:readonly", 0) + 1
+        return live_hot(solve())
+    with _LOCK:
+        try:
+            row = None if connection is None or _definitely_absent(connection, cache_key) else connection.execute(
+                f"SELECT value, provenance_id, source_box, row_seq FROM {_TABLE} WHERE key=?",
+                (cache_key,),
+            ).fetchone()
+        except sqlite3.Error:
+            counts["read_error"] += 1
+            row = None
+        if row is not None:
+            try:
+                result = _decode_hot(row[0], _read_provenance(connection, row[1]))
+            except (TypeError, ValueError, UnicodeDecodeError):
+                counts["read_error"] += 1
+                row = None
+            else:
+                # Exact row, including a stored cacheable refusal. It wins
+                # over any mask cell that covers this request. Species are
+                # recovered from the request that formed this exact key.
+                counts["hits"] += 1
+                if _backfill_input_species_on_hit(
+                    connection,
+                    cache_key,
+                    str(row[2]),
+                    int(row[3]),
+                    request,
+                    readonly=readonly,
+                ):
+                    _remember_memory_value(memory_key, result)
+                return result
+
+    version = str(chem_version)
+    masked, mask_allows_neighbour = _lookup_refusal_mask(
+        connection, engine_id, version, request, path_value,
+    )
+    # Exact HOT rows and refusal-mask outcomes both have priority. The
+    # neighbour lookup is reached only after the mask confirms no cell hit.
+    # Readonly caches may be shared across machines and runs. Their
+    # optimizer-neighbour contents must not influence the result; exact HOT
+    # lookup above remains available. Writable misses index neighbours in
+    # _finish_cache_miss after its readonly return.
+    if not readonly and masked is None and mask_allows_neighbour:
+        lookup_preset, neighbour_cells = _scope_neighbour_cells(request)
+        if lookup_preset is not None and lookup_preset in neighbour_cells:
+            neighbour = _read_neighbour(
+                connection,
+                engine_id=engine_id,
+                chem_version=chem_version,
+                preset=lookup_preset,
+                cell=neighbour_cells[lookup_preset],
+                exact_key=cache_key,
+                counts=counts,
+            )
+            if neighbour is not None:
+                counts["neighbour_hits"] = counts.get("neighbour_hits", 0) + 1
+                scope = _NEIGHBOUR_SCOPE.get()
+                counter = scope.counter if scope is not None else None
+                if counter is not None:
+                    counter.hits += 1
+                return neighbour
+    finish = {
+        "engine_id": engine_id,
+        "request": request,
+        "solve": solve,
+        "readonly": readonly,
+        "connection": connection,
+        "path": path,
+        "source_box": source_box,
+        "chem_version": chem_version,
+        "cache_key": cache_key,
+        "memory_key": memory_key,
+    }
+    if masked is None:
+        return _finish_cache_miss(**finish, precomputed=None)
+    refusal_class, recipe, cell = masked
+    if not mask_verify_selected(cache_key):
+        return _serve_mask_without_engine(
+            engine_id, refusal_class, recipe, memory_key,
+        )
+    solved, hot, exc = _capture_solve(solve)
+    if _mask_matches(recipe, refusal_class, solved, hot, exc):
+        return _serve_verified_mask(
+            engine_id, refusal_class, recipe, memory_key, solved, hot, exc,
+        )
+    _reject_false_mask(
+        connection, readonly, engine_id, version, cell,
+        refusal_class, cache_key, path_value, solved, hot, exc,
+    )
+    return _finish_cache_miss(**finish, precomputed=(solved, hot, exc))
 
 
 @contextmanager
@@ -2508,7 +3782,13 @@ def _cache_space(connection: sqlite3.Connection, schema: str, table: str) -> dic
 
 
 def engine_cache_stats(path: Path) -> dict[str, Any]:
-    """Allocated SQLite bytes, including pages currently in WAL, per stored row."""
+    """Allocated SQLite bytes, including pages currently in WAL, per stored row.
+
+    ``species_unknown_by_engine`` counts blake2b rows that still have no
+    species side row. A natural key is not unknown: its request can be
+    read. The open is read-only. Engines with rows and no such digest
+    are present with 0.
+    """
     with _read_cache(path) as (connection, has_cold):
         return {
             "file": str(path),
@@ -2516,6 +3796,7 @@ def engine_cache_stats(path: Path) -> dict[str, Any]:
             "cold": _cache_space(connection, "cold", "engine_values") if has_cold else {
                 "rows": 0, "database_bytes": 0, "bytes_per_row": None,
             },
+            "species_unknown_by_engine": _species_unknown_by_engine(connection),
         }
 
 
@@ -2712,6 +3993,12 @@ def _forget_process_cache(path: Path) -> None:
                 same = False
             if same:
                 del _MEMORY_CACHE[memory_key]
+        # Same path comparison as the memory drop. Deny keys already store
+        # the resolved path, so a symlink does not leave a cell servable.
+        resolved = str(expanded)
+        for deny_key in tuple(_MASK_DENY):
+            if deny_key[0] == resolved:
+                _MASK_DENY.discard(deny_key)
     if _CONNECTION_PATH is not None and _CONNECTION_PATH.expanduser().resolve() == expanded:
         _close_connections()
 
@@ -2797,6 +4084,80 @@ def _delete_cold_values(
     )
 
 
+def _delete_neighbour_identity(
+    connection: sqlite3.Connection,
+    engine: str,
+    *,
+    chem_version: str | None = None,
+    chem_version_not: str | None = None,
+) -> None:
+    """Drop side-table rows for one engine. A missing table is not an error.
+
+    expire, prune, and drop_chemistry_version call this for the same identity
+    they delete from the HOT table. Readonly callers do not.
+    """
+
+    clauses = ["engine=?"]
+    params: list[object] = [engine]
+    if chem_version is not None:
+        clauses.append("chem_version=?")
+        params.append(chem_version)
+    if chem_version_not is not None:
+        clauses.append("chem_version!=?")
+        params.append(chem_version_not)
+    try:
+        connection.execute(
+            f"DELETE FROM {_NEIGHBOUR_TABLE} WHERE " + " AND ".join(clauses),
+            params,
+        )
+    except sqlite3.OperationalError as exc:
+        if "no such table" in str(exc).lower():
+            # A failed DELETE can leave the implicit transaction open, and
+            # the HOT sweep then issues BEGIN IMMEDIATE.
+            if connection.in_transaction:
+                connection.rollback()
+            return
+        raise
+    if connection.in_transaction:
+        connection.commit()
+
+
+def _delete_neighbour_rows_for_pairs(
+    connection: sqlite3.Connection,
+    pairs: list[tuple[str, int]],
+) -> None:
+    """Drop cell pointers at the HOT keys about to be deleted.
+
+    A missing side table is not an error. The caller's transaction owns
+    the commit, so a later failure rolls this delete back with the HOT rows.
+    """
+
+    if not pairs:
+        return
+    keys: list[bytes] = []
+    chunk = 200
+    for start in range(0, len(pairs), chunk):
+        batch = pairs[start:start + chunk]
+        where = " OR ".join("(source_box=? AND row_seq=?)" for _ in batch)
+        params = [item for pair in batch for item in pair]
+        found = connection.execute(
+            f"SELECT key FROM {_TABLE} WHERE {where}",
+            params,
+        ).fetchall()
+        keys.extend(bytes(row[0]) for row in found)
+    if not keys:
+        return
+    try:
+        connection.executemany(
+            f"DELETE FROM {_NEIGHBOUR_TABLE} WHERE key=?",
+            [(key,) for key in keys],
+        )
+    except sqlite3.OperationalError as exc:
+        if "no such table" in str(exc).lower():
+            return
+        raise
+
+
 def _delete_cached_rows(
     connection: sqlite3.Connection,
     has_cold: bool,
@@ -2824,6 +4185,7 @@ def _delete_cached_rows(
         return
     connection.execute("BEGIN IMMEDIATE")
     try:
+        _delete_neighbour_rows_for_pairs(connection, pairs)
         connection.executemany(
             f"DELETE FROM {_SPECIES_TABLE} WHERE source_box=? AND row_seq=?",
             pairs,
@@ -3652,6 +5014,8 @@ def expire_cache_file(
             pairs.extend(pair for pair in unknown_pairs if pair not in already)
         swept = 0
         if apply:
+            if all_rows:
+                _delete_neighbour_identity(connection, engine)
             swept = _apply_maintenance_deletes(
                 connection, path, has_cold, pairs, vacuum=True
             )
@@ -3677,14 +5041,60 @@ def expire_cache_file(
         connection.close()
 
 
+def _rows_missing_species_side(
+    connection: sqlite3.Connection, engine: str | None = None
+):
+    """HOT rows with no species side row. The side-table primary key serves this."""
+
+    sql = (
+        f"SELECT e.engine, e.source_box, e.row_seq, e.key FROM {_TABLE} e "
+        f"WHERE NOT EXISTS ("
+        f"SELECT 1 FROM {_SPECIES_TABLE} s "
+        "WHERE s.source_box=e.source_box AND s.row_seq=e.row_seq)"
+    )
+    params: tuple[str, ...] = ()
+    if engine is not None:
+        sql += " AND e.engine=?"
+        params = (engine,)
+    return connection.execute(sql, params)
+
+
+def _missing_side_row_is_species_unknown(key: bytes) -> bool | None:
+    """Classify a row that has no species side row.
+
+    True is the blake2b fallback: ``species_from_natural_key`` returns
+    None, and expire deletes the row because its inputs cannot be shown.
+    False is a natural key, including one that named nothing. None is a
+    flag expire counts and leaves. Migrate's transform calls
+    ``species_from_natural_key`` itself because it also writes the
+    natural-key side rows; it is not a second classifier.
+    """
+
+    try:
+        species = species_from_natural_key(key)
+    except EngineCacheSpeciesError:
+        return None
+    return species is None
+
+
+def _species_unknown_by_engine(connection: sqlite3.Connection) -> dict[str, int]:
+    """Blake2b rows with no side row, per engine that has any HOT row."""
+
+    counts = {engine: 0 for engine in _rows_by_engine(connection)}
+    for engine, _source_box, _row_seq, key in _rows_missing_species_side(connection):
+        if _missing_side_row_is_species_unknown(bytes(key)) is True:
+            name = str(engine)
+            counts[name] = counts.get(name, 0) + 1
+    return counts
+
+
 def _species_unknown_pairs(
     connection: sqlite3.Connection, engine: str
 ) -> tuple[list[tuple[str, int]], int]:
     """Digest keys of one engine that recorded no species, and the rest.
 
-    ``species_from_natural_key`` returns None only for the blake2b fallback.
-    Migrate uses that same result to count digest keys and to skip species
-    rows. A store of a blake2b request that named nothing writes an empty
+    ``_missing_side_row_is_species_unknown`` is the classifier stats uses.
+    A store of a blake2b request that named nothing writes an empty
     species marker, so that row has a side row and is not selected here.
     A natural key that named no species returns an empty set and stays.
     A flag other than 0x00 or 0xff is counted and left. Deleting it would
@@ -3692,22 +5102,15 @@ def _species_unknown_pairs(
     would abort the expire before any other row was removed.
     """
 
-    rows = connection.execute(
-        f"SELECT e.source_box, e.row_seq, e.key FROM {_TABLE} e "
-        f"WHERE e.engine=? AND NOT EXISTS ("
-        f"SELECT 1 FROM {_SPECIES_TABLE} s "
-        "WHERE s.source_box=e.source_box AND s.row_seq=e.row_seq)",
-        (engine,),
-    ).fetchall()
     found: list[tuple[str, int]] = []
     unclassifiable = 0
-    for source_box, row_seq, key in rows:
-        try:
-            species = species_from_natural_key(bytes(key))
-        except EngineCacheSpeciesError:
+    for _engine, source_box, row_seq, key in _rows_missing_species_side(
+        connection, engine
+    ):
+        kind = _missing_side_row_is_species_unknown(bytes(key))
+        if kind is None:
             unclassifiable += 1
-            continue
-        if species is None:
+        elif kind:
             found.append((str(source_box), int(row_seq)))
     return found, unclassifiable
 
@@ -3747,6 +5150,12 @@ def prune_cache_file(path: str | Path, *, apply: bool = False) -> dict[str, Any]
             pairs.extend((str(source_box), int(row_seq)) for source_box, row_seq in found)
         swept = 0
         if apply:
+            for engine_name, version in ENGINE_CHEMISTRY_VERSION.items():
+                _delete_neighbour_identity(
+                    connection,
+                    engine_name,
+                    chem_version_not=str(version),
+                )
             swept = _apply_maintenance_deletes(
                 connection, path, has_cold, pairs, vacuum=True
             )
@@ -3761,6 +5170,88 @@ def prune_cache_file(path: str | Path, *, apply: bool = False) -> dict[str, Any]
             },
             "skipped_unknown_engine": unknown,
             "vacuumed": bool(apply and (pairs or swept)),
+        }
+    finally:
+        connection.close()
+
+
+def clear_refusal_mask(
+    path: str | Path,
+    *,
+    engine: str,
+    refusal_class: str,
+    apply: bool = False,
+) -> dict[str, Any]:
+    """Delete one engine's mask cells and audit rows for one class.
+
+    Every chemistry version of that pair goes. Dry-run unless ``apply``.
+    A file that has never learned a mask reports zeros and is not given
+    the tables just so they can be deleted. Nothing on the read or write
+    path calls this.
+    """
+
+    if engine not in ENGINE_CHEMISTRY_VERSION:
+        raise ValueError(f"unknown engine {engine!r}")
+    if not isinstance(refusal_class, str) or refusal_class == "":
+        raise ValueError("refusal class must be a non-empty string")
+    path = Path(path).expanduser()
+    connection, _has_cold = _maintenance_connection(path)
+    try:
+        present = {
+            str(name)
+            for (name,) in connection.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name IN (?, ?)",
+                (_MASK_TABLE, _MASK_AUDIT_TABLE),
+            )
+        }
+        mask_cells = 0
+        audit_records = 0
+        if _MASK_TABLE in present:
+            mask_cells = int(connection.execute(
+                f"SELECT COUNT(*) FROM {_MASK_TABLE} WHERE engine=? AND refusal_class=?",
+                (engine, refusal_class),
+            ).fetchone()[0])
+        if _MASK_AUDIT_TABLE in present:
+            audit_records = int(connection.execute(
+                f"SELECT COUNT(*) FROM {_MASK_AUDIT_TABLE} "
+                "WHERE engine=? AND refusal_class=?",
+                (engine, refusal_class),
+            ).fetchone()[0])
+        if apply and (mask_cells or audit_records):
+            try:
+                connection.execute("BEGIN IMMEDIATE")
+                if _MASK_TABLE in present:
+                    connection.execute(
+                        f"DELETE FROM {_MASK_TABLE} WHERE engine=? AND refusal_class=?",
+                        (engine, refusal_class),
+                    )
+                if _MASK_AUDIT_TABLE in present:
+                    connection.execute(
+                        f"DELETE FROM {_MASK_AUDIT_TABLE} "
+                        "WHERE engine=? AND refusal_class=?",
+                        (engine, refusal_class),
+                    )
+                connection.commit()
+            except BaseException:
+                try:
+                    connection.rollback()
+                except sqlite3.Error:
+                    pass
+                _forget_process_cache(path)
+                raise
+        if apply:
+            # The process copy would keep serving a cell this command deleted.
+            _forget_process_cache(path)
+        return {
+            "command": "clear-mask",
+            "apply": bool(apply),
+            "dry_run": not apply,
+            "engine": engine,
+            "refusal_class": refusal_class,
+            "mask_cells": mask_cells,
+            "audit_records": audit_records,
+            "deleted_mask_cells": mask_cells if apply else 0,
+            "deleted_audit_records": audit_records if apply else 0,
         }
     finally:
         connection.close()
@@ -3799,8 +5290,12 @@ def drop_chemistry_version(engine_id: str, chem_version: str | int) -> int:
     ]
     cold_path = _cache_pair(path)[1]
     has_cold = cold_path.exists()
+    _delete_neighbour_identity(
+        connection, engine_id, chem_version=str(chem_version),
+    )
     # No HOT rows and no COLD file: nothing to sweep. Returning here leaves
     # the process cache alone, as a no-op drop did before the sweep existed.
+    # Neighbour rows for this chemistry version are already gone.
     if not pairs and not has_cold:
         return 0
     if connection.in_transaction:

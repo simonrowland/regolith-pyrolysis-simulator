@@ -552581,7 +552581,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: neuman-2026-levitation-k-isotopes::neuman_2026_table_1_basalt_starting_delta41k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: neuman-2026-levitation-k-isotopes
   locator:
     page: 3
@@ -920539,7 +920550,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: neuman-2026-levitation-k-isotopes::neuman_2026_table_2_loess_starting_delta41k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: neuman-2026-levitation-k-isotopes
   locator:
     page: 6

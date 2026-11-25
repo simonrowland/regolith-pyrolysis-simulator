@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/wilkerson-2023-jsc1a-outgassing.yaml
 observations:
 - observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_fig1_tgms_vacuum_vitrification_figure_only
-  experiment_id: 10.1016/j.icarus.2023.115577::experiment::tga-atmosphere-series
+  experiment_id: 10.1016/j.icarus.2023.115577::wilkerson-2023-jsc1a-outgassing::declared:10.1016/j.icarus.2023.115577::experiment::tga-atmosphere-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -11,12 +11,11 @@ observations:
     species:
       formula: JSC-1A
       phase:
-        tag: unknown
-        reason: phase string 'JSC-1A_lunar_simulant_powder' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -41,7 +40,28 @@ observations:
         pdf_page_index: 12
         figure: '1'
         note: Icarus journal pre-proof; no printed pagination.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''JSC-1A_lunar_simulant_powder'' is not in the closed automatic map'
+    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_fig1_tgms_vacuum_vitrification_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: tga_ms_plotted_curve'
+    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_fig1_tgms_vacuum_vitrification_figure_only
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: wilkerson-2023-jsc1a-outgassing
   locator:
     pdf_page_index: 12
@@ -51,7 +71,7 @@ observations:
   provenance:
     printed_phase: JSC-1A_lunar_simulant_powder
 - observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_fig2_tgms_vacuum_he_arh2_figure_only
-  experiment_id: 10.1016/j.icarus.2023.115577::experiment::tga-atmosphere-series
+  experiment_id: 10.1016/j.icarus.2023.115577::wilkerson-2023-jsc1a-outgassing::declared:10.1016/j.icarus.2023.115577::experiment::tga-atmosphere-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -59,12 +79,11 @@ observations:
     species:
       formula: JSC-1A
       phase:
-        tag: unknown
-        reason: phase string 'JSC-1A_lunar_simulant_powder' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -89,7 +108,28 @@ observations:
         pdf_page_index: 13
         figure: '2'
         note: Icarus journal pre-proof; no printed pagination.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''JSC-1A_lunar_simulant_powder'' is not in the closed automatic map'
+    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_fig2_tgms_vacuum_he_arh2_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: tga_ms_plotted_curve'
+    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_fig2_tgms_vacuum_he_arh2_figure_only
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: wilkerson-2023-jsc1a-outgassing
   locator:
     pdf_page_index: 13
@@ -99,7 +139,7 @@ observations:
   provenance:
     printed_phase: JSC-1A_lunar_simulant_powder
 - observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_fig4_idealized_ht_tg_figure_only
-  experiment_id: 10.1016/j.icarus.2023.115577::experiment::tga-heat-treatment-series
+  experiment_id: 10.1016/j.icarus.2023.115577::wilkerson-2023-jsc1a-outgassing::declared:10.1016/j.icarus.2023.115577::experiment::tga-heat-treatment-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -107,12 +147,11 @@ observations:
     species:
       formula: JSC-1A
       phase:
-        tag: unknown
-        reason: phase string 'JSC-1A_lunar_simulant_powder' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -137,7 +176,28 @@ observations:
         pdf_page_index: 17
         figure: '4'
         note: Icarus journal pre-proof; no printed pagination.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''JSC-1A_lunar_simulant_powder'' is not in the closed automatic map'
+    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_fig4_idealized_ht_tg_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: tga_ms_plotted_curve'
+    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_fig4_idealized_ht_tg_figure_only
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: wilkerson-2023-jsc1a-outgassing
   locator:
     pdf_page_index: 17
@@ -147,7 +207,7 @@ observations:
   provenance:
     printed_phase: JSC-1A_lunar_simulant_powder
 - observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_h2_reduction_extra_water_windows
-  experiment_id: 10.1016/j.icarus.2023.115577::experiment::tga-atmosphere-series
+  experiment_id: 10.1016/j.icarus.2023.115577::wilkerson-2023-jsc1a-outgassing::declared:10.1016/j.icarus.2023.115577::experiment::tga-atmosphere-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -155,12 +215,11 @@ observations:
     species:
       formula: H2O
       phase:
-        tag: unknown
-        reason: phase string 'JSC-1A_lunar_simulant_powder' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -179,7 +238,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''JSC-1A_lunar_simulant_powder'' is not in the closed automatic map'
+    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_h2_reduction_extra_water_windows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: tga_ms_reducing_ar_5h2'
+    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_h2_reduction_extra_water_windows
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: wilkerson-2023-jsc1a-outgassing
   locator:
     pdf_page_index: 13
@@ -189,7 +269,7 @@ observations:
   provenance:
     printed_phase: JSC-1A_lunar_simulant_powder
 - observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_idealized_heat_treatment_0p50_wt_pct
-  experiment_id: 10.1016/j.icarus.2023.115577::experiment::tga-heat-treatment-series
+  experiment_id: 10.1016/j.icarus.2023.115577::wilkerson-2023-jsc1a-outgassing::declared:10.1016/j.icarus.2023.115577::experiment::tga-heat-treatment-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -197,12 +277,11 @@ observations:
     species:
       formula: JSC-1A
       phase:
-        tag: unknown
-        reason: phase string 'JSC-1A_lunar_simulant_powder' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -223,7 +302,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''JSC-1A_lunar_simulant_powder'' is not in the closed automatic map'
+    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_idealized_heat_treatment_0p50_wt_pct
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: tga_he_ramp_then_ar5h2_750C_hold'
+    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_idealized_heat_treatment_0p50_wt_pct
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: wilkerson-2023-jsc1a-outgassing
   locator:
     pdf_page_index: 17
@@ -233,7 +333,7 @@ observations:
   provenance:
     printed_phase: JSC-1A_lunar_simulant_powder
 - observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_printed_gas_release_windows
-  experiment_id: 10.1016/j.icarus.2023.115577::experiment::tga-atmosphere-series
+  experiment_id: 10.1016/j.icarus.2023.115577::wilkerson-2023-jsc1a-outgassing::declared:10.1016/j.icarus.2023.115577::experiment::tga-atmosphere-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -241,12 +341,11 @@ observations:
     species:
       formula: JSC-1A
       phase:
-        tag: unknown
-        reason: phase string 'JSC-1A_lunar_simulant_powder' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -265,7 +364,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''JSC-1A_lunar_simulant_powder'' is not in the closed automatic map'
+    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_printed_gas_release_windows
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: tga_ms_high_vacuum'
+    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_printed_gas_release_windows
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: wilkerson-2023-jsc1a-outgassing
   locator:
     pdf_page_index: 12
@@ -283,12 +403,11 @@ observations:
     species:
       formula: JSC-1A
       phase:
-        tag: unknown
-        reason: phase string 'JSC-1A_lunar_simulant' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -306,7 +425,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''JSC-1A_lunar_simulant'' is not in the closed automatic map'
+    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_quoted_loi_mckay_1994
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_literature'
+    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_quoted_loi_mckay_1994
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: wilkerson-2023-jsc1a-outgassing
   locator:
     pdf_page_index: 6
@@ -316,7 +456,7 @@ observations:
   provenance:
     printed_phase: JSC-1A_lunar_simulant
 - observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_table1_mossbauer_metallic_fe_arh2
-  experiment_id: 10.1016/j.icarus.2023.115577::experiment::tga-atmosphere-series
+  experiment_id: 10.1016/j.icarus.2023.115577::wilkerson-2023-jsc1a-outgassing::declared:10.1016/j.icarus.2023.115577::experiment::tga-atmosphere-series::method:mossbauer_spectroscopy
   identity:
     quantity:
       tag: unknown
@@ -324,12 +464,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'JSC-1A_heated_under_Ar_H2_at_1050C' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -350,7 +489,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''JSC-1A_heated_under_Ar_H2_at_1050C'' is not in the closed automatic map'
+    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_table1_mossbauer_metallic_fe_arh2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: wilkerson-2023-jsc1a-outgassing
   locator:
     pdf_page_index: 8
@@ -361,7 +511,7 @@ observations:
   provenance:
     printed_phase: JSC-1A_heated_under_Ar_H2_at_1050C
 - observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_table2_carbon_sulfur
-  experiment_id: 10.1016/j.icarus.2023.115577::experiment::tga-heat-treatment-series
+  experiment_id: 10.1016/j.icarus.2023.115577::wilkerson-2023-jsc1a-outgassing::declared:10.1016/j.icarus.2023.115577::experiment::tga-heat-treatment-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -369,12 +519,11 @@ observations:
     species:
       formula: C
       phase:
-        tag: unknown
-        reason: phase string 'JSC-1A_residue_after_1050C_treatments' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -396,7 +545,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''JSC-1A_residue_after_1050C_treatments'' is not in the closed automatic map'
+    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_table2_carbon_sulfur
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: destructive_C_S_analysis'
+    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_table2_carbon_sulfur
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: wilkerson-2023-jsc1a-outgassing
   locator:
     pdf_page_index: 14
@@ -406,7 +576,7 @@ observations:
   provenance:
     printed_phase: JSC-1A_residue_after_1050C_treatments
 - observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_table2_sulfur_pointer
-  experiment_id: 10.1016/j.icarus.2023.115577::experiment::tga-heat-treatment-series
+  experiment_id: 10.1016/j.icarus.2023.115577::wilkerson-2023-jsc1a-outgassing::declared:10.1016/j.icarus.2023.115577::experiment::tga-heat-treatment-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -414,12 +584,11 @@ observations:
     species:
       formula: S
       phase:
-        tag: unknown
-        reason: phase string 'JSC-1A_residue_after_1050C_treatments' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -437,7 +606,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''JSC-1A_residue_after_1050C_treatments'' is not in the closed automatic map'
+    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_table2_sulfur_pointer
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: destructive_C_S_analysis'
+    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_table2_sulfur_pointer
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: wilkerson-2023-jsc1a-outgassing
   locator:
     pdf_page_index: 14
@@ -455,12 +645,11 @@ observations:
     species:
       formula: JSC-1A
       phase:
-        tag: unknown
-        reason: phase string 'JSC-1A_powder_untreated_and_heat_treated' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -482,7 +671,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''JSC-1A_powder_untreated_and_heat_treated'' is not in the closed automatic map'
+    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_table3_psd_bet_density
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: post_heat_treatment_powder_characterization'
+    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_table3_psd_bet_density
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: wilkerson-2023-jsc1a-outgassing
   locator:
     pdf_page_index: 20
@@ -492,7 +702,7 @@ observations:
   provenance:
     printed_phase: JSC-1A_powder_untreated_and_heat_treated
 - observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_tga_1050C_total_mass_loss_vacuum_vs_he
-  experiment_id: 10.1016/j.icarus.2023.115577::experiment::tga-atmosphere-series
+  experiment_id: 10.1016/j.icarus.2023.115577::wilkerson-2023-jsc1a-outgassing::declared:10.1016/j.icarus.2023.115577::experiment::tga-atmosphere-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -500,12 +710,11 @@ observations:
     species:
       formula: JSC-1A
       phase:
-        tag: unknown
-        reason: phase string 'JSC-1A_lunar_simulant_powder' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -529,7 +738,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''JSC-1A_lunar_simulant_powder'' is not in the closed automatic map'
+    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_tga_1050C_total_mass_loss_vacuum_vs_he
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: tga_ms_to_1050C_avoid_vitrification'
+    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_tga_1050C_total_mass_loss_vacuum_vs_he
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: wilkerson-2023-jsc1a-outgassing
   locator:
     pdf_page_index: 13
@@ -539,7 +769,7 @@ observations:
   provenance:
     printed_phase: JSC-1A_lunar_simulant_powder
 - observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_tga_apparatus_and_thermal_program
-  experiment_id: 10.1016/j.icarus.2023.115577::experiment::tga-atmosphere-series
+  experiment_id: 10.1016/j.icarus.2023.115577::wilkerson-2023-jsc1a-outgassing::declared:10.1016/j.icarus.2023.115577::experiment::tga-atmosphere-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -547,12 +777,11 @@ observations:
     species:
       formula: JSC-1A
       phase:
-        tag: unknown
-        reason: phase string 'JSC-1A_lunar_simulant_powder' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -574,7 +803,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''JSC-1A_lunar_simulant_powder'' is not in the closed automatic map'
+    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_tga_apparatus_and_thermal_program
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: tga_ms'
+    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_tga_apparatus_and_thermal_program
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: wilkerson-2023-jsc1a-outgassing
   locator:
     pdf_page_index: 6
@@ -584,7 +834,7 @@ observations:
   provenance:
     printed_phase: JSC-1A_lunar_simulant_powder
 - observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_vacuum_ms_apparatus
-  experiment_id: 10.1016/j.icarus.2023.115577::experiment::vacuum-ms-series
+  experiment_id: 10.1016/j.icarus.2023.115577::wilkerson-2023-jsc1a-outgassing::declared:10.1016/j.icarus.2023.115577::experiment::vacuum-ms-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -592,12 +842,11 @@ observations:
     species:
       formula: JSC-1A
       phase:
-        tag: unknown
-        reason: phase string 'JSC-1A_lunar_simulant_powder' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -618,7 +867,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''JSC-1A_lunar_simulant_powder'' is not in the closed automatic map'
+    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_vacuum_ms_apparatus
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: pumped_vacuum_ms_quartz_tube'
+    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_vacuum_ms_apparatus
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: wilkerson-2023-jsc1a-outgassing
   locator:
     pdf_page_index: 7
@@ -636,12 +906,11 @@ observations:
     species:
       formula: JSC-1A
       phase:
-        tag: unknown
-        reason: phase string 'JSC-1A_untreated_and_heat_treated' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -660,7 +929,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''JSC-1A_untreated_and_heat_treated'' is not in the closed automatic map'
+    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_xrd_primary_phases_printed
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: powder_xrd'
+    origin: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_xrd_primary_phases_printed
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: wilkerson-2023-jsc1a-outgassing
   locator:
     pdf_page_index: 17

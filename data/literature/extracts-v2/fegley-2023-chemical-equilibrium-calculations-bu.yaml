@@ -11,12 +11,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -87,7 +86,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -113,12 +135,11 @@ observations:
     species:
       formula: Tl2O3
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -190,7 +211,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -216,12 +260,11 @@ observations:
     species:
       formula: As2O3
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -293,7 +336,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -319,12 +385,11 @@ observations:
     species:
       formula: MnO
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -396,7 +461,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -422,12 +510,11 @@ observations:
     species:
       formula: Rb2O
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -499,7 +586,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -525,12 +635,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -601,7 +710,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -627,12 +759,11 @@ observations:
     species:
       formula: GeO2
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -704,7 +835,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -730,12 +884,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -807,7 +960,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -833,12 +1009,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -910,7 +1085,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -936,12 +1134,11 @@ observations:
     species:
       formula: Fe2O3
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1012,7 +1209,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -1038,12 +1258,11 @@ observations:
     species:
       formula: CuO
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1115,7 +1334,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -1141,12 +1383,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1218,7 +1459,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -1244,12 +1508,11 @@ observations:
     species:
       formula: Li2O
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1321,7 +1584,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -1347,12 +1633,11 @@ observations:
     species:
       formula: WO3
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1424,7 +1709,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -1450,12 +1758,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1527,7 +1834,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -1553,12 +1883,11 @@ observations:
     species:
       formula: ZnO
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1630,7 +1959,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -1656,12 +2008,11 @@ observations:
     species:
       formula: TiO2
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1733,7 +2084,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -1759,12 +2133,11 @@ observations:
     species:
       formula: As2O3
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1836,7 +2209,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -1862,12 +2258,11 @@ observations:
     species:
       formula: CoO
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1939,7 +2334,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -1965,12 +2383,11 @@ observations:
     species:
       formula: Li2O
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2042,7 +2459,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -2068,12 +2508,11 @@ observations:
     species:
       formula: SnO2
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2145,7 +2584,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -2171,12 +2633,11 @@ observations:
     species:
       formula: TiO2
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2247,7 +2708,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -2273,12 +2757,11 @@ observations:
     species:
       formula: PbO
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2350,7 +2833,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -2376,12 +2882,11 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2453,7 +2958,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -2479,12 +3007,11 @@ observations:
     species:
       formula: Ti2O3
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2555,7 +3082,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -2581,12 +3131,11 @@ observations:
     species:
       formula: Cu2O
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2658,7 +3207,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -2684,12 +3256,11 @@ observations:
     species:
       formula: CdO
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2761,7 +3332,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -2787,12 +3381,11 @@ observations:
     species:
       formula: Li2O
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2864,7 +3457,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -2890,12 +3506,11 @@ observations:
     species:
       formula: Ag2O
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2967,7 +3582,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -2993,12 +3631,11 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3069,7 +3706,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -3095,12 +3755,11 @@ observations:
     species:
       formula: Ag2O
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3172,7 +3831,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -3198,12 +3880,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3275,7 +3956,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -3301,12 +4005,11 @@ observations:
     species:
       formula: MoO2
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3378,7 +4081,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -3404,12 +4130,11 @@ observations:
     species:
       formula: Cs2O
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3481,7 +4206,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -3507,12 +4255,11 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3584,7 +4331,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -3610,12 +4380,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3686,7 +4455,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -3712,12 +4504,11 @@ observations:
     species:
       formula: PbO
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3789,7 +4580,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -3815,12 +4629,11 @@ observations:
     species:
       formula: VO
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3892,7 +4705,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -3918,12 +4754,11 @@ observations:
     species:
       formula: K2O
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3995,7 +4830,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -4021,12 +4879,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4097,7 +4954,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -4123,12 +5003,11 @@ observations:
     species:
       formula: K2O
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4200,7 +5079,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -4226,12 +5128,11 @@ observations:
     species:
       formula: GeO2
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4303,7 +5204,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -4329,12 +5253,11 @@ observations:
     species:
       formula: GeO2
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4406,7 +5329,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -4432,12 +5378,11 @@ observations:
     species:
       formula: Cs2O
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4509,7 +5454,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -4535,12 +5503,11 @@ observations:
     species:
       formula: CrO
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4611,7 +5578,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -4637,12 +5627,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4714,7 +5703,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -4740,12 +5752,11 @@ observations:
     species:
       formula: In2O3
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4817,7 +5828,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -4843,12 +5877,11 @@ observations:
     species:
       formula: MnO
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4919,7 +5952,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -4945,12 +6001,11 @@ observations:
     species:
       formula: ZnO
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5022,7 +6077,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -5048,12 +6126,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5125,7 +6202,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -5151,12 +6251,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5228,7 +6327,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -5254,12 +6376,11 @@ observations:
     species:
       formula: Cu2O
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5331,7 +6452,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -5357,12 +6501,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5433,7 +6576,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -5459,12 +6625,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5536,7 +6701,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -5562,12 +6750,11 @@ observations:
     species:
       formula: Sb2O3
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5639,7 +6826,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -5665,12 +6875,11 @@ observations:
     species:
       formula: Bi2O3
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5742,7 +6951,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -5768,12 +7000,11 @@ observations:
     species:
       formula: B2O3
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5845,7 +7076,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -5871,12 +7125,11 @@ observations:
     species:
       formula: TiO2
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5948,7 +7201,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -5974,12 +7250,11 @@ observations:
     species:
       formula: ZnO
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6051,7 +7326,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -6077,12 +7375,11 @@ observations:
     species:
       formula: As2O3
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6154,7 +7451,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -6180,12 +7500,11 @@ observations:
     species:
       formula: Tl2O
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6257,7 +7576,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -6283,12 +7625,11 @@ observations:
     species:
       formula: Cr2O3
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6359,7 +7700,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -6385,12 +7749,11 @@ observations:
     species:
       formula: K2O
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6462,7 +7825,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -6488,12 +7874,11 @@ observations:
     species:
       formula: Ga2O3
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6565,7 +7950,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -6591,12 +7999,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6668,7 +8075,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -6694,12 +8124,11 @@ observations:
     species:
       formula: SnO
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6771,7 +8200,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -6797,12 +8249,11 @@ observations:
     species:
       formula: PbO
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6874,7 +8325,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -6900,12 +8374,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6977,7 +8450,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -7003,12 +8499,11 @@ observations:
     species:
       formula: GeO2
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7080,7 +8575,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -7106,12 +8624,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7182,7 +8699,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -7208,12 +8748,11 @@ observations:
     species:
       formula: V2O3
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7285,7 +8824,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -7311,12 +8873,11 @@ observations:
     species:
       formula: Bi2O3
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7388,7 +8949,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -7414,12 +8998,11 @@ observations:
     species:
       formula: ZnO
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7491,7 +9074,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -7517,12 +9123,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7594,7 +9199,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -7620,12 +9248,11 @@ observations:
     species:
       formula: MoO3
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7697,7 +9324,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -7723,12 +9373,11 @@ observations:
     species:
       formula: K2O
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7799,7 +9448,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -7825,12 +9497,11 @@ observations:
     species:
       formula: NiO
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7901,7 +9572,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -7927,12 +9621,11 @@ observations:
     species:
       formula: PbO
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8004,7 +9697,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -8030,12 +9746,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8107,7 +9822,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -8133,12 +9871,11 @@ observations:
     species:
       formula: Cu2O
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8210,7 +9947,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -8236,12 +9996,11 @@ observations:
     species:
       formula: Cu2O
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8313,7 +10072,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -8339,12 +10121,11 @@ observations:
     species:
       formula: Li2O
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8416,7 +10197,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 62
@@ -8442,12 +10246,11 @@ observations:
     species:
       formula: BSE
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8469,7 +10272,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_04_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_04_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 66
@@ -8488,12 +10312,11 @@ observations:
     species:
       formula: BSE
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8515,7 +10338,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_06_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_06_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 68
@@ -8534,12 +10378,11 @@ observations:
     species:
       formula: BSE
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8561,7 +10404,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_07_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_07_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 69
@@ -8580,12 +10444,11 @@ observations:
     species:
       formula: BSE
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8607,7 +10470,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_08_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_08_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 69
@@ -8626,12 +10510,11 @@ observations:
     species:
       formula: BSE
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8653,7 +10536,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_09_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_09_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 69
@@ -8672,12 +10576,11 @@ observations:
     species:
       formula: BSE
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8699,7 +10602,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_10_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_10_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 69
@@ -8718,12 +10642,11 @@ observations:
     species:
       formula: BSE
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8745,7 +10668,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_11_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_11_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 70
@@ -8764,12 +10708,11 @@ observations:
     species:
       formula: BSE
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8791,7 +10734,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_12_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_12_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 70
@@ -8810,12 +10774,11 @@ observations:
     species:
       formula: BSE
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8837,7 +10800,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_13_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_13_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 70
@@ -8856,12 +10840,11 @@ observations:
     species:
       formula: BSE
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8883,7 +10866,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_14_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_14_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 70
@@ -8902,12 +10906,11 @@ observations:
     species:
       formula: BSE
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8929,7 +10932,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_15_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_15_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 71
@@ -8948,12 +10972,11 @@ observations:
     species:
       formula: BSE
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8975,7 +10998,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_16_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_16_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 71
@@ -8994,12 +11038,11 @@ observations:
     species:
       formula: BSE
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9021,7 +11064,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_17_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_17_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 71
@@ -9040,12 +11104,11 @@ observations:
     species:
       formula: BSE
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9067,7 +11130,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_18_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_18_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 72
@@ -9086,12 +11170,11 @@ observations:
     species:
       formula: BSE
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9113,7 +11196,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_19_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_19_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 72
@@ -9132,12 +11236,11 @@ observations:
     species:
       formula: BSE
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9159,7 +11262,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_20_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_20_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 72
@@ -9178,12 +11302,11 @@ observations:
     species:
       formula: BSE
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9205,7 +11328,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_21_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_21_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 73
@@ -9224,12 +11368,11 @@ observations:
     species:
       formula: BSE
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9251,7 +11394,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_22_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_22_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 73
@@ -9270,12 +11434,11 @@ observations:
     species:
       formula: BSE
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9297,7 +11460,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_23_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_23_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 73
@@ -9316,12 +11500,11 @@ observations:
     species:
       formula: BSE
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9343,7 +11526,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_24_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_24_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 73
@@ -9362,12 +11566,11 @@ observations:
     species:
       formula: BSE
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9389,7 +11592,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_25_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_25_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 74
@@ -9408,12 +11632,11 @@ observations:
     species:
       formula: BSE
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9435,7 +11658,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_27_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_27_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 74
@@ -9454,12 +11698,11 @@ observations:
     species:
       formula: BSE
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9481,7 +11724,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_28_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_28_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 75
@@ -9500,12 +11764,11 @@ observations:
     species:
       formula: BSE
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9527,7 +11790,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_29_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_29_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 75
@@ -9546,12 +11830,11 @@ observations:
     species:
       formula: BSE
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9573,7 +11856,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_30_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_30_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 75
@@ -9592,12 +11896,11 @@ observations:
     species:
       formula: BSE
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9619,7 +11922,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_31_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_31_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 75
@@ -9638,12 +11962,11 @@ observations:
     species:
       formula: BSE
       phase:
-        tag: unknown
-        reason: phase string 'BSE_equilibrium_gas_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9665,7 +11988,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_equilibrium_gas_melt'' is not in the closed automatic map'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_32_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_32_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fegley-2023-chemical-equilibrium-calculations-bu
   locator:
     page: 76

@@ -11,12 +11,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'liquid_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -45,7 +44,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_iron'' is not in the closed automatic map'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_present_work_parameters
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: authors_Wagner_first_and_second_order_interaction_parameter_fit'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_present_work_parameters
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 625
@@ -64,12 +84,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'liquid_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -91,7 +110,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_iron'' is not in the closed automatic map'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table1_prior_parameters
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: literature_compilation'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table1_prior_parameters
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 623
@@ -110,12 +150,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'liquid_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -140,7 +179,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_iron'' is not in the closed automatic map'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: liquid_metal_deoxidation_equilibrium'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 625
@@ -167,12 +227,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'liquid_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -197,7 +256,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_iron'' is not in the closed automatic map'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: liquid_metal_deoxidation_equilibrium'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 625
@@ -224,12 +304,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'liquid_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -254,7 +333,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_iron'' is not in the closed automatic map'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: liquid_metal_deoxidation_equilibrium'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 625
@@ -281,12 +381,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'liquid_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -311,7 +410,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_iron'' is not in the closed automatic map'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: liquid_metal_deoxidation_equilibrium'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 625
@@ -338,12 +458,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'liquid_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -368,7 +487,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_iron'' is not in the closed automatic map'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: liquid_metal_deoxidation_equilibrium'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 625
@@ -395,12 +535,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'liquid_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -425,7 +564,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_iron'' is not in the closed automatic map'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: liquid_metal_deoxidation_equilibrium'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 625
@@ -452,12 +612,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'liquid_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -482,7 +641,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_iron'' is not in the closed automatic map'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: liquid_metal_deoxidation_equilibrium'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 625
@@ -509,12 +689,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'liquid_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -539,7 +718,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_iron'' is not in the closed automatic map'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: liquid_metal_deoxidation_equilibrium'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 625
@@ -566,12 +766,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'liquid_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -596,7 +795,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_iron'' is not in the closed automatic map'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: liquid_metal_deoxidation_equilibrium'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 625
@@ -623,12 +843,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'liquid_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -653,7 +872,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_iron'' is not in the closed automatic map'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: liquid_metal_deoxidation_equilibrium'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 625
@@ -680,12 +920,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'liquid_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -710,7 +949,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_iron'' is not in the closed automatic map'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: liquid_metal_deoxidation_equilibrium'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 625
@@ -737,12 +997,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'liquid_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -767,7 +1026,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_iron'' is not in the closed automatic map'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: liquid_metal_deoxidation_equilibrium'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 625
@@ -794,12 +1074,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'liquid_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -824,7 +1103,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_iron'' is not in the closed automatic map'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: liquid_metal_deoxidation_equilibrium'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 625
@@ -851,12 +1151,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'liquid_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -881,7 +1180,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_iron'' is not in the closed automatic map'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: liquid_metal_deoxidation_equilibrium'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 625
@@ -908,12 +1228,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'liquid_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -938,7 +1257,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_iron'' is not in the closed automatic map'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: liquid_metal_deoxidation_equilibrium'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 625
@@ -965,12 +1305,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'liquid_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -995,7 +1334,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_iron'' is not in the closed automatic map'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: liquid_metal_deoxidation_equilibrium'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 625
@@ -1022,12 +1382,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'liquid_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1052,7 +1411,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_iron'' is not in the closed automatic map'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: liquid_metal_deoxidation_equilibrium'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 625
@@ -1079,12 +1459,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'liquid_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1109,7 +1488,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_iron'' is not in the closed automatic map'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: liquid_metal_deoxidation_equilibrium'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 625
@@ -1136,12 +1536,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'liquid_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1166,7 +1565,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_iron'' is not in the closed automatic map'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: liquid_metal_deoxidation_equilibrium'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 625
@@ -1193,12 +1613,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'liquid_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1223,7 +1642,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_iron'' is not in the closed automatic map'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: liquid_metal_deoxidation_equilibrium'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 625
@@ -1250,12 +1690,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'liquid_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1280,7 +1719,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_iron'' is not in the closed automatic map'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: liquid_metal_deoxidation_equilibrium'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 625
@@ -1307,12 +1767,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'liquid_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1337,7 +1796,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_iron'' is not in the closed automatic map'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: liquid_metal_deoxidation_equilibrium'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 625
@@ -1364,12 +1844,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'liquid_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1394,7 +1873,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_iron'' is not in the closed automatic map'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: liquid_metal_deoxidation_equilibrium'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 625
@@ -1421,12 +1921,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'liquid_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1451,7 +1950,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_iron'' is not in the closed automatic map'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: liquid_metal_deoxidation_equilibrium'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 625
@@ -1478,12 +1998,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'liquid_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1508,7 +2027,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_iron'' is not in the closed automatic map'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: liquid_metal_deoxidation_equilibrium'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 625
@@ -1535,12 +2075,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'liquid_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1565,7 +2104,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_iron'' is not in the closed automatic map'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: liquid_metal_deoxidation_equilibrium'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 625
@@ -1592,12 +2152,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'liquid_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1622,7 +2181,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_iron'' is not in the closed automatic map'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: liquid_metal_deoxidation_equilibrium'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 625
@@ -1649,12 +2229,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'liquid_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1679,7 +2258,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_iron'' is not in the closed automatic map'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: liquid_metal_deoxidation_equilibrium'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 625
@@ -1706,12 +2306,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'liquid_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1736,7 +2335,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_iron'' is not in the closed automatic map'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: liquid_metal_deoxidation_equilibrium'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 625
@@ -1763,12 +2383,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'liquid_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1793,7 +2412,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_iron'' is not in the closed automatic map'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: liquid_metal_deoxidation_equilibrium'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 625
@@ -1820,12 +2460,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'liquid_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1850,7 +2489,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_iron'' is not in the closed automatic map'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: liquid_metal_deoxidation_equilibrium'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 625
@@ -1877,12 +2537,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'liquid_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1907,7 +2566,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_iron'' is not in the closed automatic map'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: liquid_metal_deoxidation_equilibrium'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 625
@@ -1934,12 +2614,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'liquid_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1964,7 +2643,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_iron'' is not in the closed automatic map'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: liquid_metal_deoxidation_equilibrium'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 625
@@ -1991,12 +2691,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'liquid_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2021,7 +2720,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_iron'' is not in the closed automatic map'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: liquid_metal_deoxidation_equilibrium'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 625
@@ -2048,12 +2768,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'liquid_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2078,7 +2797,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_iron'' is not in the closed automatic map'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: liquid_metal_deoxidation_equilibrium'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 625
@@ -2105,12 +2845,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'liquid_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2135,7 +2874,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_iron'' is not in the closed automatic map'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: liquid_metal_deoxidation_equilibrium'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 625
@@ -2162,12 +2922,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'liquid_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2192,7 +2951,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_iron'' is not in the closed automatic map'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: liquid_metal_deoxidation_equilibrium'
+    origin: itoh-hino-banya-1997-mg-deoxidation::itoh_hino_banya_1997_table2_mg_o_concentrations
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-hino-banya-1997-mg-deoxidation
   locator:
     published_page: 625

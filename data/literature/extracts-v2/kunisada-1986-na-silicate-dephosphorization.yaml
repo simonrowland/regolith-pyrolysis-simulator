@@ -48,7 +48,17 @@ observations:
         published_page: 126
         pdf_page_index: 5
         section: III.2 Effect of Na2CO3 in Flux
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_carbon_calculated_amount_flux_E
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 6
@@ -200,7 +210,17 @@ observations:
         published_page: 126
         pdf_page_index: 5
         section: III.2 Effect of Na2CO3 in Flux
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_carbon_calculated_increment_flux_E
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 6
@@ -353,7 +373,19 @@ observations:
         published_page: 126
         pdf_page_index: 5
         section: III.2 Effect of Na2CO3 in Flux
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Text compares the calculated
+      Flux E concentration with this measured range and references Figure 9; it does not pair individual range endpoints with
+      the 4- and 15-min analyses.'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_carbon_measured_range
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 6
@@ -482,7 +514,18 @@ observations:
         published_page: 123
         pdf_page_index: 2
         note: Text says final Na2O decreased from 31% as T.Fe increased from 9%.
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Two prose endpoints,
+      not digitized figure values; each Na2O endpoint is paired with the printed total-Fe endpoint.'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_flux_C_slag_composition_endpoint_1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 3
@@ -586,7 +629,18 @@ observations:
         published_page: 123
         pdf_page_index: 2
         note: Text says final Na2O decreased to 20% as T.Fe increased to 31%.
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Two prose endpoints,
+      not digitized figure values; each Na2O endpoint is paired with the printed total-Fe endpoint.'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_flux_C_slag_composition_endpoint_2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 3
@@ -686,7 +740,17 @@ observations:
         published_page: 125
         pdf_page_index: 4
         section: III.2 Effect of Na2CO3 in Flux
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_initial_carbon_bound
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 5
@@ -805,7 +869,18 @@ observations:
         published_page: 125
         pdf_page_index: 4
         section: III.2 Effect of Na2CO3 in Flux
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Author-reduced comparison
+      rate; the curve is not digitized.'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_initial_dephosphorization_rate_flux_C2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 5
@@ -950,7 +1025,18 @@ observations:
         published_page: 125
         pdf_page_index: 4
         section: III.2 Effect of Na2CO3 in Flux
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Author-reduced initial
+      rates; the corresponding numerical curves are in Figure 7 and are not digitized.'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_initial_dephosphorization_rate_fluxes_E_to_I
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 5
@@ -1127,6 +1213,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Author-calculated Na2O
+      loss across the flux series, not a time-resolved sodium evaporation measurement.'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_na2o_loss_flux_A
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -1281,6 +1379,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Author-calculated Na2O
+      loss across the flux series, not a time-resolved sodium evaporation measurement.'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_na2o_loss_flux_B
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -1435,6 +1545,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Author-calculated Na2O
+      loss across the flux series, not a time-resolved sodium evaporation measurement.'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_na2o_loss_flux_C
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -1589,6 +1711,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Author-calculated Na2O
+      loss across the flux series, not a time-resolved sodium evaporation measurement.'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_na2o_loss_flux_D
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -1666,7 +1800,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r03_c03
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-2-r03
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-2-r03::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1709,7 +1843,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=A-2; column=[%P]i; table_row_number=3; table_column_number=3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r03_c03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -1976,7 +2120,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r03_c05
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-2-r03
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-2-r03::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2019,7 +2163,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=A-2; column=[%O]f; table_row_number=3; table_column_number=5
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r03_c05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -3042,7 +3196,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r04_c03
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-2-r04
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-2-r04::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -3085,7 +3239,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=A-2; column=[%P]i; table_row_number=4; table_column_number=3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r04_c03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -3352,7 +3516,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r04_c05
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-2-r04
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-2-r04::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -3395,7 +3559,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=A-2; column=[%O]f; table_row_number=4; table_column_number=5
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r04_c05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -4418,7 +4592,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r05_c03
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-2-r05
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-2-r05::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -4461,7 +4635,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=A-2; column=[%P]i; table_row_number=5; table_column_number=3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r05_c03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -4728,7 +4912,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r05_c05
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-2-r05
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-2-r05::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -4771,7 +4955,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=A-2; column=[%O]f; table_row_number=5; table_column_number=5
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_2_r05_c05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -5794,7 +5988,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_3_r06_c03
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-3-r06
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-3-r06::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -5837,7 +6031,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=A-3; column=[%P]i; table_row_number=6; table_column_number=3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_3_r06_c03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -6104,7 +6308,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_3_r06_c05
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-3-r06
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-3-r06::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -6147,7 +6351,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=A-3; column=[%O]f; table_row_number=6; table_column_number=5
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_3_r06_c05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -7170,7 +7384,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_4_r07_c03
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-4-r07
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-4-r07::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -7213,7 +7427,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=A-4; column=[%P]i; table_row_number=7; table_column_number=3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_4_r07_c03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -7480,7 +7704,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_4_r07_c05
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-4-r07
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-a-4-r07::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -7523,7 +7747,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=A-4; column=[%O]f; table_row_number=7; table_column_number=5
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_a_4_r07_c05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -8546,7 +8780,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r08_c03
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-2-r08
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-2-r08::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -8589,7 +8823,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=B-2; column=[%P]i; table_row_number=8; table_column_number=3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r08_c03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -8856,7 +9100,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r08_c05
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-2-r08
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-2-r08::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -8899,7 +9143,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=B-2; column=[%O]f; table_row_number=8; table_column_number=5
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r08_c05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -9922,7 +10176,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r09_c03
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-2-r09
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-2-r09::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -9965,7 +10219,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=B-2; column=[%P]i; table_row_number=9; table_column_number=3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r09_c03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -10232,7 +10496,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r09_c05
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-2-r09
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-2-r09::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -10275,7 +10539,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=B-2; column=[%O]f; table_row_number=9; table_column_number=5
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r09_c05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -11298,7 +11572,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r10_c03
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-2-r10
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-2-r10::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -11341,7 +11615,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=B-2; column=[%P]i; table_row_number=10; table_column_number=3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r10_c03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -11608,7 +11892,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r10_c05
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-2-r10
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-2-r10::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -11651,7 +11935,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=B-2; column=[%O]f; table_row_number=10; table_column_number=5
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_2_r10_c05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -12674,7 +12968,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_3_r11_c03
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-3-r11
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-3-r11::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -12717,7 +13011,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=B-3; column=[%P]i; table_row_number=11; table_column_number=3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_3_r11_c03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -12984,7 +13288,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_3_r11_c05
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-3-r11
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-3-r11::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -13027,7 +13331,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=B-3; column=[%O]f; table_row_number=11; table_column_number=5
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_3_r11_c05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -14050,7 +14364,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_4_r12_c03
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-4-r12
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-4-r12::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -14093,7 +14407,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=B-4; column=[%P]i; table_row_number=12; table_column_number=3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_4_r12_c03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -14360,7 +14684,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_4_r12_c05
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-4-r12
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-b-4-r12::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -14403,7 +14727,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=B-4; column=[%O]f; table_row_number=12; table_column_number=5
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_b_4_r12_c05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -15426,7 +15760,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_0_r13_c03
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-0-r13
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-0-r13::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -15469,7 +15803,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=C-0; column=[%P]i; table_row_number=13; table_column_number=3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_0_r13_c03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -15736,7 +16080,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_0_r13_c05
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-0-r13
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-0-r13::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -15779,7 +16123,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=C-0; column=[%O]f; table_row_number=13; table_column_number=5
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_0_r13_c05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -16802,7 +17156,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r14_c03
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-1-r14
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-1-r14::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -16845,7 +17199,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=C-1; column=[%P]i; table_row_number=14; table_column_number=3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r14_c03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -17112,7 +17476,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r14_c05
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-1-r14
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-1-r14::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -17155,7 +17519,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=C-1; column=[%O]f; table_row_number=14; table_column_number=5
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r14_c05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -18178,7 +18552,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r15_c03
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-1-r15
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-1-r15::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -18221,7 +18595,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=C-1; column=[%P]i; table_row_number=15; table_column_number=3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r15_c03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -18488,7 +18872,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r15_c05
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-1-r15
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-1-r15::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -18531,7 +18915,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=C-1; column=[%O]f; table_row_number=15; table_column_number=5
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r15_c05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -19554,7 +19948,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r16_c03
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-1-r16
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-1-r16::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -19597,7 +19991,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=C-1; column=[%P]i; table_row_number=16; table_column_number=3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r16_c03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -19864,7 +20268,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r16_c05
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-1-r16
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-1-r16::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -19907,7 +20311,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=C-1; column=[%O]f; table_row_number=16; table_column_number=5
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_1_r16_c05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -20930,7 +21344,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r17_c03
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r17
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r17::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -20973,7 +21387,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=C-2; column=[%P]i; table_row_number=17; table_column_number=3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r17_c03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -21240,7 +21664,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r17_c05
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r17
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r17::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -21283,7 +21707,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=C-2; column=[%O]f; table_row_number=17; table_column_number=5
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r17_c05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -22306,7 +22740,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r18_c03
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r18
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r18::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -22349,7 +22783,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=C-2; column=[%P]i; table_row_number=18; table_column_number=3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r18_c03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -22616,7 +23060,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r18_c05
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r18
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r18::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -22659,7 +23103,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=C-2; column=[%O]f; table_row_number=18; table_column_number=5
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r18_c05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -23682,7 +24136,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r19_c03
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r19
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r19::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -23725,7 +24179,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=C-2; column=[%P]i; table_row_number=19; table_column_number=3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r19_c03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -23992,7 +24456,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r19_c05
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r19
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r19::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -24035,7 +24499,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=C-2; column=[%O]f; table_row_number=19; table_column_number=5
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r19_c05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -25058,7 +25532,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r20_c03
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r20
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r20::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -25101,7 +25575,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=C-2; column=[%P]i; table_row_number=20; table_column_number=3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r20_c03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -25368,7 +25852,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r20_c05
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r20
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r20::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -25411,7 +25895,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=C-2; column=[%O]f; table_row_number=20; table_column_number=5
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r20_c05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -26434,7 +26928,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r21_c03
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r21
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r21::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -26477,7 +26971,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=C-2; column=[%P]i; table_row_number=21; table_column_number=3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r21_c03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -26744,7 +27248,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r21_c05
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r21
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-2-r21::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -26787,7 +27291,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=C-2; column=[%O]f; table_row_number=21; table_column_number=5
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_2_r21_c05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -27810,7 +28324,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r22_c03
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-3-r22
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-3-r22::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -27853,7 +28367,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=C-3; column=[%P]i; table_row_number=22; table_column_number=3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r22_c03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -28120,7 +28644,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r22_c05
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-3-r22
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-3-r22::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -28163,7 +28687,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=C-3; column=[%O]f; table_row_number=22; table_column_number=5
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r22_c05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -29186,7 +29720,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r23_c03
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-3-r23
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-3-r23::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -29229,7 +29763,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=C-3; column=[%P]i; table_row_number=23; table_column_number=3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r23_c03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -29496,7 +30040,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r23_c05
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-3-r23
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-3-r23::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -29539,7 +30083,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=C-3; column=[%O]f; table_row_number=23; table_column_number=5
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r23_c05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -30562,7 +31116,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r24_c03
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-3-r24
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-3-r24::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -30605,7 +31159,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=C-3; column=[%P]i; table_row_number=24; table_column_number=3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r24_c03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -30872,7 +31436,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r24_c05
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-3-r24
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-3-r24::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -30915,7 +31479,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=C-3; column=[%O]f; table_row_number=24; table_column_number=5
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_3_r24_c05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -31938,7 +32512,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_4_r25_c03
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-4-r25
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-4-r25::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -31981,7 +32555,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=C-4; column=[%P]i; table_row_number=25; table_column_number=3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_4_r25_c03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -32248,7 +32832,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_4_r25_c05
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-4-r25
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-c-4-r25::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -32291,7 +32875,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=C-4; column=[%O]f; table_row_number=25; table_column_number=5
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_c_4_r25_c05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -33314,7 +33908,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_1_r26_c03
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-1-r26
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-1-r26::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -33357,7 +33951,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=D-1; column=[%P]i; table_row_number=26; table_column_number=3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_1_r26_c03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -33624,7 +34228,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_1_r26_c05
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-1-r26
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-1-r26::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -33667,7 +34271,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=D-1; column=[%O]f; table_row_number=26; table_column_number=5
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_1_r26_c05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -34690,7 +35304,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r27_c03
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-2-r27
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-2-r27::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -34733,7 +35347,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=D-2; column=[%P]i; table_row_number=27; table_column_number=3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r27_c03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -35000,7 +35624,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r27_c05
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-2-r27
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-2-r27::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -35043,7 +35667,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=D-2; column=[%O]f; table_row_number=27; table_column_number=5
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r27_c05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -36066,7 +36700,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r28_c03
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-2-r28
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-2-r28::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -36109,7 +36743,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=D-2; column=[%P]i; table_row_number=28; table_column_number=3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r28_c03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -36376,7 +37020,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r28_c05
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-2-r28
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-2-r28::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -36419,7 +37063,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=D-2; column=[%O]f; table_row_number=28; table_column_number=5
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r28_c05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -37442,7 +38096,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r29_c03
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-2-r29
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-2-r29::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -37485,7 +38139,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=D-2; column=[%P]i; table_row_number=29; table_column_number=3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r29_c03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -37752,7 +38416,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r29_c05
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-2-r29
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-fe2o3-flux-d-2-r29::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -37795,7 +38459,17 @@ observations:
         pdf_page_index: 1
         table: 1(I)
         note: row_label=D-2; column=[%O]f; table_row_number=29; table_column_number=5
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1i_d_2_r29_c05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -40018,7 +40692,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_e_final_O_in_liquid_iron
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-e
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-e::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -40061,7 +40735,17 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: row_label=E; column=[%O]f; table_row_number=1; table_column_number=5
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_e_final_O_in_liquid_iron
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -40148,7 +40832,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_e_initial_P_in_liquid_iron
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-e
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-e::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -40191,7 +40875,17 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: row_label=E; column=[%P]i; table_row_number=1; table_column_number=3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_e_initial_P_in_liquid_iron
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -41466,7 +42160,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_f_final_O_in_liquid_iron
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-f
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-f::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -41509,7 +42203,17 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: row_label=F; column=[%O]f; table_row_number=2; table_column_number=5
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_f_final_O_in_liquid_iron
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -41596,7 +42300,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_f_initial_P_in_liquid_iron
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-f
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-f::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -41639,7 +42343,17 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: row_label=F; column=[%P]i; table_row_number=2; table_column_number=3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_f_initial_P_in_liquid_iron
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -42914,7 +43628,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_g_final_O_in_liquid_iron
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-g
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-g::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -42957,7 +43671,17 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: row_label=G; column=[%O]f; table_row_number=3; table_column_number=5
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_g_final_O_in_liquid_iron
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -43044,7 +43768,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_g_initial_P_in_liquid_iron
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-g
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-g::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -43087,7 +43811,17 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: row_label=G; column=[%P]i; table_row_number=3; table_column_number=3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_g_initial_P_in_liquid_iron
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -44374,7 +45108,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_h_final_O_in_liquid_iron
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-h
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-h::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -44417,7 +45151,17 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: row_label=H; column=[%O]f; table_row_number=4; table_column_number=5
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_h_final_O_in_liquid_iron
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -44504,7 +45248,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_h_initial_P_in_liquid_iron
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-h
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-h::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -44547,7 +45291,17 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: row_label=H; column=[%P]i; table_row_number=4; table_column_number=3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_h_initial_P_in_liquid_iron
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -46620,7 +47374,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_i_final_O_in_liquid_iron
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-i
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-i::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -46663,7 +47417,17 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: row_label=I; column=[%O]f; table_row_number=5; table_column_number=5
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_i_final_O_in_liquid_iron
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2
@@ -46750,7 +47514,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_i_initial_P_in_liquid_iron
-  experiment_id: 10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-i
+  experiment_id: 10.2355/isijinternational1966.26.121::kunisada-1986-na-silicate-dephosphorization::declared:10.2355/isijinternational1966.26.121::experiment::kunisada-1986-na2co3-flux-i::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -46793,7 +47557,17 @@ observations:
         pdf_page_index: 1
         table: 1(II)
         note: row_label=I; column=[%P]i; table_row_number=5; table_column_number=3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: reactive_dephosphorization'
+    origin: kunisada-1986-na-silicate-dephosphorization::kunisada_1986_t1ii_i_initial_P_in_liquid_iron
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kunisada-1986-na-silicate-dephosphorization
   locator:
     page: 2

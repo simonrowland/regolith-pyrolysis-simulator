@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/fujisawa-1994-na-sn-carbonate-thermodynamics.yaml
 observations:
 - observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_group_1_log_a_NaO05::points:h=9b7e898c8982
-  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k
+  experiment_id: 10.2320/matertrans1989.35.414::fujisawa-1994-na-sn-carbonate-thermodynamics::declared:10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -88,7 +88,19 @@ observations:
         published_page: 418
         table: '2'
         note: Group average printed on row 4; represents Table 2 run rows 1-5.
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Activity determined by
+      the EMF method using equations (1)-(5).'
+    origin: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_group_1_log_a_NaO05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
   locator:
     page: 5
@@ -213,7 +225,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_group_2_log_a_NaO05::points:h=b068d26ca4eb
-  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k
+  experiment_id: 10.2320/matertrans1989.35.414::fujisawa-1994-na-sn-carbonate-thermodynamics::declared:10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -298,7 +310,19 @@ observations:
         published_page: 418
         table: '2'
         note: Group average printed on row 7; represents Table 2 run rows 6.
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Activity determined by
+      the EMF method using equations (1)-(5).'
+    origin: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_group_2_log_a_NaO05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
   locator:
     page: 5
@@ -423,7 +447,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_group_3_log_a_NaO05::points:h=84e70d18cd50
-  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k
+  experiment_id: 10.2320/matertrans1989.35.414::fujisawa-1994-na-sn-carbonate-thermodynamics::declared:10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -508,7 +532,19 @@ observations:
         published_page: 418
         table: '2'
         note: Group average printed on row 8; represents Table 2 run rows 7-8.
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Activity determined by
+      the EMF method using equations (1)-(5).'
+    origin: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_group_3_log_a_NaO05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
   locator:
     page: 5
@@ -633,7 +669,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_r1::points:h=b93108d8b925
-  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k
+  experiment_id: 10.2320/matertrans1989.35.414::fujisawa-1994-na-sn-carbonate-thermodynamics::declared:10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -730,7 +766,19 @@ observations:
         page: 5
         published_page: 418
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Activity reduced from
+      Sn distribution equilibrium in molten copper using equations (12)-(15).'
+    origin: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_r1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
   locator:
     page: 5
@@ -797,7 +845,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_r2::points:h=f70d59a198fe
-  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k
+  experiment_id: 10.2320/matertrans1989.35.414::fujisawa-1994-na-sn-carbonate-thermodynamics::declared:10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -894,7 +942,19 @@ observations:
         page: 5
         published_page: 418
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Activity reduced from
+      Sn distribution equilibrium in molten copper using equations (12)-(15).'
+    origin: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_r2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
   locator:
     page: 5
@@ -961,7 +1021,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_r3::points:h=02e581f1afe7
-  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k
+  experiment_id: 10.2320/matertrans1989.35.414::fujisawa-1994-na-sn-carbonate-thermodynamics::declared:10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1058,7 +1118,19 @@ observations:
         page: 5
         published_page: 418
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Activity reduced from
+      Sn distribution equilibrium in molten copper using equations (12)-(15).'
+    origin: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_r3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
   locator:
     page: 5
@@ -1125,7 +1197,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_r4::points:h=a9dd167aef10
-  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k
+  experiment_id: 10.2320/matertrans1989.35.414::fujisawa-1994-na-sn-carbonate-thermodynamics::declared:10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1222,7 +1294,18 @@ observations:
         page: 5
         published_page: 418
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_r4
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
   locator:
     page: 5
@@ -1289,7 +1372,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_r5::points:h=72e1e66e50e8
-  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k
+  experiment_id: 10.2320/matertrans1989.35.414::fujisawa-1994-na-sn-carbonate-thermodynamics::declared:10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1386,7 +1469,18 @@ observations:
         page: 5
         published_page: 418
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_r5
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
   locator:
     page: 5
@@ -1453,7 +1547,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_r6::points:h=810fd3185f4d
-  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k
+  experiment_id: 10.2320/matertrans1989.35.414::fujisawa-1994-na-sn-carbonate-thermodynamics::declared:10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1550,7 +1644,18 @@ observations:
         page: 5
         published_page: 418
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_r6
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
   locator:
     page: 5
@@ -1617,7 +1722,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_r7::points:h=2feae6b87aca
-  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k
+  experiment_id: 10.2320/matertrans1989.35.414::fujisawa-1994-na-sn-carbonate-thermodynamics::declared:10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1714,7 +1819,18 @@ observations:
         page: 5
         published_page: 418
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_r7
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
   locator:
     page: 5
@@ -1781,7 +1897,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_r8::points:h=8928185c97c3
-  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k
+  experiment_id: 10.2320/matertrans1989.35.414::fujisawa-1994-na-sn-carbonate-thermodynamics::declared:10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1878,7 +1994,18 @@ observations:
         page: 5
         published_page: 418
         table: '2'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t2_r8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
   locator:
     page: 5
@@ -1945,7 +2072,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t3_r1::points:h=7e320eee27ce
-  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k
+  experiment_id: 10.2320/matertrans1989.35.414::fujisawa-1994-na-sn-carbonate-thermodynamics::declared:10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -2042,7 +2169,18 @@ observations:
         page: 6
         published_page: 419
         table: '3'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t3_r1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
   locator:
     page: 6
@@ -2109,7 +2247,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t3_r2::points:h=5e7a03a219f7
-  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k
+  experiment_id: 10.2320/matertrans1989.35.414::fujisawa-1994-na-sn-carbonate-thermodynamics::declared:10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -2206,7 +2344,18 @@ observations:
         page: 6
         published_page: 419
         table: '3'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t3_r2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
   locator:
     page: 6
@@ -2273,7 +2422,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t3_r3::points:h=2c2bfa838dae
-  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k
+  experiment_id: 10.2320/matertrans1989.35.414::fujisawa-1994-na-sn-carbonate-thermodynamics::declared:10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -2370,7 +2519,18 @@ observations:
         page: 6
         published_page: 419
         table: '3'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t3_r3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
   locator:
     page: 6
@@ -2437,7 +2597,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t3_r4::points:h=9889f0a7c034
-  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k
+  experiment_id: 10.2320/matertrans1989.35.414::fujisawa-1994-na-sn-carbonate-thermodynamics::declared:10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -2534,7 +2694,18 @@ observations:
         page: 6
         published_page: 419
         table: '3'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t3_r4
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
   locator:
     page: 6
@@ -2601,7 +2772,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t3_r5::points:h=f3b94142f7e9
-  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k
+  experiment_id: 10.2320/matertrans1989.35.414::fujisawa-1994-na-sn-carbonate-thermodynamics::declared:10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -2698,7 +2869,18 @@ observations:
         page: 6
         published_page: 419
         table: '3'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t3_r5
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
   locator:
     page: 6
@@ -2765,7 +2947,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t3_r6::points:h=a64dc0935bf9
-  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k
+  experiment_id: 10.2320/matertrans1989.35.414::fujisawa-1994-na-sn-carbonate-thermodynamics::declared:10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -2862,7 +3044,18 @@ observations:
         page: 6
         published_page: 419
         table: '3'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t3_r6
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
   locator:
     page: 6
@@ -2929,7 +3122,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t3_r7::points:h=4f40f56ff8d8
-  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k
+  experiment_id: 10.2320/matertrans1989.35.414::fujisawa-1994-na-sn-carbonate-thermodynamics::declared:10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -3026,7 +3219,18 @@ observations:
         page: 6
         published_page: 419
         table: '3'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t3_r7
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
   locator:
     page: 6
@@ -3093,7 +3297,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t3_r8::points:h=7874f6b3b504
-  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k
+  experiment_id: 10.2320/matertrans1989.35.414::fujisawa-1994-na-sn-carbonate-thermodynamics::declared:10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -3190,7 +3394,18 @@ observations:
         page: 6
         published_page: 419
         table: '3'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t3_r8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
   locator:
     page: 6
@@ -3257,7 +3472,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t3_r9::points:h=d7e5f128dbab
-  experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k
+  experiment_id: 10.2320/matertrans1989.35.414::fujisawa-1994-na-sn-carbonate-thermodynamics::declared:10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -3354,7 +3569,18 @@ observations:
         page: 6
         published_page: 419
         table: '3'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fujisawa-1994-na-sn-carbonate-thermodynamics::fujisawa94_t3_r9
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
   locator:
     page: 6

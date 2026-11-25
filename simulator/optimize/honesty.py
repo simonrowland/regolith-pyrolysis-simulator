@@ -103,7 +103,15 @@ def optimizer_tier_label(
         canonical = dict(canonical)
         canonical["certification_allowed"] = False
     tier = stored_state or "unknown"
-    if (
+    neighbour_hits = _neighbour_hit_count(run_reference, result_blob, backend_payload)
+    if neighbour_hits > 0:
+        # A coarse neighbour is not an exact engine result. Rank it in its
+        # own tier. Never CERTIFIED, even when the cache tier is exact.
+        certification_allowed = False
+        canonical = dict(canonical)
+        canonical["certification_allowed"] = False
+        ux_label = "COARSE_NEIGHBOUR"
+    elif (
         tier in _CERTIFIED_CACHE_TIERS
         and certification_allowed
         and bool(backend_authoritative)
@@ -138,6 +146,45 @@ def optimizer_tier_label(
 
 def _mapping_value(value: Any) -> Mapping[str, Any]:
     return value if isinstance(value, Mapping) else {}
+
+
+def _neighbour_hit_count(*carriers: Any) -> int:
+    """Highest neighbour_hits on a mapping, an attribute, or its trace.
+
+    A RunReference is not a mapping. Study passes trace summaries, which
+    are. Both have to count, or a coarse neighbour stays CERTIFIED.
+    """
+
+    highest = 0
+    for carrier in carriers:
+        raw = _neighbour_hits_raw(carrier)
+        if raw is None and not isinstance(carrier, Mapping):
+            raw = _neighbour_hits_raw(getattr(carrier, "trace", None))
+        count = _neighbour_hits_int(raw)
+        if count > highest:
+            highest = count
+    return highest
+
+
+def _neighbour_hits_raw(carrier: Any) -> Any:
+    if isinstance(carrier, Mapping):
+        if "neighbour_hits" in carrier:
+            return carrier.get("neighbour_hits")
+        trace = carrier.get("trace")
+        if isinstance(trace, Mapping) and "neighbour_hits" in trace:
+            return trace.get("neighbour_hits")
+        return None
+    if carrier is None:
+        return None
+    if hasattr(carrier, "neighbour_hits"):
+        return getattr(carrier, "neighbour_hits")
+    return None
+
+
+def _neighbour_hits_int(raw: Any) -> int:
+    if isinstance(raw, bool) or not isinstance(raw, int):
+        return 0
+    return raw if raw > 0 else 0
 
 
 def alpha_ceiling_species(*carriers: Any) -> tuple[str, ...]:

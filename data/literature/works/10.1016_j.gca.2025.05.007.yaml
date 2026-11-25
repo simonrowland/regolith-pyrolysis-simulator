@@ -136,6 +136,166 @@ experiments:
     cell_material_and_liner:
       state:
         tag: value
+        value: Pt or Re wire loop; run assignment varies (Table S1 Loop Comp)
+      locator:
+        table: S1
+        note: Loop Comp Pt / Re as printed
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: gas mixing and atmospheric air; printed log10 fO2 from -9 to -0.68 (air)
+      locator:
+        table: '1'
+        note: Table 1/S1 log10 fO2 column; abstract fO2 10^−9 to atmospheric. Air rows print -0.68. fS2 0 or 10^−3 to 10^−2
+          where SO2 flow is used.
+  bench_id: 10.1016/j.gca.2025.05.007::bench::gas-mixing-furnace-1atm
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: interval
+            interval_low: '1480'
+            interval_high: '1773'
+            approximate: false
+        locator:
+          paragraph: abstract
+          note: Abstract prints 1480–1773 K; Table 1/S1 Temperature K column matches that envelope.
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '300'
+          interval_high: '83880'
+          approximate: false
+      locator:
+        table: S1
+        note: Printed Time, minutes column spans 5 to 1398 min across 81 runs; SI conversion only. Abstract envelope is 5
+          min to 24 h.
+    cooling_or_quench:
+      state:
+        tag: value
+        value: drop or air quench; run assignment varies (Table S1 quench type)
+      locator:
+        table: S1
+        note: quench type column prints drop or air
+- experiment_id: 10.1016/j.gca.2025.05.007::kems-140-heck-2025::declared:10.1016/j.gca.2025.05.007::experiment::open-furnace-mvce-degassing-series::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000015'
+          interval_high: '0.00005'
+          approximate: false
+      locator:
+        table: S1
+        note: Printed powder mass est. (mg) column spans 15 to 50 mg across 81 runs; SI unit conversion only (mg to kg).
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original_low
+          - state:
+              tag: value
+              value: '15'
+            locator:
+              table: S1
+              note: Printed powder mass est. (mg) column spans 15 to 50 mg across 81 runs; SI unit conversion only (mg to
+                kg).
+        - - original_high
+          - state:
+              tag: value
+              value: '50'
+            locator:
+              table: S1
+              note: Printed powder mass est. (mg) column spans 15 to 50 mg across 81 runs; SI unit conversion only (mg to
+                kg).
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              table: S1
+              note: Printed powder mass est. (mg) column spans 15 to 50 mg across 81 runs; SI unit conversion only (mg to
+                kg).
+        output_unit: kg
+        references: []
+    printed_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: '1'
+        note: Multiple Bulk Comp labels (MVE O2, KFCMAS 3, KFCMAS 3 S, KFCMAS 4, …); no single series composition. Compositions
+          remain on observation rows / Table 2.
+    form:
+      state:
+        tag: value
+        value: silicate melt bead on a Pt or Re wire loop
+      locator:
+        table: S1
+        note: Loop Comp column Pt or Re; bead & loop mass (mg) column. Not a Knudsen cell.
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        table: '1'
+        note: Printed footnote atm=atmospheric air; SI definition conversion only (1 atm = 101325 Pa). Numeral 101325 is not
+          printed.
+      inference:
+        relation: extract_inference
+        inputs:
+        - inferred=true
+        - Printed footnote atm=atmospheric air; SI definition conversion only (1 atm = 101325 Pa). Numeral 101325 is not printed.
+        parameters: []
+        output_unit: as_published
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        table: S1
+        note: Per-run CO/CO2/N2/SO2 flows (cm3/min) or atmospheric air with all flows 0 (footnote atm=atmospheric air). SweepGas
+          cannot hold the full 81-row flow matrix or the air-vs-mixture alternative set at series level without selecting
+          a single mixture; printed flows remain in Table S1 observation rows.
+    regime:
+      regime_class:
+        tag: value
+        value: viscous
+  work_id: 10.1016/j.gca.2025.05.007
+  locator:
+    table: '1'
+    note: 81 tabulated runs (Tables 1 and S1). Per-run T, log10 fO2, log10 fS2, duration, bulk composition, loop, gas flows,
+      and quench remain in observation rows; this experiment record is the series instrument assignment.
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
         value: Pt or Re wire loop (not a Knudsen cell)
       locator:
         table: S1

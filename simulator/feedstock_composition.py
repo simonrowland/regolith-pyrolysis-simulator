@@ -201,6 +201,33 @@ def feot_equivalent_moles(feedstock_or_composition: Mapping[str, Any]) -> float:
     return feo_moles + 2.0 * fe2o3_moles
 
 
+def ledger_fe3_over_sum_fe(
+    feedstock_or_composition: Mapping[str, Any],
+) -> float | None:
+    """Ledger Fe3+/ΣFe from the FeO and Fe2O3 amounts.
+
+    Premise (d-463): the furnace ferric fraction is this ledger ratio.
+    ``iron_oxide_values`` and ``feot_equivalent_moles`` already read a
+    plain mol map, which is what ``project_account_mol`` returns.
+
+    Algebra: each Fe2O3 formula contributes two Fe atoms, so
+    q = 2 n_Fe2O3 / (n_FeO + 2 n_Fe2O3). The denominator is
+    ``feot_equivalent_moles``.
+
+    Units: both amounts are moles, so q is dimensionless. Non-negative
+    inputs keep q in [0, 1]. No iron (total Fe <= 0) returns None.
+
+    Known value: FeO = 0.9 mol and Fe2O3 = 0.05 mol gives
+    2 * 0.05 / (0.9 + 2 * 0.05) = 0.1.
+    """
+
+    _feo_mol, fe2o3_mol = iron_oxide_values(feedstock_or_composition)
+    total_fe_mol = feot_equivalent_moles(feedstock_or_composition)
+    if total_fe_mol <= 0.0:
+        return None
+    return (2.0 * fe2o3_mol) / total_fe_mol
+
+
 def fe2o3_equivalent_wt_pct(
     feedstock_or_composition: Mapping[str, Any],
     feo_to_fe2o3_factor: float = DEFAULT_FEO_TO_FE2O3_EQUIVALENT_FACTOR,

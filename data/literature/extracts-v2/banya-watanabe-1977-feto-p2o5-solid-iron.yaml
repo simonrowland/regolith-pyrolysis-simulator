@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/banya-watanabe-1977-feto-p2o5-solid-iron.yaml
 observations:
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_1
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1450c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1450c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -11,12 +11,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -49,7 +48,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_1
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -211,7 +231,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_10
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1450c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1450c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -219,12 +239,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -257,7 +276,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_10
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -419,7 +459,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_2
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1450c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1450c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -427,12 +467,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -465,7 +504,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -627,7 +687,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_4
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1450c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1450c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -635,12 +695,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -673,7 +732,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_4
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_4
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -835,7 +915,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_7
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1450c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1450c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -843,12 +923,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -881,7 +960,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_7
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_7
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -1043,7 +1143,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_8
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1450c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1450c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1051,12 +1151,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1089,7 +1188,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_8
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_1_8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -1251,7 +1371,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_1
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1425c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1425c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1259,12 +1379,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1297,7 +1416,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_1
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -1459,7 +1599,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_2
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1425c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1425c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1467,12 +1607,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1505,7 +1644,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -1667,7 +1827,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_3
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1425c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1425c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1675,12 +1835,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1713,7 +1872,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -1875,7 +2055,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_4
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1425c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1425c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1883,12 +2063,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1921,7 +2100,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_4
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_4
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -2083,7 +2283,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_5
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1425c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1425c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2091,12 +2291,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2129,7 +2328,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_5
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_5
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -2291,7 +2511,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_6
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1425c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1425c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2299,12 +2519,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2337,7 +2556,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_6
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_6
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -2499,7 +2739,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_7
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1425c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1425c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2507,12 +2747,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2545,7 +2784,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_7
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_2_7
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -2707,7 +2967,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_1
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2715,12 +2975,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2753,7 +3012,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_1
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -2915,7 +3195,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_10
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2923,12 +3203,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2961,7 +3240,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_10
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -3123,7 +3423,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_11
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -3131,12 +3431,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3169,7 +3468,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_11
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -3331,7 +3651,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_12
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -3339,12 +3659,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3377,7 +3696,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_12
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -3539,7 +3879,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_13
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -3547,12 +3887,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3585,7 +3924,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_13
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_13
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -3747,7 +4107,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_14
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -3755,12 +4115,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3793,7 +4152,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_14
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_14
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -3955,7 +4335,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_15
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -3963,12 +4343,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4001,7 +4380,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_15
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_15
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -4163,7 +4563,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_16
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -4171,12 +4571,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4209,7 +4608,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_16
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_16
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -4371,7 +4791,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_17
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -4379,12 +4799,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4417,7 +4836,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_17
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_17
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -4579,7 +5019,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_19
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -4587,12 +5027,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4625,7 +5064,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_19
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_19
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -4787,7 +5247,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_2
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -4795,12 +5255,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4833,7 +5292,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -4995,7 +5475,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_20
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -5003,12 +5483,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5041,7 +5520,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_20
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_20
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -5203,7 +5703,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_21
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -5211,12 +5711,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5249,7 +5748,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_21
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_21
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -5411,7 +5931,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_22
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -5419,12 +5939,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5457,7 +5976,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_22
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_22
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -5619,7 +6159,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_23
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -5627,12 +6167,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5665,7 +6204,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_23
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_23
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -5827,7 +6387,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_24
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -5835,12 +6395,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5873,7 +6432,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_24
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_24
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -6035,7 +6615,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_25
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -6043,12 +6623,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6081,7 +6660,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_25
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_25
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -6243,7 +6843,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_26
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -6251,12 +6851,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6289,7 +6888,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_26
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_26
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -6451,7 +7071,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_27
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -6459,12 +7079,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6497,7 +7116,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_27
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_27
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -6659,7 +7299,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_28
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -6667,12 +7307,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6705,7 +7344,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_28
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_28
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -6867,7 +7527,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_29
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -6875,12 +7535,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6913,7 +7572,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_29
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_29
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -7075,7 +7755,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_3
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -7083,12 +7763,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7121,7 +7800,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -7283,7 +7983,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_30
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -7291,12 +7991,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7329,7 +8028,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_30
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_30
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -7491,7 +8211,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_4
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -7499,12 +8219,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7537,7 +8256,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_4
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_4
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -7699,7 +8439,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_5
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -7707,12 +8447,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7745,7 +8484,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_5
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_5
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -7907,7 +8667,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_6
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -7915,12 +8675,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7953,7 +8712,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_6
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_6
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -8115,7 +8895,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_7
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -8123,12 +8903,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8161,7 +8940,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_7
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_7
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -8323,7 +9123,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_8
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -8331,12 +9131,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8369,7 +9168,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_8
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -8531,7 +9351,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_9
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1400c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -8539,12 +9359,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8577,7 +9396,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_9
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_3_9
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -8739,7 +9579,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_1
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1350c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1350c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -8747,12 +9587,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8785,7 +9624,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_1
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -8947,7 +9807,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_10
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1350c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1350c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -8955,12 +9815,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8993,7 +9852,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_10
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -9155,7 +10035,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_11
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1350c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1350c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -9163,12 +10043,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9201,7 +10080,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_11
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -9363,7 +10263,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_2
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1350c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1350c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -9371,12 +10271,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9409,7 +10308,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -9571,7 +10491,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_3
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1350c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1350c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -9579,12 +10499,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9617,7 +10536,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -9779,7 +10719,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_5
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1350c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1350c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -9787,12 +10727,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9825,7 +10764,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_5
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_5
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -9987,7 +10947,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_6
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1350c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1350c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -9995,12 +10955,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10033,7 +10992,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_6
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_6
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -10195,7 +11175,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_7
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1350c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1350c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -10203,12 +11183,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10241,7 +11220,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_7
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_7
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -10403,7 +11403,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_8
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1350c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1350c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -10411,12 +11411,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10449,7 +11448,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_8
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -10611,7 +11631,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_9
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1350c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1350c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -10619,12 +11639,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10657,7 +11676,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_9
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_4_9
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -10819,7 +11859,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_10
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1300c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1300c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -10827,12 +11867,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10865,7 +11904,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_10
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -11027,7 +12087,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_11
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1300c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1300c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -11035,12 +12095,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11073,7 +12132,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_11
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -11235,7 +12315,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_12
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1300c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1300c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -11243,12 +12323,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11281,7 +12360,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_12
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -11443,7 +12543,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_13
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1300c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1300c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -11451,12 +12551,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11489,7 +12588,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_13
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_13
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -11651,7 +12771,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_14
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1300c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1300c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -11659,12 +12779,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11697,7 +12816,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_14
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_14
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -11859,7 +12999,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_15
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1300c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1300c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -11867,12 +13007,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11905,7 +13044,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_15
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_15
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -12067,7 +13227,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_16
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1300c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1300c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -12075,12 +13235,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12113,7 +13272,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_16
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_16
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -12275,7 +13455,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_2
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1300c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1300c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -12283,12 +13463,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12321,7 +13500,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -12483,7 +13683,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_3
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1300c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1300c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -12491,12 +13691,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12529,7 +13728,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -12691,7 +13911,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_4
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1300c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1300c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -12699,12 +13919,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12737,7 +13956,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_4
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_4
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -12899,7 +14139,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_5
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1300c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1300c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -12907,12 +14147,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12945,7 +14184,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_5
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_5
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -13107,7 +14367,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_6
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1300c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1300c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -13115,12 +14375,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13153,7 +14412,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_6
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_6
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -13315,7 +14595,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_7
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1300c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1300c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -13323,12 +14603,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13361,7 +14640,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_7
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_7
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -13523,7 +14823,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_8
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1300c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1300c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -13531,12 +14831,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13569,7 +14868,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_8
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -13731,7 +15051,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_9
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1300c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1300c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -13739,12 +15059,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13777,7 +15096,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_9
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_5_9
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -13939,7 +15279,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_1
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1200c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1200c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -13947,12 +15287,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13985,7 +15324,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_1
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -14147,7 +15507,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_10
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1200c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1200c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -14155,12 +15515,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -14193,7 +15552,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_10
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -14355,7 +15735,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_2
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1200c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1200c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -14363,12 +15743,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -14401,7 +15780,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -14563,7 +15963,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_3
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1200c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1200c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -14571,12 +15971,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -14609,7 +16008,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -14771,7 +16191,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_4
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1200c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1200c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -14779,12 +16199,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -14817,7 +16236,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_4
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_4
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -14979,7 +16419,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_5
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1200c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1200c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -14987,12 +16427,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -15025,7 +16464,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_5
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_5
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -15187,7 +16647,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_6
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1200c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1200c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -15195,12 +16655,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -15233,7 +16692,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_6
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_6
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -15395,7 +16875,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_7
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1200c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table3-1200c::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -15403,12 +16883,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5 slag saturated with solid iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -15441,7 +16920,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5 slag saturated with solid iron'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_7
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t3_run_6_7
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: banya-watanabe-1977-feto-p2o5-solid-iron
   locator:
     published_page: 1813
@@ -15603,7 +17103,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5 slag saturated with solid iron
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_00
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table4-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table4-1400c::method:unspecified
   identity:
     quantity:
       tag: value
@@ -15611,12 +17111,11 @@ observations:
     species:
       formula: Fe_tO
       phase:
-        tag: unknown
-        reason: phase string 'liquid FetO-P2O5 slag' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -15694,6 +17193,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid FetO-P2O5 slag; original_reason=phase
+      string ''liquid FetO-P2O5 slag'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_00
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Authors calculate a_FetO
+      from measured PH2O/PH2 using equation (11).'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_00
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -15829,7 +17352,7 @@ observations:
   provenance:
     printed_phase: liquid FetO-P2O5 slag
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_01
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table4-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table4-1400c::method:unspecified
   identity:
     quantity:
       tag: value
@@ -15837,12 +17360,11 @@ observations:
     species:
       formula: Fe_tO
       phase:
-        tag: unknown
-        reason: phase string 'liquid FetO-P2O5 slag' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -15920,6 +17442,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid FetO-P2O5 slag; original_reason=phase
+      string ''liquid FetO-P2O5 slag'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_01
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Authors calculate a_FetO
+      from measured PH2O/PH2 using equation (11).'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_01
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -16055,7 +17601,7 @@ observations:
   provenance:
     printed_phase: liquid FetO-P2O5 slag
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_02
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table4-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table4-1400c::method:unspecified
   identity:
     quantity:
       tag: value
@@ -16063,12 +17609,11 @@ observations:
     species:
       formula: Fe_tO
       phase:
-        tag: unknown
-        reason: phase string 'liquid FetO-P2O5 slag' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -16146,6 +17691,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid FetO-P2O5 slag; original_reason=phase
+      string ''liquid FetO-P2O5 slag'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_02
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Authors calculate a_FetO
+      from measured PH2O/PH2 using equation (11).'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_02
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -16281,7 +17850,7 @@ observations:
   provenance:
     printed_phase: liquid FetO-P2O5 slag
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_04
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table4-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table4-1400c::method:unspecified
   identity:
     quantity:
       tag: value
@@ -16289,12 +17858,11 @@ observations:
     species:
       formula: Fe_tO
       phase:
-        tag: unknown
-        reason: phase string 'liquid FetO-P2O5 slag' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -16372,6 +17940,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid FetO-P2O5 slag; original_reason=phase
+      string ''liquid FetO-P2O5 slag'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_04
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Authors calculate a_FetO
+      from measured PH2O/PH2 using equation (11).'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -16507,7 +18099,7 @@ observations:
   provenance:
     printed_phase: liquid FetO-P2O5 slag
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_06
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table4-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table4-1400c::method:unspecified
   identity:
     quantity:
       tag: value
@@ -16515,12 +18107,11 @@ observations:
     species:
       formula: Fe_tO
       phase:
-        tag: unknown
-        reason: phase string 'liquid FetO-P2O5 slag' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -16598,6 +18189,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid FetO-P2O5 slag; original_reason=phase
+      string ''liquid FetO-P2O5 slag'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_06
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Authors calculate a_FetO
+      from measured PH2O/PH2 using equation (11).'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -16733,7 +18348,7 @@ observations:
   provenance:
     printed_phase: liquid FetO-P2O5 slag
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_08
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table4-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table4-1400c::method:unspecified
   identity:
     quantity:
       tag: value
@@ -16741,12 +18356,11 @@ observations:
     species:
       formula: Fe_tO
       phase:
-        tag: unknown
-        reason: phase string 'liquid FetO-P2O5 slag' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -16824,6 +18438,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid FetO-P2O5 slag; original_reason=phase
+      string ''liquid FetO-P2O5 slag'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_08
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Authors calculate a_FetO
+      from measured PH2O/PH2 using equation (11).'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_08
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -16959,7 +18597,7 @@ observations:
   provenance:
     printed_phase: liquid FetO-P2O5 slag
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_10
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table4-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table4-1400c::method:unspecified
   identity:
     quantity:
       tag: value
@@ -16967,12 +18605,11 @@ observations:
     species:
       formula: Fe_tO
       phase:
-        tag: unknown
-        reason: phase string 'liquid FetO-P2O5 slag' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -17050,6 +18687,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid FetO-P2O5 slag; original_reason=phase
+      string ''liquid FetO-P2O5 slag'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_10
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Authors calculate a_FetO
+      from measured PH2O/PH2 using equation (11).'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -17185,7 +18846,7 @@ observations:
   provenance:
     printed_phase: liquid FetO-P2O5 slag
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_12
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table4-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table4-1400c::method:unspecified
   identity:
     quantity:
       tag: value
@@ -17193,12 +18854,11 @@ observations:
     species:
       formula: Fe_tO
       phase:
-        tag: unknown
-        reason: phase string 'liquid FetO-P2O5 slag' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -17276,6 +18936,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid FetO-P2O5 slag; original_reason=phase
+      string ''liquid FetO-P2O5 slag'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_12
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Authors calculate a_FetO
+      from measured PH2O/PH2 using equation (11).'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -17411,7 +19095,7 @@ observations:
   provenance:
     printed_phase: liquid FetO-P2O5 slag
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_14
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table4-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table4-1400c::method:unspecified
   identity:
     quantity:
       tag: value
@@ -17419,12 +19103,11 @@ observations:
     species:
       formula: Fe_tO
       phase:
-        tag: unknown
-        reason: phase string 'liquid FetO-P2O5 slag' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -17502,6 +19185,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid FetO-P2O5 slag; original_reason=phase
+      string ''liquid FetO-P2O5 slag'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_14
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Authors calculate a_FetO
+      from measured PH2O/PH2 using equation (11).'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_14
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -17637,7 +19344,7 @@ observations:
   provenance:
     printed_phase: liquid FetO-P2O5 slag
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_16
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table4-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table4-1400c::method:unspecified
   identity:
     quantity:
       tag: value
@@ -17645,12 +19352,11 @@ observations:
     species:
       formula: Fe_tO
       phase:
-        tag: unknown
-        reason: phase string 'liquid FetO-P2O5 slag' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -17728,6 +19434,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid FetO-P2O5 slag; original_reason=phase
+      string ''liquid FetO-P2O5 slag'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_16
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Authors calculate a_FetO
+      from measured PH2O/PH2 using equation (11).'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_16
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -17863,7 +19593,7 @@ observations:
   provenance:
     printed_phase: liquid FetO-P2O5 slag
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_18
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table4-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table4-1400c::method:unspecified
   identity:
     quantity:
       tag: value
@@ -17871,12 +19601,11 @@ observations:
     species:
       formula: Fe_tO
       phase:
-        tag: unknown
-        reason: phase string 'liquid FetO-P2O5 slag' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -17954,6 +19683,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid FetO-P2O5 slag; original_reason=phase
+      string ''liquid FetO-P2O5 slag'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_18
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Authors calculate a_FetO
+      from measured PH2O/PH2 using equation (11).'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_18
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -18089,7 +19842,7 @@ observations:
   provenance:
     printed_phase: liquid FetO-P2O5 slag
 - observation_id: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_20
-  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table4-1400c
+  experiment_id: 10.2355/tetsutohagane1955.63.12_1809::banya-watanabe-1977-feto-p2o5-solid-iron::declared:10.2355/tetsutohagane1955.63.12_1809::experiment::banya77-table4-1400c::method:unspecified
   identity:
     quantity:
       tag: value
@@ -18097,12 +19850,11 @@ observations:
     species:
       formula: Fe_tO
       phase:
-        tag: unknown
-        reason: phase string 'liquid FetO-P2O5 slag' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -18180,6 +19932,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid FetO-P2O5 slag; original_reason=phase
+      string ''liquid FetO-P2O5 slag'' is not in the closed automatic map'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_20
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Authors calculate a_FetO
+      from measured PH2O/PH2 using equation (11).'
+    origin: banya-watanabe-1977-feto-p2o5-solid-iron::banya77_t4_xp2o5_0_20
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity

@@ -15,10 +15,13 @@ from types import MappingProxyType
 from typing import Any
 
 from simulator.canonical import canonical_json_dumps, normalize_canonical_value
+from simulator.process_timestep import step_end_sample_h
 
 
 LAB_SCHEDULE_OVERRIDE_KEY = "lab_schedule"
 LAB_SCHEDULE_PO2_SETPOINT_KEY = "lab_schedule_pO2_setpoint_mbar"
+# The lower edge of the current certified pressure band. Lower positive
+# pressures remain executable and receive an extrapolation notice.
 LAB_SCHEDULE_PRESSURE_FLOOR_MBAR = 1.0e-3
 ASSUMED_WITH_SENSITIVITY = "assumption_with_sensitivity_marker"
 SUPPORTED_INTERPOLATION = "piecewise_linear"
@@ -36,6 +39,39 @@ LAB_SCHEDULE_DEPOSIT_SAMPLE_BASIS = frozenset(
 
 class LabScheduleValidationError(ValueError):
     """Raised when a declared lab schedule cannot be honored at runtime."""
+
+
+def _pressure_floor_notice_mbar(value: float) -> tuple[str, str] | None:
+    pressure_mbar = float(value)
+    if pressure_mbar < LAB_SCHEDULE_PRESSURE_FLOOR_MBAR:
+        return (
+            "lab_schedule_pressure_below_implemented_floor",
+            f"{pressure_mbar:g} mbar < {LAB_SCHEDULE_PRESSURE_FLOOR_MBAR:g} mbar",
+        )
+    return None
+
+
+def _pressure_domain_notice_mbar(
+    value: float,
+    *,
+    t_h: float | None = None,
+) -> dict[str, Any] | None:
+    pressure_mbar = float(value)
+    floor_notice = _pressure_floor_notice_mbar(pressure_mbar)
+    if floor_notice is None:
+        return None
+    notice: dict[str, Any] = {
+        "kind": "lab_schedule_pressure_domain_notice",
+        "reason": floor_notice[0],
+        "authority": "extrapolated",
+        "pressure_mbar": pressure_mbar,
+        "certified_band": {
+            "minimum_pressure_mbar": LAB_SCHEDULE_PRESSURE_FLOOR_MBAR,
+        },
+    }
+    if t_h is not None:
+        notice["t_h"] = float(t_h)
+    return notice
 
 
 def normalize_lab_schedule(
@@ -78,13 +114,15 @@ def normalize_lab_schedule(
         duration_h=duration_h,
         field="chamber_pressure_mbar",
     )
+    pressure_domain_notices_list: list[dict[str, Any]] = []
     for point in chamber_pressure_mbar:
-        if float(point["value"]) < LAB_SCHEDULE_PRESSURE_FLOOR_MBAR:
-            raise LabScheduleValidationError(
-                "lab_schedule_pressure_below_implemented_floor: "
-                f"{point['value']:g} mbar < {LAB_SCHEDULE_PRESSURE_FLOOR_MBAR:g} mbar"
-            )
-
+        notice = _pressure_domain_notice_mbar(
+            float(point["value"]),
+            t_h=float(point["t_h"]),
+        )
+        if notice is not None:
+            pressure_domain_notices_list.append(notice)
+    pressure_domain_notices = tuple(pressure_domain_notices_list)
     gas_boundary = _normalize_gas_boundary(schedule.get("gas_boundary"))
     surface_temperature_C = _normalize_surface_temperatures(
         schedule.get("surface_temperature_C", {}),
@@ -104,6 +142,7 @@ def normalize_lab_schedule(
         "furnace_ceiling_C": furnace_ceiling_C,
         "melt_temperature_C": melt_temperature_C,
         "chamber_pressure_mbar": chamber_pressure_mbar,
+        "pressure_domain_notices": pressure_domain_notices,
         "gas_boundary": gas_boundary,
         "surface_temperature_C": surface_temperature_C,
         "window_semantics": window_semantics,
@@ -152,6 +191,8 @@ def interpolate_schedule_points(
         left_t = float(left["t_h"])
         right_t = float(right["t_h"])
         if t <= right_t:
+            if t == right_t:
+                return float(right["value"])
             span = right_t - left_t
             if span <= 0.0:
                 return float(right["value"])
@@ -164,9 +205,13 @@ def interpolate_schedule_points(
     )
 
 
-def schedule_sample_time_h(schedule: Mapping[str, Any], campaign_hour: int) -> float:
+def schedule_sample_time_h(
+    schedule: Mapping[str, Any],
+    campaign_hour: int,
+    dt_h: float = 1.0,
+) -> float:
     duration_h = float(schedule["duration_h"])
-    return min(duration_h, max(0.0, float(campaign_hour) + 1.0))
+    return step_end_sample_h(campaign_hour, dt_h, duration_h)
 
 
 def pO2_setpoint_mbar_from_schedule(
@@ -201,22 +246,26 @@ def pO2_enforcement_row(
 ) -> Mapping[str, Any]:
     achieved = min(float(setpoint_mbar), float(total_pressure_mbar))
     limited = float(setpoint_mbar) > float(total_pressure_mbar)
-    return MappingProxyType(
-        {
-            "hour": int(hour),
-            "schedule_id": str(schedule.get("id", "")),
-            "schedule_time_h": float(schedule_time_h),
-            "setpoint_mbar": float(setpoint_mbar),
-            "achieved_mbar": float(achieved),
-            "p_total_mbar": float(total_pressure_mbar),
-            "limited_by_total_pressure": bool(limited),
-            "status": (
-                "clipped_to_total_pressure"
-                if limited
-                else "achieved_as_setpoint"
-            ),
-        }
-    )
+    row = {
+        "hour": int(hour),
+        "schedule_id": str(schedule.get("id", "")),
+        "schedule_time_h": float(schedule_time_h),
+        "setpoint_mbar": float(setpoint_mbar),
+        "achieved_mbar": float(achieved),
+        "p_total_mbar": float(total_pressure_mbar),
+        "limited_by_total_pressure": bool(limited),
+        "status": (
+            "clipped_to_total_pressure"
+            if limited
+            else "achieved_as_setpoint"
+        ),
+    }
+    notices = schedule.get("pressure_domain_notices", ())
+    if notices:
+        row["pressure_domain_notices"] = tuple(
+            dict(notice) for notice in notices
+        )
+    return MappingProxyType(row)
 
 
 def _validate_interpolation_marker(schedule: Mapping[str, Any]) -> None:
@@ -247,7 +296,12 @@ def _normalize_points(raw: Any, *, duration_h: float, field: str) -> tuple[Mappi
                 f"lab_schedule_{field}_time_h_alias_unsupported"
             )
         t_h = _required_finite_non_negative(item.get("t_h"), f"{field}[{index}].t_h")
-        value = _required_finite_non_negative(item.get("value"), f"{field}[{index}].value")
+        value_validator = (
+            _required_finite_positive
+            if field == "chamber_pressure_mbar"
+            else _required_finite_non_negative
+        )
+        value = value_validator(item.get("value"), f"{field}[{index}].value")
         unit = _normalize_point_unit(item, field=field, expected_unit=expected_unit)
         if previous_t is not None and t_h <= previous_t:
             raise LabScheduleValidationError(

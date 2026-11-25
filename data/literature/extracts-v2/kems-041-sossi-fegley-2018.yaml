@@ -35,7 +35,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Speciation window only
+      (Eu then EuO over Eu2O3(s), SF18-T1). No numeric γ or activity is printed on this row; sibling sf18_speciation_Eu_metal_and_EuO
+      already carries the same ordering. Locator SF18_Eu2O3_window / SF18-T1 p.403.'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_alias_SF18_Eu2O3_window
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     note: SF18_Eu2O3_window
@@ -52,12 +64,11 @@ observations:
     species:
       formula: PO2
       phase:
-        tag: unknown
-        reason: phase string 'ideal_gas' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -75,7 +86,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''ideal_gas'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_alias_SF18_Mk86_PO2_from_silicate_melt
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_alias_SF18_Mk86_PO2_from_silicate_melt
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     note: Sossi & Fegley (2018) Rev. Mineral. Geochem. 84:393-459, text citing Markova et al. 1986 (PO and PO2 from silicate
@@ -93,12 +125,11 @@ observations:
     species:
       formula: PO
       phase:
-        tag: unknown
-        reason: phase string 'ideal_gas' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -116,7 +147,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''ideal_gas'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_alias_SF18_Mk86_PO_from_silicate_melt
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_alias_SF18_Mk86_PO_from_silicate_melt
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     note: Sossi & Fegley (2018) Rev. Mineral. Geochem. 84:393-459, Table 5 p.431 (PO in solar-nebula column) and text citing
@@ -134,12 +186,11 @@ observations:
     species:
       formula: P4O10
       phase:
-        tag: unknown
-        reason: phase string 'ideal_gas' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -156,7 +207,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''ideal_gas'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_alias_SF18_T1_P4O10_KEMS_dominance
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: SF18 Table 1 dominance
+      order P4O10 >> P4O9, P4O8, P4O7, P4O6 over P4O10(s). No numeric γ or activity is printed. Sibling speciation rows already
+      use bound_not_point_ordering. Locator SF18_T1_P4O10_KEMS_dominance / SF18-T1 p.405.'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_alias_SF18_T1_P4O10_KEMS_dominance
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     note: Sossi & Fegley (2018) Rev. Mineral. Geochem. 84 Table 1 p.405; Hashizume et al. (1966) Bull. Chem. Soc. Jpn. 39:150-155;
@@ -174,12 +248,11 @@ observations:
     species:
       formula: P4O6
       phase:
-        tag: unknown
-        reason: phase string 'ideal_gas' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -197,7 +270,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''ideal_gas'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_alias_SF18_T5_P4O6_Hchondrite_column
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_alias_SF18_T5_P4O6_Hchondrite_column
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     note: Sossi & Fegley (2018) Rev. Mineral. Geochem. 84:393-459, Table 5 p.431 (P as P4O6 under H-chondrite outgassing);
@@ -239,7 +333,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Speciation window only
+      (Yb then YbO over Yb2O3(s), SF18-T1). No numeric γ or activity is printed on this row; sibling sf18_speciation_Yb_metal_and_YbO
+      already carries the same ordering. Locator SF18_Yb2O3_window / SF18-T1 p.407.'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_alias_SF18_Yb2O3_window
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     note: SF18_Yb2O3_window
@@ -256,12 +362,11 @@ observations:
     species:
       formula: P4O10
       phase:
-        tag: unknown
-        reason: phase string 'ideal_gas' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -279,7 +384,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''ideal_gas'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_alias_melt_associative_P4O10
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_alias_melt_associative_P4O10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     note: stoichiometry of associative evaporation of P4O10; SF18 Table 1 pure-oxide limit
@@ -296,12 +422,11 @@ observations:
     species:
       formula: VO_VO2
       phase:
-        tag: unknown
-        reason: phase string 'gas_over_oxide' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -318,7 +443,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''gas_over_oxide'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_alias_sf18_speciation_VO_VO2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_alias_sf18_speciation_VO_VO2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     section: SF18-T1 / speciation ordering
@@ -341,12 +487,11 @@ observations:
     species:
       formula: AlO1.5
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt_CMAS_An_Di_' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -414,7 +559,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt CMAS
+      An Di; original_reason=phase string ''complex_silicate_melt_CMAS_An_Di_'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Al__AlO_1_5_
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Al__AlO_1_5_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -467,12 +635,11 @@ observations:
     species:
       formula: AsO1.5
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt_FCS' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -539,7 +706,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt FCS;
+      original_reason=phase string ''complex_silicate_melt_FCS'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_As__AsO_1_5_
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_As__AsO_1_5_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -587,12 +777,11 @@ observations:
     species:
       formula: BiO1.5
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt_FCS' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -659,7 +848,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt FCS;
+      original_reason=phase string ''complex_silicate_melt_FCS'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Bi__BiO_1_5_
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Bi__BiO_1_5_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -707,12 +919,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt_CMAS_0_55_Basicity_0_65_' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -793,7 +1004,31 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt CMAS
+      0 55 Basicity 0 65; original_reason=phase string ''complex_silicate_melt_CMAS_0_55_Basicity_0_65_'' is not in the closed
+      automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Ca_CaO
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Ca_CaO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -845,12 +1080,11 @@ observations:
     species:
       formula: CoO
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt__F_CMAS_a_CMAS_b_' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -917,7 +1151,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt F CMAS
+      a CMAS b; original_reason=phase string ''complex_silicate_melt__F_CMAS_a_CMAS_b_'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Co_CoO
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Co_CoO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -965,12 +1222,11 @@ observations:
     species:
       formula: CoO
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt__F_CMAS_a_CMAS_b_' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1037,7 +1293,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt F CMAS
+      a CMAS b; original_reason=phase string ''complex_silicate_melt__F_CMAS_a_CMAS_b_'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Co_CoO
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Co_CoO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -1089,12 +1368,11 @@ observations:
     species:
       formula: CrO
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt_CAS' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1161,7 +1439,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt CAS;
+      original_reason=phase string ''complex_silicate_melt_CAS'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Cr_CrO
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Cr_CrO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -1209,12 +1510,11 @@ observations:
     species:
       formula: CrO1.5
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt_CAS' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1281,7 +1581,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt CAS;
+      original_reason=phase string ''complex_silicate_melt_CAS'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Cr__CrO_1_5_
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Cr__CrO_1_5_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -1329,12 +1652,11 @@ observations:
     species:
       formula: CuO0.5
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt__F_CMAS_a_CMAS_b_' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1401,7 +1723,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt F CMAS
+      a CMAS b; original_reason=phase string ''complex_silicate_melt__F_CMAS_a_CMAS_b_'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Cu__CuO_0_5_
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Cu__CuO_0_5_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -1449,12 +1794,11 @@ observations:
     species:
       formula: CuO0.5
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt__F_CMAS_a_CMAS_b_' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1520,7 +1864,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt F CMAS
+      a CMAS b; original_reason=phase string ''complex_silicate_melt__F_CMAS_a_CMAS_b_'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Cu__CuO_0_5_
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Cu__CuO_0_5_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -1566,12 +1933,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt_SKAnFa_F_CMAS_b_CMAS_c_d_' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1638,7 +2004,31 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt SKAnFa
+      F CMAS b CMAS c d; original_reason=phase string ''complex_silicate_melt_SKAnFa_F_CMAS_b_CMAS_c_d_'' is not in the closed
+      automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Fe_FeO
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Fe_FeO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -1687,12 +2077,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt_SKAnFa_F_CMAS_b_CMAS_c_d_' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1759,7 +2148,31 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt SKAnFa
+      F CMAS b CMAS c d; original_reason=phase string ''complex_silicate_melt_SKAnFa_F_CMAS_b_CMAS_c_d_'' is not in the closed
+      automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Fe_FeO
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Fe_FeO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -1808,12 +2221,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt_SKAnFa_F_CMAS_b_CMAS_c_d_' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1880,7 +2292,31 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt SKAnFa
+      F CMAS b CMAS c d; original_reason=phase string ''complex_silicate_melt_SKAnFa_F_CMAS_b_CMAS_c_d_'' is not in the closed
+      automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Fe_FeO
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Fe_FeO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -1930,12 +2366,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt_SKAnFa_F_CMAS_b_CMAS_c_d_' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2002,7 +2437,31 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt SKAnFa
+      F CMAS b CMAS c d; original_reason=phase string ''complex_silicate_melt_SKAnFa_F_CMAS_b_CMAS_c_d_'' is not in the closed
+      automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Fe_FeO
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Fe_FeO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -2055,12 +2514,11 @@ observations:
     species:
       formula: GeO2
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt_FCMS' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2127,7 +2585,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt FCMS;
+      original_reason=phase string ''complex_silicate_melt_FCMS'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_GeO2__GeO_2_
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_GeO2__GeO_2_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -2175,12 +2656,11 @@ observations:
     species:
       formula: GeO
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt_FCAS' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2247,7 +2727,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt FCAS;
+      original_reason=phase string ''complex_silicate_melt_FCAS'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Ge_GeO
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Ge_GeO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -2299,12 +2802,11 @@ observations:
     species:
       formula: InO1.5
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt_CMAS' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2370,7 +2872,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt CMAS;
+      original_reason=phase string ''complex_silicate_melt_CMAS'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_In__InO_1_5_
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_In__InO_1_5_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -2416,12 +2941,11 @@ observations:
     species:
       formula: KO0.5
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt_KFCAS_with_KAlSiO_4_s_' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2488,7 +3012,31 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt KFCAS
+      with KAlSiO 4 s; original_reason=phase string ''complex_silicate_melt_KFCAS_with_KAlSiO_4_s_'' is not in the closed
+      automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_K__KO_0_5_
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_K__KO_0_5_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -2536,12 +3084,11 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt_CMAS_0_55_Basicity_0_65_' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2622,7 +3169,31 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt CMAS
+      0 55 Basicity 0 65; original_reason=phase string ''complex_silicate_melt_CMAS_0_55_Basicity_0_65_'' is not in the closed
+      automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Mg_MgO
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Mg_MgO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -2674,12 +3245,11 @@ observations:
     species:
       formula: MnO
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt_FCMS_P_a_CAS_b_' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2746,7 +3316,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt FCMS
+      P a CAS b; original_reason=phase string ''complex_silicate_melt_FCMS_P_a_CAS_b_'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Mn_MnO
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Mn_MnO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -2794,12 +3387,11 @@ observations:
     species:
       formula: MnO
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt_FCMS_P_a_CAS_b_' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2866,7 +3458,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt FCMS
+      P a CAS b; original_reason=phase string ''complex_silicate_melt_FCMS_P_a_CAS_b_'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Mn_MnO
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Mn_MnO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -2918,12 +3533,11 @@ observations:
     species:
       formula: MoO2
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt_CMAS_a_b_' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2990,7 +3604,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt CMAS
+      a b; original_reason=phase string ''complex_silicate_melt_CMAS_a_b_'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_MoO2__MoO_2_
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_MoO2__MoO_2_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -3038,12 +3675,11 @@ observations:
     species:
       formula: MoO2
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt_CMAS_a_b_' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3110,7 +3746,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt CMAS
+      a b; original_reason=phase string ''complex_silicate_melt_CMAS_a_b_'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_MoO2__MoO_2_
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_MoO2__MoO_2_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -3159,12 +3818,11 @@ observations:
     species:
       formula: MoO3
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt_CMAS' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3236,7 +3894,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt CMAS;
+      original_reason=phase string ''complex_silicate_melt_CMAS'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_MoO3__MoO_3_
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_MoO3__MoO_3_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -3286,12 +3967,11 @@ observations:
     species:
       formula: MoO3
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt_CMAS' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3358,7 +4038,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt CMAS;
+      original_reason=phase string ''complex_silicate_melt_CMAS'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_MoO3__MoO_3_
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_MoO3__MoO_3_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -3406,12 +4109,11 @@ observations:
     species:
       formula: NaO0.5
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt_CMASa_CMS_b_' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3477,7 +4179,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt CMASa
+      CMS b; original_reason=phase string ''complex_silicate_melt_CMASa_CMS_b_'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Na__NaO_0_5_
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Na__NaO_0_5_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -3523,12 +4248,11 @@ observations:
     species:
       formula: NaO0.5
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt_CMASa_CMS_b_' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3595,7 +4319,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt CMASa
+      CMS b; original_reason=phase string ''complex_silicate_melt_CMASa_CMS_b_'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Na__NaO_0_5_
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Na__NaO_0_5_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -3643,12 +4390,11 @@ observations:
     species:
       formula: NiO
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt__F_CMASa_CMAS_b_c_' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3715,7 +4461,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt F CMASa
+      CMAS b c; original_reason=phase string ''complex_silicate_melt__F_CMASa_CMAS_b_c_'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Ni_NiO
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Ni_NiO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -3763,12 +4532,11 @@ observations:
     species:
       formula: NiO
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt__F_CMASa_CMAS_b_c_' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3835,7 +4603,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt F CMASa
+      CMAS b c; original_reason=phase string ''complex_silicate_melt__F_CMASa_CMAS_b_c_'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Ni_NiO
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Ni_NiO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -3884,12 +4675,11 @@ observations:
     species:
       formula: NiO
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt__F_CMASa_CMAS_b_c_' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3956,7 +4746,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt F CMASa
+      CMAS b c; original_reason=phase string ''complex_silicate_melt__F_CMASa_CMAS_b_c_'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Ni_NiO
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Ni_NiO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -4008,12 +4821,11 @@ observations:
     species:
       formula: PO2.5
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt_CMFS' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4080,7 +4892,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt CMFS;
+      original_reason=phase string ''complex_silicate_melt_CMFS'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_P__PO_2_5_
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_P__PO_2_5_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -4132,12 +4967,11 @@ observations:
     species:
       formula: PbO
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt_CMAS' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4203,7 +5037,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt CMAS;
+      original_reason=phase string ''complex_silicate_melt_CMAS'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Pb_PbO
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Pb_PbO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -4249,12 +5106,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt_CMAS_An_Di_' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4322,7 +5178,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt CMAS
+      An Di; original_reason=phase string ''complex_silicate_melt_CMAS_An_Di_'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_SiO2__SiO_2_
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_SiO2__SiO_2_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -4375,12 +5254,11 @@ observations:
     species:
       formula: SnO
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt_FCS' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4447,7 +5325,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt FCS;
+      original_reason=phase string ''complex_silicate_melt_FCS'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Sn_SnO
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Sn_SnO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -4495,12 +5396,11 @@ observations:
     species:
       formula: TiO2
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt_CMAS' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4568,7 +5468,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt CMAS;
+      original_reason=phase string ''complex_silicate_melt_CMAS'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_TiO2__TiO_2_
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_TiO2__TiO_2_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -4621,12 +5544,11 @@ observations:
     species:
       formula: V2O3
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt_CMAS' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4693,7 +5615,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt CMAS;
+      original_reason=phase string ''complex_silicate_melt_CMAS'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_V__V_2O_3__1900K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_V__V_2O_3__1900K
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 409
@@ -4743,12 +5688,11 @@ observations:
     species:
       formula: V2O3
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt_CMAS' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4815,7 +5759,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt CMAS;
+      original_reason=phase string ''complex_silicate_melt_CMAS'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_V__V_2O_3__2000K_contested
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_V__V_2O_3__2000K_contested
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 409
@@ -4865,12 +5832,11 @@ observations:
     species:
       formula: V2O3
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt_CMAS' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4937,7 +5903,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt CMAS;
+      original_reason=phase string ''complex_silicate_melt_CMAS'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_V__V_2O_3__2100K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_V__V_2O_3__2100K
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 409
@@ -4987,12 +5976,11 @@ observations:
     species:
       formula: WO2
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt_CMAS' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5064,7 +6052,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt CMAS;
+      original_reason=phase string ''complex_silicate_melt_CMAS'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_WO2__WO_2_
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_WO2__WO_2_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 409
@@ -5116,12 +6127,11 @@ observations:
     species:
       formula: WO2
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt_CMAS' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5188,7 +6198,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt CMAS;
+      original_reason=phase string ''complex_silicate_melt_CMAS'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_WO2__WO_2_
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_WO2__WO_2_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 409
@@ -5238,12 +6271,11 @@ observations:
     species:
       formula: WO3
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt_CMAS' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5310,7 +6342,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt CMAS;
+      original_reason=phase string ''complex_silicate_melt_CMAS'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_WO3__WO_3__1923K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_WO3__WO_3__1923K
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 409
@@ -5361,12 +6416,11 @@ observations:
     species:
       formula: WO3
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt_CMAS' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5433,7 +6487,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt CMAS;
+      original_reason=phase string ''complex_silicate_melt_CMAS'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_WO3__WO_3__relation_1673K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_WO3__WO_3__relation_1673K
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 409
@@ -5483,12 +6560,11 @@ observations:
     species:
       formula: WO3
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt_CMAS' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5560,7 +6636,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt CMAS;
+      original_reason=phase string ''complex_silicate_melt_CMAS'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_WO3__WO_3__relation_1673K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_WO3__WO_3__relation_1673K
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 409
@@ -5612,12 +6711,11 @@ observations:
     species:
       formula: ZnO
       phase:
-        tag: unknown
-        reason: phase string 'complex_silicate_melt_CAS' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5684,7 +6782,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: complex silicate melt CAS;
+      original_reason=phase string ''complex_silicate_melt_CAS'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Zn_ZnO
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Zn_ZnO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -5736,12 +6857,11 @@ observations:
     species:
       formula: volatility_order
       phase:
-        tag: unknown
-        reason: phase string 'comparison_of_solar_nebula_and_silicate_melt_evaporation' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5759,7 +6879,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''comparison_of_solar_nebula_and_silicate_melt_evaporation'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table3_order_1
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_qualitative_volatility_order'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table3_order_1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 32
@@ -5779,12 +6920,11 @@ observations:
     species:
       formula: volatility_order
       phase:
-        tag: unknown
-        reason: phase string 'comparison_of_solar_nebula_and_silicate_melt_evaporation' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5802,7 +6942,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''comparison_of_solar_nebula_and_silicate_melt_evaporation'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table3_order_2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_qualitative_volatility_order'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table3_order_2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 32
@@ -5822,12 +6983,11 @@ observations:
     species:
       formula: volatility_order
       phase:
-        tag: unknown
-        reason: phase string 'comparison_of_solar_nebula_and_silicate_melt_evaporation' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5845,7 +7005,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''comparison_of_solar_nebula_and_silicate_melt_evaporation'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table3_order_3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_qualitative_volatility_order'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table3_order_3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 32
@@ -5865,12 +7046,11 @@ observations:
     species:
       formula: steam_atmosphere_fugacity
       phase:
-        tag: unknown
-        reason: phase string 'steam_atmosphere_model' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5891,7 +7071,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''steam_atmosphere_model'' is not in the closed automatic map'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table4_elemental_fugacities
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_model_fugacity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table4_elemental_fugacities
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 36
@@ -5944,7 +7145,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Ag_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -5986,7 +7197,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_As_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -6028,7 +7249,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Au_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -6070,7 +7301,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Bi_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -6112,7 +7353,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Br_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -6154,7 +7405,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Cd_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -6196,7 +7457,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Cl_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -6238,7 +7509,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Cr_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -6280,7 +7561,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Cs_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -6322,7 +7613,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Cu_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -6364,7 +7665,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_F_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -6406,7 +7717,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Fe_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -6448,7 +7769,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Ga_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -6490,7 +7821,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Ge_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -6532,7 +7873,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_H_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -6574,7 +7925,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_I_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -6616,7 +7977,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_In_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -6658,7 +8029,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_K_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -6700,7 +8081,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Li_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -6742,7 +8133,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Mn_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -6784,7 +8185,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Mo_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -6826,7 +8237,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Na_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -6868,7 +8289,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_O_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -6910,7 +8341,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_P_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -6952,7 +8393,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Pb_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -6994,7 +8445,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Rb_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -7036,7 +8497,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_S_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -7078,7 +8549,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Sb_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -7120,7 +8601,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Se_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -7162,7 +8653,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Sn_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -7204,7 +8705,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Te_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -7246,7 +8757,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Tl_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -7288,7 +8809,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Zn_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -7308,12 +8839,11 @@ observations:
     species:
       formula: table5_log_fO2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7330,7 +8860,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_log_fO2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_log_fO2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39

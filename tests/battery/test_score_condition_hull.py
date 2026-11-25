@@ -13,6 +13,8 @@ import json
 from dataclasses import replace
 from decimal import Decimal
 
+import pytest
+
 from simulator.battery.enums import (
     AmountBasis,
     Engine,
@@ -224,6 +226,11 @@ def test_pin_headline_statistics_unchanged_by_hull() -> None:
     assert thermochemistry["band_value"] == []
     assert thermochemistry["band_derived_n"] is None
     assert thermochemistry["no_band_reason"] is None
+    capability_matrix = summary["capability_matrix"]
+    assert capability_matrix["engines"] == [ENGINE.value]
+    assert capability_matrix["cross_product_total"] == sum(
+        row["n_observations"] for row in capability_matrix["rows"]
+    )
     assert hashlib.sha256(blob.encode("utf-8")).hexdigest() == PIN_SUMMARY_SHA256
 
 
@@ -248,6 +255,10 @@ def test_pin_measured_headline_table_unchanged_by_hull() -> None:
 # No fixture row enters that stratum. Chain Ban-ya Fe_tO (t-1802 Eq. 23 /
 # d-432) does not move it: cf2a0c7fe and f96f7cace hash the same payload.
 # PIN_SUMMARY_SHA256 before d-443: 30345d844ade8f69a341c7b7f99ca2400ca340244cf4c39a9ff96aef9f625588
+# Capability rollout: summary_payload merges capability_matrix and coverage
+# into the headline JSON. The hull fixture is prebuilt residuals, not a
+# rescore, so the oxygen-frame edits do not move those rows. Studio digest
+# d3122d81… is that merge. Previous pin 41816516… lacked the two keys.
 PIN_MELT_STATS = ("0.3162277660168379331998893544", "0.10", "0.20")
 PIN_VAPOUR_STATS = (2, "0.1118033988749894848204586834", "-0.05")
 PIN_RECORD_KEYS = [
@@ -256,7 +267,9 @@ PIN_RECORD_KEYS = [
     "n_inside_band", "n_no_band", "n_score_eligible", "rail", "rms_dex",
     "sources", "tier",
 ]
-PIN_SUMMARY_SHA256 = "41816516c6f9167c34736bfef368925e4754b4867ade0ab218fb73027e350b6f"
+# 5d010cf adds the declared engine-capability matrix to this summary payload;
+# the numeric and headline statistic pins above remain unchanged.
+PIN_SUMMARY_SHA256 = "d3122d819223388edb73ef0932ee144d1afe71565f68e711232c48189b7a55ec"
 PIN_HEADLINE_LINES = (
     "| melt_activity | internal-analytical | — | 4 | 1 | 3 | 3 | 2 | "
     "0.3162277660168379331998893544 | 0.10 | 0.20 | 0.3 | "
@@ -390,6 +403,40 @@ def test_flagged_stratum_gets_its_own_hull_and_leaves_headline_alone() -> None:
     )
     assert stratum in report_only
     assert report_only == streamed
+
+
+def test_flagged_hull_duplicate_mutation_is_detected(monkeypatch) -> None:
+    """A second flagged accumulation must violate the one-row hull invariant."""
+
+    from simulator.battery.enums import NoticeKind, Quantity
+    from simulator.battery.records import Notice
+
+    context, residuals = hull_fixture()
+    flag = Notice(
+        kind=NoticeKind.CELL_MATERIAL_INFERRED,
+        affected_quantities=(Quantity.ACTIVITY,),
+        reason="fixture cell material inferred",
+        origin="fixture",
+    )
+    flagged = tuple(
+        replace(r, notices=(flag,)) if r.reference == "act-3" else r
+        for r in residuals
+    )
+    original_add = _ScorePayloadAccumulator.add
+
+    def duplicate_flagged_add(self, row, *, row_metadata=None):
+        metadata = original_add(self, row, row_metadata=row_metadata)
+        if row.get("reference") == "act-3":
+            self.flagged_census.add(row)
+        return metadata
+
+    monkeypatch.setattr(_ScorePayloadAccumulator, "add", duplicate_flagged_add)
+    expected_once = (
+        "| flagged:cell-material-inferred | melt_activity | internal-analytical | "
+        "1 | 1923 (1) | 50000 (1) | mole_fraction: CaO 0.3, SiO2 0.7 (1) |"
+    )
+    with pytest.raises(AssertionError):
+        assert expected_once in _hull_section(_report(context, flagged))
 
 
 def test_compilation_point_temperature_reads_only_printed_cell_ids() -> None:

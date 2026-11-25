@@ -52,6 +52,12 @@ def _context_by_id(document: dict) -> dict[str, dict]:
     }
 
 
+def _assert_observation_species_matches_component(document: dict) -> None:
+    for formula, block in document["species"].items():
+        for row in block["observations"]:
+            assert row["values"]["component_as_published"] == formula
+
+
 def _assert_single_liquid_run_compositions(document: dict) -> None:
     experiments = {row["experiment_id"]: row for row in document["experiments"]}
     contexts = _context_by_id(document)
@@ -165,11 +171,26 @@ def test_table_ii_render_pins_and_complete_row_migration(tmp_path: Path) -> None
         for row in species["observations"]
         if row["phase"] == "l"
     )
-    assert {container: len(block["observations"]) for container, block in document["species"].items()} == {
-        "SiO2": 78,
-        "MgO": 54,
-        "TiO2": 48,
+    assert {
+        container: len(block["observations"])
+        for container, block in document["species"].items()
+    } == {
+        "SiO2": 60,
+        "MgO": 60,
+        "TiO2": 60,
     }
+    _assert_observation_species_matches_component(document)
+    changed_species = deepcopy(document)
+    wrong_group = changed_species["species"]["TiO2"]["observations"]
+    moved = next(
+        row
+        for row in wrong_group
+        if row["observation_id"] == "chen22_C7_liquid_tio2"
+    )
+    wrong_group.remove(moved)
+    changed_species["species"]["SiO2"]["observations"].append(moved)
+    with pytest.raises(AssertionError):
+        _assert_observation_species_matches_component(changed_species)
     containers = {
         observation["observation_id"]: container
         for container, block in document["species"].items()
@@ -177,10 +198,10 @@ def test_table_ii_render_pins_and_complete_row_migration(tmp_path: Path) -> None
     }
     expected_containers = {
         "chen22_C5_liquid_tio2": "TiO2",  # liquid with one coexisting solid
-        "chen22_C73_liquid_tio2": "MgO",  # liquid with one coexisting MgO·SiO2 solid
-        "chen22_C7_liquid_tio2": "SiO2",  # liquid in a three-phase invariant
-        "chen22_C45_liquid_tio2": "SiO2",  # liquid with two solids
-        "chen22_C65_mgo_2tio2_sio2": "TiO2",  # solid compound has more TiO2
+        "chen22_C73_liquid_tio2": "TiO2",  # liquid with one coexisting MgO·SiO2 solid
+        "chen22_C7_liquid_tio2": "TiO2",  # liquid in a three-phase invariant
+        "chen22_C45_liquid_tio2": "TiO2",  # liquid with two solids
+        "chen22_C65_mgo_2tio2_sio2": "SiO2",  # solid row's reported component
         "chen22_C58_2mgo_sio2_mgo": "MgO",
     }
     assert {key: containers[key] for key in expected_containers} == expected_containers
@@ -211,12 +232,9 @@ def test_table_ii_render_pins_and_complete_row_migration(tmp_path: Path) -> None
     assert sum(row.value.kind.value == "point" for row in result.observations.values()) == 169
     assert sum(row.value.kind.value == "unavailable" for row in result.observations.values()) == 11
 
-    migrated_containers = {
-        observation_id: container
-        for container, block in document["species"].items()
-        for observation_id in (
-            row["observation_id"] for row in block["observations"]
-        )
+    migrated_components = {
+        row["observation_id"]: row["values"]["component_as_published"]
+        for row in rows.values()
     }
     assemblages_by_sample: dict[str, set[str]] = {}
     for observation_id, migrated in result.observations.items():
@@ -225,7 +243,10 @@ def test_table_ii_render_pins_and_complete_row_migration(tmp_path: Path) -> None
         expected_phase = Phase.L if source_phase == "l" else Phase.CR
         assert migrated.identity.species.phase.value is expected_phase
         conditions = migrated.point_conditions or {}
-        assert migrated.identity.species.formula == migrated_containers[source_observation_id]
+        assert (
+            migrated.identity.species.formula
+            == migrated_components[source_observation_id]
+        )
         temperature = conditions["temperature_K"]
         assert temperature.state.is_value
         assert temperature.locator is not None

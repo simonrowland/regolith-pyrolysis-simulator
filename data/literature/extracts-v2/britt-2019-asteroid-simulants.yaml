@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/britt-2019-asteroid-simulants.yaml
 observations:
 - observation_id: britt-2019-asteroid-simulants::britt_2019_ci_table3_xrf_major_oxide_composition
-  experiment_id: 10.1111/maps.13345::experiment::xrf-ci
+  experiment_id: 10.1111/maps.13345::britt-2019-asteroid-simulants::declared:10.1111/maps.13345::experiment::xrf-ci::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -11,12 +11,11 @@ observations:
     species:
       formula: CI_Asteroid_Simulant
       phase:
-        tag: unknown
-        reason: phase string 'CI_asteroid_simulant_prototype_crushed_powder' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -67,7 +66,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CI_asteroid_simulant_prototype_crushed_powder'' is not in the closed automatic map'
+    origin: britt-2019-asteroid-simulants::britt_2019_ci_table3_xrf_major_oxide_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: xrf_oxide_mode'
+    origin: britt-2019-asteroid-simulants::britt_2019_ci_table3_xrf_major_oxide_composition
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: britt-2019-asteroid-simulants
   locator:
     pdf_page_index: 9
@@ -314,7 +334,7 @@ observations:
   provenance:
     printed_phase: CI_asteroid_simulant_prototype_crushed_powder
 - observation_id: britt-2019-asteroid-simulants::britt_2019_ci_tg_integrated_mass_loss
-  experiment_id: 10.1111/maps.13345::experiment::tga-ega-ci
+  experiment_id: 10.1111/maps.13345::britt-2019-asteroid-simulants::declared:10.1111/maps.13345::experiment::tga-ega-ci::method:unspecified
   identity:
     quantity:
       tag: value
@@ -322,12 +342,11 @@ observations:
     species:
       formula: CI_Asteroid_Simulant
       phase:
-        tag: unknown
-        reason: phase string 'CI_asteroid_simulant_prototype' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -393,6 +412,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CI_asteroid_simulant_prototype'' is not in the closed automatic map'
+    origin: britt-2019-asteroid-simulants::britt_2019_ci_tg_integrated_mass_loss
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: tga_ega_flowing_helium'
+    origin: britt-2019-asteroid-simulants::britt_2019_ci_tg_integrated_mass_loss
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -415,7 +457,7 @@ observations:
   provenance:
     printed_phase: CI_asteroid_simulant_prototype
 - observation_id: britt-2019-asteroid-simulants::britt_2019_cm_table3_xrf_major_oxide_composition
-  experiment_id: 10.1111/maps.13345::experiment::xrf-cm
+  experiment_id: 10.1111/maps.13345::britt-2019-asteroid-simulants::declared:10.1111/maps.13345::experiment::xrf-cm::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -423,12 +465,11 @@ observations:
     species:
       formula: CM_Asteroid_Simulant
       phase:
-        tag: unknown
-        reason: phase string 'CM_asteroid_simulant_prototype_crushed_powder' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -479,7 +520,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CM_asteroid_simulant_prototype_crushed_powder'' is not in the closed automatic map'
+    origin: britt-2019-asteroid-simulants::britt_2019_cm_table3_xrf_major_oxide_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: xrf_oxide_mode'
+    origin: britt-2019-asteroid-simulants::britt_2019_cm_table3_xrf_major_oxide_composition
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: britt-2019-asteroid-simulants
   locator:
     pdf_page_index: 9
@@ -726,7 +788,7 @@ observations:
   provenance:
     printed_phase: CM_asteroid_simulant_prototype_crushed_powder
 - observation_id: britt-2019-asteroid-simulants::britt_2019_cm_tg_integrated_mass_loss
-  experiment_id: 10.1111/maps.13345::experiment::tga-ega-cm
+  experiment_id: 10.1111/maps.13345::britt-2019-asteroid-simulants::declared:10.1111/maps.13345::experiment::tga-ega-cm::method:unspecified
   identity:
     quantity:
       tag: value
@@ -734,12 +796,11 @@ observations:
     species:
       formula: CM_Asteroid_Simulant
       phase:
-        tag: unknown
-        reason: phase string 'CM_asteroid_simulant_prototype' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -805,6 +866,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CM_asteroid_simulant_prototype'' is not in the closed automatic map'
+    origin: britt-2019-asteroid-simulants::britt_2019_cm_tg_integrated_mass_loss
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: tga_ega_flowing_helium'
+    origin: britt-2019-asteroid-simulants::britt_2019_cm_tg_integrated_mass_loss
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -827,7 +911,7 @@ observations:
   provenance:
     printed_phase: CM_asteroid_simulant_prototype
 - observation_id: britt-2019-asteroid-simulants::britt_2019_cr_table3_xrf_major_oxide_composition
-  experiment_id: 10.1111/maps.13345::experiment::xrf-cr
+  experiment_id: 10.1111/maps.13345::britt-2019-asteroid-simulants::declared:10.1111/maps.13345::experiment::xrf-cr::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -835,12 +919,11 @@ observations:
     species:
       formula: CR_Asteroid_Simulant
       phase:
-        tag: unknown
-        reason: phase string 'CR_asteroid_simulant_prototype_crushed_powder' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -891,7 +974,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CR_asteroid_simulant_prototype_crushed_powder'' is not in the closed automatic map'
+    origin: britt-2019-asteroid-simulants::britt_2019_cr_table3_xrf_major_oxide_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: xrf_oxide_mode'
+    origin: britt-2019-asteroid-simulants::britt_2019_cr_table3_xrf_major_oxide_composition
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: britt-2019-asteroid-simulants
   locator:
     pdf_page_index: 9
@@ -1138,7 +1242,7 @@ observations:
   provenance:
     printed_phase: CR_asteroid_simulant_prototype_crushed_powder
 - observation_id: britt-2019-asteroid-simulants::britt_2019_cr_tg_integrated_mass_loss
-  experiment_id: 10.1111/maps.13345::experiment::tga-ega-cr
+  experiment_id: 10.1111/maps.13345::britt-2019-asteroid-simulants::declared:10.1111/maps.13345::experiment::tga-ega-cr::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1146,12 +1250,11 @@ observations:
     species:
       formula: CR_Asteroid_Simulant
       phase:
-        tag: unknown
-        reason: phase string 'CR_asteroid_simulant_prototype' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1217,6 +1320,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CR_asteroid_simulant_prototype'' is not in the closed automatic map'
+    origin: britt-2019-asteroid-simulants::britt_2019_cr_tg_integrated_mass_loss
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: tga_ega_flowing_helium'
+    origin: britt-2019-asteroid-simulants::britt_2019_cr_tg_integrated_mass_loss
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -1247,12 +1373,11 @@ observations:
     species:
       formula: asteroid_simulants
       phase:
-        tag: unknown
-        reason: phase string 'CI_CM_CR_asteroid_simulant_prototypes' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1271,7 +1396,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CI_CM_CR_asteroid_simulant_prototypes'' is not in the closed automatic map'
+    origin: britt-2019-asteroid-simulants::britt_2019_table2_prototype_recipes
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: simulant_characterisation'
+    origin: britt-2019-asteroid-simulants::britt_2019_table2_prototype_recipes
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: britt-2019-asteroid-simulants
   locator:
     pdf_page_index: 5
@@ -1289,12 +1435,11 @@ observations:
     species:
       formula: asteroid_simulants
       phase:
-        tag: unknown
-        reason: phase string 'CI_CM_CR_asteroid_simulant_prototypes' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1315,7 +1460,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CI_CM_CR_asteroid_simulant_prototypes'' is not in the closed automatic map'
+    origin: britt-2019-asteroid-simulants::britt_2019_tga_ega_release_patterns
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: tga_ega_flowing_helium'
+    origin: britt-2019-asteroid-simulants::britt_2019_tga_ega_release_patterns
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: britt-2019-asteroid-simulants
   locator:
     pdf_page_index: 11
@@ -1334,12 +1500,11 @@ observations:
     species:
       formula: asteroid_simulants
       phase:
-        tag: unknown
-        reason: phase string 'CI_CM_CR_asteroid_simulant_prototypes' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1363,7 +1528,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CI_CM_CR_asteroid_simulant_prototypes'' is not in the closed automatic map'
+    origin: britt-2019-asteroid-simulants::britt_2019_tga_ega_thermal_program
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: tga_ega_flowing_helium'
+    origin: britt-2019-asteroid-simulants::britt_2019_tga_ega_thermal_program
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: britt-2019-asteroid-simulants
   locator:
     pdf_page_index: 11

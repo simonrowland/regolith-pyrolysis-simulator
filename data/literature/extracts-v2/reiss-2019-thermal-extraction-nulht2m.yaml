@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/reiss-2019-thermal-extraction-nulht2m.yaml
 observations:
 - observation_id: reiss-2019-thermal-extraction-nulht2m::reiss_2019_apparatus_and_pressure_regime
-  experiment_id: 10.1016/j.pss.2019.05.001::experiment::nulht2m-extraction-series
+  experiment_id: 10.1016/j.pss.2019.05.001::reiss-2019-thermal-extraction-nulht2m::declared:10.1016/j.pss.2019.05.001::experiment::nulht2m-extraction-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -11,12 +11,11 @@ observations:
     species:
       formula: NU-LHT-2M
       phase:
-        tag: unknown
-        reason: phase string 'NU-LHT-2M_in_stainless_steel_holder' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -46,7 +45,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''NU-LHT-2M_in_stainless_steel_holder'' is not in the closed automatic map'
+    origin: reiss-2019-thermal-extraction-nulht2m::reiss_2019_apparatus_and_pressure_regime
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: pumped_high_vacuum_EGA'
+    origin: reiss-2019-thermal-extraction-nulht2m::reiss_2019_apparatus_and_pressure_regime
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: reiss-2019-thermal-extraction-nulht2m
   locator:
     page: 6
@@ -59,7 +79,7 @@ observations:
   provenance:
     printed_phase: NU-LHT-2M_in_stainless_steel_holder
 - observation_id: reiss-2019-thermal-extraction-nulht2m::reiss_2019_co2_high_t_printed_and_figure_only
-  experiment_id: 10.1016/j.pss.2019.05.001::experiment::nulht2m-extraction-series
+  experiment_id: 10.1016/j.pss.2019.05.001::reiss-2019-thermal-extraction-nulht2m::declared:10.1016/j.pss.2019.05.001::experiment::nulht2m-extraction-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -67,12 +87,11 @@ observations:
     species:
       formula: CO2
       phase:
-        tag: unknown
-        reason: phase string 'NU-LHT-2M_mineral_decomposition' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -97,7 +116,28 @@ observations:
   admission:
     status: pending
     reason: source admission_status=figure_only_curve_plus_printed_T_attribution is not a closed v2.1 token
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''NU-LHT-2M_mineral_decomposition'' is not in the closed automatic map'
+    origin: reiss-2019-thermal-extraction-nulht2m::reiss_2019_co2_high_t_printed_and_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: pumped_high_vacuum_EGA'
+    origin: reiss-2019-thermal-extraction-nulht2m::reiss_2019_co2_high_t_printed_and_figure_only
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: reiss-2019-thermal-extraction-nulht2m
   locator:
     pdf_page_index: 18
@@ -116,12 +156,11 @@ observations:
     species:
       formula: H2O
       phase:
-        tag: unknown
-        reason: phase string 'NU-LHT-2M_humidified_nitrogen' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -145,7 +184,28 @@ observations:
   admission:
     status: pending
     reason: source admission_status=printed_on_figure_not_axis_digitised is not a closed v2.1 token
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''NU-LHT-2M_humidified_nitrogen'' is not in the closed automatic map'
+    origin: reiss-2019-thermal-extraction-nulht2m::reiss_2019_fig5_printed_adsorption_fits
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: glovebox_hydration'
+    origin: reiss-2019-thermal-extraction-nulht2m::reiss_2019_fig5_printed_adsorption_fits
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: reiss-2019-thermal-extraction-nulht2m
   locator:
     page: 10
@@ -156,7 +216,7 @@ observations:
   provenance:
     printed_phase: NU-LHT-2M_humidified_nitrogen
 - observation_id: reiss-2019-thermal-extraction-nulht2m::reiss_2019_h2_identified_in_rga_figure_only
-  experiment_id: 10.1016/j.pss.2019.05.001::experiment::nulht2m-extraction-series
+  experiment_id: 10.1016/j.pss.2019.05.001::reiss-2019-thermal-extraction-nulht2m::declared:10.1016/j.pss.2019.05.001::experiment::nulht2m-extraction-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -164,12 +224,11 @@ observations:
     species:
       formula: H2
       phase:
-        tag: unknown
-        reason: phase string 'NU-LHT-2M_pumped_vacuum_EGA' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -202,7 +261,28 @@ observations:
         pdf_page_index: 12
         figure: 6-7
         paragraph: 206-207
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''NU-LHT-2M_pumped_vacuum_EGA'' is not in the closed automatic map'
+    origin: reiss-2019-thermal-extraction-nulht2m::reiss_2019_h2_identified_in_rga_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: pumped_high_vacuum_EGA'
+    origin: reiss-2019-thermal-extraction-nulht2m::reiss_2019_h2_identified_in_rga_figure_only
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: reiss-2019-thermal-extraction-nulht2m
   locator:
     pdf_page_index: 12
@@ -212,7 +292,7 @@ observations:
   provenance:
     printed_phase: NU-LHT-2M_pumped_vacuum_EGA
 - observation_id: reiss-2019-thermal-extraction-nulht2m::reiss_2019_h2s_mz32_peak_around_550C
-  experiment_id: 10.1016/j.pss.2019.05.001::experiment::nulht2m-extraction-series
+  experiment_id: 10.1016/j.pss.2019.05.001::reiss-2019-thermal-extraction-nulht2m::declared:10.1016/j.pss.2019.05.001::experiment::nulht2m-extraction-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -220,12 +300,11 @@ observations:
     species:
       formula: H2S
       phase:
-        tag: unknown
-        reason: phase string 'NU-LHT-2M_mineral_decomposition' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -252,7 +331,28 @@ observations:
   admission:
     status: pending
     reason: source admission_status=figure_only_curve_plus_printed_T_attribution is not a closed v2.1 token
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''NU-LHT-2M_mineral_decomposition'' is not in the closed automatic map'
+    origin: reiss-2019-thermal-extraction-nulht2m::reiss_2019_h2s_mz32_peak_around_550C
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: pumped_high_vacuum_EGA'
+    origin: reiss-2019-thermal-extraction-nulht2m::reiss_2019_h2s_mz32_peak_around_550C
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: reiss-2019-thermal-extraction-nulht2m
   locator:
     pdf_page_index: 18
@@ -262,7 +362,7 @@ observations:
   provenance:
     printed_phase: NU-LHT-2M_mineral_decomposition
 - observation_id: reiss-2019-thermal-extraction-nulht2m::reiss_2019_mz18_yield_phase2_model_derived
-  experiment_id: 10.1016/j.pss.2019.05.001::experiment::nulht2m-extraction-series
+  experiment_id: 10.1016/j.pss.2019.05.001::reiss-2019-thermal-extraction-nulht2m::declared:10.1016/j.pss.2019.05.001::experiment::nulht2m-extraction-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -270,12 +370,11 @@ observations:
     species:
       formula: H2O
       phase:
-        tag: unknown
-        reason: phase string 'NU-LHT-2M_phase2_desorption' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -305,7 +404,28 @@ observations:
   admission:
     status: pending
     reason: source admission_status=authors_integral_of_figure_curves_with_assumed_pump_rate is not a closed v2.1 token
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''NU-LHT-2M_phase2_desorption'' is not in the closed automatic map'
+    origin: reiss-2019-thermal-extraction-nulht2m::reiss_2019_mz18_yield_phase2_model_derived
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: pumped_high_vacuum_EGA'
+    origin: reiss-2019-thermal-extraction-nulht2m::reiss_2019_mz18_yield_phase2_model_derived
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: reiss-2019-thermal-extraction-nulht2m
   locator:
     page: 18
@@ -316,7 +436,7 @@ observations:
   provenance:
     printed_phase: NU-LHT-2M_phase2_desorption
 - observation_id: reiss-2019-thermal-extraction-nulht2m::reiss_2019_printed_peak_temperature_bands
-  experiment_id: 10.1016/j.pss.2019.05.001::experiment::nulht2m-extraction-series
+  experiment_id: 10.1016/j.pss.2019.05.001::reiss-2019-thermal-extraction-nulht2m::declared:10.1016/j.pss.2019.05.001::experiment::nulht2m-extraction-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -324,12 +444,11 @@ observations:
     species:
       formula: H2O
       phase:
-        tag: unknown
-        reason: phase string 'NU-LHT-2M_pumped_vacuum_EGA' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -357,7 +476,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''NU-LHT-2M_pumped_vacuum_EGA'' is not in the closed automatic map'
+    origin: reiss-2019-thermal-extraction-nulht2m::reiss_2019_printed_peak_temperature_bands
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: pumped_high_vacuum_EGA'
+    origin: reiss-2019-thermal-extraction-nulht2m::reiss_2019_printed_peak_temperature_bands
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: reiss-2019-thermal-extraction-nulht2m
   locator:
     page: 13
@@ -369,7 +509,7 @@ observations:
   provenance:
     printed_phase: NU-LHT-2M_pumped_vacuum_EGA
 - observation_id: reiss-2019-thermal-extraction-nulht2m::reiss_2019_rga_release_curves_figure_only
-  experiment_id: 10.1016/j.pss.2019.05.001::experiment::nulht2m-extraction-series
+  experiment_id: 10.1016/j.pss.2019.05.001::reiss-2019-thermal-extraction-nulht2m::declared:10.1016/j.pss.2019.05.001::experiment::nulht2m-extraction-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -377,12 +517,11 @@ observations:
     species:
       formula: H2O
       phase:
-        tag: unknown
-        reason: phase string 'NU-LHT-2M_pumped_vacuum_EGA' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -416,7 +555,28 @@ observations:
       evidence:
         figure: 6-11
         note: RGA partial-pressure and total-pressure vs set-point T; not digitised; pdf_page_index=12-20
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''NU-LHT-2M_pumped_vacuum_EGA'' is not in the closed automatic map'
+    origin: reiss-2019-thermal-extraction-nulht2m::reiss_2019_rga_release_curves_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: pumped_high_vacuum_EGA'
+    origin: reiss-2019-thermal-extraction-nulht2m::reiss_2019_rga_release_curves_figure_only
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: reiss-2019-thermal-extraction-nulht2m
   locator:
     figure: 6-11
@@ -425,7 +585,7 @@ observations:
   provenance:
     printed_phase: NU-LHT-2M_pumped_vacuum_EGA
 - observation_id: reiss-2019-thermal-extraction-nulht2m::reiss_2019_table1_test_parameters
-  experiment_id: 10.1016/j.pss.2019.05.001::experiment::nulht2m-extraction-series
+  experiment_id: 10.1016/j.pss.2019.05.001::reiss-2019-thermal-extraction-nulht2m::declared:10.1016/j.pss.2019.05.001::experiment::nulht2m-extraction-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -433,12 +593,11 @@ observations:
     species:
       formula: NU-LHT-2M
       phase:
-        tag: unknown
-        reason: phase string 'NU-LHT-2M_highland_simulant_sieved_fractions' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -463,7 +622,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''NU-LHT-2M_highland_simulant_sieved_fractions'' is not in the closed automatic map'
+    origin: reiss-2019-thermal-extraction-nulht2m::reiss_2019_table1_test_parameters
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: pumped_high_vacuum_EGA'
+    origin: reiss-2019-thermal-extraction-nulht2m::reiss_2019_table1_test_parameters
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: reiss-2019-thermal-extraction-nulht2m
   locator:
     page: 10
@@ -482,12 +662,11 @@ observations:
     species:
       formula: NU-LHT-2M
       phase:
-        tag: unknown
-        reason: phase string 'NU-LHT-2M_single_phase_particles' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -509,7 +688,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''NU-LHT-2M_single_phase_particles'' is not in the closed automatic map'
+    origin: reiss-2019-thermal-extraction-nulht2m::reiss_2019_table2_nulht2m_mineralogy_quoted
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_composition'
+    origin: reiss-2019-thermal-extraction-nulht2m::reiss_2019_table2_nulht2m_mineralogy_quoted
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: reiss-2019-thermal-extraction-nulht2m
   locator:
     page: 18

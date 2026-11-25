@@ -15,6 +15,7 @@ from engines.antoine import (
     _antoine_log10_pressure,
     _read_antoine_coefficients,
 )
+from engines.vapor_limits import BUILTIN_VAPOR_BELOW_400K_LIMIT_K
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_METAL_PHASE_GAS,
     ELLINGHAM_THERMO as _CANONICAL_ELLINGHAM_THERMO,
@@ -32,6 +33,10 @@ from simulator.chemistry.melt_activity import (
 from simulator.fe_redox import (
     calphad_ferrous_feo_activity_diagnostic,
     kress91_furnace_activity_pressure_bar,
+)
+from simulator.metal_saturation_floor import (
+    activities_for_metal_saturation_floor,
+    apply_melt_metal_saturation_floor,
 )
 from simulator.environment import (
     controlled_background_partial_pressure,
@@ -418,7 +423,7 @@ class EquilibriumMixin:
             )
 
         T_K = float(self.melt.temperature_C) + CELSIUS_TO_KELVIN_OFFSET
-        if T_K < 400:
+        if T_K < BUILTIN_VAPOR_BELOW_400K_LIMIT_K:
             # Reached only after the control guard: T_K is finite and > 0 K,
             # p_total_mbar is finite and >= 0. On this cold path the
             # vapor-pressure loop is skipped; empty vapors with
@@ -570,16 +575,6 @@ class EquilibriumMixin:
         else:
             intrinsic_fO2_log = float(intrinsic_fO2_value)
 
-        melt_dissociation_pO2_bar, melt_pO2_clamped = (
-            physical_melt_dissociation_pO2_bar(intrinsic_fO2_log)
-        )
-        if melt_pO2_clamped:
-            # b-148: do not feed the 1e300 float sentinel into mass action.
-            warnings.append(
-                "melt_dissociation_pO2_clamped_to_physical_envelope: "
-                f"fO2_log={intrinsic_fO2_log:.6g} "
-                f"pO2_bar={melt_dissociation_pO2_bar:g}"
-            )
         feo_activity_pressure_bar = kress91_furnace_activity_pressure_bar(
             floor_bar=vacuum_floor_bar,
         )
@@ -616,6 +611,43 @@ class EquilibriumMixin:
             floor_bar=vacuum_floor_bar,
             liquid_domain=liquid_domain,
         )
+        # a_FeO is the unfloored Kress value. Table-gamma FeO is not
+        # the saturation couple. The 1e-30 bar clamp remains the float
+        # guard after the metal floor, not the published melt state.
+        a_feo_stoich = float(
+            feo_activity_diagnostic.get("a_FeO_authoritative", 0.0) or 0.0
+        )
+        dissociation_fO2_log, metal_saturation_floor_notice = (
+            apply_melt_metal_saturation_floor(
+                intrinsic_fO2_log,
+                T_K,
+                activities_for_metal_saturation_floor(
+                    melt_account_mol,
+                    T_K,
+                    a_feo_stoich=a_feo_stoich,
+                ),
+            )
+        )
+        if metal_saturation_floor_notice is not None:
+            warnings.append(
+                f"{metal_saturation_floor_notice['kind']}: "
+                f"metal={metal_saturation_floor_notice['metal']} "
+                f"T_K={float(metal_saturation_floor_notice['temperature_K']):.6g} "
+                "floor_log10_fO2_bar="
+                f"{float(metal_saturation_floor_notice['floor_log10_fO2_bar']):.6g} "
+                "unfloored_log10_fO2_bar="
+                f"{float(metal_saturation_floor_notice['unfloored_log10_fO2_bar']):.6g}"
+            )
+        melt_dissociation_pO2_bar, melt_pO2_clamped = (
+            physical_melt_dissociation_pO2_bar(dissociation_fO2_log)
+        )
+        if melt_pO2_clamped:
+            # b-148: do not feed the 1e300 float sentinel into mass action.
+            warnings.append(
+                "melt_dissociation_pO2_clamped_to_physical_envelope: "
+                f"fO2_log={dissociation_fO2_log:.6g} "
+                f"pO2_bar={melt_dissociation_pO2_bar:g}"
+            )
 
         # ================================================================
         # METAL SPECIES: Ellingham equilibrium + Antoine               [ELLI]
@@ -1549,6 +1581,10 @@ class EquilibriumMixin:
         }
         # This completed path sets status='ok'; invalid T/P already returned
         # out_of_domain above. Merge every typed omission note into its result.
+        if metal_saturation_floor_notice is not None:
+            _eq_diagnostics['melt_metal_saturation_floor_notice'] = (
+                metal_saturation_floor_notice
+            )
         if silent_zero_notes:
             merge_notes_into_mapping(_eq_diagnostics, silent_zero_notes)
         return EquilibriumResult(

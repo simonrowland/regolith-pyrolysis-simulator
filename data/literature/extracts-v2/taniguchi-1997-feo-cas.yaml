@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/taniguchi-1997-feo-cas.yaml
 observations:
 - observation_id: taniguchi-1997-feo-cas::taniguchi_1997_table1_sample_101_metal_fe_composition
-  experiment_id: ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::experiment::taniguchi-1997-table1-101-metal
+  experiment_id: ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::taniguchi-1997-feo-cas::declared:ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::experiment::taniguchi-1997-table1-101-metal::method:unspecified
   identity:
     quantity:
       tag: value
@@ -11,12 +11,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'metal' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -95,7 +94,30 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row=101; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''metal'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table1_sample_101_metal_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table1_sample_101_metal_fe_composition
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 2
@@ -208,7 +230,7 @@ observations:
   provenance:
     printed_phase: metal
 - observation_id: taniguchi-1997-feo-cas::taniguchi_1997_table1_sample_102_metal_fe_composition
-  experiment_id: ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::experiment::taniguchi-1997-table1-102-metal
+  experiment_id: ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::taniguchi-1997-feo-cas::declared:ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::experiment::taniguchi-1997-table1-102-metal::method:unspecified
   identity:
     quantity:
       tag: value
@@ -216,12 +238,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'metal' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -300,7 +321,30 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row=102; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''metal'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table1_sample_102_metal_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table1_sample_102_metal_fe_composition
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 2
@@ -413,7 +457,7 @@ observations:
   provenance:
     printed_phase: metal
 - observation_id: taniguchi-1997-feo-cas::taniguchi_1997_table1_sample_103_metal_fe_composition
-  experiment_id: ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::experiment::taniguchi-1997-table1-103-metal
+  experiment_id: ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::taniguchi-1997-feo-cas::declared:ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::experiment::taniguchi-1997-table1-103-metal::method:unspecified
   identity:
     quantity:
       tag: value
@@ -421,12 +465,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'metal' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -505,7 +548,30 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row=103; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''metal'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table1_sample_103_metal_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table1_sample_103_metal_fe_composition
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 2
@@ -618,7 +684,7 @@ observations:
   provenance:
     printed_phase: metal
 - observation_id: taniguchi-1997-feo-cas::taniguchi_1997_table1_sample_104_metal_fe_composition
-  experiment_id: ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::experiment::taniguchi-1997-table1-104-metal
+  experiment_id: ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::taniguchi-1997-feo-cas::declared:ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::experiment::taniguchi-1997-table1-104-metal::method:unspecified
   identity:
     quantity:
       tag: value
@@ -626,12 +692,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'metal' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -710,7 +775,30 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row=104; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''metal'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table1_sample_104_metal_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table1_sample_104_metal_fe_composition
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 2
@@ -823,7 +911,7 @@ observations:
   provenance:
     printed_phase: metal
 - observation_id: taniguchi-1997-feo-cas::taniguchi_1997_table1_sample_105_metal_fe_composition
-  experiment_id: ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::experiment::taniguchi-1997-table1-105-metal
+  experiment_id: ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::taniguchi-1997-feo-cas::declared:ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::experiment::taniguchi-1997-table1-105-metal::method:unspecified
   identity:
     quantity:
       tag: value
@@ -831,12 +919,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'metal' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -915,7 +1002,30 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row=105; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''metal'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table1_sample_105_metal_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table1_sample_105_metal_fe_composition
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 2
@@ -1028,7 +1138,7 @@ observations:
   provenance:
     printed_phase: metal
 - observation_id: taniguchi-1997-feo-cas::taniguchi_1997_table1_sample_106_metal_fe_composition
-  experiment_id: ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::experiment::taniguchi-1997-table1-106-metal
+  experiment_id: ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::taniguchi-1997-feo-cas::declared:ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::experiment::taniguchi-1997-table1-106-metal::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1036,12 +1146,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'metal' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1120,7 +1229,30 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row=106; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''metal'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table1_sample_106_metal_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table1_sample_106_metal_fe_composition
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 2
@@ -1233,7 +1365,7 @@ observations:
   provenance:
     printed_phase: metal
 - observation_id: taniguchi-1997-feo-cas::taniguchi_1997_table1_sample_107_metal_fe_composition
-  experiment_id: ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::experiment::taniguchi-1997-table1-107-metal
+  experiment_id: ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::taniguchi-1997-feo-cas::declared:ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::experiment::taniguchi-1997-table1-107-metal::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1241,12 +1373,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'metal' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1325,7 +1456,30 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row=107; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''metal'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table1_sample_107_metal_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table1_sample_107_metal_fe_composition
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 2
@@ -1446,12 +1600,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'metal' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1530,7 +1683,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=201; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''metal'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_201_metal_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -1651,12 +1816,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1745,7 +1909,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=201; column=Al2O3
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_201_slag_al2o3_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -1876,12 +2052,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1970,7 +2145,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=201; column=CaO
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_201_slag_cao_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -2101,12 +2288,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2195,7 +2381,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=201; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_201_slag_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -2326,12 +2524,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2420,7 +2617,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=201; column=SiO2
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_201_slag_sio2_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -2551,12 +2760,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'metal' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2635,7 +2843,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=202; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''metal'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_202_metal_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -2756,12 +2976,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2850,7 +3069,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=202; column=Al2O3
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_202_slag_al2o3_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -2981,12 +3212,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3075,7 +3305,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=202; column=CaO
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_202_slag_cao_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -3206,12 +3448,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3300,7 +3541,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=202; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_202_slag_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -3431,12 +3684,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3525,7 +3777,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=202; column=SiO2
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_202_slag_sio2_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -3656,12 +3920,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'metal' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3740,7 +4003,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=203; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''metal'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_203_metal_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -3861,12 +4136,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3955,7 +4229,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=203; column=Al2O3
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_203_slag_al2o3_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -4086,12 +4372,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4180,7 +4465,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=203; column=CaO
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_203_slag_cao_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -4311,12 +4608,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4405,7 +4701,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=203; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_203_slag_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -4536,12 +4844,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4630,7 +4937,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=203; column=SiO2
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_203_slag_sio2_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -4761,12 +5080,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'metal' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4845,7 +5163,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=204; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''metal'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_204_metal_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -4966,12 +5296,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5060,7 +5389,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=204; column=Al2O3
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_204_slag_al2o3_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -5191,12 +5532,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5285,7 +5625,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=204; column=CaO
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_204_slag_cao_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -5416,12 +5768,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5510,7 +5861,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=204; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_204_slag_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -5641,12 +6004,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5735,7 +6097,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=204; column=SiO2
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_204_slag_sio2_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -5866,12 +6240,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'metal' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5950,7 +6323,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=205; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''metal'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_205_metal_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -6071,12 +6456,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6165,7 +6549,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=205; column=Al2O3
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_205_slag_al2o3_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -6296,12 +6692,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6390,7 +6785,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=205; column=CaO
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_205_slag_cao_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -6521,12 +6928,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6615,7 +7021,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=205; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_205_slag_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -6746,12 +7164,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6840,7 +7257,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=205; column=SiO2
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_205_slag_sio2_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -6971,12 +7400,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'metal' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7055,7 +7483,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=206; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''metal'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_206_metal_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -7176,12 +7616,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7270,7 +7709,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=206; column=Al2O3
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_206_slag_al2o3_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -7401,12 +7852,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7495,7 +7945,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=206; column=CaO
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_206_slag_cao_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -7626,12 +8088,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7720,7 +8181,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=206; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_206_slag_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -7851,12 +8324,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7945,7 +8417,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=206; column=SiO2
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_206_slag_sio2_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -8076,12 +8560,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'metal' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8160,7 +8643,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=207; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''metal'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_207_metal_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -8281,12 +8776,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8375,7 +8869,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=207; column=Al2O3
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_207_slag_al2o3_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -8506,12 +9012,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8600,7 +9105,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=207; column=CaO
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_207_slag_cao_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -8731,12 +9248,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8825,7 +9341,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=207; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_207_slag_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -8956,12 +9484,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9050,7 +9577,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=207; column=SiO2
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_207_slag_sio2_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -9181,12 +9720,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'metal' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9265,7 +9803,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=208; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''metal'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_208_metal_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -9386,12 +9936,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9480,7 +10029,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=208; column=Al2O3
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_208_slag_al2o3_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -9611,12 +10172,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9705,7 +10265,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=208; column=CaO
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_208_slag_cao_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -9836,12 +10408,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9930,7 +10501,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=208; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_208_slag_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -10061,12 +10644,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10155,7 +10737,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=208; column=SiO2
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_208_slag_sio2_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -10286,12 +10880,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'metal' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10370,7 +10963,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=209; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''metal'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_209_metal_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -10491,12 +11096,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10585,7 +11189,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=209; column=Al2O3
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_209_slag_al2o3_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -10716,12 +11332,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10810,7 +11425,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=209; column=CaO
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_209_slag_cao_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -10941,12 +11568,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11035,7 +11661,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=209; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_209_slag_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -11166,12 +11804,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11260,7 +11897,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=209; column=SiO2
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_209_slag_sio2_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -11391,12 +12040,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'metal' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11475,7 +12123,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=210; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''metal'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_210_metal_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -11596,12 +12256,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11690,7 +12349,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=210; column=Al2O3
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_210_slag_al2o3_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -11821,12 +12492,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11915,7 +12585,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=210; column=CaO
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_210_slag_cao_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -12046,12 +12728,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12140,7 +12821,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=210; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_210_slag_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -12271,12 +12964,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12365,7 +13057,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=210; column=SiO2
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_210_slag_sio2_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -12496,12 +13200,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'metal' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12580,7 +13283,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=211; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''metal'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_211_metal_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -12701,12 +13416,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12795,7 +13509,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=211; column=Al2O3
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_211_slag_al2o3_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -12926,12 +13652,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13020,7 +13745,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=211; column=CaO
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_211_slag_cao_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -13151,12 +13888,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13245,7 +13981,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=211; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_211_slag_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -13376,12 +14124,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13470,7 +14217,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=211; column=SiO2
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_211_slag_sio2_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -13601,12 +14360,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'metal' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13685,7 +14443,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=212; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''metal'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_212_metal_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -13806,12 +14576,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13900,7 +14669,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=212; column=Al2O3
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_212_slag_al2o3_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -14031,12 +14812,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -14125,7 +14905,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=212; column=CaO
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_212_slag_cao_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -14256,12 +15048,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -14350,7 +15141,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=212; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_212_slag_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -14481,12 +15284,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -14575,7 +15377,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=212; column=SiO2
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_212_slag_sio2_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -14706,12 +15520,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'metal' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -14790,7 +15603,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=213; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''metal'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_213_metal_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -14911,12 +15736,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -14995,7 +15819,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=213; column=Al2O3
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_213_slag_al2o3_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -15116,12 +15952,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -15200,7 +16035,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=213; column=CaO
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_213_slag_cao_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -15321,12 +16168,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -15405,7 +16251,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=213; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_213_slag_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -15526,12 +16384,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -15610,7 +16467,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=213; column=SiO2
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_213_slag_sio2_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -15731,12 +16600,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'metal' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -15815,7 +16683,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=214; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''metal'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_214_metal_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -15936,12 +16816,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -16030,7 +16909,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=214; column=Al2O3
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_214_slag_al2o3_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -16161,12 +17052,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -16255,7 +17145,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=214; column=CaO
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_214_slag_cao_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -16386,12 +17288,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -16480,7 +17381,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=214; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_214_slag_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -16611,12 +17524,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -16705,7 +17617,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=214; column=SiO2
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_214_slag_sio2_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -16836,12 +17760,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'metal' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -16920,7 +17843,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=301; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''metal'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_301_metal_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -17041,12 +17976,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -17135,7 +18069,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=301; column=Al2O3
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_301_slag_al2o3_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -17266,12 +18212,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -17360,7 +18305,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=301; column=CaO
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_301_slag_cao_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -17491,12 +18448,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -17585,7 +18541,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=301; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_301_slag_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -17716,12 +18684,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -17810,7 +18777,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=301; column=SiO2
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_301_slag_sio2_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -17941,12 +18920,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'metal' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -18025,7 +19003,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=302; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''metal'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_302_metal_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -18146,12 +19136,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -18240,7 +19229,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=302; column=Al2O3
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_302_slag_al2o3_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -18371,12 +19372,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -18465,7 +19465,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=302; column=CaO
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_302_slag_cao_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -18596,12 +19608,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -18690,7 +19701,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=302; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_302_slag_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -18821,12 +19844,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -18915,7 +19937,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=302; column=SiO2
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_302_slag_sio2_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -19046,12 +20080,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'metal' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -19130,7 +20163,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=303; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''metal'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_303_metal_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -19251,12 +20296,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -19345,7 +20389,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=303; column=Al2O3
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_303_slag_al2o3_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -19476,12 +20532,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -19570,7 +20625,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=303; column=CaO
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_303_slag_cao_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -19701,12 +20768,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -19795,7 +20861,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=303; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_303_slag_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -19926,12 +21004,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -20020,7 +21097,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=303; column=SiO2
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_303_slag_sio2_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -20151,12 +21240,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'metal' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -20235,7 +21323,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=304; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''metal'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_304_metal_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -20356,12 +21456,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -20450,7 +21549,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=304; column=Al2O3
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_304_slag_al2o3_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -20581,12 +21692,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -20675,7 +21785,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=304; column=CaO
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_304_slag_cao_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -20806,12 +21928,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -20900,7 +22021,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=304; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_304_slag_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -21031,12 +22164,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -21125,7 +22257,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=304; column=SiO2
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_304_slag_sio2_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -21256,12 +22400,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'metal' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -21340,7 +22483,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=305; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''metal'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_305_metal_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -21461,12 +22616,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -21555,7 +22709,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=305; column=Al2O3
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_305_slag_al2o3_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -21686,12 +22852,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -21780,7 +22945,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=305; column=CaO
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_305_slag_cao_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -21911,12 +23088,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -22005,7 +23181,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=305; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_305_slag_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -22136,12 +23324,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -22230,7 +23417,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=305; column=SiO2
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_305_slag_sio2_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -22361,12 +23560,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'metal' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -22445,7 +23643,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=306; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''metal'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_306_metal_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -22566,12 +23776,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -22660,7 +23869,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=306; column=Al2O3
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_306_slag_al2o3_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -22791,12 +24012,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -22885,7 +24105,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=306; column=CaO
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_306_slag_cao_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -23016,12 +24248,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -23110,7 +24341,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=306; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_306_slag_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -23241,12 +24484,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -23335,7 +24577,19 @@ observations:
         pdf_page_index: 3
         table: '4'
         note: row=306; column=SiO2
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table4_sample_306_slag_sio2_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 4
@@ -23466,12 +24720,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'metal' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -23550,7 +24803,19 @@ observations:
         pdf_page_index: 4
         table: '5'
         note: row=401; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''metal'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_401_metal_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 5
@@ -23671,12 +24936,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -23763,7 +25027,19 @@ observations:
         pdf_page_index: 4
         table: '5'
         note: row=401; column=Al2O3
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_401_slag_al2o3_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 5
@@ -23892,12 +25168,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -23984,7 +25259,19 @@ observations:
         pdf_page_index: 4
         table: '5'
         note: row=401; column=CaO
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_401_slag_cao_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 5
@@ -24113,12 +25400,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -24205,7 +25491,19 @@ observations:
         pdf_page_index: 4
         table: '5'
         note: row=401; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_401_slag_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 5
@@ -24334,12 +25632,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'metal' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -24418,7 +25715,19 @@ observations:
         pdf_page_index: 4
         table: '5'
         note: row=402; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''metal'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_402_metal_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 5
@@ -24539,12 +25848,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -24633,7 +25941,19 @@ observations:
         pdf_page_index: 4
         table: '5'
         note: row=402; column=Al2O3
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_402_slag_al2o3_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 5
@@ -24764,12 +26084,11 @@ observations:
     species:
       formula: CaF2
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -24858,7 +26177,19 @@ observations:
         pdf_page_index: 4
         table: '5'
         note: row=402; column=CaF2
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_402_slag_caf2_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 5
@@ -24989,12 +26320,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -25083,7 +26413,19 @@ observations:
         pdf_page_index: 4
         table: '5'
         note: row=402; column=CaO
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_402_slag_cao_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 5
@@ -25214,12 +26556,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -25308,7 +26649,19 @@ observations:
         pdf_page_index: 4
         table: '5'
         note: row=402; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_402_slag_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 5
@@ -25439,12 +26792,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'metal' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -25523,7 +26875,19 @@ observations:
         pdf_page_index: 4
         table: '5'
         note: row=403; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''metal'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_403_metal_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 5
@@ -25644,12 +27008,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -25738,7 +27101,19 @@ observations:
         pdf_page_index: 4
         table: '5'
         note: row=403; column=Al2O3
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_403_slag_al2o3_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 5
@@ -25869,12 +27244,11 @@ observations:
     species:
       formula: CaF2
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -25963,7 +27337,19 @@ observations:
         pdf_page_index: 4
         table: '5'
         note: row=403; column=CaF2
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_403_slag_caf2_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 5
@@ -26094,12 +27480,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -26188,7 +27573,19 @@ observations:
         pdf_page_index: 4
         table: '5'
         note: row=403; column=CaO
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_403_slag_cao_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 5
@@ -26319,12 +27716,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -26413,7 +27809,19 @@ observations:
         pdf_page_index: 4
         table: '5'
         note: row=403; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_403_slag_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 5
@@ -26544,12 +27952,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'metal' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -26628,7 +28035,19 @@ observations:
         pdf_page_index: 4
         table: '5'
         note: row=404; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''metal'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_404_metal_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 5
@@ -26749,12 +28168,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -26843,7 +28261,19 @@ observations:
         pdf_page_index: 4
         table: '5'
         note: row=404; column=Al2O3
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_404_slag_al2o3_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 5
@@ -26974,12 +28404,11 @@ observations:
     species:
       formula: CaF2
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -27068,7 +28497,19 @@ observations:
         pdf_page_index: 4
         table: '5'
         note: row=404; column=CaF2
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_404_slag_caf2_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 5
@@ -27199,12 +28640,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -27293,7 +28733,19 @@ observations:
         pdf_page_index: 4
         table: '5'
         note: row=404; column=CaO
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_404_slag_cao_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 5
@@ -27424,12 +28876,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -27518,7 +28969,19 @@ observations:
         pdf_page_index: 4
         table: '5'
         note: row=404; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_404_slag_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 5
@@ -27649,12 +29112,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'metal' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -27733,7 +29195,19 @@ observations:
         pdf_page_index: 4
         table: '5'
         note: row=405; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''metal'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_405_metal_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 5
@@ -27854,12 +29328,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -27948,7 +29421,19 @@ observations:
         pdf_page_index: 4
         table: '5'
         note: row=405; column=Al2O3
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_405_slag_al2o3_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 5
@@ -28079,12 +29564,11 @@ observations:
     species:
       formula: CaF2
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -28173,7 +29657,19 @@ observations:
         pdf_page_index: 4
         table: '5'
         note: row=405; column=CaF2
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_405_slag_caf2_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 5
@@ -28304,12 +29800,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -28398,7 +29893,19 @@ observations:
         pdf_page_index: 4
         table: '5'
         note: row=405; column=CaO
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_405_slag_cao_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 5
@@ -28529,12 +30036,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -28623,7 +30129,19 @@ observations:
         pdf_page_index: 4
         table: '5'
         note: row=405; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_405_slag_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 5
@@ -28754,12 +30272,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'metal' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -28838,7 +30355,19 @@ observations:
         pdf_page_index: 4
         table: '5'
         note: row=406; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''metal'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_406_metal_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 5
@@ -28959,12 +30488,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -29062,6 +30590,18 @@ observations:
     origin: taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_406_slag_al2o3_composition
     original: '102.452'
     band: 95-102 wt% printed phase total
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_406_slag_al2o3_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 5
@@ -29199,12 +30739,11 @@ observations:
     species:
       formula: CaF2
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -29302,6 +30841,18 @@ observations:
     origin: taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_406_slag_caf2_composition
     original: '102.452'
     band: 95-102 wt% printed phase total
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_406_slag_caf2_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 5
@@ -29439,12 +30990,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -29542,6 +31092,18 @@ observations:
     origin: taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_406_slag_cao_composition
     original: '102.452'
     band: 95-102 wt% printed phase total
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_406_slag_cao_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 5
@@ -29679,12 +31241,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -29782,6 +31343,18 @@ observations:
     origin: taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_406_slag_fe_composition
     original: '102.452'
     band: 95-102 wt% printed phase total
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_406_slag_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 5
@@ -29919,12 +31492,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'metal' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -30003,7 +31575,19 @@ observations:
         pdf_page_index: 4
         table: '5'
         note: row=407; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''metal'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_407_metal_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 5
@@ -30124,12 +31708,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -30218,7 +31801,19 @@ observations:
         pdf_page_index: 4
         table: '5'
         note: row=407; column=Al2O3
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_407_slag_al2o3_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 5
@@ -30349,12 +31944,11 @@ observations:
     species:
       formula: CaF2
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -30443,7 +32037,19 @@ observations:
         pdf_page_index: 4
         table: '5'
         note: row=407; column=CaF2
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_407_slag_caf2_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 5
@@ -30574,12 +32180,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -30668,7 +32273,19 @@ observations:
         pdf_page_index: 4
         table: '5'
         note: row=407; column=CaO
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_407_slag_cao_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 5
@@ -30799,12 +32416,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -30893,7 +32509,19 @@ observations:
         pdf_page_index: 4
         table: '5'
         note: row=407; column=Fe
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''slag'' is not in the closed automatic map'
+    origin: taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_407_slag_fe_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: taniguchi-1997-feo-cas
   locator:
     page: 5

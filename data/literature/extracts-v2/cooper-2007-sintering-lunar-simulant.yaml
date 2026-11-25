@@ -11,12 +11,11 @@ observations:
     species:
       formula: Apollo_14_glass
       phase:
-        tag: unknown
-        reason: phase string 'synthetic_apollo14_composition_glass' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -41,7 +40,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''synthetic_apollo14_composition_glass'' is not in the closed automatic map'
+    origin: cooper-2007-sintering-lunar-simulant::cooper_2007_apollo14_glass_sintering_minutes_800c
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: sintering'
+    origin: cooper-2007-sintering-lunar-simulant::cooper_2007_apollo14_glass_sintering_minutes_800c
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: cooper-2007-sintering-lunar-simulant
   locator:
     pdf_page_index: 1
@@ -92,12 +112,11 @@ observations:
     species:
       formula: JSC-1A
       phase:
-        tag: unknown
-        reason: phase string 'particulate_glass_rich_simulant' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -118,7 +137,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''particulate_glass_rich_simulant'' is not in the closed automatic map'
+    origin: cooper-2007-sintering-lunar-simulant::cooper_2007_jsc1a_grain_size_statistics
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: simulant_characterisation'
+    origin: cooper-2007-sintering-lunar-simulant::cooper_2007_jsc1a_grain_size_statistics
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: cooper-2007-sintering-lunar-simulant
   locator:
     pdf_page_index: 8
@@ -206,6 +246,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: sintering'
+    origin: cooper-2007-sintering-lunar-simulant::cooper_2007_jsc1a_sintering_1050c_three_hours
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -328,6 +379,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: sintering'
+    origin: cooper-2007-sintering-lunar-simulant::cooper_2007_jsc1a_sintering_1100c_quoted
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -379,12 +441,11 @@ observations:
     species:
       formula: JSC-1AF
       phase:
-        tag: unknown
-        reason: phase string 'synthetic_apollo14_composition_glass' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -409,7 +470,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''synthetic_apollo14_composition_glass'' is not in the closed automatic map'
+    origin: cooper-2007-sintering-lunar-simulant::cooper_2007_jsc1af_figure1_sintering_threshold
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: sintering'
+    origin: cooper-2007-sintering-lunar-simulant::cooper_2007_jsc1af_figure1_sintering_threshold
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: cooper-2007-sintering-lunar-simulant
   locator:
     pdf_page_index: 2
@@ -436,12 +518,11 @@ observations:
     species:
       formula: JSC-1AF
       phase:
-        tag: unknown
-        reason: phase string 'particulate_glass_rich_simulant' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -462,7 +543,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''particulate_glass_rich_simulant'' is not in the closed automatic map'
+    origin: cooper-2007-sintering-lunar-simulant::cooper_2007_jsc1af_grain_size_statistics
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: simulant_characterisation'
+    origin: cooper-2007-sintering-lunar-simulant::cooper_2007_jsc1af_grain_size_statistics
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: cooper-2007-sintering-lunar-simulant
   locator:
     pdf_page_index: 8

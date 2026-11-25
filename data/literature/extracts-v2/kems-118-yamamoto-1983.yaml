@@ -11,12 +11,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -40,7 +39,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Sn_or_Fe-Sn-Cu'' is not in the closed automatic map'
+    origin: kems-118-yamamoto-1983::yamamoto_1983_critical_mixing_author_estimate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-118-yamamoto-1983
   locator:
     published_page: 56
@@ -67,12 +77,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -99,6 +108,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Sn_or_Fe-Sn-Cu'' is not in the closed automatic map'
+    origin: kems-118-yamamoto-1983::yamamoto_1983_figs_activities_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -173,12 +193,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -204,7 +223,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Sn_or_Fe-Sn-Cu'' is not in the closed automatic map'
+    origin: kems-118-yamamoto-1983::yamamoto_1983_gamma_inf_and_epsilon
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-118-yamamoto-1983
   locator:
     published_page: 56
@@ -1369,12 +1399,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1401,7 +1430,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Sn_or_Fe-Sn-Cu'' is not in the closed automatic map'
+    origin: kems-118-yamamoto-1983::yamamoto_1983_table3_activities_and_heats
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-118-yamamoto-1983
   locator:
     published_page: 58
@@ -1451,12 +1491,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1483,7 +1522,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Sn_or_Fe-Sn-Cu'' is not in the closed automatic map'
+    origin: kems-118-yamamoto-1983::yamamoto_1983_table3_activities_and_heats
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-118-yamamoto-1983
   locator:
     published_page: 58
@@ -1533,12 +1583,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1565,7 +1614,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Sn_or_Fe-Sn-Cu'' is not in the closed automatic map'
+    origin: kems-118-yamamoto-1983::yamamoto_1983_table3_activities_and_heats
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-118-yamamoto-1983
   locator:
     published_page: 58
@@ -1615,12 +1675,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1647,7 +1706,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Sn_or_Fe-Sn-Cu'' is not in the closed automatic map'
+    origin: kems-118-yamamoto-1983::yamamoto_1983_table3_activities_and_heats
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-118-yamamoto-1983
   locator:
     published_page: 58
@@ -1697,12 +1767,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1729,7 +1798,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Sn_or_Fe-Sn-Cu'' is not in the closed automatic map'
+    origin: kems-118-yamamoto-1983::yamamoto_1983_table3_activities_and_heats
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-118-yamamoto-1983
   locator:
     published_page: 58
@@ -1779,12 +1859,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1811,7 +1890,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Sn_or_Fe-Sn-Cu'' is not in the closed automatic map'
+    origin: kems-118-yamamoto-1983::yamamoto_1983_table3_activities_and_heats
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-118-yamamoto-1983
   locator:
     published_page: 58
@@ -1861,12 +1951,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1893,7 +1982,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Sn_or_Fe-Sn-Cu'' is not in the closed automatic map'
+    origin: kems-118-yamamoto-1983::yamamoto_1983_table3_activities_and_heats
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-118-yamamoto-1983
   locator:
     published_page: 58
@@ -1943,12 +2043,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1975,7 +2074,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Sn_or_Fe-Sn-Cu'' is not in the closed automatic map'
+    origin: kems-118-yamamoto-1983::yamamoto_1983_table3_activities_and_heats
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-118-yamamoto-1983
   locator:
     published_page: 58
@@ -2025,12 +2135,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2057,7 +2166,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Sn_or_Fe-Sn-Cu'' is not in the closed automatic map'
+    origin: kems-118-yamamoto-1983::yamamoto_1983_table3_activities_and_heats
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-118-yamamoto-1983
   locator:
     published_page: 58
@@ -2107,12 +2227,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2139,7 +2258,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Sn_or_Fe-Sn-Cu'' is not in the closed automatic map'
+    origin: kems-118-yamamoto-1983::yamamoto_1983_table3_activities_and_heats
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-118-yamamoto-1983
   locator:
     published_page: 58
@@ -2189,12 +2319,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2221,7 +2350,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Sn_or_Fe-Sn-Cu'' is not in the closed automatic map'
+    origin: kems-118-yamamoto-1983::yamamoto_1983_table3_activities_and_heats
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-118-yamamoto-1983
   locator:
     published_page: 58
@@ -2271,12 +2411,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2303,7 +2442,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Sn_or_Fe-Sn-Cu'' is not in the closed automatic map'
+    origin: kems-118-yamamoto-1983::yamamoto_1983_table3_activities_and_heats
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-118-yamamoto-1983
   locator:
     published_page: 58
@@ -2353,12 +2503,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2385,7 +2534,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Sn_or_Fe-Sn-Cu'' is not in the closed automatic map'
+    origin: kems-118-yamamoto-1983::yamamoto_1983_table3_activities_and_heats
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-118-yamamoto-1983
   locator:
     published_page: 58
@@ -2435,12 +2595,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2467,7 +2626,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Sn_or_Fe-Sn-Cu'' is not in the closed automatic map'
+    origin: kems-118-yamamoto-1983::yamamoto_1983_table3_activities_and_heats
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-118-yamamoto-1983
   locator:
     published_page: 58
@@ -3477,12 +3647,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3510,7 +3679,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Sn_or_Fe-Sn-Cu'' is not in the closed automatic map'
+    origin: kems-118-yamamoto-1983::yamamoto_1983_table5_FeSnCu
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-118-yamamoto-1983
   locator:
     published_page: 60
@@ -3528,12 +3708,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3556,7 +3735,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Sn_or_Fe-Sn-Cu'' is not in the closed automatic map'
+    origin: kems-118-yamamoto-1983::yamamoto_1983_table6_comparison
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-118-yamamoto-1983
   locator:
     published_page: 64
@@ -3607,12 +3797,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3635,7 +3824,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Sn_or_Fe-Sn-Cu'' is not in the closed automatic map'
+    origin: kems-118-yamamoto-1983::yamamoto_1983_table6_comparison
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-118-yamamoto-1983
   locator:
     published_page: 64
@@ -3686,12 +3886,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3714,7 +3913,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Sn_or_Fe-Sn-Cu'' is not in the closed automatic map'
+    origin: kems-118-yamamoto-1983::yamamoto_1983_table6_comparison
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-118-yamamoto-1983
   locator:
     published_page: 64
@@ -3765,12 +3975,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3793,7 +4002,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Sn_or_Fe-Sn-Cu'' is not in the closed automatic map'
+    origin: kems-118-yamamoto-1983::yamamoto_1983_table6_comparison
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-118-yamamoto-1983
   locator:
     published_page: 64
@@ -3844,12 +4064,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3872,7 +4091,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Sn_or_Fe-Sn-Cu'' is not in the closed automatic map'
+    origin: kems-118-yamamoto-1983::yamamoto_1983_table6_comparison
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-118-yamamoto-1983
   locator:
     published_page: 64
@@ -3923,12 +4153,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3951,7 +4180,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Sn_or_Fe-Sn-Cu'' is not in the closed automatic map'
+    origin: kems-118-yamamoto-1983::yamamoto_1983_table6_comparison
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-118-yamamoto-1983
   locator:
     published_page: 64
@@ -4002,12 +4242,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Sn_or_Fe-Sn-Cu' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4030,7 +4269,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Sn_or_Fe-Sn-Cu'' is not in the closed automatic map'
+    origin: kems-118-yamamoto-1983::yamamoto_1983_table6_comparison
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-118-yamamoto-1983
   locator:
     published_page: 64

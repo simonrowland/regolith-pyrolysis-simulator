@@ -595,15 +595,15 @@ def test_all_zero_capacity_flux_preserves_and_routes_live_carrier_authority(
     monkeypatch.setattr(
         active,
         "_apply_analytic_evaporation_depletion",
-        lambda flux: flux,
+        lambda flux, **kwargs: flux,
     )
 
     routed_fluxes = []
     real_route = active.condensation_model.route
 
-    def observed_route(evap_flux, melt):
+    def observed_route(evap_flux, melt, **kwargs):
         routed_fluxes.append(evap_flux)
-        return real_route(evap_flux, melt)
+        return real_route(evap_flux, melt, **kwargs)
 
     monkeypatch.setattr(active.condensation_model, "route", observed_route)
     active.step()

@@ -11,12 +11,11 @@ observations:
     species:
       formula: BSE
       phase:
-        tag: unknown
-        reason: phase string 'steam_atmosphere_in_equilibrium_with_silica' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -36,7 +35,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''steam_atmosphere_in_equilibrium_with_silica'' is not in the closed automatic map'
+    origin: arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_1_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_1_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: arxiv-1602-00658-fegley-rock-steam-solubility
   locator:
     page: 120
@@ -53,12 +73,11 @@ observations:
     species:
       formula: BSE
       phase:
-        tag: unknown
-        reason: phase string 'bulk_silicate_Earth_composition' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -78,7 +97,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''bulk_silicate_Earth_composition'' is not in the closed automatic map'
+    origin: arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_3_compilation
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_composition'
+    origin: arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_3_compilation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: arxiv-1602-00658-fegley-rock-steam-solubility
   locator:
     page: 122
@@ -95,12 +135,11 @@ observations:
     species:
       formula: BSE
       phase:
-        tag: unknown
-        reason: phase string 'steam_at_220_64_bar' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -120,7 +159,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''steam_at_220_64_bar'' is not in the closed automatic map'
+    origin: arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_4_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_4_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: arxiv-1602-00658-fegley-rock-steam-solubility
   locator:
     page: 123
@@ -137,12 +197,11 @@ observations:
     species:
       formula: BSE
       phase:
-        tag: unknown
-        reason: phase string 'BSE_or_continental_crust_magma_plus_steam' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -162,7 +221,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''BSE_or_continental_crust_magma_plus_steam'' is not in the closed automatic map'
+    origin: arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_5_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_5_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: arxiv-1602-00658-fegley-rock-steam-solubility
   locator:
     page: 124
@@ -179,12 +259,11 @@ observations:
     species:
       formula: BSE
       phase:
-        tag: unknown
-        reason: phase string 'gas_photolysis' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -204,7 +283,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''gas_photolysis'' is not in the closed automatic map'
+    origin: arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_6_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: photochemical_model'
+    origin: arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_6_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: arxiv-1602-00658-fegley-rock-steam-solubility
   locator:
     page: 125

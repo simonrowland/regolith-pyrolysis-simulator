@@ -11,12 +11,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'liquid' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -80,6 +79,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: equilibrium_slag_metal_experiment'
+    origin: nagabayashi-hino-banya-1989-phosphorus::nagabayashi_1989_experiment_1823K
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -119,12 +129,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'liquid' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -188,6 +197,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: equilibrium_slag_metal_experiment'
+    origin: nagabayashi-hino-banya-1989-phosphorus::nagabayashi_1989_experiment_1873K
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -225,12 +245,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'liquid' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -294,6 +313,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: equilibrium_slag_metal_experiment'
+    origin: nagabayashi-hino-banya-1989-phosphorus::nagabayashi_1989_experiment_1923K
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -331,12 +361,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'liquid' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -401,6 +430,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - interaction_parameter
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: regular_solution_quadratic_formalism'
+    origin: nagabayashi-hino-banya-1989-phosphorus::nagabayashi_1989_interaction_ca_p5
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - interaction_parameter
@@ -427,12 +467,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'liquid' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -497,6 +536,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - interaction_parameter
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: regular_solution_quadratic_formalism'
+    origin: nagabayashi-hino-banya-1989-phosphorus::nagabayashi_1989_interaction_mg_p5
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - interaction_parameter
@@ -523,12 +573,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'liquid' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -593,6 +642,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - interaction_parameter
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: regular_solution_quadratic_formalism'
+    origin: nagabayashi-hino-banya-1989-phosphorus::nagabayashi_1989_interaction_si_p5
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - interaction_parameter
@@ -619,12 +679,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'liquid' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -689,7 +748,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - log10_Kf
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: regular_solution_quadratic_formalism'
+    origin: nagabayashi-hino-banya-1989-phosphorus::nagabayashi_1989_log_kp1_temperature_fit
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagabayashi-hino-banya-1989-phosphorus
   locator:
     page: 6
@@ -710,12 +780,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'liquid' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -780,7 +849,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - log10_Kf
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: regular_solution_quadratic_formalism'
+    origin: nagabayashi-hino-banya-1989-phosphorus::nagabayashi_1989_log_kp2_temperature_fit
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagabayashi-hino-banya-1989-phosphorus
   locator:
     page: 6
@@ -801,12 +881,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'liquid' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -825,7 +904,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: regular_solution_quadratic_formalism'
+    origin: nagabayashi-hino-banya-1989-phosphorus::nagabayashi_1989_model_accuracy_statement
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagabayashi-hino-banya-1989-phosphorus
   locator:
     page: 7
@@ -845,12 +934,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'liquid' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -873,7 +961,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: equilibrium_slag_metal_experiment'
+    origin: nagabayashi-hino-banya-1989-phosphorus::nagabayashi_1989_phosphorus_distribution_text_results
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagabayashi-hino-banya-1989-phosphorus
   locator:
     page: 3
@@ -908,12 +1006,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'liquid' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -936,7 +1033,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: equilibrium_slag_metal_experiment'
+    origin: nagabayashi-hino-banya-1989-phosphorus::nagabayashi_1989_phosphorus_distribution_text_results
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagabayashi-hino-banya-1989-phosphorus
   locator:
     page: 3
@@ -971,12 +1078,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'liquid' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -999,7 +1105,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: equilibrium_slag_metal_experiment'
+    origin: nagabayashi-hino-banya-1989-phosphorus::nagabayashi_1989_phosphorus_distribution_text_results
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagabayashi-hino-banya-1989-phosphorus
   locator:
     page: 3
@@ -1034,12 +1150,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'liquid' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1062,7 +1177,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: equilibrium_slag_metal_experiment'
+    origin: nagabayashi-hino-banya-1989-phosphorus::nagabayashi_1989_phosphorus_distribution_text_results
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagabayashi-hino-banya-1989-phosphorus
   locator:
     page: 3
@@ -1097,12 +1222,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'liquid' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1125,7 +1249,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: equilibrium_slag_metal_experiment'
+    origin: nagabayashi-hino-banya-1989-phosphorus::nagabayashi_1989_phosphorus_distribution_text_results
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagabayashi-hino-banya-1989-phosphorus
   locator:
     page: 3

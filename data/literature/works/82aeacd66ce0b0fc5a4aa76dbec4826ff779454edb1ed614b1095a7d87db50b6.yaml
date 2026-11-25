@@ -212,6 +212,189 @@ experiments:
     published_page: 294
     pdf_page_index: 2
     table: '2'
+- experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::rb86-stebbins-carmichael-1984::declared:82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c1::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6
+  locator:
+    page: 2
+    published_page: 293
+    pdf_page_index: 1
+    table: '1'
+    section: Calorimetry
+- experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::rb86-stebbins-carmichael-1984::declared:82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_drop_calorimetry_c2::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6
+  locator:
+    page: 2
+    published_page: 293
+    pdf_page_index: 1
+    table: '1'
+    section: Calorimetry
+- experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::rb86-stebbins-carmichael-1984::declared:82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_fusion_enthalpy_calculation::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6
+  locator:
+    page: 5
+    published_page: 296
+    pdf_page_index: 4
+    section: Heat of fusion calculations
+    equation: '12'
+- experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::rb86-stebbins-carmichael-1984::declared:82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_incongruent_fusion_1490k_1bar::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 5
+        published_page: 296
+        pdf_page_index: 4
+        section: Heat of fusion calculations
+        equation: '11'
+        note: The source states 1 bar; expressed in Pa for the identity axis.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 5
+        published_page: 296
+        pdf_page_index: 4
+        section: Heat of fusion calculations
+        equation: '11'
+        note: No sweep-gas condition is printed for the fusion calculation.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6
+  locator:
+    page: 5
+    published_page: 296
+    pdf_page_index: 4
+    section: Heat of fusion calculations
+    equation: '11'
+- experiment_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::rb86-stebbins-carmichael-1984::declared:82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6::experiment::sc1984_table2_bulk_sample_analyses::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 82aeacd66ce0b0fc5a4aa76dbec4826ff779454edb1ed614b1095a7d87db50b6
+  locator:
+    page: 3
+    published_page: 294
+    pdf_page_index: 2
+    table: '2'
 context:
 - observation_id: sc1984_capsule_iron_loss_and_c1_liquid_correction
   type: iron_loss_correction_context

@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/delgado-2015-mg-thermite-regolith.yaml
 observations:
 - observation_id: delgado-2015-mg-thermite-regolith::delgado_2015_jsc1a_cdta_reaction_peak
-  experiment_id: 10.2514/6.2015-1179::delgado-2015-mg-thermite-regolith
+  experiment_id: 10.2514/6.2015-1179::delgado-2015-mg-thermite-regolith::method:dta_dsc
   identity:
     quantity:
       tag: unknown
@@ -173,7 +173,17 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table 1 row 4 (Al2O3), column 2 (JSC-1A [9]).; row=Al2O3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: delgado-2015-mg-thermite-regolith::delgado_2015_table1_al2o3_jsc_1a
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: delgado-2015-mg-thermite-regolith
   locator:
     page: 3
@@ -440,7 +450,17 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table 1 row 4 (Al2O3), column 3 (JSC-Mars-1A [10]).; row=Al2O3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: delgado-2015-mg-thermite-regolith::delgado_2015_table1_al2o3_jsc_mars_1a
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: delgado-2015-mg-thermite-regolith
   locator:
     page: 3
@@ -707,7 +727,17 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table 1 row 4 (Al2O3), column 4 (Mojave Mars [10]).; row=Al2O3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: delgado-2015-mg-thermite-regolith::delgado_2015_table1_al2o3_mojave_mars
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: delgado-2015-mg-thermite-regolith
   locator:
     page: 3
@@ -974,7 +1004,17 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table 1 row 6 (CaO), column 2 (JSC-1A [9]).; row=CaO
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: delgado-2015-mg-thermite-regolith::delgado_2015_table1_cao_jsc_1a
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: delgado-2015-mg-thermite-regolith
   locator:
     page: 3
@@ -1241,7 +1281,17 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table 1 row 6 (CaO), column 3 (JSC-Mars-1A [10]).; row=CaO
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: delgado-2015-mg-thermite-regolith::delgado_2015_table1_cao_jsc_mars_1a
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: delgado-2015-mg-thermite-regolith
   locator:
     page: 3
@@ -1508,7 +1558,17 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table 1 row 6 (CaO), column 4 (Mojave Mars [10]).; row=CaO
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: delgado-2015-mg-thermite-regolith::delgado_2015_table1_cao_mojave_mars
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: delgado-2015-mg-thermite-regolith
   locator:
     page: 3
@@ -1775,7 +1835,17 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table 1 row 5 (Fe2O3), column 2 (JSC-1A [9]).; row=Fe2O3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: delgado-2015-mg-thermite-regolith::delgado_2015_table1_fe2o3_jsc_1a
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: delgado-2015-mg-thermite-regolith
   locator:
     page: 3
@@ -2042,7 +2112,17 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table 1 row 5 (Fe2O3), column 3 (JSC-Mars-1A [10]).; row=Fe2O3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: delgado-2015-mg-thermite-regolith::delgado_2015_table1_fe2o3_jsc_mars_1a
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: delgado-2015-mg-thermite-regolith
   locator:
     page: 3
@@ -2309,7 +2389,17 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table 1 row 5 (Fe2O3), column 4 (Mojave Mars [10]).; row=Fe2O3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: delgado-2015-mg-thermite-regolith::delgado_2015_table1_fe2o3_mojave_mars
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: delgado-2015-mg-thermite-regolith
   locator:
     page: 3
@@ -2576,7 +2666,17 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table 1 row 7 (MgO), column 2 (JSC-1A [9]).; row=MgO
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: delgado-2015-mg-thermite-regolith::delgado_2015_table1_mgo_jsc_1a
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: delgado-2015-mg-thermite-regolith
   locator:
     page: 3
@@ -2843,7 +2943,17 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table 1 row 7 (MgO), column 3 (JSC-Mars-1A [10]).; row=MgO
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: delgado-2015-mg-thermite-regolith::delgado_2015_table1_mgo_jsc_mars_1a
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: delgado-2015-mg-thermite-regolith
   locator:
     page: 3
@@ -3110,7 +3220,17 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table 1 row 7 (MgO), column 4 (Mojave Mars [10]).; row=MgO
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: delgado-2015-mg-thermite-regolith::delgado_2015_table1_mgo_mojave_mars
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: delgado-2015-mg-thermite-regolith
   locator:
     page: 3
@@ -3377,7 +3497,17 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table 1 row 8 (Na2O), column 2 (JSC-1A [9]).; row=Na2O
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: delgado-2015-mg-thermite-regolith::delgado_2015_table1_na2o_jsc_1a
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: delgado-2015-mg-thermite-regolith
   locator:
     page: 3
@@ -3644,7 +3774,17 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table 1 row 8 (Na2O), column 3 (JSC-Mars-1A [10]).; row=Na2O
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: delgado-2015-mg-thermite-regolith::delgado_2015_table1_na2o_jsc_mars_1a
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: delgado-2015-mg-thermite-regolith
   locator:
     page: 3
@@ -3911,7 +4051,17 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table 1 row 8 (Na2O), column 4 (Mojave Mars [10]).; row=Na2O
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: delgado-2015-mg-thermite-regolith::delgado_2015_table1_na2o_mojave_mars
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: delgado-2015-mg-thermite-regolith
   locator:
     page: 3
@@ -4178,7 +4328,17 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table 1 row 3 (SiO2), column 2 (JSC-1A [9]).; row=SiO2
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: delgado-2015-mg-thermite-regolith::delgado_2015_table1_sio2_jsc_1a
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: delgado-2015-mg-thermite-regolith
   locator:
     page: 3
@@ -4445,7 +4605,17 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table 1 row 3 (SiO2), column 3 (JSC-Mars-1A [10]).; row=SiO2
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: delgado-2015-mg-thermite-regolith::delgado_2015_table1_sio2_jsc_mars_1a
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: delgado-2015-mg-thermite-regolith
   locator:
     page: 3
@@ -4712,7 +4882,17 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table 1 row 3 (SiO2), column 4 (Mojave Mars [10]).; row=SiO2
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: delgado-2015-mg-thermite-regolith::delgado_2015_table1_sio2_mojave_mars
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: delgado-2015-mg-thermite-regolith
   locator:
     page: 3
@@ -4979,7 +5159,17 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table 1 row 9 (TiO2), column 2 (JSC-1A [9]).; row=TiO2
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: delgado-2015-mg-thermite-regolith::delgado_2015_table1_tio2_jsc_1a
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: delgado-2015-mg-thermite-regolith
   locator:
     page: 3
@@ -5246,7 +5436,17 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table 1 row 9 (TiO2), column 3 (JSC-Mars-1A [10]).; row=TiO2
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: delgado-2015-mg-thermite-regolith::delgado_2015_table1_tio2_jsc_mars_1a
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: delgado-2015-mg-thermite-regolith
   locator:
     page: 3
@@ -5513,7 +5713,17 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table 1 row 9 (TiO2), column 4 (Mojave Mars [10]).; row=TiO2
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: delgado-2015-mg-thermite-regolith::delgado_2015_table1_tio2_mojave_mars
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: delgado-2015-mg-thermite-regolith
   locator:
     page: 3

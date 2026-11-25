@@ -11,12 +11,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -66,6 +65,27 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-001-homma-1966::homma_1966_cu_fitted_constants_quoted_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_cu_fitted_constants_quoted_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -109,12 +129,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -164,6 +183,27 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-001-homma-1966::homma_1966_cu_fitted_constants_quoted_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_cu_fitted_constants_quoted_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -207,12 +247,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -262,6 +301,27 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-001-homma-1966::homma_1966_cu_fitted_constants_quoted_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_cu_fitted_constants_quoted_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -305,12 +365,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -360,6 +419,27 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-001-homma-1966::homma_1966_cu_fitted_constants_quoted_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_cu_fitted_constants_quoted_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -403,12 +483,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -440,7 +519,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Cu_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_cu_masses_6503_11_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_cu_masses_6503_11_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: 517–518
@@ -497,12 +597,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -534,7 +633,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Cu_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_cu_masses_6503_11_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_cu_masses_6503_11_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: 517–518
@@ -591,12 +711,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -628,7 +747,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Cu_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_cu_masses_6503_11_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_cu_masses_6503_11_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: 517–518
@@ -685,12 +825,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -722,7 +861,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Cu_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_cu_masses_6503_11_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_cu_masses_6503_11_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: 517–518
@@ -779,12 +939,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -816,7 +975,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Cu_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_cu_masses_6503_12_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_cu_masses_6503_12_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: 517–518
@@ -873,12 +1053,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -910,7 +1089,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Cu_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_cu_masses_6503_12_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_cu_masses_6503_12_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: 517–518
@@ -967,12 +1167,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1004,7 +1203,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Cu_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_cu_masses_6503_12_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_cu_masses_6503_12_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: 517–518
@@ -1061,12 +1281,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1098,7 +1317,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Cu_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_cu_masses_6503_12_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_cu_masses_6503_12_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: 517–518
@@ -1155,12 +1395,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1192,7 +1431,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Cu_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_cu_masses_6503_16_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_cu_masses_6503_16_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: 517–518
@@ -1249,12 +1509,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1286,7 +1545,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Cu_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_cu_masses_6503_16_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_cu_masses_6503_16_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: 517–518
@@ -1343,12 +1623,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1380,7 +1659,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Cu_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_cu_masses_6503_16_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_cu_masses_6503_16_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: 517–518
@@ -1437,12 +1737,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1474,7 +1773,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Cu_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_cu_masses_6503_16_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_cu_masses_6503_16_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: 517–518
@@ -1531,12 +1851,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1568,7 +1887,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Cu_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_cu_masses_6503_28_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_cu_masses_6503_28_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: 517–518
@@ -1625,12 +1965,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1662,7 +2001,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Cu_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_cu_masses_6503_28_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_cu_masses_6503_28_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: 517–518
@@ -1719,12 +2079,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1756,7 +2115,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Cu_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_cu_masses_6503_28_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_cu_masses_6503_28_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: 517–518
@@ -1813,12 +2193,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1850,7 +2229,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Cu_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_cu_masses_6503_28_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_cu_masses_6503_28_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: 517–518
@@ -1943,7 +2343,17 @@ observations:
         line_range: 166-168
         note: repaired_table_path=text/kems-001-homma-1966/ocr-repair/kems-001-homma-1966.md
         source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: olette_relative_evaporation_coefficient'
+    origin: kems-001-homma-1966::homma_1966_cu_olette_alpha_exp_table2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: PDF pp. 3-4 / printed pp. 517-518
@@ -1974,12 +2384,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_alloy_steel_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2008,7 +2417,28 @@ observations:
       evidence:
         paragraph: Olette relative evaporation coefficient
         source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_alloy_steel_melt'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_cu_olette_class_fence_b1
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: olette_relative_evaporation_coefficient'
+    origin: kems-001-homma-1966::homma_1966_cu_olette_class_fence_b1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     paragraph: Olette relative evaporation coefficient
@@ -2033,12 +2463,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2065,7 +2494,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Cu_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_cu_olette_class_fence_quoted_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: olette_relative_evaporation_coefficient'
+    origin: kems-001-homma-1966::homma_1966_cu_olette_class_fence_quoted_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: 517–518
@@ -2083,12 +2533,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Cu_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2139,7 +2588,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Cu_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_cu_olette_experimental_quoted_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: olette_relative_evaporation_coefficient'
+    origin: kems-001-homma-1966::homma_1966_cu_olette_experimental_quoted_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: 517–518
@@ -2157,12 +2627,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2186,6 +2655,27 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-001-homma-1966::homma_1966_cu_olette_theoretical_quoted_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: olette_relative_evaporation_coefficient'
+    origin: kems-001-homma-1966::homma_1966_cu_olette_theoretical_quoted_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -2259,7 +2749,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_cu_specific_evaporation_constant
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     table: '5'
@@ -2310,12 +2810,11 @@ observations:
     species:
       formula: Mn
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2380,6 +2879,27 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -2423,12 +2943,11 @@ observations:
     species:
       formula: Mn
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2493,6 +3012,27 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -2536,12 +3076,11 @@ observations:
     species:
       formula: Mn
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2606,6 +3145,27 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -2649,12 +3209,11 @@ observations:
     species:
       formula: Mn
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2719,6 +3278,27 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -2762,12 +3342,11 @@ observations:
     species:
       formula: Mn
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2832,6 +3411,27 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -2875,12 +3475,11 @@ observations:
     species:
       formula: Mn
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2945,6 +3544,27 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -2988,12 +3608,11 @@ observations:
     species:
       formula: Mn
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3058,6 +3677,27 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -3101,12 +3741,11 @@ observations:
     species:
       formula: Mn
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3171,6 +3810,27 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -3214,12 +3874,11 @@ observations:
     species:
       formula: Mn
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3284,6 +3943,27 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -3327,12 +4007,11 @@ observations:
     species:
       formula: Mn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Mn_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3362,7 +4041,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Mn_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_mn_masses_6412_14_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_mn_masses_6412_14_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: '517'
@@ -3419,12 +4119,11 @@ observations:
     species:
       formula: Mn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Mn_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3454,7 +4153,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Mn_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_mn_masses_6412_14_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_mn_masses_6412_14_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: '517'
@@ -3511,12 +4231,11 @@ observations:
     species:
       formula: Mn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Mn_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3546,7 +4265,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Mn_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_mn_masses_6412_14_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_mn_masses_6412_14_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: '517'
@@ -3603,12 +4343,11 @@ observations:
     species:
       formula: Mn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Mn_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3638,7 +4377,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Mn_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_mn_masses_6502_1_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_mn_masses_6502_1_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: '517'
@@ -3695,12 +4455,11 @@ observations:
     species:
       formula: Mn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Mn_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3730,7 +4489,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Mn_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_mn_masses_6502_1_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_mn_masses_6502_1_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: '517'
@@ -3787,12 +4567,11 @@ observations:
     species:
       formula: Mn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Mn_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3822,7 +4601,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Mn_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_mn_masses_6502_1_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_mn_masses_6502_1_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: '517'
@@ -3879,12 +4679,11 @@ observations:
     species:
       formula: Mn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Mn_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3914,7 +4713,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Mn_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_mn_masses_6502_2_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_mn_masses_6502_2_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: '517'
@@ -3971,12 +4791,11 @@ observations:
     species:
       formula: Mn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Mn_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4006,7 +4825,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Mn_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_mn_masses_6502_2_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_mn_masses_6502_2_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: '517'
@@ -4063,12 +4903,11 @@ observations:
     species:
       formula: Mn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Mn_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4098,7 +4937,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Mn_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_mn_masses_6502_2_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_mn_masses_6502_2_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: '517'
@@ -4192,7 +5052,17 @@ observations:
         table: '1'
         line_range: 162-164
         source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: olette_relative_evaporation_coefficient'
+    origin: kems-001-homma-1966::homma_1966_mn_olette_alpha_exp_table1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     table: '1'
@@ -4219,12 +5089,11 @@ observations:
     species:
       formula: Mn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_alloy_steel_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4253,7 +5122,28 @@ observations:
       evidence:
         paragraph: Olette relative evaporation coefficient
         source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_alloy_steel_melt'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_mn_olette_class_fence_b1
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: olette_relative_evaporation_coefficient'
+    origin: kems-001-homma-1966::homma_1966_mn_olette_class_fence_b1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     paragraph: Olette relative evaporation coefficient
@@ -4278,12 +5168,11 @@ observations:
     species:
       formula: Mn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Mn_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4310,7 +5199,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Mn_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_mn_olette_class_fence_quoted_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: olette_relative_evaporation_coefficient'
+    origin: kems-001-homma-1966::homma_1966_mn_olette_class_fence_quoted_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: '517'
@@ -4328,12 +5238,11 @@ observations:
     species:
       formula: Mn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Mn_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4384,7 +5293,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Mn_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_mn_olette_experimental_quoted_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: olette_relative_evaporation_coefficient'
+    origin: kems-001-homma-1966::homma_1966_mn_olette_experimental_quoted_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: '517'
@@ -4402,12 +5332,11 @@ observations:
     species:
       formula: Mn
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4431,6 +5360,27 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-001-homma-1966::homma_1966_mn_olette_theoretical_quoted_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: olette_relative_evaporation_coefficient'
+    origin: kems-001-homma-1966::homma_1966_mn_olette_theoretical_quoted_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -4506,7 +5456,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_mn_specific_evaporation_constant
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     table: '4'
@@ -4561,12 +5521,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4616,6 +5575,27 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-001-homma-1966::homma_1966_sn_fitted_constants_quoted_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_sn_fitted_constants_quoted_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -4659,12 +5639,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4714,6 +5693,27 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-001-homma-1966::homma_1966_sn_fitted_constants_quoted_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_sn_fitted_constants_quoted_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -4757,12 +5757,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4812,6 +5811,27 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-001-homma-1966::homma_1966_sn_fitted_constants_quoted_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_sn_fitted_constants_quoted_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -4855,12 +5875,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Sn_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4892,7 +5911,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Sn_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_sn_masses_6503_14_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_sn_masses_6503_14_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: '518'
@@ -4949,12 +5989,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Sn_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4986,7 +6025,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Sn_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_sn_masses_6503_14_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_sn_masses_6503_14_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: '518'
@@ -5043,12 +6103,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Sn_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5080,7 +6139,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Sn_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_sn_masses_6503_14_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_sn_masses_6503_14_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: '518'
@@ -5137,12 +6217,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Sn_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5174,7 +6253,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Sn_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_sn_masses_6503_14_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_sn_masses_6503_14_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: '518'
@@ -5231,12 +6331,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Sn_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5268,7 +6367,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Sn_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_sn_masses_6503_15_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_sn_masses_6503_15_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: '518'
@@ -5325,12 +6445,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Sn_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5362,7 +6481,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Sn_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_sn_masses_6503_15_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_sn_masses_6503_15_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: '518'
@@ -5419,12 +6559,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Sn_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5456,7 +6595,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Sn_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_sn_masses_6503_15_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_sn_masses_6503_15_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: '518'
@@ -5513,12 +6673,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Sn_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5550,7 +6709,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Sn_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_sn_masses_6503_15_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_sn_masses_6503_15_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: '518'
@@ -5607,12 +6787,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Sn_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5644,7 +6823,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Sn_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_sn_masses_6504_1_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_sn_masses_6504_1_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: '518'
@@ -5701,12 +6901,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Sn_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5738,7 +6937,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Sn_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_sn_masses_6504_1_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_sn_masses_6504_1_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: '518'
@@ -5795,12 +7015,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Sn_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5832,7 +7051,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Sn_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_sn_masses_6504_1_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_sn_masses_6504_1_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: '518'
@@ -5889,12 +7129,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Sn_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5926,7 +7165,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Sn_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_sn_masses_6504_1_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_sn_masses_6504_1_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: '518'
@@ -6019,7 +7279,17 @@ observations:
         line_range: 174-176
         note: repaired_table_path=text/kems-001-homma-1966/ocr-repair/kems-001-homma-1966.md
         source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: olette_relative_evaporation_coefficient'
+    origin: kems-001-homma-1966::homma_1966_sn_olette_alpha_exp_table3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: PDF p. 4 / printed p. 518
@@ -6050,12 +7320,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_alloy_steel_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6084,7 +7353,28 @@ observations:
       evidence:
         paragraph: Olette relative evaporation coefficient
         source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_alloy_steel_melt'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_sn_olette_class_fence_b1
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: olette_relative_evaporation_coefficient'
+    origin: kems-001-homma-1966::homma_1966_sn_olette_class_fence_b1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     paragraph: Olette relative evaporation coefficient
@@ -6109,12 +7399,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Sn_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6141,7 +7430,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Sn_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_sn_olette_class_fence_quoted_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: olette_relative_evaporation_coefficient'
+    origin: kems-001-homma-1966::homma_1966_sn_olette_class_fence_quoted_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: '518'
@@ -6159,12 +7469,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe_Sn_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6215,7 +7524,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe_Sn_alloy'' is not in the closed automatic map'
+    origin: kems-001-homma-1966::homma_1966_sn_olette_experimental_quoted_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: olette_relative_evaporation_coefficient'
+    origin: kems-001-homma-1966::homma_1966_sn_olette_experimental_quoted_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     page: '518'
@@ -6233,12 +7563,11 @@ observations:
     species:
       formula: Sn
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6262,6 +7591,27 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-001-homma-1966::homma_1966_sn_olette_theoretical_quoted_deep
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: olette_relative_evaporation_coefficient'
+    origin: kems-001-homma-1966::homma_1966_sn_olette_theoretical_quoted_deep
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -6335,7 +7685,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_induction_free_evaporation_steel_melt'
+    origin: kems-001-homma-1966::homma_1966_sn_specific_evaporation_constant
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-001-homma-1966
   locator:
     table: '5'

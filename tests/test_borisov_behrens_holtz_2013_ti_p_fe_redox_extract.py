@@ -9,14 +9,32 @@ import pytest
 import yaml
 
 from tests.helpers.corpus_paths import regolith_corpus_root
-from simulator.battery.enums import AmountBasis, NoticeKind, Phase, Quantity, ValueKind
-from simulator.battery.migrate import Migrator
+from simulator.battery.default_policy import resolve
+from simulator.battery.enums import (
+    AmountBasis,
+    MethodToken,
+    NoticeKind,
+    Phase,
+    Quantity,
+    ValueKind,
+)
+from simulator.battery.migrate import Migrator, write_outputs
+from simulator.battery.records import NoticePolicy
 
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_ID = "borisov-behrens-holtz-2013-ti-p-fe-redox"
+WORK_ID = "10.1007/s00410-013-0943-9"
 EXTRACT = ROOT / "data/literature/extracts" / f"{SOURCE_ID}.yaml"
 OXIDES = ("SiO2", "TiO2", "Al2O3", "Fe2O3", "MgO", "CaO", "P2O5")
+UNSTATED_METHOD_IDS = {
+    "borisov_2013_morb_christie_1986_quoted",
+    "borisov_2013_morb_cottrell_kelley_2011_quoted",
+    "borisov_2013_pu3_schuessler_2008_quoted_mean",
+    "borisov_2013_pu3_wet_chemistry_session_1",
+    "borisov_2013_pu3_wet_chemistry_session_2",
+    "borisov_2013_pu3_wet_chemistry_session_3",
+}
 
 # Independently transcribed from the 600 dpi render of physical PDF page 5.
 # Temperature and duration ditto marks are expanded to the preceding printed
@@ -230,17 +248,59 @@ def test_table1_post_run_p2o5_and_sample_weights_match_render() -> None:
             assert item["point_conditions"]["total_pressure_Pa"]["state"]["value"] == "101325"
 
 
+def _assert_unstated_method_rows(result, document: dict) -> None:
+    records = list(result.observations.values())
+    method_rows = {
+        record.observation_id.split("::", 1)[1]: record
+        for record in records
+        if record.observation_id.split("::", 1)[1] in UNSTATED_METHOD_IDS
+    }
+    assert set(method_rows) == UNSTATED_METHOD_IDS, (
+        f"missing moved observations: {UNSTATED_METHOD_IDS - set(method_rows)}; "
+        f"unexpected matches: {set(method_rows) - UNSTATED_METHOD_IDS}"
+    )
+    method_policy = NoticePolicy(**resolve("DP-106").payload["policy"])
+    source_rows = {
+        item["observation_id"]: item
+        for body in document["species"].values()
+        for item in body.get("observations", [])
+    }
+    for record in method_rows.values():
+        local_id = record.observation_id.split("::", 1)[1]
+        assert record.experiment_id == f"{WORK_ID}::experiment::{local_id}"
+        method = result.experiments[record.experiment_id].method
+        assert method.is_value and method.value is MethodToken.UNSPECIFIED, (
+            f"{local_id} must not inherit a quench experiment method"
+        )
+        method_notices = [
+            notice for notice in record.notices
+            if notice.kind is NoticeKind.METHOD_UNSTATED
+        ]
+        assert len(method_notices) == 1, (
+            f"{local_id} should have one METHOD_UNSTATED notice, "
+            f"found {len(method_notices)}"
+        )
+        method_notice = method_notices[0]
+        assert method_notice.policy == method_policy
+        printed_method = source_rows[local_id]["values"]["method_as_printed"]
+        assert f"printed source evidence: {printed_method}" in method_notice.reason
+
+
 def test_migration_types_every_quantity_and_keeps_conditions_and_quench() -> None:
     document = _document()
     result = _migrate()
     records = list(result.observations.values())
     assert len(records) == 62
     assert not result.registry_issues
-    assert len(result.queue) == 6
-    assert all(
-        item.axes == ["method"] and item.why == "source does not state method"
+    assert not any("method" in item.axes for item in result.queue)
+    _assert_unstated_method_rows(result, document)
+
+    remaining_non_method_queue = {
+        (item.observation_id, tuple(item.axes), item.why)
         for item in result.queue
-    )
+        if "method" not in item.axes
+    }
+    assert remaining_non_method_queue == set()
 
     source_formula = {
         item["observation_id"]: formula
@@ -263,6 +323,11 @@ def test_migration_types_every_quantity_and_keeps_conditions_and_quench() -> Non
     assert len(iron_rows) == 43
     assert all(r.identity.quantity.value is Quantity.VALENCE_RATIO for r in iron_rows)
     assert all(r.identity.species.formula == "Fe" for r in iron_rows)
+    quench_experiment_id = f"{WORK_ID}::{SOURCE_ID}"
+    assert all(r.experiment_id == quench_experiment_id for r in iron_rows)
+    quench_method = result.experiments[quench_experiment_id].method
+    assert quench_method.is_value
+    assert quench_method.value is MethodToken.QUENCH_EQUILIBRATION
     assert all(r.value.kind is ValueKind.POINT for r in iron_rows)
     assert all(r.identity.species.phase.value.value == Phase.L for r in iron_rows)
     for record in iron_rows:
@@ -387,6 +452,29 @@ def test_migration_types_every_quantity_and_keeps_conditions_and_quench() -> Non
         assert "composition" in conditions
 
 
+def test_mutating_method_resolver_to_drop_method_notice_fails(
+    monkeypatch,
+) -> None:
+    original = Migrator._resolve_method_for_observation
+    def discard_method_notice(self, **kwargs):
+        method, notice = original(self, **kwargs)
+        if (
+            kwargs["observation_id"].split("::", 1)[1] in UNSTATED_METHOD_IDS
+            and notice is not None
+            and notice.kind is NoticeKind.METHOD_UNSTATED
+        ):
+            return method, None
+        return method, notice
+
+    monkeypatch.setattr(
+        Migrator,
+        "_resolve_method_for_observation",
+        discard_method_notice,
+    )
+    with pytest.raises(AssertionError, match="should have one METHOD_UNSTATED notice"):
+        _assert_unstated_method_rows(_migrate(), _document())
+
+
 def test_figure_records_are_deferred_and_keep_printed_oxygen_condition() -> None:
     document = _document()
     figures = [
@@ -439,6 +527,50 @@ def test_all_extract_locators_use_physical_pdf_pages() -> None:
     collect(document)
     assert locators
     assert all(item["page"] == item["pdf_page_index"] + 1 for item in locators)
+    schuessler = next(
+        row
+        for body in document["species"].values()
+        for row in body.get("observations", ())
+        if row["observation_id"] == "borisov_2013_pu3_schuessler_2008_quoted_mean"
+    )
+    experiment = next(
+        item
+        for item in document["experiments"]
+        if item["experiment_id"] == schuessler["experiment"]
+    )
+    assert schuessler["locator"] == experiment["locator"]
+    assert (
+        schuessler["locator"]["page"],
+        schuessler["locator"]["published_page"],
+        schuessler["locator"]["pdf_page_index"],
+    ) == (4, 1580, 3)
+
+
+def test_generated_projection_matches_fresh_isolated_migration(tmp_path: Path) -> None:
+    observation_id = f"{SOURCE_ID}::borisov_2013_pu3_schuessler_2008_quoted_mean"
+    experiment_id = (
+        f"{WORK_ID}::experiment::borisov_2013_pu3_schuessler_2008_quoted_mean"
+    )
+    result = _migrate()
+    observation = result.observations[observation_id]
+    assert observation.experiment_id == experiment_id
+    assert any(
+        notice.kind is NoticeKind.METHOD_UNSTATED
+        for notice in observation.notices
+    )
+
+    write_outputs(result, tmp_path)
+    for relative_path in (
+        Path("data/literature/extracts-v2") / f"{SOURCE_ID}.yaml",
+        Path("data/literature/works/10.1007_s00410-013-0943-9.yaml"),
+    ):
+        stored = yaml.safe_load(
+            (ROOT / relative_path).read_text(encoding="utf-8")
+        )
+        regenerated = yaml.safe_load(
+            (tmp_path / relative_path).read_text(encoding="utf-8")
+        )
+        assert stored == regenerated, relative_path
 
 
 def test_cited_table_pages_are_the_physical_pdf_pages() -> None:

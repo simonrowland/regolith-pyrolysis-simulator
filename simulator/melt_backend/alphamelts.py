@@ -43,7 +43,6 @@ import struct
 import subprocess
 import tempfile
 import time
-import traceback
 import warnings
 from dataclasses import dataclass, replace
 from functools import lru_cache
@@ -96,6 +95,7 @@ from simulator.engine_pool import (
     EngineWorkerRemoteError,
     EngineWorkerTimeout,
     WarmEngineWorker,
+    engine_worker_failure_text,
 )
 from simulator.melt_backend.alphamelts_contract import (
     AlphaMELTSSubprocessRunMode,
@@ -933,7 +933,8 @@ def _run_petthermotools_worker(
         connection.send(('ok', result))
     except BaseException as exc:  # pragma: no cover - child/native boundary
         connection.send((
-            'error', type(exc).__name__, str(exc), traceback.format_exc(),
+            'error', type(exc).__name__, str(exc),
+            engine_worker_failure_text(exc),
         ))
     finally:
         connection.close()

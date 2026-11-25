@@ -100,6 +100,39 @@ experiments:
     published_page: 58
     pdf_page_index: 3
     section: Abstract
+- experiment_id: 27d923ff037b52531983872bbf22a4fa7b2a8c912c8407190eca349655139af7::shornikov-2023-silica-phosphate-melts::declared:27d923ff037b52531983872bbf22a4fa7b2a8c912c8407190eca349655139af7::experiment::shornikov-2023-sio2-model::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 27d923ff037b52531983872bbf22a4fa7b2a8c912c8407190eca349655139af7
+  locator:
+    page: 4
+    published_page: 58
+    pdf_page_index: 3
+    section: Abstract
 context:
 - observation_id: shornikov_2023_sio2_fig1_phase_diagram
   type: thermodynamic_example

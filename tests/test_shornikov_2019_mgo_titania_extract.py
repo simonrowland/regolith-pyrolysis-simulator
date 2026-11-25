@@ -382,7 +382,11 @@ def test_unprinted_standard_pressure_widens_printed_gas_band_at_row_temperature(
     )
     assert scored.band.band_basis == "printed_plus_derived_bound"
     assert scored.two_sigma_band is not None
-    assert scored.two_sigma_band.value == Decimal("0.2") + expected
+    # Printed half-width / k = 0.2 / 2 = 0.1 kJ/mol; normal-95 ticket
+    # transform, then add the independent pressure ambiguity bound.
+    assert scored.two_sigma_band.value == (
+        Decimal("0.1") * NORMAL_95_TICKET_MULTIPLIER + expected
+    )
 
     overridden = _printed_uncertainty_band(
         Quantity.DELTA_FG,
@@ -393,7 +397,10 @@ def test_unprinted_standard_pressure_widens_printed_gas_band_at_row_temperature(
     )
     assert overridden.refusal is None
     assert overridden.band is not None
-    assert overridden.band.value == Decimal("0.2") + expected
+    # The two-sigma printed half-width is 0.1 kJ/mol; ticket it at normal 95%.
+    assert overridden.band.value == (
+        Decimal("0.1") * NORMAL_95_TICKET_MULTIPLIER + expected
+    )
     assert overridden.notice is None
     assert overridden.two_sigma_band is None
     if temperature_K == "2973":
@@ -1081,7 +1088,7 @@ def test_condensed_element_frame_uses_production_predictions_or_typed_refusals(
                 ("unsupported", "engine-thermo-does-not-emit"): 23,
                 ("identity_incomplete", "solid_liquid_reference_conversion_missing_input"): 10,
                 ("identity_mismatch", "identity-mismatch-element-reference-phase"): 1,
-                ("method_unknown", "method_unknown"): 1,
+                ("identity_incomplete", "printed_solid_reference_above_melting"): 1,
             },
         ),
         "shornikov-2011-cao-mgo-alumina-melts": (
@@ -1111,7 +1118,7 @@ def test_condensed_element_frame_uses_production_predictions_or_typed_refusals(
                 # JANAF TiO2 O-043/O-044 pair (2130 K crossing), so the
                 # printed 2173 K TiO2 solid now refuses as above-melting.
                 ("identity_incomplete", "solid_liquid_reference_conversion_missing_input"): 3,
-                ("method_unknown", "method_unknown"): 1,
+                ("identity_incomplete", "printed_solid_reference_above_melting"): 1,
                 ("unsupported", "engine-thermo-does-not-emit"): 11,
                 ("identity_mismatch", "identity-mismatch-element-reference-phase"): 1,
                 ("unsupported", "ellingham-phase-or-polymorph-not-in-fit"): 3,
@@ -1170,6 +1177,14 @@ def test_condensed_element_frame_uses_production_predictions_or_typed_refusals(
                 residual.refusal.reason.value,
                 residual.refusal.detail.get("reason"),
             )
+            if key == (
+                "identity_incomplete",
+                "printed_solid_reference_above_melting",
+            ):
+                assert any(
+                    notice.kind is NoticeKind.METHOD_UNSTATED
+                    for notice in row.notices
+                )
             refusals[key] = refusals.get(key, 0) + 1
 
         expected_rows, expected_numeric_ids, expected_refusals = expected[source_id]

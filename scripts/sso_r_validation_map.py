@@ -71,19 +71,29 @@ NATIVE_FE_PARTITION_TRANSITIONS = frozenset({
     "native_fe_metal_partition",
 })
 ANCHOR_REFERENCE_SOURCE = (
+    "docs-private/research/2026-11-22-robinot-phys/b1282d-ror-report.md (physics probe of the "
+    "production values after d-463 ext 3c); superseded anchors: "
     "docs-private/research/2026-07-01-sso-r-scope/findings.md lines 107 and 259; "
     "CH1-CLOSEOUT.md lines 23-26 and 107-118 record the ch1/ch1c redox-state provenance"
 )
+# Anchors retargeted 2026-11-23 (physics b1282d-ror-0145) to the probed production values at 1600 C, 10 mbar,
+# lunar_mare_low_ti, 1000 kg. Why they moved: native-Fe onset is now the Fe-metal saturation floor
+# fe_metal_saturation_log10_fO2_bar = IW + 2*log10(a_FeO) evaluated at the melt's own a_FeO on the wustite
+# basis (Holzheid multiplier 1.66 at 1600 C), d-463 ext 3c. That puts onset at log10 fO2 = -9.429100272192215.
+# Sanity: -9.0 is 0.429 dex MORE oxidizing than onset, so no native Fe (0.0); -9.5 is 0.071 dex below onset, so
+# a small native-Fe fraction (0.0807). The old anchors (0.0125 and 0.44) were model outputs of the superseded
+# mixed-basis pairing, not measurements. Design consequence: at 1600 C and 10 mbar the native-Fe window's
+# oxidizing edge shifts about 0.43 dex more reducing (native Fe starts at -9.43, not at -9.0).
 ANCHOR_REFERENCE_BY_FO2 = {
     -9.0: {
-        "native_fe_frac": 0.012467999513236896,
+        "native_fe_frac": 0.0,
         "abs_tolerance": 5.0e-6,
-        "note": "recorded forced-reduction native_frac_before at 1600 C",
+        "note": "probed production value at 1600 C, 10 mbar: above the -9.4291 onset, no native Fe",
     },
     -9.5: {
-        "native_fe_frac": 0.44,
-        "abs_tolerance": 5.0e-4,
-        "note": "recorded manual fO2 curve native fraction, 44.0 percent at 1600 C",
+        "native_fe_frac": 0.08073534636137808,
+        "abs_tolerance": 5.0e-6,
+        "note": "probed production value at 1600 C, 10 mbar: 0.071 dex below the -9.4291 onset",
     },
 }
 ROW_UNITS = {
@@ -495,7 +505,11 @@ def run_row(
     T_K = float(temperature_C) + 273.15
     sim._re_reference_melt_fO2_to_temperature(T_K)
     exchange = sim._apply_oxygen_reservoir_exchange()
-    first_respeciation = sim._apply_fe_redox_respeciation()
+    # Same pre-split contract as PyrolysisSimulator._step_one_hour:
+    # the ledger moves, and the floor is not published before the split.
+    first_respeciation = sim._apply_fe_redox_respeciation(
+        update_reservoir_state=False,
+    )
     split = sim._apply_native_fe_saturation_split(sample_time_h=SAMPLE_TIME_H)
     sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
     equilibrium = sim._get_equilibrium()

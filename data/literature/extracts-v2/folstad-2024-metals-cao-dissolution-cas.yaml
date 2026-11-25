@@ -88,7 +88,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: folstad-2024-metals-cao-dissolution-cas::folstad_2024_table3_liquidus_slag1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: folstad-2024-metals-cao-dissolution-cas
   locator:
     page: 5
@@ -263,7 +274,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: folstad-2024-metals-cao-dissolution-cas::folstad_2024_table3_liquidus_slag2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: folstad-2024-metals-cao-dissolution-cas
   locator:
     page: 5
@@ -438,7 +460,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: folstad-2024-metals-cao-dissolution-cas::folstad_2024_table3_liquidus_slag3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: folstad-2024-metals-cao-dissolution-cas
   locator:
     page: 5

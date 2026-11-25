@@ -47,6 +47,74 @@ if TYPE_CHECKING:
     )
 
 
+def _residue_adapter_kinds(point, engine, experiment, quantity) -> tuple[object, ...]:
+    """Residue predictors this pair selects, in assignment order.
+
+    Hashimoto and Sossi bind only on openimcc and internal-analytical.
+    Method-specific extent adapters are last so they overwrite an earlier
+    prediction.
+    Shard-failure and duplicate guards are not part of this choice: the
+    score loop applies those before it calls a predictor.
+    """
+
+    from simulator.battery.enums import Engine, Quantity
+    from simulator.battery.identity import Identity
+    from simulator.battery.score import _extent_residue_method
+
+    if quantity not in {
+        Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        Quantity.ELEMENT_RETENTION_RATIO,
+    }:
+        return ()
+    if not isinstance(getattr(point, "identity", None), Identity):
+        return ()
+    kinds: list[object] = []
+    predictor = declared_residue_predictor(getattr(point, "source_id", None))
+    if predictor == HASHIMOTO_RESIDUE_PREDICTOR and engine in {
+        Engine.OPENIMCC,
+        Engine.INTERNAL_ANALYTICAL,
+    }:
+        kinds.append(HASHIMOTO_RESIDUE_PREDICTOR)
+    if predictor == SOSSI_RESIDUE_PREDICTOR and engine in {
+        Engine.OPENIMCC,
+        Engine.INTERNAL_ANALYTICAL,
+    }:
+        kinds.append(SOSSI_RESIDUE_PREDICTOR)
+    if (extent_method := _extent_residue_method(point, experiment, quantity)) is not None:
+        kinds.append(extent_method)
+    return tuple(kinds)
+
+
+def _residue_adapter_binds(point, engine, experiment, quantity) -> bool:
+    """Whether a source-specific residue predictor will run for this pair."""
+
+    return bool(_residue_adapter_kinds(point, engine, experiment, quantity))
+
+
+def _scoring_quantity(point, quantity):
+    """Quantity this pair offers the engine.
+
+    A Zhang implied-alpha row stays an evaporation-coefficient observation.
+    The engine request is the activity coefficient, and coverage follows
+    that request. Every other row keeps its own quantity.
+    """
+
+    from simulator.battery.enums import Quantity
+    from simulator.battery.identity import Identity
+    from simulator.battery.score import (
+        _implied_alpha_activity_observation,
+        quantity_token,
+    )
+
+    if quantity is not Quantity.EVAPORATION_COEFFICIENT_ALPHA:
+        return quantity
+    implied = _implied_alpha_activity_observation(point)
+    if implied is None or not isinstance(getattr(implied, "identity", None), Identity):
+        return quantity
+    rewritten = quantity_token(implied.identity)
+    return quantity if rewritten is None else rewritten
+
+
 def _residue_cohort_selection(
     selected_experiment_ids: frozenset[str] | None,
     test_experiment_ids: frozenset[str] | None,
@@ -345,14 +413,15 @@ def _score_store_with_decisions(
         _compilation_decision_strata,
         _compile_residual_with_lineage,
         _duplicate_observation_refusal_detail,
+        _extent_residue_prediction,
         _group_token,
         _has_duplicate_observation_link,
         _has_intrinsic_redox_activity,
         _hashimoto_residue_prediction,
-        _knudsen_residue_prediction,
         _prepare_score_run,
         _source_alignment_group_key,
         _sossi_residue_prediction,
+        _subtype_text,
         _validated_score_engines,
         is_compilation_source,
         is_internal_consistency,
@@ -400,6 +469,7 @@ def _score_store_with_decisions(
         _iter_compilation_series_cells,
         is_compilation_evidence,
     )
+    from simulator.battery.engine_capability import observation_route_covered
     from simulator.battery.validate import _bound_work_inputs
 
     provided_handles = dict(handles or {})
@@ -412,6 +482,7 @@ def _score_store_with_decisions(
     started = time.monotonic()
     last_progress = started
     done = 0
+    skipped_capability = 0
     total = sum(
         prepared.series_point_counts.get(obs.observation_id, 1) for obs in refs
     ) * max(len(engine_set), 1)
@@ -424,6 +495,8 @@ def _score_store_with_decisions(
         if _stream is not None:
             _stream.flush()
         progress = f"score progress {done}/{total} residuals"
+        if skipped_capability:
+            progress += f" skipped_capability={skipped_capability}"
         if _stream is not None:
             progress += f" written={_stream.count}"
         print(
@@ -504,6 +577,36 @@ def _score_store_with_decisions(
                         point_origin,
                         production_scoring=predict is None,
                     ):
+                        # An engine with no adapter for this quantity is a
+                        # capability-matrix cell, not a residual. Injected
+                        # predictors still see every engine. Residue adapters
+                        # stay in the loop even though the quantity is absent
+                        # from the generic table. Implied-alpha coverage uses
+                        # the activity-coefficient request, not the stored alpha.
+                        offered_quantity = (
+                            None
+                            if quantity is None
+                            else _scoring_quantity(point, quantity)
+                        )
+                        phase_basis = (
+                            _subtype_text(point.identity)
+                            if isinstance(point.identity, Identity)
+                            else None
+                        )
+                        if (
+                            predict is None
+                            and offered_quantity is not None
+                            and not observation_route_covered(
+                                engine, offered_quantity, phase_basis
+                            )
+                            and not _residue_adapter_binds(
+                                point, engine, experiment, quantity
+                            )
+                        ):
+                            done += 1
+                            skipped_capability += 1
+                            report_progress_if_due()
+                            continue
                         prediction = None
                         scoring_predict = (
                             partial(
@@ -537,19 +640,18 @@ def _score_store_with_decisions(
                                 refusal_detail={"reason": "diagnostic_population"},
                                 identity=point.identity if isinstance(point.identity, Identity) else None,
                             )
-                        if (
-                            _shard_failure_reason is None
-                            and duplicate_detail is None
-                            and predict is None
-                            and isinstance(point.identity, Identity)
-                            and quantity in {
-                                Quantity.RESIDUE_COMPONENT_COMPOSITION,
-                                Quantity.ELEMENT_RETENTION_RATIO,
-                            }
-                            and declared_residue_predictor(point.source_id)
-                            == HASHIMOTO_RESIDUE_PREDICTOR
-                            and engine in {Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL}
-                        ):
+                        residue_kinds = (
+                            ()
+                            if (
+                                _shard_failure_reason is not None
+                                or duplicate_detail is not None
+                                or predict is not None
+                            )
+                            else _residue_adapter_kinds(
+                                point, engine, experiment, quantity
+                            )
+                        )
+                        if HASHIMOTO_RESIDUE_PREDICTOR in residue_kinds:
                             prediction = _hashimoto_residue_prediction(
                                 context,
                                 point,
@@ -558,19 +660,7 @@ def _score_store_with_decisions(
                                 selected_experiment_ids=prepared.hashimoto_experiment_ids,
                                 test_experiment_ids=prepared.test_experiment_ids,
                             )
-                        if (
-                            _shard_failure_reason is None
-                            and duplicate_detail is None
-                            and predict is None
-                            and isinstance(point.identity, Identity)
-                            and quantity in {
-                                Quantity.RESIDUE_COMPONENT_COMPOSITION,
-                                Quantity.ELEMENT_RETENTION_RATIO,
-                            }
-                            and declared_residue_predictor(point.source_id)
-                            == SOSSI_RESIDUE_PREDICTOR
-                            and engine in {Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL}
-                        ):
+                        if SOSSI_RESIDUE_PREDICTOR in residue_kinds:
                             prediction = _sossi_residue_prediction(
                                 context,
                                 point,
@@ -580,18 +670,10 @@ def _score_store_with_decisions(
                                 test_experiment_ids=prepared.test_experiment_ids,
                             )
                         if (
-                            _shard_failure_reason is None
-                            and duplicate_detail is None
-                            and predict is None
-                            and isinstance(point.identity, Identity)
-                            and quantity in {
-                                Quantity.RESIDUE_COMPONENT_COMPOSITION,
-                                Quantity.ELEMENT_RETENTION_RATIO,
-                            }
-                            and experiment is not None and experiment.method.is_value
-                            and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
+                            MethodToken.KNUDSEN_EFFUSION in residue_kinds
+                            or MethodToken.LANGMUIR_FREE_EVAPORATION in residue_kinds
                         ):
-                            prediction = _knudsen_residue_prediction(
+                            prediction = _extent_residue_prediction(
                                 context, point, engine, residue_prediction_cache,
                             )
                         intrinsic_redox_activity = _has_intrinsic_redox_activity(
@@ -1112,6 +1194,7 @@ def _materialize_failed_score_shard(
         _ResidualJsonlStream,
         _score_store_with_decisions,
         is_store_stamp_payload,
+        parse_residual_order_entry,
     )
     if result.failure is None:
         return result
@@ -1151,27 +1234,24 @@ def _materialize_failed_score_shard(
                         if (
                             not isinstance(payload, Mapping)
                             or is_store_stamp_payload(payload)
-                            or not isinstance(order_value, list)
-                            or len(order_value) != 4
-                            or not isinstance(order_value[0], str)
-                            or any(
-                                type(value) is not int for value in order_value[1:]
-                            )
                         ):
                             continue
-                        stable_order = (
-                            order_value[0],
-                            order_value[1],
-                            order_value[2],
-                            order_value[3],
-                        )
-                        if stable_order in completed_orders:
+                        entry = parse_residual_order_entry(order_value)
+                        if entry is None or entry.sort_order in completed_orders:
                             continue
-                        recovered_stream.append_payload_line(
-                            line,
-                            sort_order=stable_order,
-                        )
-                        completed_orders.add(stable_order)
+                        if entry.exact:
+                            recovered_stream.append_payload_line(
+                                line,
+                                sort_order=entry.sort_order,
+                                numeric_value=entry.numeric_value,
+                                band_value=entry.band_value,
+                            )
+                        else:
+                            recovered_stream.append_payload_line(
+                                line,
+                                sort_order=entry.sort_order,
+                            )
+                        completed_orders.add(entry.sort_order)
         _score_store_with_decisions(
             prepared.context,
             _prepared=prepared,
@@ -1221,6 +1301,8 @@ def _score_store_to_jsonl(
         _prepare_score_run,
         _score_store_with_decisions,
         is_store_stamp_payload,
+        order_sidecar_index_text,
+        parse_residual_order_entry,
         supervised_process_map,
     )
 
@@ -1411,26 +1493,19 @@ def _score_store_to_jsonl(
                                 ):
                                     continue
                                 order_value = json.loads(order_file.readline())
-                                if (
-                                    not isinstance(order_value, list)
-                                    or len(order_value) != 4
-                                    or not isinstance(order_value[0], str)
-                                    or any(
-                                        type(value) is not int
-                                        for value in order_value[1:]
-                                    )
-                                ):
+                                entry = parse_residual_order_entry(order_value)
+                                if entry is None:
                                     raise ValueError(
                                         "score shard has an invalid serial-order entry"
                                     )
+                                numeric_value, band_value = order_sidecar_index_text(
+                                    order_value, entry, payload
+                                )
                                 stream.append_payload_line(
                                     line,
-                                    sort_order=(
-                                        order_value[0],
-                                        order_value[1],
-                                        order_value[2],
-                                        order_value[3],
-                                    ),
+                                    sort_order=entry.sort_order,
+                                    numeric_value=numeric_value,
+                                    band_value=band_value,
                                 )
                             if order_file.read(1):
                                 raise ValueError(

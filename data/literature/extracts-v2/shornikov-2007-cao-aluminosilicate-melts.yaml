@@ -11,12 +11,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -89,7 +88,19 @@ observations:
         figure: '1'
         note: Present-study calculated Al2O3 curves at 2000 K; unmarked model curves are not digitized.; panel=a and b; symbol=calculated
           curves
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3-SiO2 melt; original_reason=phase
+      string ''CaO-Al2O3-SiO2 melt'' is not in the closed automatic map'
+    origin: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_al2o3_activity_calculated_curve
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: shornikov-2007-cao-aluminosilicate-melts
   locator:
     page: 3
@@ -122,12 +133,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -200,6 +210,18 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3-SiO2 melt; original_reason=phase
+      string ''CaO-Al2O3-SiO2 melt'' is not in the closed automatic map'
+    origin: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_al2o3_activity_prior_markers
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity
@@ -264,12 +286,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -342,6 +363,18 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3-SiO2 melt; original_reason=phase
+      string ''CaO-Al2O3-SiO2 melt'' is not in the closed automatic map'
+    origin: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_al2o3_activity_prior_markers
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity
@@ -406,12 +439,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -484,6 +516,18 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3-SiO2 melt; original_reason=phase
+      string ''CaO-Al2O3-SiO2 melt'' is not in the closed automatic map'
+    origin: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_al2o3_activity_prior_markers
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity
@@ -548,12 +592,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -626,6 +669,18 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3-SiO2 melt; original_reason=phase
+      string ''CaO-Al2O3-SiO2 melt'' is not in the closed automatic map'
+    origin: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_al2o3_activity_prior_markers
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity
@@ -690,12 +745,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -768,6 +822,18 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3-SiO2 melt; original_reason=phase
+      string ''CaO-Al2O3-SiO2 melt'' is not in the closed automatic map'
+    origin: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_al2o3_activity_prior_markers
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity
@@ -832,12 +898,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -910,6 +975,18 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3-SiO2 melt; original_reason=phase
+      string ''CaO-Al2O3-SiO2 melt'' is not in the closed automatic map'
+    origin: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_al2o3_activity_prior_markers
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity
@@ -974,12 +1051,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1052,6 +1128,18 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3-SiO2 melt; original_reason=phase
+      string ''CaO-Al2O3-SiO2 melt'' is not in the closed automatic map'
+    origin: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_al2o3_activity_prior_markers
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity
@@ -1116,12 +1204,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1194,6 +1281,18 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3-SiO2 melt; original_reason=phase
+      string ''CaO-Al2O3-SiO2 melt'' is not in the closed automatic map'
+    origin: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_al2o3_activity_prior_markers
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity
@@ -1258,12 +1357,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1336,6 +1434,18 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3-SiO2 melt; original_reason=phase
+      string ''CaO-Al2O3-SiO2 melt'' is not in the closed automatic map'
+    origin: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_al2o3_activity_prior_markers
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity
@@ -1400,12 +1510,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1478,6 +1587,18 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3-SiO2 melt; original_reason=phase
+      string ''CaO-Al2O3-SiO2 melt'' is not in the closed automatic map'
+    origin: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_al2o3_activity_prior_markers
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity
@@ -1542,12 +1663,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1620,7 +1740,19 @@ observations:
         figure: '1'
         note: Present-study calculated CaO curves at 2000 K; unmarked model curves are not digitized.; panel=a and b; symbol=calculated
           curves
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3-SiO2 melt; original_reason=phase
+      string ''CaO-Al2O3-SiO2 melt'' is not in the closed automatic map'
+    origin: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_cao_activity_calculated_curve
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: shornikov-2007-cao-aluminosilicate-melts
   locator:
     page: 3
@@ -1653,12 +1785,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1731,6 +1862,18 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3-SiO2 melt; original_reason=phase
+      string ''CaO-Al2O3-SiO2 melt'' is not in the closed automatic map'
+    origin: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_cao_activity_prior_markers
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity
@@ -1795,12 +1938,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1873,6 +2015,18 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3-SiO2 melt; original_reason=phase
+      string ''CaO-Al2O3-SiO2 melt'' is not in the closed automatic map'
+    origin: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_cao_activity_prior_markers
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity
@@ -1937,12 +2091,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2015,6 +2168,18 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3-SiO2 melt; original_reason=phase
+      string ''CaO-Al2O3-SiO2 melt'' is not in the closed automatic map'
+    origin: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_cao_activity_prior_markers
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity
@@ -2079,12 +2244,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2157,6 +2321,18 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3-SiO2 melt; original_reason=phase
+      string ''CaO-Al2O3-SiO2 melt'' is not in the closed automatic map'
+    origin: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_cao_activity_prior_markers
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity
@@ -2221,12 +2397,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2299,6 +2474,18 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3-SiO2 melt; original_reason=phase
+      string ''CaO-Al2O3-SiO2 melt'' is not in the closed automatic map'
+    origin: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_cao_activity_prior_markers
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity
@@ -2363,12 +2550,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2441,6 +2627,18 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3-SiO2 melt; original_reason=phase
+      string ''CaO-Al2O3-SiO2 melt'' is not in the closed automatic map'
+    origin: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_cao_activity_prior_markers
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity
@@ -2505,12 +2703,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2583,6 +2780,18 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3-SiO2 melt; original_reason=phase
+      string ''CaO-Al2O3-SiO2 melt'' is not in the closed automatic map'
+    origin: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_cao_activity_prior_markers
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity
@@ -2647,12 +2856,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2725,6 +2933,18 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3-SiO2 melt; original_reason=phase
+      string ''CaO-Al2O3-SiO2 melt'' is not in the closed automatic map'
+    origin: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_cao_activity_prior_markers
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity
@@ -2789,12 +3009,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2867,6 +3086,18 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3-SiO2 melt; original_reason=phase
+      string ''CaO-Al2O3-SiO2 melt'' is not in the closed automatic map'
+    origin: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_cao_activity_prior_markers
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity
@@ -2931,12 +3162,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3009,6 +3239,18 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3-SiO2 melt; original_reason=phase
+      string ''CaO-Al2O3-SiO2 melt'' is not in the closed automatic map'
+    origin: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_cao_activity_prior_markers
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity
@@ -3073,12 +3315,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3151,6 +3392,18 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3-SiO2 melt; original_reason=phase
+      string ''CaO-Al2O3-SiO2 melt'' is not in the closed automatic map'
+    origin: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_cao_activity_prior_markers
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity
@@ -3215,12 +3468,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3293,7 +3545,19 @@ observations:
         figure: '1'
         note: Present-study calculated SiO2 curves at 2000 K; unmarked model curves are not digitized.; panel=a and b; symbol=calculated
           curves
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3-SiO2 melt; original_reason=phase
+      string ''CaO-Al2O3-SiO2 melt'' is not in the closed automatic map'
+    origin: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_sio2_activity_calculated_curve
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: shornikov-2007-cao-aluminosilicate-melts
   locator:
     page: 3
@@ -3326,12 +3590,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3404,6 +3667,18 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3-SiO2 melt; original_reason=phase
+      string ''CaO-Al2O3-SiO2 melt'' is not in the closed automatic map'
+    origin: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_sio2_activity_prior_markers
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity
@@ -3468,12 +3743,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3546,6 +3820,18 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3-SiO2 melt; original_reason=phase
+      string ''CaO-Al2O3-SiO2 melt'' is not in the closed automatic map'
+    origin: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_sio2_activity_prior_markers
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity
@@ -3610,12 +3896,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3688,6 +3973,18 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3-SiO2 melt; original_reason=phase
+      string ''CaO-Al2O3-SiO2 melt'' is not in the closed automatic map'
+    origin: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_sio2_activity_prior_markers
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity
@@ -3752,12 +4049,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3830,6 +4126,18 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3-SiO2 melt; original_reason=phase
+      string ''CaO-Al2O3-SiO2 melt'' is not in the closed automatic map'
+    origin: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_sio2_activity_prior_markers
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity
@@ -3894,12 +4202,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3972,6 +4279,18 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3-SiO2 melt; original_reason=phase
+      string ''CaO-Al2O3-SiO2 melt'' is not in the closed automatic map'
+    origin: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_sio2_activity_prior_markers
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity
@@ -4036,12 +4355,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4114,6 +4432,18 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3-SiO2 melt; original_reason=phase
+      string ''CaO-Al2O3-SiO2 melt'' is not in the closed automatic map'
+    origin: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_sio2_activity_prior_markers
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity
@@ -4178,12 +4508,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4256,6 +4585,18 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3-SiO2 melt; original_reason=phase
+      string ''CaO-Al2O3-SiO2 melt'' is not in the closed automatic map'
+    origin: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_sio2_activity_prior_markers
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity
@@ -4320,12 +4661,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4398,6 +4738,18 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3-SiO2 melt; original_reason=phase
+      string ''CaO-Al2O3-SiO2 melt'' is not in the closed automatic map'
+    origin: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_sio2_activity_prior_markers
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity
@@ -4462,12 +4814,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4540,6 +4891,18 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3-SiO2 melt; original_reason=phase
+      string ''CaO-Al2O3-SiO2 melt'' is not in the closed automatic map'
+    origin: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_sio2_activity_prior_markers
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity
@@ -4604,12 +4967,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'CaO-Al2O3-SiO2 melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4682,6 +5044,18 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: CaO-Al2O3-SiO2 melt; original_reason=phase
+      string ''CaO-Al2O3-SiO2 melt'' is not in the closed automatic map'
+    origin: shornikov-2007-cao-aluminosilicate-melts::shornikov_2007_figure1_sio2_activity_prior_markers
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity

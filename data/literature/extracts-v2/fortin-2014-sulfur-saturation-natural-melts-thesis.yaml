@@ -126852,7 +126852,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_average_water_scss_slope
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -126898,7 +126898,18 @@ observations:
         figure: '4'
         section: reported average slope
         source_path: raw/fortin-2014-sulfur-saturation-natural-melts-thesis/fortin-2014-sulfur-saturation-natural-melts-thesis.pdf
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Average slope reported
+      in prose'
+    origin: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_average_water_scss_slope
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fortin-2014-sulfur-saturation-natural-melts-thesis
   locator:
     page: 40
@@ -126934,7 +126945,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_equation7_liu_comparator
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -126975,7 +126986,18 @@ observations:
         pdf_page_index: 48
         section: Comparative model equation 7
         source_path: raw/fortin-2014-sulfur-saturation-natural-melts-thesis/fortin-2014-sulfur-saturation-natural-melts-thesis.pdf
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Liu et al. (2007) SCSS
+      regression equation'
+    origin: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_equation7_liu_comparator
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fortin-2014-sulfur-saturation-natural-melts-thesis
   locator:
     page: 49
@@ -127013,7 +127035,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_equation9_li_ripley_comparator
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -127054,7 +127076,18 @@ observations:
         pdf_page_index: 49
         section: Comparative model equation 9
         source_path: raw/fortin-2014-sulfur-saturation-natural-melts-thesis/fortin-2014-sulfur-saturation-natural-melts-thesis.pdf
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Li and Ripley (2009)
+      SCSS regression equation'
+    origin: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_equation9_li_ripley_comparator
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fortin-2014-sulfur-saturation-natural-melts-thesis
   locator:
     page: 50
@@ -127093,7 +127126,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_al2o3_maf_12_p038_t03_r16_c04
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_12
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_12::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -127481,7 +127514,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_al2o3_maf_14_p038_t03_r06_c04
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_14
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_14::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -127860,7 +127893,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_al2o3_maf_15_p038_t03_r17_c04
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_15
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_15::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -128239,7 +128272,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_al2o3_maf_18_p038_t03_r07_c04
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_18
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_18::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -128618,7 +128651,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_al2o3_maf_19_p038_t03_r18_c04
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_19
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_19::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -128997,7 +129030,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_al2o3_maf_1_p038_t03_r03_c04
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_1
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_1::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -129385,7 +129418,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_al2o3_maf_20_p038_t03_r08_c04
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_20
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_20::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -129764,7 +129797,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_al2o3_maf_22_p038_t03_r09_c04
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_22
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_22::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -130143,7 +130176,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_al2o3_maf_26_p038_t03_r10_c04
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_26
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_26::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -130522,7 +130555,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_al2o3_maf_27_p039_t03_r25_c04
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_27
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_27::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -130835,7 +130868,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_al2o3_maf_28_p039_t03_r19_c04
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_28
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_28::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -131214,7 +131247,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_al2o3_maf_29_p038_t03_r11_c04
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_29
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_29::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -131593,7 +131626,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_al2o3_maf_2_p038_t03_r04_c04
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_2
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_2::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -131972,7 +132005,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_al2o3_maf_31_p039_t03_r26_c04
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_31
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_31::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -132285,7 +132318,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_al2o3_maf_32_p039_t03_r20_c04
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_32
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_32::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -132664,7 +132697,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_al2o3_maf_33_p039_t03_r27_c04
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_33
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_33::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -132977,7 +133010,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_al2o3_maf_34_p039_t03_r21_c04
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_34
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_34::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -133356,7 +133389,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_al2o3_maf_35_p039_t03_r28_c04
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_35
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_35::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -133669,7 +133702,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_al2o3_maf_36_p039_t03_r22_c04
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_36
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_36::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -134048,7 +134081,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_al2o3_maf_38_p039_t03_r23_c04
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_38
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_38::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -134427,7 +134460,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_al2o3_maf_39_p039_t03_r29_c04
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_39
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_39::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -134740,7 +134773,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_al2o3_maf_44_p039_t03_r30_c04
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_44
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_44::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -135053,7 +135086,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_al2o3_maf_45_p039_t03_r24_c04
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_45
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_45::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -135441,7 +135474,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_al2o3_maf_4_p038_t03_r13_c04
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_4
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_4::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -135820,7 +135853,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_al2o3_maf_7_p038_t03_r14_c04
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_7
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_7::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -136199,7 +136232,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_al2o3_maf_8_p038_t03_r05_c04
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_8
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_8::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -136578,7 +136611,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_al2o3_maf_9_p038_t03_r15_c04
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_9
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_9::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -136957,7 +136990,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_cao_maf_12_p038_t03_r16_c08
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_12
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_12::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -137345,7 +137378,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_cao_maf_14_p038_t03_r06_c08
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_14
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_14::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -137724,7 +137757,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_cao_maf_15_p038_t03_r17_c08
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_15
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_15::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -138103,7 +138136,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_cao_maf_18_p038_t03_r07_c08
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_18
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_18::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -138482,7 +138515,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_cao_maf_19_p038_t03_r18_c08
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_19
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_19::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -138861,7 +138894,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_cao_maf_1_p038_t03_r03_c08
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_1
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_1::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -139249,7 +139282,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_cao_maf_20_p038_t03_r08_c08
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_20
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_20::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -139628,7 +139661,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_cao_maf_22_p038_t03_r09_c08
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_22
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_22::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -140007,7 +140040,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_cao_maf_26_p038_t03_r10_c08
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_26
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_26::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -140386,7 +140419,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_cao_maf_27_p039_t03_r25_c08
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_27
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_27::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -140699,7 +140732,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_cao_maf_28_p039_t03_r19_c08
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_28
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_28::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -141078,7 +141111,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_cao_maf_29_p038_t03_r11_c08
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_29
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_29::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -141457,7 +141490,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_cao_maf_2_p038_t03_r04_c08
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_2
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_2::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -141836,7 +141869,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_cao_maf_31_p039_t03_r26_c08
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_31
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_31::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -142149,7 +142182,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_cao_maf_32_p039_t03_r20_c08
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_32
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_32::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -142528,7 +142561,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_cao_maf_33_p039_t03_r27_c08
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_33
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_33::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -142841,7 +142874,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_cao_maf_34_p039_t03_r21_c08
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_34
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_34::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -143220,7 +143253,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_cao_maf_35_p039_t03_r28_c08
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_35
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_35::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -143533,7 +143566,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_cao_maf_36_p039_t03_r22_c08
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_36
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_36::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -143912,7 +143945,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_cao_maf_38_p039_t03_r23_c08
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_38
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_38::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -144291,7 +144324,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_cao_maf_39_p039_t03_r29_c08
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_39
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_39::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -144604,7 +144637,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_cao_maf_44_p039_t03_r30_c08
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_44
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_44::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -144917,7 +144950,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_cao_maf_45_p039_t03_r24_c08
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_45
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_45::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -145305,7 +145338,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_cao_maf_4_p038_t03_r13_c08
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_4
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_4::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -145684,7 +145717,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_cao_maf_7_p038_t03_r14_c08
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_7
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_7::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -146063,7 +146096,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_cao_maf_8_p038_t03_r05_c08
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_8
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_8::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -146442,7 +146475,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_cao_maf_9_p038_t03_r15_c08
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_9
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_9::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -146821,7 +146854,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_feo_maf_12_p038_t03_r16_c05
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_12
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_12::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -147209,7 +147242,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_feo_maf_14_p038_t03_r06_c05
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_14
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_14::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -147588,7 +147621,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_feo_maf_15_p038_t03_r17_c05
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_15
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_15::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -147967,7 +148000,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_feo_maf_18_p038_t03_r07_c05
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_18
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_18::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -148346,7 +148379,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_feo_maf_19_p038_t03_r18_c05
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_19
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_19::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -148725,7 +148758,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_feo_maf_1_p038_t03_r03_c05
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_1
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_1::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -149113,7 +149146,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_feo_maf_20_p038_t03_r08_c05
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_20
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_20::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -149492,7 +149525,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_feo_maf_22_p038_t03_r09_c05
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_22
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_22::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -149871,7 +149904,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_feo_maf_26_p038_t03_r10_c05
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_26
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_26::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -150250,7 +150283,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_feo_maf_27_p039_t03_r25_c05
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_27
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_27::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -150563,7 +150596,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_feo_maf_28_p039_t03_r19_c05
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_28
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_28::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -150942,7 +150975,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_feo_maf_29_p038_t03_r11_c05
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_29
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_29::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -151321,7 +151354,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_feo_maf_2_p038_t03_r04_c05
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_2
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_2::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -151700,7 +151733,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_feo_maf_31_p039_t03_r26_c05
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_31
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_31::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -152013,7 +152046,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_feo_maf_32_p039_t03_r20_c05
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_32
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_32::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -152392,7 +152425,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_feo_maf_33_p039_t03_r27_c05
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_33
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_33::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -152705,7 +152738,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_feo_maf_34_p039_t03_r21_c05
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_34
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_34::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -153084,7 +153117,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_feo_maf_35_p039_t03_r28_c05
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_35
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_35::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -153397,7 +153430,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_feo_maf_36_p039_t03_r22_c05
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_36
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_36::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -153776,7 +153809,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_feo_maf_38_p039_t03_r23_c05
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_38
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_38::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -154155,7 +154188,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_feo_maf_39_p039_t03_r29_c05
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_39
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_39::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -154468,7 +154501,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_feo_maf_44_p039_t03_r30_c05
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_44
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_44::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -154781,7 +154814,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_feo_maf_45_p039_t03_r24_c05
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_45
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_45::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -155169,7 +155202,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_feo_maf_4_p038_t03_r13_c05
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_4
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_4::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -155548,7 +155581,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_feo_maf_7_p038_t03_r14_c05
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_7
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_7::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -155927,7 +155960,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_feo_maf_8_p038_t03_r05_c05
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_8
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_8::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -156306,7 +156339,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_feo_maf_9_p038_t03_r15_c05
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_9
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_9::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -156685,7 +156718,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_h2o_maf_12_p038_t03_r16_c15
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_12
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_12::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -157094,7 +157127,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_h2o_maf_14_p038_t03_r06_c15
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_14
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_14::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -157494,7 +157527,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_h2o_maf_15_p038_t03_r17_c15
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_15
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_15::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -157894,7 +157927,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_h2o_maf_18_p038_t03_r07_c15
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_18
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_18::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -158294,7 +158327,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_h2o_maf_19_p038_t03_r18_c15
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_19
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_19::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -158694,7 +158727,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_h2o_maf_1_p038_t03_r03_c15
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_1
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_1::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -159103,7 +159136,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_h2o_maf_20_p038_t03_r08_c15
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_20
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_20::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -159503,7 +159536,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_h2o_maf_22_p038_t03_r09_c15
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_22
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_22::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -159903,7 +159936,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_h2o_maf_26_p038_t03_r10_c15
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_26
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_26::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -160303,7 +160336,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_h2o_maf_27_p039_t03_r25_c15
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_27
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_27::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -160637,7 +160670,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_h2o_maf_28_p039_t03_r19_c15
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_28
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_28::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -161037,7 +161070,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_h2o_maf_2_p038_t03_r04_c15
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_2
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_2::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -161437,7 +161470,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_h2o_maf_31_p039_t03_r26_c15
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_31
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_31::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -161771,7 +161804,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_h2o_maf_32_p039_t03_r20_c15
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_32
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_32::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -162171,7 +162204,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_h2o_maf_33_p039_t03_r27_c15
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_33
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_33::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -162505,7 +162538,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_h2o_maf_34_p039_t03_r21_c15
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_34
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_34::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -162905,7 +162938,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_h2o_maf_35_p039_t03_r28_c15
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_35
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_35::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -163239,7 +163272,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_h2o_maf_36_p039_t03_r22_c15
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_36
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_36::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -163639,7 +163672,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_h2o_maf_38_p039_t03_r23_c15
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_38
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_38::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -164039,7 +164072,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_h2o_maf_39_p039_t03_r29_c15
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_39
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_39::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -164373,7 +164406,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_h2o_maf_44_p039_t03_r30_c15
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_44
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_44::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -164707,7 +164740,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_h2o_maf_45_p039_t03_r24_c15
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_45
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_45::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -165116,7 +165149,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_h2o_maf_4_p038_t03_r13_c15
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_4
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_4::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -165516,7 +165549,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_h2o_maf_7_p038_t03_r14_c15
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_7
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_7::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -165916,7 +165949,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_h2o_maf_8_p038_t03_r05_c15
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_8
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_8::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -166316,7 +166349,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_h2o_maf_9_p038_t03_r15_c15
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_9
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_9::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -166716,7 +166749,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_k2o_maf_12_p038_t03_r16_c10
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_12
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_12::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -167104,7 +167137,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_k2o_maf_14_p038_t03_r06_c10
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_14
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_14::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -167483,7 +167516,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_k2o_maf_15_p038_t03_r17_c10
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_15
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_15::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -167862,7 +167895,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_k2o_maf_18_p038_t03_r07_c10
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_18
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_18::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -168241,7 +168274,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_k2o_maf_19_p038_t03_r18_c10
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_19
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_19::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -168620,7 +168653,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_k2o_maf_1_p038_t03_r03_c10
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_1
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_1::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -169008,7 +169041,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_k2o_maf_20_p038_t03_r08_c10
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_20
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_20::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -169387,7 +169420,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_k2o_maf_22_p038_t03_r09_c10
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_22
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_22::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -169766,7 +169799,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_k2o_maf_26_p038_t03_r10_c10
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_26
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_26::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -170145,7 +170178,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_k2o_maf_27_p039_t03_r25_c10
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_27
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_27::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -170458,7 +170491,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_k2o_maf_28_p039_t03_r19_c10
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_28
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_28::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -170837,7 +170870,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_k2o_maf_29_p038_t03_r11_c10
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_29
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_29::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -171216,7 +171249,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_k2o_maf_2_p038_t03_r04_c10
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_2
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_2::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -171595,7 +171628,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_k2o_maf_31_p039_t03_r26_c10
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_31
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_31::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -171908,7 +171941,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_k2o_maf_32_p039_t03_r20_c10
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_32
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_32::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -172287,7 +172320,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_k2o_maf_33_p039_t03_r27_c10
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_33
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_33::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -172600,7 +172633,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_k2o_maf_34_p039_t03_r21_c10
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_34
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_34::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -172979,7 +173012,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_k2o_maf_35_p039_t03_r28_c10
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_35
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_35::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -173292,7 +173325,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_k2o_maf_36_p039_t03_r22_c10
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_36
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_36::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -173671,7 +173704,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_k2o_maf_38_p039_t03_r23_c10
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_38
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_38::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -174050,7 +174083,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_k2o_maf_39_p039_t03_r29_c10
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_39
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_39::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -174363,7 +174396,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_k2o_maf_44_p039_t03_r30_c10
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_44
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_44::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -174676,7 +174709,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_k2o_maf_45_p039_t03_r24_c10
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_45
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_45::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -175064,7 +175097,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_k2o_maf_4_p038_t03_r13_c10
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_4
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_4::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -175443,7 +175476,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_k2o_maf_7_p038_t03_r14_c10
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_7
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_7::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -175822,7 +175855,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_k2o_maf_8_p038_t03_r05_c10
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_8
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_8::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -176201,7 +176234,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_k2o_maf_9_p038_t03_r15_c10
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_9
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_9::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -176580,7 +176613,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mgo_maf_12_p038_t03_r16_c07
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_12
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_12::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -176968,7 +177001,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mgo_maf_14_p038_t03_r06_c07
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_14
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_14::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -177347,7 +177380,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mgo_maf_15_p038_t03_r17_c07
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_15
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_15::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -177726,7 +177759,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mgo_maf_18_p038_t03_r07_c07
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_18
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_18::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -178105,7 +178138,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mgo_maf_19_p038_t03_r18_c07
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_19
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_19::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -178484,7 +178517,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mgo_maf_1_p038_t03_r03_c07
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_1
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_1::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -178872,7 +178905,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mgo_maf_20_p038_t03_r08_c07
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_20
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_20::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -179251,7 +179284,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mgo_maf_22_p038_t03_r09_c07
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_22
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_22::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -179630,7 +179663,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mgo_maf_26_p038_t03_r10_c07
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_26
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_26::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -180309,7 +180342,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mgo_maf_28_p039_t03_r19_c07
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_28
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_28::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -180688,7 +180721,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mgo_maf_29_p038_t03_r11_c07
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_29
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_29::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -181067,7 +181100,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mgo_maf_2_p038_t03_r04_c07
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_2
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_2::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -181746,7 +181779,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mgo_maf_32_p039_t03_r20_c07
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_32
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_32::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -182425,7 +182458,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mgo_maf_34_p039_t03_r21_c07
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_34
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_34::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -183104,7 +183137,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mgo_maf_36_p039_t03_r22_c07
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_36
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_36::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -183483,7 +183516,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mgo_maf_38_p039_t03_r23_c07
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_38
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_38::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -184462,7 +184495,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mgo_maf_45_p039_t03_r24_c07
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_45
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_45::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -184850,7 +184883,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mgo_maf_4_p038_t03_r13_c07
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_4
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_4::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -185229,7 +185262,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mgo_maf_7_p038_t03_r14_c07
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_7
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_7::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -185608,7 +185641,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mgo_maf_8_p038_t03_r05_c07
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_8
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_8::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -185987,7 +186020,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mgo_maf_9_p038_t03_r15_c07
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_9
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_9::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -186366,7 +186399,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mno_maf_12_p038_t03_r16_c06
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_12
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_12::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -186754,7 +186787,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mno_maf_14_p038_t03_r06_c06
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_14
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_14::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -187133,7 +187166,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mno_maf_15_p038_t03_r17_c06
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_15
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_15::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -187512,7 +187545,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mno_maf_18_p038_t03_r07_c06
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_18
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_18::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -187891,7 +187924,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mno_maf_19_p038_t03_r18_c06
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_19
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_19::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -188270,7 +188303,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mno_maf_1_p038_t03_r03_c06
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_1
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_1::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -188658,7 +188691,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mno_maf_20_p038_t03_r08_c06
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_20
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_20::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -189037,7 +189070,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mno_maf_22_p038_t03_r09_c06
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_22
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_22::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -189416,7 +189449,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mno_maf_26_p038_t03_r10_c06
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_26
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_26::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -190095,7 +190128,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mno_maf_28_p039_t03_r19_c06
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_28
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_28::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -190474,7 +190507,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mno_maf_29_p038_t03_r11_c06
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_29
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_29::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -190853,7 +190886,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mno_maf_2_p038_t03_r04_c06
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_2
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_2::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -191532,7 +191565,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mno_maf_32_p039_t03_r20_c06
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_32
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_32::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -192211,7 +192244,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mno_maf_34_p039_t03_r21_c06
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_34
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_34::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -192890,7 +192923,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mno_maf_36_p039_t03_r22_c06
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_36
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_36::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -193269,7 +193302,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mno_maf_38_p039_t03_r23_c06
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_38
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_38::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -194248,7 +194281,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mno_maf_45_p039_t03_r24_c06
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_45
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_45::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -194636,7 +194669,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mno_maf_4_p038_t03_r13_c06
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_4
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_4::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -195015,7 +195048,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mno_maf_7_p038_t03_r14_c06
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_7
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_7::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -195394,7 +195427,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mno_maf_8_p038_t03_r05_c06
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_8
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_8::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -195773,7 +195806,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_mno_maf_9_p038_t03_r15_c06
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_9
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_9::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -196152,7 +196185,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_na2o_maf_12_p038_t03_r16_c09
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_12
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_12::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -196540,7 +196573,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_na2o_maf_14_p038_t03_r06_c09
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_14
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_14::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -196919,7 +196952,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_na2o_maf_15_p038_t03_r17_c09
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_15
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_15::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -197298,7 +197331,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_na2o_maf_18_p038_t03_r07_c09
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_18
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_18::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -197677,7 +197710,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_na2o_maf_19_p038_t03_r18_c09
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_19
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_19::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -198056,7 +198089,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_na2o_maf_1_p038_t03_r03_c09
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_1
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_1::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -198444,7 +198477,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_na2o_maf_20_p038_t03_r08_c09
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_20
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_20::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -198823,7 +198856,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_na2o_maf_22_p038_t03_r09_c09
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_22
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_22::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -199202,7 +199235,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_na2o_maf_26_p038_t03_r10_c09
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_26
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_26::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -199581,7 +199614,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_na2o_maf_27_p039_t03_r25_c09
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_27
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_27::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -199894,7 +199927,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_na2o_maf_28_p039_t03_r19_c09
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_28
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_28::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -200273,7 +200306,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_na2o_maf_29_p038_t03_r11_c09
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_29
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_29::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -200652,7 +200685,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_na2o_maf_2_p038_t03_r04_c09
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_2
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_2::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -201031,7 +201064,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_na2o_maf_31_p039_t03_r26_c09
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_31
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_31::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -201344,7 +201377,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_na2o_maf_32_p039_t03_r20_c09
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_32
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_32::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -201723,7 +201756,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_na2o_maf_33_p039_t03_r27_c09
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_33
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_33::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -202036,7 +202069,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_na2o_maf_34_p039_t03_r21_c09
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_34
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_34::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -202415,7 +202448,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_na2o_maf_35_p039_t03_r28_c09
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_35
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_35::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -202728,7 +202761,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_na2o_maf_36_p039_t03_r22_c09
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_36
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_36::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -203107,7 +203140,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_na2o_maf_38_p039_t03_r23_c09
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_38
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_38::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -203486,7 +203519,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_na2o_maf_39_p039_t03_r29_c09
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_39
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_39::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -203799,7 +203832,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_na2o_maf_44_p039_t03_r30_c09
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_44
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_44::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -204112,7 +204145,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_na2o_maf_45_p039_t03_r24_c09
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_45
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_45::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -204500,7 +204533,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_na2o_maf_4_p038_t03_r13_c09
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_4
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_4::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -204879,7 +204912,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_na2o_maf_7_p038_t03_r14_c09
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_7
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_7::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -205258,7 +205291,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_na2o_maf_8_p038_t03_r05_c09
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_8
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_8::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -205637,7 +205670,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_na2o_maf_9_p038_t03_r15_c09
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_9
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_9::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -206016,7 +206049,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_p2o5_maf_12_p038_t03_r16_c11
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_12
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_12::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -206404,7 +206437,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_p2o5_maf_14_p038_t03_r06_c11
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_14
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_14::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -206783,7 +206816,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_p2o5_maf_15_p038_t03_r17_c11
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_15
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_15::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -207162,7 +207195,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_p2o5_maf_18_p038_t03_r07_c11
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_18
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_18::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -207541,7 +207574,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_p2o5_maf_19_p038_t03_r18_c11
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_19
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_19::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -207920,7 +207953,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_p2o5_maf_1_p038_t03_r03_c11
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_1
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_1::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -208308,7 +208341,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_p2o5_maf_20_p038_t03_r08_c11
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_20
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_20::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -208687,7 +208720,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_p2o5_maf_22_p038_t03_r09_c11
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_22
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_22::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -209066,7 +209099,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_p2o5_maf_26_p038_t03_r10_c11
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_26
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_26::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -209745,7 +209778,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_p2o5_maf_28_p039_t03_r19_c11
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_28
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_28::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -210124,7 +210157,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_p2o5_maf_29_p038_t03_r11_c11
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_29
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_29::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -210503,7 +210536,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_p2o5_maf_2_p038_t03_r04_c11
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_2
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_2::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -211182,7 +211215,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_p2o5_maf_32_p039_t03_r20_c11
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_32
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_32::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -211861,7 +211894,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_p2o5_maf_34_p039_t03_r21_c11
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_34
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_34::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -212540,7 +212573,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_p2o5_maf_36_p039_t03_r22_c11
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_36
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_36::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -212919,7 +212952,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_p2o5_maf_38_p039_t03_r23_c11
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_38
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_38::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -213898,7 +213931,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_p2o5_maf_45_p039_t03_r24_c11
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_45
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_45::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -214286,7 +214319,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_p2o5_maf_4_p038_t03_r13_c11
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_4
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_4::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -214665,7 +214698,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_p2o5_maf_7_p038_t03_r14_c11
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_7
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_7::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -215044,7 +215077,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_p2o5_maf_8_p038_t03_r05_c11
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_8
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_8::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -215423,7 +215456,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_p2o5_maf_9_p038_t03_r15_c11
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_9
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_9::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -215802,7 +215835,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_s_maf_12_p038_t03_r16_c12
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_12
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_12::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -216190,7 +216223,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_s_maf_14_p038_t03_r06_c12
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_14
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_14::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -216569,7 +216602,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_s_maf_15_p038_t03_r17_c12
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_15
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_15::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -216948,7 +216981,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_s_maf_18_p038_t03_r07_c12
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_18
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_18::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -217327,7 +217360,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_s_maf_19_p038_t03_r18_c12
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_19
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_19::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -217706,7 +217739,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_s_maf_1_p038_t03_r03_c12
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_1
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_1::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -218094,7 +218127,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_s_maf_20_p038_t03_r08_c12
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_20
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_20::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -218473,7 +218506,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_s_maf_22_p038_t03_r09_c12
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_22
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_22::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -218852,7 +218885,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_s_maf_26_p038_t03_r10_c12
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_26
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_26::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -219231,7 +219264,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_s_maf_27_p039_t03_r25_c12
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_27
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_27::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -219544,7 +219577,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_s_maf_28_p039_t03_r19_c12
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_28
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_28::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -219923,7 +219956,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_s_maf_29_p038_t03_r11_c12
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_29
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_29::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -220302,7 +220335,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_s_maf_2_p038_t03_r04_c12
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_2
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_2::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -220681,7 +220714,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_s_maf_31_p039_t03_r26_c12
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_31
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_31::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -220994,7 +221027,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_s_maf_32_p039_t03_r20_c12
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_32
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_32::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -221373,7 +221406,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_s_maf_33_p039_t03_r27_c12
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_33
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_33::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -221686,7 +221719,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_s_maf_34_p039_t03_r21_c12
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_34
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_34::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -222065,7 +222098,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_s_maf_35_p039_t03_r28_c12
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_35
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_35::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -222378,7 +222411,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_s_maf_36_p039_t03_r22_c12
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_36
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_36::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -222757,7 +222790,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_s_maf_38_p039_t03_r23_c12
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_38
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_38::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -223136,7 +223169,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_s_maf_39_p039_t03_r29_c12
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_39
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_39::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -223449,7 +223482,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_s_maf_44_p039_t03_r30_c12
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_44
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_44::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -223762,7 +223795,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_s_maf_45_p039_t03_r24_c12
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_45
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_45::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -224150,7 +224183,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_s_maf_4_p038_t03_r13_c12
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_4
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_4::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -224529,7 +224562,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_s_maf_7_p038_t03_r14_c12
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_7
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_7::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -224908,7 +224941,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_s_maf_8_p038_t03_r05_c12
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_8
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_8::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -225287,7 +225320,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_s_maf_9_p038_t03_r15_c12
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_9
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_9::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -225666,7 +225699,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_sio2_maf_12_p038_t03_r16_c02
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_12
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_12::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -226054,7 +226087,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_sio2_maf_14_p038_t03_r06_c02
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_14
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_14::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -226433,7 +226466,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_sio2_maf_15_p038_t03_r17_c02
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_15
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_15::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -226812,7 +226845,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_sio2_maf_18_p038_t03_r07_c02
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_18
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_18::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -227191,7 +227224,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_sio2_maf_19_p038_t03_r18_c02
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_19
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_19::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -227570,7 +227603,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_sio2_maf_1_p038_t03_r03_c02
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_1
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_1::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -227958,7 +227991,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_sio2_maf_20_p038_t03_r08_c02
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_20
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_20::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -228337,7 +228370,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_sio2_maf_22_p038_t03_r09_c02
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_22
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_22::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -228716,7 +228749,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_sio2_maf_26_p038_t03_r10_c02
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_26
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_26::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -229095,7 +229128,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_sio2_maf_27_p039_t03_r25_c02
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_27
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_27::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -229408,7 +229441,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_sio2_maf_28_p039_t03_r19_c02
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_28
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_28::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -229787,7 +229820,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_sio2_maf_29_p038_t03_r11_c02
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_29
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_29::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -230166,7 +230199,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_sio2_maf_2_p038_t03_r04_c02
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_2
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_2::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -230545,7 +230578,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_sio2_maf_31_p039_t03_r26_c02
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_31
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_31::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -230858,7 +230891,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_sio2_maf_32_p039_t03_r20_c02
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_32
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_32::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -231237,7 +231270,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_sio2_maf_33_p039_t03_r27_c02
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_33
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_33::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -231550,7 +231583,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_sio2_maf_34_p039_t03_r21_c02
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_34
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_34::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -231929,7 +231962,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_sio2_maf_35_p039_t03_r28_c02
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_35
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_35::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -232242,7 +232275,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_sio2_maf_36_p039_t03_r22_c02
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_36
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_36::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -232621,7 +232654,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_sio2_maf_38_p039_t03_r23_c02
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_38
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_38::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -233000,7 +233033,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_sio2_maf_39_p039_t03_r29_c02
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_39
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_39::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -233313,7 +233346,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_sio2_maf_44_p039_t03_r30_c02
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_44
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_44::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -233626,7 +233659,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_sio2_maf_45_p039_t03_r24_c02
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_45
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_45::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -234014,7 +234047,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_sio2_maf_4_p038_t03_r13_c02
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_4
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_4::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -234393,7 +234426,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_sio2_maf_7_p038_t03_r14_c02
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_7
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_7::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -234772,7 +234805,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_sio2_maf_8_p038_t03_r05_c02
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_8
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_8::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -235151,7 +235184,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_sio2_maf_9_p038_t03_r15_c02
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_9
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_9::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -235530,7 +235563,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_tio2_maf_12_p038_t03_r16_c03
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_12
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_12::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -235918,7 +235951,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_tio2_maf_14_p038_t03_r06_c03
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_14
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_14::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -236297,7 +236330,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_tio2_maf_15_p038_t03_r17_c03
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_15
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_15::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -236676,7 +236709,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_tio2_maf_18_p038_t03_r07_c03
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_18
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_18::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -237055,7 +237088,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_tio2_maf_19_p038_t03_r18_c03
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_19
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_19::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -237434,7 +237467,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_tio2_maf_1_p038_t03_r03_c03
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_1
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_1::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -237822,7 +237855,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_tio2_maf_20_p038_t03_r08_c03
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_20
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_20::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -238201,7 +238234,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_tio2_maf_22_p038_t03_r09_c03
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_22
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_22::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -238580,7 +238613,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_tio2_maf_26_p038_t03_r10_c03
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_26
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_26::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -238959,7 +238992,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_tio2_maf_27_p039_t03_r25_c03
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_27
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_27::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -239272,7 +239305,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_tio2_maf_28_p039_t03_r19_c03
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_28
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_28::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -239651,7 +239684,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_tio2_maf_29_p038_t03_r11_c03
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_29
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_29::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -240030,7 +240063,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_tio2_maf_2_p038_t03_r04_c03
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_2
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_2::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -240409,7 +240442,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_tio2_maf_31_p039_t03_r26_c03
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_31
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_31::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -240722,7 +240755,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_tio2_maf_32_p039_t03_r20_c03
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_32
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_32::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -241101,7 +241134,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_tio2_maf_33_p039_t03_r27_c03
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_33
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_33::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -241414,7 +241447,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_tio2_maf_34_p039_t03_r21_c03
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_34
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_34::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -241793,7 +241826,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_tio2_maf_35_p039_t03_r28_c03
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_35
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_35::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -242106,7 +242139,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_tio2_maf_36_p039_t03_r22_c03
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_36
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_36::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -242485,7 +242518,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_tio2_maf_38_p039_t03_r23_c03
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_38
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_38::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -242864,7 +242897,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_tio2_maf_39_p039_t03_r29_c03
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_39
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_39::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -243177,7 +243210,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_tio2_maf_44_p039_t03_r30_c03
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_44
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_44::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -243490,7 +243523,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_tio2_maf_45_p039_t03_r24_c03
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_45
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_45::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -243878,7 +243911,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_tio2_maf_4_p038_t03_r13_c03
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_4
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_4::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -244257,7 +244290,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_tio2_maf_7_p038_t03_r14_c03
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_7
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_7::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -244636,7 +244669,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_tio2_maf_8_p038_t03_r05_c03
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_8
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_8::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -245015,7 +245048,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table3_tio2_maf_9_p038_t03_r15_c03
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_9
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::declared:f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::experiment::fortin_2014_maf_9::method:quench_equilibration
   identity:
     quantity:
       tag: value
@@ -245394,7 +245427,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table4_equation_10_scss_model_coefficients
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -245437,7 +245470,17 @@ observations:
         table: '4'
         section: model B coefficients; equation 10 printed on PDF page 51
         source_path: raw/fortin-2014-sulfur-saturation-natural-melts-thesis/fortin-2014-sulfur-saturation-natural-melts-thesis.pdf
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table4_equation_10_scss_model_coefficients
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fortin-2014-sulfur-saturation-natural-melts-thesis
   locator:
     page: 55
@@ -245688,7 +245731,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table4_equation_8_scss_model_coefficients
-  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis
+  experiment_id: f92371a90529d75a6a1a112862957c15a0ca8b49dd790be0badaac5adc4dc32a::fortin-2014-sulfur-saturation-natural-melts-thesis::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -245731,7 +245774,17 @@ observations:
         table: '4'
         section: model A coefficients; equation 8 printed on PDF page 50
         source_path: raw/fortin-2014-sulfur-saturation-natural-melts-thesis/fortin-2014-sulfur-saturation-natural-melts-thesis.pdf
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fortin-2014-sulfur-saturation-natural-melts-thesis::fortin_2014_table4_equation_8_scss_model_coefficients
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: fortin-2014-sulfur-saturation-natural-melts-thesis
   locator:
     page: 55

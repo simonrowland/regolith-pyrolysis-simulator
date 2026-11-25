@@ -3707,6 +3707,20 @@ def test_fe_activity_uses_kress91_only_with_explicit_intrinsic_channel(
     ]["Fe"]
     assert reduced_prov["activity_basis"] == "kress91_ferrous"
     assert reduced_prov["degraded_activity_basis"] is None
+    assert reduced_prov["activity_used_for_pressure"] == pytest.approx(
+        reduced_activity
+    )
+
+    high_temperature = replace(reduced, temperature_C=1700.0)
+    high_result = provider.dispatch(high_temperature)
+    high_diagnostic = high_result.diagnostic
+    high_provenance = high_diagnostic[
+        "vapor_pressure_numerator_provenance"
+    ]["Fe"]
+    assert high_provenance["activity_basis"] != "kress91_ferrous"
+    assert high_provenance["activity_used_for_pressure"] == pytest.approx(
+        high_diagnostic["activities"]["Fe"]
+    )
     assert reduced_activity > static_activity
     assert oxidized_activity < reduced_activity
 

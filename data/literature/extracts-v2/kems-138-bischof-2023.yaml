@@ -11,12 +11,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_solid_Ga2O3' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -51,7 +50,18 @@ observations:
         pdf_page_index: 10
         figure: '5'
         note: Fig. 5a-c P(T) of Ga2O, Ga, GaO; no numeric table besides printed 1752 K points
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_solid_Ga2O3'' is not in the closed automatic map'
+    origin: kems-138-bischof-2023::bischof_2023_fig5_ga_psat_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-138-bischof-2023
   locator:
     published_page: 9
@@ -70,12 +80,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_solid_Ga2O3' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -111,7 +120,18 @@ observations:
         figure: '5'
         note: quote=Fig. 5. Partial pressures of Ga-bearing species a) Ga2O, b) Ga and c) GaO above heated Ga2O3, determined
           within a temperature range of 1510–1752 K.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_solid_Ga2O3'' is not in the closed automatic map'
+    origin: kems-138-bischof-2023::bischof_2023_fig5_ga_psat_figure_only_deep4_quoted
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-138-bischof-2023
   locator:
     published_page: 9
@@ -131,12 +151,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_solid_In2O3' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -169,7 +188,18 @@ observations:
         published_page: 9
         pdf_page_index: 10
         figure: '6'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_solid_In2O3'' is not in the closed automatic map'
+    origin: kems-138-bischof-2023::bischof_2023_fig6_in_psat_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-138-bischof-2023
   locator:
     published_page: 9
@@ -187,12 +217,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_solid_In2O3' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -227,7 +256,18 @@ observations:
         figure: '6'
         note: quote=Fig. 6. Partial pressures of In-bearing species a) In2O, b) In and c) InO above heated In2O3, quantified
           within a temperature range of 1210–1611 K.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_solid_In2O3'' is not in the closed automatic map'
+    origin: kems-138-bischof-2023::bischof_2023_fig6_in_psat_figure_only_deep4_quoted
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-138-bischof-2023
   locator:
     published_page: 9
@@ -247,12 +287,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_solid_M2O3' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -284,7 +323,18 @@ observations:
         figure: '7'
         note: also Figs 8-11 ln(K) and Delta_r H vs 1/T; quote=ln(K) for the reactions of Ga2O3 into a) Ga2O, b) Ga and c)
           GaO plotted vs. reciprocal T for measured and literature data.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_solid_M2O3'' is not in the closed automatic map'
+    origin: kems-138-bischof-2023::bischof_2023_fig7_11_lnK_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-138-bischof-2023
   locator:
     published_page: 10
@@ -304,12 +354,11 @@ observations:
     species:
       formula: Ga2O3
       phase:
-        tag: unknown
-        reason: phase string 'method_calibration' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -333,7 +382,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''method_calibration'' is not in the closed automatic map'
+    origin: kems-138-bischof-2023::bischof_2023_fragmentation_f_i
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-138-bischof-2023
   locator:
     published_page: 6
@@ -352,12 +412,11 @@ observations:
     species:
       formula: Ga2O3
       phase:
-        tag: unknown
-        reason: phase string 'solid_Ga2O3_In2O3_KEMS' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -381,7 +440,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid_Ga2O3_In2O3_KEMS'' is not in the closed automatic map'
+    origin: kems-138-bischof-2023::bischof_2023_kems_ir_cell_geometry
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-138-bischof-2023
   locator:
     published_page: 2
@@ -1266,12 +1336,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'method_calibration' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1295,7 +1364,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''method_calibration'' is not in the closed automatic map'
+    origin: kems-138-bischof-2023::bischof_2023_sigma_O2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-138-bischof-2023
   locator:
     published_page: 4
@@ -1314,12 +1394,11 @@ observations:
     species:
       formula: Ga2O
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_solid_Ga2O3' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1343,7 +1422,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_solid_Ga2O3'' is not in the closed automatic map'
+    origin: kems-138-bischof-2023::bischof_2023_table10_ga2o_delta_f_3rd_recommended
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-138-bischof-2023
   locator:
     published_page: 1
@@ -1355,7 +1445,7 @@ observations:
   provenance:
     printed_phase: vapor_over_solid_Ga2O3
 - observation_id: kems-138-bischof-2023::bischof_2023_table10_gao_ab_initio
-  experiment_id: 10.1016/j.calphad.2022.102507::experiment::ga2o3-series
+  experiment_id: 10.1016/j.calphad.2022.102507::kems-138-bischof-2023::declared:10.1016/j.calphad.2022.102507::experiment::ga2o3-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1400,7 +1490,17 @@ observations:
         pdf_page_index: 15
         table: '10'
         note: quote=GaO(g) = Ga(g) + O(g) 129404 Pets04, FACTSG
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: kems-138-bischof-2023::bischof_2023_table10_gao_ab_initio
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-138-bischof-2023
   locator:
     published_page: 14
@@ -1421,7 +1521,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: kems-138-bischof-2023::bischof_2023_table10_gao_ab_initio_deep4_quoted
-  experiment_id: 10.1016/j.calphad.2022.102507::kems-138-bischof-2023
+  experiment_id: 10.1016/j.calphad.2022.102507::kems-138-bischof-2023::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1454,7 +1554,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: kems-138-bischof-2023::bischof_2023_table10_gao_ab_initio_deep4_quoted
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-138-bischof-2023
   locator:
     published_page: 14
@@ -1473,12 +1583,11 @@ observations:
     species:
       formula: GaO
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_solid_Ga2O3' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1502,7 +1611,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_solid_Ga2O3'' is not in the closed automatic map'
+    origin: kems-138-bischof-2023::bischof_2023_table10_gao_delta_f_3rd_recommended
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-138-bischof-2023
   locator:
     published_page: 14
@@ -1521,12 +1641,11 @@ observations:
     species:
       formula: In2O
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_solid_In2O3' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1550,7 +1669,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_solid_In2O3'' is not in the closed automatic map'
+    origin: kems-138-bischof-2023::bischof_2023_table11_in2o_delta_f_3rd_recommended
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-138-bischof-2023
   locator:
     published_page: 1
@@ -1570,12 +1700,11 @@ observations:
     species:
       formula: InO
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_solid_In2O3' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1599,7 +1728,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_solid_In2O3'' is not in the closed automatic map'
+    origin: kems-138-bischof-2023::bischof_2023_table11_ino_delta_f_3rd_recommended
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-138-bischof-2023
   locator:
     published_page: 1
@@ -2222,7 +2362,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: kems-138-bischof-2023::bischof_2023_table13_ga2o_2nd_law_factsage
-  experiment_id: 10.1016/j.calphad.2022.102507::experiment::ga2o3-series
+  experiment_id: 10.1016/j.calphad.2022.102507::kems-138-bischof-2023::declared:10.1016/j.calphad.2022.102507::experiment::ga2o3-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2230,12 +2370,11 @@ observations:
     species:
       formula: Ga2O
       phase:
-        tag: unknown
-        reason: phase string 'homogeneous_gas' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2261,7 +2400,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''homogeneous_gas'' is not in the closed automatic map'
+    origin: kems-138-bischof-2023::bischof_2023_table13_ga2o_2nd_law_factsage
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: kems-138-bischof-2023::bischof_2023_table13_ga2o_2nd_law_factsage
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-138-bischof-2023
   locator:
     published_page: 17
@@ -2310,12 +2470,11 @@ observations:
     species:
       formula: Ga2O
       phase:
-        tag: unknown
-        reason: phase string 'homogeneous_gas' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2339,7 +2498,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''homogeneous_gas'' is not in the closed automatic map'
+    origin: kems-138-bischof-2023::bischof_2023_table13_ga2o_homogeneous_3rd
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-138-bischof-2023
   locator:
     published_page: 17
@@ -2358,12 +2528,11 @@ observations:
     species:
       formula: In2O
       phase:
-        tag: unknown
-        reason: phase string 'homogeneous_gas' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2387,7 +2556,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''homogeneous_gas'' is not in the closed automatic map'
+    origin: kems-138-bischof-2023::bischof_2023_table13_in2o_homogeneous_3rd
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-138-bischof-2023
   locator:
     published_page: 17
@@ -2406,12 +2586,11 @@ observations:
     species:
       formula: Ga2O3
       phase:
-        tag: unknown
-        reason: phase string 'solid_alpha_Ga2O3' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2434,7 +2613,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid_alpha_Ga2O3'' is not in the closed automatic map'
+    origin: kems-138-bischof-2023::bischof_2023_table3_ga2o3_runs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-138-bischof-2023
   locator:
     published_page: 3
@@ -2453,12 +2643,11 @@ observations:
     species:
       formula: In2O3
       phase:
-        tag: unknown
-        reason: phase string 'solid_alpha_In2O3' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2481,7 +2670,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid_alpha_In2O3'' is not in the closed automatic map'
+    origin: kems-138-bischof-2023::bischof_2023_table3_in2o3_runs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-138-bischof-2023
   locator:
     published_page: 3
@@ -2500,12 +2700,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_solid_M2O3' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2529,7 +2728,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_solid_M2O3'' is not in the closed automatic map'
+    origin: kems-138-bischof-2023::bischof_2023_table6_po2_equations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-138-bischof-2023
   locator:
     published_page: 6
@@ -2549,12 +2759,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_solid_Ga2O3' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2626,7 +2835,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_solid_Ga2O3'' is not in the closed automatic map'
+    origin: kems-138-bischof-2023::bischof_2023_table7_ga_isotherm_intensities
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-138-bischof-2023
   locator:
     published_page: 7
@@ -2647,7 +2868,7 @@ observations:
   provenance:
     printed_phase: vapor_over_solid_Ga2O3
 - observation_id: kems-138-bischof-2023::bischof_2023_table8_ga_2nd_law_and_factsage
-  experiment_id: 10.1016/j.calphad.2022.102507::experiment::ga2o3-series
+  experiment_id: 10.1016/j.calphad.2022.102507::kems-138-bischof-2023::declared:10.1016/j.calphad.2022.102507::experiment::ga2o3-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2655,12 +2876,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_solid_Ga2O3' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2684,7 +2904,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_solid_Ga2O3'' is not in the closed automatic map'
+    origin: kems-138-bischof-2023::bischof_2023_table8_ga_2nd_law_and_factsage
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: kems-138-bischof-2023::bischof_2023_table8_ga_2nd_law_and_factsage
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-138-bischof-2023
   locator:
     published_page: 8
@@ -2731,12 +2972,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_solid_Ga2O3' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2760,7 +3000,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_solid_Ga2O3'' is not in the closed automatic map'
+    origin: kems-138-bischof-2023::bischof_2023_table8_ga_3rd_law_this_work
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-138-bischof-2023
   locator:
     published_page: 8
@@ -2771,7 +3022,7 @@ observations:
   provenance:
     printed_phase: vapor_over_solid_Ga2O3
 - observation_id: kems-138-bischof-2023::bischof_2023_table9_in_2nd_law_and_factsage
-  experiment_id: 10.1016/j.calphad.2022.102507::experiment::in2o3-series
+  experiment_id: 10.1016/j.calphad.2022.102507::kems-138-bischof-2023::declared:10.1016/j.calphad.2022.102507::experiment::in2o3-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2779,12 +3030,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_solid_In2O3' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2808,7 +3058,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_solid_In2O3'' is not in the closed automatic map'
+    origin: kems-138-bischof-2023::bischof_2023_table9_in_2nd_law_and_factsage
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: kems-138-bischof-2023::bischof_2023_table9_in_2nd_law_and_factsage
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-138-bischof-2023
   locator:
     published_page: 13
@@ -2857,12 +3128,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_solid_In2O3' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2886,7 +3156,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_solid_In2O3'' is not in the closed automatic map'
+    origin: kems-138-bischof-2023::bischof_2023_table9_in_3rd_law_this_work
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-138-bischof-2023
   locator:
     published_page: 13

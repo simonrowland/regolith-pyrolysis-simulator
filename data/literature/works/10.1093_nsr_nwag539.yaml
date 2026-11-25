@@ -1730,8 +1730,8 @@ experiments:
 - experiment_id: 10.1093/nsr/nwag539::xu-2026-excess-oxygen-magma
   kind: literature
   method:
-    tag: unknown
-    reason: source does not state method
+    tag: value
+    value: unspecified
   sample: {}
   conditions:
     temperature_K:
@@ -1758,6 +1758,1702 @@ experiments:
   locator:
     table: S1
     record: Supplementary Table S1 _ 072226.xlsx; sheet "Table S1"; Fe3+ area cell B11
+- experiment_id: 10.1093/nsr/nwag539::xu-2026-excess-oxygen-magma::declared:10.1093/nsr/nwag539::experiment::xu_2026_lvp_10::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1723.15'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5000000000'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1093/nsr/nwag539
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: row=LVP-10
+  fO2_control:
+    channel:
+      tag: value
+      value: intrinsic
+    buffer:
+      state:
+        tag: value
+        value: No PtO2 powder was added; an actual run fO2 is not reported
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: cubic press run at the listed temperature followed by power-off quenching
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3600'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+- experiment_id: 10.1093/nsr/nwag539::xu-2026-excess-oxygen-magma::declared:10.1093/nsr/nwag539::experiment::xu_2026_lvp_11::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1873.15'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5000000000'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1093/nsr/nwag539
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: row=LVP-11
+  fO2_control:
+    channel:
+      tag: value
+      value: intrinsic
+    buffer:
+      state:
+        tag: value
+        value: No PtO2 powder was added; an actual run fO2 is not reported
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: cubic press run at the listed temperature followed by power-off quenching
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '120'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+- experiment_id: 10.1093/nsr/nwag539::xu-2026-excess-oxygen-magma::declared:10.1093/nsr/nwag539::experiment::xu_2026_lvp_12::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1673.15'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5000000000'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1093/nsr/nwag539
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: row=LVP-12
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: value
+        value: PtO2 powder was added as an oxygen source; the supplement reports log fO2 ≈ 0 for the Pt–PtO2 buffer, while
+          the authors state actual run fO2 was more reduced
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: cubic press run at the listed temperature followed by power-off quenching
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5400'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+- experiment_id: 10.1093/nsr/nwag539::xu-2026-excess-oxygen-magma::declared:10.1093/nsr/nwag539::experiment::xu_2026_lvp_13::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1723.15'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5000000000'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1093/nsr/nwag539
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: row=LVP-13
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: value
+        value: PtO2 powder was added as an oxygen source; the supplement reports log fO2 ≈ 0 for the Pt–PtO2 buffer, while
+          the authors state actual run fO2 was more reduced
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: cubic press run at the listed temperature followed by power-off quenching
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3600'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+- experiment_id: 10.1093/nsr/nwag539::xu-2026-excess-oxygen-magma::declared:10.1093/nsr/nwag539::experiment::xu_2026_lvp_14::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1873.15'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5000000000'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1093/nsr/nwag539
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: row=LVP-14
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: value
+        value: PtO2 powder was added as an oxygen source; the supplement reports log fO2 ≈ 0 for the Pt–PtO2 buffer, while
+          the authors state actual run fO2 was more reduced
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: cubic press run at the listed temperature followed by power-off quenching
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '120'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+- experiment_id: 10.1093/nsr/nwag539::xu-2026-excess-oxygen-magma::declared:10.1093/nsr/nwag539::experiment::xu_2026_lvp_15::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1973.15'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5000000000'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1093/nsr/nwag539
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: row=LVP-15
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: value
+        value: PtO2 powder was added as an oxygen source; the supplement reports log fO2 ≈ 0 for the Pt–PtO2 buffer, while
+          the authors state actual run fO2 was more reduced
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: cubic press run at the listed temperature followed by power-off quenching
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '120'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+- experiment_id: 10.1093/nsr/nwag539::xu-2026-excess-oxygen-magma::declared:10.1093/nsr/nwag539::experiment::xu_2026_lvp_16::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1873.15'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '7000000000'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1093/nsr/nwag539
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: row=LVP-16
+  fO2_control:
+    channel:
+      tag: value
+      value: intrinsic
+    buffer:
+      state:
+        tag: value
+        value: No PtO2 powder was added; an actual run fO2 is not reported
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: cubic press run at the listed temperature followed by power-off quenching
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '300'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+- experiment_id: 10.1093/nsr/nwag539::xu-2026-excess-oxygen-magma::declared:10.1093/nsr/nwag539::experiment::xu_2026_lvp_17::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1673.15'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '7000000000'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1093/nsr/nwag539
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: row=LVP-17
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: value
+        value: PtO2 powder was added as an oxygen source; the supplement reports log fO2 ≈ 0 for the Pt–PtO2 buffer, while
+          the authors state actual run fO2 was more reduced
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: cubic press run at the listed temperature followed by power-off quenching
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5400'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+- experiment_id: 10.1093/nsr/nwag539::xu-2026-excess-oxygen-magma::declared:10.1093/nsr/nwag539::experiment::xu_2026_lvp_18::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1723.15'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '7000000000'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1093/nsr/nwag539
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: row=LVP-18
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: value
+        value: PtO2 powder was added as an oxygen source; the supplement reports log fO2 ≈ 0 for the Pt–PtO2 buffer, while
+          the authors state actual run fO2 was more reduced
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: cubic press run at the listed temperature followed by power-off quenching
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3600'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+- experiment_id: 10.1093/nsr/nwag539::xu-2026-excess-oxygen-magma::declared:10.1093/nsr/nwag539::experiment::xu_2026_lvp_19::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1873.15'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '7000000000'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1093/nsr/nwag539
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: row=LVP-19
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: value
+        value: PtO2 powder was added as an oxygen source; the supplement reports log fO2 ≈ 0 for the Pt–PtO2 buffer, while
+          the authors state actual run fO2 was more reduced
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: cubic press run at the listed temperature followed by power-off quenching
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '120'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+- experiment_id: 10.1093/nsr/nwag539::xu-2026-excess-oxygen-magma::declared:10.1093/nsr/nwag539::experiment::xu_2026_lvp_1::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1673.15'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1093/nsr/nwag539
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: row=LVP-1
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: box furnace; temperature calibrated using the melting point of gold
+      locator:
+        page: 5
+        pdf_page_index: 4
+        section: High-pressure, high-temperature experiments
+        source_path: XuEtAl_Suppl_0820.pdf
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '300'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+- experiment_id: 10.1093/nsr/nwag539::xu-2026-excess-oxygen-magma::declared:10.1093/nsr/nwag539::experiment::xu_2026_lvp_20::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1973.15'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '7000000000'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1093/nsr/nwag539
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: row=LVP-20
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: value
+        value: PtO2 powder was added as an oxygen source; the supplement reports log fO2 ≈ 0 for the Pt–PtO2 buffer, while
+          the authors state actual run fO2 was more reduced
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: cubic press run at the listed temperature followed by power-off quenching
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '120'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+- experiment_id: 10.1093/nsr/nwag539::xu-2026-excess-oxygen-magma::declared:10.1093/nsr/nwag539::experiment::xu_2026_lvp_21::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1973.15'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '7000000000'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1093/nsr/nwag539
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: row=LVP-21
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: value
+        value: PtO2 powder was added as an oxygen source; the supplement reports log fO2 ≈ 0 for the Pt–PtO2 buffer, while
+          the authors state actual run fO2 was more reduced
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: cubic press run at the listed temperature followed by power-off quenching
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '240'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+- experiment_id: 10.1093/nsr/nwag539::xu-2026-excess-oxygen-magma::declared:10.1093/nsr/nwag539::experiment::xu_2026_lvp_22::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2073.15'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '7000000000'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1093/nsr/nwag539
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: row=LVP-22
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: value
+        value: PtO2 powder was added as an oxygen source; the supplement reports log fO2 ≈ 0 for the Pt–PtO2 buffer, while
+          the authors state actual run fO2 was more reduced
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: cubic press run at the listed temperature followed by power-off quenching
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '240'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+- experiment_id: 10.1093/nsr/nwag539::xu-2026-excess-oxygen-magma::declared:10.1093/nsr/nwag539::experiment::xu_2026_lvp_2::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1673.15'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '500000000'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1093/nsr/nwag539
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: row=LVP-2
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: value
+        value: PtO2 powder was added as an oxygen source; the supplement reports log fO2 ≈ 0 for the Pt–PtO2 buffer, while
+          the authors state actual run fO2 was more reduced
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: piston-cylinder press run at the listed temperature followed by power-off quenching
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '300'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+- experiment_id: 10.1093/nsr/nwag539::xu-2026-excess-oxygen-magma::declared:10.1093/nsr/nwag539::experiment::xu_2026_lvp_3::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1773.15'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '500000000'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1093/nsr/nwag539
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: row=LVP-3
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: value
+        value: PtO2 powder was added as an oxygen source; the supplement reports log fO2 ≈ 0 for the Pt–PtO2 buffer, while
+          the authors state actual run fO2 was more reduced
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: piston-cylinder press run at the listed temperature followed by power-off quenching
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '300'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+- experiment_id: 10.1093/nsr/nwag539::xu-2026-excess-oxygen-magma::declared:10.1093/nsr/nwag539::experiment::xu_2026_lvp_4::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1473.15'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1000000000'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1093/nsr/nwag539
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: row=LVP-4
+  fO2_control:
+    channel:
+      tag: value
+      value: intrinsic
+    buffer:
+      state:
+        tag: value
+        value: No PtO2 powder was added; an actual run fO2 is not reported
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: piston-cylinder press run at the listed temperature followed by power-off quenching
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '10800'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+- experiment_id: 10.1093/nsr/nwag539::xu-2026-excess-oxygen-magma::declared:10.1093/nsr/nwag539::experiment::xu_2026_lvp_5::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1873.15'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3400000000'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1093/nsr/nwag539
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: row=LVP-5
+  fO2_control:
+    channel:
+      tag: value
+      value: intrinsic
+    buffer:
+      state:
+        tag: value
+        value: No PtO2 powder was added; an actual run fO2 is not reported
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: cubic press run at the listed temperature followed by power-off quenching
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '120'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+- experiment_id: 10.1093/nsr/nwag539::xu-2026-excess-oxygen-magma::declared:10.1093/nsr/nwag539::experiment::xu_2026_lvp_6::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1773.15'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3400000000'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1093/nsr/nwag539
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: row=LVP-6
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: value
+        value: PtO2 powder was added as an oxygen source; the supplement reports log fO2 ≈ 0 for the Pt–PtO2 buffer, while
+          the authors state actual run fO2 was more reduced
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: cubic press run at the listed temperature followed by power-off quenching
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '120'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+- experiment_id: 10.1093/nsr/nwag539::xu-2026-excess-oxygen-magma::declared:10.1093/nsr/nwag539::experiment::xu_2026_lvp_7::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1873.15'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3400000000'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1093/nsr/nwag539
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: row=LVP-7
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: value
+        value: PtO2 powder was added as an oxygen source; the supplement reports log fO2 ≈ 0 for the Pt–PtO2 buffer, while
+          the authors state actual run fO2 was more reduced
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: cubic press run at the listed temperature followed by power-off quenching
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '120'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+- experiment_id: 10.1093/nsr/nwag539::xu-2026-excess-oxygen-magma::declared:10.1093/nsr/nwag539::experiment::xu_2026_lvp_8::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1973.15'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3400000000'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1093/nsr/nwag539
+  locator:
+    page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: row=LVP-8
+  fO2_control:
+    channel:
+      tag: value
+      value: commanded
+    buffer:
+      state:
+        tag: value
+        value: PtO2 powder was added as an oxygen source; the supplement reports log fO2 ≈ 0 for the Pt–PtO2 buffer, while
+          the authors state actual run fO2 was more reduced
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: cubic press run at the listed temperature followed by power-off quenching
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '240'
+          approximate: false
+      locator:
+        page: 3
+        pdf_page_index: 2
+        table: '1'
 context:
 - observation_id: xu_2026_figure_1_deferred
   type: figure_record

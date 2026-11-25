@@ -341,7 +341,8 @@ def test_persisted_kems_activity_recovers_comparison_method_from_calibration(
 
 def test_reference_phase_convention_notice_round_trips_and_legacy_notice_stays_valid() -> None:
     from simulator.battery.enums import Authority
-    from simulator.battery.records import Notice
+    from simulator.battery.default_policy import load_policy_table
+    from simulator.battery.records import Notice, NoticePolicy
 
     notice = Notice(
         kind=NoticeKind.REFERENCE_PHASE_BY_CONVENTION,
@@ -358,6 +359,29 @@ def test_reference_phase_convention_notice_round_trips_and_legacy_notice_stays_v
     assert payload["kind"] == "reference_phase_by_convention"
     assert payload["authority"] == "convention"
     assert payload["certification"] == "fetch the JANAF 4th ed. printed page for the table"
+    phase_entry = load_policy_table()["DP-016"]
+    policy_notice = Notice(
+        kind=NoticeKind.PHASE_INFERRED,
+        affected_quantities=(Quantity.DELTA_FG,),
+        reason="phase_inferred: value=unspecified; evidence=no phase identified",
+        origin="policy-round-trip",
+        policy=NoticePolicy(
+            id=phase_entry["id"],
+            version=phase_entry["version"],
+            status=phase_entry["status"],
+            value=Phase.UNSPECIFIED.value,
+            units=phase_entry["units"],
+        ),
+    )
+    policy_payload = to_plain(policy_notice)
+    assert policy_payload["policy"] == {
+        "id": phase_entry["id"],
+        "version": phase_entry["version"],
+        "status": phase_entry["status"],
+        "value": Phase.UNSPECIFIED.value,
+        "units": phase_entry["units"],
+    }
+    assert _notice_from_plain(policy_payload) == policy_notice
     assert _notice_from_plain(payload) == notice
 
     legacy = {
@@ -501,7 +525,79 @@ def test_values_method_is_used_when_extract_regime_is_absent(tmp_path: Path) -> 
     )
     migrated = next(iter(result.observations.values()))
     experiment = result.experiments[migrated.experiment_id]
-    assert experiment.method.is_unknown
+    assert experiment.method == State.of(MethodToken.UNSPECIFIED)
+    unmapped_rows = [
+        row
+        for row in result.observations.values()
+        if row.observation_id == "fixture-source::na_psat"
+        or row.observation_id.startswith("fixture-source::na_psat::")
+    ]
+    assert unmapped_rows
+    assert all(
+        sum(
+            1
+            for notice in row.notices
+            if notice.kind is NoticeKind.METHOD_UNSTATED
+            and "source method text is not mapped: unmapped source regime"
+            in notice.reason
+        )
+        == 1
+        for row in unmapped_rows
+    )
+
+
+def test_unmapped_regime_method_notice_mutation_rejects_duplicate(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    observation = extract["species"]["Na"]["observations"][0]
+    observation["regime"] = "unmapped source regime"
+    observation["values"]["method"] = (
+        "KEMS ion-current intensities converted to partial pressures using "
+        "the thesis calibration (Eq. 2)."
+    )
+    original = Migrator._add_observation
+
+    def readd_method_notice(self, observation, source_key, *args, **kwargs):
+        duplicate = next(
+            (
+                notice
+                for notice in observation.notices
+                if notice.kind is NoticeKind.METHOD_UNSTATED
+                and "source method text is not mapped: unmapped source regime"
+                in notice.reason
+            ),
+            None,
+        )
+        if duplicate is not None:
+            observation = replace(
+                observation, notices=(*observation.notices, duplicate)
+            )
+        return original(self, observation, source_key, *args, **kwargs)
+
+    monkeypatch.setattr(Migrator, "_add_observation", readd_method_notice)
+    result = migrate(
+        _write_min_tree(tmp_path / "duplicate-notice", extract), write=False
+    )
+    rows = [
+        row
+        for row in result.observations.values()
+        if row.observation_id == "fixture-source::na_psat"
+        or row.observation_id.startswith("fixture-source::na_psat::")
+    ]
+    assert rows
+    with pytest.raises(AssertionError):
+        assert all(
+            sum(
+                1
+                for notice in row.notices
+                if notice.kind is NoticeKind.METHOD_UNSTATED
+                and "source method text is not mapped: unmapped source regime"
+                in notice.reason
+            )
+            == 1
+            for row in rows
+        )
 
 
 def _migrate_real_extract(
@@ -913,7 +1009,10 @@ def test_tachibana_approximate_author_estimate_reaches_residual_stratum(
     )
     assert residual.status is ResidualStatus.REFUSED
     assert flagged_strata(residual.notices) == (
+        NoticeKind.METHOD_UNSTATED.value,
+        NoticeKind.PHASE_INFERRED.value,
         FLAGGED_STRATUM_APPROXIMATE_VALUE,
+        "proposed-policy",
     )
 
 
@@ -3676,7 +3775,11 @@ def test_pressure_phase_provenance_matches_resulting_phase(
     if phase == "condensed_solid":
         assert all(point.identity.species.phase.value is Phase.CR for point in points)
     else:
-        assert all(point.identity.species.phase.is_unknown for point in points)
+        assert all(
+            point.identity.species.phase.is_value
+            and point.identity.species.phase.value is Phase.UNSPECIFIED
+            for point in points
+        )
 
 
 def test_series_row_point_conditions_preserve_pressure_interval(tmp_path: Path) -> None:
@@ -5178,23 +5281,23 @@ def test_unrecognised_polymorph_is_counted_and_queued(tmp_path: Path) -> None:
     assert known_queued == []
 
 
-def test_g01_blank_phase_is_unknown_not_gas(tmp_path: Path) -> None:
+def test_g01_blank_phase_is_flagged_unspecified_not_gas(tmp_path: Path) -> None:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     extract["species"]["Na"]["observations"][0]["phase"] = ""
     root = _write_min_tree(tmp_path, extract)
     result = migrate(root, write=False)
     obs = next(iter(result.observations.values()))
     phase = _phase_state(obs)
-    assert phase.is_unknown, phase
-    assert phase.value is None
+    assert phase.is_value and phase.value is Phase.UNSPECIFIED
+    assert any(notice.kind is NoticeKind.PHASE_INFERRED for notice in obs.notices)
     report = validate_corpus(
         result.works, result.experiments, result.observations, residuals=None
     )
     assert report.hard_issues == ()
 
 
-def test_g01_unmapped_and_sidecar_phases_are_unknown(tmp_path: Path) -> None:
-    """Grok P0-1 table: unmapped/missing source phases must not become g."""
+def test_g01_unmapped_phases_are_flagged_unspecified_not_guessed(tmp_path: Path) -> None:
+    """Unmapped source phases stay distinct from the ordinary gas phase."""
 
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     rows = extract["species"]["Na"]["observations"]
@@ -5236,12 +5339,16 @@ def test_g01_unmapped_and_sidecar_phases_are_unknown(tmp_path: Path) -> None:
     for i, (phase, _extra) in enumerate(mislifts[1:], start=1):
         obs = by_prefix(f"mislift_{i}")
         stored = _phase_state(obs)
-        assert stored.is_unknown, (phase, stored)
-        assert stored.value is not Phase.G
-        assert stored.value is not Phase.CR
+        if phase == "graphite":
+            assert stored.is_value and stored.value is Phase.CR
+        else:
+            assert stored.is_value and stored.value is Phase.UNSPECIFIED, (phase, stored)
+            assert any(
+                notice.kind is NoticeKind.PHASE_INFERRED for notice in obs.notices
+            )
 
 
-def test_g01_sidecar_without_phase_is_unknown(tmp_path: Path) -> None:
+def test_g01_partial_pressure_sidecar_without_phase_is_flagged_gas(tmp_path: Path) -> None:
     root = _write_min_tree(tmp_path)
     lit = root / "data" / "literature"
     (lit / "kems_measurements.yaml").write_text(
@@ -5275,7 +5382,9 @@ def test_g01_sidecar_without_phase_is_unknown(tmp_path: Path) -> None:
     )
     result = migrate(root, write=False)
     kems = result.observations["kems_no_phase"]
-    assert kems.identity.species.phase.is_unknown
+    assert kems.identity.species.phase.is_value
+    assert kems.identity.species.phase.value is Phase.G
+    assert any(notice.kind is NoticeKind.PHASE_INFERRED for notice in kems.notices)
 
 
 def test_effusion_pressure_reservoir_requires_stated_phase_and_pressure() -> None:
@@ -5845,7 +5954,9 @@ def test_langmuir_printed_derived_from_is_flagged_verbatim(tmp_path: Path) -> No
     _assert_printed_lineage_flagged(result, printed, "derived_from")
 
 
-def test_g02_kems_row_without_method_is_unknown(tmp_path: Path) -> None:
+def test_g02_kems_citation_does_not_infer_effusion_when_row_method_is_absent(
+    tmp_path: Path,
+) -> None:
     root = _write_min_tree(tmp_path)
     (root / "data" / "literature" / "kems_measurements.yaml").write_text(
         yaml.safe_dump(
@@ -5875,7 +5986,15 @@ def test_g02_kems_row_without_method_is_unknown(tmp_path: Path) -> None:
     result = migrate(root, write=False)
     obs = result.observations["kems_no_method"]
     exp = result.experiments[obs.experiment_id]
-    assert exp.method.is_unknown
+    assert exp.method.is_value
+    assert exp.method.value is MethodToken.UNSPECIFIED
+    method_notice = next(
+        notice for notice in obs.notices
+        if notice.kind is NoticeKind.METHOD_UNSTATED
+    )
+    assert method_notice.policy is not None
+    assert method_notice.policy.id == "DP-106"
+    assert not any(notice.kind is NoticeKind.METHOD_INFERRED for notice in obs.notices)
     assert obs.evidence.class_.is_unknown
     assert obs.evidence.class_.value is not EvidenceClass.FIGURE_ONLY
 
@@ -7479,6 +7598,47 @@ def test_g05_identical_duplicate_keys_are_aliased(tmp_path: Path) -> None:
     assert ledger_count.observations_out == 1
     store_obs = sum(c.observations_out for c in result.source_counts.values())
     assert store_obs == len(result.observations)
+
+
+def test_duplicate_method_reason_mutation_probe_rejects_lost_original_reason(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root = _write_min_tree(tmp_path)
+    point = {
+        "key": "pankratz-dup::T=336.35::delta_fG_kJ_mol",
+        "source_id": "pankratz-1987-usbm-b689",
+        "species": "AgS",
+        "temperature_K": 336.35,
+        "table_kJ_mol": 1.0,
+    }
+    ledger = root / "data" / "literature" / "gibbs_battery_residual_ledger.yaml"
+    ledger.write_text(
+        yaml.safe_dump(
+            {"schema_version": 1, "points": [point, dict(point)]},
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+
+    original = Migrator._resolve_method_for_observation
+
+    def lose_original_method_reason(self, *args, **kwargs):
+        if (
+            kwargs.get("observation_id") == point["key"]
+            and point["key"] in self.result.observations
+        ):
+            self._unstated_method_original_reason_by_experiment.pop(
+                kwargs["experiment_id"], None
+            )
+        return original(self, *args, **kwargs)
+
+    monkeypatch.setattr(
+        Migrator,
+        "_resolve_method_for_observation",
+        lose_original_method_reason,
+    )
+    with pytest.raises(DuplicateObservationIdError):
+        migrate(root, write=True)
 
 
 def test_g05_conflicting_duplicate_key_is_hard_error(tmp_path: Path) -> None:
@@ -10305,10 +10465,10 @@ def test_borisov_combined_iron_composition_migrates_without_a_redox_split(
         observation = by_id[row_id]
         composition = observation.identity.composition.value
         assert composition.as_map()["FeO"] == as_decimal(expected_total_iron)
-        assert observation.identity.species.phase.is_unknown
-        assert (
-            observation.identity.species.phase.reason
-            == "source does not state phase"
+        assert observation.identity.species.phase.is_value
+        assert observation.identity.species.phase.value is Phase.UNSPECIFIED
+        assert any(
+            notice.kind is NoticeKind.PHASE_INFERRED for notice in observation.notices
         )
         assert observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
         assert observation.evidence.original_method_class == "quoted_attributed"
@@ -11863,7 +12023,7 @@ def test_k02_zr_th_and_pending_anchors_are_unavailable_domains() -> None:
         assert lo in blob and hi in blob, fname
 
 
-def test_k03_ledger_missing_phase_is_queued(tmp_path: Path) -> None:
+def test_k03_ledger_missing_phase_is_flagged_and_migrated(tmp_path: Path) -> None:
     root = _write_min_tree(tmp_path)
     (root / "data" / "literature" / "gibbs_battery_residual_ledger.yaml").write_text(
         yaml.safe_dump(
@@ -11886,14 +12046,15 @@ def test_k03_ledger_missing_phase_is_queued(tmp_path: Path) -> None:
     )
     result = migrate(root, write=False)
     obs = result.observations["ledger-unknown-phase"]
-    assert obs.identity.species.phase.is_unknown
+    assert obs.identity.species.phase.is_value
+    assert obs.identity.species.phase.value is Phase.UNSPECIFIED
+    assert any(notice.kind is NoticeKind.PHASE_INFERRED for notice in obs.notices)
     phase_entries = [
         e
         for e in result.queue
         if e.observation_id == "ledger-unknown-phase" and "phase" in (e.axes or ())
     ]
-    assert phase_entries
-    assert any("phase" in (e.why or "").lower() for e in phase_entries)
+    assert not phase_entries
 
 
 def _quantity_state(obs) -> tuple[object, str | None]:
@@ -15970,7 +16131,8 @@ def test_pankratz_1987_crystal_columns_reach_separate_series(tmp_path: Path) -> 
         ]
         assert observations
         assert all(
-            observation.identity.species.phase.is_unknown
+            observation.identity.species.phase.is_value
+            and observation.identity.species.phase.value is Phase.UNSPECIFIED
             for observation in observations
         )
 

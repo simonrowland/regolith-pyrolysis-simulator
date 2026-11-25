@@ -41,7 +41,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_K1175_0p99658
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: eliezer-howald-1978-potassium-silicate-vapor-pressure
   locator:
     page: 5
@@ -118,7 +128,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_K1175_1p00455
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: eliezer-howald-1978-potassium-silicate-vapor-pressure
   locator:
     page: 5
@@ -195,7 +215,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_K1623_0p993
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: eliezer-howald-1978-potassium-silicate-vapor-pressure
   locator:
     page: 5
@@ -274,7 +304,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_K1623_lt_0p99526
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: eliezer-howald-1978-potassium-silicate-vapor-pressure
   locator:
     page: 5
@@ -350,7 +390,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_K_approx_0p98
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: eliezer-howald-1978-potassium-silicate-vapor-pressure
   locator:
     page: 5
@@ -474,6 +524,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Gibbs-Duhem integration
+      of the authors'' log gamma1 composition function.'
+    origin: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_gibbs_duhem_x0293_loggamma2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -639,6 +701,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - partial_molar_enthalpy
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_hbar2_x0297
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - partial_molar_enthalpy
@@ -773,6 +846,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: "Log γ2 is known at several
+      temperatures and compositions from the phase diagram measurements."; printed source evidence: "Log γ2 is known at several
+      temperatures and compositions from the phase diagram measurements."'
+    origin: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_phase_diagram_x0102_loggamma2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -909,6 +995,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: "Log γ2 is known at several
+      temperatures and compositions from the phase diagram measurements."; printed source evidence: "Log γ2 is known at several
+      temperatures and compositions from the phase diagram measurements."'
+    origin: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_phase_diagram_x0102_sio2_activity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -1043,6 +1142,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: "Log γ2 is known at several
+      temperatures and compositions from the phase diagram measurements."; printed source evidence: "Log γ2 is known at several
+      temperatures and compositions from the phase diagram measurements."'
+    origin: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_phase_diagram_x0297_loggamma2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -1179,6 +1291,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: "Log γ2 is known at several
+      temperatures and compositions from the phase diagram measurements."; printed source evidence: "Log γ2 is known at several
+      temperatures and compositions from the phase diagram measurements."'
+    origin: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_phase_diagram_x0297_sio2_activity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -1312,6 +1437,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - partial_molar_enthalpy
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_table1_x021537_hm827
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - partial_molar_enthalpy
@@ -1455,6 +1591,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - partial_molar_enthalpy
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_table1_x028548_hm632
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - partial_molar_enthalpy
@@ -1598,6 +1745,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - partial_molar_enthalpy
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_table1_x033497_hm594
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - partial_molar_enthalpy
@@ -1741,6 +1899,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - partial_molar_enthalpy
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_table1_x034025_hm630
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - partial_molar_enthalpy
@@ -1845,7 +2014,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_table1_x0390_excess_enthalpy_at_1500k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: eliezer-howald-1978-potassium-silicate-vapor-pressure
   locator:
     page: 3
@@ -1990,6 +2169,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: With either set of equilibrium
+      constants for tridymite, these data give a partial molal enthalpy of KO0.5 in tridymite of about −36 kcal mol−1. If
+      the entropy of solution of KO0.5 is approximately ideal and H̄1 = −36, the solubility of KO0.5 in tridymite at 1743
+      K (activity of KO0.5(s) = 0.7157 × 10^-6) will be a mole fraction of about 0.0234.'
+    origin: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_tridymite_ko05_activity_1743
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity

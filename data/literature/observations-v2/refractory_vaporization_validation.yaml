@@ -11,8 +11,8 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -79,6 +79,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - log10_Kf
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: refractory:condensed_log10_kf:Al2O3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - log10_Kf
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: refractory:condensed_log10_kf:Al2O3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - log10_Kf
@@ -106,8 +129,8 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -174,6 +197,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - log10_Kf
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: refractory:log10_kf:Al
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - log10_Kf
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: refractory:log10_kf:Al
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - log10_Kf
@@ -201,8 +247,8 @@ observations:
     species:
       formula: Al2O
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -269,6 +315,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - log10_Kf
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: refractory:log10_kf:Al2O
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - log10_Kf
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: refractory:log10_kf:Al2O
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - log10_Kf
@@ -296,8 +365,8 @@ observations:
     species:
       formula: AlO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -364,6 +433,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - log10_Kf
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: refractory:log10_kf:AlO
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - log10_Kf
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: refractory:log10_kf:AlO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - log10_Kf
@@ -391,8 +483,8 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -459,6 +551,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - log10_Kf
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: refractory:log10_kf:CaO
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - log10_Kf
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: refractory:log10_kf:CaO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - log10_Kf
@@ -486,8 +601,8 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -554,6 +669,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - log10_Kf
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: refractory:log10_kf:MgO
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - log10_Kf
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: refractory:log10_kf:MgO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - log10_Kf
@@ -581,8 +719,8 @@ observations:
     species:
       formula: O
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -649,6 +787,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - log10_Kf
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: refractory:log10_kf:O
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - log10_Kf
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: refractory:log10_kf:O
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - log10_Kf
@@ -676,8 +837,8 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -744,6 +905,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - log10_Kf
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: refractory:log10_kf:SiO
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - log10_Kf
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: refractory:log10_kf:SiO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - log10_Kf
@@ -771,8 +955,8 @@ observations:
     species:
       formula: TiO2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -839,6 +1023,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - log10_Kf
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: refractory:log10_kf:TiO2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - log10_Kf
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: refractory:log10_kf:TiO2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - log10_Kf

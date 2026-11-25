@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/kems-189-bischof-2021.yaml
 observations:
 - observation_id: kems-189-bischof-2021::bischof_2021_andi_doping_ga_in
-  experiment_id: 10.7185/gold2021.7353::kems-189-bischof-2021
+  experiment_id: 10.7185/gold2021.7353::kems-189-bischof-2021::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -11,12 +11,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_glass' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -36,7 +35,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''anorthite_diopside_eutectic_silicate_glass'' is not in the closed automatic map'
+    origin: kems-189-bischof-2021::bischof_2021_andi_doping_ga_in
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: analytical_composition'
+    origin: kems-189-bischof-2021::bischof_2021_andi_doping_ga_in
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-189-bischof-2021
   locator:
     page: 1
@@ -47,7 +67,7 @@ observations:
   provenance:
     printed_phase: anorthite_diopside_eutectic_silicate_glass
 - observation_id: kems-189-bischof-2021::bischof_2021_andi_doping_in
-  experiment_id: 10.7185/gold2021.7353::kems-189-bischof-2021
+  experiment_id: 10.7185/gold2021.7353::kems-189-bischof-2021::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -55,12 +75,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_glass' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -80,7 +99,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''anorthite_diopside_eutectic_silicate_glass'' is not in the closed automatic map'
+    origin: kems-189-bischof-2021::bischof_2021_andi_doping_in
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: analytical_composition'
+    origin: kems-189-bischof-2021::bischof_2021_andi_doping_in
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-189-bischof-2021
   locator:
     page: 1
@@ -99,12 +139,11 @@ observations:
     species:
       formula: Ga2O
       phase:
-        tag: unknown
-        reason: phase string 'gas_over_pure_Ga2O3' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -124,7 +163,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''gas_over_pure_Ga2O3'' is not in the closed automatic map'
+    origin: kems-189-bischof-2021::bischof_2021_ga2o_dominant_gas_species
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-189-bischof-2021
   locator:
     page: 1
@@ -143,12 +193,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -172,7 +221,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic map'
+    origin: kems-189-bischof-2021::bischof_2021_gao15_activity_qualitative
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-189-bischof-2021
   locator:
     page: 1
@@ -191,12 +251,11 @@ observations:
     species:
       formula: In2O
       phase:
-        tag: unknown
-        reason: phase string 'gas_over_pure_In2O3' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -216,7 +275,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''gas_over_pure_In2O3'' is not in the closed automatic map'
+    origin: kems-189-bischof-2021::bischof_2021_in2o_dominant_gas_species
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-189-bischof-2021
   locator:
     page: 1
@@ -235,12 +305,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -264,7 +333,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic map'
+    origin: kems-189-bischof-2021::bischof_2021_ino15_activity_qualitative
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-189-bischof-2021
   locator:
     page: 1
@@ -283,12 +363,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'iridium_knudsen_cell_KEMS' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -309,7 +388,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''iridium_knudsen_cell_KEMS'' is not in the closed automatic map'
+    origin: kems-189-bischof-2021::bischof_2021_kems_method_metadata
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-189-bischof-2021
   locator:
     page: 1
@@ -329,12 +419,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -354,7 +443,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic map'
+    origin: kems-189-bischof-2021::bischof_2021_melt_ga_ions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-189-bischof-2021
   locator:
     page: 1
@@ -373,12 +473,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -398,7 +497,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic map'
+    origin: kems-189-bischof-2021::bischof_2021_melt_ga_pM0_over_pM2O_higher
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-189-bischof-2021
   locator:
     page: 1
@@ -417,12 +527,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -442,7 +551,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic map'
+    origin: kems-189-bischof-2021::bischof_2021_melt_in_ions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-189-bischof-2021
   locator:
     page: 1
@@ -461,12 +581,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -486,7 +605,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic map'
+    origin: kems-189-bischof-2021::bischof_2021_melt_in_pM0_over_pM2O_higher
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-189-bischof-2021
   locator:
     page: 1
@@ -505,12 +635,11 @@ observations:
     species:
       formula: In2O3
       phase:
-        tag: unknown
-        reason: phase string 'solid_Ga2O3_In2O3_KEMS' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -530,7 +659,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid_Ga2O3_In2O3_KEMS'' is not in the closed automatic map'
+    origin: kems-189-bischof-2021::bischof_2021_pure_in2o3_ions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-189-bischof-2021
   locator:
     page: 1
@@ -549,12 +689,11 @@ observations:
     species:
       formula: In2O3
       phase:
-        tag: unknown
-        reason: phase string 'solid_Ga2O3_In2O3_KEMS' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -574,7 +713,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid_Ga2O3_In2O3_KEMS'' is not in the closed automatic map'
+    origin: kems-189-bischof-2021::bischof_2021_pure_in2o3_psat_order
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-189-bischof-2021
   locator:
     page: 1
@@ -593,12 +743,11 @@ observations:
     species:
       formula: Ga2O3
       phase:
-        tag: unknown
-        reason: phase string 'solid_Ga2O3_In2O3_KEMS' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -618,7 +767,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid_Ga2O3_In2O3_KEMS'' is not in the closed automatic map'
+    origin: kems-189-bischof-2021::bischof_2021_pure_oxide_ions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-189-bischof-2021
   locator:
     page: 1
@@ -638,12 +798,11 @@ observations:
     species:
       formula: Ga2O3
       phase:
-        tag: unknown
-        reason: phase string 'solid_Ga2O3_In2O3_KEMS' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -663,7 +822,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid_Ga2O3_In2O3_KEMS'' is not in the closed automatic map'
+    origin: kems-189-bischof-2021::bischof_2021_pure_oxide_psat_order
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-189-bischof-2021
   locator:
     page: 1
@@ -682,12 +852,11 @@ observations:
     species:
       formula: Tl
       phase:
-        tag: unknown
-        reason: phase string 'not_specified_for_Tl_on_this_page' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -707,7 +876,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_specified_for_Tl_on_this_page'' is not in the closed automatic map'
+    origin: kems-189-bischof-2021::bischof_2021_tl_too_volatile
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-189-bischof-2021
   locator:
     page: 1

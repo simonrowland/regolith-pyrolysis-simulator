@@ -11,12 +11,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string '(Mg,Fe)O solid solution + liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -96,7 +95,30 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [784.5, 505.5] and fresh page-crop color-mask center [833.6,
           556.2]. boundary identified from the printed region labels I/II/III.; panel=a; series=2; marker_symbol=filled green
           circle; pixel_read_1_page=[3234.5, 3355.5]; pixel_read_2_page=[3233.6, 3356.2]'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''(Mg,Fe)O solid solution + liquid'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_liquidus_marker_01
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_liquidus_marker_01
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -150,12 +172,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string '(Mg,Fe)O solid solution + liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -235,7 +256,30 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1025, 610.5] and fresh page-crop color-mask center [1075.2,
           660.3]. boundary identified from the printed region labels I/II/III.; panel=a; series=2; marker_symbol=filled green
           circle; pixel_read_1_page=[3475.0, 3460.5]; pixel_read_2_page=[3475.2, 3460.3]'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''(Mg,Fe)O solid solution + liquid'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_liquidus_marker_02
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_liquidus_marker_02
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -289,12 +333,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string '(Mg,Fe)O solid solution + liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -374,7 +417,30 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1220, 755.5] and fresh page-crop color-mask center [1270.0,
           805.3]. boundary identified from the printed region labels I/II/III.; panel=a; series=2; marker_symbol=filled green
           circle; pixel_read_1_page=[3670.0, 3605.5]; pixel_read_2_page=[3670, 3605.3]'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''(Mg,Fe)O solid solution + liquid'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_liquidus_marker_03
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_liquidus_marker_03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -428,12 +494,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string '(Mg,Fe)O solid solution + liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -513,7 +578,30 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1280, 798.5] and fresh page-crop color-mask center [1330.3,
           848.7]. boundary identified from the printed region labels I/II/III.; panel=a; series=2; marker_symbol=filled green
           circle; pixel_read_1_page=[3730.0, 3648.5]; pixel_read_2_page=[3730.3, 3648.7]'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''(Mg,Fe)O solid solution + liquid'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_liquidus_marker_04
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_liquidus_marker_04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -567,12 +655,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string '(Mg,Fe)O solid solution + liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -652,7 +739,30 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1392, 844.5] and fresh page-crop color-mask center [1441.9,
           894.6]. boundary identified from the printed region labels I/II/III.; panel=a; series=2; marker_symbol=filled green
           circle; pixel_read_1_page=[3842.0, 3694.5]; pixel_read_2_page=[3841.9, 3694.6]'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''(Mg,Fe)O solid solution + liquid'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_liquidus_marker_05
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_liquidus_marker_05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -706,12 +816,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string '(Mg,Fe)O solid solution + liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -791,7 +900,30 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1407, 916.5] and fresh page-crop color-mask center [1457.2,
           966.7]. boundary identified from the printed region labels I/II/III.; panel=a; series=2; marker_symbol=filled green
           circle; pixel_read_1_page=[3857.0, 3766.5]; pixel_read_2_page=[3857.2, 3766.7]'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''(Mg,Fe)O solid solution + liquid'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_liquidus_marker_06
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_liquidus_marker_06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -845,12 +977,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string '(Mg,Fe)O solid solution + liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -930,7 +1061,30 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1503, 955.5] and fresh page-crop color-mask center [1553.2,
           1005.3]. boundary identified from the printed region labels I/II/III.; panel=a; series=2; marker_symbol=filled green
           circle; pixel_read_1_page=[3953.0, 3805.5]; pixel_read_2_page=[3953.2, 3805.3]'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''(Mg,Fe)O solid solution + liquid'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_liquidus_marker_07
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_liquidus_marker_07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -984,12 +1138,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string '(Mg,Fe)O solid solution + liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1069,7 +1222,30 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1534.5, 998.5] and fresh page-crop color-mask center [1583.4,
           1047.2]. boundary identified from the printed region labels I/II/III.; panel=a; series=2; marker_symbol=filled green
           circle; pixel_read_1_page=[3984.5, 3848.5]; pixel_read_2_page=[3983.4, 3847.2]'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''(Mg,Fe)O solid solution + liquid'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_liquidus_marker_08
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_liquidus_marker_08
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -1123,12 +1299,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string '(Mg,Fe)O solid solution + liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1208,7 +1383,30 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1593, 1056] and fresh page-crop color-mask center [1643.3,
           1106.4]. boundary identified from the printed region labels I/II/III.; panel=a; series=2; marker_symbol=filled green
           circle; pixel_read_1_page=[4043.0, 3906.0]; pixel_read_2_page=[4043.3, 3906.4]'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''(Mg,Fe)O solid solution + liquid'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_liquidus_marker_09
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_liquidus_marker_09
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -1262,12 +1460,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string '(Mg,Fe)O solid solution + liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1347,7 +1544,30 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1626.5, 1104] and fresh page-crop color-mask center [1676.4,
           1153.5]. boundary identified from the printed region labels I/II/III.; panel=a; series=2; marker_symbol=filled green
           circle; pixel_read_1_page=[4076.5, 3954.0]; pixel_read_2_page=[4076.4, 3953.5]'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''(Mg,Fe)O solid solution + liquid'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_liquidus_marker_10
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_liquidus_marker_10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -1401,12 +1621,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string '(Mg,Fe)O solid solution + liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1486,7 +1705,30 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1695, 1144] and fresh page-crop color-mask center [1744.8,
           1193.6]. boundary identified from the printed region labels I/II/III.; panel=a; series=2; marker_symbol=filled green
           circle; pixel_read_1_page=[4145.0, 3994.0]; pixel_read_2_page=[4144.8, 3993.6]'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''(Mg,Fe)O solid solution + liquid'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_liquidus_marker_11
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_liquidus_marker_11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -1540,12 +1782,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string '(Mg,Fe)O solid solution + liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1625,7 +1866,30 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [437.5, 506.5] and fresh page-crop color-mask center [487.7,
           556.1]. boundary identified from the printed region labels I/II/III.; panel=a; series=2; marker_symbol=open green
           circle; pixel_read_1_page=[2887.5, 3356.5]; pixel_read_2_page=[2887.7, 3356.1]'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''(Mg,Fe)O solid solution + liquid'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_solidus_marker_01
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_solidus_marker_01
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -1679,12 +1943,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string '(Mg,Fe)O solid solution + liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1764,7 +2027,30 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [560.5, 609] and fresh page-crop color-mask center [609.6,
           660.6]. boundary identified from the printed region labels I/II/III.; panel=a; series=2; marker_symbol=open green
           circle; pixel_read_1_page=[3010.5, 3459.0]; pixel_read_2_page=[3009.6, 3460.6]'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''(Mg,Fe)O solid solution + liquid'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_solidus_marker_02
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_solidus_marker_02
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -1818,12 +2104,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string '(Mg,Fe)O solid solution + liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1903,7 +2188,30 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [695.5, 753.5] and fresh page-crop color-mask center [745.5,
           803.9]. boundary identified from the printed region labels I/II/III.; panel=a; series=2; marker_symbol=open green
           circle; pixel_read_1_page=[3145.5, 3603.5]; pixel_read_2_page=[3145.5, 3603.9]'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''(Mg,Fe)O solid solution + liquid'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_solidus_marker_03
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_solidus_marker_03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -1957,12 +2265,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string '(Mg,Fe)O solid solution + liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2042,7 +2349,30 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [755.5, 798] and fresh page-crop color-mask center [805.4,
           848.2]. boundary identified from the printed region labels I/II/III.; panel=a; series=2; marker_symbol=open green
           circle; pixel_read_1_page=[3205.5, 3648.0]; pixel_read_2_page=[3205.4, 3648.2]'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''(Mg,Fe)O solid solution + liquid'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_solidus_marker_04
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_solidus_marker_04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -2096,12 +2426,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string '(Mg,Fe)O solid solution + liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2181,7 +2510,30 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [838.5, 842] and fresh page-crop color-mask center [888.7,
           891.5]. boundary identified from the printed region labels I/II/III.; panel=a; series=2; marker_symbol=open green
           circle; pixel_read_1_page=[3288.5, 3692.0]; pixel_read_2_page=[3288.7, 3691.5]'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''(Mg,Fe)O solid solution + liquid'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_solidus_marker_05
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_solidus_marker_05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -2235,12 +2587,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string '(Mg,Fe)O solid solution + liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2320,7 +2671,30 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [901.5, 915.5] and fresh page-crop color-mask center [952.4,
           965.6]. boundary identified from the printed region labels I/II/III.; panel=a; series=2; marker_symbol=open green
           circle; pixel_read_1_page=[3351.5, 3765.5]; pixel_read_2_page=[3352.4, 3765.6]'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''(Mg,Fe)O solid solution + liquid'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_solidus_marker_06
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_solidus_marker_06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -2374,12 +2748,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string '(Mg,Fe)O solid solution + liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2459,7 +2832,30 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [992, 954.5] and fresh page-crop color-mask center [1042.2,
           1004.8]. boundary identified from the printed region labels I/II/III.; panel=a; series=2; marker_symbol=open green
           circle; pixel_read_1_page=[3442.0, 3804.5]; pixel_read_2_page=[3442.2, 3804.8]'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''(Mg,Fe)O solid solution + liquid'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_solidus_marker_07
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_solidus_marker_07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -2513,12 +2909,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string '(Mg,Fe)O solid solution + liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2598,7 +2993,30 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1060.5, 998] and fresh page-crop color-mask center [1111.0,
           1047.8]. boundary identified from the printed region labels I/II/III.; panel=a; series=2; marker_symbol=open green
           circle; pixel_read_1_page=[3510.5, 3848.0]; pixel_read_2_page=[3511, 3847.8]'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''(Mg,Fe)O solid solution + liquid'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_solidus_marker_08
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_solidus_marker_08
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -2652,12 +3070,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string '(Mg,Fe)O solid solution + liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2737,7 +3154,30 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1170.5, 1054] and fresh page-crop color-mask center [1221.0,
           1103.5]. boundary identified from the printed region labels I/II/III.; panel=a; series=2; marker_symbol=open green
           circle; pixel_read_1_page=[3620.5, 3904.0]; pixel_read_2_page=[3621, 3903.5]'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''(Mg,Fe)O solid solution + liquid'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_solidus_marker_09
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_solidus_marker_09
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -2791,12 +3231,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string '(Mg,Fe)O solid solution + liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2876,7 +3315,30 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1273.5, 1102] and fresh page-crop color-mask center [1324.0,
           1151.6]. boundary identified from the printed region labels I/II/III.; panel=a; series=2; marker_symbol=open green
           circle; pixel_read_1_page=[3723.5, 3952.0]; pixel_read_2_page=[3724, 3951.6]'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''(Mg,Fe)O solid solution + liquid'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_solidus_marker_10
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_solidus_marker_10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -2930,12 +3392,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string '(Mg,Fe)O solid solution + liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3015,7 +3476,30 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1395, 1143.5] and fresh page-crop color-mask center [1445.8,
           1191.9]. boundary identified from the printed region labels I/II/III.; panel=a; series=2; marker_symbol=open green
           circle; pixel_read_1_page=[3845.0, 3993.5]; pixel_read_2_page=[3845.8, 3991.9]'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''(Mg,Fe)O solid solution + liquid'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_solidus_marker_11
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_solidus_marker_11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -3069,12 +3553,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string '(Mg,Fe)O solid solution + liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3154,7 +3637,30 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1525.5, 1187.1999999999998] and fresh page-crop color-mask
           center [1578.1, 1236.1]. boundary identified from the printed region labels I/II/III.; panel=a; series=2; marker_symbol=open
           green circle; pixel_read_1_page=[3975.5, 4037.2]; pixel_read_2_page=[3978.1, 4036.1]'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''(Mg,Fe)O solid solution + liquid'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_solidus_marker_12
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_solidus_marker_12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -3208,12 +3714,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string '(Mg,Fe)O solid solution + liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3293,7 +3798,30 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1574.5, 1201.5] and fresh page-crop color-mask center [1625.8,
           1250.8]. boundary identified from the printed region labels I/II/III.; panel=a; series=2; marker_symbol=open green
           circle; pixel_read_1_page=[4024.5, 4051.5]; pixel_read_2_page=[4025.8, 4050.8]'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''(Mg,Fe)O solid solution + liquid'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_solidus_marker_13
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_solidus_marker_13
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -3347,12 +3875,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string '(Mg,Fe)O solid solution + liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3432,7 +3959,30 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1715, 1247.5] and fresh page-crop color-mask center [1765.4,
           1296.1]. boundary identified from the printed region labels I/II/III.; panel=a; series=2; marker_symbol=open green
           circle; pixel_read_1_page=[4165.0, 4097.5]; pixel_read_2_page=[4165.4, 4096.1]'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''(Mg,Fe)O solid solution + liquid'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_solidus_marker_14
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s2_solidus_marker_14
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -3486,12 +4036,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string '(Mg,Fe)O solid solution + liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3571,7 +4120,30 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [831, 628.5] and fresh page-crop color-mask center [881.1,
           680.5]. boundary identified from the printed region labels I/II/III.; panel=a; series=3; marker_symbol=black triangle;
           pixel_read_1_page=[3281.0, 3478.5]; pixel_read_2_page=[3281.1, 3480.5]'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''(Mg,Fe)O solid solution + liquid'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s3_liquidus_marker_01
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s3_liquidus_marker_01
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -3625,12 +4197,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string '(Mg,Fe)O solid solution + liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3710,7 +4281,30 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [956, 677.5] and fresh page-crop color-mask center [1006.1,
           730.4]. boundary identified from the printed region labels I/II/III.; panel=a; series=3; marker_symbol=black triangle;
           pixel_read_1_page=[3406.0, 3527.5]; pixel_read_2_page=[3406.1, 3530.4]'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''(Mg,Fe)O solid solution + liquid'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s3_liquidus_marker_02
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s3_liquidus_marker_02
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -3764,12 +4358,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string '(Mg,Fe)O solid solution + liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3849,7 +4442,30 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1037, 739.5] and fresh page-crop color-mask center [1086.9,
           794.0]. boundary identified from the printed region labels I/II/III.; panel=a; series=3; marker_symbol=black triangle;
           pixel_read_1_page=[3487.0, 3589.5]; pixel_read_2_page=[3486.9, 3594]'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''(Mg,Fe)O solid solution + liquid'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s3_liquidus_marker_03
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s3_liquidus_marker_03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -3903,12 +4519,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string '(Mg,Fe)O solid solution + liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3988,7 +4603,30 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1151.5, 757.5] and fresh page-crop color-mask center [1201.8,
           810.5]. boundary identified from the printed region labels I/II/III.; panel=a; series=3; marker_symbol=black triangle;
           pixel_read_1_page=[3601.5, 3607.5]; pixel_read_2_page=[3601.8, 3610.5]'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''(Mg,Fe)O solid solution + liquid'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s3_liquidus_marker_04
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s3_liquidus_marker_04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -4042,12 +4680,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string '(Mg,Fe)O solid solution + liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4127,7 +4764,30 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1202.5, 799.5] and fresh page-crop color-mask center [1252.4,
           852.2]. boundary identified from the printed region labels I/II/III.; panel=a; series=3; marker_symbol=black triangle;
           pixel_read_1_page=[3652.5, 3649.5]; pixel_read_2_page=[3652.4, 3652.2]'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''(Mg,Fe)O solid solution + liquid'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s3_liquidus_marker_05
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s3_liquidus_marker_05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -4181,12 +4841,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string '(Mg,Fe)O solid solution + liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4266,7 +4925,30 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1286.5, 828] and fresh page-crop color-mask center [1336.7,
           880.4]. boundary identified from the printed region labels I/II/III.; panel=a; series=3; marker_symbol=black triangle;
           pixel_read_1_page=[3736.5, 3678.0]; pixel_read_2_page=[3736.7, 3680.4]'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''(Mg,Fe)O solid solution + liquid'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s3_liquidus_marker_06
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s3_liquidus_marker_06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -4320,12 +5002,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string '(Mg,Fe)O solid solution + liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4405,7 +5086,30 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1342.5, 868] and fresh page-crop color-mask center [1392.3,
           920.3]. boundary identified from the printed region labels I/II/III.; panel=a; series=3; marker_symbol=black triangle;
           pixel_read_1_page=[3792.5, 3718.0]; pixel_read_2_page=[3792.3, 3720.3]'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''(Mg,Fe)O solid solution + liquid'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s3_liquidus_marker_07
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s3_liquidus_marker_07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -4459,12 +5163,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string '(Mg,Fe)O solid solution + liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4544,7 +5247,30 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1435.5, 907] and fresh page-crop color-mask center [1485.5,
           959.7]. boundary identified from the printed region labels I/II/III.; panel=a; series=3; marker_symbol=black triangle;
           pixel_read_1_page=[3885.5, 3757.0]; pixel_read_2_page=[3885.5, 3759.7]'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''(Mg,Fe)O solid solution + liquid'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s3_liquidus_marker_08
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s3_liquidus_marker_08
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -4598,12 +5324,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string '(Mg,Fe)O solid solution + liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4683,7 +5408,30 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1548, 996] and fresh page-crop color-mask center [1596.9,
           1048.5]. boundary identified from the printed region labels I/II/III.; panel=a; series=3; marker_symbol=black triangle;
           pixel_read_1_page=[3998.0, 3846.0]; pixel_read_2_page=[3996.9, 3848.5]'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''(Mg,Fe)O solid solution + liquid'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s3_liquidus_marker_09
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s3_liquidus_marker_09
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -4737,12 +5485,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string '(Mg,Fe)O solid solution + liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4822,7 +5569,30 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1639, 1065] and fresh page-crop color-mask center [1689.8,
           1117.0]. boundary identified from the printed region labels I/II/III.; panel=a; series=3; marker_symbol=black triangle;
           pixel_read_1_page=[4089.0, 3915.0]; pixel_read_2_page=[4089.8, 3917]'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''(Mg,Fe)O solid solution + liquid'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s3_liquidus_marker_10
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s3_liquidus_marker_10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -4876,12 +5646,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string '(Mg,Fe)O solid solution + liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4961,7 +5730,30 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1696, 1152.5] and fresh page-crop color-mask center [1746.0,
           1202.9]. boundary identified from the printed region labels I/II/III.; panel=a; series=3; marker_symbol=black triangle;
           pixel_read_1_page=[4146.0, 4002.5]; pixel_read_2_page=[4146, 4002.9]'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''(Mg,Fe)O solid solution + liquid'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s3_liquidus_marker_11
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s3_liquidus_marker_11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -5015,12 +5807,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string '(Mg,Fe)O solid solution + liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5100,7 +5891,30 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1780.5, 1223.5] and fresh page-crop color-mask center [1830.2,
           1277.2]. boundary identified from the printed region labels I/II/III.; panel=a; series=3; marker_symbol=black triangle;
           pixel_read_1_page=[4230.5, 4073.5]; pixel_read_2_page=[4230.2, 4077.2]'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''(Mg,Fe)O solid solution + liquid'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s3_liquidus_marker_12
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_s3_liquidus_marker_12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -5154,12 +5968,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string 'MgO–FeO melt system' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5234,7 +6047,30 @@ observations:
         figure: '1'
         note: Figure 1 series 1, liquidus boundary by the printed regions I/II/III; attributed to Bowen & Schairer (1935).;
           panel=a; series=1
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''MgO–FeO melt system'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_series1_liquidus_curve
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_series1_liquidus_curve
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -5276,12 +6112,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string 'MgO–FeO melt system' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5356,7 +6191,30 @@ observations:
         figure: '1'
         note: Figure 1 series 1, solidus boundary by the printed regions I/II/III; attributed to Bowen & Schairer (1935).;
           panel=a; series=1
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''MgO–FeO melt system'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_series1_solidus_curve
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_series1_solidus_curve
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -5398,12 +6256,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string 'MgO–FeO melt system' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5478,7 +6335,30 @@ observations:
         figure: '1'
         note: Unresolved overlapping source-2 circles at the FeO-rich convergence of the two boundaries.; panel=a; series=2;
           marker_symbol=overlapping green circles; marker_count=4
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''MgO–FeO melt system'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_series2_endpoint_marker_cluster
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_series2_endpoint_marker_cluster
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -5520,12 +6400,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string 'MgO–FeO melt system' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5600,7 +6479,30 @@ observations:
         figure: '1'
         note: Figure 1 series 4, liquidus boundary by the printed regions I/II/III; attributed to Wu et al. (1993).; panel=a;
           series=4
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''MgO–FeO melt system'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_series4_liquidus_curve
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_series4_liquidus_curve
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -5642,12 +6544,11 @@ observations:
     species:
       formula: MgO-FeO_melt
       phase:
-        tag: unknown
-        reason: phase string 'MgO–FeO melt system' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5722,7 +6623,30 @@ observations:
         figure: '1'
         note: Figure 1 series 4, solidus boundary by the printed regions I/II/III; attributed to Wu et al. (1993).; panel=a;
           series=4
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''MgO–FeO melt system'' is not in the closed automatic map'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_series4_solidus_curve
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig1_series4_solidus_curve
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 1
@@ -5848,7 +6772,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [311.5, 774.5] and fresh page-crop color-mask center [161.9,
           594.0]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=1; marker_symbol=open
           black circle; pixel_read_1_page=[1061.5, 2424.5]; pixel_read_2_page=[1061.9, 2424]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s1_marker_01
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -5988,7 +6923,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [391.5, 808.5] and fresh page-crop color-mask center [242.1,
           628.1]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=1; marker_symbol=open
           black circle; pixel_read_1_page=[1141.5, 2458.5]; pixel_read_2_page=[1142.1, 2458.1]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s1_marker_02
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -6128,7 +7074,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [550, 896] and fresh page-crop color-mask center [400.1, 716.2];
           linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=1; marker_symbol=open black
           circle; pixel_read_1_page=[1300.0, 2546.0]; pixel_read_2_page=[1300.1, 2546.2]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s1_marker_03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -6268,7 +7225,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [709, 1039] and fresh page-crop color-mask center [559.1, 859.1];
           linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=1; marker_symbol=open black
           circle; pixel_read_1_page=[1459.0, 2689.0]; pixel_read_2_page=[1459.1, 2689.1]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s1_marker_04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -6408,7 +7376,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [868, 1168] and fresh page-crop color-mask center [718.5, 986.8];
           linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=1; marker_symbol=open black
           circle; pixel_read_1_page=[1618.0, 2818.0]; pixel_read_2_page=[1618.5, 2816.8]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s1_marker_05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -6548,7 +7527,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1193.5, 1326.5] and fresh page-crop color-mask center [1045.7,
           1148.7]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=1; marker_symbol=open
           black circle; pixel_read_1_page=[1943.5, 2976.5]; pixel_read_2_page=[1945.7, 2978.7]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s1_marker_06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -6688,7 +7678,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1351.5, 1361] and fresh page-crop color-mask center [1203.7,
           1183.5]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=1; marker_symbol=open
           black circle; pixel_read_1_page=[2101.5, 3011.0]; pixel_read_2_page=[2103.7, 3013.5]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s1_marker_07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -6823,7 +7824,18 @@ observations:
         figure: '2'
         note: Figure 2 panel a, series 1; 5 center(s) unresolved in overlapping symbols/axis-end cluster.; panel=a; series=1;
           marker_symbol=open black circle; marker_count=5
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s1_unresolved_marker_cluster
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -6953,7 +7965,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [390.5, 949] and fresh page-crop color-mask center [240.6,
           769.0]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=2; marker_symbol=filled
           red square; pixel_read_1_page=[1140.5, 2599.0]; pixel_read_2_page=[1140.6, 2599]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s2_marker_01
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -7093,7 +8116,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [470.5, 817] and fresh page-crop color-mask center [320.5,
           636.8]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=2; marker_symbol=filled
           red square; pixel_read_1_page=[1220.5, 2467.0]; pixel_read_2_page=[1220.5, 2466.8]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s2_marker_02
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -7233,7 +8267,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [629.5, 1003.5] and fresh page-crop color-mask center [479.8,
           823.6]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=2; marker_symbol=filled
           red square; pixel_read_1_page=[1379.5, 2653.5]; pixel_read_2_page=[1379.8, 2653.6]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s2_marker_03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -7373,7 +8418,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [756.5, 1136.5] and fresh page-crop color-mask center [606.2,
           956.5]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=2; marker_symbol=filled
           red square; pixel_read_1_page=[1506.5, 2786.5]; pixel_read_2_page=[1506.2, 2786.5]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s2_marker_04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -7513,7 +8569,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1035.5, 1269.5] and fresh page-crop color-mask center [886.9,
           1093.5]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=2; marker_symbol=filled
           red square; pixel_read_1_page=[1785.5, 2919.5]; pixel_read_2_page=[1786.9, 2923.5]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s2_marker_05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -7653,7 +8720,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1282, 1369] and fresh page-crop color-mask center [1129.5,
           1192.0]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=2; marker_symbol=filled
           red square; pixel_read_1_page=[2032.0, 3019.0]; pixel_read_2_page=[2029.5, 3022]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s2_marker_06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -7793,7 +8871,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1492.5, 1407] and fresh page-crop color-mask center [1342.5,
           1229.0]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=2; marker_symbol=filled
           red square; pixel_read_1_page=[2242.5, 3057.0]; pixel_read_2_page=[2242.5, 3059]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s2_marker_07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -7933,7 +9022,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1663.5, 1415] and fresh page-crop color-mask center [1514.2,
           1241.1]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=2; marker_symbol=filled
           red square; pixel_read_1_page=[2413.5, 3065.0]; pixel_read_2_page=[2414.2, 3071.1]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s2_marker_08
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -8073,7 +9173,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1741.5, 1407.5] and fresh page-crop color-mask center [1591.9,
           1228.4]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=2; marker_symbol=filled
           red square; pixel_read_1_page=[2491.5, 3057.5]; pixel_read_2_page=[2491.9, 3058.4]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s2_marker_09
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -8213,7 +9324,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [550.5, 637.5] and fresh page-crop color-mask center [400.1,
           462.0]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=3; marker_symbol=filled
           teal triangle; pixel_read_1_page=[1300.5, 2287.5]; pixel_read_2_page=[1300.1, 2292]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s3_marker_01
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -8353,7 +9475,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [867.5, 1064] and fresh page-crop color-mask center [717.9,
           888.6]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=3; marker_symbol=filled
           teal triangle; pixel_read_1_page=[1617.5, 2714.0]; pixel_read_2_page=[1617.9, 2718.6]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s3_marker_02
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -8493,7 +9626,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1185.5, 1224.5] and fresh page-crop color-mask center [1035.9,
           1048.2]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=3; marker_symbol=filled
           teal triangle; pixel_read_1_page=[1935.5, 2874.5]; pixel_read_2_page=[1935.9, 2878.2]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s3_marker_03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -8633,7 +9777,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1511, 1348] and fresh page-crop color-mask center [1361.1,
           1170.2]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=3; marker_symbol=filled
           teal triangle; pixel_read_1_page=[2261.0, 2998.0]; pixel_read_2_page=[2261.1, 3000.2]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s3_marker_04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -8773,7 +9928,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1664, 1363.5] and fresh page-crop color-mask center [1513.5,
           1185.0]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=3; marker_symbol=filled
           teal triangle; pixel_read_1_page=[2414.0, 3013.5]; pixel_read_2_page=[2413.5, 3015]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s3_marker_05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -8913,7 +10079,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [703, 1091] and fresh page-crop color-mask center [553.3, 911.2];
           linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=5; marker_symbol=open blue
           inverted triangle; pixel_read_1_page=[1453.0, 2741.0]; pixel_read_2_page=[1453.3, 2741.2]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s5_marker_01
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -9053,7 +10230,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [860.5, 1200] and fresh page-crop color-mask center [710.2,
           1018.3]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=5; marker_symbol=open
           blue inverted triangle; pixel_read_1_page=[1610.5, 2850.0]; pixel_read_2_page=[1610.2, 2848.3]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s5_marker_02
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -9193,7 +10381,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1009, 1268.5] and fresh page-crop color-mask center [859.8,
           1088.5]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=5; marker_symbol=open
           blue inverted triangle; pixel_read_1_page=[1759.0, 2918.5]; pixel_read_2_page=[1759.8, 2918.5]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s5_marker_03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -9333,7 +10532,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1170, 1330] and fresh page-crop color-mask center [1021.6,
           1151.7]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=5; marker_symbol=open
           blue inverted triangle; pixel_read_1_page=[1920.0, 2980.0]; pixel_read_2_page=[1921.6, 2981.7]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s5_marker_04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -9473,7 +10683,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1333, 1363] and fresh page-crop color-mask center [1183.2,
           1184.9]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=5; marker_symbol=open
           blue inverted triangle; pixel_read_1_page=[2083.0, 3013.0]; pixel_read_2_page=[2083.2, 3014.9]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s5_marker_05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -9608,7 +10829,18 @@ observations:
         figure: '2'
         note: Figure 2 panel a, series 5; 3 center(s) unresolved in overlapping symbols/axis-end cluster.; panel=a; series=5;
           marker_symbol=open blue inverted triangle; marker_count=3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s5_unresolved_marker_cluster
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -9738,7 +10970,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [292.5, 313.5] and fresh page-crop color-mask center [142.3,
           134.0]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=6; marker_symbol=filled
           magenta diamond; pixel_read_1_page=[1042.5, 1963.5]; pixel_read_2_page=[1042.3, 1964]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s6_marker_01
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -9878,7 +11121,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [357, 489] and fresh page-crop color-mask center [208.1, 308.8];
           linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=6; marker_symbol=filled magenta
           diamond; pixel_read_1_page=[1107.0, 2139.0]; pixel_read_2_page=[1108.1, 2138.8]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s6_marker_02
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -10018,7 +11272,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [480.5, 715] and fresh page-crop color-mask center [330.2,
           535.0]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=6; marker_symbol=filled
           magenta diamond; pixel_read_1_page=[1230.5, 2365.0]; pixel_read_2_page=[1230.2, 2365]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s6_marker_03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -10158,7 +11423,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [882, 1124.5] and fresh page-crop color-mask center [731.5,
           942.5]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=6; marker_symbol=filled
           magenta diamond; pixel_read_1_page=[1632.0, 2774.5]; pixel_read_2_page=[1631.5, 2772.5]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s6_marker_04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -10298,7 +11574,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1077.5, 1235.5] and fresh page-crop color-mask center [927.7,
           1056.0]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=6; marker_symbol=filled
           magenta diamond; pixel_read_1_page=[1827.5, 2885.5]; pixel_read_2_page=[1827.7, 2886]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s6_marker_05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -10438,7 +11725,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1195, 1296.5] and fresh page-crop color-mask center [1044.8,
           1113.3]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=6; marker_symbol=filled
           magenta diamond; pixel_read_1_page=[1945.0, 2946.5]; pixel_read_2_page=[1944.8, 2943.3]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s6_marker_06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -10578,7 +11876,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1384.5, 1348.5] and fresh page-crop color-mask center [1233.6,
           1168.1]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=6; marker_symbol=filled
           magenta diamond; pixel_read_1_page=[2134.5, 2998.5]; pixel_read_2_page=[2133.6, 2998.1]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s6_marker_07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -10718,7 +12027,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [395, 502] and fresh page-crop color-mask center [241.2, 322.8];
           linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=8; marker_symbol=filled purple
           right triangle; pixel_read_1_page=[1145.0, 2152.0]; pixel_read_2_page=[1141.2, 2152.8]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s8_marker_01
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -10858,7 +12178,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [554.5, 803.5] and fresh page-crop color-mask center [400.5,
           623.6]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=8; marker_symbol=filled
           purple right triangle; pixel_read_1_page=[1304.5, 2453.5]; pixel_read_2_page=[1300.5, 2453.6]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s8_marker_02
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -10998,7 +12329,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [713.5, 980.5] and fresh page-crop color-mask center [560.1,
           800.7]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=8; marker_symbol=filled
           purple right triangle; pixel_read_1_page=[1463.5, 2630.5]; pixel_read_2_page=[1460.1, 2630.7]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s8_marker_03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -11138,7 +12480,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [873.5, 1104] and fresh page-crop color-mask center [722.5,
           926.1]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=8; marker_symbol=filled
           purple right triangle; pixel_read_1_page=[1623.5, 2754.0]; pixel_read_2_page=[1622.5, 2756.1]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s8_marker_04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -11278,7 +12631,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1032, 1208.5] and fresh page-crop color-mask center [878.1,
           1029.4]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=8; marker_symbol=filled
           purple right triangle; pixel_read_1_page=[1782.0, 2858.5]; pixel_read_2_page=[1778.1, 2859.4]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s8_marker_05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -11418,7 +12782,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1190.5, 1282] and fresh page-crop color-mask center [1038.5,
           1102.8]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=8; marker_symbol=filled
           purple right triangle; pixel_read_1_page=[1940.5, 2932.0]; pixel_read_2_page=[1938.5, 2932.8]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s8_marker_06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -11558,7 +12933,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1349.5, 1334.5] and fresh page-crop color-mask center [1196.9,
           1155.0]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=8; marker_symbol=filled
           purple right triangle; pixel_read_1_page=[2099.5, 2984.5]; pixel_read_2_page=[2096.9, 2985]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s8_marker_07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -11698,7 +13084,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1505.5, 1366.5] and fresh page-crop color-mask center [1352.9,
           1190.1]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=8; marker_symbol=filled
           purple right triangle; pixel_read_1_page=[2255.5, 3016.5]; pixel_read_2_page=[2252.9, 3020.1]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s8_marker_08
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -11833,7 +13230,18 @@ observations:
         figure: '2'
         note: Figure 2 panel a, series 8; 1 center(s) unresolved in overlapping symbols/axis-end cluster.; panel=a; series=8;
           marker_symbol=filled purple right triangle; marker_count=1
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s8_unresolved_marker_cluster
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -11963,7 +13371,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [703.5, 886.5] and fresh page-crop color-mask center [557.9,
           706.6]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=9; marker_symbol=filled
           dark purple left triangle; pixel_read_1_page=[1453.5, 2536.5]; pixel_read_2_page=[1457.9, 2536.6]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s9_marker_01
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -12103,7 +13522,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1293, 1354] and fresh page-crop color-mask center [1146.6,
           1173.8]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=9; marker_symbol=filled
           dark purple left triangle; pixel_read_1_page=[2043.0, 3004.0]; pixel_read_2_page=[2046.6, 3003.8]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s9_marker_02
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -12243,7 +13673,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1501, 1395] and fresh page-crop color-mask center [1352.8,
           1214.1]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=9; marker_symbol=filled
           dark purple left triangle; pixel_read_1_page=[2251.0, 3045.0]; pixel_read_2_page=[2252.8, 3044.1]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s9_marker_03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -12383,7 +13824,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [1655.5, 1403] and fresh page-crop color-mask center [1508.4,
           1220.2]; linear axes FeO mol % and gamma_FeO; panel a at 1173 K per caption.; panel=a; series=9; marker_symbol=filled
           dark purple left triangle; pixel_read_1_page=[2405.5, 3053.0]; pixel_read_2_page=[2408.4, 3050.2]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s9_marker_04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -12518,7 +13970,18 @@ observations:
         figure: '2'
         note: Figure 2 panel a, series 9; 2 center(s) unresolved in overlapping symbols/axis-end cluster.; panel=a; series=9;
           marker_symbol=filled dark purple left triangle; marker_count=2
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2a_s9_unresolved_marker_cluster
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -12648,7 +14111,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [2313.5, 905] and fresh page-crop color-mask center [2163.5,
           725.0]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.; panel=b; series=10; marker_symbol=half-filled
           maroon circle; pixel_read_1_page=[3063.5, 2555.0]; pixel_read_2_page=[3063.5, 2555]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2b_s10_marker_01
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -12788,7 +14262,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [2471, 1042] and fresh page-crop color-mask center [2318.0,
           862.0]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.; panel=b; series=10; marker_symbol=half-filled
           maroon circle; pixel_read_1_page=[3221.0, 2692.0]; pixel_read_2_page=[3218, 2692]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2b_s10_marker_02
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -12928,7 +14413,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [2711.5, 1181] and fresh page-crop color-mask center [2561.5,
           1001.0]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.; panel=b; series=10; marker_symbol=half-filled
           maroon circle; pixel_read_1_page=[3461.5, 2831.0]; pixel_read_2_page=[3461.5, 2831]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2b_s10_marker_03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -13068,7 +14564,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [2822.5, 1233.5] and fresh page-crop color-mask center [2672.5,
           1054.0]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.; panel=b; series=10; marker_symbol=half-filled
           maroon circle; pixel_read_1_page=[3572.5, 2883.5]; pixel_read_2_page=[3572.5, 2884]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2b_s10_marker_04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -13208,7 +14715,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [3108, 1332.5] and fresh page-crop color-mask center [2957.5,
           1152.0]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.; panel=b; series=10; marker_symbol=half-filled
           maroon circle; pixel_read_1_page=[3858.0, 2982.5]; pixel_read_2_page=[3857.5, 2982]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2b_s10_marker_05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -13348,7 +14866,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [3267, 1371.5] and fresh page-crop color-mask center [3117.0,
           1192.0]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.; panel=b; series=10; marker_symbol=half-filled
           maroon circle; pixel_read_1_page=[4017.0, 3021.5]; pixel_read_2_page=[4017, 3022]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2b_s10_marker_06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -13488,7 +15017,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [3425, 1405.5] and fresh page-crop color-mask center [3272.0,
           1226.0]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.; panel=b; series=10; marker_symbol=half-filled
           maroon circle; pixel_read_1_page=[4175.0, 3055.5]; pixel_read_2_page=[4172, 3056]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2b_s10_marker_07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -13623,7 +15163,18 @@ observations:
         figure: '2'
         note: Figure 2 panel b, series 10; 1 center(s) unresolved in overlapping symbols/axis-end cluster.; panel=b; series=10;
           marker_symbol=half-filled maroon circle; marker_count=1
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2b_s10_unresolved_marker_cluster
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -13753,7 +15304,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [2225.5, 371] and fresh page-crop color-mask center [2075.8,
           192.2]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.; panel=b; series=11; marker_symbol=open
           gray star; pixel_read_1_page=[2975.5, 2021.0]; pixel_read_2_page=[2975.8, 2022.2]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2b_s11_marker_01
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -13893,7 +15455,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [2384.5, 650] and fresh page-crop color-mask center [2234.2,
           471.3]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.; panel=b; series=11; marker_symbol=open
           gray star; pixel_read_1_page=[3134.5, 2300.0]; pixel_read_2_page=[3134.2, 2301.3]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2b_s11_marker_02
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -14033,7 +15606,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [2702, 1063] and fresh page-crop color-mask center [2552.0,
           884.2]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.; panel=b; series=11; marker_symbol=open
           gray star; pixel_read_1_page=[3452.0, 2713.0]; pixel_read_2_page=[3452, 2714.2]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2b_s11_marker_03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -14173,7 +15757,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [2861, 1146] and fresh page-crop color-mask center [2710.5,
           966.3]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.; panel=b; series=11; marker_symbol=open
           gray star; pixel_read_1_page=[3611.0, 2796.0]; pixel_read_2_page=[3610.5, 2796.3]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2b_s11_marker_04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -14313,7 +15908,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [3020, 1260] and fresh page-crop color-mask center [2869.5,
           1081.6]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.; panel=b; series=11; marker_symbol=open
           gray star; pixel_read_1_page=[3770.0, 2910.0]; pixel_read_2_page=[3769.5, 2911.6]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2b_s11_marker_05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -14453,7 +16059,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [3177.5, 1309.5] and fresh page-crop color-mask center [3028.7,
           1130.6]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.; panel=b; series=11; marker_symbol=open
           gray star; pixel_read_1_page=[3927.5, 2959.5]; pixel_read_2_page=[3928.7, 2960.6]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2b_s11_marker_06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -14593,7 +16210,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [3337.5, 1384] and fresh page-crop color-mask center [3187.7,
           1206.8]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.; panel=b; series=11; marker_symbol=open
           gray star; pixel_read_1_page=[4087.5, 3034.0]; pixel_read_2_page=[4087.7, 3036.8]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2b_s11_marker_07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -14733,7 +16361,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [3496.5, 1396.5] and fresh page-crop color-mask center [3347.2,
           1218.2]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.; panel=b; series=11; marker_symbol=open
           gray star; pixel_read_1_page=[4246.5, 3046.5]; pixel_read_2_page=[4247.2, 3048.2]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2b_s11_marker_08
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -14873,7 +16512,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [2225.5, 598.5] and fresh page-crop color-mask center [2075.5,
           422.3]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.; panel=b; series=4; marker_symbol=open
           teal triangle; pixel_read_1_page=[2975.5, 2248.5]; pixel_read_2_page=[2975.5, 2252.3]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2b_s4_marker_01
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -15013,7 +16663,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [2384.5, 784.5] and fresh page-crop color-mask center [2234.6,
           608.1]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.; panel=b; series=4; marker_symbol=open
           teal triangle; pixel_read_1_page=[3134.5, 2434.5]; pixel_read_2_page=[3134.6, 2438.1]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2b_s4_marker_02
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -15153,7 +16814,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [3499, 1373] and fresh page-crop color-mask center [3348.7,
           1192.6]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.; panel=b; series=4; marker_symbol=open
           teal triangle; pixel_read_1_page=[4249.0, 3023.0]; pixel_read_2_page=[4248.7, 3022.6]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2b_s4_marker_03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -15293,7 +16965,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [2537, 1030] and fresh page-crop color-mask center [2387.3,
           852.7]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.; panel=b; series=5; marker_symbol=open
           blue inverted triangle; pixel_read_1_page=[3287.0, 2680.0]; pixel_read_2_page=[3287.3, 2682.7]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2b_s5_marker_01
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -15433,7 +17116,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [2677.5, 1178.5] and fresh page-crop color-mask center [2530.0,
           999.0]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.; panel=b; series=5; marker_symbol=open
           blue inverted triangle; pixel_read_1_page=[3427.5, 2828.5]; pixel_read_2_page=[3430, 2829]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2b_s5_marker_02
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -15573,7 +17267,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [3007, 1302.5] and fresh page-crop color-mask center [2856.8,
           1119.7]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.; panel=b; series=5; marker_symbol=open
           blue inverted triangle; pixel_read_1_page=[3757.0, 2952.5]; pixel_read_2_page=[3756.8, 2949.7]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2b_s5_marker_03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -15713,7 +17418,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [3161.5, 1337.5] and fresh page-crop color-mask center [3011.7,
           1156.9]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.; panel=b; series=5; marker_symbol=open
           blue inverted triangle; pixel_read_1_page=[3911.5, 2987.5]; pixel_read_2_page=[3911.7, 2986.9]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2b_s5_marker_04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -15848,7 +17564,18 @@ observations:
         figure: '2'
         note: Figure 2 panel b, series 5; 3 center(s) unresolved in overlapping symbols/axis-end cluster.; panel=b; series=5;
           marker_symbol=open blue inverted triangle; marker_count=3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2b_s5_unresolved_marker_cluster
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -15978,7 +17705,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [2548, 963.5] and fresh page-crop color-mask center [2401.1,
           786.6]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.; panel=b; series=7; marker_symbol=blue
           cross; pixel_read_1_page=[3298.0, 2613.5]; pixel_read_2_page=[3301.1, 2616.6]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2b_s7_marker_01
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -16118,7 +17856,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [2861, 1146] and fresh page-crop color-mask center [2713.2,
           975.2]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.; panel=b; series=7; marker_symbol=blue
           cross; pixel_read_1_page=[3611.0, 2796.0]; pixel_read_2_page=[3613.2, 2805.2]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2b_s7_marker_02
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -16258,7 +18007,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [3018, 1260] and fresh page-crop color-mask center [2866.1,
           1072.5]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.; panel=b; series=7; marker_symbol=blue
           cross; pixel_read_1_page=[3768.0, 2910.0]; pixel_read_2_page=[3766.1, 2902.5]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2b_s7_marker_03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -16398,7 +18158,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [3177.5, 1309.5] and fresh page-crop color-mask center [3024.7,
           1135.0]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.; panel=b; series=7; marker_symbol=blue
           cross; pixel_read_1_page=[3927.5, 2959.5]; pixel_read_2_page=[3924.7, 2965]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2b_s7_marker_04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -16538,7 +18309,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [3323, 1386.5] and fresh page-crop color-mask center [3172.3,
           1192.2]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.; panel=b; series=7; marker_symbol=blue
           cross; pixel_read_1_page=[4073.0, 3036.5]; pixel_read_2_page=[4072.3, 3022.2]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2b_s7_marker_05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -16678,7 +18460,18 @@ observations:
         note: 'Independent 600 dpi reads: original crop center [3485, 1399.5] and fresh page-crop color-mask center [3327.0,
           1221.3]; linear axes FeO mol % and gamma_FeO; panel b at 1473 K per caption.; panel=b; series=7; marker_symbol=blue
           cross; pixel_read_1_page=[4235.0, 3049.5]; pixel_read_2_page=[4227, 3051.3]'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: figure_comparison'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig2b_s7_marker_06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 2
@@ -16811,7 +18604,18 @@ observations:
         pdf_page_index: 2
         figure: '4'
         note: Figure 4 caption identifies MgO activity at 2000 K; smooth curve not sampled.; panel=a; series=1
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig4a_series1_mgo_activity_curve
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 3
@@ -16930,7 +18734,18 @@ observations:
         pdf_page_index: 2
         figure: '4'
         note: Figure 4 caption identifies MgO activity at 2473 K; smooth curve not sampled.; panel=a; series=2
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig4a_series2_mgo_activity_curve
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 3
@@ -17049,7 +18864,18 @@ observations:
         pdf_page_index: 2
         figure: '4'
         note: Figure 4 caption identifies MgO activity at 2773 K; smooth curve not sampled.; panel=a; series=3
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig4a_series3_mgo_activity_curve
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 3
@@ -17168,7 +18994,18 @@ observations:
         pdf_page_index: 2
         figure: '4'
         note: Figure 4 caption identifies MgO activity at 2773 K; smooth curve not sampled.; panel=a; series=4
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig4a_series4_mgo_activity_curve
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 3
@@ -17287,7 +19124,18 @@ observations:
         pdf_page_index: 2
         figure: '4'
         note: Figure 4 caption identifies FeO activity at 2000 K; smooth curve not sampled.; panel=a; series=5
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig4a_series5_feo_activity_curve
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 3
@@ -17406,7 +19254,18 @@ observations:
         pdf_page_index: 2
         figure: '4'
         note: Figure 4 caption identifies FeO activity at 2473 K; smooth curve not sampled.; panel=a; series=6
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig4a_series6_feo_activity_curve
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 3
@@ -17525,7 +19384,18 @@ observations:
         pdf_page_index: 2
         figure: '4'
         note: Figure 4 caption identifies FeO activity at 2773 K; smooth curve not sampled.; panel=a; series=7
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig4a_series7_feo_activity_curve
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 3
@@ -17644,7 +19514,18 @@ observations:
         pdf_page_index: 2
         figure: '4'
         note: Figure 4 caption identifies FeO activity at 2773 K; smooth curve not sampled.; panel=a; series=8
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_fig4a_series8_feo_activity_curve
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2020-mgo-feo-melts
   locator:
     page: 3
@@ -17758,6 +19639,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Semi-empirical model
+      (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions.;
+      printed source evidence: Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides
+      and vapor species and find equilibrium conditions.'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_mgo_feo_melts_p002_t03_r03_c02
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -17894,6 +19789,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Semi-empirical model
+      (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions.;
+      printed source evidence: Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides
+      and vapor species and find equilibrium conditions.'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_mgo_feo_melts_p002_t03_r03_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -18030,6 +19939,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Semi-empirical model
+      (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions.;
+      printed source evidence: Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides
+      and vapor species and find equilibrium conditions.'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_mgo_feo_melts_p002_t03_r03_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -18167,6 +20090,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Semi-empirical model
+      (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions.;
+      printed source evidence: Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides
+      and vapor species and find equilibrium conditions.'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_mgo_feo_melts_p002_t03_r04_c02
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -18303,6 +20240,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Semi-empirical model
+      (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions.;
+      printed source evidence: Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides
+      and vapor species and find equilibrium conditions.'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_mgo_feo_melts_p002_t03_r04_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -18440,6 +20391,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Semi-empirical model
+      (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions.;
+      printed source evidence: Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides
+      and vapor species and find equilibrium conditions.'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_mgo_feo_melts_p002_t03_r05_c02
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -18576,6 +20541,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Semi-empirical model
+      (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions.;
+      printed source evidence: Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides
+      and vapor species and find equilibrium conditions.'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_mgo_feo_melts_p002_t03_r05_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -18713,6 +20692,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Semi-empirical model
+      (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions.;
+      printed source evidence: Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides
+      and vapor species and find equilibrium conditions.'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_mgo_feo_melts_p002_t03_r06_c02
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -18849,6 +20842,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Semi-empirical model
+      (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions.;
+      printed source evidence: Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides
+      and vapor species and find equilibrium conditions.'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_mgo_feo_melts_p002_t03_r06_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -18985,6 +20992,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Semi-empirical model
+      (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions.;
+      printed source evidence: Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides
+      and vapor species and find equilibrium conditions.'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_mgo_feo_melts_p002_t03_r06_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -19121,6 +21142,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Semi-empirical model
+      (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions.;
+      printed source evidence: Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides
+      and vapor species and find equilibrium conditions.'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_mgo_feo_melts_p002_t03_r07_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -19257,6 +21292,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Semi-empirical model
+      (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions.;
+      printed source evidence: Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides
+      and vapor species and find equilibrium conditions.'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_mgo_feo_melts_p002_t03_r08_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -19393,6 +21442,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Semi-empirical model
+      (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions.;
+      printed source evidence: Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides
+      and vapor species and find equilibrium conditions.'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_mgo_feo_melts_p002_t03_r09_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -19529,6 +21592,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Semi-empirical model
+      (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions.;
+      printed source evidence: Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides
+      and vapor species and find equilibrium conditions.'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_mgo_feo_melts_p002_t03_r10_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -19665,6 +21742,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Semi-empirical model
+      (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions.;
+      printed source evidence: Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides
+      and vapor species and find equilibrium conditions.'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_mgo_feo_melts_p002_t03_r11_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -19801,6 +21892,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Semi-empirical model
+      (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions.;
+      printed source evidence: Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides
+      and vapor species and find equilibrium conditions.'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_mgo_feo_melts_p002_t03_r12_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -19937,6 +22042,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Semi-empirical model
+      (Shornikov, 2019), used to calculate standard Gibbs energies for oxides and vapor species and find equilibrium conditions.;
+      printed source evidence: Semi-empirical model (Shornikov, 2019), used to calculate standard Gibbs energies for oxides
+      and vapor species and find equilibrium conditions.'
+    origin: shornikov-2020-mgo-feo-melts::shornikov_2020_mgo_feo_melts_p002_t03_r13_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG

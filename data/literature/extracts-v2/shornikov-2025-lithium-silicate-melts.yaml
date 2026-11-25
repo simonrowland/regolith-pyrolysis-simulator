@@ -213,12 +213,11 @@ observations:
     species:
       formula: Li2O
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -303,7 +302,19 @@ observations:
           (1) and 1673 (2–8) K" and does not mention series 9. The body says the Li2O activities of this study (Fig. 3A) are
           at 1673 K. Series 6 is inside the closing clause''s 2–8 group. No temperature was chosen in order to digitize a
           point.; panel=A'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: shornikov-2025-lithium-silicate-melts::shornikov_2025_li2o_sio2_fig3a_series6
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shornikov-2025-lithium-silicate-melts
   locator:
     page: 4
@@ -343,12 +354,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -429,7 +439,19 @@ observations:
         note: 'Caption series 9, calculated in the present study. 600 dpi render: continuous stroke, no symbols on panel B.
           The caption''s closing temperature clause stops at series 8 ("1673 (2–8) K") and does not assign a temperature to
           series 9. The body discusses Fig. 3B without a separate temperature. No T_range_K is stored.; panel=B'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: shornikov-2025-lithium-silicate-melts::shornikov_2025_li2o_sio2_fig3b_series9
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shornikov-2025-lithium-silicate-melts
   locator:
     page: 4

@@ -2215,6 +2215,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_k2co3_melting_temperature
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -30047,6 +30058,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_congruent_melting_temperature
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -36394,7 +36416,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_na6si2o7_to_na4sio4_reaction_heats
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kroger-fingas-1935-alkali-silicate-equilibria
   locator:
     page: 23
@@ -39527,7 +39559,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_sodium_disilicate_formation_enthalpy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kroger-fingas-1935-alkali-silicate-equilibria
   locator:
     page: 23
@@ -39732,7 +39774,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Derived from slopes of
+      log pressure versus 1/T and reaction cycles; approximate Nernst values are reported alongside.'
+    origin: kroger-fingas-1935-alkali-silicate-equilibria::kroger_fingas_1935_sodium_metasilicate_formation_enthalpy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kroger-fingas-1935-alkali-silicate-equilibria
   locator:
     page: 23

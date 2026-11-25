@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/ta-mendybaev-2002-lpsc.yaml
 observations:
 - observation_id: ta-mendybaev-2002-lpsc::mendybaev_2002_apparent_Ea_1mm_multi_T
-  experiment_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::experiment::b133-vacuum-multi-T-campaign
+  experiment_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::ta-mendybaev-2002-lpsc::declared:902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::experiment::b133-vacuum-multi-T-campaign::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -11,12 +11,11 @@ observations:
     species:
       formula: B133_CAI_like_melt
       phase:
-        tag: unknown
-        reason: phase string 'Type_B_CAI_like_liquid_B133' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -42,7 +41,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Type_B_CAI_like_liquid_B133'' is not in the closed automatic map'
+    origin: ta-mendybaev-2002-lpsc::mendybaev_2002_apparent_Ea_1mm_multi_T
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_free_evaporation'
+    origin: ta-mendybaev-2002-lpsc::mendybaev_2002_apparent_Ea_1mm_multi_T
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-mendybaev-2002-lpsc
   locator:
     pdf_page_index: 2
@@ -66,7 +86,7 @@ observations:
   provenance:
     printed_phase: Type_B_CAI_like_liquid_B133
 - observation_id: ta-mendybaev-2002-lpsc::mendybaev_2002_mg_isotope_alpha_vacuum
-  experiment_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::experiment::b133-vacuum-1800C-loop-series
+  experiment_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::ta-mendybaev-2002-lpsc::declared:902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::experiment::b133-vacuum-1800C-loop-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -74,12 +94,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'Type_B_CAI_like_liquid_B133_residue' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -101,7 +120,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Type_B_CAI_like_liquid_B133_residue'' is not in the closed automatic map'
+    origin: ta-mendybaev-2002-lpsc::mendybaev_2002_mg_isotope_alpha_vacuum
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Rayleigh_distillation_vacuum'
+    origin: ta-mendybaev-2002-lpsc::mendybaev_2002_mg_isotope_alpha_vacuum
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-mendybaev-2002-lpsc
   locator:
     pdf_page_index: 2
@@ -111,7 +151,7 @@ observations:
   provenance:
     printed_phase: Type_B_CAI_like_liquid_B133_residue
 - observation_id: ta-mendybaev-2002-lpsc::mendybaev_2002_weight_loss_rate_1600C_1mm_loops
-  experiment_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::experiment::b133-vacuum-multi-T-campaign
+  experiment_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::ta-mendybaev-2002-lpsc::declared:902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::experiment::b133-vacuum-multi-T-campaign::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -119,12 +159,11 @@ observations:
     species:
       formula: B133_CAI_like_melt
       phase:
-        tag: unknown
-        reason: phase string 'Type_B_CAI_like_liquid_B133' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -148,7 +187,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Type_B_CAI_like_liquid_B133'' is not in the closed automatic map'
+    origin: ta-mendybaev-2002-lpsc::mendybaev_2002_weight_loss_rate_1600C_1mm_loops
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_free_evaporation'
+    origin: ta-mendybaev-2002-lpsc::mendybaev_2002_weight_loss_rate_1600C_1mm_loops
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-mendybaev-2002-lpsc
   locator:
     pdf_page_index: 2
@@ -169,7 +229,7 @@ observations:
   provenance:
     printed_phase: Type_B_CAI_like_liquid_B133
 - observation_id: ta-mendybaev-2002-lpsc::mendybaev_2002_weight_loss_rate_1700C_1mm_loops
-  experiment_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::experiment::b133-vacuum-multi-T-campaign
+  experiment_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::ta-mendybaev-2002-lpsc::declared:902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::experiment::b133-vacuum-multi-T-campaign::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -177,12 +237,11 @@ observations:
     species:
       formula: B133_CAI_like_melt
       phase:
-        tag: unknown
-        reason: phase string 'Type_B_CAI_like_liquid_B133' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -206,7 +265,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Type_B_CAI_like_liquid_B133'' is not in the closed automatic map'
+    origin: ta-mendybaev-2002-lpsc::mendybaev_2002_weight_loss_rate_1700C_1mm_loops
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_free_evaporation'
+    origin: ta-mendybaev-2002-lpsc::mendybaev_2002_weight_loss_rate_1700C_1mm_loops
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-mendybaev-2002-lpsc
   locator:
     pdf_page_index: 2
@@ -227,7 +307,7 @@ observations:
   provenance:
     printed_phase: Type_B_CAI_like_liquid_B133
 - observation_id: ta-mendybaev-2002-lpsc::mendybaev_2002_weight_loss_rate_1800C_1mm_loops
-  experiment_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::experiment::b133-vacuum-1800C-loop-series
+  experiment_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::ta-mendybaev-2002-lpsc::declared:902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::experiment::b133-vacuum-1800C-loop-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -235,12 +315,11 @@ observations:
     species:
       formula: B133_CAI_like_melt
       phase:
-        tag: unknown
-        reason: phase string 'Type_B_CAI_like_liquid_B133' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -265,7 +344,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Type_B_CAI_like_liquid_B133'' is not in the closed automatic map'
+    origin: ta-mendybaev-2002-lpsc::mendybaev_2002_weight_loss_rate_1800C_1mm_loops
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_free_evaporation'
+    origin: ta-mendybaev-2002-lpsc::mendybaev_2002_weight_loss_rate_1800C_1mm_loops
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-mendybaev-2002-lpsc
   locator:
     pdf_page_index: 1
@@ -282,7 +382,7 @@ observations:
   provenance:
     printed_phase: Type_B_CAI_like_liquid_B133
 - observation_id: ta-mendybaev-2002-lpsc::mendybaev_2002_weight_loss_rate_1800C_large_loops
-  experiment_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::experiment::b133-vacuum-1800C-loop-series
+  experiment_id: 902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::ta-mendybaev-2002-lpsc::declared:902510908415be31627b6455b1c2e313e9b13235dd467f9309dc5d4f7cc8425d::experiment::b133-vacuum-1800C-loop-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -290,12 +390,11 @@ observations:
     species:
       formula: B133_CAI_like_melt
       phase:
-        tag: unknown
-        reason: phase string 'Type_B_CAI_like_liquid_B133' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -319,7 +418,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Type_B_CAI_like_liquid_B133'' is not in the closed automatic map'
+    origin: ta-mendybaev-2002-lpsc::mendybaev_2002_weight_loss_rate_1800C_large_loops
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_free_evaporation'
+    origin: ta-mendybaev-2002-lpsc::mendybaev_2002_weight_loss_rate_1800C_large_loops
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-mendybaev-2002-lpsc
   locator:
     pdf_page_index: 1

@@ -11,6 +11,8 @@ import yaml
 
 from simulator.battery.enums import (
     EvidenceClass,
+    MethodToken,
+    NoticeKind,
     PerBasis,
     Phase,
     Quantity,
@@ -528,7 +530,18 @@ def test_wood_wade_2013_isolated_migration_reaches_required_identity_axes(
     assert experiment.experiment_id == (
         "10.1007/s00410-013-0896-z::experiment::wood_wade_2013_bw1102"
     )
-    assert experiment.method.is_unknown
+    assert experiment.method.is_value
+    assert experiment.method.value is MethodToken.UNSPECIFIED
+    experiment_observations = [
+        row
+        for row in result.observations.values()
+        if row.experiment_id == experiment.experiment_id
+    ]
+    assert experiment_observations
+    assert all(
+        any(notice.kind is NoticeKind.METHOD_UNSTATED for notice in row.notices)
+        for row in experiment_observations
+    )
     assert experiment.conditions["T_C"].state.value == Decimal("1650")
     assert experiment.conditions["T_C"].locator.page == _page_from_grep(
         "1.5 GPa and 1,650 °C"

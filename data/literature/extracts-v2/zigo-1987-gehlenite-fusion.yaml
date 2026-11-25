@@ -85,6 +85,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Difference between extrapolated
+      melt and crystal relative enthalpies at the selected fusion temperature, from Eqs. (5) and (6).'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_fusion_enthalpy_at_1863K
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -202,6 +214,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - entropy_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_fusion_entropy_at_1863K
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - entropy_of_fusion
@@ -246,12 +269,11 @@ observations:
     species:
       formula: gehlenite
       phase:
-        tag: unknown
-        reason: phase string 'gehlenite_C2AS_crystal_and_composition_matched_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -276,7 +298,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''gehlenite_C2AS_crystal_and_composition_matched_melt'' is not in the closed automatic map'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_fusion_temperature_selected
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: At 1863 K the selected
+      temperature is explicitly called the equilibrium fusion temperature.'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_fusion_temperature_selected
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 2
@@ -377,7 +421,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_fusion_temperature_sensitivity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 10
@@ -491,7 +546,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_fusion_temperature_sensitivity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 10
@@ -525,7 +591,7 @@ observations:
   provenance:
     printed_phase: gehlenite_C2AS_crystal_to_composition_matched_melt
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_fit::T=1519:h=1f77549d499a
-  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion::method:calorimetry
   identity:
     quantity:
       tag: value
@@ -533,11 +599,11 @@ observations:
     species:
       formula: gehlenite
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_gehlenite_C2AS' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -604,7 +670,31 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - H_minus_H298
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_gehlenite_C2AS'' identifies a crystal; original_reason=phase
+      string ''crystalline_gehlenite_C2AS'' is not in the closed automatic map'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_fit
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: least_squares_fit_to_drop_calorimetry'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_fit
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 4
@@ -661,7 +751,7 @@ observations:
   provenance:
     printed_phase: crystalline_gehlenite_C2AS
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_fit::T=1567:h=310e1ea7d9b7
-  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion::method:calorimetry
   identity:
     quantity:
       tag: value
@@ -669,11 +759,11 @@ observations:
     species:
       formula: gehlenite
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_gehlenite_C2AS' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -740,7 +830,31 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - H_minus_H298
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_gehlenite_C2AS'' identifies a crystal; original_reason=phase
+      string ''crystalline_gehlenite_C2AS'' is not in the closed automatic map'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_fit
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: least_squares_fit_to_drop_calorimetry'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_fit
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 4
@@ -797,7 +911,7 @@ observations:
   provenance:
     printed_phase: crystalline_gehlenite_C2AS
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_fit::T=1582:h=ebebb9edb87d
-  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion::method:calorimetry
   identity:
     quantity:
       tag: value
@@ -805,11 +919,11 @@ observations:
     species:
       formula: gehlenite
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_gehlenite_C2AS' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -876,7 +990,31 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - H_minus_H298
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_gehlenite_C2AS'' identifies a crystal; original_reason=phase
+      string ''crystalline_gehlenite_C2AS'' is not in the closed automatic map'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_fit
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: least_squares_fit_to_drop_calorimetry'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_fit
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 4
@@ -933,7 +1071,7 @@ observations:
   provenance:
     printed_phase: crystalline_gehlenite_C2AS
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_fit::T=1691:h=c5aa36137802
-  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion::method:calorimetry
   identity:
     quantity:
       tag: value
@@ -941,11 +1079,11 @@ observations:
     species:
       formula: gehlenite
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_gehlenite_C2AS' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -1012,7 +1150,31 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - H_minus_H298
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_gehlenite_C2AS'' identifies a crystal; original_reason=phase
+      string ''crystalline_gehlenite_C2AS'' is not in the closed automatic map'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_fit
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: least_squares_fit_to_drop_calorimetry'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_fit
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 4
@@ -1069,7 +1231,7 @@ observations:
   provenance:
     printed_phase: crystalline_gehlenite_C2AS
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_fit::T=1730:h=ef5d3582a8c1
-  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion::method:calorimetry
   identity:
     quantity:
       tag: value
@@ -1077,11 +1239,11 @@ observations:
     species:
       formula: gehlenite
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_gehlenite_C2AS' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -1148,7 +1310,31 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - H_minus_H298
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_gehlenite_C2AS'' identifies a crystal; original_reason=phase
+      string ''crystalline_gehlenite_C2AS'' is not in the closed automatic map'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_fit
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: least_squares_fit_to_drop_calorimetry'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_fit
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 4
@@ -1205,7 +1391,7 @@ observations:
   provenance:
     printed_phase: crystalline_gehlenite_C2AS
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_fit::T=1799:h=775d6ba75174
-  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion::method:calorimetry
   identity:
     quantity:
       tag: value
@@ -1213,11 +1399,11 @@ observations:
     species:
       formula: gehlenite
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_gehlenite_C2AS' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -1284,7 +1470,31 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - H_minus_H298
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_gehlenite_C2AS'' identifies a crystal; original_reason=phase
+      string ''crystalline_gehlenite_C2AS'' is not in the closed automatic map'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_fit
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: least_squares_fit_to_drop_calorimetry'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_fit
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 4
@@ -1349,11 +1559,11 @@ observations:
     species:
       formula: gehlenite
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_gehlenite_C2AS' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -1420,7 +1630,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - H_minus_H298
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_gehlenite_C2AS'' identifies a crystal; original_reason=phase
+      string ''crystalline_gehlenite_C2AS'' is not in the closed automatic map'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_measured
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: cooling_to_298_K_in_drop_calorimeter'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 4
@@ -1474,11 +1707,11 @@ observations:
     species:
       formula: gehlenite
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_gehlenite_C2AS' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -1545,7 +1778,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - H_minus_H298
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_gehlenite_C2AS'' identifies a crystal; original_reason=phase
+      string ''crystalline_gehlenite_C2AS'' is not in the closed automatic map'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_measured
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: cooling_to_298_K_in_drop_calorimeter'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 4
@@ -1599,11 +1855,11 @@ observations:
     species:
       formula: gehlenite
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_gehlenite_C2AS' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -1670,7 +1926,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - H_minus_H298
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_gehlenite_C2AS'' identifies a crystal; original_reason=phase
+      string ''crystalline_gehlenite_C2AS'' is not in the closed automatic map'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_measured
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: cooling_to_298_K_in_drop_calorimeter'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 4
@@ -1724,11 +2003,11 @@ observations:
     species:
       formula: gehlenite
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_gehlenite_C2AS' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -1795,7 +2074,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - H_minus_H298
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_gehlenite_C2AS'' identifies a crystal; original_reason=phase
+      string ''crystalline_gehlenite_C2AS'' is not in the closed automatic map'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_measured
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: cooling_to_298_K_in_drop_calorimeter'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 4
@@ -1849,11 +2151,11 @@ observations:
     species:
       formula: gehlenite
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_gehlenite_C2AS' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -1920,7 +2222,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - H_minus_H298
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_gehlenite_C2AS'' identifies a crystal; original_reason=phase
+      string ''crystalline_gehlenite_C2AS'' is not in the closed automatic map'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_measured
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: cooling_to_298_K_in_drop_calorimeter'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 4
@@ -1974,11 +2299,11 @@ observations:
     species:
       formula: gehlenite
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_gehlenite_C2AS' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -2045,7 +2370,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - H_minus_H298
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_gehlenite_C2AS'' identifies a crystal; original_reason=phase
+      string ''crystalline_gehlenite_C2AS'' is not in the closed automatic map'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_measured
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: cooling_to_298_K_in_drop_calorimeter'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 4
@@ -2091,7 +2439,7 @@ observations:
   provenance:
     printed_phase: crystalline_gehlenite_C2AS
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t2_crystal_solution_calorimetry
-  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion::method:solution_calorimetry
   identity:
     quantity:
       tag: unknown
@@ -2099,12 +2447,11 @@ observations:
     species:
       formula: gehlenite
       phase:
-        tag: unknown
-        reason: phase string 'gehlenite_sample_with_unreacted_admixtures' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2130,7 +2477,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''gehlenite_sample_with_unreacted_admixtures'' is not in the closed automatic map'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t2_crystal_solution_calorimetry
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 5
@@ -2151,7 +2509,7 @@ observations:
   provenance:
     printed_phase: gehlenite_sample_with_unreacted_admixtures
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t2_crystal_solution_corrected
-  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion::method:solution_calorimetry
   identity:
     quantity:
       tag: unknown
@@ -2159,11 +2517,11 @@ observations:
     species:
       formula: gehlenite
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_gehlenite_C2AS' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -2187,7 +2545,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_gehlenite_C2AS'' identifies a crystal; original_reason=phase
+      string ''crystalline_gehlenite_C2AS'' is not in the closed automatic map'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t2_crystal_solution_corrected
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 6
@@ -2207,11 +2576,11 @@ observations:
     species:
       formula: gehlenite
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_gehlenite_C2AS' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -2238,7 +2607,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_gehlenite_C2AS'' identifies a crystal; original_reason=phase
+      string ''crystalline_gehlenite_C2AS'' is not in the closed automatic map'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t3_crystal_relative_enthalpy_fit
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t3_crystal_relative_enthalpy_fit
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 6
@@ -2257,11 +2647,11 @@ observations:
     species:
       formula: gehlenite
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_gehlenite_C2AS' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -2285,7 +2675,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_gehlenite_C2AS'' identifies a crystal; original_reason=phase
+      string ''crystalline_gehlenite_C2AS'' is not in the closed automatic map'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t3_crystal_relative_enthalpy_measured_derived
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t3_crystal_relative_enthalpy_measured_derived
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 6
@@ -2312,11 +2723,11 @@ observations:
     species:
       formula: gehlenite
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_gehlenite_C2AS' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -2340,7 +2751,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_gehlenite_C2AS'' identifies a crystal; original_reason=phase
+      string ''crystalline_gehlenite_C2AS'' is not in the closed automatic map'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t3_crystal_relative_enthalpy_measured_derived
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t3_crystal_relative_enthalpy_measured_derived
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 6
@@ -2367,11 +2799,11 @@ observations:
     species:
       formula: gehlenite
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_gehlenite_C2AS' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -2395,7 +2827,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_gehlenite_C2AS'' identifies a crystal; original_reason=phase
+      string ''crystalline_gehlenite_C2AS'' is not in the closed automatic map'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t3_crystal_relative_enthalpy_measured_derived
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t3_crystal_relative_enthalpy_measured_derived
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 6
@@ -2422,11 +2875,11 @@ observations:
     species:
       formula: gehlenite
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_gehlenite_C2AS' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -2450,7 +2903,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_gehlenite_C2AS'' identifies a crystal; original_reason=phase
+      string ''crystalline_gehlenite_C2AS'' is not in the closed automatic map'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t3_crystal_relative_enthalpy_measured_derived
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t3_crystal_relative_enthalpy_measured_derived
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 6
@@ -2477,11 +2951,11 @@ observations:
     species:
       formula: gehlenite
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_gehlenite_C2AS' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -2505,7 +2979,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_gehlenite_C2AS'' identifies a crystal; original_reason=phase
+      string ''crystalline_gehlenite_C2AS'' is not in the closed automatic map'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t3_crystal_relative_enthalpy_measured_derived
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t3_crystal_relative_enthalpy_measured_derived
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 6
@@ -2532,11 +3027,11 @@ observations:
     species:
       formula: gehlenite
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_gehlenite_C2AS' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -2560,7 +3055,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_gehlenite_C2AS'' identifies a crystal; original_reason=phase
+      string ''crystalline_gehlenite_C2AS'' is not in the closed automatic map'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t3_crystal_relative_enthalpy_measured_derived
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t3_crystal_relative_enthalpy_measured_derived
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 6
@@ -2579,7 +3095,7 @@ observations:
   provenance:
     printed_phase: crystalline_gehlenite_C2AS
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_cooling_enthalpy_measured::T=1873:h=f37185a20f4d
-  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion::method:calorimetry
   identity:
     quantity:
       tag: unknown
@@ -2587,12 +3103,11 @@ observations:
     species:
       formula: gehlenite
       phase:
-        tag: unknown
-        reason: phase string 'C2AS_melt_composition_corresponding_to_gehlenite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2616,7 +3131,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''C2AS_melt_composition_corresponding_to_gehlenite'' is not in the closed automatic map'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_cooling_enthalpy_measured
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: drop_and_solution_calorimetry; cooling_to_298_K'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_cooling_enthalpy_measured
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 7
@@ -2637,7 +3174,7 @@ observations:
   provenance:
     printed_phase: C2AS_melt_composition_corresponding_to_gehlenite
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_cooling_enthalpy_measured::T=1888:h=1827f9c3f743
-  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion::method:calorimetry
   identity:
     quantity:
       tag: unknown
@@ -2645,12 +3182,11 @@ observations:
     species:
       formula: gehlenite
       phase:
-        tag: unknown
-        reason: phase string 'C2AS_melt_composition_corresponding_to_gehlenite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2674,7 +3210,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''C2AS_melt_composition_corresponding_to_gehlenite'' is not in the closed automatic map'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_cooling_enthalpy_measured
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: drop_and_solution_calorimetry; cooling_to_298_K'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_cooling_enthalpy_measured
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 7
@@ -2695,7 +3253,7 @@ observations:
   provenance:
     printed_phase: C2AS_melt_composition_corresponding_to_gehlenite
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_cooling_enthalpy_measured::T=1908:h=e237edd0b1f1
-  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion::method:calorimetry
   identity:
     quantity:
       tag: unknown
@@ -2703,12 +3261,11 @@ observations:
     species:
       formula: gehlenite
       phase:
-        tag: unknown
-        reason: phase string 'C2AS_melt_composition_corresponding_to_gehlenite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2732,7 +3289,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''C2AS_melt_composition_corresponding_to_gehlenite'' is not in the closed automatic map'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_cooling_enthalpy_measured
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: drop_and_solution_calorimetry; cooling_to_298_K'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_cooling_enthalpy_measured
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 7
@@ -2753,7 +3332,7 @@ observations:
   provenance:
     printed_phase: C2AS_melt_composition_corresponding_to_gehlenite
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_cooling_enthalpy_measured::T=1932:h=0e5a34baee80
-  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion::method:calorimetry
   identity:
     quantity:
       tag: unknown
@@ -2761,12 +3340,11 @@ observations:
     species:
       formula: gehlenite
       phase:
-        tag: unknown
-        reason: phase string 'C2AS_melt_composition_corresponding_to_gehlenite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2790,7 +3368,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''C2AS_melt_composition_corresponding_to_gehlenite'' is not in the closed automatic map'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_cooling_enthalpy_measured
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: drop_and_solution_calorimetry; cooling_to_298_K'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_cooling_enthalpy_measured
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 7
@@ -2811,7 +3411,7 @@ observations:
   provenance:
     printed_phase: C2AS_melt_composition_corresponding_to_gehlenite
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_cooling_enthalpy_measured::T=1948:h=5c5f9238f18f
-  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion::method:calorimetry
   identity:
     quantity:
       tag: unknown
@@ -2819,12 +3419,11 @@ observations:
     species:
       formula: gehlenite
       phase:
-        tag: unknown
-        reason: phase string 'C2AS_melt_composition_corresponding_to_gehlenite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2848,7 +3447,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''C2AS_melt_composition_corresponding_to_gehlenite'' is not in the closed automatic map'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_cooling_enthalpy_measured
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: drop_and_solution_calorimetry; cooling_to_298_K'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_cooling_enthalpy_measured
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 7
@@ -2869,7 +3490,7 @@ observations:
   provenance:
     printed_phase: C2AS_melt_composition_corresponding_to_gehlenite
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_enthalpy_calorimetry::T=1873:h=221016e7caf4
-  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion::method:calorimetry
   identity:
     quantity:
       tag: unknown
@@ -2877,12 +3498,11 @@ observations:
     species:
       formula: gehlenite
       phase:
-        tag: unknown
-        reason: phase string 'C2AS_melt_composition_corresponding_to_gehlenite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2906,7 +3526,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''C2AS_melt_composition_corresponding_to_gehlenite'' is not in the closed automatic map'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_enthalpy_calorimetry
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: drop_and_solution_calorimetry; cooling_to_298_K'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_enthalpy_calorimetry
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 7
@@ -2927,7 +3569,7 @@ observations:
   provenance:
     printed_phase: C2AS_melt_composition_corresponding_to_gehlenite
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_enthalpy_calorimetry::T=1888:h=dc8d6f35ff52
-  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion::method:calorimetry
   identity:
     quantity:
       tag: unknown
@@ -2935,12 +3577,11 @@ observations:
     species:
       formula: gehlenite
       phase:
-        tag: unknown
-        reason: phase string 'C2AS_melt_composition_corresponding_to_gehlenite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2964,7 +3605,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''C2AS_melt_composition_corresponding_to_gehlenite'' is not in the closed automatic map'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_enthalpy_calorimetry
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: drop_and_solution_calorimetry; cooling_to_298_K'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_enthalpy_calorimetry
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 7
@@ -2985,7 +3648,7 @@ observations:
   provenance:
     printed_phase: C2AS_melt_composition_corresponding_to_gehlenite
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_enthalpy_calorimetry::T=1908:h=a46d20c33e7e
-  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion::method:calorimetry
   identity:
     quantity:
       tag: unknown
@@ -2993,12 +3656,11 @@ observations:
     species:
       formula: gehlenite
       phase:
-        tag: unknown
-        reason: phase string 'C2AS_melt_composition_corresponding_to_gehlenite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3022,7 +3684,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''C2AS_melt_composition_corresponding_to_gehlenite'' is not in the closed automatic map'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_enthalpy_calorimetry
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: drop_and_solution_calorimetry; cooling_to_298_K'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_enthalpy_calorimetry
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 7
@@ -3043,7 +3727,7 @@ observations:
   provenance:
     printed_phase: C2AS_melt_composition_corresponding_to_gehlenite
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_enthalpy_calorimetry::T=1932:h=7f3e1f7cdeb8
-  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion::method:calorimetry
   identity:
     quantity:
       tag: unknown
@@ -3051,12 +3735,11 @@ observations:
     species:
       formula: gehlenite
       phase:
-        tag: unknown
-        reason: phase string 'C2AS_melt_composition_corresponding_to_gehlenite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3080,7 +3763,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''C2AS_melt_composition_corresponding_to_gehlenite'' is not in the closed automatic map'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_enthalpy_calorimetry
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: drop_and_solution_calorimetry; cooling_to_298_K'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_enthalpy_calorimetry
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 7
@@ -3101,7 +3806,7 @@ observations:
   provenance:
     printed_phase: C2AS_melt_composition_corresponding_to_gehlenite
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_enthalpy_calorimetry::T=1948:h=7dec275177e2
-  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion::method:calorimetry
   identity:
     quantity:
       tag: unknown
@@ -3109,12 +3814,11 @@ observations:
     species:
       formula: gehlenite
       phase:
-        tag: unknown
-        reason: phase string 'C2AS_melt_composition_corresponding_to_gehlenite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3138,7 +3842,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''C2AS_melt_composition_corresponding_to_gehlenite'' is not in the closed automatic map'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_enthalpy_calorimetry
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: drop_and_solution_calorimetry; cooling_to_298_K'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_enthalpy_calorimetry
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 7
@@ -3167,12 +3893,11 @@ observations:
     species:
       formula: gehlenite
       phase:
-        tag: unknown
-        reason: phase string 'C2AS_melt_composition_corresponding_to_gehlenite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3198,7 +3923,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''C2AS_melt_composition_corresponding_to_gehlenite'' is not in the closed automatic map'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_relative_enthalpy_fit
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_relative_enthalpy_fit
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 8

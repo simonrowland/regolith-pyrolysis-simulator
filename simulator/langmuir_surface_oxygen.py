@@ -112,9 +112,15 @@ subunit activity up through 1 and the pressure stops at ``P_sat``
 instead of following the power law past it. Sanity: ``raw = 100``,
 ``n = -1/2`` gives ``p_uncap/p_ref = 1e4``. The same ``raw = 0.25``
 enters the cap at ``p/p_ref = 1/16``. The O2 coefficient of the
-reaction is ``nu_O2 = -n``, so the parent supplies
+reaction is ``nu_O2 = -n``, so a fixed-valence parent supplies
 ``dO = nO_gas - 2*n`` oxygen atoms per vapor molecule whether or not
-the cap is binding. The Hertz-Knudsen molar flux is
+the cap is binding. Elemental Fe(g) is the exception when the furnace
+passes a ledger Fe3+/ΣFe. The metal-rail exponent is the fixed-activity
+FeO slope ``n = -1/2``, and inverting it always books 1 O per Fe.
+That demand is ``iron_mean_oxygen_per_atom(q)`` (d-466), with q the
+ledger fraction (d-463). A missing q keeps the inversion, including Fe.
+Fe-bearing oxide vapors stay on the inversion: their pressure exponent
+is not this parent demand. The Hertz-Knudsen molar flux is
 ``J = alpha*P/sqrt(2*pi*M*R*T)``, and the surface root is
 ``sum_i (nO_i - dO_i)*J_i = 0``. The factor ``1/sqrt(2*pi*R*T)`` is
 common and cancels, leaving
@@ -252,6 +258,11 @@ class LangmuirSurfaceOxygen:
     # power. Empty when every published log-pressure was representable.
     pressure_continuations: Mapping[str, str] = field(default_factory=dict)
     alpha_authority_status_by_species: Mapping[str, str] = field(default_factory=dict)
+    # Parent oxygen booked per vapor molecule for channels that entered
+    # the solve. Not a persisted diagnostic key.
+    parent_oxygen_demand_by_species: Mapping[str, float] = field(
+        default_factory=dict
+    )
 
     def as_diagnostic(self) -> dict[str, Any]:
         return {
@@ -281,8 +292,9 @@ class LangmuirSurfaceOxygen:
 class _Carrier:
     species: str
     pressure_Pa: float
-    # Mass-action slope of the parent reaction. Oxygen demand uses this,
-    # including while a condensed-metal cap holds the local slope at 0.
+    # Mass-action slope of the parent reaction. Fixed-valence oxygen
+    # demand uses this, including while a condensed-metal cap holds the
+    # local slope at 0. Elemental Fe with a ledger q does not.
     reaction_exponent: float | None
     p_ref_bar: float | None
     inverted: bool
@@ -455,6 +467,7 @@ def apply_langmuir_surface_oxygen(
     conductance_mol_s_m2_Pa: Mapping[str, float] | None = None,
     allow_unmeasured_alpha_fallback: bool = False,
     unmeasured_alpha_fallback_species_allowlist: set[str] | None = None,
+    fe3_over_sum_fe: float | None = None,
 ) -> LangmuirSurfaceOxygen:
     """Return flux pressures at the d-376 amendment 1 surface pO2.
 
@@ -463,8 +476,11 @@ def apply_langmuir_surface_oxygen(
     floor or the reservoir source capacity is negligible. Otherwise the
     map is the reservoir / mass-action publication. A successful root
     copies the map and rescales every melt-surface carrier at one
-    shared pO2. Reaction stoichiometry, not the local cap slope, is the
-    oxygen demand, and a condensed-metal cap follows the uncap law.
+    shared pO2. Fixed-valence reaction stoichiometry, not the local cap
+    slope, is the oxygen demand. Elemental Fe uses
+    ``iron_mean_oxygen_per_atom(fe3_over_sum_fe)`` when that ledger
+    fraction is passed, and the exponent inversion when it is not.
+    A condensed-metal cap follows the uncap law.
     Transport-headspace pressures, including SiO, stay published.
     The root already includes overhead backpressure and the publisher
     gas resistance, so the surface is not clamped to the overhead
@@ -560,6 +576,7 @@ def apply_langmuir_surface_oxygen(
         unmeasured_alpha_fallback_species_allowlist=(
             unmeasured_alpha_fallback_species_allowlist
         ),
+        fe3_over_sum_fe=fe3_over_sum_fe,
     )
 
 
@@ -904,15 +921,54 @@ def _flux_alpha(
     return float(decision.alpha), f"evaporation_flux_alpha:{status}", status
 
 
-def _parent_oxygen_demand(oxygen_atoms: float, exponent: float) -> float:
+def _parent_oxygen_demand(
+    oxygen_atoms: float,
+    exponent: float,
+    *,
+    metals: Mapping[str, float],
+    fe3_over_sum_fe: float | None,
+) -> float:
     """Oxygen atoms the parent must supply per vapor molecule.
 
-    This is ``dO = nO_gas - 2*n`` from the module docstring. Checks:
-    Ca n=-1/2, nO=0 demands 1; SiO n=-1/2, nO=1 demands 2; CaO(g) n=0,
-    nO=1 demands 1; O2 n=+1, nO=2 demands 0. The signed weight
-    (nO - demand) is 2n.
+    Fixed-valence parents use ``dO = nO_gas - 2*n``. Checks: Ca n=-1/2,
+    nO=0 demands 1; SiO n=-1/2, nO=1 demands 2; CaO(g) n=0, nO=1
+    demands 1; O2 n=+1, nO=2 demands 0. The signed weight
+    ``(nO - demand)`` is ``2n``.
+
+    Elemental Fe(g) with a furnace ledger q does not invert that
+    exponent. Premise (d-463, d-466): q is Fe3+/ΣFe on the ledger, and
+    the oxygen released per evaporated Fe atom is the melt mean
+    o_bar_Fe. Fe(g) carries no oxygen, so the released oxygen per Fe(g)
+    molecule is o_bar_Fe - 0.
+
+    Algebra: o_bar_Fe = 1 + q/2, from ``iron_mean_oxygen_per_atom``.
+    One Fe(g) therefore demands 1 + q/2 oxygen atoms. The metal-rail
+    exponent stays the fixed-activity FeO slope, n = -1/2. Inverting
+    that slope is 0 - 2*(-1/2) = 1 for every q, which is only the q = 0
+    case. FeO(g) and the FeO association gas stay on the exponent:
+    their n is not this parent stoichiometry, and replacing it would
+    move the q = 0 demand.
+
+    Units: q is mol Fe3+ / mol Fe, dimensionless. The return is a count
+    of O atoms per vapor molecule, also dimensionless. Multiplying by
+    the Fe atoms in the formula converts o_bar (O per Fe) into that
+    count. Ledger q does not change across the surface-pO2 probes, so
+    one evaluation here is the demand every residual evaluation uses.
+
+    Sanity: q = 0 is FeO and demands 1. q = 1 is Fe2O3 (3 O per 2 Fe)
+    and demands 1.5. q = 0.1 demands 1.05. q outside [0, 1] raises
+    from the owner and the carrier is refused.
     """
 
+    if (
+        fe3_over_sum_fe is not None
+        and oxygen_atoms == 0.0
+        and set(metals) == {"Fe"}
+    ):
+        from simulator.vacuum_oxygen_balance import iron_mean_oxygen_per_atom
+
+        n_fe = float(metals["Fe"])
+        return iron_mean_oxygen_per_atom(fe3_over_sum_fe) * n_fe  # b1293-fe-obar
     return oxygen_atoms - 2.0 * exponent
 
 
@@ -1337,6 +1393,7 @@ def _solve_or_refuse(
     eval_pO2_below_physical_floor: bool = False,
     allow_unmeasured_alpha_fallback: bool = False,
     unmeasured_alpha_fallback_species_allowlist: set[str] | None = None,
+    fe3_over_sum_fe: float | None = None,
 ) -> LangmuirSurfaceOxygen:
     registry = _formula_registry(rows)
     from simulator.evaporation import (
@@ -1400,11 +1457,26 @@ def _solve_or_refuse(
             zero_alpha.append(carrier)
             continue
         oxygen_atoms = float(formula.elements.get("O", 0.0))
+        metals = {
+            str(element): float(count)
+            for element, count in formula.elements.items()
+            if element != "O"
+        }
         # Reaction exponent, never the capped local slope. A pure-metal
-        # cap still releases the parent oxide's oxygen.
-        demand = _parent_oxygen_demand(
-            oxygen_atoms, carrier.reaction_exponent
-        )
+        # cap still releases its parent oxygen. Elemental Fe with a
+        # ledger q uses the mean oxygen owner instead of inverting n.
+        try:
+            demand = _parent_oxygen_demand(
+                oxygen_atoms,
+                float(carrier.reaction_exponent),
+                metals=metals,
+                fe3_over_sum_fe=fe3_over_sum_fe,
+            )
+        except ValueError as exc:
+            refused[carrier.species] = (
+                "oxygen demand refused; surface pressure omitted: " + str(exc)
+            )
+            continue
         if demand < 0.0:
             refused[carrier.species] = (
                 "oxygen demand is negative; surface pressure omitted"
@@ -1636,6 +1708,10 @@ def _solve_or_refuse(
         alpha_authority_status_by_species={
             species: status for species, status in alpha_authorities.items()
             if species in adjusted
+        },
+        parent_oxygen_demand_by_species={
+            channel.species: float(channel.parent_oxygen_demand)
+            for channel in channels
         },
     )
 

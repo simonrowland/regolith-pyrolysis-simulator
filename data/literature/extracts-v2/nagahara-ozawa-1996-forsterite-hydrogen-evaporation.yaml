@@ -85,6 +85,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_alpha_1e-4_bar
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -313,6 +324,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_alpha_vacuum
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -492,7 +514,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_equation_2_pressure_dependent_flux_fit
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 5
@@ -651,7 +683,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_optimized_J_p2p00Em05_r21_c14
-  experiment_id: 10.1016/0016-7037(96)00014-2::experiment::optimized_fit_2p00Em05
+  experiment_id: 10.1016/0016-7037(96)00014-2::nagahara-ozawa-1996-forsterite-hydrogen-evaporation::declared:10.1016/0016-7037(96)00014-2::experiment::optimized_fit_2p00Em05::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -701,7 +733,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_optimized_J_p2p00Em05_r21_c14
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -860,7 +902,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_optimized_J_p2p00Em06_r10_c14
-  experiment_id: 10.1016/0016-7037(96)00014-2::experiment::optimized_fit_2p00Em06
+  experiment_id: 10.1016/0016-7037(96)00014-2::nagahara-ozawa-1996-forsterite-hydrogen-evaporation::declared:10.1016/0016-7037(96)00014-2::experiment::optimized_fit_2p00Em06::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -910,7 +952,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_optimized_J_p2p00Em06_r10_c14
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -1067,7 +1119,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_optimized_J_p2p00Em07_r6_c14
-  experiment_id: 10.1016/0016-7037(96)00014-2::experiment::optimized_fit_2p00Em07
+  experiment_id: 10.1016/0016-7037(96)00014-2::nagahara-ozawa-1996-forsterite-hydrogen-evaporation::declared:10.1016/0016-7037(96)00014-2::experiment::optimized_fit_2p00Em07::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1117,7 +1169,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_optimized_J_p2p00Em07_r6_c14
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -1276,7 +1338,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_optimized_J_p3p95Em06_r13_c14
-  experiment_id: 10.1016/0016-7037(96)00014-2::experiment::optimized_fit_3p95Em06
+  experiment_id: 10.1016/0016-7037(96)00014-2::nagahara-ozawa-1996-forsterite-hydrogen-evaporation::declared:10.1016/0016-7037(96)00014-2::experiment::optimized_fit_3p95Em06::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1326,7 +1388,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_optimized_J_p3p95Em06_r13_c14
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -1485,7 +1557,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_optimized_J_p4p00Em05_r29_c14
-  experiment_id: 10.1016/0016-7037(96)00014-2::experiment::optimized_fit_4p00Em05
+  experiment_id: 10.1016/0016-7037(96)00014-2::nagahara-ozawa-1996-forsterite-hydrogen-evaporation::declared:10.1016/0016-7037(96)00014-2::experiment::optimized_fit_4p00Em05::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1535,7 +1607,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_optimized_J_p4p00Em05_r29_c14
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -1692,7 +1774,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_optimized_J_p7p89Em06_r19_c14
-  experiment_id: 10.1016/0016-7037(96)00014-2::experiment::optimized_fit_7p89Em06
+  experiment_id: 10.1016/0016-7037(96)00014-2::nagahara-ozawa-1996-forsterite-hydrogen-evaporation::declared:10.1016/0016-7037(96)00014-2::experiment::optimized_fit_7p89Em06::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1742,7 +1824,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_optimized_J_p7p89Em06_r19_c14
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -1897,7 +1989,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_optimized_J_p8p60Em05_r33_c14
-  experiment_id: 10.1016/0016-7037(96)00014-2::experiment::optimized_fit_8p60Em05
+  experiment_id: 10.1016/0016-7037(96)00014-2::nagahara-ozawa-1996-forsterite-hydrogen-evaporation::declared:10.1016/0016-7037(96)00014-2::experiment::optimized_fit_8p60Em05::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1947,7 +2039,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_optimized_J_p8p60Em05_r33_c14
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -2104,7 +2206,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_optimized_J_pvacuum_r2_c14
-  experiment_id: 10.1016/0016-7037(96)00014-2::experiment::optimized_fit_vacuum
+  experiment_id: 10.1016/0016-7037(96)00014-2::nagahara-ozawa-1996-forsterite-hydrogen-evaporation::declared:10.1016/0016-7037(96)00014-2::experiment::optimized_fit_vacuum::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2151,7 +2253,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_optimized_J_pvacuum_r2_c14
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -2335,7 +2447,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_752_evaporation_flux_r4_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -2569,6 +2691,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_752_mass_loss_fraction_r4_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -2760,7 +2893,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_752_mass_loss_g_r4_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -2950,7 +3093,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_752_sample_weights_r4_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -3135,7 +3288,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_753_evaporation_flux_r3_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -3369,6 +3532,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_753_mass_loss_fraction_r3_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -3560,7 +3734,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_753_mass_loss_g_r3_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -3750,7 +3934,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_753_sample_weights_r3_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -3935,7 +4129,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_754_evaporation_flux_r2_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -4169,6 +4373,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_754_mass_loss_fraction_r2_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -4360,7 +4575,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_754_mass_loss_g_r2_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -4553,7 +4778,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_754_sample_weights_r2_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -4745,7 +4980,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_755_evaporation_flux_r5_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -4979,6 +5224,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_755_mass_loss_fraction_r5_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -5170,7 +5426,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_755_mass_loss_g_r5_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -5360,7 +5626,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_755_sample_weights_r5_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -5545,7 +5821,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_756_evaporation_flux_r22_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -5779,6 +6065,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_756_mass_loss_fraction_r22_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -5970,7 +6267,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_756_mass_loss_g_r22_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -6163,7 +6470,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_756_sample_weights_r22_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -6355,7 +6672,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_764_evaporation_flux_r24_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -6589,6 +6916,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_764_mass_loss_fraction_r24_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -6780,7 +7118,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_764_mass_loss_g_r24_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -6973,7 +7321,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_764_sample_weights_r24_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -7165,7 +7523,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_765_evaporation_flux_r21_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -7399,6 +7767,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_765_mass_loss_fraction_r21_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -7590,7 +7969,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_765_mass_loss_g_r21_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -7780,7 +8169,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_765_sample_weights_r21_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -7965,7 +8364,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_766_evaporation_flux_r23_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -8199,6 +8608,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_766_mass_loss_fraction_r23_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -8390,7 +8810,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_766_mass_loss_g_r23_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -8583,7 +9013,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_766_sample_weights_r23_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -8775,7 +9215,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_767_evaporation_flux_r9_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -9009,6 +9459,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_767_mass_loss_fraction_r9_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -9200,7 +9661,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_767_mass_loss_g_r9_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -9393,7 +9864,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_767_sample_weights_r9_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -9585,7 +10066,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_768_evaporation_flux_r8_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -9819,6 +10310,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_768_mass_loss_fraction_r8_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -10010,7 +10512,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_768_mass_loss_g_r8_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -10203,7 +10715,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_768_sample_weights_r8_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -10395,7 +10917,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_769_evaporation_flux_r6_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -10629,6 +11161,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_769_mass_loss_fraction_r6_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -10820,7 +11363,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_769_mass_loss_g_r6_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -11010,7 +11563,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_769_sample_weights_r6_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -11195,7 +11758,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_770_evaporation_flux_r7_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -11429,6 +12002,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_770_mass_loss_fraction_r7_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -11620,7 +12204,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_770_mass_loss_g_r7_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -11813,7 +12407,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_770_sample_weights_r7_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -12005,7 +12609,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_771_evaporation_flux_r10_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -12239,6 +12853,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_771_mass_loss_fraction_r10_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -12430,7 +13055,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_771_mass_loss_g_r10_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -12620,7 +13255,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_771_sample_weights_r10_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -12805,7 +13450,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_772_evaporation_flux_r11_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -13039,6 +13694,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_772_mass_loss_fraction_r11_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -13230,7 +13896,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_772_mass_loss_g_r11_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -13423,7 +14099,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_772_sample_weights_r11_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -13615,7 +14301,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_773_evaporation_flux_r12_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -13849,6 +14545,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_773_mass_loss_fraction_r12_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -14040,7 +14747,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_773_mass_loss_g_r12_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -14233,7 +14950,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_773_sample_weights_r12_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -14425,7 +15152,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_774_evaporation_flux_r37_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -14659,6 +15396,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_774_mass_loss_fraction_r37_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -14850,7 +15598,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_774_mass_loss_g_r37_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -15043,7 +15801,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_774_sample_weights_r37_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -15235,7 +16003,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_775_evaporation_flux_r35_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -15469,6 +16247,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_775_mass_loss_fraction_r35_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -15660,7 +16449,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_775_mass_loss_g_r35_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -15853,7 +16652,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_775_sample_weights_r35_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -16045,7 +16854,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_776_evaporation_flux_r34_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -16279,6 +17098,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_776_mass_loss_fraction_r34_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -16470,7 +17300,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_776_mass_loss_g_r34_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -16663,7 +17503,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_776_sample_weights_r34_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -16855,7 +17705,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_777_evaporation_flux_r33_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -17089,6 +17949,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_777_mass_loss_fraction_r33_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -17280,7 +18151,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_777_mass_loss_g_r33_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -17470,7 +18351,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_777_sample_weights_r33_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -17655,7 +18546,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_778_evaporation_flux_r36_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -17889,6 +18790,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_778_mass_loss_fraction_r36_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -18080,7 +18992,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_778_mass_loss_g_r36_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -18273,7 +19195,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_778_sample_weights_r36_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -18465,7 +19397,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_779_evaporation_flux_r39_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -18699,6 +19641,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_779_mass_loss_fraction_r39_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -18890,7 +19843,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_779_mass_loss_g_r39_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -19083,7 +20046,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_779_sample_weights_r39_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -19275,7 +20248,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_780_evaporation_flux_r25_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -19509,6 +20492,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_780_mass_loss_fraction_r25_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -19700,7 +20694,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_780_mass_loss_g_r25_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -19893,7 +20897,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_780_sample_weights_r25_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -20085,7 +21099,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_781_evaporation_flux_r26_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -20319,6 +21343,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_781_mass_loss_fraction_r26_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -20510,7 +21545,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_781_mass_loss_g_r26_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -20703,7 +21748,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_781_sample_weights_r26_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -20895,7 +21950,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_782_evaporation_flux_r41_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -21129,6 +22194,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_782_mass_loss_fraction_r41_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -21320,7 +22396,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_782_mass_loss_g_r41_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -21513,7 +22599,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_782_sample_weights_r41_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -21705,7 +22801,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_783_evaporation_flux_r27_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -21939,6 +23045,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_783_mass_loss_fraction_r27_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -22130,7 +23247,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_783_mass_loss_g_r27_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -22323,7 +23450,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_783_sample_weights_r27_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -22515,7 +23652,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_784_evaporation_flux_r40_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -22749,6 +23896,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_784_mass_loss_fraction_r40_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -22940,7 +24098,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_784_mass_loss_g_r40_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -23133,7 +24301,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_784_sample_weights_r40_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -23325,7 +24503,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_785_evaporation_flux_r38_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -23559,6 +24747,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_785_mass_loss_fraction_r38_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -23750,7 +24949,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_785_mass_loss_g_r38_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -23940,7 +25149,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_785_sample_weights_r38_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -24125,7 +25344,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_786_evaporation_flux_r28_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -24359,6 +25588,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_786_mass_loss_fraction_r28_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -24550,7 +25790,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_786_mass_loss_g_r28_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -24743,7 +25993,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_786_sample_weights_r28_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -24935,7 +26195,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_787_evaporation_flux_r19_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -25169,6 +26439,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_787_mass_loss_fraction_r19_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -25360,7 +26641,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_787_mass_loss_g_r19_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -25550,7 +26841,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_787_sample_weights_r19_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -25735,7 +27036,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_788_evaporation_flux_r20_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -25969,6 +27280,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_788_mass_loss_fraction_r20_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -26160,7 +27482,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_788_mass_loss_g_r20_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -26353,7 +27685,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_788_sample_weights_r20_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -26545,7 +27887,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_789_evaporation_flux_r18_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -26779,6 +28131,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_789_mass_loss_fraction_r18_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -26970,7 +28333,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_789_mass_loss_g_r18_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -27163,7 +28536,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_789_sample_weights_r18_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -27355,7 +28738,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_790_evaporation_flux_r17_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -27589,6 +28982,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_790_mass_loss_fraction_r17_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -27780,7 +29184,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_790_mass_loss_g_r17_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -27970,7 +29384,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_790_sample_weights_r17_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -28155,7 +29579,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_791_evaporation_flux_r31_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -28389,6 +29823,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_791_mass_loss_fraction_r31_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -28580,7 +30025,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_791_mass_loss_g_r31_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -28773,7 +30228,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_791_sample_weights_r31_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -28965,7 +30430,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_792_evaporation_flux_r32_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -29199,6 +30674,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_792_mass_loss_fraction_r32_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -29390,7 +30876,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_792_mass_loss_g_r32_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -29583,7 +31079,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_792_sample_weights_r32_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -29775,7 +31281,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_793_evaporation_flux_r42_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -30009,6 +31525,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_793_mass_loss_fraction_r42_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -30200,7 +31727,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_793_mass_loss_g_r42_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -30390,7 +31927,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_793_sample_weights_r42_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -30575,7 +32122,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_794_evaporation_flux_r44_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -30809,6 +32366,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_794_mass_loss_fraction_r44_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -31000,7 +32568,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_794_mass_loss_g_r44_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -31193,7 +32771,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_794_sample_weights_r44_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -31385,7 +32973,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_795_evaporation_flux_r16_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -31619,6 +33217,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_795_mass_loss_fraction_r16_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -31810,7 +33419,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_795_mass_loss_g_r16_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -32003,7 +33622,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_795_sample_weights_r16_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -32195,7 +33824,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_796_evaporation_flux_r45_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -32429,6 +34068,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_796_mass_loss_fraction_r45_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -32620,7 +34270,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_796_mass_loss_g_r45_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -32810,7 +34470,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_796_sample_weights_r45_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -32995,7 +34665,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_797_evaporation_flux_r15_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -33229,6 +34909,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_797_mass_loss_fraction_r15_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -33420,7 +35111,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_797_mass_loss_g_r15_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -33613,7 +35314,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_797_sample_weights_r15_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -33805,7 +35516,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_798_evaporation_flux_r46_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -34039,6 +35760,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_798_mass_loss_fraction_r46_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -34232,7 +35964,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_798_mass_loss_g_r46_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -34425,7 +36167,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_798_sample_weights_r46_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -34617,7 +36369,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_799_evaporation_flux_r30_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -34851,6 +36613,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_799_mass_loss_fraction_r30_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -35042,7 +36815,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_799_mass_loss_g_r30_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -35235,7 +37018,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_799_sample_weights_r30_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -35427,7 +37220,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_800_evaporation_flux_r14_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -35661,6 +37464,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_800_mass_loss_fraction_r14_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -35852,7 +37666,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_800_mass_loss_g_r14_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -36045,7 +37869,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_800_sample_weights_r14_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -36237,7 +38071,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_804_evaporation_flux_r43_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -36471,6 +38315,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_804_mass_loss_fraction_r43_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -36662,7 +38517,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_804_mass_loss_g_r43_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -36855,7 +38720,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_804_sample_weights_r43_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -37047,7 +38922,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_805_evaporation_flux_r29_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -37281,6 +39166,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_805_mass_loss_fraction_r29_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -37472,7 +39368,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_805_mass_loss_g_r29_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -37662,7 +39568,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_805_sample_weights_r29_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -37847,7 +39763,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_806_evaporation_flux_r13_c12
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -38081,6 +40007,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_806_mass_loss_fraction_r13_c11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -38272,7 +40209,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_806_mass_loss_g_r13_c10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4
@@ -38462,7 +40409,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: nagahara-ozawa-1996-forsterite-hydrogen-evaporation::nagahara_ozawa_1996_run_806_sample_weights_r13_c8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   locator:
     page: 4

@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/shornikov-2023-mgo-phosphate-melts.yaml
 observations:
 - observation_id: shornikov-2023-mgo-phosphate-melts::shornikov_2023_mgo_fig2_curve_1
-  experiment_id: 8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b::experiment::shornikov-2023-mgo-model
+  experiment_id: 8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b::shornikov-2023-mgo-phosphate-melts::declared:8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b::experiment::shornikov-2023-mgo-model::method:unspecified
   identity:
     quantity:
       tag: value
@@ -90,7 +90,18 @@ observations:
         pdf_page_index: 4
         figure: '2'
         note: Curve 1. Calculated lg a(MgO) at 1673 K.; panel=A
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2023-mgo-phosphate-melts::shornikov_2023_mgo_fig2_curve_1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2023-mgo-phosphate-melts
   locator:
     page: 5
@@ -122,7 +133,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2023-mgo-phosphate-melts::shornikov_2023_mgo_fig2_p4o10_curve_3
-  experiment_id: 8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b::experiment::shornikov-2023-mgo-model
+  experiment_id: 8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b::shornikov-2023-mgo-phosphate-melts::declared:8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b::experiment::shornikov-2023-mgo-model::method:unspecified
   identity:
     quantity:
       tag: value
@@ -209,7 +220,18 @@ observations:
         pdf_page_index: 4
         figure: '2'
         note: Curve 3. Calculated lg a(P4O10) at 1673 K.; panel=A
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2023-mgo-phosphate-melts::shornikov_2023_mgo_fig2_p4o10_curve_3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2023-mgo-phosphate-melts
   locator:
     page: 5
@@ -241,7 +263,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2023-mgo-phosphate-melts::shornikov_2023_mgo_fig2_p4o10_symbols_4_to_8
-  experiment_id: 8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b::experiment::shornikov-2023-mgo-cited-points
+  experiment_id: 8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b::shornikov-2023-mgo-phosphate-melts::declared:8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b::experiment::shornikov-2023-mgo-cited-points::method:unspecified
   identity:
     quantity:
       tag: value
@@ -330,7 +352,18 @@ observations:
         pdf_page_index: 4
         figure: '2'
         note: Symbols 4–8 on the P4O10 activity panel.; panel=A
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2023-mgo-phosphate-melts::shornikov_2023_mgo_fig2_p4o10_symbols_4_to_8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2023-mgo-phosphate-melts
   locator:
     page: 5
@@ -361,7 +394,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2023-mgo-phosphate-melts::shornikov_2023_mgo_fig2_symbol_2
-  experiment_id: 8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b::experiment::shornikov-2023-mgo-cited-points
+  experiment_id: 8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b::shornikov-2023-mgo-phosphate-melts::declared:8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b::experiment::shornikov-2023-mgo-cited-points::method:unspecified
   identity:
     quantity:
       tag: value
@@ -448,7 +481,18 @@ observations:
         pdf_page_index: 4
         figure: '2'
         note: Symbol 2 on the MgO activity panel.; panel=A
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2023-mgo-phosphate-melts::shornikov_2023_mgo_fig2_symbol_2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2023-mgo-phosphate-melts
   locator:
     page: 5
@@ -480,7 +524,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2023-mgo-phosphate-melts::shornikov_2023_mgo_fig3_partial_pressures
-  experiment_id: 8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b::experiment::shornikov-2023-mgo-model
+  experiment_id: 8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b::shornikov-2023-mgo-phosphate-melts::declared:8328c51909be20b206cf1544461f15d04cd4afea1794aa8e19aa62c27ff5439b::experiment::shornikov-2023-mgo-model::method:unspecified
   identity:
     quantity:
       tag: value
@@ -568,7 +612,18 @@ observations:
         figure: '3'
         note: Lines 1–4 are calculated partial pressures of O2, Mg, PO and PO2 over Mg3P2O8 and Mg2P2O7. Symbols 5–7 are Knudsen
           measurements from Lopatin.
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2023-mgo-phosphate-melts::shornikov_2023_mgo_fig3_partial_pressures
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2023-mgo-phosphate-melts
   locator:
     page: 5

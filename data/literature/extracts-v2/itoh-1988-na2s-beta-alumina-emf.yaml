@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/itoh-1988-na2s-beta-alumina-emf.yaml
 observations:
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_eq3_emf_fit
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -50,7 +50,17 @@ observations:
         pdf_page_index: 1
         section: 3. Results and discussion
         equation: '3'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_eq3_emf_fit
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -172,7 +182,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_eq4_exchange_gibbs_fit
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -219,7 +229,17 @@ observations:
         pdf_page_index: 1
         section: 3. Results and discussion
         equation: '4'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_eq4_exchange_gibbs_fit
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -277,7 +297,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_eq7_na2s_delta_fg_fit
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: value
@@ -364,7 +384,18 @@ observations:
         pdf_page_index: 1
         section: 3. Results and discussion
         equation: '7'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_eq7_na2s_delta_fg_fit
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -486,7 +517,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_eq8_reference_na2s_delta_fg_fit
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: value
@@ -574,7 +605,18 @@ observations:
         pdf_page_index: 2
         section: 3. Results and discussion
         equation: '8'
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_eq8_reference_na2s_delta_fg_fit
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 3
@@ -637,7 +679,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no01_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -693,7 +735,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 1; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no01_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -745,7 +797,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no01_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -802,7 +854,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 1; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no01_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -863,7 +925,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no01_na2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: value
@@ -940,6 +1002,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no01_na2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -1014,7 +1087,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no02_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1070,7 +1143,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 2; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no02_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -1122,7 +1205,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no02_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1179,7 +1262,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 2; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no02_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -1240,7 +1333,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no02_na2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1317,6 +1410,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no02_na2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -1391,7 +1495,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no03_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1447,7 +1551,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 3; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no03_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -1499,7 +1613,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no03_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1556,7 +1670,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 3; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no03_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -1617,7 +1741,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no03_na2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1694,6 +1818,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no03_na2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -1768,7 +1903,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no04_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1824,7 +1959,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 4; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no04_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -1876,7 +2021,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no04_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1933,7 +2078,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 4; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no04_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -1994,7 +2149,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no04_na2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: value
@@ -2071,6 +2226,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no04_na2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -2145,7 +2311,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no05_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2201,7 +2367,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 5; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no05_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -2253,7 +2429,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no05_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2310,7 +2486,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 5; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no05_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -2371,7 +2557,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no05_na2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: value
@@ -2448,6 +2634,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no05_na2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -2522,7 +2719,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no06_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2578,7 +2775,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 6; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no06_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -2630,7 +2837,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no06_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2687,7 +2894,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 6; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no06_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -2748,7 +2965,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no06_na2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: value
@@ -2825,6 +3042,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no06_na2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -2899,7 +3127,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no07_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2955,7 +3183,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 7; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no07_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -3007,7 +3245,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no07_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -3064,7 +3302,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 7; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no07_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -3125,7 +3373,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no07_na2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: value
@@ -3202,6 +3450,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no07_na2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -3276,7 +3535,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no08_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -3331,7 +3590,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 8; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no08_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -3383,7 +3652,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no08_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -3439,7 +3708,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 8; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no08_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -3500,7 +3779,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no09_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -3556,7 +3835,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 9; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no09_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -3608,7 +3897,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no09_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -3665,7 +3954,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 9; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no09_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -3726,7 +4025,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no09_na2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: value
@@ -3803,6 +4102,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no09_na2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -3877,7 +4187,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no10_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -3933,7 +4243,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 10; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no10_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -3985,7 +4305,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no10_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -4042,7 +4362,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 10; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no10_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -4103,7 +4433,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no10_na2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: value
@@ -4180,6 +4510,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no10_na2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -4254,7 +4595,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no11_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -4310,7 +4651,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 11; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no11_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -4362,7 +4713,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no11_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -4419,7 +4770,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 11; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no11_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -4480,7 +4841,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no11_na2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: value
@@ -4557,6 +4918,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no11_na2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -4631,7 +5003,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no12_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -4687,7 +5059,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 12; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no12_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -4739,7 +5121,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no12_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -4796,7 +5178,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 12; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no12_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -4857,7 +5249,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no12_na2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: value
@@ -4934,6 +5326,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no12_na2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -5008,7 +5411,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no13_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -5064,7 +5467,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 13; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no13_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -5116,7 +5529,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no13_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -5173,7 +5586,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 13; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no13_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -5234,7 +5657,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no13_na2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: value
@@ -5311,6 +5734,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no13_na2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -5385,7 +5819,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no14_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -5441,7 +5875,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 14; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no14_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -5493,7 +5937,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no14_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -5550,7 +5994,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 14; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no14_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -5611,7 +6065,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no14_na2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: value
@@ -5688,6 +6142,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no14_na2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -5762,7 +6227,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no15_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -5818,7 +6283,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 15; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no15_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -5870,7 +6345,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no15_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -5927,7 +6402,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 15; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no15_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -5988,7 +6473,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no15_na2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: value
@@ -6065,6 +6550,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no15_na2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -6139,7 +6635,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no16_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -6195,7 +6691,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 16; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no16_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -6247,7 +6753,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no16_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -6304,7 +6810,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 16; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no16_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -6365,7 +6881,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no16_na2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: value
@@ -6442,6 +6958,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no16_na2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -6516,7 +7043,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no17_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -6572,7 +7099,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 17; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no17_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -6624,7 +7161,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no17_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -6681,7 +7218,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 17; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no17_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -6742,7 +7289,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no17_na2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: value
@@ -6819,6 +7366,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no17_na2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -6893,7 +7451,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no18_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -6949,7 +7507,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 18; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no18_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -7001,7 +7569,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no18_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -7058,7 +7626,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 18; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no18_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -7119,7 +7697,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no18_na2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: value
@@ -7196,6 +7774,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no18_na2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -7270,7 +7859,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no19_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -7326,7 +7915,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 19; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no19_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -7378,7 +7977,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no19_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -7435,7 +8034,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 19; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no19_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -7496,7 +8105,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no19_na2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: value
@@ -7573,6 +8182,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no19_na2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -7647,7 +8267,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no20_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -7703,7 +8323,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 20; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no20_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -7755,7 +8385,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no20_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -7812,7 +8442,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 20; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no20_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -7873,7 +8513,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no20_na2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: value
@@ -7950,6 +8590,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no20_na2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -8024,7 +8675,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no21_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -8080,7 +8731,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 21; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no21_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -8132,7 +8793,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no21_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -8189,7 +8850,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 21; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no21_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -8250,7 +8921,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no21_na2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: value
@@ -8327,6 +8998,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no21_na2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -8401,7 +9083,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no22_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -8456,7 +9138,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 22; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no22_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -8508,7 +9200,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no22_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -8564,7 +9256,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 22; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no22_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -8625,7 +9327,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no23_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -8680,7 +9382,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 23; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no23_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -8732,7 +9444,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no23_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -8788,7 +9500,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 23; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no23_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -8849,7 +9571,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no24_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -8904,7 +9626,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 24; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no24_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -8956,7 +9688,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no24_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -9012,7 +9744,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 24; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no24_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -9073,7 +9815,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no25_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -9128,7 +9870,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 25; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no25_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -9180,7 +9932,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no25_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -9236,7 +9988,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 25; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no25_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -9297,7 +10059,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no26_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -9352,7 +10114,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 26; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no26_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -9404,7 +10176,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no26_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -9460,7 +10232,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 26; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no26_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -9521,7 +10303,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no27_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -9576,7 +10358,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 27; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no27_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -9628,7 +10420,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no27_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -9684,7 +10476,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 27; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no27_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -9745,7 +10547,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no28_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -9800,7 +10602,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 28; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no28_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -9852,7 +10664,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no28_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -9908,7 +10720,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 28; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no28_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -9969,7 +10791,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no29_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -10025,7 +10847,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 29; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no29_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -10077,7 +10909,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no29_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -10134,7 +10966,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 29; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no29_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -10195,7 +11037,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no29_na2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: value
@@ -10272,6 +11114,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no29_na2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -10346,7 +11199,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no30_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -10402,7 +11255,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 30; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no30_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -10454,7 +11317,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no30_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -10511,7 +11374,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 30; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no30_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -10572,7 +11445,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no30_na2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: value
@@ -10649,6 +11522,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no30_na2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -10723,7 +11607,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no31_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -10779,7 +11663,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 31; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no31_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -10831,7 +11725,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no31_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -10888,7 +11782,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 31; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no31_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -10949,7 +11853,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no31_na2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: value
@@ -11026,6 +11930,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no31_na2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -11100,7 +12015,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no32_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -11156,7 +12071,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 32; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no32_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -11208,7 +12133,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no32_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -11265,7 +12190,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 32; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no32_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -11326,7 +12261,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no32_na2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: value
@@ -11403,6 +12338,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no32_na2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -11477,7 +12423,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no33_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -11532,7 +12478,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 33; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no33_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -11584,7 +12540,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no33_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -11640,7 +12596,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 33; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no33_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -11701,7 +12667,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no34_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -11747,7 +12713,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 34; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no34_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -11791,7 +12767,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no34_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -11838,7 +12814,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 34; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no34_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -11891,7 +12877,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no35_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -11937,7 +12923,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 35; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no35_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -11981,7 +12977,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no35_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -12028,7 +13024,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 35; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no35_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -12081,7 +13087,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no36_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -12127,7 +13133,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 36; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no36_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -12171,7 +13187,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no36_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -12218,7 +13234,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 1 No. 36; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run1_no36_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -12271,7 +13297,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no01_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -12317,7 +13343,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 2 No. 1; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no01_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -12361,7 +13397,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no01_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -12408,7 +13444,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 2 No. 1; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no01_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -12461,7 +13507,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no02_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -12507,7 +13553,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 2 No. 2; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no02_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -12551,7 +13607,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no02_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -12598,7 +13654,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 2 No. 2; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no02_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -12651,7 +13717,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no03_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -12697,7 +13763,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 2 No. 3; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no03_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -12741,7 +13817,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no03_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -12788,7 +13864,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 2 No. 3; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no03_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -12841,7 +13927,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no04_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -12888,7 +13974,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 2 No. 4; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no04_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -12932,7 +14028,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no04_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -12980,7 +14076,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 2 No. 4; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no04_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -13033,7 +14139,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no04_na2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: value
@@ -13110,6 +14216,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no04_na2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -13176,7 +14293,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no05_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -13223,7 +14340,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 2 No. 5; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no05_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -13267,7 +14394,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no05_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -13315,7 +14442,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 2 No. 5; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no05_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -13368,7 +14505,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no05_na2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: value
@@ -13445,6 +14582,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no05_na2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -13511,7 +14659,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no06_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -13558,7 +14706,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 2 No. 6; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no06_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -13602,7 +14760,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no06_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -13650,7 +14808,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 2 No. 6; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no06_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -13703,7 +14871,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no06_na2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: value
@@ -13780,6 +14948,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no06_na2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -13846,7 +15025,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no07_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -13893,7 +15072,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 2 No. 7; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no07_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -13937,7 +15126,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no07_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -13985,7 +15174,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 2 No. 7; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no07_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -14038,7 +15237,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no07_na2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: value
@@ -14115,6 +15314,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no07_na2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -14181,7 +15391,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no08_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -14228,7 +15438,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 2 No. 8; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no08_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -14272,7 +15492,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no08_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -14320,7 +15540,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 2 No. 8; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no08_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -14373,7 +15603,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no08_na2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: value
@@ -14450,6 +15680,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no08_na2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -14516,7 +15757,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no09_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -14563,7 +15804,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 2 No. 9; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no09_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -14607,7 +15858,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no09_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -14655,7 +15906,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 2 No. 9; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no09_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -14708,7 +15969,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no09_na2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: value
@@ -14785,6 +16046,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no09_na2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -14851,7 +16123,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no10_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -14898,7 +16170,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 2 No. 10; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no10_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -14942,7 +16224,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no10_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -14990,7 +16272,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 2 No. 10; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no10_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -15043,7 +16335,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no10_na2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: value
@@ -15120,6 +16412,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no10_na2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -15186,7 +16489,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no11_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -15232,7 +16535,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 2 No. 11; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no11_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -15276,7 +16589,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no11_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -15323,7 +16636,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 2 No. 11; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no11_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -15376,7 +16699,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no12_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -15422,7 +16745,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 2 No. 12; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no12_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -15466,7 +16799,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no12_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -15513,7 +16846,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 2 No. 12; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no12_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -15566,7 +16909,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no13_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -15612,7 +16955,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 2 No. 13; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no13_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -15656,7 +17009,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no13_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -15703,7 +17056,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 2 No. 13; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no13_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -15756,7 +17119,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no14_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -15802,7 +17165,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 2 No. 14; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no14_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -15846,7 +17219,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no14_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -15893,7 +17266,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 2 No. 14; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no14_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -15946,7 +17329,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no15_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -15992,7 +17375,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 2 No. 15; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no15_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -16036,7 +17429,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no15_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -16083,7 +17476,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 2 No. 15; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no15_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -16136,7 +17539,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no16_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -16182,7 +17585,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 2 No. 16; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no16_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -16226,7 +17639,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no16_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -16273,7 +17686,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 2 No. 16; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no16_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -16326,7 +17749,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no17_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -16373,7 +17796,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 2 No. 17; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no17_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -16417,7 +17850,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no17_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -16465,7 +17898,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 2 No. 17; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no17_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -16518,7 +17961,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no17_na2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: value
@@ -16595,6 +18038,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no17_na2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -16661,7 +18115,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no18_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -16708,7 +18162,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 2 No. 18; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no18_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -16752,7 +18216,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no18_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -16800,7 +18264,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 2 No. 18; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no18_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -16853,7 +18327,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no18_na2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: value
@@ -16930,6 +18404,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no18_na2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -16996,7 +18481,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no19_emf
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -17043,7 +18528,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 2 No. 19; column=3; column_label=E/V
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no19_emf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -17087,7 +18582,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no19_exchange_gibbs
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -17135,7 +18630,17 @@ observations:
         pdf_page_index: 1
         table: I
         note: row=Run 2 No. 19; column=4; column_label=ΔG*
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no19_exchange_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -17188,7 +18693,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no19_na2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
   identity:
     quantity:
       tag: value
@@ -17265,6 +18770,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t1_run2_no19_na2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -17331,7 +18847,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_500_ag2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data::method:unspecified
   identity:
     quantity:
       tag: value
@@ -17409,6 +18925,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_500_ag2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -17446,7 +18973,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_500_ag2s_g
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -17492,7 +19019,17 @@ observations:
         pdf_page_index: 1
         table: II
         note: row=500 K; column=6; column_label=G(α-Ag2S(s))
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_500_ag2s_g
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -17525,7 +19062,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_500_ag_g
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -17571,7 +19108,17 @@ observations:
         pdf_page_index: 1
         table: II
         note: row=500 K; column=4; column_label=G(Ag(s))
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_500_ag_g
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -17604,7 +19151,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_500_na2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data::method:unspecified
   identity:
     quantity:
       tag: value
@@ -17682,6 +19229,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_500_na2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -17719,7 +19277,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_500_na2s_g
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -17765,7 +19323,17 @@ observations:
         pdf_page_index: 1
         table: II
         note: row=500 K; column=5; column_label=G(Na2S(s))
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_500_na2s_g
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -17798,7 +19366,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_500_na_g
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -17843,7 +19411,17 @@ observations:
         pdf_page_index: 1
         table: II
         note: row=500 K; column=3; column_label=G(Na(l))
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_500_na_g
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -17876,7 +19454,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_500_s2_g
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -17921,7 +19499,17 @@ observations:
         pdf_page_index: 1
         table: II
         note: row=500 K; column=2; column_label=G(S2(g))
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_500_s2_g
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -17954,7 +19542,7 @@ observations:
   provenance:
     printed_phase: g
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_600_ag2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data::method:unspecified
   identity:
     quantity:
       tag: value
@@ -18032,6 +19620,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_600_ag2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -18069,7 +19668,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_600_ag2s_g
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -18115,7 +19714,17 @@ observations:
         pdf_page_index: 1
         table: II
         note: row=600 K; column=6; column_label=G(α-Ag2S(s))
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_600_ag2s_g
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -18148,7 +19757,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_600_ag_g
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -18194,7 +19803,17 @@ observations:
         pdf_page_index: 1
         table: II
         note: row=600 K; column=4; column_label=G(Ag(s))
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_600_ag_g
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -18227,7 +19846,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_600_na2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data::method:unspecified
   identity:
     quantity:
       tag: value
@@ -18305,6 +19924,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_600_na2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -18342,7 +19972,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_600_na2s_g
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -18388,7 +20018,17 @@ observations:
         pdf_page_index: 1
         table: II
         note: row=600 K; column=5; column_label=G(Na2S(s))
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_600_na2s_g
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -18421,7 +20061,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_600_na_g
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -18466,7 +20106,17 @@ observations:
         pdf_page_index: 1
         table: II
         note: row=600 K; column=3; column_label=G(Na(l))
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_600_na_g
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -18499,7 +20149,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_600_s2_g
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -18544,7 +20194,17 @@ observations:
         pdf_page_index: 1
         table: II
         note: row=600 K; column=2; column_label=G(S2(g))
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_600_s2_g
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -18577,7 +20237,7 @@ observations:
   provenance:
     printed_phase: g
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_700_ag2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data::method:unspecified
   identity:
     quantity:
       tag: value
@@ -18655,6 +20315,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_700_ag2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -18692,7 +20363,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_700_ag2s_g
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -18738,7 +20409,17 @@ observations:
         pdf_page_index: 1
         table: II
         note: row=700 K; column=6; column_label=G(α-Ag2S(s))
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_700_ag2s_g
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -18771,7 +20452,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_700_ag_g
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -18817,7 +20498,17 @@ observations:
         pdf_page_index: 1
         table: II
         note: row=700 K; column=4; column_label=G(Ag(s))
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_700_ag_g
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -18850,7 +20541,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_700_na2s_delta_fg
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data::method:unspecified
   identity:
     quantity:
       tag: value
@@ -18928,6 +20619,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_700_na2s_delta_fg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -18965,7 +20667,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_700_na2s_g
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -19011,7 +20713,17 @@ observations:
         pdf_page_index: 1
         table: II
         note: row=700 K; column=5; column_label=G(Na2S(s))
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_700_na2s_g
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -19044,7 +20756,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_700_na_g
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -19089,7 +20801,17 @@ observations:
         pdf_page_index: 1
         table: II
         note: row=700 K; column=3; column_label=G(Na(l))
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_700_na_g
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2
@@ -19122,7 +20844,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_700_s2_g
-  experiment_id: 10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data
+  experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -19167,7 +20889,17 @@ observations:
         pdf_page_index: 1
         table: II
         note: row=700 K; column=2; column_label=G(S2(g))
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: itoh-1988-na2s-beta-alumina-emf::itoh_1988_t2_700_s2_g
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: itoh-1988-na2s-beta-alumina-emf
   locator:
     page: 2

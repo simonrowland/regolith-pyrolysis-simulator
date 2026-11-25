@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/zhang-2021-acsesc-si.yaml
 observations:
 - observation_id: zhang-2021-acsesc-si::zhang_2021_table1_bas1200c0h1_residue_composition
-  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si
+  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si::method:electron_microprobe
   identity:
     quantity:
       tag: value
@@ -75,7 +75,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_inferred: value=electron_microprobe; evidence=source text names ''electron probe microanalysis''; original_reason=source
+      method text: electron probe microanalysis (EPMA)'
+    origin: zhang-2021-acsesc-si::zhang_2021_table1_bas1200c0h1_residue_composition
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: electron_microprobe
+      units: method token
   source_id: zhang-2021-acsesc-si
   locator:
     page: 71
@@ -366,7 +378,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: zhang-2021-acsesc-si::zhang_2021_table1_bas1200c0h2_residue_composition
-  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si
+  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si::method:electron_microprobe
   identity:
     quantity:
       tag: value
@@ -438,7 +450,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_inferred: value=electron_microprobe; evidence=source text names ''electron probe microanalysis''; original_reason=source
+      method text: electron probe microanalysis (EPMA)'
+    origin: zhang-2021-acsesc-si::zhang_2021_table1_bas1200c0h2_residue_composition
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: electron_microprobe
+      units: method token
   source_id: zhang-2021-acsesc-si
   locator:
     page: 71
@@ -729,7 +753,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: zhang-2021-acsesc-si::zhang_2021_table1_bas1200c10h_residue_composition
-  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si
+  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si::method:electron_microprobe
   identity:
     quantity:
       tag: value
@@ -801,7 +825,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_inferred: value=electron_microprobe; evidence=source text names ''electron probe microanalysis''; original_reason=source
+      method text: electron probe microanalysis (EPMA)'
+    origin: zhang-2021-acsesc-si::zhang_2021_table1_bas1200c10h_residue_composition
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: electron_microprobe
+      units: method token
   source_id: zhang-2021-acsesc-si
   locator:
     page: 71
@@ -1092,7 +1128,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: zhang-2021-acsesc-si::zhang_2021_table1_bas1200c1h_residue_composition
-  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si
+  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si::method:electron_microprobe
   identity:
     quantity:
       tag: value
@@ -1164,7 +1200,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_inferred: value=electron_microprobe; evidence=source text names ''electron probe microanalysis''; original_reason=source
+      method text: electron probe microanalysis (EPMA)'
+    origin: zhang-2021-acsesc-si::zhang_2021_table1_bas1200c1h_residue_composition
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: electron_microprobe
+      units: method token
   source_id: zhang-2021-acsesc-si
   locator:
     page: 71
@@ -1455,7 +1503,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: zhang-2021-acsesc-si::zhang_2021_table1_bas1200c40h_residue_composition
-  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si
+  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si::method:electron_microprobe
   identity:
     quantity:
       tag: value
@@ -1527,7 +1575,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_inferred: value=electron_microprobe; evidence=source text names ''electron probe microanalysis''; original_reason=source
+      method text: electron probe microanalysis (EPMA)'
+    origin: zhang-2021-acsesc-si::zhang_2021_table1_bas1200c40h_residue_composition
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: electron_microprobe
+      units: method token
   source_id: zhang-2021-acsesc-si
   locator:
     page: 71
@@ -1818,7 +1878,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: zhang-2021-acsesc-si::zhang_2021_table1_bas1200c4h_residue_composition
-  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si
+  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si::method:electron_microprobe
   identity:
     quantity:
       tag: value
@@ -1890,7 +1950,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_inferred: value=electron_microprobe; evidence=source text names ''electron probe microanalysis''; original_reason=source
+      method text: electron probe microanalysis (EPMA)'
+    origin: zhang-2021-acsesc-si::zhang_2021_table1_bas1200c4h_residue_composition
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: electron_microprobe
+      units: method token
   source_id: zhang-2021-acsesc-si
   locator:
     page: 71
@@ -2181,7 +2253,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: zhang-2021-acsesc-si::zhang_2021_table1_bas1400c0m1_residue_composition
-  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si
+  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si::method:electron_microprobe
   identity:
     quantity:
       tag: value
@@ -2253,7 +2325,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_inferred: value=electron_microprobe; evidence=source text names ''electron probe microanalysis''; original_reason=source
+      method text: electron probe microanalysis (EPMA)'
+    origin: zhang-2021-acsesc-si::zhang_2021_table1_bas1400c0m1_residue_composition
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: electron_microprobe
+      units: method token
   source_id: zhang-2021-acsesc-si
   locator:
     page: 71
@@ -2544,7 +2628,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: zhang-2021-acsesc-si::zhang_2021_table1_bas1400c0m2_residue_composition
-  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si
+  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si::method:electron_microprobe
   identity:
     quantity:
       tag: value
@@ -2616,7 +2700,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_inferred: value=electron_microprobe; evidence=source text names ''electron probe microanalysis''; original_reason=source
+      method text: electron probe microanalysis (EPMA)'
+    origin: zhang-2021-acsesc-si::zhang_2021_table1_bas1400c0m2_residue_composition
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: electron_microprobe
+      units: method token
   source_id: zhang-2021-acsesc-si
   locator:
     page: 71
@@ -2907,7 +3003,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: zhang-2021-acsesc-si::zhang_2021_table1_bas1400c15m_residue_composition
-  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si
+  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si::method:electron_microprobe
   identity:
     quantity:
       tag: value
@@ -2979,7 +3075,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_inferred: value=electron_microprobe; evidence=source text names ''electron probe microanalysis''; original_reason=source
+      method text: electron probe microanalysis (EPMA)'
+    origin: zhang-2021-acsesc-si::zhang_2021_table1_bas1400c15m_residue_composition
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: electron_microprobe
+      units: method token
   source_id: zhang-2021-acsesc-si
   locator:
     page: 71
@@ -3270,7 +3378,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: zhang-2021-acsesc-si::zhang_2021_table1_bas1400c30m_residue_composition
-  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si
+  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si::method:electron_microprobe
   identity:
     quantity:
       tag: value
@@ -3342,7 +3450,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_inferred: value=electron_microprobe; evidence=source text names ''electron probe microanalysis''; original_reason=source
+      method text: electron probe microanalysis (EPMA)'
+    origin: zhang-2021-acsesc-si::zhang_2021_table1_bas1400c30m_residue_composition
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: electron_microprobe
+      units: method token
   source_id: zhang-2021-acsesc-si
   locator:
     page: 71
@@ -3633,7 +3753,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: zhang-2021-acsesc-si::zhang_2021_table1_bas1400c60m_residue_composition
-  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si
+  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si::method:electron_microprobe
   identity:
     quantity:
       tag: value
@@ -3705,7 +3825,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_inferred: value=electron_microprobe; evidence=source text names ''electron probe microanalysis''; original_reason=source
+      method text: electron probe microanalysis (EPMA)'
+    origin: zhang-2021-acsesc-si::zhang_2021_table1_bas1400c60m_residue_composition
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: electron_microprobe
+      units: method token
   source_id: zhang-2021-acsesc-si
   locator:
     page: 71
@@ -3996,7 +4128,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: zhang-2021-acsesc-si::zhang_2021_table1_bas1400c90m_residue_composition
-  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si
+  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si::method:electron_microprobe
   identity:
     quantity:
       tag: value
@@ -4068,7 +4200,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_inferred: value=electron_microprobe; evidence=source text names ''electron probe microanalysis''; original_reason=source
+      method text: electron probe microanalysis (EPMA)'
+    origin: zhang-2021-acsesc-si::zhang_2021_table1_bas1400c90m_residue_composition
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: electron_microprobe
+      units: method token
   source_id: zhang-2021-acsesc-si
   locator:
     page: 71

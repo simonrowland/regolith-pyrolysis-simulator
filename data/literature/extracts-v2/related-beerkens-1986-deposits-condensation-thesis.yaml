@@ -80,7 +80,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_literature_jackson_duffin_1700_nacl_dew_point
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 70
@@ -241,7 +252,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_literature_jackson_duffin_34_nacl_dew_point
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 70
@@ -402,7 +424,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_literature_kohl_na2so4_dew_point
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 71
@@ -562,7 +595,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_section3_3_2_na2so4_experimental_dew_point_gas_i
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 112
@@ -722,7 +766,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - wall_deposit_areal_rate
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_section4_5_5_k2so4_measured_maximum_deposition_rate
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 167
@@ -904,7 +959,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - wall_deposit_areal_rate
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_section4_5_5_na2so4_model_comparator_rate
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 167
@@ -1081,7 +1147,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_section4_5_6_pbo_measured_dew_point
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 168
@@ -1244,7 +1321,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - wall_deposit_areal_rate
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_section4_5_6_pbo_measured_maximum_deposition_rate
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 169
@@ -1381,7 +1469,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table1_5_k_volume_ppm
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 28
@@ -1480,7 +1578,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table1_5_k_volume_ppm
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 28
@@ -1579,7 +1687,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table1_5_k_volume_ppm
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 28
@@ -1678,7 +1796,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table1_5_k_volume_ppm
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 28
@@ -1777,7 +1905,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table1_5_k_volume_ppm
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 28
@@ -1876,7 +2014,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table1_5_k_volume_ppm
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 28
@@ -1975,7 +2123,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table1_5_na_volume_ppm
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 28
@@ -2074,7 +2232,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table1_5_na_volume_ppm
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 28
@@ -2173,7 +2341,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table1_5_na_volume_ppm
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 28
@@ -2272,7 +2450,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table1_5_na_volume_ppm
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 28
@@ -2371,7 +2559,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table1_5_na_volume_ppm
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 28
@@ -2470,7 +2668,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table1_5_na_volume_ppm
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 28
@@ -2569,7 +2777,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table1_5_na_volume_ppm
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 28
@@ -2668,7 +2886,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table1_5_s_volume_ppm
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 28
@@ -2767,7 +2995,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table1_5_s_volume_ppm
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 28
@@ -2866,7 +3104,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table1_5_s_volume_ppm
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 28
@@ -2965,7 +3213,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table1_5_s_volume_ppm
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 28
@@ -3064,7 +3322,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table1_5_s_volume_ppm
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 28
@@ -3163,7 +3431,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table1_5_s_volume_ppm
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 28
@@ -3262,7 +3540,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table2_4_water_cooled_paddle_carryover
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 73
@@ -3363,7 +3651,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table2_4_water_cooled_paddle_carryover
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 73
@@ -3464,7 +3762,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table2_4_water_cooled_paddle_carryover
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 73
@@ -3565,7 +3873,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table2_4_water_cooled_paddle_carryover
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 73
@@ -3666,7 +3984,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table2_4_water_cooled_paddle_carryover
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 73
@@ -3767,7 +4095,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table2_4_water_cooled_paddle_carryover
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 73
@@ -3868,7 +4206,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table2_4_water_cooled_paddle_carryover
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 73
@@ -3969,7 +4317,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table2_4_water_cooled_paddle_carryover
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 73
@@ -4077,7 +4435,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table2_4_water_cooled_paddle_carryover
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 73
@@ -4185,7 +4553,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table2_4_water_cooled_paddle_carryover
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 73
@@ -4293,7 +4671,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table2_4_water_cooled_paddle_carryover
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 73
@@ -4401,7 +4789,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table2_4_water_cooled_paddle_carryover
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 73
@@ -4509,7 +4907,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table2_4_water_cooled_paddle_carryover
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 73
@@ -4617,7 +5025,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table2_4_water_cooled_paddle_carryover
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 73
@@ -4725,7 +5143,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table2_4_water_cooled_paddle_carryover
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 73
@@ -4833,7 +5261,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table2_4_water_cooled_paddle_carryover
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 73
@@ -4941,7 +5379,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table2_4_water_cooled_paddle_carryover
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 73
@@ -5049,7 +5497,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table2_4_water_cooled_paddle_carryover
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 73
@@ -5157,7 +5615,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table2_4_water_cooled_paddle_carryover
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 73
@@ -5310,7 +5778,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - wall_deposit_areal_rate
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_2_na2so4_max_deposition_rate_cfbl
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 137
@@ -5484,7 +5963,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - wall_deposit_areal_rate
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_2_na2so4_max_deposition_rate_cfbl
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 137
@@ -5658,7 +6148,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - wall_deposit_areal_rate
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_2_na2so4_max_deposition_rate_cfbl
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 137
@@ -5832,7 +6333,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - wall_deposit_areal_rate
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_2_na2so4_max_deposition_rate_cfbl
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 137
@@ -6005,7 +6517,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - wall_deposit_areal_rate
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_2_na2so4_max_deposition_rate_experiment
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 137
@@ -6178,7 +6701,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - wall_deposit_areal_rate
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_2_na2so4_max_deposition_rate_experiment
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 137
@@ -6351,7 +6885,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - wall_deposit_areal_rate
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_2_na2so4_max_deposition_rate_experiment
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 137
@@ -6524,7 +7069,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - wall_deposit_areal_rate
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_2_na2so4_max_deposition_rate_experiment
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 137
@@ -6698,7 +7254,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_3_na2so4_dew_point_cfbl_saturation_10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 139
@@ -6854,7 +7421,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_3_na2so4_dew_point_cfbl_saturation_10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 139
@@ -7010,7 +7588,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_3_na2so4_dew_point_cfbl_saturation_10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 139
@@ -7166,7 +7755,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_3_na2so4_dew_point_cfbl_saturation_10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 139
@@ -7322,7 +7922,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_3_na2so4_dew_point_cfbl_saturation_1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 139
@@ -7478,7 +8089,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_3_na2so4_dew_point_cfbl_saturation_1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 139
@@ -7634,7 +8256,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_3_na2so4_dew_point_cfbl_saturation_1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 139
@@ -7790,7 +8423,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_3_na2so4_dew_point_cfbl_saturation_1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 139
@@ -7945,7 +8589,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_3_na2so4_dew_point_experiment
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 139
@@ -8100,7 +8755,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_3_na2so4_dew_point_experiment
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 139
@@ -8255,7 +8921,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_3_na2so4_dew_point_experiment
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 139
@@ -8410,7 +9087,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: related-beerkens-1986-deposits-condensation-thesis::beerkens_1986_table4_3_na2so4_dew_point_experiment
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: related-beerkens-1986-deposits-condensation-thesis
   locator:
     page: 139

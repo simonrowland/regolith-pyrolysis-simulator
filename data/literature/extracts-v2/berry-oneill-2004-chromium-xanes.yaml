@@ -7153,7 +7153,7 @@ observations:
   provenance:
     printed_phase: condensed_liquid
 - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_en_r25::T=1673.15:h=700ef3c65d6a
-  experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::experiment::berry_2004_table3_one_bar
+  experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::berry-oneill-2004-chromium-xanes::declared:4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::experiment::berry_2004_table3_one_bar::method:xanes_spectroscopy
   identity:
     quantity:
       tag: value
@@ -13874,7 +13874,7 @@ observations:
   provenance:
     printed_phase: condensed_liquid
 - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_fo_r25::T=1673.15:h=2c08df0bc7fd
-  experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::experiment::berry_2004_table3_one_bar
+  experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::berry-oneill-2004-chromium-xanes::declared:4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::experiment::berry_2004_table3_one_bar::method:xanes_spectroscopy
   identity:
     quantity:
       tag: value
@@ -21034,7 +21034,7 @@ observations:
   provenance:
     printed_phase: condensed_liquid
 - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_qz_r25::T=1673.15:h=42834e735fd6
-  experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::experiment::berry_2004_table3_one_bar
+  experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::berry-oneill-2004-chromium-xanes::declared:4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::experiment::berry_2004_table3_one_bar::method:xanes_spectroscopy
   identity:
     quantity:
       tag: value
@@ -28080,7 +28080,7 @@ observations:
   provenance:
     printed_phase: condensed_liquid
 - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_r25::T=1673.15:h=f2ee7db36dd4
-  experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::experiment::berry_2004_table3_one_bar
+  experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::berry-oneill-2004-chromium-xanes::declared:4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::experiment::berry_2004_table3_one_bar::method:xanes_spectroscopy
   identity:
     quantity:
       tag: value
@@ -43257,7 +43257,7 @@ observations:
   provenance:
     printed_phase: condensed_liquid
 - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table3_ad_wo_r25::T=1673.15:h=8100eac1a67c
-  experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::experiment::berry_2004_table3_one_bar
+  experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::berry-oneill-2004-chromium-xanes::declared:4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::experiment::berry_2004_table3_one_bar::method:xanes_spectroscopy
   identity:
     quantity:
       tag: value
@@ -43592,7 +43592,7 @@ observations:
   provenance:
     printed_phase: condensed_liquid
 - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table4_logkprime_ad::T=1673.15:h=9f93a39f90e1
-  experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::berry-oneill-2004-chromium-xanes
+  experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::berry-oneill-2004-chromium-xanes::method:unspecified
   identity:
     quantity:
       tag: value
@@ -43697,7 +43697,18 @@ observations:
         pdf_page_index: 6
         table: '4'
         record: Table 4 row AD log K-prime fit
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 4 redox fit'
+    origin: berry-oneill-2004-chromium-xanes::berry_2004_table4_logkprime_ad
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-oneill-2004-chromium-xanes
   locator:
     published_page: 795
@@ -43910,7 +43921,7 @@ observations:
   provenance:
     printed_phase: condensed_liquid
 - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table4_logkprime_ad_en::T=1673.15:h=368466279c06
-  experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::berry-oneill-2004-chromium-xanes
+  experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::berry-oneill-2004-chromium-xanes::method:unspecified
   identity:
     quantity:
       tag: value
@@ -44015,7 +44026,18 @@ observations:
         pdf_page_index: 6
         table: '4'
         record: Table 4 row AD + En log K-prime fit
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 4 redox fit'
+    origin: berry-oneill-2004-chromium-xanes::berry_2004_table4_logkprime_ad_en
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-oneill-2004-chromium-xanes
   locator:
     published_page: 795
@@ -44228,7 +44250,7 @@ observations:
   provenance:
     printed_phase: condensed_liquid
 - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table4_logkprime_ad_fo::T=1673.15:h=f8e197111d14
-  experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::berry-oneill-2004-chromium-xanes
+  experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::berry-oneill-2004-chromium-xanes::method:unspecified
   identity:
     quantity:
       tag: value
@@ -44333,7 +44355,18 @@ observations:
         pdf_page_index: 6
         table: '4'
         record: Table 4 row AD + Fo log K-prime fit
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 4 redox fit'
+    origin: berry-oneill-2004-chromium-xanes::berry_2004_table4_logkprime_ad_fo
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-oneill-2004-chromium-xanes
   locator:
     published_page: 795
@@ -44546,7 +44579,7 @@ observations:
   provenance:
     printed_phase: condensed_liquid
 - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table4_logkprime_ad_qz::T=1673.15:h=5772c5899246
-  experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::berry-oneill-2004-chromium-xanes
+  experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::berry-oneill-2004-chromium-xanes::method:unspecified
   identity:
     quantity:
       tag: value
@@ -44651,7 +44684,18 @@ observations:
         pdf_page_index: 6
         table: '4'
         record: Table 4 row AD + Qz log K-prime fit
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 4 redox fit'
+    origin: berry-oneill-2004-chromium-xanes::berry_2004_table4_logkprime_ad_qz
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-oneill-2004-chromium-xanes
   locator:
     published_page: 795
@@ -44864,7 +44908,7 @@ observations:
   provenance:
     printed_phase: condensed_liquid
 - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table4_logkprime_ad_rt10::T=1673.15:h=b61f472662dc
-  experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::berry-oneill-2004-chromium-xanes
+  experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::berry-oneill-2004-chromium-xanes::method:unspecified
   identity:
     quantity:
       tag: value
@@ -44971,7 +45015,18 @@ observations:
         pdf_page_index: 6
         table: '4'
         record: Table 4 row AD + Rt (10%) log K-prime fit
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 4 redox fit'
+    origin: berry-oneill-2004-chromium-xanes::berry_2004_table4_logkprime_ad_rt10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-oneill-2004-chromium-xanes
   locator:
     published_page: 795
@@ -45205,7 +45260,7 @@ observations:
   provenance:
     printed_phase: condensed_liquid
 - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table4_logkprime_ad_rt20::T=1673.15:h=0b5bcc9f2574
-  experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::berry-oneill-2004-chromium-xanes
+  experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::berry-oneill-2004-chromium-xanes::method:unspecified
   identity:
     quantity:
       tag: value
@@ -45312,7 +45367,18 @@ observations:
         pdf_page_index: 6
         table: '4'
         record: Table 4 row AD + Rt (20%) log K-prime fit
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 4 redox fit'
+    origin: berry-oneill-2004-chromium-xanes::berry_2004_table4_logkprime_ad_rt20
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-oneill-2004-chromium-xanes
   locator:
     published_page: 795
@@ -45546,7 +45612,7 @@ observations:
   provenance:
     printed_phase: condensed_liquid
 - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table4_logkprime_ad_wo::T=1673.15:h=59502b562690
-  experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::berry-oneill-2004-chromium-xanes
+  experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::berry-oneill-2004-chromium-xanes::method:unspecified
   identity:
     quantity:
       tag: value
@@ -45651,7 +45717,18 @@ observations:
         pdf_page_index: 6
         table: '4'
         record: Table 4 row AD + Wo log K-prime fit
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 4 redox fit'
+    origin: berry-oneill-2004-chromium-xanes::berry_2004_table4_logkprime_ad_wo
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-oneill-2004-chromium-xanes
   locator:
     published_page: 795
@@ -45864,7 +45941,7 @@ observations:
   provenance:
     printed_phase: condensed_liquid
 - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table4_slope_ad::T=1673.15:h=37b5c0ac03c0
-  experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::berry-oneill-2004-chromium-xanes
+  experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::berry-oneill-2004-chromium-xanes::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -45923,7 +46000,18 @@ observations:
         pdf_page_index: 6
         table: '4'
         record: Table 4 row AD n/4 slope
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 4 variable-exponent
+      redox fit'
+    origin: berry-oneill-2004-chromium-xanes::berry_2004_table4_slope_ad
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-oneill-2004-chromium-xanes
   locator:
     published_page: 795
@@ -46136,7 +46224,7 @@ observations:
   provenance:
     printed_phase: condensed_liquid
 - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table4_slope_ad_en::T=1673.15:h=decc84798669
-  experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::berry-oneill-2004-chromium-xanes
+  experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::berry-oneill-2004-chromium-xanes::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -46195,7 +46283,18 @@ observations:
         pdf_page_index: 6
         table: '4'
         record: Table 4 row AD + En n/4 slope
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 4 variable-exponent
+      redox fit'
+    origin: berry-oneill-2004-chromium-xanes::berry_2004_table4_slope_ad_en
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-oneill-2004-chromium-xanes
   locator:
     published_page: 795
@@ -46408,7 +46507,7 @@ observations:
   provenance:
     printed_phase: condensed_liquid
 - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table4_slope_ad_fo::T=1673.15:h=71ea4e95f391
-  experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::berry-oneill-2004-chromium-xanes
+  experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::berry-oneill-2004-chromium-xanes::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -46467,7 +46566,18 @@ observations:
         pdf_page_index: 6
         table: '4'
         record: Table 4 row AD + Fo n/4 slope
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 4 variable-exponent
+      redox fit'
+    origin: berry-oneill-2004-chromium-xanes::berry_2004_table4_slope_ad_fo
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-oneill-2004-chromium-xanes
   locator:
     published_page: 795
@@ -46680,7 +46790,7 @@ observations:
   provenance:
     printed_phase: condensed_liquid
 - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table4_slope_ad_qz::T=1673.15:h=1b0d297c335a
-  experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::berry-oneill-2004-chromium-xanes
+  experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::berry-oneill-2004-chromium-xanes::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -46739,7 +46849,18 @@ observations:
         pdf_page_index: 6
         table: '4'
         record: Table 4 row AD + Qz n/4 slope
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 4 variable-exponent
+      redox fit'
+    origin: berry-oneill-2004-chromium-xanes::berry_2004_table4_slope_ad_qz
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-oneill-2004-chromium-xanes
   locator:
     published_page: 795
@@ -46952,7 +47073,7 @@ observations:
   provenance:
     printed_phase: condensed_liquid
 - observation_id: berry-oneill-2004-chromium-xanes::berry_2004_table4_slope_ad_wo::T=1673.15:h=df7a106433a5
-  experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::berry-oneill-2004-chromium-xanes
+  experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::berry-oneill-2004-chromium-xanes::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -47011,7 +47132,18 @@ observations:
         pdf_page_index: 6
         table: '4'
         record: Table 4 row AD + Wo n/4 slope
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 4 variable-exponent
+      redox fit'
+    origin: berry-oneill-2004-chromium-xanes::berry_2004_table4_slope_ad_wo
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-oneill-2004-chromium-xanes
   locator:
     published_page: 795

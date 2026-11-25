@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/shornikov-2007-ca-aluminosilicate-activities.yaml
 observations:
 - observation_id: shornikov-2007-ca-aluminosilicate-activities::shornikov_2007_redox_al_ratio
-  experiment_id: 1cff46581acf4550d852ed77c0567fcfdefd9bc7075cd2af2b7be979e83f5bfe::experiment::shornikov-2007-redox-note
+  experiment_id: 1cff46581acf4550d852ed77c0567fcfdefd9bc7075cd2af2b7be979e83f5bfe::shornikov-2007-ca-aluminosilicate-activities::declared:1cff46581acf4550d852ed77c0567fcfdefd9bc7075cd2af2b7be979e83f5bfe::experiment::shornikov-2007-redox-note::method:unspecified
   identity:
     quantity:
       tag: value
@@ -81,7 +81,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2007-ca-aluminosilicate-activities::shornikov_2007_redox_al_ratio
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2007-ca-aluminosilicate-activities
   locator:
     page: 1
@@ -93,7 +104,7 @@ observations:
   provenance:
     printed_phase: g
 - observation_id: shornikov-2007-ca-aluminosilicate-activities::shornikov_2007_redox_ca_ratio
-  experiment_id: 1cff46581acf4550d852ed77c0567fcfdefd9bc7075cd2af2b7be979e83f5bfe::experiment::shornikov-2007-redox-note
+  experiment_id: 1cff46581acf4550d852ed77c0567fcfdefd9bc7075cd2af2b7be979e83f5bfe::shornikov-2007-ca-aluminosilicate-activities::declared:1cff46581acf4550d852ed77c0567fcfdefd9bc7075cd2af2b7be979e83f5bfe::experiment::shornikov-2007-redox-note::method:unspecified
   identity:
     quantity:
       tag: value
@@ -171,7 +182,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2007-ca-aluminosilicate-activities::shornikov_2007_redox_ca_ratio
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2007-ca-aluminosilicate-activities
   locator:
     page: 1
@@ -183,7 +205,7 @@ observations:
   provenance:
     printed_phase: g
 - observation_id: shornikov-2007-ca-aluminosilicate-activities::shornikov_2007_redox_fe_ratio
-  experiment_id: 1cff46581acf4550d852ed77c0567fcfdefd9bc7075cd2af2b7be979e83f5bfe::experiment::shornikov-2007-redox-note
+  experiment_id: 1cff46581acf4550d852ed77c0567fcfdefd9bc7075cd2af2b7be979e83f5bfe::shornikov-2007-ca-aluminosilicate-activities::declared:1cff46581acf4550d852ed77c0567fcfdefd9bc7075cd2af2b7be979e83f5bfe::experiment::shornikov-2007-redox-note::method:unspecified
   identity:
     quantity:
       tag: value
@@ -261,7 +283,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2007-ca-aluminosilicate-activities::shornikov_2007_redox_fe_ratio
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2007-ca-aluminosilicate-activities
   locator:
     page: 1
@@ -273,7 +306,7 @@ observations:
   provenance:
     printed_phase: g
 - observation_id: shornikov-2007-ca-aluminosilicate-activities::shornikov_2007_redox_forsterite_alpha
-  experiment_id: 1cff46581acf4550d852ed77c0567fcfdefd9bc7075cd2af2b7be979e83f5bfe::experiment::shornikov-2007-redox-note
+  experiment_id: 1cff46581acf4550d852ed77c0567fcfdefd9bc7075cd2af2b7be979e83f5bfe::shornikov-2007-ca-aluminosilicate-activities::declared:1cff46581acf4550d852ed77c0567fcfdefd9bc7075cd2af2b7be979e83f5bfe::experiment::shornikov-2007-redox-note::method:unspecified
   identity:
     quantity:
       tag: value
@@ -353,6 +386,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2007-ca-aluminosilicate-activities::shornikov_2007_redox_forsterite_alpha
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -369,7 +413,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2007-ca-aluminosilicate-activities::shornikov_2007_redox_mg_ratio
-  experiment_id: 1cff46581acf4550d852ed77c0567fcfdefd9bc7075cd2af2b7be979e83f5bfe::experiment::shornikov-2007-redox-note
+  experiment_id: 1cff46581acf4550d852ed77c0567fcfdefd9bc7075cd2af2b7be979e83f5bfe::shornikov-2007-ca-aluminosilicate-activities::declared:1cff46581acf4550d852ed77c0567fcfdefd9bc7075cd2af2b7be979e83f5bfe::experiment::shornikov-2007-redox-note::method:unspecified
   identity:
     quantity:
       tag: value
@@ -447,7 +491,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2007-ca-aluminosilicate-activities::shornikov_2007_redox_mg_ratio
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2007-ca-aluminosilicate-activities
   locator:
     page: 1
@@ -458,7 +513,7 @@ observations:
   provenance:
     printed_phase: g
 - observation_id: shornikov-2007-ca-aluminosilicate-activities::shornikov_2007_redox_sio2_alpha
-  experiment_id: 1cff46581acf4550d852ed77c0567fcfdefd9bc7075cd2af2b7be979e83f5bfe::experiment::shornikov-2007-redox-note
+  experiment_id: 1cff46581acf4550d852ed77c0567fcfdefd9bc7075cd2af2b7be979e83f5bfe::shornikov-2007-ca-aluminosilicate-activities::declared:1cff46581acf4550d852ed77c0567fcfdefd9bc7075cd2af2b7be979e83f5bfe::experiment::shornikov-2007-redox-note::method:unspecified
   identity:
     quantity:
       tag: value
@@ -538,6 +593,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2007-ca-aluminosilicate-activities::shornikov_2007_redox_sio2_alpha
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -554,7 +620,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: shornikov-2007-ca-aluminosilicate-activities::shornikov_2007_redox_sio2_ptot_discrepancy
-  experiment_id: 1cff46581acf4550d852ed77c0567fcfdefd9bc7075cd2af2b7be979e83f5bfe::experiment::shornikov-2007-redox-note
+  experiment_id: 1cff46581acf4550d852ed77c0567fcfdefd9bc7075cd2af2b7be979e83f5bfe::shornikov-2007-ca-aluminosilicate-activities::declared:1cff46581acf4550d852ed77c0567fcfdefd9bc7075cd2af2b7be979e83f5bfe::experiment::shornikov-2007-redox-note::method:unspecified
   identity:
     quantity:
       tag: value
@@ -633,7 +699,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2007-ca-aluminosilicate-activities::shornikov_2007_redox_sio2_ptot_discrepancy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2007-ca-aluminosilicate-activities
   locator:
     page: 3
@@ -646,7 +723,7 @@ observations:
   provenance:
     printed_phase: g
 - observation_id: shornikov-2007-ca-aluminosilicate-activities::shornikov_2007_redox_sio_ratio
-  experiment_id: 1cff46581acf4550d852ed77c0567fcfdefd9bc7075cd2af2b7be979e83f5bfe::experiment::shornikov-2007-redox-note
+  experiment_id: 1cff46581acf4550d852ed77c0567fcfdefd9bc7075cd2af2b7be979e83f5bfe::shornikov-2007-ca-aluminosilicate-activities::declared:1cff46581acf4550d852ed77c0567fcfdefd9bc7075cd2af2b7be979e83f5bfe::experiment::shornikov-2007-redox-note::method:unspecified
   identity:
     quantity:
       tag: value
@@ -724,7 +801,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2007-ca-aluminosilicate-activities::shornikov_2007_redox_sio_ratio
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2007-ca-aluminosilicate-activities
   locator:
     page: 1

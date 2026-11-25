@@ -139,3 +139,111 @@ experiments:
     published_page: 1396
     pdf_page_index: 1
     table: II
+- experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_na2s_emf_cell::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1395
+        pdf_page_index: 0
+        section: 2. Experimental procedure
+        note: The source reports evacuation and argon backfill but gives no total pressure.
+    fO2_log:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 1
+        published_page: 1395
+        pdf_page_index: 0
+        section: 2. Experimental procedure
+        note: Purified argon is named but no oxygen fugacity or gas ratio is printed.
+    temperature_K:
+      state:
+        tag: unknown
+        reason: varies_by_table_row
+      locator:
+        page: 2
+        published_page: 1396
+        pdf_page_index: 1
+        table: I
+        note: Every Table I measurement prints its temperature in column T(K); row-level values are carried on each observation.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/bf01154606
+  locator:
+    page: 1
+    published_page: 1395
+    pdf_page_index: 0
+    section: 2. Experimental procedure
+- experiment_id: 10.1007/bf01154606::itoh-1988-na2s-beta-alumina-emf::declared:10.1007/bf01154606::experiment::itoh_1988_reference_thermochemical_data::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        published_page: 1396
+        pdf_page_index: 1
+        table: II
+        note: The table gives thermochemical reference values without a pressure.
+    fO2_log:
+      state:
+        tag: not_applicable
+        reason: reference_thermochemical_data
+      locator:
+        page: 2
+        published_page: 1396
+        pdf_page_index: 1
+        table: II
+        note: These are standard Gibbs-energy reference data, not measurements under a gas atmosphere.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/bf01154606
+  locator:
+    page: 2
+    published_page: 1396
+    pdf_page_index: 1
+    table: II

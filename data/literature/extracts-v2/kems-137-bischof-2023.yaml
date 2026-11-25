@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/kems-137-bischof-2023.yaml
 observations:
 - observation_id: kems-137-bischof-2023::bischof_2023_ga2o3_henrian_log10_gamma_model
-  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  experiment_id: 10.1016/j.gca.2023.08.027::kems-137-bischof-2023::declared:10.1016/j.gca.2023.08.027::experiment::an-di-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -11,12 +11,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -39,7 +38,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic map'
+    origin: kems-137-bischof-2023::bischof_2023_ga2o3_henrian_log10_gamma_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: model'
+    origin: kems-137-bischof-2023::bischof_2023_ga2o3_henrian_log10_gamma_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-137-bischof-2023
   locator:
     page: 30
@@ -58,12 +78,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -127,7 +146,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-137-bischof-2023::bischof_2023_ga_ion_currents_table4_r2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-137-bischof-2023
   locator:
     page: 10
@@ -2606,12 +2637,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2692,6 +2722,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt Average of selected plateau points (Fig. 5a, red) plus isotherm. Competing with per-run Table S series;
+      do not average again.; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed
+      automatic map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_preferred_1700k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -2727,12 +2771,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2824,6 +2867,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s1_1low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -3003,12 +3059,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3100,6 +3155,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s1_1low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -3279,12 +3347,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3376,6 +3443,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s1_1low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -3555,12 +3635,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3652,6 +3731,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s1_1low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -3831,12 +3923,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3928,6 +4019,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s1_1low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -4107,12 +4211,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4204,6 +4307,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s1_1low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -4383,12 +4499,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4480,6 +4595,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s1_1low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -4660,12 +4788,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4757,6 +4884,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s1_1low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -4937,12 +5077,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5034,6 +5173,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s1_1low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -5214,12 +5366,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5311,6 +5462,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s1_1low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -5491,12 +5655,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5588,6 +5751,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s1_1low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -5768,12 +5944,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5865,6 +6040,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -6045,12 +6233,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6142,6 +6329,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -6322,12 +6522,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6419,6 +6618,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -6599,12 +6811,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6696,6 +6907,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -6876,12 +7100,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6973,6 +7196,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -7153,12 +7389,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7250,6 +7485,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -7430,12 +7678,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7527,6 +7774,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -7707,12 +7967,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7804,6 +8063,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -7984,12 +8256,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8081,6 +8352,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -8261,12 +8545,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8358,6 +8641,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -8538,12 +8834,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8635,6 +8930,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -8815,12 +9123,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8912,6 +9219,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -9092,12 +9412,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9189,6 +9508,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -9369,12 +9701,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9466,6 +9797,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -9646,12 +9990,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9743,6 +10086,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -9923,12 +10279,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10020,6 +10375,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -10200,12 +10568,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10297,6 +10664,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt First tabulated Ga gamma is 2.70E+02 at 1425.6 K (pre-plateau). Authors select the high-T plateau for
+      the preferred 0.036 value.; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the
+      closed automatic map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -10456,12 +10837,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10553,6 +10933,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt First tabulated Ga gamma is 2.70E+02 at 1425.6 K (pre-plateau). Authors select the high-T plateau for
+      the preferred 0.036 value.; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the
+      closed automatic map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -10712,12 +11106,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10809,6 +11202,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt First tabulated Ga gamma is 2.70E+02 at 1425.6 K (pre-plateau). Authors select the high-T plateau for
+      the preferred 0.036 value.; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the
+      closed automatic map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -10968,12 +11375,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11065,6 +11471,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt First tabulated Ga gamma is 2.70E+02 at 1425.6 K (pre-plateau). Authors select the high-T plateau for
+      the preferred 0.036 value.; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the
+      closed automatic map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -11232,12 +11652,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11329,6 +11748,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt First tabulated Ga gamma is 2.70E+02 at 1425.6 K (pre-plateau). Authors select the high-T plateau for
+      the preferred 0.036 value.; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the
+      closed automatic map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -11496,12 +11929,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11593,6 +12025,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt First tabulated Ga gamma is 2.70E+02 at 1425.6 K (pre-plateau). Authors select the high-T plateau for
+      the preferred 0.036 value.; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the
+      closed automatic map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -11760,12 +12206,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11857,6 +12302,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt First tabulated Ga gamma is 2.70E+02 at 1425.6 K (pre-plateau). Authors select the high-T plateau for
+      the preferred 0.036 value.; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the
+      closed automatic map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -12024,12 +12483,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12121,6 +12579,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt First tabulated Ga gamma is 2.70E+02 at 1425.6 K (pre-plateau). Authors select the high-T plateau for
+      the preferred 0.036 value.; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the
+      closed automatic map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -12288,12 +12760,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12385,6 +12856,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt First tabulated Ga gamma is 2.70E+02 at 1425.6 K (pre-plateau). Authors select the high-T plateau for
+      the preferred 0.036 value.; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the
+      closed automatic map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -12552,12 +13037,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12649,6 +13133,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt First tabulated Ga gamma is 2.70E+02 at 1425.6 K (pre-plateau). Authors select the high-T plateau for
+      the preferred 0.036 value.; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the
+      closed automatic map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -12816,12 +13314,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -12913,6 +13410,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt First tabulated Ga gamma is 2.70E+02 at 1425.6 K (pre-plateau). Authors select the high-T plateau for
+      the preferred 0.036 value.; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the
+      closed automatic map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -13080,12 +13591,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13177,6 +13687,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt First tabulated Ga gamma is 2.70E+02 at 1425.6 K (pre-plateau). Authors select the high-T plateau for
+      the preferred 0.036 value.; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the
+      closed automatic map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -13344,12 +13868,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13441,6 +13964,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt First tabulated Ga gamma is 2.70E+02 at 1425.6 K (pre-plateau). Authors select the high-T plateau for
+      the preferred 0.036 value.; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the
+      closed automatic map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -13608,12 +14145,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13705,6 +14241,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt First tabulated Ga gamma is 2.70E+02 at 1425.6 K (pre-plateau). Authors select the high-T plateau for
+      the preferred 0.036 value.; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the
+      closed automatic map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -13872,12 +14422,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -13969,6 +14518,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt First tabulated Ga gamma is 2.70E+02 at 1425.6 K (pre-plateau). Authors select the high-T plateau for
+      the preferred 0.036 value.; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the
+      closed automatic map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -14136,12 +14699,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -14233,6 +14795,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt First tabulated Ga gamma is 2.70E+02 at 1425.6 K (pre-plateau). Authors select the high-T plateau for
+      the preferred 0.036 value.; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the
+      closed automatic map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -14400,12 +14976,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -14497,6 +15072,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt First tabulated Ga gamma is 2.70E+02 at 1425.6 K (pre-plateau). Authors select the high-T plateau for
+      the preferred 0.036 value.; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the
+      closed automatic map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -14664,12 +15253,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -14761,6 +15349,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt First tabulated Ga gamma is 2.70E+02 at 1425.6 K (pre-plateau). Authors select the high-T plateau for
+      the preferred 0.036 value.; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the
+      closed automatic map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -14928,12 +15530,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -15025,6 +15626,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt First tabulated Ga gamma is 2.70E+02 at 1425.6 K (pre-plateau). Authors select the high-T plateau for
+      the preferred 0.036 value.; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the
+      closed automatic map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -15193,12 +15808,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -15290,6 +15904,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt First tabulated Ga gamma is 2.70E+02 at 1425.6 K (pre-plateau). Authors select the high-T plateau for
+      the preferred 0.036 value.; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the
+      closed automatic map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -15458,12 +16086,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -15555,6 +16182,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt First tabulated Ga gamma is 2.70E+02 at 1425.6 K (pre-plateau). Authors select the high-T plateau for
+      the preferred 0.036 value.; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the
+      closed automatic map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -15723,12 +16364,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -15820,6 +16460,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt First tabulated Ga gamma is 2.70E+02 at 1425.6 K (pre-plateau). Authors select the high-T plateau for
+      the preferred 0.036 value.; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the
+      closed automatic map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -15988,12 +16642,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -16085,6 +16738,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt First tabulated Ga gamma is 2.70E+02 at 1425.6 K (pre-plateau). Authors select the high-T plateau for
+      the preferred 0.036 value.; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the
+      closed automatic map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -16253,12 +16920,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -16350,6 +17016,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt First tabulated Ga gamma is 2.70E+02 at 1425.6 K (pre-plateau). Authors select the high-T plateau for
+      the preferred 0.036 value.; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the
+      closed automatic map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -16518,12 +17198,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -16615,6 +17294,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt First tabulated Ga gamma is 2.70E+02 at 1425.6 K (pre-plateau). Authors select the high-T plateau for
+      the preferred 0.036 value.; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the
+      closed automatic map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -16783,12 +17476,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -16880,6 +17572,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt First tabulated Ga gamma is 2.70E+02 at 1425.6 K (pre-plateau). Authors select the high-T plateau for
+      the preferred 0.036 value.; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the
+      closed automatic map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -17048,12 +17754,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -17145,6 +17850,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s4_3high_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -17312,12 +18030,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -17409,6 +18126,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s4_3high_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -17576,12 +18306,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -17673,6 +18402,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s4_3high_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -17840,12 +18582,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -17937,6 +18678,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s4_3high_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -18104,12 +18858,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -18201,6 +18954,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s4_3high_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -18368,12 +19134,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -18465,6 +19230,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s4_3high_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -18632,12 +19410,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -18729,6 +19506,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s4_3high_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -18896,12 +19686,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -18993,6 +19782,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s4_3high_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -19160,12 +19962,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -19257,6 +20058,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s4_3high_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -19424,12 +20238,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -19521,6 +20334,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_gao15_gamma_s4_3high_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -19680,7 +20506,7 @@ observations:
   provenance:
     printed_phase: anorthite_diopside_eutectic_silicate_melt
 - observation_id: kems-137-bischof-2023::bischof_2023_in2o3_henrian_log10_gamma_model
-  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  experiment_id: 10.1016/j.gca.2023.08.027::kems-137-bischof-2023::declared:10.1016/j.gca.2023.08.027::experiment::an-di-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -19688,12 +20514,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -19716,7 +20541,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic map'
+    origin: kems-137-bischof-2023::bischof_2023_in2o3_henrian_log10_gamma_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: model'
+    origin: kems-137-bischof-2023::bischof_2023_in2o3_henrian_log10_gamma_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-137-bischof-2023
   locator:
     page: 30
@@ -19735,12 +20581,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -19804,7 +20649,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-137-bischof-2023::bischof_2023_in_ion_currents_table4_r2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-137-bischof-2023
   locator:
     page: 10
@@ -22283,12 +23140,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -22368,6 +23224,20 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt Authors: value within error for all runs; for 1 low the isotherm is the most reliable because surface
+      In was measured.; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_preferred_1674k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -22401,12 +23271,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -22498,6 +23367,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -22665,12 +23547,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -22762,6 +23643,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -22929,12 +23823,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -23026,6 +23919,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -23193,12 +24099,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -23290,6 +24195,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -23457,12 +24375,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -23554,6 +24471,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -23721,12 +24651,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -23818,6 +24747,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -23985,12 +24927,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -24082,6 +25023,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -24250,12 +25204,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -24347,6 +25300,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -24515,12 +25481,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -24612,6 +25577,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -24780,12 +25758,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -24877,6 +25854,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -25045,12 +26035,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -25142,6 +26131,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -25310,12 +26312,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -25407,6 +26408,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -25575,12 +26589,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -25672,6 +26685,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -25840,12 +26866,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -25937,6 +26962,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -26105,12 +27143,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -26202,6 +27239,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -26370,12 +27420,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -26467,6 +27516,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -26635,12 +27697,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -26732,6 +27793,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -26900,12 +27974,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -26997,6 +28070,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -27165,12 +28251,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -27262,6 +28347,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -27430,12 +28528,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -27527,6 +28624,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -27695,12 +28805,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -27792,6 +28901,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -27960,12 +29082,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -28057,6 +29178,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -28225,12 +29359,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -28322,6 +29455,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -28490,12 +29636,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -28587,6 +29732,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -28755,12 +29913,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -28852,6 +30009,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -29020,12 +30190,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -29117,6 +30286,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -29285,12 +30467,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -29382,6 +30563,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -29550,12 +30744,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -29647,6 +30840,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -29806,12 +31012,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -29903,6 +31108,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -30062,12 +31280,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -30159,6 +31376,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -30318,12 +31548,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -30415,6 +31644,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -30574,12 +31816,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -30671,6 +31912,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -30830,12 +32084,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -30927,6 +32180,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -31094,12 +32360,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -31191,6 +32456,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -31358,12 +32636,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -31455,6 +32732,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -31622,12 +32912,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -31719,6 +33008,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -31886,12 +33188,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -31983,6 +33284,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -32150,12 +33464,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -32247,6 +33560,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -32414,12 +33740,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -32511,6 +33836,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -32678,12 +34016,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -32775,6 +34112,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -32942,12 +34292,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -33039,6 +34388,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -33206,12 +34568,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -33303,6 +34664,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -33470,12 +34844,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -33567,6 +34940,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -33734,12 +35120,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -33831,6 +35216,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -33998,12 +35396,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -34095,6 +35492,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -34262,12 +35672,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -34359,6 +35768,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -34526,12 +35948,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -34623,6 +36044,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -34790,12 +36224,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -34887,6 +36320,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -35055,12 +36501,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -35152,6 +36597,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -35320,12 +36778,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -35417,6 +36874,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -35585,12 +37055,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -35682,6 +37151,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -35850,12 +37332,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -35947,6 +37428,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -36115,12 +37609,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -36212,6 +37705,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -36380,12 +37886,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -36477,6 +37982,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -36645,12 +38163,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -36742,6 +38259,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: out_of_certified_band
     affected_quantities:
     - activity_coefficient
@@ -36910,12 +38440,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -37007,6 +38536,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s4_3high_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -37174,12 +38716,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -37271,6 +38812,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s4_3high_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -37438,12 +38992,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -37535,6 +39088,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s4_3high_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -37702,12 +39268,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -37799,6 +39364,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s4_3high_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -37966,12 +39544,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -38063,6 +39640,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s4_3high_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -38230,12 +39820,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -38327,6 +39916,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s4_3high_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -38494,12 +40096,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -38591,6 +40192,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s4_3high_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -38758,12 +40372,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -38855,6 +40468,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s4_3high_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -39022,12 +40648,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -39119,6 +40744,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s4_3high_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -39286,12 +40924,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -39383,6 +41020,19 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: anorthite diopside eutectic
+      silicate melt; original_reason=phase string ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic
+      map'
+    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s4_3high_polytherm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: engine_model_caveat
     affected_quantities:
     - activity_coefficient
@@ -39550,12 +41200,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -39594,7 +41243,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic map'
+    origin: kems-137-bischof-2023::bischof_2023_kems_geometry_and_calibration
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-137-bischof-2023
   locator:
     page: 6
@@ -39716,7 +41376,7 @@ observations:
   provenance:
     printed_phase: anorthite_diopside_eutectic_silicate_melt
 - observation_id: kems-137-bischof-2023::bischof_2023_t50c_ga_factsage_table9::rows:h=6c804341a8cf
-  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  experiment_id: 10.1016/j.gca.2023.08.027::kems-137-bischof-2023::declared:10.1016/j.gca.2023.08.027::experiment::an-di-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -39724,12 +41384,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -39751,7 +41410,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic map'
+    origin: kems-137-bischof-2023::bischof_2023_t50c_ga_factsage_table9
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: model'
+    origin: kems-137-bischof-2023::bischof_2023_t50c_ga_factsage_table9
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-137-bischof-2023
   locator:
     page: 30
@@ -39762,7 +41442,7 @@ observations:
   provenance:
     printed_phase: anorthite_diopside_eutectic_silicate_melt
 - observation_id: kems-137-bischof-2023::bischof_2023_t50c_ga_factsage_table9::rows:h=aa3d21adafc2
-  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  experiment_id: 10.1016/j.gca.2023.08.027::kems-137-bischof-2023::declared:10.1016/j.gca.2023.08.027::experiment::an-di-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -39770,12 +41450,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -39797,7 +41476,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic map'
+    origin: kems-137-bischof-2023::bischof_2023_t50c_ga_factsage_table9
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: model'
+    origin: kems-137-bischof-2023::bischof_2023_t50c_ga_factsage_table9
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-137-bischof-2023
   locator:
     page: 30
@@ -39808,7 +41508,7 @@ observations:
   provenance:
     printed_phase: anorthite_diopside_eutectic_silicate_melt
 - observation_id: kems-137-bischof-2023::bischof_2023_t50c_ga_factsage_table9::rows:h=db266f8fab28
-  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  experiment_id: 10.1016/j.gca.2023.08.027::kems-137-bischof-2023::declared:10.1016/j.gca.2023.08.027::experiment::an-di-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -39816,12 +41516,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -39843,7 +41542,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic map'
+    origin: kems-137-bischof-2023::bischof_2023_t50c_ga_factsage_table9
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: model'
+    origin: kems-137-bischof-2023::bischof_2023_t50c_ga_factsage_table9
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-137-bischof-2023
   locator:
     page: 30
@@ -39854,7 +41574,7 @@ observations:
   provenance:
     printed_phase: anorthite_diopside_eutectic_silicate_melt
 - observation_id: kems-137-bischof-2023::bischof_2023_t50c_in_factsage_table9::rows:h=45d2277779c3
-  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  experiment_id: 10.1016/j.gca.2023.08.027::kems-137-bischof-2023::declared:10.1016/j.gca.2023.08.027::experiment::an-di-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -39862,12 +41582,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -39889,7 +41608,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic map'
+    origin: kems-137-bischof-2023::bischof_2023_t50c_in_factsage_table9
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: model'
+    origin: kems-137-bischof-2023::bischof_2023_t50c_in_factsage_table9
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-137-bischof-2023
   locator:
     page: 30
@@ -39900,7 +41640,7 @@ observations:
   provenance:
     printed_phase: anorthite_diopside_eutectic_silicate_melt
 - observation_id: kems-137-bischof-2023::bischof_2023_t50c_in_factsage_table9::rows:h=466e2fdb3a17
-  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  experiment_id: 10.1016/j.gca.2023.08.027::kems-137-bischof-2023::declared:10.1016/j.gca.2023.08.027::experiment::an-di-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -39908,12 +41648,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -39935,7 +41674,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic map'
+    origin: kems-137-bischof-2023::bischof_2023_t50c_in_factsage_table9
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: model'
+    origin: kems-137-bischof-2023::bischof_2023_t50c_in_factsage_table9
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-137-bischof-2023
   locator:
     page: 30
@@ -39946,7 +41706,7 @@ observations:
   provenance:
     printed_phase: anorthite_diopside_eutectic_silicate_melt
 - observation_id: kems-137-bischof-2023::bischof_2023_t50c_in_factsage_table9::rows:h=a60632fa1d18
-  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  experiment_id: 10.1016/j.gca.2023.08.027::kems-137-bischof-2023::declared:10.1016/j.gca.2023.08.027::experiment::an-di-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -39954,12 +41714,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -39981,7 +41740,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic map'
+    origin: kems-137-bischof-2023::bischof_2023_t50c_in_factsage_table9
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: model'
+    origin: kems-137-bischof-2023::bischof_2023_t50c_in_factsage_table9
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-137-bischof-2023
   locator:
     page: 30
@@ -40000,12 +41780,11 @@ observations:
     species:
       formula: Ga
       phase:
-        tag: unknown
-        reason: phase string 'anorthite_diopside_eutectic_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -40029,7 +41808,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''anorthite_diopside_eutectic_silicate_melt'' is not in the closed automatic map'
+    origin: kems-137-bischof-2023::bischof_2023_table8_x_gao15
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-137-bischof-2023
   locator:
     page: 22

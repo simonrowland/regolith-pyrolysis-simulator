@@ -11,12 +11,11 @@ observations:
     species:
       formula: Ar
       phase:
-        tag: unknown
-        reason: phase string 'container_gas' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -37,7 +36,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''container_gas'' is not in the closed automatic map'
+    origin: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_argon_isotope_ratio_range
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: multi_laboratory_noble_gas_mass_spectrometry'
+    origin: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_argon_isotope_ratio_range
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: okazaki-2022-ryugu-gas-treasure-box
   locator:
     published_page: 4
@@ -62,12 +82,11 @@ observations:
     species:
       formula: He
       phase:
-        tag: unknown
-        reason: phase string 'container_gas' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -91,7 +110,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''container_gas'' is not in the closed automatic map'
+    origin: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_container_helium_isotope_ratio
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: multi_laboratory_noble_gas_mass_spectrometry'
+    origin: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_container_helium_isotope_ratio
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: okazaki-2022-ryugu-gas-treasure-box
   locator:
     published_page: 3
@@ -116,12 +156,11 @@ observations:
     species:
       formula: Ne
       phase:
-        tag: unknown
-        reason: phase string 'container_gas' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -145,7 +184,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''container_gas'' is not in the closed automatic map'
+    origin: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_container_ne_isotope_ratios
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: multi_laboratory_noble_gas_mass_spectrometry'
+    origin: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_container_ne_isotope_ratios
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: okazaki-2022-ryugu-gas-treasure-box
   locator:
     published_page: 3
@@ -170,12 +230,11 @@ observations:
     species:
       formula: Ryugu_sample_container
       phase:
-        tag: unknown
-        reason: phase string 'Ryugu_sample_container' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -196,7 +255,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Ryugu_sample_container'' is not in the closed automatic map'
+    origin: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_container_pressure_direct
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: sealed_container_after_return'
+    origin: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_container_pressure_direct
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: okazaki-2022-ryugu-gas-treasure-box
   locator:
     published_page: 3
@@ -221,12 +301,11 @@ observations:
     species:
       formula: Ryugu_sample_container
       phase:
-        tag: unknown
-        reason: phase string 'Ryugu_sample_container' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -248,7 +327,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Ryugu_sample_container'' is not in the closed automatic map'
+    origin: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_container_pressure_increase_and_leak
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: post_collection_container_leak'
+    origin: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_container_pressure_increase_and_leak
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: okazaki-2022-ryugu-gas-treasure-box
   locator:
     published_page: 4
@@ -274,12 +374,11 @@ observations:
     species:
       formula: Ryugu_SW_layer
       phase:
-        tag: unknown
-        reason: phase string 'Ryugu_grains' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -302,7 +401,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Ryugu_grains'' is not in the closed automatic map'
+    origin: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_fragmentation_assumptions_and_model_output
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: isotropic_fragmentation_model'
+    origin: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_fragmentation_assumptions_and_model_output
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: okazaki-2022-ryugu-gas-treasure-box
   locator:
     published_page: 8
@@ -333,12 +453,11 @@ observations:
     species:
       formula: Ryugu_sample_container
       phase:
-        tag: unknown
-        reason: phase string 'Ryugu_grains' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -360,7 +479,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Ryugu_grains'' is not in the closed automatic map'
+    origin: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_maximum_temperature_history
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: return_thermal_history'
+    origin: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_maximum_temperature_history
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: okazaki-2022-ryugu-gas-treasure-box
   locator:
     published_page: 5
@@ -386,12 +526,11 @@ observations:
     species:
       formula: CH4
       phase:
-        tag: unknown
-        reason: phase string 'Ryugu_grains' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -413,7 +552,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Ryugu_grains'' is not in the closed automatic map'
+    origin: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_methane_detection_limit
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: purge_and_trap_gas_chromatography_isotope_ratio_mass_spectrometry'
+    origin: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_methane_detection_limit
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: okazaki-2022-ryugu-gas-treasure-box
   locator:
     published_page: 7
@@ -438,12 +598,11 @@ observations:
     species:
       formula: N
       phase:
-        tag: unknown
-        reason: phase string 'container_gas' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -506,7 +665,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - isotope_delta
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''container_gas'' is not in the closed automatic map'
+    origin: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_nitrogen_delta15_range
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: multi_laboratory_noble_gas_mass_spectrometry'
+    origin: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_nitrogen_delta15_range
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: okazaki-2022-ryugu-gas-treasure-box
   locator:
     published_page: 4
@@ -524,12 +706,11 @@ observations:
     species:
       formula: Ryugu_sample_container
       phase:
-        tag: unknown
-        reason: phase string 'Ryugu_grains' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -551,7 +732,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Ryugu_grains'' is not in the closed automatic map'
+    origin: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_recovered_mass_density_size
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: recovered_sample_characterisation'
+    origin: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_recovered_mass_density_size
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: okazaki-2022-ryugu-gas-treasure-box
   locator:
     published_page: 8
@@ -577,12 +779,11 @@ observations:
     species:
       formula: He
       phase:
-        tag: unknown
-        reason: phase string 'Ryugu_grains' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -603,7 +804,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Ryugu_grains'' is not in the closed automatic map'
+    origin: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_solar_wind_helium_abundance
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: solar_wind_component_after_mixing_correction'
+    origin: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_solar_wind_helium_abundance
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: okazaki-2022-ryugu-gas-treasure-box
   locator:
     published_page: 5
@@ -628,12 +850,11 @@ observations:
     species:
       formula: Ne
       phase:
-        tag: unknown
-        reason: phase string 'Ryugu_grains' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -654,7 +875,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Ryugu_grains'' is not in the closed automatic map'
+    origin: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_solar_wind_neon_abundance
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: solar_wind_component_after_mixing_correction'
+    origin: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_solar_wind_neon_abundance
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: okazaki-2022-ryugu-gas-treasure-box
   locator:
     published_page: 5
@@ -679,12 +921,11 @@ observations:
     species:
       formula: Ryugu_SW_layer
       phase:
-        tag: unknown
-        reason: phase string 'Ryugu_grains' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -707,7 +948,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Ryugu_grains'' is not in the closed automatic map'
+    origin: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_surface_pulverization_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: surface_pulverization_model'
+    origin: okazaki-2022-ryugu-gas-treasure-box::okazaki_2022_surface_pulverization_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: okazaki-2022-ryugu-gas-treasure-box
   locator:
     published_page: 8

@@ -11,12 +11,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'lunar_regolith_oxide_compilation' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -36,7 +35,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''lunar_regolith_oxide_compilation'' is not in the closed automatic map'
+    origin: robinot-2025-promes-review::robinot_2025_t1_lunar_oxide_minmax_avg
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_composition'
+    origin: robinot-2025-promes-review::robinot_2025_t1_lunar_oxide_minmax_avg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: robinot-2025-promes-review
   locator:
     page: 3
@@ -56,12 +76,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'lunar_regolith_oxide_compilation' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -81,7 +100,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''lunar_regolith_oxide_compilation'' is not in the closed automatic map'
+    origin: robinot-2025-promes-review::robinot_2025_t1_lunar_oxide_minmax_avg
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_composition'
+    origin: robinot-2025-promes-review::robinot_2025_t1_lunar_oxide_minmax_avg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: robinot-2025-promes-review
   locator:
     page: 3
@@ -101,12 +141,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'lunar_regolith_oxide_compilation' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -126,7 +165,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''lunar_regolith_oxide_compilation'' is not in the closed automatic map'
+    origin: robinot-2025-promes-review::robinot_2025_t1_lunar_oxide_minmax_avg
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_composition'
+    origin: robinot-2025-promes-review::robinot_2025_t1_lunar_oxide_minmax_avg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: robinot-2025-promes-review
   locator:
     page: 3
@@ -146,12 +206,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'lunar_regolith_oxide_compilation' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -171,7 +230,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''lunar_regolith_oxide_compilation'' is not in the closed automatic map'
+    origin: robinot-2025-promes-review::robinot_2025_t1_lunar_oxide_minmax_avg
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_composition'
+    origin: robinot-2025-promes-review::robinot_2025_t1_lunar_oxide_minmax_avg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: robinot-2025-promes-review
   locator:
     page: 3
@@ -191,12 +271,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'lunar_regolith_oxide_compilation' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -216,7 +295,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''lunar_regolith_oxide_compilation'' is not in the closed automatic map'
+    origin: robinot-2025-promes-review::robinot_2025_t1_lunar_oxide_minmax_avg
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_composition'
+    origin: robinot-2025-promes-review::robinot_2025_t1_lunar_oxide_minmax_avg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: robinot-2025-promes-review
   locator:
     page: 3
@@ -236,12 +336,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'lunar_regolith_oxide_compilation' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -261,7 +360,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''lunar_regolith_oxide_compilation'' is not in the closed automatic map'
+    origin: robinot-2025-promes-review::robinot_2025_t1_lunar_oxide_minmax_avg
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_composition'
+    origin: robinot-2025-promes-review::robinot_2025_t1_lunar_oxide_minmax_avg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: robinot-2025-promes-review
   locator:
     page: 3
@@ -281,12 +401,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'lunar_regolith_oxide_compilation' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -306,7 +425,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''lunar_regolith_oxide_compilation'' is not in the closed automatic map'
+    origin: robinot-2025-promes-review::robinot_2025_t1_lunar_oxide_minmax_avg
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_composition'
+    origin: robinot-2025-promes-review::robinot_2025_t1_lunar_oxide_minmax_avg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: robinot-2025-promes-review
   locator:
     page: 3
@@ -326,12 +466,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'lunar_regolith_oxide_compilation' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -351,7 +490,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''lunar_regolith_oxide_compilation'' is not in the closed automatic map'
+    origin: robinot-2025-promes-review::robinot_2025_t1_lunar_oxide_minmax_avg
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_composition'
+    origin: robinot-2025-promes-review::robinot_2025_t1_lunar_oxide_minmax_avg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: robinot-2025-promes-review
   locator:
     page: 3
@@ -371,12 +531,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'lunar_regolith_oxide_compilation' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -396,7 +555,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''lunar_regolith_oxide_compilation'' is not in the closed automatic map'
+    origin: robinot-2025-promes-review::robinot_2025_t1_lunar_oxide_minmax_avg
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_composition'
+    origin: robinot-2025-promes-review::robinot_2025_t1_lunar_oxide_minmax_avg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: robinot-2025-promes-review
   locator:
     page: 3
@@ -416,12 +596,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'lunar_regolith_oxide_compilation' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -441,7 +620,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''lunar_regolith_oxide_compilation'' is not in the closed automatic map'
+    origin: robinot-2025-promes-review::robinot_2025_t1_lunar_oxide_minmax_avg
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_composition'
+    origin: robinot-2025-promes-review::robinot_2025_t1_lunar_oxide_minmax_avg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: robinot-2025-promes-review
   locator:
     page: 3
@@ -461,12 +661,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'lunar_regolith_oxide_compilation' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -486,7 +685,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''lunar_regolith_oxide_compilation'' is not in the closed automatic map'
+    origin: robinot-2025-promes-review::robinot_2025_t1_lunar_oxide_minmax_avg
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_composition'
+    origin: robinot-2025-promes-review::robinot_2025_t1_lunar_oxide_minmax_avg
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: robinot-2025-promes-review
   locator:
     page: 3
@@ -506,12 +726,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_SiO2' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -535,7 +754,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''compiled_vacuum_pyrolysis_feedstock_SiO2'' is not in the closed automatic map'
+    origin: robinot-2025-promes-review::robinot_2025_t2_li_2022_sio2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: review_compilation_vacuum_pyrolysis'
+    origin: robinot-2025-promes-review::robinot_2025_t2_li_2022_sio2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: robinot-2025-promes-review
   locator:
     page: 7
@@ -566,12 +806,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_Fe2O3' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -592,7 +831,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''compiled_vacuum_pyrolysis_feedstock_Fe2O3'' is not in the closed automatic map'
+    origin: robinot-2025-promes-review::robinot_2025_t2_li_2023_fe2o3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: review_compilation_vacuum_pyrolysis'
+    origin: robinot-2025-promes-review::robinot_2025_t2_li_2023_fe2o3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: robinot-2025-promes-review
   locator:
     page: 7
@@ -612,12 +872,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_FeTiO3_Fe2O3_SiO2' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -638,7 +897,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''compiled_vacuum_pyrolysis_feedstock_FeTiO3_Fe2O3_SiO2'' is not in the closed automatic map'
+    origin: robinot-2025-promes-review::robinot_2025_t2_li_2023_fetio3_fe2o3_sio2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: review_compilation_vacuum_pyrolysis'
+    origin: robinot-2025-promes-review::robinot_2025_t2_li_2023_fetio3_fe2o3_sio2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: robinot-2025-promes-review
   locator:
     page: 7
@@ -658,12 +938,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_Regolith_Simulant' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -684,7 +963,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''compiled_vacuum_pyrolysis_feedstock_Regolith_Simulant'' is not in the closed automatic map'
+    origin: robinot-2025-promes-review::robinot_2025_t2_li_2023_regolith_simulant
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: review_compilation_vacuum_pyrolysis'
+    origin: robinot-2025-promes-review::robinot_2025_t2_li_2023_regolith_simulant
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: robinot-2025-promes-review
   locator:
     page: 7
@@ -704,12 +1004,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_FeO' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -733,7 +1032,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''compiled_vacuum_pyrolysis_feedstock_FeO'' is not in the closed automatic map'
+    origin: robinot-2025-promes-review::robinot_2025_t2_li_2024_feo
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: review_compilation_vacuum_pyrolysis'
+    origin: robinot-2025-promes-review::robinot_2025_t2_li_2024_feo
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: robinot-2025-promes-review
   locator:
     page: 7
@@ -753,12 +1073,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_Al2O3' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -782,7 +1101,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''compiled_vacuum_pyrolysis_feedstock_Al2O3'' is not in the closed automatic map'
+    origin: robinot-2025-promes-review::robinot_2025_t2_matchett_2006_al2o3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: review_compilation_vacuum_pyrolysis'
+    origin: robinot-2025-promes-review::robinot_2025_t2_matchett_2006_al2o3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: robinot-2025-promes-review
   locator:
     page: 7
@@ -813,12 +1153,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_FeTiO3' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -842,7 +1181,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''compiled_vacuum_pyrolysis_feedstock_FeTiO3'' is not in the closed automatic map'
+    origin: robinot-2025-promes-review::robinot_2025_t2_matchett_2006_fetio3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: review_compilation_vacuum_pyrolysis'
+    origin: robinot-2025-promes-review::robinot_2025_t2_matchett_2006_fetio3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: robinot-2025-promes-review
   locator:
     page: 7
@@ -862,12 +1222,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_MgSiO3' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -891,7 +1250,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''compiled_vacuum_pyrolysis_feedstock_MgSiO3'' is not in the closed automatic map'
+    origin: robinot-2025-promes-review::robinot_2025_t2_matchett_2006_mgsio3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: review_compilation_vacuum_pyrolysis'
+    origin: robinot-2025-promes-review::robinot_2025_t2_matchett_2006_mgsio3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: robinot-2025-promes-review
   locator:
     page: 7
@@ -911,12 +1291,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_MLS-1a' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -940,7 +1319,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''compiled_vacuum_pyrolysis_feedstock_MLS-1a'' is not in the closed automatic map'
+    origin: robinot-2025-promes-review::robinot_2025_t2_matchett_2006_mls1a
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: review_compilation_vacuum_pyrolysis'
+    origin: robinot-2025-promes-review::robinot_2025_t2_matchett_2006_mls1a
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: robinot-2025-promes-review
   locator:
     page: 7
@@ -971,12 +1371,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_CaO' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1000,7 +1399,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''compiled_vacuum_pyrolysis_feedstock_CaO'' is not in the closed automatic map'
+    origin: robinot-2025-promes-review::robinot_2025_t2_sauerborn_2005_cao
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: review_compilation_vacuum_pyrolysis'
+    origin: robinot-2025-promes-review::robinot_2025_t2_sauerborn_2005_cao
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: robinot-2025-promes-review
   locator:
     page: 7
@@ -1031,12 +1451,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_MS1' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1060,7 +1479,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''compiled_vacuum_pyrolysis_feedstock_MS1'' is not in the closed automatic map'
+    origin: robinot-2025-promes-review::robinot_2025_t2_sauerborn_2005_ms1
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: review_compilation_vacuum_pyrolysis'
+    origin: robinot-2025-promes-review::robinot_2025_t2_sauerborn_2005_ms1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: robinot-2025-promes-review
   locator:
     page: 7
@@ -1091,12 +1531,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_SiO2' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1120,7 +1559,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''compiled_vacuum_pyrolysis_feedstock_SiO2'' is not in the closed automatic map'
+    origin: robinot-2025-promes-review::robinot_2025_t2_sauerborn_2005_sio2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: review_compilation_vacuum_pyrolysis'
+    origin: robinot-2025-promes-review::robinot_2025_t2_sauerborn_2005_sio2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: robinot-2025-promes-review
   locator:
     page: 7
@@ -1151,12 +1611,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_ZnO' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1180,7 +1639,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''compiled_vacuum_pyrolysis_feedstock_ZnO'' is not in the closed automatic map'
+    origin: robinot-2025-promes-review::robinot_2025_t2_sauerborn_2005_zno
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: review_compilation_vacuum_pyrolysis'
+    origin: robinot-2025-promes-review::robinot_2025_t2_sauerborn_2005_zno
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: robinot-2025-promes-review
   locator:
     page: 7
@@ -1211,12 +1691,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_CaAl2SiO8' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1240,7 +1719,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''compiled_vacuum_pyrolysis_feedstock_CaAl2SiO8'' is not in the closed automatic map'
+    origin: robinot-2025-promes-review::robinot_2025_t2_senior_1991_caal2sio8
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: review_compilation_vacuum_pyrolysis'
+    origin: robinot-2025-promes-review::robinot_2025_t2_senior_1991_caal2sio8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: robinot-2025-promes-review
   locator:
     page: 7
@@ -1260,12 +1760,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_FeTiO3' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1289,7 +1788,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''compiled_vacuum_pyrolysis_feedstock_FeTiO3'' is not in the closed automatic map'
+    origin: robinot-2025-promes-review::robinot_2025_t2_senior_1991_fetio3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: review_compilation_vacuum_pyrolysis'
+    origin: robinot-2025-promes-review::robinot_2025_t2_senior_1991_fetio3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: robinot-2025-promes-review
   locator:
     page: 7
@@ -1309,12 +1829,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_EAC-1' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1338,7 +1857,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''compiled_vacuum_pyrolysis_feedstock_EAC-1'' is not in the closed automatic map'
+    origin: robinot-2025-promes-review::robinot_2025_t2_sesko_2024_eac1
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: review_compilation_vacuum_pyrolysis'
+    origin: robinot-2025-promes-review::robinot_2025_t2_sesko_2024_eac1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: robinot-2025-promes-review
   locator:
     page: 7
@@ -1358,12 +1898,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_FeO_Fe2O3' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1387,7 +1926,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''compiled_vacuum_pyrolysis_feedstock_FeO_Fe2O3'' is not in the closed automatic map'
+    origin: robinot-2025-promes-review::robinot_2025_t2_shaw_2022_feo_fe2o3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: review_compilation_vacuum_pyrolysis'
+    origin: robinot-2025-promes-review::robinot_2025_t2_shaw_2022_feo_fe2o3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: robinot-2025-promes-review
   locator:
     page: 7
@@ -1407,12 +1967,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_FeTiO3' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1436,7 +1995,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''compiled_vacuum_pyrolysis_feedstock_FeTiO3'' is not in the closed automatic map'
+    origin: robinot-2025-promes-review::robinot_2025_t2_shaw_2022_fetio3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: review_compilation_vacuum_pyrolysis'
+    origin: robinot-2025-promes-review::robinot_2025_t2_shaw_2022_fetio3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: robinot-2025-promes-review
   locator:
     page: 7
@@ -1467,12 +2047,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_LMS-1' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1496,7 +2075,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''compiled_vacuum_pyrolysis_feedstock_LMS-1'' is not in the closed automatic map'
+    origin: robinot-2025-promes-review::robinot_2025_t2_shaw_2022_lms1
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: review_compilation_vacuum_pyrolysis'
+    origin: robinot-2025-promes-review::robinot_2025_t2_shaw_2022_lms1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: robinot-2025-promes-review
   locator:
     page: 7
@@ -1516,12 +2116,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_SiO2' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1545,7 +2144,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''compiled_vacuum_pyrolysis_feedstock_SiO2'' is not in the closed automatic map'
+    origin: robinot-2025-promes-review::robinot_2025_t2_steurer_1985_sio2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: review_compilation_vacuum_pyrolysis'
+    origin: robinot-2025-promes-review::robinot_2025_t2_steurer_1985_sio2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: robinot-2025-promes-review
   locator:
     page: 7
@@ -1576,12 +2196,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_Al2O3' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1605,7 +2224,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''compiled_vacuum_pyrolysis_feedstock_Al2O3'' is not in the closed automatic map'
+    origin: robinot-2025-promes-review::robinot_2025_t2_tanaka_2019_al2o3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: review_compilation_vacuum_pyrolysis'
+    origin: robinot-2025-promes-review::robinot_2025_t2_tanaka_2019_al2o3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: robinot-2025-promes-review
   locator:
     page: 7
@@ -1625,12 +2265,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'compiled_vacuum_pyrolysis_feedstock_TiO2' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1654,7 +2293,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''compiled_vacuum_pyrolysis_feedstock_TiO2'' is not in the closed automatic map'
+    origin: robinot-2025-promes-review::robinot_2025_t2_zhao_2023_tio2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: review_compilation_vacuum_pyrolysis'
+    origin: robinot-2025-promes-review::robinot_2025_t2_zhao_2023_tio2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: robinot-2025-promes-review
   locator:
     page: 7
@@ -1674,12 +2334,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'laser_vacuum_pyrolysis_Fe2O3' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1700,7 +2359,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''laser_vacuum_pyrolysis_Fe2O3'' is not in the closed automatic map'
+    origin: robinot-2025-promes-review::robinot_2025_t3_li_2023_fe2o3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: review_compilation_laser_pyrolysis'
+    origin: robinot-2025-promes-review::robinot_2025_t3_li_2023_fe2o3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: robinot-2025-promes-review
   locator:
     page: 9
@@ -1720,12 +2400,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'laser_vacuum_pyrolysis_FeTiO3_Fe2O3_SiO2' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1746,7 +2425,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''laser_vacuum_pyrolysis_FeTiO3_Fe2O3_SiO2'' is not in the closed automatic map'
+    origin: robinot-2025-promes-review::robinot_2025_t3_li_2023_fetio3_fe2o3_sio2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: review_compilation_laser_pyrolysis'
+    origin: robinot-2025-promes-review::robinot_2025_t3_li_2023_fetio3_fe2o3_sio2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: robinot-2025-promes-review
   locator:
     page: 9
@@ -1766,12 +2466,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'laser_vacuum_pyrolysis_Regolith_Simulant' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1792,7 +2491,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''laser_vacuum_pyrolysis_Regolith_Simulant'' is not in the closed automatic map'
+    origin: robinot-2025-promes-review::robinot_2025_t3_li_2023_regolith_simulant
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: review_compilation_laser_pyrolysis'
+    origin: robinot-2025-promes-review::robinot_2025_t3_li_2023_regolith_simulant
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: robinot-2025-promes-review
   locator:
     page: 9
@@ -1812,12 +2532,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'laser_vacuum_pyrolysis_deposit_Fe2O3' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1838,7 +2557,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''laser_vacuum_pyrolysis_deposit_Fe2O3'' is not in the closed automatic map'
+    origin: robinot-2025-promes-review::robinot_2025_t4_li_2023_fe2o3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: review_compilation_laser_pyrolysis'
+    origin: robinot-2025-promes-review::robinot_2025_t4_li_2023_fe2o3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: robinot-2025-promes-review
   locator:
     page: 10
@@ -1858,12 +2598,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'laser_vacuum_pyrolysis_deposit_FeTiO3_Fe2O3_SiO2' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1884,7 +2623,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''laser_vacuum_pyrolysis_deposit_FeTiO3_Fe2O3_SiO2'' is not in the closed automatic map'
+    origin: robinot-2025-promes-review::robinot_2025_t4_li_2023_fetio3_fe2o3_sio2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: review_compilation_laser_pyrolysis'
+    origin: robinot-2025-promes-review::robinot_2025_t4_li_2023_fetio3_fe2o3_sio2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: robinot-2025-promes-review
   locator:
     page: 10
@@ -1904,12 +2664,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'laser_vacuum_pyrolysis_deposit_Regolith_Simulant' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1930,7 +2689,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''laser_vacuum_pyrolysis_deposit_Regolith_Simulant'' is not in the closed automatic map'
+    origin: robinot-2025-promes-review::robinot_2025_t4_li_2023_regolith_simulant
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: review_compilation_laser_pyrolysis'
+    origin: robinot-2025-promes-review::robinot_2025_t4_li_2023_regolith_simulant
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: robinot-2025-promes-review
   locator:
     page: 10

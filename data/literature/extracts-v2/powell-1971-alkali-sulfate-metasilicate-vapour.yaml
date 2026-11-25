@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/powell-1971-alkali-sulfate-metasilicate-vapour.yaml
 observations:
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_eyber_na2so4_r01_log_kp
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: value
@@ -68,7 +68,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - log10_K_reaction
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: sodium_sulphate_decomposition_equilibrium'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_eyber_na2so4_r01_log_kp
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 45
@@ -118,7 +129,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_eyber_na2so4_r01_pressure
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -153,7 +164,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_vapour_pressure;
+      printed source evidence: experimental method not stated by Powell'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_eyber_na2so4_r01_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 45
@@ -203,7 +225,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_eyber_na2so4_r02_log_kp
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: value
@@ -268,7 +290,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - log10_K_reaction
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: sodium_sulphate_decomposition_equilibrium'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_eyber_na2so4_r02_log_kp
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 45
@@ -318,7 +351,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_eyber_na2so4_r02_pressure
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -353,7 +386,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_vapour_pressure;
+      printed source evidence: experimental method not stated by Powell'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_eyber_na2so4_r02_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 45
@@ -403,7 +447,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_eyber_na2so4_r03_log_kp
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: value
@@ -468,7 +512,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - log10_K_reaction
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: sodium_sulphate_decomposition_equilibrium'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_eyber_na2so4_r03_log_kp
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 45
@@ -518,7 +573,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_eyber_na2so4_r03_pressure
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -553,7 +608,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_vapour_pressure;
+      printed source evidence: experimental method not stated by Powell'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_eyber_na2so4_r03_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 45
@@ -603,7 +669,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_eyber_na2so4_r04_log_kp
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: value
@@ -668,7 +734,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - log10_K_reaction
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: sodium_sulphate_decomposition_equilibrium'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_eyber_na2so4_r04_log_kp
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 45
@@ -718,7 +795,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_eyber_na2so4_r04_pressure
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -753,7 +830,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_vapour_pressure;
+      printed source evidence: experimental method not stated by Powell'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_eyber_na2so4_r04_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 45
@@ -803,7 +891,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_eyber_na2so4_r05_log_kp
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: value
@@ -868,7 +956,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - log10_K_reaction
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: sodium_sulphate_decomposition_equilibrium'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_eyber_na2so4_r05_log_kp
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 45
@@ -918,7 +1017,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_eyber_na2so4_r05_pressure
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -953,7 +1052,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_vapour_pressure;
+      printed source evidence: experimental method not stated by Powell'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_eyber_na2so4_r05_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 45
@@ -1003,7 +1113,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_eyber_na2so4_r06_log_kp
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1068,7 +1178,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - log10_K_reaction
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: sodium_sulphate_decomposition_equilibrium'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_eyber_na2so4_r06_log_kp
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 45
@@ -1118,7 +1239,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_k2so4_nickel_r01_pressure
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1154,7 +1275,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_vapour_pressure;
+      printed source evidence: nickel cell; Knudsen effusion'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_k2so4_nickel_r01_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 47
@@ -1204,7 +1336,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_k2so4_nickel_r02_pressure
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1240,7 +1372,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_vapour_pressure;
+      printed source evidence: nickel cell; Knudsen effusion'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_k2so4_nickel_r02_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 47
@@ -1290,7 +1433,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_k2so4_nickel_r03_pressure
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1326,7 +1469,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_vapour_pressure;
+      printed source evidence: nickel cell; Knudsen effusion'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_k2so4_nickel_r03_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 47
@@ -1376,7 +1530,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_k2so4_nickel_r04_pressure
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1412,7 +1566,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_vapour_pressure;
+      printed source evidence: nickel cell; Knudsen effusion'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_k2so4_nickel_r04_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 47
@@ -1462,7 +1627,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_k2so4_platinum_r05_pressure
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1498,7 +1663,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_vapour_pressure;
+      printed source evidence: platinum cell; Knudsen effusion'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_k2so4_platinum_r05_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 47
@@ -1548,7 +1724,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_k2so4_platinum_r06_pressure
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1584,7 +1760,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_vapour_pressure;
+      printed source evidence: platinum cell; Knudsen effusion'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_k2so4_platinum_r06_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 47
@@ -1634,7 +1821,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_k2so4_platinum_r07_pressure
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1670,7 +1857,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_vapour_pressure;
+      printed source evidence: platinum cell; Knudsen effusion'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_k2so4_platinum_r07_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 47
@@ -1720,7 +1918,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_k2so4_platinum_r08_pressure
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1756,7 +1954,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_vapour_pressure;
+      printed source evidence: platinum cell; Knudsen effusion'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_k2so4_platinum_r08_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 47
@@ -1806,7 +2015,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_na2so4_r01_pressure
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1842,7 +2051,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_vapour_pressure;
+      printed source evidence: nickel Knudsen cell; below Na2SO4 melting point'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_na2so4_r01_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 46
@@ -1892,7 +2112,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_na2so4_r02_pressure
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1928,7 +2148,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_vapour_pressure;
+      printed source evidence: nickel Knudsen cell; below Na2SO4 melting point'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_na2so4_r02_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 46
@@ -1978,7 +2209,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_na2so4_r03_pressure
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2014,7 +2245,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_vapour_pressure;
+      printed source evidence: nickel Knudsen cell; below Na2SO4 melting point'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_na2so4_r03_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 46
@@ -2064,7 +2306,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_na2so4_r04_pressure
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2100,7 +2342,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_vapour_pressure;
+      printed source evidence: nickel Knudsen cell; below Na2SO4 melting point'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_na2so4_r04_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 46
@@ -2150,7 +2403,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_na2so4_r05_pressure
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2186,7 +2439,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_vapour_pressure;
+      printed source evidence: nickel Knudsen cell; below Na2SO4 melting point'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_na2so4_r05_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 46
@@ -2236,7 +2500,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_na2so4_r06_pressure
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2272,7 +2536,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_vapour_pressure;
+      printed source evidence: nickel Knudsen cell; below Na2SO4 melting point'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_na2so4_r06_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 46
@@ -2322,7 +2597,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_na2so4_r07_pressure
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2358,7 +2633,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_vapour_pressure;
+      printed source evidence: nickel Knudsen cell; below Na2SO4 melting point'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_na2so4_r07_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 46
@@ -2408,7 +2694,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_na2so4_r08_pressure
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2444,7 +2730,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_vapour_pressure;
+      printed source evidence: nickel Knudsen cell; below Na2SO4 melting point'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_na2so4_r08_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 46
@@ -2494,7 +2791,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_p100_r01_dissociation_and_kp
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2528,7 +2825,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: candidate_oxide_vapour_reaction'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_p100_r01_dissociation_and_kp
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 100
@@ -2559,7 +2866,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_p100_r02_dissociation_and_kp
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2593,7 +2900,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: candidate_oxide_vapour_reaction'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_p100_r02_dissociation_and_kp
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 100
@@ -2624,7 +2941,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_p100_r03_dissociation_and_kp
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2659,7 +2976,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: candidate_oxide_vapour_reaction'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_p100_r03_dissociation_and_kp
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 100
@@ -2690,7 +3017,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_p100_r04_dissociation_and_kp
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2725,7 +3052,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: candidate_oxide_vapour_reaction'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_p100_r04_dissociation_and_kp
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 100
@@ -2756,7 +3093,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_p100_r05_dissociation_and_kp
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2791,7 +3128,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: candidate_oxide_vapour_reaction'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_p100_r05_dissociation_and_kp
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 100
@@ -2822,7 +3169,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_p101_r01_dissociation_and_kp
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2856,7 +3203,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: candidate_oxide_vapour_reaction'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_p101_r01_dissociation_and_kp
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 101
@@ -2887,7 +3244,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_p101_r02_dissociation_and_kp
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2921,7 +3278,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: candidate_oxide_vapour_reaction'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_p101_r02_dissociation_and_kp
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 101
@@ -2952,7 +3319,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_p101_r03_dissociation_and_kp
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2986,7 +3353,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: candidate_oxide_vapour_reaction'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_p101_r03_dissociation_and_kp
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 101
@@ -3017,7 +3394,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_p101_r04_dissociation_and_kp
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -3025,12 +3402,11 @@ observations:
     species:
       formula: Li2SO4
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3052,7 +3428,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_p101_r04_dissociation_and_kp
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: candidate_oxide_vapour_reaction'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_p101_r04_dissociation_and_kp
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 101
@@ -3081,7 +3478,7 @@ observations:
         note: JANAF free-energy function inputs are cited but not tabulated with these calculated rows.
     references: []
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_p101_r05_dissociation_and_kp
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -3089,12 +3486,11 @@ observations:
     species:
       formula: Li2SO4
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3116,7 +3512,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_p101_r05_dissociation_and_kp
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: candidate_oxide_vapour_reaction'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_p101_r05_dissociation_and_kp
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 101
@@ -3600,12 +4017,11 @@ observations:
     species:
       formula: Li2SO4
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3627,7 +4043,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t01_r05_apparent_knudsen_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 79
@@ -3653,12 +4080,11 @@ observations:
     species:
       formula: Li2SO4
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3721,7 +4147,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t01_r05_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 79
@@ -4784,12 +5222,11 @@ observations:
     species:
       formula: Li2SO4
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4811,7 +5248,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t01_r13_apparent_knudsen_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 79
@@ -4837,12 +5285,11 @@ observations:
     species:
       formula: Li2SO4
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4905,7 +5352,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t01_r13_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 79
@@ -13555,7 +14014,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t06_r01_slope_enthalpy
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -13586,7 +14045,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: van_thoff_log_pressure_slope'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t06_r01_slope_enthalpy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 92
@@ -13618,7 +14087,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t06_r02_slope_enthalpy
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -13650,7 +14119,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: van_thoff_log_pressure_slope'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t06_r02_slope_enthalpy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 92
@@ -13682,7 +14161,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t06_r03_slope_enthalpy
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -13713,7 +14192,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: van_thoff_log_pressure_slope'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t06_r03_slope_enthalpy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 92
@@ -13750,7 +14239,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t06_r04_slope_enthalpy
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -13782,7 +14271,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: van_thoff_log_pressure_slope'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t06_r04_slope_enthalpy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 92
@@ -13819,7 +14318,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t06_r05_slope_enthalpy
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -13851,7 +14350,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: van_thoff_log_pressure_slope'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t06_r05_slope_enthalpy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 92
@@ -13882,7 +14391,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t06_r06_slope_enthalpy
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -13914,7 +14423,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: van_thoff_log_pressure_slope'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t06_r06_slope_enthalpy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 92
@@ -13947,7 +14466,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t06_r07_slope_enthalpy
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -13979,7 +14498,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: van_thoff_log_pressure_slope'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t06_r07_slope_enthalpy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 92
@@ -14011,7 +14540,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t07_r02_torsion_pressure
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -14046,7 +14575,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: torsion_effusion'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t07_r02_torsion_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 104
@@ -14064,7 +14603,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t07_r03_torsion_pressure
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -14099,7 +14638,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: torsion_effusion'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t07_r03_torsion_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 104
@@ -14117,7 +14666,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t07_r04_torsion_pressure
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -14152,7 +14701,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: torsion_effusion'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t07_r04_torsion_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 104
@@ -14170,7 +14729,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t08_r02_torsion_pressure
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -14205,7 +14764,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: torsion_effusion'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t08_r02_torsion_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 106
@@ -14223,7 +14792,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t08_r03_torsion_pressure
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -14258,7 +14827,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: torsion_effusion'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t08_r03_torsion_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 106
@@ -14276,7 +14855,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t08_r04_torsion_pressure
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -14311,7 +14890,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: torsion_effusion'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t08_r04_torsion_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 106
@@ -14329,7 +14918,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t08_r05_torsion_pressure
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -14364,7 +14953,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: torsion_effusion'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t08_r05_torsion_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 106
@@ -18107,7 +18706,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t11_r02_torsion_pressure
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -18142,7 +18741,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: torsion_effusion'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t11_r02_torsion_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 131
@@ -18160,7 +18769,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t11_r03_torsion_pressure
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -18195,7 +18804,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: torsion_effusion'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t11_r03_torsion_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 131
@@ -18213,7 +18832,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t11_r04_torsion_pressure
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -18248,7 +18867,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: torsion_effusion'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t11_r04_torsion_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 131
@@ -18266,7 +18895,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t11_r05_torsion_pressure
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -18301,7 +18930,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: torsion_effusion'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t11_r05_torsion_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 131
@@ -18319,7 +18958,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t11_r06_torsion_pressure
-  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour
+  experiment_id: 0cb1ed733fde70e7b96e0f3b1000a4693c3f33010197bca975ce8d4cc8fafe79::powell-1971-alkali-sulfate-metasilicate-vapour::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -18354,7 +18993,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: torsion_effusion'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t11_r06_torsion_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 131

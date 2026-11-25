@@ -11,12 +11,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'mare_regolith_HSC_model' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -46,7 +45,28 @@ observations:
       evidence:
         page: 18
         figure: '11'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''mare_regolith_HSC_model'' is not in the closed automatic map'
+    origin: kems-038-matchett-2006::matchett_2006_fig11_mare_PT_figure_only_blocked
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
+    origin: kems-038-matchett-2006::matchett_2006_fig11_mare_PT_figure_only_blocked
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-038-matchett-2006
   locator:
     page: 18
@@ -63,12 +83,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'pure_oxide_compilation' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -91,7 +110,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''pure_oxide_compilation'' is not in the closed automatic map'
+    origin: kems-038-matchett-2006::matchett_2006_table2_compiled_dissociation
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_thermochemistry'
+    origin: kems-038-matchett-2006::matchett_2006_table2_compiled_dissociation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-038-matchett-2006
   locator:
     page: 18
@@ -109,12 +149,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'pure_oxide_compilation' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -137,7 +176,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''pure_oxide_compilation'' is not in the closed automatic map'
+    origin: kems-038-matchett-2006::matchett_2006_table2_compiled_dissociation
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_thermochemistry'
+    origin: kems-038-matchett-2006::matchett_2006_table2_compiled_dissociation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-038-matchett-2006
   locator:
     page: 18
@@ -155,12 +215,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'pure_oxide_compilation' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -183,7 +242,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''pure_oxide_compilation'' is not in the closed automatic map'
+    origin: kems-038-matchett-2006::matchett_2006_table2_compiled_dissociation
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_thermochemistry'
+    origin: kems-038-matchett-2006::matchett_2006_table2_compiled_dissociation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-038-matchett-2006
   locator:
     page: 18
@@ -201,12 +281,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'pure_oxide_compilation' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -229,7 +308,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''pure_oxide_compilation'' is not in the closed automatic map'
+    origin: kems-038-matchett-2006::matchett_2006_table2_compiled_dissociation
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_thermochemistry'
+    origin: kems-038-matchett-2006::matchett_2006_table2_compiled_dissociation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-038-matchett-2006
   locator:
     page: 18
@@ -247,12 +347,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'pure_oxide_compilation' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -275,7 +374,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''pure_oxide_compilation'' is not in the closed automatic map'
+    origin: kems-038-matchett-2006::matchett_2006_table2_compiled_dissociation
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_thermochemistry'
+    origin: kems-038-matchett-2006::matchett_2006_table2_compiled_dissociation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-038-matchett-2006
   locator:
     page: 18
@@ -293,12 +413,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'pure_oxide_compilation' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -321,7 +440,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''pure_oxide_compilation'' is not in the closed automatic map'
+    origin: kems-038-matchett-2006::matchett_2006_table2_compiled_dissociation
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_thermochemistry'
+    origin: kems-038-matchett-2006::matchett_2006_table2_compiled_dissociation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-038-matchett-2006
   locator:
     page: 18
@@ -339,12 +479,11 @@ observations:
     species:
       formula: MgSiO3
       phase:
-        tag: unknown
-        reason: phase string 'mixed_oxides_and_MLS-1a' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -416,7 +555,18 @@ observations:
         page: 27
         table: '3'
         source_path: text/kems-038-matchett-2006/ocr-repair/kems-038-matchett-2006.md
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''mixed_oxides_and_MLS-1a'' is not in the closed automatic map'
+    origin: kems-038-matchett-2006::matchett_2006_table3_fresnel_pyrolysis_log
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-038-matchett-2006
   locator:
     page: 27
@@ -524,12 +674,11 @@ observations:
     species:
       formula: MgSiO3
       phase:
-        tag: unknown
-        reason: phase string 'mixed_oxides_and_MLS-1a' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -601,7 +750,18 @@ observations:
         page: 27
         table: '3'
         source_path: text/kems-038-matchett-2006/ocr-repair/kems-038-matchett-2006.md
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''mixed_oxides_and_MLS-1a'' is not in the closed automatic map'
+    origin: kems-038-matchett-2006::matchett_2006_table3_fresnel_pyrolysis_log
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-038-matchett-2006
   locator:
     page: 27
@@ -709,12 +869,11 @@ observations:
     species:
       formula: FeTiO3
       phase:
-        tag: unknown
-        reason: phase string 'mixed_oxides_and_MLS-1a' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -786,7 +945,18 @@ observations:
         page: 27
         table: '3'
         source_path: text/kems-038-matchett-2006/ocr-repair/kems-038-matchett-2006.md
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''mixed_oxides_and_MLS-1a'' is not in the closed automatic map'
+    origin: kems-038-matchett-2006::matchett_2006_table3_fresnel_pyrolysis_log
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-038-matchett-2006
   locator:
     page: 27
@@ -860,12 +1030,11 @@ observations:
     species:
       formula: unknown
       phase:
-        tag: unknown
-        reason: phase string 'mixed_oxides_and_MLS-1a' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -937,7 +1106,18 @@ observations:
         page: 27
         table: '3'
         source_path: text/kems-038-matchett-2006/ocr-repair/kems-038-matchett-2006.md
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''mixed_oxides_and_MLS-1a'' is not in the closed automatic map'
+    origin: kems-038-matchett-2006::matchett_2006_table3_fresnel_pyrolysis_log
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-038-matchett-2006
   locator:
     page: 27
@@ -1045,12 +1225,11 @@ observations:
     species:
       formula: FeTiO3
       phase:
-        tag: unknown
-        reason: phase string 'mixed_oxides_and_MLS-1a' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1122,7 +1301,18 @@ observations:
         page: 27
         table: '3'
         source_path: text/kems-038-matchett-2006/ocr-repair/kems-038-matchett-2006.md
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''mixed_oxides_and_MLS-1a'' is not in the closed automatic map'
+    origin: kems-038-matchett-2006::matchett_2006_table3_fresnel_pyrolysis_log
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-038-matchett-2006
   locator:
     page: 27
@@ -1196,12 +1386,11 @@ observations:
     species:
       formula: MgSiO3
       phase:
-        tag: unknown
-        reason: phase string 'mixed_oxides_and_MLS-1a' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1273,7 +1462,18 @@ observations:
         page: 27
         table: '3'
         source_path: text/kems-038-matchett-2006/ocr-repair/kems-038-matchett-2006.md
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''mixed_oxides_and_MLS-1a'' is not in the closed automatic map'
+    origin: kems-038-matchett-2006::matchett_2006_table3_fresnel_pyrolysis_log
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-038-matchett-2006
   locator:
     page: 27
@@ -1381,12 +1581,11 @@ observations:
     species:
       formula: FeTiO3
       phase:
-        tag: unknown
-        reason: phase string 'mixed_oxides_and_MLS-1a' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1452,6 +1651,17 @@ observations:
     status: pending
     reason: Cardiff Table 1 prints 16.00/37.00 where Matchett Table 3 prints 0.16/0.37; both left as printed
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''mixed_oxides_and_MLS-1a'' is not in the closed automatic map'
+    origin: kems-038-matchett-2006::matchett_2006_table3_fresnel_pyrolysis_log
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: source_disagreement
     affected_quantities:
     - mass_loss_fraction
@@ -1566,12 +1776,11 @@ observations:
     species:
       formula: FeTiO3
       phase:
-        tag: unknown
-        reason: phase string 'mixed_oxides_and_MLS-1a' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1637,6 +1846,17 @@ observations:
     status: pending
     reason: Cardiff Table 1 prints 16.00/37.00 where Matchett Table 3 prints 0.16/0.37; both left as printed
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''mixed_oxides_and_MLS-1a'' is not in the closed automatic map'
+    origin: kems-038-matchett-2006::matchett_2006_table3_fresnel_pyrolysis_log
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: source_disagreement
     affected_quantities:
     - mass_loss_fraction
@@ -1727,12 +1947,11 @@ observations:
     species:
       formula: FeTiO3
       phase:
-        tag: unknown
-        reason: phase string 'mixed_oxides_and_MLS-1a' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1797,7 +2016,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''mixed_oxides_and_MLS-1a'' is not in the closed automatic map'
+    origin: kems-038-matchett-2006::matchett_2006_table3_fresnel_pyrolysis_log
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-038-matchett-2006
   locator:
     page: 27

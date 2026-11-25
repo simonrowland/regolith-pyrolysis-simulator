@@ -2505,12 +2505,11 @@ observations:
     species:
       formula: Al2SiO5
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2576,7 +2575,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_AL2SiO5(an)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -4021,12 +4032,11 @@ observations:
     species:
       formula: AlF3
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4092,7 +4102,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_ALF3(I)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -4111,12 +4133,11 @@ observations:
     species:
       formula: AlF3
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4182,7 +4203,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_ALF3(II)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -23622,12 +23655,11 @@ observations:
     species:
       formula: C
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -23693,7 +23725,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_C(gr)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim from vp-cea-u0-hits-DRAFT.yaml
@@ -45786,12 +45830,11 @@ observations:
     species:
       formula: CaSO4
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -45857,7 +45900,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_CaSO4(I)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -45876,12 +45931,11 @@ observations:
     species:
       formula: CaSO4
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -45947,7 +46001,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_CaSO4(II)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -46947,12 +47013,11 @@ observations:
     species:
       formula: Cr2O3
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -47018,7 +47083,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_Cr2O3(I')_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -47037,12 +47114,11 @@ observations:
     species:
       formula: Cr2O3
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -47108,7 +47184,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_Cr2O3(I)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -50781,12 +50869,11 @@ observations:
     species:
       formula: CsNO2
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -50852,7 +50939,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_CsNO2(I)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -62556,12 +62655,11 @@ observations:
     species:
       formula: GeO2
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -62627,7 +62725,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_GeO2(I)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -62646,12 +62756,11 @@ observations:
     species:
       formula: GeO2
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -62717,7 +62826,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_GeO2(II)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -63181,12 +63302,11 @@ observations:
     species:
       formula: GeS2
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -63252,7 +63372,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_GeS2(II)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -70739,12 +70871,11 @@ observations:
     species:
       formula: InCl
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -70810,7 +70941,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_InCL(crI)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -70829,12 +70972,11 @@ observations:
     species:
       formula: InCl
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -70900,7 +71042,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_InCL(crII)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -75110,12 +75264,11 @@ observations:
     species:
       formula: K2SO4
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -75181,7 +75334,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_K2SO4(I)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -75200,12 +75365,11 @@ observations:
     species:
       formula: K2SO4
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -75271,7 +75435,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_K2SO4(II)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -76094,12 +76270,11 @@ observations:
     species:
       formula: K3AlF6
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -76165,7 +76340,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_K3ALF6(I)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -76184,12 +76371,11 @@ observations:
     species:
       formula: K3AlF6
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -76255,7 +76441,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_K3ALF6(II)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -76452,12 +76650,11 @@ observations:
     species:
       formula: KAlO2
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -76523,7 +76720,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_KALO2(I)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -76542,12 +76751,11 @@ observations:
     species:
       formula: KAlO2
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -76613,7 +76821,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_KALO2(II)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -77524,12 +77744,11 @@ observations:
     species:
       formula: KCN
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -77595,7 +77814,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_KCN(II)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -78685,12 +78916,11 @@ observations:
     species:
       formula: KNO2
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -78756,7 +78986,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_KNO2(I)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -78775,12 +79017,11 @@ observations:
     species:
       formula: KNO2
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -78846,7 +79087,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_KNO2(II)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -81986,12 +82239,11 @@ observations:
     species:
       formula: Li3AlF6
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -82057,7 +82309,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_Li3ALF6(I)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -82076,12 +82340,11 @@ observations:
     species:
       formula: Li3AlF6
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -82147,7 +82410,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_Li3ALF6(II)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -82166,12 +82441,11 @@ observations:
     species:
       formula: Li3AlF6
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -82237,7 +82511,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_Li3ALF6(III)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -82256,12 +82542,11 @@ observations:
     species:
       formula: Li3AlF6
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -82327,7 +82612,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_Li3ALF6(IV)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -84220,12 +84517,11 @@ observations:
     species:
       formula: LiNO2
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -84291,7 +84587,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_LiNO2(I)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -84310,12 +84618,11 @@ observations:
     species:
       formula: LiNO2
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -84381,7 +84688,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_LiNO2(II)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -89305,12 +89624,11 @@ observations:
     species:
       formula: MgSO4
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -89376,7 +89694,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_MgSO4(I)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -89395,12 +89725,11 @@ observations:
     species:
       formula: MgSO4
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -89466,7 +89795,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_MgSO4(II)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -89663,12 +90004,11 @@ observations:
     species:
       formula: MgSiO3
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -89734,7 +90074,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_MgSiO3(I)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -89753,12 +90105,11 @@ observations:
     species:
       formula: MgSiO3
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -89824,7 +90175,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_MgSiO3(II)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -89843,12 +90206,11 @@ observations:
     species:
       formula: MgSiO3
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -89914,7 +90276,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_MgSiO3(III)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -93851,12 +94225,11 @@ observations:
     species:
       formula: NH4Cl
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -93922,7 +94295,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_NH4CL(II)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -93941,12 +94326,11 @@ observations:
     species:
       formula: NH4Cl
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -94012,7 +94396,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_NH4CL(III)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -97508,12 +97904,11 @@ observations:
     species:
       formula: Na2SO4
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -97579,7 +97974,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_Na2SO4(I)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -97598,12 +98005,11 @@ observations:
     species:
       formula: Na2SO4
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -97669,7 +98075,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_Na2SO4(IV)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -97777,12 +98195,11 @@ observations:
     species:
       formula: Na2SO4
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -97848,7 +98265,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_Na2SO4(V)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -99742,12 +100171,11 @@ observations:
     species:
       formula: NaCN
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -99813,7 +100241,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_NaCN(II)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -99832,12 +100272,11 @@ observations:
     species:
       formula: NaCN
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -99903,7 +100342,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_NaCN(III)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -100992,12 +101443,11 @@ observations:
     species:
       formula: NaNO2
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -101063,7 +101513,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_NaNO2(I')_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -101082,12 +101544,11 @@ observations:
     species:
       formula: NaNO2
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -101153,7 +101614,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_NaNO2(I)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -102957,12 +103430,11 @@ observations:
     species:
       formula: NbO2
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -103028,7 +103500,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_NbO2(I)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -103047,12 +103531,11 @@ observations:
     species:
       formula: NbO2
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -103118,7 +103601,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_NbO2(II)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -106600,7 +107095,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: nasa-cea-thermo::cea_P4O10(L)_gibbs
-  experiment_id: b96a3fbb1cfee93264e9dd1dce793f42245a9be400b1f7f0e3e5241ab0fffd2e::nasa-cea-thermo
+  experiment_id: b96a3fbb1cfee93264e9dd1dce793f42245a9be400b1f7f0e3e5241ab0fffd2e::nasa-cea-thermo::method:unspecified
   identity:
     quantity:
       tag: value
@@ -106678,7 +107173,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: condensed_liquid_standard_state_thermo'
+    origin: nasa-cea-thermo::cea_P4O10(L)_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -111500,12 +112006,11 @@ observations:
     species:
       formula: PbO
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -111571,7 +112076,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_PbO(I-y)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -111590,12 +112107,11 @@ observations:
     species:
       formula: PbO
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -111661,7 +112177,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_PbO(II-r)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -115697,12 +116225,11 @@ observations:
     species:
       formula: RbNO2
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -115768,7 +116295,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_RbNO2(I)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -115965,12 +116504,11 @@ observations:
     species:
       formula: RbNO3
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -116036,7 +116574,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_RbNO3(I)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -116055,12 +116605,11 @@ observations:
     species:
       formula: RbNO3
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -116126,7 +116675,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_RbNO3(II)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -116145,12 +116706,11 @@ observations:
     species:
       formula: RbNO3
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -116216,7 +116776,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_RbNO3(III)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -116235,12 +116807,11 @@ observations:
     species:
       formula: RbNO3
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -116306,7 +116877,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_RbNO3(IV)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -125222,12 +125805,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -125293,7 +125875,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_SiO2(a-qz)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -125312,12 +125906,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -125383,7 +125976,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_SiO2(b-crt)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -125402,12 +126007,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -125473,7 +126077,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_SiO2(b-qz)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -132270,12 +132886,11 @@ observations:
     species:
       formula: Ta2O5
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -132341,7 +132956,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_Ta2O5(I)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -132360,12 +132987,11 @@ observations:
     species:
       formula: Ta2O5
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -132431,7 +133057,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_Ta2O5(II)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -133609,12 +134247,11 @@ observations:
     species:
       formula: Ti2O3
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -133680,7 +134317,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_Ti2O3(I')_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -133699,12 +134348,11 @@ observations:
     species:
       formula: Ti2O3
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -133770,7 +134418,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_Ti2O3(I)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -136558,12 +137218,11 @@ observations:
     species:
       formula: U3O8
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -136629,7 +137288,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_U3O8(I)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -136648,12 +137319,11 @@ observations:
     species:
       formula: U3O8
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -136719,7 +137389,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_U3O8(II)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -136738,12 +137420,11 @@ observations:
     species:
       formula: U4O9
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -136809,7 +137490,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_U4O9(I)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -136828,12 +137521,11 @@ observations:
     species:
       formula: U4O9
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -136899,7 +137591,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_U4O9(II)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -136918,12 +137622,11 @@ observations:
     species:
       formula: U4O9
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -136989,7 +137692,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_U4O9(III)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -138966,12 +139681,11 @@ observations:
     species:
       formula: V2O4
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -139037,7 +139751,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_V2O4(I)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -139056,12 +139782,11 @@ observations:
     species:
       formula: V2O4
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -139127,7 +139852,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_V2O4(II)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -140484,12 +141221,11 @@ observations:
     species:
       formula: WCl6
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -140555,7 +141291,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_WCL6(I)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -140574,12 +141322,11 @@ observations:
     species:
       formula: WCl6
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -140645,7 +141392,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_WCL6(II)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -140664,12 +141423,11 @@ observations:
     species:
       formula: WCl6
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -140735,7 +141493,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_WCL6(III)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -141290,12 +142060,11 @@ observations:
     species:
       formula: WO3
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -141361,7 +142130,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_WO3(I)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -141380,12 +142161,11 @@ observations:
     species:
       formula: WO3
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -141451,7 +142231,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_WO3(III)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -141470,12 +142262,11 @@ observations:
     species:
       formula: WO3
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -141541,7 +142332,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_WO3(III,II)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -142271,12 +143074,11 @@ observations:
     species:
       formula: ZnSO4
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -142342,7 +143144,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_ZnSO4(a')_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -143345,12 +144159,11 @@ observations:
     species:
       formula: ZrO2
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -143416,7 +144229,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_ZrO2(I)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -143435,12 +144260,11 @@ observations:
     species:
       formula: ZrO2
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -143506,7 +144330,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_ZrO2(II)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2
@@ -143525,12 +144361,11 @@ observations:
     species:
       formula: ZrO2
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -143596,7 +144431,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fG
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: nasa-cea-thermo::cea_ZrO2(III)_gibbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2

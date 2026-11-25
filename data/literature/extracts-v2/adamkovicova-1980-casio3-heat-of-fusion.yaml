@@ -83,6 +83,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Difference between Hrel
+      for CaSiO3 melt and Hrel for pseudowollastonite at 1817 K, using Eqs. (6) and (7), as described with Fig. 1.'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_heat_of_fusion_at_1817K
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -199,6 +211,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - cp
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_melt_heat_capacity_stated
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - cp
@@ -233,12 +256,11 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'CaSiO3_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -263,7 +285,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CaSiO3_melt'' is not in the closed automatic map'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_melt_relative_enthalpy_fit_eq7
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_melt_relative_enthalpy_fit_eq7
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 5
@@ -300,12 +343,11 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'CaSiO3_heat_of_fusion_prior_value' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -372,6 +414,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CaSiO3_heat_of_fusion_prior_value'' is not in the closed automatic map'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_27_6_quote
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Earlier-worker value
+      quoted for comparison; not measured in the present work.'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_27_6_quote
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -405,12 +471,11 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'CaSiO3_heat_of_fusion_prior_value' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -478,6 +543,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CaSiO3_heat_of_fusion_prior_value'' is not in the closed automatic map'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_50_1_quote
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Earlier-worker value
+      quoted for comparison; not measured in the present work.'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_50_1_quote
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -511,12 +600,11 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'CaSiO3_heat_of_fusion_prior_value' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -584,6 +672,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CaSiO3_heat_of_fusion_prior_value'' is not in the closed automatic map'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_56_1_quote
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Prior tabulated value
+      quoted for comparison; not measured in the present work.'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_56_1_quote
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -617,12 +729,11 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'CaSiO3_heat_of_fusion_prior_value' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -690,6 +801,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CaSiO3_heat_of_fusion_prior_value'' is not in the closed automatic map'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_59_0_quote
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Earlier-worker calculated
+      value quoted for comparison; not measured in the present work.'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_59_0_quote
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -723,12 +858,11 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'CaSiO3_heat_of_fusion_prior_value' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -795,6 +929,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CaSiO3_heat_of_fusion_prior_value'' is not in the closed automatic map'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_68_2_quote
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Earlier-worker calculated
+      value quoted for comparison; not measured in the present work.'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_68_2_quote
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -828,12 +986,11 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'CaSiO3_heat_of_fusion_prior_value' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -900,6 +1057,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CaSiO3_heat_of_fusion_prior_value'' is not in the closed automatic map'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_82_9_quote
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Earlier-worker value
+      quoted for comparison; not measured in the present work.'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_82_9_quote
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -1005,6 +1186,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - cp
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Alternative earlier-worker
+      melt heat-capacity value quoted in the discussion.'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_melt_heat_capacity_0_14654_quote
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - cp
@@ -1100,6 +1293,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - cp
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Earlier-worker melt heat-capacity
+      value quoted in the discussion.'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_melt_heat_capacity_0_15073_quote
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - cp
@@ -1123,8 +1328,8 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: value
         value: pseudowollastonite
@@ -1152,7 +1357,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_pseudowollastonite_alpha_wollastonite''
+      identifies a crystal; original_reason=phase string ''crystalline_pseudowollastonite_alpha_wollastonite'' is not in the
+      closed automatic map'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_solid_cooling_fit_eq3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_solid_cooling_fit_eq3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 3
@@ -1191,8 +1418,8 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: value
         value: pseudowollastonite
@@ -1218,7 +1445,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_pseudowollastonite_alpha_wollastonite''
+      identifies a crystal; original_reason=phase string ''crystalline_pseudowollastonite_alpha_wollastonite'' is not in the
+      closed automatic map'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_solid_heat_capacity_eq4
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_solid_heat_capacity_eq4
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 4
@@ -1246,8 +1495,8 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: value
         value: pseudowollastonite
@@ -1275,7 +1524,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_pseudowollastonite_alpha_wollastonite''
+      identifies a crystal; original_reason=phase string ''crystalline_pseudowollastonite_alpha_wollastonite'' is not in the
+      closed automatic map'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_solid_relative_enthalpy_fit_eq6
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_solid_relative_enthalpy_fit_eq6
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 4
@@ -1299,7 +1570,7 @@ observations:
   provenance:
     printed_phase: crystalline_pseudowollastonite_alpha_wollastonite
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1506:h=18f513d69601
-  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-drop-series
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion::declared:fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-drop-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1377,7 +1648,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 3
@@ -1423,7 +1705,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1576:h=b53aea1560f8
-  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-drop-series
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion::declared:fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-drop-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1501,7 +1783,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 3
@@ -1547,7 +1840,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1630:h=406a82a894f5
-  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-drop-series
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion::declared:fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-drop-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1625,7 +1918,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 3
@@ -1671,7 +1975,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1678:h=3904cda43355
-  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-drop-series
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion::declared:fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-drop-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1749,7 +2053,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 3
@@ -1795,7 +2110,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1730:h=398645529cd2
-  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-drop-series
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion::declared:fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-drop-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1873,7 +2188,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 3
@@ -1919,7 +2245,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1780:h=4ba768d0eaad
-  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-drop-series
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion::declared:fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-drop-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1997,7 +2323,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 3
@@ -2051,8 +2388,8 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: value
         value: pseudowollastonite
@@ -2079,7 +2416,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_pseudowollastonite_alpha_wollastonite''
+      identifies a crystal; original_reason=phase string ''crystalline_pseudowollastonite_alpha_wollastonite'' is not in the
+      closed automatic map'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 3
@@ -2130,8 +2489,8 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: value
         value: pseudowollastonite
@@ -2158,7 +2517,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_pseudowollastonite_alpha_wollastonite''
+      identifies a crystal; original_reason=phase string ''crystalline_pseudowollastonite_alpha_wollastonite'' is not in the
+      closed automatic map'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 3
@@ -2209,8 +2590,8 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: value
         value: pseudowollastonite
@@ -2237,7 +2618,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_pseudowollastonite_alpha_wollastonite''
+      identifies a crystal; original_reason=phase string ''crystalline_pseudowollastonite_alpha_wollastonite'' is not in the
+      closed automatic map'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 3
@@ -2288,8 +2691,8 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: value
         value: pseudowollastonite
@@ -2316,7 +2719,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_pseudowollastonite_alpha_wollastonite''
+      identifies a crystal; original_reason=phase string ''crystalline_pseudowollastonite_alpha_wollastonite'' is not in the
+      closed automatic map'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 3
@@ -2367,8 +2792,8 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: value
         value: pseudowollastonite
@@ -2395,7 +2820,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_pseudowollastonite_alpha_wollastonite''
+      identifies a crystal; original_reason=phase string ''crystalline_pseudowollastonite_alpha_wollastonite'' is not in the
+      closed automatic map'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 3
@@ -2446,8 +2893,8 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: value
         value: pseudowollastonite
@@ -2474,7 +2921,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_pseudowollastonite_alpha_wollastonite''
+      identifies a crystal; original_reason=phase string ''crystalline_pseudowollastonite_alpha_wollastonite'' is not in the
+      closed automatic map'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 3
@@ -2517,7 +2986,7 @@ observations:
   provenance:
     printed_phase: crystalline_pseudowollastonite_alpha_wollastonite
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured
-  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-solution-series
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion::declared:fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-solution-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2525,8 +2994,8 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_pseudowollastonite_alpha_wollastonite' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: value
         value: pseudowollastonite
@@ -2555,7 +3024,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_pseudowollastonite_alpha_wollastonite''
+      identifies a crystal; original_reason=phase string ''crystalline_pseudowollastonite_alpha_wollastonite'' is not in the
+      closed automatic map'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 4
@@ -2576,7 +3067,7 @@ observations:
   provenance:
     printed_phase: crystalline_pseudowollastonite_alpha_wollastonite
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1829:h=7fede8d9f322
-  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-drop-series
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion::declared:fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-drop-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2584,12 +3075,11 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'CaSiO3_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2613,7 +3103,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CaSiO3_melt'' is not in the closed automatic map'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Printed pp. 194-195:
+      melt ΔHcool depends on the structure of the glass formed on cooling in the drop calorimeter, so the drop is not liquid
+      H(T)-H(298 K).'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 4
@@ -2634,7 +3147,7 @@ observations:
   provenance:
     printed_phase: CaSiO3_melt
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1848:h=7c4f837720a4
-  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-drop-series
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion::declared:fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-drop-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2642,12 +3155,11 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'CaSiO3_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2671,7 +3183,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CaSiO3_melt'' is not in the closed automatic map'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Printed pp. 194-195:
+      melt ΔHcool depends on the structure of the glass formed on cooling in the drop calorimeter, so the drop is not liquid
+      H(T)-H(298 K).'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 4
@@ -2692,7 +3227,7 @@ observations:
   provenance:
     printed_phase: CaSiO3_melt
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1859:h=4d038eb2bc00
-  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-drop-series
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion::declared:fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-drop-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2700,12 +3235,11 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'CaSiO3_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2729,7 +3263,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CaSiO3_melt'' is not in the closed automatic map'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Printed pp. 194-195:
+      melt ΔHcool depends on the structure of the glass formed on cooling in the drop calorimeter, so the drop is not liquid
+      H(T)-H(298 K).'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 4
@@ -2750,7 +3307,7 @@ observations:
   provenance:
     printed_phase: CaSiO3_melt
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1915:h=650213d91f74
-  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-drop-series
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion::declared:fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-drop-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2758,12 +3315,11 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'CaSiO3_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2787,7 +3343,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CaSiO3_melt'' is not in the closed automatic map'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Printed pp. 194-195:
+      melt ΔHcool depends on the structure of the glass formed on cooling in the drop calorimeter, so the drop is not liquid
+      H(T)-H(298 K).'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 4
@@ -2808,7 +3387,7 @@ observations:
   provenance:
     printed_phase: CaSiO3_melt
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1961:h=7aae6dcb0477
-  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-drop-series
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion::declared:fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-drop-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2816,12 +3395,11 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'CaSiO3_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2845,7 +3423,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CaSiO3_melt'' is not in the closed automatic map'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Printed pp. 194-195:
+      melt ΔHcool depends on the structure of the glass formed on cooling in the drop calorimeter, so the drop is not liquid
+      H(T)-H(298 K).'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 4
@@ -2874,12 +3475,11 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'CaSiO3_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2903,7 +3503,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CaSiO3_melt'' is not in the closed automatic map'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 4
@@ -2959,12 +3580,11 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'CaSiO3_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2988,7 +3608,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CaSiO3_melt'' is not in the closed automatic map'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 4
@@ -3044,12 +3685,11 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'CaSiO3_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3073,7 +3713,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CaSiO3_melt'' is not in the closed automatic map'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 4
@@ -3129,12 +3790,11 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'CaSiO3_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3158,7 +3818,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CaSiO3_melt'' is not in the closed automatic map'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 4
@@ -3214,12 +3895,11 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'CaSiO3_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3243,7 +3923,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CaSiO3_melt'' is not in the closed automatic map'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 4
@@ -3291,7 +3992,7 @@ observations:
   provenance:
     printed_phase: CaSiO3_melt
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1829:h=22f3731c16bd
-  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-solution-series
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion::declared:fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-solution-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -3299,12 +4000,11 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'CaSiO3_melt_sample_solution_heat' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3328,7 +4028,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CaSiO3_melt_sample_solution_heat'' is not in the closed automatic map'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table III reports the
+      mean heat of solution for each melt sample; the printed text says these are mean values of measurements but does not
+      establish a replicate count.'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 4
@@ -3349,7 +4072,7 @@ observations:
   provenance:
     printed_phase: CaSiO3_melt_sample_solution_heat
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1848:h=a662473fe545
-  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-solution-series
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion::declared:fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-solution-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -3357,12 +4080,11 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'CaSiO3_melt_sample_solution_heat' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3386,7 +4108,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CaSiO3_melt_sample_solution_heat'' is not in the closed automatic map'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table III reports the
+      mean heat of solution for each melt sample; the printed text says these are mean values of measurements but does not
+      establish a replicate count.'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 4
@@ -3407,7 +4152,7 @@ observations:
   provenance:
     printed_phase: CaSiO3_melt_sample_solution_heat
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1859:h=9d06b38c7c61
-  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-solution-series
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion::declared:fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-solution-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -3415,12 +4160,11 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'CaSiO3_melt_sample_solution_heat' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3444,7 +4188,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CaSiO3_melt_sample_solution_heat'' is not in the closed automatic map'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table III reports the
+      mean heat of solution for each melt sample; the printed text says these are mean values of measurements but does not
+      establish a replicate count.'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 4
@@ -3465,7 +4232,7 @@ observations:
   provenance:
     printed_phase: CaSiO3_melt_sample_solution_heat
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1915:h=ecc019604d45
-  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-solution-series
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion::declared:fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-solution-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -3473,12 +4240,11 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'CaSiO3_melt_sample_solution_heat' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3502,7 +4268,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CaSiO3_melt_sample_solution_heat'' is not in the closed automatic map'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table III reports the
+      mean heat of solution for each melt sample; the printed text says these are mean values of measurements but does not
+      establish a replicate count.'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 4
@@ -3523,7 +4312,7 @@ observations:
   provenance:
     printed_phase: CaSiO3_melt_sample_solution_heat
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1961:h=9d06b38c7c61
-  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-solution-series
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion::declared:fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-solution-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -3531,12 +4320,11 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'CaSiO3_melt_sample_solution_heat' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3560,7 +4348,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CaSiO3_melt_sample_solution_heat'' is not in the closed automatic map'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table III reports the
+      mean heat of solution for each melt sample; the printed text says these are mean values of measurements but does not
+      establish a replicate count.'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
     page: 4

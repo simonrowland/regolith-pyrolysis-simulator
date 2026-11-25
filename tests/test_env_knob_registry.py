@@ -29,7 +29,8 @@ OPERATOR_DOC = ROOT / "docs" / "configuration.md"
 # simulator/melt_backend/alphamelts.py gate_cooling_path. The ambient helper's
 # environment = os.environ token, and its .get("ALPHAMELTS_CALC_MODE"), were
 # already in the 95. The .get call is not itself an environ/getenv token.
-# 95 + 1 = 96.
+# 95 + 1 for the AlphaMELTS copied environment = 96; the default-policy
+# proposer and two mutation-script subprocesses no longer read environ.
 ENV_ACCESS_TOKEN_CEILING = 96
 ENV_ACCESS_TOKEN = re.compile(r"\b(?:environ|getenv)\b")
 

@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 from datetime import UTC, datetime
 import json
+import os
 from pathlib import Path
 import sys
 from typing import Sequence
@@ -27,12 +28,24 @@ from simulator.optimize.study import (
     run,
     run_certify,
 )
+from simulator.corpus_version import current_corpus_version, interoperable_corpus_versions
+from simulator.optimize.discovery import OPTIMIZER_CACHE_NAME, optimizer_run_dirs
+from simulator.optimize.import_bundle import (
+    OptimizerStoreClassification,
+    StagedImportStoreError,
+    classify_optimizer_store,
+)
+from simulator.optimize.results_store import ResultStore, study_results_write_lock_path
+from simulator.optimize.save_bundle import PARETO_NAME
 
 
 JOB_STATUS_NAME = "job_status.json"
 
 
 def main(argv: Sequence[str] | None = None) -> int:
+    argv = list(sys.argv[1:] if argv is None else argv)
+    if argv and argv[0] == "prune-stale-corpus":
+        return _prune_stale_corpus(argv[1:])
     parser = _parser()
     args = parser.parse_args(argv)
     _validate_constrained_max_args(args, parser)
@@ -112,6 +125,116 @@ def main(argv: Sequence[str] | None = None) -> int:
     return 0
 
 
+def _prune_stale_corpus(argv: Sequence[str]) -> int:
+    parser = argparse.ArgumentParser(
+        prog="python -m simulator.optimize prune-stale-corpus"
+    )
+    parser.add_argument("--store", action="append", type=Path, default=[])
+    parser.add_argument("--runs-root", type=Path, default=Path.cwd() / "runs")
+    parser.add_argument("--apply", action="store_true")
+    args = parser.parse_args(argv)
+    keep_versions = tuple(interoperable_corpus_versions())
+    runs_root = args.runs_root.expanduser()
+    auto_archive_stores: set[Path] = set()
+    if args.store:
+        stores = args.store
+    else:
+        archive_stores = []
+        for path in runs_root.rglob(OPTIMIZER_CACHE_NAME):
+            classification = classify_optimizer_store(path, runs_root)
+            if classification is OptimizerStoreClassification.PUBLISHED_ARCHIVE:
+                archive_stores.append(path)
+                auto_archive_stores.add(path)
+        stores = list(dict.fromkeys([
+            *(path / OPTIMIZER_CACHE_NAME for path in optimizer_run_dirs(runs_root)),
+            *archive_stores,
+        ]))
+    report = {
+        "keep_corpus_version": current_corpus_version(),
+        "keep_corpus_versions": list(keep_versions),
+        "mode": "apply" if args.apply else "dry-run",
+        "stores": [],
+        "retained_artifacts": [],
+    }
+    try:
+        for path in stores:
+            if not path.is_file():
+                if not args.store and path in auto_archive_stores:
+                    report["stores"].append(
+                        {
+                            "store": str(path),
+                            "artifact_kind": "archive",
+                            "status": "disappeared",
+                        }
+                    )
+                    continue
+                raise FileNotFoundError(f"optimizer result store not found: {path}")
+            real_path = Path(os.path.realpath(path))
+            classification = classify_optimizer_store(real_path, runs_root)
+            if classification is OptimizerStoreClassification.STAGED:
+                if args.store:
+                    raise StagedImportStoreError(real_path.parent)
+                continue
+            if classification is OptimizerStoreClassification.PUBLISHED_ARCHIVE:
+                report["stores"].append(
+                    {"store": str(real_path), "artifact_kind": "archive", "status": "skipped"}
+                )
+                continue
+            if args.apply:
+                result_store = ResultStore(
+                    real_path,
+                    write_lock_path=study_results_write_lock_path(real_path.parent),
+                )
+                counts = result_store.prune_stale_corpus_version(keep_versions, apply=True)
+            else:
+                counts = ResultStore.count_stale_corpus_versions(real_path, keep_versions)
+            report["stores"].append(
+                {
+                    "store": str(real_path),
+                    "artifact_kind": "result_rows",
+                    **counts,
+                    "deleted": counts["stale"] if args.apply else 0,
+                }
+            )
+        artifact_dirs = {Path(entry["store"]).parent for entry in report["stores"]}
+        if not args.store:
+            artifact_dirs.update(path.parent for path in runs_root.rglob(PARETO_NAME))
+        for directory in sorted(artifact_dirs):
+            pareto = directory / PARETO_NAME
+            if pareto.is_file():
+                report["retained_artifacts"].append(
+                    {"path": str(pareto), "artifact_kind": "warm_start", "status": "kept"}
+                )
+    except (Exception, KeyboardInterrupt) as exc:
+        print(f"Prune aborted: {type(exc).__name__}: {exc}")
+        print(
+            json.dumps(
+                {**report, "abort_reason": f"{type(exc).__name__}: {exc}"},
+                sort_keys=True,
+            )
+        )
+        raise
+    if not report["stores"]:
+        print("No optimizer result stores found.")
+    for entry in report["stores"]:
+        if entry["artifact_kind"] == "archive":
+            print(
+                f"{entry['store']} archive: {entry['status']}"
+                if entry["status"] == "disappeared"
+                else f"{entry['store']} archive: skipped (archive markers present)"
+            )
+            continue
+        action = "deleted" if args.apply else "would delete"
+        print(
+            f"{entry['store']} result_rows: {action} {entry['stale']} stale; "
+            f"kept {entry['kept']}; unversioned {entry['unversioned']}"
+        )
+    for entry in report["retained_artifacts"]:
+        print(f"{entry['path']} warm_start: kept")
+    print(json.dumps(report, sort_keys=True))
+    return 0
+
+
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="python -m simulator.optimize",
@@ -141,7 +264,10 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--seed", type=_non_negative_int, default=0, help="strategy seed")
     parser.add_argument(
         "--warm-start-from",
-        help="prior optimizer run directory, cache.sqlite, or pareto.json for W1 warm-start seeds",
+        help=(
+            "prior optimizer run directory, "
+            f"{OPTIMIZER_CACHE_NAME}, or {PARETO_NAME} for W1 warm-start seeds"
+        ),
     )
     parser.add_argument(
         "--per-eval-timeout-seconds",
@@ -200,7 +326,7 @@ def _parser() -> argparse.ArgumentParser:
         "--source-store",
         type=Path,
         default=None,
-        help="source results cache.sqlite for --certify",
+        help=f"source results {OPTIMIZER_CACHE_NAME} for --certify",
     )
     parser.add_argument(
         "--cache-key",

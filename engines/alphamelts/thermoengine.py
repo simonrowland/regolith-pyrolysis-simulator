@@ -606,6 +606,37 @@ class ThermoEngineOutOfDomainError(ValueError):
         return STATUS_BY_REFUSAL_CAUSE[self.cause]
 
 
+def _mask_out_of_domain(recipe: Mapping[str, Any]) -> ThermoEngineOutOfDomainError:
+    """Rebuild a masked out-of-domain refusal from the stored cause token.
+
+    Requested and solved belong to the key that raised. A neighbor in the
+    same coarse cell does not inherit them.
+    """
+
+    return ThermoEngineOutOfDomainError(str(recipe["cause"]))
+
+
+def _mask_non_finite(recipe: Mapping[str, Any]) -> ThermoEngineNonFiniteField:
+    return ThermoEngineNonFiniteField(*(recipe.get("args") or ()))
+
+
+def _mask_fo2_omitted(recipe: Mapping[str, Any]) -> ThermoEngineFO2OmittedError:
+    return ThermoEngineFO2OmittedError(*(recipe.get("args") or ()))
+
+
+def _register_refusal_mask_exceptions() -> None:
+    """Teach the cache leaf to raise these types without importing this module."""
+
+    from simulator.engine_cache import register_mask_exception
+
+    register_mask_exception("ThermoEngineOutOfDomainError", _mask_out_of_domain)
+    register_mask_exception("ThermoEngineNonFiniteField", _mask_non_finite)
+    register_mask_exception("ThermoEngineFO2OmittedError", _mask_fo2_omitted)
+
+
+_register_refusal_mask_exceptions()
+
+
 # One membership for typed ThermoEngine / worker failures. The freeze-gate
 # and the liquidus finder import this tuple; they do not restate it.
 # Declared ThermoEngine failures and the PetThermoTools origin tag /

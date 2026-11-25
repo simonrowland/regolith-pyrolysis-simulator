@@ -212,13 +212,22 @@ def test_migrated_fe_values_species_temperature_atmosphere_and_composition():
                 "missing input: printed air fO2 requires stated total pressure"
             )
             assert observation.identity.fO2_Pa.is_unknown
-            assert len(observation.notices) == 1
-            assert observation.notices[0].kind is NoticeKind.INPUT_OMITTED
-            assert observation.notices[0].reason == (
+            assert {notice.kind for notice in observation.notices} == {
+                NoticeKind.INPUT_OMITTED,
+                NoticeKind.METHOD_UNSTATED,
+            }
+            assert len(observation.notices) == 2
+            input_notice = next(
+                notice for notice in observation.notices
+                if notice.kind is NoticeKind.INPUT_OMITTED
+            )
+            assert input_notice.reason == (
                 "missing input: printed air fO2 requires stated total pressure"
             )
         else:
-            assert not observation.notices
+            assert tuple(notice.kind for notice in observation.notices) == (
+                NoticeKind.METHOD_UNSTATED,
+            )
         composition = observation.identity.composition
         assert composition is not None and composition.is_value
         composition_map = composition.value.as_map()
