@@ -351,11 +351,13 @@ class RunExecutor:
 
         def execution_run_flags() -> tuple[dict[str, Any], ...]:
             run_flags = tuple(getattr(session, "_run_flags", ()) or ())
-            return (
-                run_flags
-                if not execution_advanced
-                else run_flags[run_flags_start:]
-            )
+            if not execution_advanced:
+                return run_flags
+            run_flags = run_flags[run_flags_start:]
+            stored_run_flags = getattr(session, "_run_flags", None)
+            if isinstance(stored_run_flags, list):
+                stored_run_flags[:] = run_flags
+            return run_flags
 
         snapshot_start = len(
             tuple(getattr(getattr(sim, "record", None), "snapshots", ()))

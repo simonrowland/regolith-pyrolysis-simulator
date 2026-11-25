@@ -730,6 +730,13 @@ def test_zero_hour_campaign_completion_exports_only_new_run_flags():
         for flag in artifact["terminal"]["run_metadata"].get("run_flags", ())
     )
 
+    projected_execution = RunExecutor().execute_session(session, hours=0)
+
+    assert not any(
+        flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+        for flag in projected_execution.run_flags
+    )
+
 
 def test_budget_flag_contains_json_safe_unresolved_cyclic_limit():
     session = _started_internal_session(_run(campaign="C2A", hours=1))
