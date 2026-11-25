@@ -8,6 +8,7 @@ not call the pyrolysis engine. A temperature walk calls only
 from __future__ import annotations
 
 import math
+import sys
 from collections import Counter
 from pathlib import Path
 
@@ -61,6 +62,15 @@ _PRESET = _ROOT / "data" / "presets" / "vacuum_pyrolysis" / "robinot_2026.yaml"
 _CARRIER_NL_MIN = 0.3
 _CHAMBER_MBAR = 13.0
 _DT_S = 30.0
+
+
+def _emit(text: str) -> None:
+    """The gate profile refuses pytest ``-s``, so a captured print never
+    reaches the receipt. The census lines go to the original stdout.
+    """
+
+    sys.__stdout__.write(text + "\n")
+    sys.__stdout__.flush()
 
 
 def _preset() -> dict:
@@ -362,7 +372,7 @@ def test_lag_uses_the_process_timestep_fraction_and_moves_the_peak() -> None:
         lines.append(
             f"{tau:.0f} {peaks[tau]:.1f} {molar[tau]:.6e} {ppm_integrals[tau]:.6e}"
         )
-    print("\n".join(lines))
+    _emit("\n".join(lines))
 
 
 def test_carrier_flow_scales_ppm_and_not_the_molar_integral() -> None:
@@ -421,7 +431,7 @@ def test_carrier_flow_scales_ppm_and_not_the_molar_integral() -> None:
     assert _molar(series[0.3]) == pytest.approx(_molar(series[0.6]))
     ratio = _ppm(series[0.15]) / _ppm(series[0.3])
     assert 1.9 < ratio < 2.1
-    print(
+    _emit(
         "carrier_nl_min ppm_integral_ppm_min "
         f"0.15={_ppm(series[0.15]):.6e} "
         f"0.30={_ppm(series[0.3]):.6e} "
@@ -519,7 +529,7 @@ def test_booked_zero_bleed_flags_every_fig4a_point() -> None:
     )
     assert integrals[0].actual_value == pytest.approx(0.0)
     assert integrals[0].status == "assumed-input"
-    print(
+    _emit(
         "BENCHM1 robinot_o2_ppm_time_series "
         f"points=120 scored=0 flagged=120 refused=0 "
         f"rms={rms:.6f} max_abs={max_abs:.6f} inside={inside} "
@@ -642,11 +652,11 @@ def test_power_root_sweep_reports_peak_temperature_and_the_1400_c_line() -> None
                 f"{peak_s / 60.0:.2f} {minute_1:.2f} {minute_30:.2f} "
                 f"{int(crosses)}"
             )
-    print("\n".join(lines))
+    _emit("\n".join(lines))
     assert nominal_minute_30 is not None and nominal_peak is not None
     assert 1500.0 < nominal_minute_30 < 2500.0
     assert nominal_peak > 1400.0
-    print(
+    _emit(
         "o2_molar_integral_mol=0 for every face and absorptance in this "
         "probe: the bleed writer is not called. A peak at or above 1400 C "
         "can open peak_SiO_window_1400_1600C; that integral is not invented."
