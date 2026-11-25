@@ -516,10 +516,22 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
         assert row.identity.temperature_K.value == expected_temperature, (quantity, sample, formula)
         assert row.locator.page == row.locator.pdf_page_index + 1
         conditions = row.point_conditions or {}
+        is_wo3_condition_row = row.observation_id.startswith(wo3_conditions_prefix)
+        # The rejected WO3 series has no printed total-pressure point condition.
         required_conditions = (
             ("temperature_K", "time_min", "total_pressure_Pa", "printed_composition")
             if quantity is Quantity.MASS_LOSS_FRACTION
-            else ("temperature_K", "time_min", "VF_wt_pct", "composition", "total_pressure_Pa")
+            else (
+                ("temperature_K", "time_min", "VF_wt_pct", "composition")
+                if is_wo3_condition_row
+                else (
+                    "temperature_K",
+                    "time_min",
+                    "VF_wt_pct",
+                    "composition",
+                    "total_pressure_Pa",
+                )
+            )
         )
         for name in required_conditions:
             assert name in conditions and conditions[name].locator is not None, (quantity, sample, formula, name)
@@ -537,12 +549,13 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
                 "TiO2": "0.097",
                 "FeO": "35.5",
             }
-        pressure = conditions["total_pressure_Pa"]
-        assert pressure.state.is_value
-        assert pressure.state.value.kind is ValueKind.POINT
-        assert pressure.state.value.point == Decimal("0.00013332236842105")
-        assert pressure.state.value.approximate is True
-        assert pressure.locator.page == 3
+        if not is_wo3_condition_row:
+            pressure = conditions["total_pressure_Pa"]
+            assert pressure.state.is_value
+            assert pressure.state.value.kind is ValueKind.POINT
+            assert pressure.state.value.point == Decimal("0.00013332236842105")
+            assert pressure.state.value.approximate is True
+            assert pressure.locator.page == 3
         if quantity is Quantity.MASS_LOSS_FRACTION:
             assert formula == "unknown"
             assert row.identity.species.phase.value == "l"
@@ -736,10 +749,17 @@ def test_residue_component_parent_convention_controls_width_lookup(
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
 
+    ion_probe_prefix = (
+        f"{extract['source_id']}::wang_2001_table1_ion_microprobe_residue_compositions::"
+    )
+    # The content-derived child ID changes when this test mutates its parent uncertainty.
     row = next(
         observation
         for observation in migrator.result.observations.values()
-        if observation.observation_id.endswith("122b3beaa55d")
+        if observation.observation_id.startswith(ion_probe_prefix)
+        and observation.identity.species.formula == "MgO"
+        and observation.locator is not None
+        and re.search(r"row=SC12(?!\d)", observation.locator.note or "")
     )
     if expected_token == "conflict":
         assert any(
