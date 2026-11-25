@@ -109,7 +109,8 @@ def _assert_langmuir_notices(notices):
     assert any(
         notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
         and "xi includes the furnace ramp" in notice.reason
-        and "isothermal step at the printed run temperature" in notice.reason
+        and "isothermal at " in notice.reason
+        and " C and does not model ramp evaporation." in notice.reason
         for notice in notices
     )
     assert any(

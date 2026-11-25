@@ -40,7 +40,7 @@ from simulator.source_ids import (
 )
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.fe_redox import _engine_fe_speciation
-from simulator.physical_constants import PA_PER_BAR
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET, PA_PER_BAR
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
 
 
@@ -3104,8 +3104,8 @@ def predict_langmuir_residue_composition(
             kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
             affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
             reason=(
-                "xi includes the furnace ramp; the scored extent path uses one "
-                "isothermal step at the printed run temperature and does not "
+                "xi includes the furnace ramp; the scored extent path is isothermal "
+                f"at {temperature_K - CELSIUS_TO_KELVIN_OFFSET:g} C and does not "
                 "model ramp evaporation."
             ),
             origin="Langmuir residue extent",
