@@ -355,6 +355,78 @@ class VaporPressureComputationError(RuntimeError):
     """Raised when vapor-pressure math cannot produce an authoritative value."""
 
 
+class _VaporPressureActivityBasisMismatch(VaporPressureComputationError):
+    """Typed refusal for an activity exponent on the wrong formula basis."""
+
+    reason_code = "vapor_pressure_activity_basis_k_mismatch"
+
+
+def _activity_standard_state(
+    component_basis: str,
+) -> dict[str, str] | None:
+    """Standard-state triple for an activity basis handed to the vapour law."""
+
+    if component_basis == "single_cation":
+        return {
+            "convention": "raoultian_pure_endmember",
+            "phase": "liquid",
+            "component_basis": "single_cation",
+        }
+    if component_basis == "FeO":
+        # The Kress rail reports stoichiometric FeO on its liquid-endmember
+        # source state (melt_activity_models.yaml:219-220; simulator/fe_redox.py:1231).
+        return {
+            "convention": "stoichiometric_FeO_l",
+            "phase": "liquid_endmember",
+            "component_basis": "FeO",
+        }
+    if component_basis == "parent_oxide_formula":
+        return {
+            "convention": "raoultian_pure_endmember",
+            "phase": "liquid",
+            "component_basis": "parent_oxide_formula",
+        }
+    return None
+
+
+def _validate_activity_basis_k_consistency(
+    *,
+    species: str,
+    parent_oxide: str,
+    component_basis: str,
+    k_formula_activity_exponent: float,
+    applied_activity_exponent: float,
+) -> None:
+    """Refuse when the activity power does not match K's oxide formula unit."""
+
+    from simulator.chemistry.melt_activity import MELT_OXIDE_CATIONS_PER_FORMULA
+
+    if component_basis == "single_cation":
+        formula_units = float(MELT_OXIDE_CATIONS_PER_FORMULA.get(parent_oxide, 0.0))
+    elif component_basis in {"parent_oxide_formula", parent_oxide}:
+        formula_units = 1.0
+    else:
+        formula_units = 0.0
+    expected_exponent = formula_units * float(k_formula_activity_exponent)
+    actual_exponent = float(applied_activity_exponent)
+    if (
+        formula_units <= 0.0
+        or not math.isfinite(expected_exponent)
+        or not math.isfinite(actual_exponent)
+        or not math.isclose(
+            actual_exponent, expected_exponent, rel_tol=0.0, abs_tol=1.0e-12
+        )
+    ):
+        raise _VaporPressureActivityBasisMismatch(
+            "vapor_pressure_activity_basis_k_mismatch: "
+            f"species={species}; parent_oxide={parent_oxide}; "
+            f"component_basis={component_basis}; "
+            f"K_formula_activity_exponent={k_formula_activity_exponent}; "
+            f"applied_activity_exponent={applied_activity_exponent}; "
+            f"expected_activity_exponent={expected_exponent}"
+        )
+
+
 class VaporPressureRangeError(VaporPressureComputationError):
     """A requested Antoine pressure lies outside its certified source range."""
 
@@ -3012,6 +3084,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         vapor_pressure_provenance: dict[str, dict[str, Any]] = {}
         below_reporting_threshold_omissions: dict[str, dict[str, Any]] = {}
         activities: dict[str, float] = {}
+        activity_standard_states: dict[str, dict[str, str]] = {}
         metal_extrapolations: dict[str, dict[str, object]] = {}
         oxide_vapor_extrapolations: dict[str, dict[str, object]] = {}
         ellingham_extrapolations: dict[str, dict[str, object]] = {}
@@ -3682,6 +3755,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
 
             fe_degraded_activity_basis = None
             fe_activity_basis = None
+            parent_activity_exponent: float | None = None
+            activity_component_basis: str | None = None
             if parent_oxide == 'FeO':
                 candidate_activity = _high_t_activity_for_parent(
                     parent_oxide,
@@ -3703,10 +3778,12 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         }
                         else "openimcc_single_cation"
                     )
+                    activity_component_basis = "single_cation"
                 elif intrinsic_fO2_log is not None:
                     oxide_activity = None
                     a_oxide = below_cap_fe_activity
                     fe_activity_basis = "kress91_ferrous"
+                    activity_component_basis = "FeO"
                 else:
                     oxide_activity = None
                     # Documented degraded pre-existing public-caller path:
@@ -3737,7 +3814,11 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 # still written on the parent oxide (Na2O, Al2O3, Cr2O3), so
                 # feed an equivalent parent activity whose legacy exponent
                 # produces the single-cation activity.
-                a_oxide = oxide_activity.equivalent_parent_activity(n_ox / n_M)
+                parent_activity_exponent = n_ox / n_M
+                a_oxide = oxide_activity.equivalent_parent_activity(
+                    parent_activity_exponent
+                )
+                activity_component_basis = "single_cation"
                 if oxide_activity.warning:
                     warnings.append(oxide_activity.warning)
             if (
@@ -3766,6 +3847,26 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             activities[species] = (
                 a_oxide if oxide_activity is None else oxide_activity.activity
             )
+            if activity_component_basis is not None:
+                standard_state = _activity_standard_state(
+                    activity_component_basis
+                )
+                if standard_state is not None:
+                    activity_standard_states[species] = standard_state
+                if activity_component_basis == "single_cation":
+                    # K_decomp is per mole O2, then the metal activity root
+                    # raises it to 1/n_M.  Compare on the reported activity
+                    # basis after that root and the equivalent-parent mapping.
+                    applied_activity_exponent = 1.0
+                else:
+                    applied_activity_exponent = n_ox / n_M
+                _validate_activity_basis_k_consistency(
+                    species=species,
+                    parent_oxide=str(parent_oxide),
+                    component_basis=activity_component_basis,
+                    k_formula_activity_exponent=n_ox / n_M,
+                    applied_activity_exponent=applied_activity_exponent,
+                )
 
             # Ellingham: dG_f(T) = dH_f - T * dS_f (kJ/mol O2)
             dG_f_kJ = ellingham_delta_g_kj_per_mol_o2(species, T_K)
@@ -4485,6 +4586,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             ),
             "activities": activities,
             "activities_provider": "BuiltinVaporPressureProvider",
+            "selected_parent_activities_standard_state": (
+                activity_standard_states
+            ),
             "activities_standard_state": {
                 "convention": "raoultian_pure_endmember",
                 "phase": "liquid",
@@ -4548,6 +4652,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         if high_t_activity_authority is not None:
             selected_parent_activities = {}
             selected_parent_provenance = {}
+            selected_parent_activity_standard_states = {}
             for parent in melt_account_mol:
                 selected = _high_t_activity_for_parent(
                     parent, melt_account_mol, temperature_K=T_K,
@@ -4583,18 +4688,28 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         ),
                         "reason": reason,
                         "activity": selected_parent_activities[parent],
-                        "component_basis": "parent_oxide_formula",
+                        "component_basis": (
+                            "FeO" if analytical_fe else "parent_oxide_formula"
+                        ),
                     }
+                    selected_parent_activity_standard_state = (
+                        _activity_standard_state(
+                            "FeO" if analytical_fe else "parent_oxide_formula"
+                        )
+                    )
+                    if selected_parent_activity_standard_state is not None:
+                        selected_parent_activity_standard_states[parent] = (
+                            selected_parent_activity_standard_state
+                        )
             high_t_activity_authority["selected_parent_activities"] = selected_parent_activities
             high_t_activity_authority["selected_parent_activity_provenance"] = selected_parent_provenance
             providers = {row["provider"] for row in selected_parent_provenance.values()}
             high_t_activity_authority["selected_parent_activities_provider"] = (
                 "mixed" if len(providers) > 1 else next(iter(providers), None)
             )
-            high_t_activity_authority["selected_parent_activities_standard_state"] = {
-                **diagnostic["activities_standard_state"],
-                "component_basis": "parent_oxide_formula",
-            }
+            high_t_activity_authority[
+                "selected_parent_activities_standard_state"
+            ] = selected_parent_activity_standard_states
             diagnostic["high_t_melt_activity"] = dict(
                 high_t_activity_authority
             )

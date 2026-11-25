@@ -3900,6 +3900,16 @@ def _internal_analytical_vapor_pressure_adapter(
         "vapor_pressure_diagnostic": core_diagnostic,
         "imcc_notices": imcc_notices,
     }
+    equilibrium_diagnostics = getattr(equilibrium, "diagnostics", None)
+    core_activity_standard_states = (
+        equilibrium_diagnostics.get("activities_standard_state")
+        if isinstance(equilibrium_diagnostics, Mapping)
+        else None
+    )
+    if isinstance(core_activity_standard_states, Mapping):
+        diagnostics["activities_standard_state"] = dict(
+            core_activity_standard_states
+        )
     high_t_activity = core_diagnostic.get("high_t_melt_activity")
     if isinstance(high_t_activity, Mapping) and high_t_activity.get("backend_failure_disposition"):
         # imcc_nonconvergence and backend absence are not request-deterministic.
@@ -3989,14 +3999,22 @@ def internal_analytical_residue_vapor_pressure(
 
     def solve_live():
         from simulator.engine_cache import _without_engine_cache
+        from engines.builtin.vapor_pressure import VaporPressureComputationError
 
-        with _without_engine_cache():
-            result = _internal_analytical_vapor_pressure_adapter(
-                core=core, temperature_C=temperature_C, pressure_bar=pressure_bar,
-                composition_kg=composition_kg, composition_mol=composition_mol,
-                fO2_log=fO2_log, po2_request=po2_request,
-                include_diagnostic_shadows=include_diagnostic_shadows,
-            )
+        try:
+            with _without_engine_cache():
+                result = _internal_analytical_vapor_pressure_adapter(
+                    core=core, temperature_C=temperature_C, pressure_bar=pressure_bar,
+                    composition_kg=composition_kg, composition_mol=composition_mol,
+                    fO2_log=fO2_log, po2_request=po2_request,
+                    include_diagnostic_shadows=include_diagnostic_shadows,
+                )
+        except VaporPressureComputationError as exc:
+            if exc.reason_code != "vapor_pressure_activity_basis_k_mismatch":
+                raise
+            raise _InternalAnalyticalInputRefusal(
+                2, exc.reason_code, str(exc)
+            ) from exc
         return result
 
     def solve():

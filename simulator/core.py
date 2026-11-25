@@ -10795,12 +10795,27 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         kernel_activities = parent_activities or diagnostic.get('activities') or {}
         if kernel_activities:
             result.activity_coefficients = dict(kernel_activities)
+            producer_standard_state = {}
+            for standard_state_source in (
+                diagnostic.get('selected_parent_activities_standard_state'),
+                high_t_activity.get('selected_parent_activities_standard_state'),
+            ):
+                if isinstance(standard_state_source, Mapping):
+                    producer_standard_state.update(standard_state_source)
+            activity_diagnostics = {}
             if parent_activities:
-                result.diagnostics = {
-                    **(getattr(result, 'diagnostics', {}) or {}),
+                activity_diagnostics.update({
                     'activities_provider': high_t_activity['selected_parent_activities_provider'],
                     'activity_provenance': high_t_activity['selected_parent_activity_provenance'],
-                    'activities_standard_state': high_t_activity['selected_parent_activities_standard_state'],
+                })
+            if producer_standard_state:
+                activity_diagnostics['activities_standard_state'] = dict(
+                    producer_standard_state
+                )
+            if activity_diagnostics:
+                result.diagnostics = {
+                    **(getattr(result, 'diagnostics', {}) or {}),
+                    **activity_diagnostics,
                 }
         self._last_vapor_pressures_source = dict(
             getattr(result, 'vapor_pressures_source', {}) or {}

@@ -581,12 +581,18 @@ def test_selected_parent_activities_have_matching_mixed_provenance(temperature_K
 
     assert set(provenance) == set(values) == set(composition)
     assert high_t["selected_parent_activities_provider"] == "mixed"
-    assert high_t["selected_parent_activities_standard_state"]["component_basis"] == "parent_oxide_formula"
+    standard_states = high_t["selected_parent_activities_standard_state"]
+    assert set(standard_states) == set(values)
     for parent, value in values.items():
         row = provenance[parent]
         assert row["activity"] == value
         assert row["component_basis"] == "parent_oxide_formula"
         assert row["provider"] and row["authority"] and row["reason"]
+        assert standard_states[parent] == {
+            "convention": "raoultian_pure_endmember",
+            "phase": "liquid",
+            "component_basis": "parent_oxide_formula",
+        }
     assert provenance["SiO2"]["provider"] == "openimcc"
     assert provenance["K2O"]["provider"] == "internal-analytical"
     assert provenance["K2O"]["reason"] == "openimcc_authority_excluded"

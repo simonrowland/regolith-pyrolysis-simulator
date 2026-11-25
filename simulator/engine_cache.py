@@ -394,6 +394,8 @@ CACHEABLE_REFUSAL_CODES = frozenset({
     "internal_analytical_invalid_composition",
     "internal_analytical_missing_oxygen_condition",
     "internal_analytical_invalid_oxygen_condition",
+    # The vapor-law basis check is deterministic for a fixed activity and K.
+    "vapor_pressure_activity_basis_k_mismatch",
     "openimcc_composition_canonicalization",
     # OpenIMCC input refusals. Each is a predicate of the request
     # (composition, temperature, oxygen fugacity, pack, and the two allow

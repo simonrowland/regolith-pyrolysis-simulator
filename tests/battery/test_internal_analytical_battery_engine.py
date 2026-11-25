@@ -97,6 +97,32 @@ def test_internal_analytical_cell_reports_activity_not_gamma() -> None:
     assert cell.activities_standard_state == benchmark_standard_state
 
 
+def test_internal_analytical_constant_gamma_reports_per_species_activity_states() -> None:
+    core = _new_internal_analytical_core()
+    core._high_t_melt_activity = "constant_gamma"
+    output = _internal_analytical_vapor_pressure_adapter(
+        core=core,
+        temperature_C=1700.0 - 273.15,
+        pressure_bar=1.0e-6,
+        composition_kg=None,
+        composition_mol=_markova_first_interval_moles(),
+        fO2_log=-8.0,
+        po2_request=Po2Request(mode=PO2_COMMANDED, po2_bar=1.0e-8),
+    )
+
+    states = output.diagnostics["activities_standard_state"]
+    assert states["Al"] == {
+        "convention": "raoultian_pure_endmember",
+        "phase": "liquid",
+        "component_basis": "single_cation",
+    }
+    assert states["Fe"] == {
+        "convention": "stoichiometric_FeO_l",
+        "phase": "liquid_endmember",
+        "component_basis": "FeO",
+    }
+
+
 def _markova_first_interval_moles() -> dict[str, float]:
     # Markova 1984 first-interval residual-melt composition used by the
     # residue prediction regressions.

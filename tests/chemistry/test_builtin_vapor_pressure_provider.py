@@ -37,6 +37,7 @@ from engines.builtin.vapor_pressure import (
     VaporPressureComputationError,
     VaporPressureRangeError,
     _ELLINGHAM_THERMO,
+    _validate_activity_basis_k_consistency,
     reconstructed_vapor_pressure_authority_limit,
     require_antoine_source_certified_temperature,
 )
@@ -77,6 +78,22 @@ from tests.chemistry.conftest import _build_sim
 _VP_TOLERANCE_REL = 1e-9
 _VP_TOLERANCE_ABS_PA = 3e-7
 _CA_RANGE_EXTRAPOLATION_T_K = 1713.0
+
+
+def test_activity_basis_mismatch_with_k_formula_unit_is_a_typed_refusal():
+    from simulator.engine_cache import CACHEABLE_REFUSAL_CODES
+
+    with pytest.raises(VaporPressureComputationError) as refusal:
+        _validate_activity_basis_k_consistency(
+            species="Al",
+            parent_oxide="Al2O3",
+            component_basis="single_cation",
+            k_formula_activity_exponent=1.0,
+            applied_activity_exponent=1.0,
+        )
+
+    assert refusal.value.reason_code == "vapor_pressure_activity_basis_k_mismatch"
+    assert refusal.value.reason_code in CACHEABLE_REFUSAL_CODES
 
 # ---------------------------------------------------------------------------
 # Ellingham flat-table provenance pins.
