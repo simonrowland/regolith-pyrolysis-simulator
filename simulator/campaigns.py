@@ -1388,12 +1388,37 @@ class CampaignManager:
             return ('branch_two' if record_branch == 'two' else 'branch_one',)
         return ()
 
+    def _campaign_max_hours_override(
+        self,
+        campaign: CampaignPhase,
+    ) -> float | None:
+        """Return the positive max_hours endpoint override, if configured."""
+        overrides = self._campaign_overrides(campaign)
+        if 'max_hours' not in overrides:
+            return None
+        raw_max_hours = overrides['max_hours']
+        if not is_declared_real_scalar(
+            raw_max_hours,
+            allow_numeric_str=True,
+        ):
+            raise ValueError("max_hours override must be numeric")
+        max_hours = float(raw_max_hours)
+        return max_hours if max_hours > 0.0 else None
+
     def _active_campaign_max_hold_hr(
         self,
         campaign: CampaignPhase,
         record: BatchRecord,
     ) -> float:
-        """Resolve the active campaign's configured hold ceiling."""
+        """Resolve the active campaign's effective finite hour ceiling."""
+        if campaign not in (
+            CampaignPhase.C0,
+            CampaignPhase.C4,
+            CampaignPhase.C6,
+        ):
+            max_hours = self._campaign_max_hours_override(campaign)
+            if max_hours is not None:
+                return max_hours
         if campaign == CampaignPhase.C2A_STAGED:
             return self._configured_staged_max_hold_hr(campaign)
         if campaign in (CampaignPhase.C3_K, CampaignPhase.C3_NA):
@@ -2960,14 +2985,11 @@ class CampaignManager:
             CampaignPhase.C6,
             CampaignPhase.C0,
         ) and 'max_hours' in ovr:
-            raw_max_hours = ovr['max_hours']
-            if not is_declared_real_scalar(
-                raw_max_hours,
-                allow_numeric_str=True,
+            max_hours = self._campaign_max_hours_override(campaign)
+            if (
+                max_hours is not None
+                and completed_campaign_hour >= max_hours
             ):
-                raise ValueError("max_hours override must be numeric")
-            max_h = float(raw_max_hours)
-            if max_h > 0 and completed_campaign_hour >= max_h:
                 return self._end_at("time_cap", detail="max_hours")
 
         if campaign == CampaignPhase.C0:
@@ -3858,21 +3880,30 @@ class CampaignManager:
             return value.strip().lower() in {'1', 'true', 'yes', 'on'}
         return bool(value)
 
-    def _c7_enabled(self, record: BatchRecord) -> bool:
+    def _c7_route_configuration(
+        self,
+        record: BatchRecord,
+    ) -> tuple[bool, str | None]:
         if getattr(record, 'branch', '') != 'two':
-            return False
+            return False, None
         cfg = self._campaign_config(CampaignPhase.C7_CA_ALUMINOTHERMIC)
         ovr = self._campaign_overrides(CampaignPhase.C7_CA_ALUMINOTHERMIC)
         enabled = self._truthy_config(ovr.get('enabled', cfg.get('enabled', False)))
         if not enabled:
-            return False
+            return False, None
         c4_cfg = self._campaign_config(CampaignPhase.C4)
         ca_harvest = c4_cfg.get('optional_Ca_harvest', {})
         if isinstance(ca_harvest, Mapping) and self._truthy_config(
             ca_harvest.get('enabled', False)
         ):
-            raise ValueError('c4_ca_harvest_conflicts_with_c7')
-        return True
+            return True, 'c4_ca_harvest_conflicts_with_c7'
+        return True, None
+
+    def _c7_enabled(self, record: BatchRecord) -> bool:
+        enabled, unresolved_reason = self._c7_route_configuration(record)
+        if unresolved_reason is not None:
+            raise ValueError(unresolved_reason)
+        return enabled
 
     def get_next_campaign(self, current: CampaignPhase,
                           record: BatchRecord) -> Optional[CampaignPhase]:
@@ -3884,6 +3915,17 @@ class CampaignManager:
             CampaignPhase.COMPLETE if the batch is done,
             or None if a decision is needed first.
         """
+        return self._get_next_campaign(current, record)
+
+    def _get_next_campaign(
+        self,
+        current: CampaignPhase,
+        record: BatchRecord,
+        *,
+        unresolved_routes: list[dict[str, str]] | None = None,
+    ) -> Optional[CampaignPhase]:
+        """Resolve a transition, optionally recording invalid future routes."""
+
         # --- MRE-only track: skip pyrolysis campaigns entirely ---
         # After C0 (degas), go straight to MRE_BASELINE. No C0b, no decisions.
         if record.track == 'mre_baseline':
@@ -3976,7 +4018,18 @@ class CampaignManager:
             return self._get_next_after_c5(record)
 
         elif current == CampaignPhase.C6:
-            if self._c7_enabled(record):
+            c7_enabled, unresolved_reason = self._c7_route_configuration(record)
+            if unresolved_reason is not None:
+                if unresolved_routes is None:
+                    raise ValueError(unresolved_reason)
+                unresolved_routes.append({
+                    'campaign': CampaignPhase.C7_CA_ALUMINOTHERMIC.name,
+                    'kind': 'campaign_route',
+                    'status': 'unresolved',
+                    'code': unresolved_reason,
+                })
+                return CampaignPhase.C7_CA_ALUMINOTHERMIC
+            if c7_enabled:
                 self._record_auto_decision(record, DecisionType.C7_PROCEED, 'yes')
                 return CampaignPhase.C7_CA_ALUMINOTHERMIC
             return CampaignPhase.COMPLETE
@@ -4081,24 +4134,62 @@ class CampaignManager:
         start: CampaignPhase,
         record: BatchRecord,
     ) -> tuple[CampaignPhase, ...]:
-        """Phases AUTO_APPLY will enter, using this manager's transitions.
+        """Unique phases AUTO_APPLY can enter, using this manager's routes.
 
         The walk calls ``get_next_campaign``, ``get_decision``, and
-        ``decision_successor``. It does not copy caps or end criteria.
-        A real evaluation drives ``check_endpoint`` through the session.
+        ``decision_successor``. Optimizer product claims need each phase once;
+        a real evaluation drives ``check_endpoint`` through the session.
         """
+        phases, _unresolved = self._walk_auto_apply_sequence(
+            start,
+            record,
+            allow_unresolved_routes=False,
+            preserve_repeats=False,
+        )
+        return phases
+
+    def _configured_auto_apply_sequence(
+        self,
+        start: CampaignPhase,
+        record: BatchRecord,
+    ) -> tuple[tuple[CampaignPhase, ...], tuple[dict[str, str], ...]]:
+        """Return ordered future phases and any unresolved configured route."""
+        return self._walk_auto_apply_sequence(
+            start,
+            record,
+            allow_unresolved_routes=True,
+            preserve_repeats=True,
+        )
+
+    def _walk_auto_apply_sequence(
+        self,
+        start: CampaignPhase,
+        record: BatchRecord,
+        *,
+        allow_unresolved_routes: bool,
+        preserve_repeats: bool,
+    ) -> tuple[tuple[CampaignPhase, ...], tuple[dict[str, str], ...]]:
+        """Walk the transition owner with caller-selected reporting policy."""
 
         phases: list[CampaignPhase] = []
+        unresolved_routes: list[dict[str, str]] = []
         current: Optional[CampaignPhase] = start
         seen: set[CampaignPhase] = set()
         for _ in range(len(CampaignPhase) + 1):
             if current is None or current == CampaignPhase.COMPLETE:
                 break
-            if current in seen:
+            if not preserve_repeats and current in seen:
                 break
             seen.add(current)
             phases.append(current)
-            nxt = self.get_next_campaign(current, record)
+            if allow_unresolved_routes:
+                nxt = self._get_next_campaign(
+                    current,
+                    record,
+                    unresolved_routes=unresolved_routes,
+                )
+            else:
+                nxt = self.get_next_campaign(current, record)
             if nxt is None:
                 decision = self.get_decision(current, record)
                 choice = decision.recommendation or (
@@ -4116,4 +4207,4 @@ class CampaignManager:
             elif nxt == CampaignPhase.COMPLETE:
                 break
             current = nxt
-        return tuple(phases)
+        return tuple(phases), tuple(unresolved_routes)

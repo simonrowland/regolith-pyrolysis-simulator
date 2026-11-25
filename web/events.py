@@ -2838,6 +2838,7 @@ def _full_runner_payload(
     config = session._config
     if config is None:
         raise RuntimeError('web session has no runner configuration')
+    run_flags = tuple(getattr(session, 'run_flags', ()) or ())
     execution = RunExecutor().execute_session(session, hours=0)
     execution = replace(
         execution,
@@ -2853,6 +2854,7 @@ def _full_runner_payload(
             if refusal_diagnostic is not None
             else dict(execution.refusal_diagnostic or {})
         ),
+        run_flags=run_flags or tuple(execution.run_flags),
     )
     if projector is None:
         raise RuntimeError('web session has no canonical runner projector')

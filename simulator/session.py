@@ -924,29 +924,61 @@ def drive_session(
                 phase = sim.melt.campaign
                 if phase not in (CampaignPhase.IDLE, CampaignPhase.COMPLETE):
                     campaign_mgr = sim.campaign_mgr
-                    successors = copy.copy(campaign_mgr).auto_apply_sequence(
-                        phase,
-                        copy.deepcopy(sim.record),
+                    configured_phases, unresolved_routes = (
+                        copy.copy(campaign_mgr)._configured_auto_apply_sequence(
+                            phase,
+                            copy.deepcopy(sim.record),
+                        )
                     )
+                    last_campaign_summary = None
+                    if session._step_results:
+                        candidate_summary = getattr(
+                            session._step_results[-1],
+                            "campaign_summary",
+                            None,
+                        )
+                        if isinstance(candidate_summary, Mapping):
+                            last_campaign_summary = candidate_summary
+                    just_completed_campaign = str(
+                        (last_campaign_summary or {}).get("campaign") or ""
+                    )
+                    at_campaign_boundary = bool(
+                        just_completed_campaign
+                        and just_completed_campaign != phase.name
+                    )
+                    not_reached_start = 0 if at_campaign_boundary else 1
+                    detail: dict[str, Any] = {
+                        "active_campaign": phase.name,
+                        "hours_run_in_campaign": int(
+                            sim.melt.campaign_hour
+                        ),
+                        "campaign_cap_hours": float(
+                            campaign_mgr._active_campaign_max_hold_hr(
+                                phase,
+                                sim.record,
+                            )
+                        ),
+                        "successors_not_reached": [
+                            successor.name
+                            for successor in configured_phases[
+                                not_reached_start:
+                            ]
+                        ],
+                        "at_campaign_boundary": at_campaign_boundary,
+                        "ruling": "d-473",
+                    }
+                    if at_campaign_boundary:
+                        detail["just_completed_campaign"] = (
+                            just_completed_campaign
+                        )
+                    if unresolved_routes:
+                        detail["unresolved_successors"] = [
+                            dict(route) for route in unresolved_routes
+                        ]
                     session._run_flags = [{
                         "kind": "run_truncation",
                         "code": "run_hour_budget_exhausted_mid_campaign",
-                        "detail": {
-                            "active_campaign": phase.name,
-                            "hours_run_in_campaign": int(
-                                sim.melt.campaign_hour
-                            ),
-                            "campaign_cap_hours": float(
-                                campaign_mgr._active_campaign_max_hold_hr(
-                                    phase,
-                                    sim.record,
-                                )
-                            ),
-                            "successors_not_reached": [
-                                successor.name for successor in successors[1:]
-                            ],
-                            "ruling": "d-473",
-                        },
+                        "detail": detail,
                     }]
                     return dict(session.run_flags[0])
             return

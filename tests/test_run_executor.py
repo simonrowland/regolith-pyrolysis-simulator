@@ -124,7 +124,9 @@ def test_hour_budget_lookahead_records_route_conflict_without_failing_run():
     sim = session.simulator
     sim.record.branch = "two"
     sim.campaign_mgr.campaigns["C7"]["enabled"] = True
-    sim.campaign_mgr.campaigns["C4"]["optional_Ca_harvest"]["enabled"] = True
+    sim.campaign_mgr.campaigns["C4"].setdefault(
+        "optional_Ca_harvest", {}
+    )["enabled"] = True
 
     execution = RunExecutor().execute_session(session, hours=1)
 
@@ -136,6 +138,7 @@ def test_hour_budget_lookahead_records_route_conflict_without_failing_run():
         {
             "campaign": "C7_CA_ALUMINOTHERMIC",
             "kind": "campaign_route",
+            "status": "unresolved",
             "code": "c4_ca_harvest_conflicts_with_c7",
         }
     ]
