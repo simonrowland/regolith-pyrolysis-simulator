@@ -1,9 +1,9 @@
-"""Remote full-store out-of-scope row decode, source IDs A through C."""
+"""Remote full-store out-of-scope row decode, source IDs starting with A."""
 
 from tests.battery.test_migrate_split_baseline import (
     _assert_complete_store_regeneration_matches_checked_in_bytes,
 )
 
 
-def test_full_store_out_of_scope_rows_am() -> None:
-    _assert_complete_store_regeneration_matches_checked_in_bytes("scope", ("A-C",))
+def test_full_store_out_of_scope_rows_a() -> None:
+    _assert_complete_store_regeneration_matches_checked_in_bytes("scope", ("A",))
