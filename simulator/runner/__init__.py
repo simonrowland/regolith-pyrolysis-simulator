@@ -1502,6 +1502,7 @@ class PyrolysisRun:
         # the runner needing to know about it.
         for key, value in metadata_overrides.items():
             run_metadata[str(key)] = value
+        _attach_execution_diagnostics(run_metadata, execution)
         run_metadata["campaigns_elapsed"] = _safe_failure_value(
             lambda: float(execution.campaigns_elapsed),
             section="run_metadata.campaigns_elapsed",
@@ -5874,6 +5875,23 @@ def _execution_shadow_trace(execution: RunExecution | None) -> list[Any]:
     return _json_safe(list(getattr(execution, "shadow_trace", ()) or ()))
 
 
+def _attach_execution_diagnostics(
+    run_metadata: dict[str, Any],
+    execution: RunExecution | None,
+) -> None:
+    if execution is None:
+        return
+    run_flags = list(getattr(execution, "run_flags", ()) or ())
+    if run_flags:
+        run_metadata["run_flags"] = _json_safe(run_flags)
+    campaign_stops = list(getattr(execution, "campaign_stops", ()) or ())
+    if any(
+        isinstance(stop, Mapping) and stop.get("flags")
+        for stop in campaign_stops
+    ):
+        run_metadata["campaign_stops"] = _json_safe(campaign_stops)
+
+
 def _execution_pO2_enforcement_by_hour(
     execution: RunExecution | None,
     *,
@@ -5949,6 +5967,7 @@ def _runner_failure_result(
     }
     for key, value in overrides.items():
         run_metadata[str(key)] = _json_safe(value)
+    _attach_execution_diagnostics(run_metadata, execution)
     run_metadata["campaigns_elapsed"] = _safe_failure_value(
         lambda: _json_safe(
             float(

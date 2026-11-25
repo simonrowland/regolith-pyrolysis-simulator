@@ -9,6 +9,7 @@ from types import SimpleNamespace
 import pytest
 
 from simulator.accounting.ledger import AtomLedger, snapshot_atom_ledger
+from simulator.accounting.run_artifact import build_run_artifact
 from simulator.campaigns import (
     CampaignHoldTargetRefusal,
     CampaignPressureSetpointRefusal,
@@ -27,6 +28,7 @@ from simulator.session import (
     SimSession,
     SimSessionConfig,
     StepResult,
+    _hour_budget_exhausted_flag,
     drive_session,
 )
 from simulator.state import CampaignPhase, DecisionType
@@ -48,6 +50,14 @@ def _run(**overrides) -> PyrolysisRun:
     }
     kwargs.update(overrides)
     return PyrolysisRun(**kwargs)
+
+
+def _started_internal_session(run: PyrolysisRun) -> SimSession:
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    session = SimSession()
+    session.start(run._session_config(), backend=backend)
+    return session
 
 
 def test_run_executor_returns_structured_execution():
@@ -417,6 +427,205 @@ def test_run_executor_advances_after_c4_acquisition_time_cap_without_c6_mislabel
     assert sim.campaign_endpoint_refused() is False
     assert sim.melt.campaign == CampaignPhase.C2A
     assert sim._last_c6_refusal_diagnostic == {}
+
+
+def test_c4_time_cap_and_exact_boundary_flags_reach_batch_artifact():
+    run = _run(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C4",
+        hours=1,
+        additives_kg={},
+        runtime_campaign_overrides={"C2A": {"max_hours": 7}},
+    )
+    session = _started_internal_session(run)
+    sim = session.simulator
+    sim.record.branch = "two"
+    sim.campaign_mgr.campaigns["C4"]["max_target_acquisition_hr"] = 1.0
+
+    execution = RunExecutor().execute_session(session, hours=1)
+    assert execution.status == "ok"
+    assert sim.melt.campaign is CampaignPhase.C2A
+
+    c4_stop = next(
+        stop for stop in execution.campaign_stops if stop["campaign"] == "C4"
+    )
+    generic_flag = next(
+        flag for flag in c4_stop["flags"]
+        if flag["code"] == "campaign_time_cap_unconverged"
+    )
+    assert generic_flag["kind"] == "campaign_stop"
+    assert generic_flag["detail"]["successor"] == "C2A"
+    c4_flag = next(
+        flag for flag in c4_stop["flags"]
+        if flag["code"] == "c4_time_capped_without_na_endpoint"
+    )
+    termination = sim.campaign_mgr.last_c4_termination
+    assert c4_flag["detail"]["residual_Na_kg"] == (
+        termination["residual_melt"]["Na_kg"]
+    )
+    assert c4_flag["detail"]["na_endpoint_threshold_atom_mol"] == (
+        termination["na_endpoint_threshold_atom_mol"]
+    )
+
+    budget_flag = next(
+        flag for flag in execution.run_flags
+        if flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+    )
+    detail = budget_flag["detail"]
+    assert detail["campaign"] == "C2A"
+    assert detail["hours_run_in_campaign"] == 0
+    assert detail["at_campaign_boundary"] is True
+    assert detail["just_completed_campaign"] == "C4"
+    assert detail["successors_not_reached"][0] == "C2A"
+    assert detail["configured_limits"]["max_hours_override"] == 7
+    assert detail["configured_limits"]["setpoint_max_hold_hr"] == (
+        sim.campaign_mgr._campaign_config(CampaignPhase.C2A)["max_hold_hr"]
+    )
+    assert "max_hold_hr" not in detail
+    assert "cap" not in detail
+
+    payload = run._build_output(execution)
+    assert payload["run_metadata"]["run_flags"] == list(execution.run_flags)
+    c4_payload_stop = next(
+        stop for stop in payload["run_metadata"]["campaign_stops"]
+        if stop["campaign"] == "C4"
+    )
+    assert c4_payload_stop["flags"] == c4_stop["flags"]
+    artifact = build_run_artifact(payload, run_id="b1310-exact-boundary")
+    assert artifact["terminal"]["run_metadata"]["run_flags"] == list(
+        execution.run_flags
+    )
+    assert artifact["terminal"]["run_metadata"]["campaign_stops"]
+
+
+def test_hour_budget_flag_keeps_repeated_configured_successors():
+    run = _run(campaign="C2A", hours=1)
+    session = _started_internal_session(run)
+    session.simulator.record.path = "A"
+    session.simulator.record.branch = "two"
+
+    execution = RunExecutor().execute_session(session, hours=1)
+
+    flag = next(
+        flag for flag in execution.run_flags
+        if flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+    )
+    successors = flag["detail"]["successors_not_reached"]
+    assert successors.count("C2A") == 1
+    assert successors[-1] == "C6"
+    assert execution.status == "ok"
+
+
+def test_terminal_campaign_completion_does_not_emit_hour_budget_flag():
+    run = _run(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C7_CA_ALUMINOTHERMIC",
+        hours=1,
+        additives_kg={},
+        runtime_campaign_overrides={"C7": {"max_hours": 1}},
+    )
+    session = _started_internal_session(run)
+
+    execution = RunExecutor().execute_session(session, hours=1)
+
+    assert execution.status == "ok"
+    assert session.is_complete()
+    assert not any(
+        flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+        for flag in execution.run_flags
+    )
+    c7_stop = next(
+        stop for stop in execution.campaign_stops
+        if stop["campaign"] == "C7_CA_ALUMINOTHERMIC"
+    )
+    assert c7_stop["stop_reason"] == "time_cap"
+    assert any(
+        flag["code"] == "campaign_time_cap_unconverged"
+        for flag in c7_stop["flags"]
+    )
+
+
+def test_budget_flag_records_pending_decision_before_chain_lookahead(monkeypatch):
+    session = _started_internal_session(_run(campaign="C0", hours=1))
+    calls = []
+    pending = SimpleNamespace(
+        decision_type=DecisionType.PATH_AB,
+        options=("A_staged",),
+        recommendation="A_staged",
+        context="pending path choice",
+    )
+
+    def pending_decision():
+        calls.append("pending_decision")
+        return pending
+
+    from simulator import session as session_module
+
+    real_walk = session_module._configured_campaign_walk
+
+    def checked_walk(*args):
+        calls.append("chain_walk")
+        return real_walk(*args)
+
+    monkeypatch.setattr(session, "pending_decision", pending_decision)
+    monkeypatch.setattr(session_module, "_configured_campaign_walk", checked_walk)
+    record_path = session.simulator.record.path
+
+    flag = _hour_budget_exhausted_flag(session)
+
+    assert calls[:2] == ["pending_decision", "chain_walk"]
+    assert flag["detail"]["pending_decision"]["type"] == "PATH_AB"
+    assert session.simulator.record.path == record_path
+
+
+def test_budget_flag_exception_is_typed_without_exception_text(monkeypatch):
+    session = _started_internal_session(_run(campaign="C0", hours=1))
+    pending = SimpleNamespace(
+        decision_type=DecisionType.PATH_AB,
+        options=("A_staged",),
+        recommendation="A_staged",
+        context="pending path choice",
+    )
+    monkeypatch.setattr(session, "pending_decision", lambda: pending)
+
+    def fail_walk(*_args):
+        raise RuntimeError("do not serialize this message")
+
+    from simulator import session as session_module
+
+    monkeypatch.setattr(session_module, "_configured_campaign_walk", fail_walk)
+
+    flag = _hour_budget_exhausted_flag(session)
+
+    assert flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+    assert flag["detail"] == {
+        "unresolved": True,
+        "error_type": "RuntimeError",
+        "pending_decision": {
+            "type": "PATH_AB",
+            "options": ["A_staged"],
+            "recommendation": "A_staged",
+            "context": "pending path choice",
+        },
+    }
+    assert "do not serialize this message" not in repr(flag)
+
+
+def test_budget_flag_does_not_catch_base_exception(monkeypatch):
+    session = _started_internal_session(_run(campaign="C0", hours=1))
+
+    class FatalDiagnostic(BaseException):
+        pass
+
+    def abort_walk(*_args):
+        raise FatalDiagnostic()
+
+    from simulator import session as session_module
+
+    monkeypatch.setattr(session_module, "_configured_campaign_walk", abort_walk)
+
+    with pytest.raises(FatalDiagnostic):
+        _hour_budget_exhausted_flag(session)
 
 
 def test_c4_refusal_is_non_resumable_under_auto_apply_and_decide() -> None:

@@ -59,7 +59,7 @@ from simulator.melt_backend.alphamelts import AlphaMELTSBackend
 from simulator.recipe import recipe_schema_version
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.recipe_io import RecipeIOError, normalize_recipe_patch
-from simulator.run_executor import RunExecutor
+from simulator.run_executor import RunExecutor, _campaign_stop_records_from_session
 from simulator.runner import (
     PyrolysisRun,
     RunnerError,
@@ -2900,6 +2900,12 @@ def _available_runner_payload(
         metadata['refusal_diagnostic'] = copy.deepcopy(
             dict(refusal_diagnostic)
         )
+    run_flags = list(getattr(session, '_run_flags', ()) or ())
+    if run_flags:
+        metadata['run_flags'] = copy.deepcopy(run_flags)
+    campaign_stops = _campaign_stop_records_from_session(session)
+    if any(stop.get('flags') for stop in campaign_stops):
+        metadata['campaign_stops'] = copy.deepcopy(list(campaign_stops))
     for attach_notice in (
         _attach_engine_commissioning_notice,
         _attach_diagnostic_gate_authority_notice,

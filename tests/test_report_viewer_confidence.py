@@ -88,6 +88,52 @@ def _confidence_note(html: str) -> str | None:
     return match.group(0) if match else None
 
 
+def _render_diagnostics(artifact: dict) -> dict:
+    harness = r"""
+const fs = require("fs");
+const vm = require("vm");
+const makeNode = (tagName) => ({
+  tagName,
+  children: [],
+  textContent: "",
+  appendChild(child) { this.children.push(child); },
+});
+const context = {
+  console,
+  document: { querySelector: () => makeNode("root"), createElement: makeNode },
+  fetch: () => new Promise(() => {}),
+  URLSearchParams,
+  window: { location: { search: "" } },
+};
+context.globalThis = context;
+context.__artifact = JSON.parse(process.argv[4]);
+vm.createContext(context);
+vm.runInContext(fs.readFileSync(process.argv[2], "utf8"), context);
+vm.runInContext(fs.readFileSync(process.argv[3], "utf8"), context);
+vm.runInContext(`
+  const root = document.createElement("root");
+  appendRunDiagnostics(root, globalThis.__artifact);
+  const section = root.children[0];
+  const list = section.children.find((child) => child.tagName === "ul");
+  globalThis.__diagnostics = {
+    title: section.children[0].textContent,
+    lines: list.children.map((item) => item.textContent),
+    itemChildCounts: list.children.map((item) => item.children.length),
+  };
+`, context);
+process.stdout.write(JSON.stringify(context.__diagnostics));
+"""
+    completed = subprocess.run(
+        ["node", "-", str(LABELS), str(SCRIPT), json.dumps(artifact)],
+        input=harness,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stderr
+    return json.loads(completed.stdout)
+
+
 def test_grade_string_is_copied_verbatim_not_min_folded() -> None:
     artifact = _minimal_artifact({
         "grade": "copied-verbatim-grade-token",
@@ -163,3 +209,36 @@ def test_viewer_source_does_not_fold_or_alias_confidence() -> None:
     assert '({ high: "pure", medium: "mixed", low: "contaminated" })' not in viewer
     assert "terminal.confidence" not in p9
     assert "function confidence_rollup" not in (ROOT / "simulator" / "accounting" / "run_artifact.py").read_text()
+
+
+def test_run_and_campaign_flags_render_as_text_content() -> None:
+    artifact = _minimal_artifact()
+    artifact["terminal"]["run_metadata"] = {
+        "run_flags": [{
+            "kind": "run_diagnostic",
+            "code": "run_hour_budget_exhausted_mid_campaign",
+            "detail": {"campaign": "C2A", "label": "<script>text</script>"},
+        }],
+        "campaign_stops": [{
+            "campaign": "C4",
+            "flags": [{
+                "kind": "campaign_stop",
+                "code": "c4_time_capped_without_na_endpoint",
+                "detail": {"residual_Na_kg": 0.25},
+            }],
+        }],
+    }
+
+    rendered = _render_diagnostics(artifact)
+
+    assert rendered["title"] == "Run diagnostics"
+    assert "run_hour_budget_exhausted_mid_campaign" in rendered["lines"][0]
+    assert "<script>text</script>" in rendered["lines"][0]
+    assert "C4 · c4_time_capped_without_na_endpoint" in rendered["lines"][1]
+    assert all(count == 0 for count in rendered["itemChildCounts"])
+    viewer = SCRIPT.read_text()
+    body = viewer.split("function appendRunDiagnostics", 1)[1].split(
+        "function panelSectionsHtml", 1
+    )[0]
+    assert "item.textContent =" in body
+    assert "item.innerHTML =" not in body

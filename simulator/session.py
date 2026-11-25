@@ -27,7 +27,7 @@ from simulator.core import CampaignPhase, PyrolysisSimulator
 from simulator.feedstock_guard import BlockedFeedstockError, assert_feedstock_loadable
 from simulator.lab_schedule import LAB_SCHEDULE_OVERRIDE_KEY, normalize_lab_schedule
 from simulator.scalar_boundary import is_declared_real_scalar, require_finite_float as _finite_float
-from simulator.campaigns import parse_campaign_override_value
+from simulator.campaigns import decision_successor, parse_campaign_override_value
 from simulator.condensation_routing import STAGE3_PURITY_FIELDS
 from simulator.chemistry.melt_activity import normalize_high_t_melt_activity
 from simulator.state import (
@@ -282,6 +282,7 @@ class SimSession:
         self._paused = False
         self._step_results: list[StepResult] = []
         self._operator_decisions: list[dict[str, Any]] = []
+        self._run_flags: list[dict[str, Any]] = []
         self._result_document: Mapping[str, Any] | None = None
         self._poisoned_error: RuntimeError | None = None
 
@@ -513,6 +514,7 @@ class SimSession:
         self._paused = False
         self._step_results = []
         self._operator_decisions = []
+        self._run_flags = []
         self._result_document = None
         self._poisoned_error = None
 
@@ -905,6 +907,11 @@ def drive_session(
     step_index = 0
     while True:
         if not until_campaign_complete and step_index >= int(hours):
+            config = getattr(session, "_config", None)
+            if step_index > 0 and int(getattr(config, "hours", 0) or 0) > 0:
+                run_flag = _hour_budget_exhausted_flag(session)
+                if run_flag is not None:
+                    session._run_flags.append(run_flag)
             return
         step_index += 1
         if stop_at_stage0_exit and _at_stage0_exit(session):
@@ -980,3 +987,123 @@ def _operator_decision_event(
         "options": list(decision.options),
         "context": decision.context,
     }
+
+
+def _configured_campaign_walk(
+    campaign_manager: Any,
+    campaign: CampaignPhase,
+    record: Any,
+) -> tuple[CampaignPhase, ...]:
+    """Walk configured AUTO_APPLY successors without touching live state."""
+
+    manager = copy.deepcopy(campaign_manager)
+    walk_record = copy.deepcopy(record)
+    phases: list[CampaignPhase] = []
+    current: CampaignPhase | None = campaign
+    while current is not None and current is not CampaignPhase.COMPLETE:
+        phases.append(current)
+        next_campaign = manager.get_next_campaign(current, walk_record)
+        if next_campaign is None:
+            decision = manager.get_decision(current, walk_record)
+            choice = decision.recommendation or (
+                decision.options[0] if decision.options else ""
+            )
+            next_campaign, updates, complete = decision_successor(
+                decision.decision_type,
+                choice,
+                c5_enabled=bool(manager.c5_enabled),
+            )
+            for field_name, field_value in updates.items():
+                setattr(walk_record, field_name, field_value)
+            if complete or next_campaign is None:
+                break
+        if next_campaign is CampaignPhase.COMPLETE:
+            break
+        current = next_campaign
+    return tuple(phases)
+
+
+def _hour_budget_exhausted_flag(session: SimSession) -> dict[str, Any] | None:
+    """Describe an incomplete finite run without changing simulator state."""
+
+    pending_decision: dict[str, Any] | None = None
+    try:
+        pending = session.pending_decision()
+        pending_decision = _decision_event(pending) if pending is not None else None
+        detail: dict[str, Any] = {}
+        if pending_decision is not None:
+            detail["pending_decision"] = pending_decision
+        sim = session.simulator
+        if sim.is_complete():
+            return None
+
+        campaign = sim.melt.campaign
+        campaign_name = campaign.name
+        step_results = tuple(getattr(session, "_step_results", ()))
+        last_summary = (
+            getattr(step_results[-1], "campaign_summary", None)
+            if step_results
+            else None
+        )
+        just_completed_campaign = (
+            str(last_summary.get("campaign") or "")
+            if isinstance(last_summary, Mapping)
+            else None
+        )
+        at_campaign_boundary = just_completed_campaign is not None
+
+        phases = _configured_campaign_walk(
+            sim.campaign_mgr,
+            campaign,
+            sim.record,
+        )
+        if not at_campaign_boundary or just_completed_campaign == campaign_name:
+            phases = phases[1:]
+
+        manager = sim.campaign_mgr
+        campaign_config = manager._campaign_config(campaign)
+        runtime_overrides = getattr(
+            getattr(session, "_config", None),
+            "runtime_campaign_overrides",
+            {},
+        ) or {}
+        campaign_overrides: dict[str, Any] = {}
+        for key in (manager._campaign_config_key(campaign), campaign_name):
+            raw_override = runtime_overrides.get(key, {})
+            if isinstance(raw_override, Mapping):
+                campaign_overrides.update(raw_override)
+        configured_limits: dict[str, Any] = {}
+        if "max_hold_hr" in campaign_config:
+            configured_limits["setpoint_max_hold_hr"] = copy.deepcopy(
+                campaign_config["max_hold_hr"]
+            )
+        if "max_hours" in campaign_overrides:
+            configured_limits["max_hours_override"] = copy.deepcopy(
+                campaign_overrides["max_hours"]
+            )
+
+        detail.update({
+            "campaign": campaign_name,
+            "hours_run_in_campaign": int(sim.melt.campaign_hour),
+            "at_campaign_boundary": at_campaign_boundary,
+            "just_completed_campaign": just_completed_campaign,
+            "successors_not_reached": [phase.name for phase in phases],
+            "configured_limits": configured_limits,
+        })
+        return {
+            "kind": "run_diagnostic",
+            "code": "run_hour_budget_exhausted_mid_campaign",
+            "detail": detail,
+        }
+    except Exception as exc:
+        unresolved_detail: dict[str, Any] = {
+            "unresolved": True,
+            "error_type": type(exc).__name__,
+        }
+        if pending_decision is not None:
+            unresolved_detail["pending_decision"] = pending_decision
+        return {
+            "kind": "run_diagnostic",
+            "code": "run_hour_budget_exhausted_mid_campaign",
+            "detail": unresolved_detail,
+        }

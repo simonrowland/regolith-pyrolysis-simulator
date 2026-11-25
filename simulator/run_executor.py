@@ -124,8 +124,9 @@ class RunExecution:
         default=None, compare=False, repr=False
     )
     # One record per completed campaign: campaign, stop_reason, duration_h,
-    # and the cap or refusal name when the endpoint recorded one.
+    # detail, and typed flags when the endpoint recorded them.
     campaign_stops: tuple[Mapping[str, Any], ...] = ()
+    run_flags: tuple[Mapping[str, Any], ...] = ()
 
 
 _CAMPAIGN_STOP_REASONS = frozenset({
@@ -157,7 +158,25 @@ def campaign_stop_record(summary: Mapping[str, Any] | None) -> dict[str, Any] | 
     detail = summary.get("stop_detail", summary.get("detail"))
     if detail:
         record["detail"] = str(detail)
+    flags = summary.get("flags")
+    if isinstance(flags, (list, tuple)):
+        record["flags"] = [
+            deepcopy(dict(flag)) for flag in flags if isinstance(flag, Mapping)
+        ]
     return record
+
+
+def _campaign_stop_records_from_session(
+    session: SimSession,
+) -> tuple[dict[str, Any], ...]:
+    records = []
+    for result in tuple(getattr(session, "_step_results", ())):
+        record = campaign_stop_record(
+            getattr(result, "campaign_summary", None)
+        )
+        if record is not None:
+            records.append(record)
+    return tuple(records)
 
 
 def _campaigns_elapsed_from_session_history(
@@ -329,7 +348,7 @@ class RunExecutor:
         until_campaign_complete = bool(
             getattr(config, "until_campaign_complete", False)
         )
-        campaign_stops: list[dict[str, Any]] = []
+        campaign_stops = list(_campaign_stop_records_from_session(session))
 
         try:
             if initial_refusal is not None:
@@ -609,6 +628,7 @@ class RunExecutor:
                     ),
                 ),
                 campaigns_elapsed_start=campaigns_elapsed_start,
+                run_flags=tuple(getattr(session, "_run_flags", ()) or ()),
                 campaign_stops=tuple(campaign_stops),
             )
         except Exception as envelope_exc:  # noqa: BLE001 -- reporting must survive
@@ -697,6 +717,7 @@ class RunExecutor:
                     ),
                 ),
                 campaigns_elapsed_start=campaigns_elapsed_start,
+                run_flags=tuple(getattr(session, "_run_flags", ()) or ()),
                 campaign_stops=tuple(campaign_stops),
             )
 

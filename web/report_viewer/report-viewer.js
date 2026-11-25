@@ -715,6 +715,46 @@ function panelRegistry() {
   return Array.isArray(globalThis.ReportPanels) ? globalThis.ReportPanels : [];
 }
 
+function appendRunDiagnostics(container, artifact) {
+  const metadata = artifact?.terminal?.run_metadata || {};
+  const runFlags = Array.isArray(metadata.run_flags) ? metadata.run_flags : [];
+  const campaignStops = Array.isArray(metadata.campaign_stops)
+    ? metadata.campaign_stops
+    : [];
+  const campaignFlags = campaignStops.flatMap((stop) =>
+    Array.isArray(stop?.flags)
+      ? stop.flags.map((flag) => ({ campaign: stop.campaign, flag }))
+      : []
+  );
+  if (!runFlags.length && !campaignFlags.length) return;
+
+  const sectionElement = document.createElement("section");
+  const title = document.createElement("h2");
+  title.textContent = "Run diagnostics";
+  sectionElement.appendChild(title);
+
+  const list = document.createElement("ul");
+  for (const flag of runFlags) {
+    const item = document.createElement("li");
+    const code = String(flag?.code || "run_diagnostic");
+    const detail = flag?.detail === undefined ? "" : `: ${JSON.stringify(flag.detail)}`;
+    item.textContent = `${code}${detail}`;
+    list.appendChild(item);
+  }
+  for (const entry of campaignFlags) {
+    const item = document.createElement("li");
+    const campaign = String(entry.campaign || "campaign");
+    const code = String(entry.flag?.code || "campaign_stop");
+    const detail = entry.flag?.detail === undefined
+      ? ""
+      : `: ${JSON.stringify(entry.flag.detail)}`;
+    item.textContent = `${campaign} · ${code}${detail}`;
+    list.appendChild(item);
+  }
+  sectionElement.appendChild(list);
+  container.appendChild(sectionElement);
+}
+
 function panelSectionsHtml(artifact, rows, spans, energy) {
   return panelRegistry().map((panel, index) => {
     // Read the id BEFORE the try: a null entry made the catch block itself
@@ -825,6 +865,7 @@ function render(artifact) {
     panelSectionsHtml(artifact, rows, spans, energy) +
     costSection(artifact, energy) + provenanceSection(artifact) +
     `<footer class="footer"><span>Frozen flatfile report · engine-free · artifact-only rendering</span><a href="./settings.html${RUN_QUERY}">Captured settings</a><span class="mono">${esc(artifact.header.run_id)}</span></footer>`;
+  appendRunDiagnostics($("#report"), artifact);
   if (rows.length) {
     const stepper = $("#stepper");
     stepper.addEventListener("input", () => renderCurrent(artifact, Number(stepper.value)));

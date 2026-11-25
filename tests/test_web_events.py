@@ -4290,6 +4290,82 @@ def test_real_web_session_uses_canonical_runner_projector(
             _clear_simulation_state(sid)
 
 
+def test_unbudgeted_web_pacing_slice_does_not_emit_run_flags(monkeypatch):
+    _force_socketio_internal_analytical(monkeypatch)
+    app = app_module.create_app()
+    client = _identified_socket_client(app)
+    before = set(_simulations)
+
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "internal-analytical",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 0,
+                "track": "pyrolysis",
+            },
+        )
+        sid = (set(_simulations) - before).pop()
+        state = _simulations[sid]
+        session = state["session"]
+        assert session._config.hours == 0
+
+        results = list(web_events.drive_session(
+            session,
+            hours=1,
+            policy=web_events.DecisionPolicy.AUTO_APPLY,
+        ))
+
+        assert len(results) == 1
+        assert session._run_flags == []
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
+def test_web_artifact_projection_preserves_existing_run_and_campaign_flags():
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C0",
+        hours=0,
+    )
+    session = run._start_session()
+    run_flag = {
+        "kind": "run_diagnostic",
+        "code": "already_recorded_run_flag",
+        "detail": {"source": "session record"},
+    }
+    campaign_flag = {
+        "kind": "campaign_stop",
+        "code": "already_recorded_campaign_flag",
+        "detail": {"campaign": "C0"},
+    }
+    session._run_flags.append(run_flag)
+    session._step_results.append(SimpleNamespace(campaign_summary={
+        "campaign": "C0",
+        "stop_reason": "time_cap",
+        "duration_h": 1,
+        "flags": [campaign_flag],
+    }))
+
+    payload = web_events._full_runner_payload(
+        session,
+        projector=run,
+        status="ok",
+    )
+    artifact = web_events.build_run_artifact(
+        payload,
+        run_id="web-existing-flags",
+    )
+
+    metadata = artifact["terminal"]["run_metadata"]
+    assert metadata["run_flags"] == [run_flag]
+    assert metadata["campaign_stops"][0]["flags"] == [campaign_flag]
+
+
 def test_real_web_session_failure_persists_non_sparse_terminal(tmp_path, monkeypatch):
     captured_tasks = _force_socketio_internal_analytical(monkeypatch)
     app = app_module.create_app()
