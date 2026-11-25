@@ -126,8 +126,7 @@ class RunExecution:
     # One record per completed campaign: campaign, stop_reason, duration_h,
     # detail, and typed flags when the endpoint recorded them.
     campaign_stops: tuple[Mapping[str, Any], ...] = ()
-    # Run-level typed flags, including session-budget truncation. These do not
-    # belong in campaign_stops because the active campaign did not complete.
+    # Run-level flags include a finite session-budget truncation.
     run_flags: tuple[Mapping[str, Any], ...] = ()
 
 
@@ -194,21 +193,60 @@ def _campaigns_elapsed_from_session_history(
         campaign = getattr(getattr(sim, "melt", None), "campaign", None)
         campaign_duration_h: float | None = None
         if campaign_mgr is not None and campaign is not None:
-            record = getattr(sim, "record", None)
-            if record is None:
+            campaign_name = str(getattr(campaign, "name", ""))
+            if campaign_name == "C2A_STAGED":
+                duration = getattr(
+                    campaign_mgr, "_configured_staged_max_hold_hr", None
+                )
+                if callable(duration):
+                    campaign_duration_h = float(duration(campaign))
+            elif campaign_name in {"C3_K", "C3_NA"}:
+                record_path = str(getattr(getattr(sim, "record", None), "path", ""))
+                duration_path = (
+                    "A_staged"
+                    if record_path == "A_staged"
+                    else "A" if record_path == "A" else "default"
+                )
+                configured_duration = getattr(
+                    campaign_mgr, "_configured_max_hold_hr", None
+                )
+                if callable(configured_duration):
+                    campaign_duration_h = float(
+                        configured_duration(campaign, campaign_name, duration_path)
+                    )
+                if record_path == "A_staged":
+                    overrides = getattr(campaign_mgr, "_campaign_overrides", None)
+                    if callable(overrides):
+                        staged_duration = overrides(campaign).get(
+                            "staged_duration_h"
+                        )
+                        if staged_duration is not None:
+                            campaign_duration_h = float(staged_duration)
+            elif campaign_name == "C5":
+                # C5 max_hold_hr is per-branch (setpoints.yaml):
+                #   {branch_two: H2, branch_one: H1}
+                # Match campaigns.py C5 endpoint selection exactly:
+                #   record.branch == 'two' -> branch_two; else -> branch_one.
+                # Unset/empty branch therefore uses branch_one so the progress
+                # denominator equals the hold ceiling that would actually fire.
+                # Do not float() the mapping; _max_hold_hr(campaign) alone aborts.
+                record_branch = str(
+                    getattr(getattr(sim, "record", None), "branch", "") or ""
+                )
+                hold_key = (
+                    "branch_two" if record_branch == "two" else "branch_one"
+                )
+                configured_duration = getattr(
+                    campaign_mgr, "_configured_max_hold_hr", None
+                )
+                if callable(configured_duration):
+                    campaign_duration_h = float(
+                        configured_duration(campaign, hold_key)
+                    )
+            else:
                 duration = getattr(campaign_mgr, "_max_hold_hr", None)
                 if callable(duration):
                     campaign_duration_h = float(duration(campaign))
-            else:
-                duration = getattr(
-                    campaign_mgr, "_campaign_progress_denominator_hr", None
-                )
-                if callable(duration):
-                    campaign_duration_h = float(duration(campaign, record))
-                else:
-                    duration = getattr(campaign_mgr, "_max_hold_hr", None)
-                    if callable(duration):
-                        campaign_duration_h = float(duration(campaign))
         if campaign_duration_h is not None:
             if math.isfinite(campaign_duration_h) and campaign_duration_h > 0.0:
                 # The cumulative wall load includes every executed hour, so

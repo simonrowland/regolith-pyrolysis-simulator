@@ -59,7 +59,7 @@ from simulator.melt_backend.alphamelts import AlphaMELTSBackend
 from simulator.recipe import recipe_schema_version
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.recipe_io import RecipeIOError, normalize_recipe_patch
-from simulator.run_executor import RunExecutor
+from simulator.run_executor import RunExecutor, campaign_stop_record
 from simulator.runner import (
     PyrolysisRun,
     RunnerError,
@@ -2838,8 +2838,16 @@ def _full_runner_payload(
     config = session._config
     if config is None:
         raise RuntimeError('web session has no runner configuration')
-    run_flags = tuple(getattr(session, 'run_flags', ()) or ())
     execution = RunExecutor().execute_session(session, hours=0)
+    campaign_stops = tuple(
+        record
+        for result in session._step_results
+        if (
+            record := campaign_stop_record(
+                getattr(result, 'campaign_summary', None)
+            )
+        ) is not None
+    )
     execution = replace(
         execution,
         snapshots=tuple(getattr(sim.record, 'snapshots', ()) or ()),
@@ -2854,7 +2862,9 @@ def _full_runner_payload(
             if refusal_diagnostic is not None
             else dict(execution.refusal_diagnostic or {})
         ),
-        run_flags=run_flags or tuple(execution.run_flags),
+        campaign_stops=tuple(execution.campaign_stops) + campaign_stops,
+        run_flags=tuple(getattr(session, 'run_flags', ()) or ())
+        + tuple(execution.run_flags),
     )
     if projector is None:
         raise RuntimeError('web session has no canonical runner projector')
@@ -3319,22 +3329,13 @@ def _start_background_loop(
                 ):
                     break
 
-                campaign_summary = step_result.campaign_summary
-                if (
-                    isinstance(campaign_summary, Mapping)
-                    and session.run_flags
-                ):
-                    campaign_summary = dict(campaign_summary)
-                    campaign_summary['run_flags'] = [
-                        dict(flag) for flag in session.run_flags
-                    ]
-                if campaign_summary is not None:
+                if step_result.campaign_summary is not None:
                     if not _emit_if_current(
                         socketio,
                         sid,
                         run_id,
                         'campaign_complete_summary',
-                        campaign_summary,
+                        step_result.campaign_summary,
                     ):
                         break
             except Exception as exc:  # noqa: BLE001 -- loop boundary

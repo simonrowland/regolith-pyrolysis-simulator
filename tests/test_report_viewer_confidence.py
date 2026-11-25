@@ -163,15 +163,15 @@ def test_exactly_one_provenance_surface_renders_the_run_level_grade() -> None:
     assert "deferred to the report provenance section" in p9
 
 
-def test_run_truncation_flag_is_rendered_as_text_in_artifact_provenance() -> None:
+def test_run_flags_are_rendered_as_text_in_report_provenance() -> None:
     artifact = _minimal_artifact(include_confidence_key=False)
     artifact["terminal"]["run_metadata"]["run_flags"] = [{
         "kind": "run_truncation",
         "code": "run_hour_budget_exhausted_mid_campaign",
         "detail": {
-            "active_campaign": "C2A",
+            "campaign": "C2A",
             "hours_run_in_campaign": 3,
-            "campaign_cap_hours": 160,
+            "at_campaign_boundary": False,
             "successors_not_reached": ["C6"],
             "ruling": "d-473",
             "untrusted_text": "<script>not markup</script>",
@@ -190,13 +190,11 @@ def test_run_truncation_flag_is_rendered_as_text_in_artifact_provenance() -> Non
 
     assert 'data-run-flags' in rendered["provenance"]
     assert "run_hour_budget_exhausted_mid_campaign" in rendered["runFlagText"]
-    assert '"campaign_cap_hours":160' in rendered["runFlagText"]
     assert '"successors_not_reached":["C6"]' in rendered["runFlagText"]
     assert "c4_time_capped_without_na_endpoint" in rendered["runFlagText"]
     assert '"residual_Na_kg":0.25' in rendered["runFlagText"]
-    assert '"na_endpoint_threshold_atom_mol":0.004' in rendered["runFlagText"]
-    assert "<script>not markup</script>" in rendered["runFlagText"]
-    assert "<script>not markup</script>" not in rendered["provenance"]
+    assert '<script>not markup</script>' in rendered["runFlagText"]
+    assert '<script>not markup</script>' not in rendered["provenance"]
 
 
 def test_viewer_source_does_not_fold_or_alias_confidence() -> None:

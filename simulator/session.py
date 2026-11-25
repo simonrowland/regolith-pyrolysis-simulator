@@ -908,121 +908,110 @@ def drive_session(
 
     if not is_declared_real_scalar(hours, allow_numeric_str=True):
         raise TypeError(f"hours must be numeric, not {type(hours).__name__}")
-    session._run_flags = []
     step_index = 0
     while True:
         if not until_campaign_complete and step_index >= int(hours):
-            # d-473: a finite budget that cuts an active campaign is a
-            # run-level truncation, not a completed campaign stop. Zero-hour
-            # projections do not describe an executed budget.
+            configured_hours = getattr(
+                getattr(session, "_config", None), "hours", 0
+            )
             if (
-                step_index > 0
+                int(configured_hours) > 0
+                and step_index > 0
                 and not session.is_complete()
             ):
-                sim = session.simulator
-                phase = sim.melt.campaign
-                if phase not in (CampaignPhase.IDLE, CampaignPhase.COMPLETE):
+                detail: dict[str, Any] = {
+                    "campaign": "unresolved",
+                    "hours_run_in_campaign": 0,
+                    "at_campaign_boundary": False,
+                    "successors_not_reached": [],
+                    "configured_limits": {},
+                    "ruling": "d-473",
+                }
+                try:
+                    sim = session.simulator
+                    phase = sim.melt.campaign
                     campaign_mgr = sim.campaign_mgr
-                    detail: dict[str, Any] = {
-                        "active_campaign": phase.name,
-                        "hours_run_in_campaign": 0,
-                        "campaign_cap_hours": None,
-                        "successors_not_reached": [],
-                        "at_campaign_boundary": False,
-                        "ruling": "d-473",
-                    }
-                    try:
-                        detail["hours_run_in_campaign"] = int(
-                            sim.melt.campaign_hour
+                    detail["campaign"] = phase.name
+
+                    # Pending decisions are part of the truncation record and
+                    # must be captured before the read-only successor walk.
+                    pending_decision = session.pending_decision()
+                    if pending_decision is not None:
+                        decision_type = getattr(
+                            pending_decision, "decision_type", None
                         )
-                        last_campaign_summary = None
-                        if session._step_results:
-                            candidate_summary = getattr(
-                                session._step_results[-1],
-                                "campaign_summary",
-                                None,
+                        detail["pending_decision"] = str(
+                            getattr(
+                                decision_type,
+                                "name",
+                                decision_type or "unknown",
                             )
-                            if isinstance(candidate_summary, Mapping):
-                                last_campaign_summary = candidate_summary
-                        just_completed_campaign = str(
-                            (last_campaign_summary or {}).get("campaign") or ""
                         )
-                        at_campaign_boundary = bool(
+
+                    detail["hours_run_in_campaign"] = int(
+                        sim.melt.campaign_hour
+                    )
+                    last_campaign_summary = None
+                    if session._step_results:
+                        candidate_summary = getattr(
+                            session._step_results[-1],
+                            "campaign_summary",
+                            None,
+                        )
+                        if isinstance(candidate_summary, Mapping):
+                            last_campaign_summary = candidate_summary
+                    just_completed_campaign = str(
+                        (last_campaign_summary or {}).get("campaign") or ""
+                    )
+                    at_campaign_boundary = bool(
+                        just_completed_campaign
+                        and sim.melt.campaign_hour == 0
+                    )
+                    detail["at_campaign_boundary"] = at_campaign_boundary
+                    if at_campaign_boundary:
+                        detail["just_completed_campaign"] = (
                             just_completed_campaign
-                            and just_completed_campaign != phase.name
                         )
-                        not_reached_start = 0 if at_campaign_boundary else 1
-                        detail["at_campaign_boundary"] = at_campaign_boundary
-                        if at_campaign_boundary:
-                            detail["just_completed_campaign"] = (
-                                just_completed_campaign
-                            )
 
-                        endpoint_cap = getattr(
-                            campaign_mgr, "last_endpoint_cap", None
+                    campaign_config = campaign_mgr._campaign_config(phase)
+                    configured_limits: dict[str, Any] = {
+                        "max_hold_hr": copy.deepcopy(
+                            campaign_config.get("max_hold_hr")
+                        ),
+                    }
+                    overrides = campaign_mgr._campaign_overrides(phase)
+                    if "max_hours" in overrides:
+                        configured_limits["max_hours"] = copy.deepcopy(
+                            overrides["max_hours"]
                         )
-                        if (
-                            isinstance(endpoint_cap, Mapping)
-                            and endpoint_cap.get("campaign") == phase.name
-                        ):
-                            detail["campaign_cap_hours"] = float(
-                                endpoint_cap["hours"]
-                            )
-                        elif at_campaign_boundary:
-                            detail["campaign_cap_hours"] = float(
-                                campaign_mgr._active_campaign_max_hold_hr(
-                                    phase,
-                                    sim.record,
-                                    sim.melt,
-                                )
-                            )
+                    detail["configured_limits"] = configured_limits
 
-                        pending_decision = session.pending_decision()
-                        configured_phases, unresolved_routes = (
-                            copy.copy(
-                                campaign_mgr
-                            )._configured_auto_apply_sequence(
-                                phase,
-                                copy.deepcopy(sim.record),
-                            )
+                    diagnostic_manager = copy.copy(campaign_mgr)
+                    configured_sequence = (
+                        diagnostic_manager._auto_apply_sequence_with_repeats(
+                            phase,
+                            copy.deepcopy(sim.record),
                         )
-                        detail["successors_not_reached"] = [
-                            successor.name
-                            for successor in configured_phases[
-                                not_reached_start:
-                            ]
-                        ]
-                        if unresolved_routes:
-                            detail["unresolved_successors"] = [
-                                dict(route) for route in unresolved_routes
-                            ]
-                        if pending_decision is not None:
-                            decision_type = getattr(
-                                pending_decision, "decision_type", None
-                            )
-                            detail["pending_decision"] = str(
-                                getattr(
-                                    decision_type,
-                                    "name",
-                                    decision_type or "unknown",
-                                )
-                            )
-                    except Exception as exc:
-                        # d-473 is diagnostic only: a malformed future route
-                        # cannot turn a completed hour into a failed run.
-                        detail["unresolved_successors"] = [{
-                            "campaign": phase.name,
-                            "kind": "campaign_sequence",
-                            "status": "unresolved",
-                            "code": "campaign_successor_lookahead_failed",
-                            "reason": f"{type(exc).__name__}: {exc}",
-                        }]
-                    session._run_flags = [{
-                        "kind": "run_truncation",
-                        "code": "run_hour_budget_exhausted_mid_campaign",
-                        "detail": detail,
+                    )
+                    first_unreached = 0 if at_campaign_boundary else 1
+                    detail["successors_not_reached"] = [
+                        campaign.name
+                        for campaign in configured_sequence[first_unreached:]
+                    ]
+                except Exception as exc:
+                    detail["unresolved_successors"] = [{
+                        "kind": "campaign_sequence",
+                        "status": "unresolved",
+                        "code": "campaign_successor_lookahead_failed",
+                        "reason": type(exc).__name__,
                     }]
-                    return dict(session.run_flags[0])
+                flag = {
+                    "kind": "run_truncation",
+                    "code": "run_hour_budget_exhausted_mid_campaign",
+                    "detail": detail,
+                }
+                session._run_flags = [flag]
+                return flag
             return
         step_index += 1
         if stop_at_stage0_exit and _at_stage0_exit(session):

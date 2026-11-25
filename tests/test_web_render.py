@@ -1078,71 +1078,6 @@ def test_furnace_material_catalog_failure_is_reported():
     )
 
 
-def test_campaign_summary_renders_typed_stop_flags_as_text():
-    rendered = _render_status_strip(
-        sequence=[
-            {
-                "event": "campaign_complete_summary",
-                "payload": {
-                    "campaign": "C4",
-                    "duration_h": 1,
-                    "start_mass_kg": 1000.0,
-                    "end_mass_kg": 999.0,
-                    "mass_lost_kg": 1.0,
-                    "energy_electrical_plus_evaporation_kWh": 2.0,
-                    "energy_scope": "partial",
-                    "furnace_heat_status": "partial",
-                    "O2_kg": 0.0,
-                    "species_extracted": {},
-                    "flags": [
-                        {
-                            "kind": "campaign_stop",
-                            "code": "campaign_time_cap_unconverged",
-                            "detail": {
-                                "campaign": "C4",
-                                "successor": "C2A",
-                                "ruling": "d-471",
-                            },
-                        },
-                        {
-                            "kind": "campaign_stop",
-                            "code": "c4_time_capped_without_na_endpoint",
-                            "detail": {
-                                "residual_Na_kg": 0.25,
-                                "na_endpoint_threshold_atom_mol": 0.004,
-                                "ruling": "d-471",
-                            },
-                        },
-                    ],
-                    "run_flags": [
-                        {
-                            "kind": "run_truncation",
-                            "code": "run_hour_budget_exhausted_mid_campaign",
-                            "detail": {
-                                "active_campaign": "C2A",
-                                "hours_run_in_campaign": 1,
-                                "campaign_cap_hours": 3.0,
-                                "successors_not_reached": ["C6"],
-                                "ruling": "d-473",
-                            },
-                        },
-                    ],
-                },
-            },
-        ]
-    )
-    summary_text = rendered["steps"][0]["campaignSummaryText"]
-
-    assert "campaign_time_cap_unconverged" in summary_text
-    assert '"successor":"C2A"' in summary_text
-    assert "c4_time_capped_without_na_endpoint" in summary_text
-    assert '"residual_Na_kg":0.25' in summary_text
-    assert '"na_endpoint_threshold_atom_mol":0.004' in summary_text
-    assert "run_hour_budget_exhausted_mid_campaign" in summary_text
-    assert '"campaign_cap_hours":3' in summary_text
-    assert '"successors_not_reached":["C6"]' in summary_text
-
-
 def test_duplicate_pending_starts_accept_only_latest_generation():
     sequence = [
         {"event": "start_click", "payload": {}},
@@ -1252,6 +1187,50 @@ def test_prelaunch_errors_without_diagnostic_fields_release_controls(error_type)
     assert rendered["final"]["startDisabled"] is False
     assert rendered["final"]["pauseDisabled"] is True
     assert rendered["final"]["resumeDisabled"] is True
+
+
+def test_campaign_complete_summary_renders_stop_flags_as_text():
+    rendered = _render_status_strip(
+        sequence=[{
+            "event": "campaign_complete_summary",
+            "payload": {
+                "campaign": "C4",
+                "duration_h": 1,
+                "start_mass_kg": 1000.0,
+                "end_mass_kg": 999.0,
+                "mass_lost_kg": 1.0,
+                "energy_electrical_plus_evaporation_kWh": 2.0,
+                "energy_scope": "partial",
+                "furnace_heat_status": "partial",
+                "O2_kg": 0.0,
+                "species_extracted": {},
+                "flags": [{
+                    "kind": "campaign_stop",
+                    "code": "campaign_time_cap_unconverged",
+                    "detail": {
+                        "campaign": "C4",
+                        "successor": "C2A",
+                        "ruling": "d-471",
+                    },
+                }, {
+                    "kind": "campaign_stop",
+                    "code": "c4_time_capped_without_na_endpoint",
+                    "detail": {
+                        "residual_Na_kg": 0.25,
+                        "na_endpoint_threshold_atom_mol": 0.004,
+                        "ruling": "d-471",
+                    },
+                }],
+            },
+        }]
+    )
+    summary_text = rendered["steps"][0]["campaignSummaryText"]
+
+    assert "campaign_time_cap_unconverged" in summary_text
+    assert '"successor":"C2A"' in summary_text
+    assert "c4_time_capped_without_na_endpoint" in summary_text
+    assert '"residual_Na_kg":0.25' in summary_text
+    assert '"na_endpoint_threshold_atom_mol":0.004' in summary_text
     assert rendered["final"]["statusText"] != "Running"
 
 

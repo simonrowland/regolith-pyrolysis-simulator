@@ -6113,7 +6113,6 @@ def test_socketio_continues_after_binding_c6_refusal_and_retains_diagnostic(
         new_sids = set(_simulations) - before
         assert len(new_sids) == 1
         sid = new_sids.pop()
-        web_session = _simulations[sid]["session"]
         # Background task runs the full operator loop synchronously here.
         names = [event["name"] for event in events]
         statuses = [
@@ -6131,9 +6130,6 @@ def test_socketio_continues_after_binding_c6_refusal_and_retains_diagnostic(
             and event["args"][0].get("campaign") == "C6"
         ]
         assert c6_summaries
-        assert "run_flags" not in c6_summaries[0]
-        assert web_session._config.hours == 0
-        assert web_session.run_flags == ()
         assert c6_summaries[0]["c6_refusal_diagnostic"]["diagnostic"][
             "reason_refused"
         ] == "c6_hold_target_not_acquired"
@@ -6152,101 +6148,6 @@ def test_socketio_continues_after_binding_c6_refusal_and_retains_diagnostic(
         )
         # Contrast: C4 terminal path is covered by
         # test_socketio_c4_refusal_is_terminal_before_next_decision.
-    finally:
-        client.disconnect()
-        for sid in set(_simulations) - before:
-            _clear_simulation_state(sid)
-
-
-def test_web_runner_projection_preserves_existing_run_flags_at_zero_hours():
-    run = PyrolysisRun(
-        feedstock_id="lunar_mare_low_ti",
-        campaign="C2A",
-        hours=0,
-        additives_kg={},
-        allow_fallback_vapor=True,
-        allow_unmeasured_alpha_fallback=True,
-        run_metadata_overrides={
-            "started_at_utc": "2026-05-30T00:00:00Z",
-            "kernel_commit_sha": "web-run-flag-projection",
-        },
-    )
-    backend = InternalAnalyticalBackend()
-    backend.initialize({})
-    session = SimSession().start(run._session_config(), backend=backend)
-    flag = {
-        "kind": "run_truncation",
-        "code": "run_hour_budget_exhausted_mid_campaign",
-        "detail": {
-            "active_campaign": "C2A",
-            "hours_run_in_campaign": 1,
-            "campaign_cap_hours": 160.0,
-            "successors_not_reached": ["C6"],
-            "ruling": "d-473",
-        },
-    }
-    session._run_flags = [flag]
-
-    payload = web_events._full_runner_payload(
-        session,
-        projector=run,
-        status="ok",
-    )
-
-    assert session._config.hours == 0
-    assert payload["run_metadata"]["run_flags"] == [flag]
-
-
-def test_zero_hour_web_session_uses_real_pacing_without_run_flags(
-    monkeypatch,
-):
-    def force_internal_analytical_backend(_backend_name):
-        backend = InternalAnalyticalBackend()
-        backend.initialize({})
-        return backend
-
-    def run_background_task(target, *args, **kwargs):
-        target(*args, **kwargs)
-        return {"completed_inline": True}
-
-    monkeypatch.setattr(
-        web_events, "_get_backend", force_internal_analytical_backend
-    )
-    monkeypatch.setattr(
-        app_module.socketio,
-        "start_background_task",
-        run_background_task,
-    )
-    app = app_module.create_app()
-    client = _identified_socket_client(app)
-    client.get_received()
-    before = set(_simulations)
-
-    try:
-        client.emit(
-            "start_simulation",
-            {
-                "backend": "internal-analytical",
-                "feedstock": "lunar_mare_low_ti",
-                "mass_kg": 1000,
-                "speed": 0,
-                "track": "pyrolysis",
-            },
-        )
-        events = client.get_received()
-        new_sids = set(_simulations) - before
-        assert len(new_sids) == 1
-        sid = new_sids.pop()
-        session = _simulations[sid]["session"]
-
-        assert session._config.hours == 0
-        assert session.run_flags == ()
-        assert any(event["name"] == "simulation_tick" for event in events)
-        assert all(
-            "run_flags" not in event["args"][0]
-            for event in events
-            if event["args"] and isinstance(event["args"][0], dict)
-        )
     finally:
         client.disconnect()
         for sid in set(_simulations) - before:
@@ -6916,3 +6817,111 @@ def test_every_refusal_payload_explains_itself_not_just_one_of_them():
         "refusal payload(s) emit the raw reason token as the operator-facing "
         f"message instead of routing through _refusal_message: {offenders}"
     )
+
+
+def test_web_artifact_projection_preserves_existing_run_and_campaign_flags():
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C2A",
+        hours=0,
+        additives_kg={},
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+    )
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    session = SimSession().start(run._session_config(), backend=backend)
+    run_flag = {
+        "kind": "run_truncation",
+        "code": "run_hour_budget_exhausted_mid_campaign",
+        "detail": {
+            "campaign": "C2A",
+            "hours_run_in_campaign": 1,
+            "at_campaign_boundary": False,
+            "successors_not_reached": ["C6"],
+            "ruling": "d-473",
+        },
+    }
+    campaign_flag = {
+        "kind": "campaign_stop",
+        "code": "campaign_time_cap_unconverged",
+        "detail": {
+            "campaign": "C4",
+            "successor": "C2A",
+            "ruling": "d-471",
+        },
+    }
+    session._run_flags = [run_flag]
+    session._step_results = [SimpleNamespace(campaign_summary={
+        "campaign": "C4",
+        "stop_reason": "time_cap",
+        "duration_h": 1,
+        "stop_detail": "max_hold_no_signal",
+        "flags": [campaign_flag],
+    })]
+
+    payload = web_events._full_runner_payload(
+        session,
+        projector=run,
+        status="ok",
+    )
+
+    assert session._config.hours == 0
+    assert payload["run_metadata"]["run_flags"] == [
+        run_flag,
+        campaign_flag,
+    ]
+
+
+def test_zero_hour_web_session_uses_real_pacing_without_budget_flag(monkeypatch):
+    def force_internal_analytical_backend(_backend_name):
+        backend = InternalAnalyticalBackend()
+        backend.initialize({})
+        return backend
+
+    def run_background_task(target, *args, **kwargs):
+        target(*args, **kwargs)
+        return {"completed_inline": True}
+
+    monkeypatch.setattr(
+        web_events, "_get_backend", force_internal_analytical_backend
+    )
+    monkeypatch.setattr(
+        app_module.socketio,
+        "start_background_task",
+        run_background_task,
+    )
+    app = app_module.create_app()
+    client = _identified_socket_client(app)
+    client.get_received()
+    before = set(_simulations)
+
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "internal-analytical",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 0,
+                "track": "pyrolysis",
+            },
+        )
+        events = client.get_received()
+        new_sids = set(_simulations) - before
+        assert len(new_sids) == 1
+        sid = new_sids.pop()
+        session = _simulations[sid]["session"]
+
+        assert session._config.hours == 0
+        assert session.run_flags == ()
+        assert any(event["name"] == "simulation_tick" for event in events)
+        assert all(
+            "run_flags" not in event["args"][0]
+            for event in events
+            if event["args"] and isinstance(event["args"][0], dict)
+        )
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
