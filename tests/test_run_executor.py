@@ -34,6 +34,8 @@ from simulator.session import (
 from simulator.state import CampaignPhase, DecisionType
 from simulator.trace import PhysicsTrace
 
+FULL_PAYLOAD_DIGEST_PENDING_STUDIO_PIN = "PENDING_STUDIO_RECEIPT"
+
 
 def _run(**overrides) -> PyrolysisRun:
     kwargs = {
@@ -138,7 +140,7 @@ def test_short_run_payload_and_ledger_match_rollback_baseline_golden():
     )
     # constack merge: repin on gate box
     assert hashlib.sha256(payload_bytes).hexdigest() == (
-        "718ffcf58809ccc9d85d8f125a7e418b19e711a61d8b6f22ec9279b251d4c751"
+        FULL_PAYLOAD_DIGEST_PENDING_STUDIO_PIN
     )
     assert hashlib.sha256(ledger_bytes).hexdigest() == (
         "c366b84c33ed81fb2a2c3c376df6cd20ac8366a5ae8e279d1679ba143a9bc4a3"
@@ -518,7 +520,7 @@ def test_campaign_time_cap_flag_identifies_pending_successor_decision():
     sim = session.simulator
     sim.record.path = "A_post_mg_boiloff"
     sim.record.branch = "two"
-    sim.campaign_mgr.campaigns["C2A"]["max_hold_hr"] = 1
+    sim.campaign_mgr.campaigns["C2A_continuous"]["max_hold_hr"] = 1
 
     execution = RunExecutor().execute_session(session, hours=1)
 
@@ -554,12 +556,12 @@ def test_budget_flag_uses_live_campaign_adjustment():
     assert not hasattr(session, "_finite_budget_intent")
 
 
-def test_hour_budget_flag_keeps_repeated_configured_successors():
+def test_hour_budget_flag_stops_before_repeated_c2a_after_decision():
     run = _run(campaign="C2A", hours=1)
     session = _started_internal_session(run)
     session.simulator.record.path = "A"
     session.simulator.record.branch = "two"
-    session.simulator.campaign_mgr.c5_enabled = True
+    session.simulator.campaign_mgr.c5_enabled = False
 
     execution = RunExecutor().execute_session(session, hours=1)
 
@@ -567,14 +569,16 @@ def test_hour_budget_flag_keeps_repeated_configured_successors():
         flag for flag in execution.run_flags
         if flag["code"] == "run_hour_budget_exhausted_mid_campaign"
     )
-    successors = flag["detail"]["successors_not_reached"]
-    assert successors.count("C2A") == 1
-    assert successors[-1] == "C6"
+    detail = flag["detail"]
+    assert detail["successors_not_reached"] == ["C3_K", "C3_NA"]
+    assert detail["decision_dependent"] == {
+        "decision_type": "BRANCH_ONE_TWO",
+    }
     assert execution.status == "ok"
 
 
 def test_hour_budget_flag_follows_live_manager_c5_route_exactly():
-    session = _started_internal_session(_run(campaign="C2A", hours=1))
+    session = _started_internal_session(_run(campaign="C4", hours=1))
     session.simulator.record.path = "A"
     session.simulator.record.branch = "two"
     session.simulator.campaign_mgr.c5_enabled = True
@@ -583,21 +587,18 @@ def test_hour_budget_flag_follows_live_manager_c5_route_exactly():
     flag = _hour_budget_exhausted_flag(session)
 
     assert flag["detail"]["successors_not_reached"] == [
-        "C3_K",
-        "C3_NA",
-        "C4",
         "C5",
-        "C6",
     ]
+    assert flag["detail"]["decision_dependent"] == {
+        "decision_type": "C6_PROCEED",
+    }
 
 
 @pytest.mark.parametrize(
-    ("recommendation", "successors", "expected_successor"),
-    [("yes", ["C6"], "C6"), ("no", [], None)],
+    "recommendation",
+    ["yes", "no"],
 )
-def test_hour_budget_flag_uses_live_pending_decision_route(
-    recommendation, successors, expected_successor
-):
+def test_hour_budget_flag_stops_at_live_pending_decision(recommendation):
     session = _started_internal_session(_run(campaign="C2A", hours=1))
     sim = session.simulator
     sim.record.path = "A_post_mg_boiloff"
@@ -614,13 +615,21 @@ def test_hour_budget_flag_uses_live_pending_decision_route(
 
     detail = flag["detail"]
     assert detail["pending_decision"]["recommendation"] == recommendation
-    assert detail["successors_not_reached"] == successors
-    assert detail["decision_dependent_successor"] == {
-        "kind": "decision_dependent",
+    assert detail["successors_not_reached"] == []
+    assert detail["decision_dependent"] == {
         "decision_type": "C6_PROCEED",
         "recommendation": recommendation,
-        "successor": expected_successor,
     }
+    assert {
+        "campaign",
+        "hours_run_in_campaign",
+        "at_campaign_boundary",
+        "just_completed_campaign",
+        "successors_not_reached",
+        "configured_limits",
+        "pending_decision",
+        "decision_dependent",
+    } <= detail.keys()
 
 
 def test_terminal_campaign_completion_does_not_emit_hour_budget_flag():
