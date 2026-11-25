@@ -27,6 +27,7 @@ from simulator.core import (
 )
 from simulator.electrolysis import MREElectrolysisInvalidInput
 from simulator.evaporation import EvaporationFluxRefusal
+from simulator.json_safety import _json_safe
 from simulator.melt_backend.melt_envelope import (
     MELT_EXTRAPOLATION_ENVELOPE_FIELDS,
     consume_melt_extrapolation_envelope,
@@ -167,14 +168,25 @@ def campaign_stop_record(summary: Mapping[str, Any] | None) -> dict[str, Any] | 
     return record
 
 
-def _campaign_stop_records_from_session(
-    session: SimSession,
-) -> tuple[dict[str, Any], ...]:
-    records = []
-    for result in tuple(getattr(session, "_step_results", ())):
-        record = campaign_stop_record(
-            getattr(result, "campaign_summary", None)
-        )
+def _campaign_stops_for_trace(run_execution: Any) -> tuple[dict[str, Any], ...]:
+    """Completed-step stop records stored on the ranking trace.
+
+    Prefer records accumulated by one execution. A carrier that did not copy
+    them still yields the same records from its session step list. A summary
+    with no stop token is omitted. It is not stored as ``endpoint_met``.
+    """
+
+    stored = getattr(run_execution, "campaign_stops", None)
+    if not stored:
+        session = getattr(run_execution, "session", run_execution)
+        stored = []
+        for result in getattr(session, "_step_results", ()) or ():
+            record = campaign_stop_record(getattr(result, "campaign_summary", None))
+            if record is not None:
+                stored.append(record)
+    records: list[dict[str, Any]] = []
+    for item in stored:
+        record = campaign_stop_record(item)
         if record is not None:
             records.append(record)
     return tuple(records)
@@ -355,7 +367,7 @@ class RunExecutor:
         until_campaign_complete = bool(
             getattr(config, "until_campaign_complete", False)
         )
-        campaign_stops = list(_campaign_stop_records_from_session(session))
+        campaign_stops = list(_campaign_stops_for_trace(session))
 
         try:
             if initial_refusal is not None:
@@ -1040,30 +1052,3 @@ def _collect_reduced_real_cache_diagnostic(
         None,
     )
     return _json_safe(diagnostic)
-
-
-def _json_safe(value: Any) -> Any:
-    """Recursively convert ``value`` into a JSON-serialisable form.
-
-    Non-finite numeric telemetry exports as ``None`` so strict JSON consumers
-    see schema-compatible nulls instead of Python-only NaN/Infinity tokens or
-    stringified pseudo-numbers.
-    """
-
-    if isinstance(value, Mapping):
-        return {str(k): _json_safe(v) for k, v in value.items()}
-    if isinstance(value, (set, frozenset)):
-        return sorted((_json_safe(item) for item in value), key=repr)
-    if isinstance(value, (list, tuple)):
-        return [_json_safe(item) for item in value]
-    if isinstance(value, (str, bool)) or value is None:
-        return value
-    if isinstance(value, (int, float)):
-        if isinstance(value, float) and (math.isnan(value) or math.isinf(value)):
-            return None
-        return value
-    if dataclasses.is_dataclass(value):
-        return _json_safe(dataclasses.asdict(value))
-    # Enums, IntentResult-like wrappers -- fall back to repr so the
-    # shadow_trace stays informative without leaking object identity.
-    return repr(value)

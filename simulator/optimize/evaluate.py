@@ -169,7 +169,7 @@ from simulator.pumping_cost import (
 )
 from simulator.reduced_real_determinism import PT0NonFinitePayload
 from simulator.mre_ladder import max_voltage_for_target, parse_ladder_from_setpoints
-from simulator.run_executor import RunExecutor, campaign_stop_record
+from simulator.run_executor import RunExecutor, _campaign_stops_for_trace
 from simulator.recipe_errors import MalformedRecipeError
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.runner import PyrolysisRun, RunnerError
@@ -6635,31 +6635,6 @@ def _live_run_reference_trace(
     if not isinstance(payload, MappingABC) or payload is trace:
         return trace
     return _TraceOverlay(trace, MappingProxyType(dict(payload)))
-
-
-def _campaign_stops_for_trace(run_execution: Any) -> tuple[dict[str, Any], ...]:
-    """Completed-step stop records stored on the ranking trace.
-
-    Prefer the records the executor accumulated. A carrier that did not
-    copy them still yields the same records from the session step list.
-    A summary with no stop token is omitted. It is not stored as
-    ``endpoint_met``.
-    """
-
-    stored = getattr(run_execution, "campaign_stops", None)
-    if not stored:
-        session = getattr(run_execution, "session", None)
-        stored = []
-        for result in getattr(session, "_step_results", ()) or ():
-            record = campaign_stop_record(getattr(result, "campaign_summary", None))
-            if record is not None:
-                stored.append(record)
-    records: list[dict[str, Any]] = []
-    for item in stored:
-        record = campaign_stop_record(item)
-        if record is not None:
-            records.append(record)
-    return tuple(records)
 
 
 def _cache_trace_payload(
