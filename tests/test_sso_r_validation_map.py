@@ -408,13 +408,9 @@ def test_exact_full_dose_oxidizing_pn2_row_skips_c3_reduction_without_capacity()
     assert math.isfinite(row["post_exchange_fO2_log_diagnostic"])
     assert math.isfinite(row["redox_source_delta_ln_fO2"])
     assert "redox_source:evaporative_metal_loss" not in terms
-    assert terms[loss] < 0.0
-    assert (loss in applied) != (loss in skipped)
-    if loss in skipped:
-        assert row["redox_source_skipped_reasons_by_label"][loss] in {
-            "no_melt_redox_capacity",
-            "redox_capacity_saturation_refusal",
-        }
+    assert loss not in terms
+    assert loss not in applied
+    assert loss not in skipped
     assert skipped["redox_source:c3_na_shuttle_reduction"] < 0.0
     assert row["redox_source_skipped_reasons_by_label"][
         "redox_source:c3_na_shuttle_reduction"
@@ -500,7 +496,7 @@ def test_run_row_books_evaporation_as_oxygen_loss_not_internal_o(
 
     terms = row["redox_source_terms_mol_o2_equiv_by_label"]
     assert "redox_source:evaporative_metal_loss" not in terms
-    assert terms["redox_source:evaporative_oxygen_loss"] < 0.0
+    assert "redox_source:evaporative_oxygen_loss" not in terms
     assert available_internal_o2_mol[-1] == pytest.approx(0.0)
     assert calls[-1] != FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS
 

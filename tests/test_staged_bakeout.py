@@ -55,12 +55,15 @@ METAL_PHASE_FE_ACCOUNTS = (
 # native-Fe metallic tap fold (shared condensation-train competition).
 # 2026-07-18 a91db36 repaired staged trajectory rebaseline on corrected tip
 # 0990232.
-# 2026-07-21 B1 wall-gate fix: the staged C2A pipework is all hot-wall
-# (above SiO T_cond), so the honest segment wall load is ZERO — the old
-# nonzero pin was the unguarded backstop's phantom deposit. The genuinely
-# cold-segment scenario (nonzero wall coverage) lives in
-# test_intentional_pipe_cold_spot_flags_and_changes_wall_deposit.
-STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 0.0
+# 2026-07-21 B1 wall-gate fix: with the melt at the effervescence cap the
+# staged C2A segment-wall sum was zero. The intentional cold-segment
+# case still lives in test_intentional_pipe_cold_spot_flags_and_changes_wall_deposit.
+# 2026-11-25 d-472 amended remeasure (studio 09c22d2f): congruent
+# evaporation has no fO2 tangent, so melt fO2 stays on the Fe metal line
+# instead of log10(P_total). Metal-vapour p ∝ fO2^(-n), and this sum
+# (SiO + Si + SiO2 + FeSi over the pipe-segment wall accounts) is the
+# measured load. The assert does not split those four species.
+STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 0.14929136844379295
 
 
 def _run_script(lines: list[str]):

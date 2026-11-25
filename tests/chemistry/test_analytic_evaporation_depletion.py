@@ -52,9 +52,14 @@ def test_evaporation_batch_redox_is_independent_of_carrier_commit_order(
             melt_intrinsic_fO2_log=initial_fO2_log,
             reference_T_K=2173.15,
         )
-        # A fixed tangent isolates batch integration from the capacity model.
-        # TiO, Fe and Mg all release gas O2, so every source is reducing.
-        # None of them may credit reservoir.fo2_buffer or cross the ceiling.
+        # h8ceil floors a plant below the Fe metal line before any
+        # dispatch. -20 at 2173.15 K is below that line; -2.1 is above
+        # it and is stored as planted. The dispatch reader must stay
+        # on this published value. Congruent evaporation adds no tangent
+        # that would move it between carriers.
+        published_fO2_log = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+        # Congruent TiO, Fe, and Mg release gas O2 and contribute no
+        # melt-redox source. None of them may credit reservoir.fo2_buffer.
         monkeypatch.setattr(
             sim, "_melt_redox_source_capacity_mol_per_ln_fO2",
             lambda **kwargs: 1.0,
@@ -126,13 +131,13 @@ def test_evaporation_batch_redox_is_independent_of_carrier_commit_order(
         # canonical wall order for every mode.
         assert tuple(committed) == canonical_order
         assert "redox_source:evaporative_metal_loss" not in sim._redox_source_terms_this_hr
-        assert sim._redox_source_terms_this_hr["redox_source:evaporative_oxygen_loss"] < 0.0
+        assert "redox_source:evaporative_oxygen_loss" not in sim._redox_source_terms_this_hr
         assert sim.atom_ledger.mol_by_account("reservoir.fo2_buffer").get("O2", 0.0) == pytest.approx(0.0, abs=1e-12)
         results.append((
             sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log,
             sim.atom_ledger.mol_by_account("reservoir.fo2_buffer").get("O2", 0.0),
             sim.atom_ledger.mol_by_account(),
-            committed, applied, reader_values,
+            committed, applied, reader_values, published_fO2_log,
         ))
 
     reference, canonical, producer_first = results
@@ -144,7 +149,7 @@ def test_evaporation_batch_redox_is_independent_of_carrier_commit_order(
             assert result[2][account] == pytest.approx(
                 reference[2][account], rel=1e-14, abs=1e-14,
             )
-    for _, _, _, committed, applied, reader_values in results:
+    for _, _, _, committed, applied, reader_values, published_fO2_log in results:
         assert len(applied) == len(committed) == 3
         for transition in committed.values():
             assert sum(item is transition for item in applied) == 1
@@ -152,7 +157,7 @@ def test_evaporation_batch_redox_is_independent_of_carrier_commit_order(
             id(committed[species]) for species in canonical_order
         ]
         assert len(reader_values) == 6  # evaporation + condensation per carrier
-        assert reader_values == [initial_fO2_log] * len(reader_values)
+        assert reader_values == [published_fO2_log] * len(reader_values)
 
 
 def test_parent_grouped_analytic_depletion_is_shared_and_deterministic(
@@ -304,9 +309,8 @@ def test_three_titanium_carriers_share_one_parent_debit_and_o2_overhead(
     tio2_terms = sim._evaporative_redox_source_terms_from_transition(
         transitions["evaporate_TiO2_gas"]
     )
-    assert "redox_source:evaporative_metal_loss" not in ti_terms
-    assert ti_terms["redox_source:evaporative_oxygen_loss"] < 0.0
-    assert tio_terms["redox_source:evaporative_oxygen_loss"] < 0.0
+    assert ti_terms == {}
+    assert tio_terms == {}
     assert tio2_terms == {}
     assert abs(sim._make_snapshot().mass_balance_error_pct) <= 5e-12
 

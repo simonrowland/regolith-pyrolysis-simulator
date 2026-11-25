@@ -295,14 +295,14 @@ def _project_evaporation_overhead_source_mol_hr(
         oxygen_destination = str(
             stoich.get('oxygen_destination') or ''
         )
-        # Forecast of BuiltinEvaporationTransitionProvider's overhead O2
-        # credit. Elemental metals (no oxygen_destination) post the same
-        # coproduct as oxide vapors. The rejected buffer token posts nothing
-        # because the provider refuses that carrier. No shared helper: a
-        # provider must not import this module (engines/builtin/__init__.py).
+        # Forecast only the destinations the provider posts. Empty and
+        # process.overhead_gas credit or debit overhead O2. Any other
+        # token, including reservoir.fo2_buffer, is refused and forecasts
+        # nothing. No shared helper: a provider must not import this
+        # module (engines/builtin/__init__.py).
         if (
             o2_kg_hr != 0.0
-            and oxygen_destination != 'reservoir.fo2_buffer'
+            and oxygen_destination in ('', 'process.overhead_gas')
         ):
             source_mol_hr['O2'] = (
                 source_mol_hr.get('O2', 0.0)
@@ -6422,6 +6422,18 @@ class EvaporationMixin:
         if kernel_result.transition is None:
             return 0.0
 
+        # Reactive condensation debits overhead O2 after the coproduct
+        # credit. Shrink the exclusion so the debit is not charged
+        # entirely to tap O2. kernel_result.transition is still the
+        # proposal: account -> species -> mol (condensation_route.py).
+        # It is not a committed lot, so the kg reader does not apply.
+        overhead_debit_mol = kernel_result.transition.debits.get(
+            'process.overhead_gas', {}
+        )
+        self._shrink_evaporation_coproduct_counter(
+            float(overhead_debit_mol.get(OXYGEN_SPECIES, 0.0) or 0.0)
+        )
+
         diagnostic = dict(kernel_result.diagnostic or {})
         reaction = dict(diagnostic.get('stage3_reactive_alkali') or {})
         if reaction:
@@ -6584,6 +6596,33 @@ class EvaporationMixin:
             if isinstance(state, Mapping)
         }
 
+    def _shrink_evaporation_coproduct_counter(self, debit_mol: float) -> None:
+        """Drop later overhead O2 debits out of this hour's excluded coproduct.
+
+        Premise: the counter is coproduct still in process.overhead_gas.
+        A later debit (Cr-oxide uptake, reactive condensation) removes
+        gas from the mixed pool of preexisting O2, tap O2, and coproduct.
+        Leaving the counter at the gross credit treats that debit as if
+        it ate only the legitimate oxidant, and the Fe split then refuses
+        tap O2 that is still in the mixture.
+        Algebra: counter' = max(0, counter − n_debit).
+        Unit: mol O2.
+        Limit: a debit larger than the counter floors at 0. It cannot go
+        negative and cannot invent oxidant. The Fe-split debit is not
+        passed here. That debit is the legitimate oxidant the counter
+        already kept out of the split.
+        """
+
+        debit_mol = float(debit_mol or 0.0)
+        if debit_mol <= 0.0:
+            return
+        current = float(getattr(
+            self, '_evaporation_coproduct_o2_mol_this_hr', 0.0,
+        ) or 0.0)
+        self._evaporation_coproduct_o2_mol_this_hr = max(
+            0.0, current - debit_mol,
+        )
+
     def _mark_overhead_na_origin_pool(self) -> None:
         """Declare headspace sodium origins well-mixed for partial withdrawals."""
         self.atom_ledger.mark_amalgamated_pool('process.overhead_gas', ('Na',))
@@ -6701,7 +6740,8 @@ class EvaporationMixin:
         self._mark_overhead_na_origin_pool()
         # Overhead O2 credited by this transition is coproduct the sweep
         # removes. The same-hour Fe split must not draw it as oxidant.
-        # Debits (CrO2/CrO3 consuming O2) are not coproduct and stay out.
+        # A debit on this same transition is not coproduct; the shrink
+        # below removes it from the counter instead of adding it.
         overhead_o2_credit_mol = self._transition_species_mol(
             transition,
             side='credits',
@@ -6715,6 +6755,15 @@ class EvaporationMixin:
                 ) or 0.0)
                 + overhead_o2_credit_mol
             )
+        # A negative stoich (CrO2/CrO3) debits overhead O2. That debit is
+        # later than any coproduct already counted this hour.
+        overhead_o2_debit_mol = self._transition_species_mol(
+            transition,
+            side='debits',
+            account='process.overhead_gas',
+            species=OXYGEN_SPECIES,
+        )
+        self._shrink_evaporation_coproduct_counter(overhead_o2_debit_mol)
         # Green: K and Mg are the same source-mixed overhead pool,
         # declared when that cation is the credited species.
         if species in ('K', 'Mg'):

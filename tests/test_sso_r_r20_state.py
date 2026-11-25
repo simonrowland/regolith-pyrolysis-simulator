@@ -249,16 +249,39 @@ def test_collapsing_ferric_capacity_routes_evaporative_o2_to_gas(monkeypatch, li
         monkeypatch.setattr(sim, "_melt_redox_temperature_shift_is_liquid", lambda *_args, **_kwargs: False)
         monkeypatch.setattr(sim, "_melt_redox_source_capacity_mol_per_ln_fO2", lambda **_kwargs: 0.0)
 
-    sim._credit_evaporation_transition(
-        "Fe", 0.001, 0.001, sim.vapor_pressures["metals"]["Fe"],
+    fe_data = sim.vapor_pressures["metals"]["Fe"]
+    fe_stoich = sim._evaporation_stoich("Fe", fe_data)
+    stoich_o2_mol = (
+        0.001
+        * sim.process_dt_hr()
+        * float(fe_stoich["O2_per_product_kg"])
+        / sim.species_formula_registry["O2"].molar_mass_kg_per_mol()
     )
+    overhead_before = sim.atom_ledger.mol_by_account(
+        "process.overhead_gas"
+    ).get("O2", 0.0)
+    fe2o3_before = sim.atom_ledger.mol_by_account(
+        "process.cleaned_melt"
+    ).get("Fe2O3", 0.0)
+    sim._credit_evaporation_transition(
+        "Fe", 0.001, 0.001, fe_data,
+    )
+    # The credit applies the evaporative source before settle. Congruent
+    # Fe loss has none, so the planted sentinel is still 78. Settle then
+    # republishes the ledger (the metal line at q = 0). That publisher
+    # is not the tangent, and it must not spend the coproduct on Fe2O3.
+    assert sim._current_melt_redox_fO2_log() == 78.0
     sim._settle_evaporative_redox_after_batch()
-
-    # The coproduct is overhead gas. It must not raise the planted fO2.
-    # A reducing integral may lower a liquid state; a solid hour holds.
-    assert sim._current_melt_redox_fO2_log() <= 78.0
-    if not liquid:
+    if liquid:
+        T_K = float(sim.melt.temperature_C) + 273.15
+        assert sim._current_melt_redox_fO2_log() == pytest.approx(
+            sim._ledger_consistent_melt_fO2_log(T_K),
+        )
+    else:
         assert sim._current_melt_redox_fO2_log() == 78.0
+    assert sim.atom_ledger.mol_by_account("process.cleaned_melt").get(
+        "Fe2O3", 0.0,
+    ) <= fe2o3_before + 1.0e-12
     evaporation = sim.atom_ledger.transitions[transitions_before]
     emitted_o2 = _transition_account_species_mol(
         sim, evaporation, side="credits", account="process.overhead_gas", species="O2",
@@ -266,9 +289,11 @@ def test_collapsing_ferric_capacity_routes_evaporative_o2_to_gas(monkeypatch, li
     buffer_credit = _transition_account_species_mol(
         sim, evaporation, side="credits", account="reservoir.fo2_buffer", species="O2",
     )
-    assert emitted_o2 > 0.0
+    assert emitted_o2 == pytest.approx(stoich_o2_mol)
     assert buffer_credit == pytest.approx(0.0)
-    assert sim.atom_ledger.mol_by_account("process.overhead_gas")["O2"] >= emitted_o2
+    assert sim.atom_ledger.mol_by_account("process.overhead_gas")["O2"] - (
+        overhead_before
+    ) == pytest.approx(stoich_o2_mol)
     for transition in sim.atom_ledger.transitions[transitions_before:]:
         transition.validate_conservation(sim.species_formula_registry)
         if transition.name == "oxygen_reservoir_exchange":
@@ -2405,16 +2430,12 @@ def test_sio_evaporative_o_loss_source_term_from_committed_transition() -> None:
     assert credited_condensed_kg == pytest.approx(0.0)
     assert transition.name == "evaporate_SiO"
     assert o2_mol > 0.0
-    assert breakdown["terms_mol_o2_equiv_by_label"][label] == pytest.approx(
-        -o2_mol
-    )
-    # SiO's overhead O2 is reducing. With no Fe2O3 booked, the tangent
-    # stops and does not publish a lower fO2. The overhead credit remains.
+    # SiO removes SiO2 oxygen in the melt's own proportion. q is unchanged,
+    # so the old reducing tangent is not a source. The overhead credit remains.
+    assert label not in (breakdown.get("terms_mol_o2_equiv_by_label") or {})
+    assert label not in (breakdown.get("skipped_reasons_by_label") or {})
     assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(
         before_fO2
-    )
-    assert breakdown["skipped_reasons_by_label"][label] == (
-        "ferric_couple_exhausted"
     )
     assert sim.atom_ledger.mol_by_account("process.overhead_gas").get(
         "O2", 0.0
@@ -2428,12 +2449,17 @@ def test_sio_evaporative_o_loss_source_term_from_committed_transition() -> None:
     assert sim.melt.oxygen_reservoir.exchange_direction.split("|")[0] == (
         exchange_direction
     )
-    assert label in summary["redox_source_breakdown"][
-        "terms_mol_o2_equiv_by_label"
-    ]
-    assert summary["redox_source_breakdown"]["ferric_divergence"][
-        "warning_threshold_abs"
-    ] == pytest.approx(FERRIC_DIVERGENCE_WARNING_THRESHOLD)
+    summary_breakdown = summary.get("redox_source_breakdown") or {}
+    assert label not in (summary_breakdown.get("terms_mol_o2_equiv_by_label") or {})
+    # No congruent source leaves the breakdown empty unless exchange
+    # already recorded a respeciation attempt. A populated breakdown
+    # still carries the ferric-divergence threshold.
+    if summary_breakdown:
+        assert summary_breakdown["ferric_divergence"][
+            "warning_threshold_abs"
+        ] == pytest.approx(FERRIC_DIVERGENCE_WARNING_THRESHOLD)
+    else:
+        assert summary_breakdown == {}
 
 
 @pytest.mark.parametrize("species", ["Na", "K", "Fe", "Mg"])
@@ -2490,10 +2516,10 @@ def test_elemental_evaporation_coproduct_o2_does_not_oxidize_melt(
     assert parent_oxide_o2_equiv_mol > 0.0
     assert overhead_o2_mol == pytest.approx(parent_oxide_o2_equiv_mol)
     assert buffer_o2_mol == pytest.approx(0.0)
-    assert breakdown["terms_mol_o2_equiv_by_label"][label] == pytest.approx(
-        -parent_oxide_o2_equiv_mol
+    assert label not in (breakdown.get("terms_mol_o2_equiv_by_label") or {})
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(
+        before_fO2
     )
-    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log <= before_fO2
 
 
 def test_isochemical_temperature_ramp_references_fO2_on_kress91_curve() -> None:

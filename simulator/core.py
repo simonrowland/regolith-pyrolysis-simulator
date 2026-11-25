@@ -3319,18 +3319,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         prefix = 'evaporate_'
         if not transition.name.startswith(prefix):
             return {}
-        vapor_species = transition.name[len(prefix):]
-        vapor_formula = resolve_species_formula(
-            vapor_species,
-            self.species_formula_registry,
-        )
-        vapor_oxygen_atoms = float(vapor_formula.elements.get('O', 0.0) or 0.0)
-        overhead_o2_credit_mol = self._transition_species_mol(
-            transition,
-            side='credits',
-            account='process.overhead_gas',
-            species=OXYGEN_SPECIES,
-        )
         overhead_o2_debit_mol = self._transition_species_mol(
             transition,
             side='debits',
@@ -3343,37 +3331,35 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             account=FO2_BUFFER_ACCOUNT,
             species=OXYGEN_SPECIES,
         )
-        # Actual ledger destination outranks carrier class. A coproduct
-        # released to overhead is reducing. Oxygen that leaves the fO2
-        # buffer to oxidise a vapour leaves the melt redox reservoir, so
-        # the melt is more reducing and fO2 falls. An overhead debit keeps
-        # the oxidising sign it had when that debit was overhead gas.
-        # This reader sums the oxygen the transition posted. It does not
-        # choose the account. The apply step divides this source by C_m.
-        # Algebra: source = overhead_debit - buffer_debit - overhead_credit.
-        # Unit: mol O2. Limit: a posting inside the noop is not a source.
-        # Sanity: TiO2(g) posts no O2 and has no source. A buffer credit is
-        # not this debit. A buffer debit of 1 mol at 1 mol/ln lowers fO2
-        # by 1 ln. Congruent evaporation posts its O2 to overhead, not the
-        # buffer, so this buffer term stays idle for those carriers.
-        net_posted_o2_mol = (
-            overhead_o2_credit_mol
-            - overhead_o2_debit_mol
-            + buffer_o2_debit_mol
-        )
-        if abs(net_posted_o2_mol) > OXYGEN_RESERVOIR_NOOP_MOL:
+        # d-472 amended. Congruent evaporation removes n_M of MO_{o_bar}.
+        # o_bar is the melt's own oxygen per metal atom and already
+        # includes the ferric share, so the atoms that leave are in the
+        # ledger ratio:
+        #   Fe3+' / Fe2+' = Fe3+ / Fe2+
+        #   q' = Fe3+' / (Fe3+' + Fe2+') = q
+        #   Δq = 0.
+        # A redox_source of -n_O2 on top of that removal books the same
+        # oxygen again, in the reducing direction. The overhead O2 credit
+        # (Na, K, Fe, Mg, SiO, TiO alike) is therefore not a source. The
+        # integrator applies only the dict returned here, so it does not
+        # add a tangent for that credit either.
+        # Unit: n_O2 is mol, not mol per ln(fO2). A zero source does not
+        # divide by C_m.
+        # Limiting case: pure Na2O loss from a ferric-free melt leaves q
+        # at 0, and fO2 stays the Kress state of that q. The coproduct is
+        # gas the sweep removes.
+        # What remains a source, because it is not that congruent removal:
+        #   source = n_overhead_debit - n_buffer_debit
+        # An overhead debit (CrO2/CrO3 taking O2 from the gas) is oxidising.
+        # A buffer debit is oxygen that left the melt redox account, so
+        # fO2 falls. A posting inside the noop is not a source. TiO2(g)
+        # posts no O2 and returns nothing. The positive metal-loss term
+        # stays deleted: it was this same oxygen counted as ferric.
+        source_mol = overhead_o2_debit_mol - buffer_o2_debit_mol
+        if abs(source_mol) > OXYGEN_RESERVOIR_NOOP_MOL:
             return {
-                'redox_source:evaporative_oxygen_loss': -net_posted_o2_mol,
+                'redox_source:evaporative_oxygen_loss': source_mol,
             }
-        if vapor_oxygen_atoms > 0.0:
-            return {}
-        # Oxide oxygen the proposal did not credit to the gas is not a melt
-        # oxidant. Congruent evaporation posts that O2 to overhead, and the
-        # branch above already returned the reducing oxygen-loss term. A
-        # positive metal-loss term here booked the same oxygen a second time
-        # and ratcheted melt fO2 to log10(P_total) under an inert sweep.
-        # Limiting case: net overhead O2 ≈ 0 returns nothing — there is no
-        # ferric to invent from a vapor that took its oxygen with it.
         return {}
 
     def _apply_evaporative_redox_source_terms(

@@ -2,8 +2,8 @@
 
 Congruent metal evaporation (Na2O → 2 Na(g) + ½ O2, FeO → Fe(g) + ½ O2)
 releases O2 at the surface. Under PN2_SWEEP that O2 leaves with the sweep.
-The melt may become more reduced, or hold. It must not climb toward the
-effervescence cap, and q = Fe3+/ΣFe must not rise.
+The loss removes oxide in the melt's own Fe3+/Fe2+ proportion, so q is
+unchanged and there is no fO2 tangent. The coproduct is gas.
 """
 
 from __future__ import annotations
@@ -117,15 +117,34 @@ def _assert_sweep_did_not_oxidize(
     buffer_after = sim.atom_ledger.mol_by_account(
         "reservoir.fo2_buffer"
     ).get("O2", 0.0)
-    assert q_after <= q_before + 1.0e-12
+    assert q_after == pytest.approx(q_before, abs=1.0e-12)
     assert math.isfinite(fO2_after)
+    # No evaporative tangent. q = 0 has no finite Kress inverse, so
+    # settle publishes the Fe metal line of the post-hour composition
+    # (d-463 snap): min(floor, ceiling). Na and Fe leaving change
+    # a_FeO, so that line can move at fixed q. The evaporation source
+    # does not move it: the oxygen-loss term is absent and the source
+    # integral stays zero. A tangent would be a nonzero
+    # redox_source_delta_ln_fO2.
+    terms = dict(sim._redox_source_terms_this_hr)
+    assert "redox_source:evaporative_metal_loss" not in terms
+    assert "redox_source:evaporative_oxygen_loss" not in terms
+    assert sim.melt.oxygen_reservoir.redox_source_delta_ln_fO2 == pytest.approx(
+        0.0, abs=1.0e-12,
+    )
+    T_K = float(sim.melt.temperature_C) + 273.15
+    assert fO2_after == pytest.approx(
+        sim._ledger_consistent_melt_fO2_log(T_K), abs=1.0e-9,
+    )
+    # The line can move reduced as a_FeO falls. It cannot climb.
     assert fO2_after <= fO2_before + 1.0e-9
     assert buffer_after <= buffer_before + 1.0e-12
 
-    incoming_bar = max(0.0, float(sim.melt.pO2_mbar) / 1000.0)
-    headspace_bar = max(incoming_bar, sim._oxygen_numerical_floor_bar())
-    assert fO2_after <= math.log10(headspace_bar) + 1.0
-    assert fO2_after <= sim._melt_redox_fO2_upper_bound_log()
+    # q = 0 publishes the Fe metal line. That line sits above
+    # log10(numerical floor)+1, and the floor is not a headspace
+    # fugacity the melt has to track. Coproduct is not a source.
+    # The oxidation bug was the effervescence cap.
+    assert fO2_after <= sim._melt_redox_fO2_upper_bound_log() - 1.0
 
     posted_overhead_o2 = False
     for transition in sim.atom_ledger.transitions:
@@ -140,9 +159,6 @@ def _assert_sweep_did_not_oxidize(
                 posted_overhead_o2 = True
     assert posted_overhead_o2
 
-    terms = dict(sim._redox_source_terms_this_hr)
-    assert "redox_source:evaporative_metal_loss" not in terms
-    assert terms["redox_source:evaporative_oxygen_loss"] < 0.0
     assert _oxygen_atoms(sim) == pytest.approx(oxygen_before, abs=1.0e-6)
     assert abs(sim._make_snapshot().mass_balance_error_pct) < 5.0e-12
 
@@ -173,13 +189,43 @@ def test_pn2_sweep_c2a_hour_does_not_raise_q_or_melt_fo2(
         buffer_before=buffer_before,
         oxygen_before=oxygen_before,
     )
+    # Cold-train runtime enforcement is off, so the bleed's NoColdTrain
+    # branch credits drained melt O2 to terminal.oxygen_melt_offgas_stored
+    # and not the vacuum vent. force_drain_all is the sweep emptying the
+    # holdup; a conductance-limited call can leave a later-hour remainder
+    # that is still gas.
+    coproduct_mol = sim.atom_ledger.mol_by_account(
+        "process.overhead_gas"
+    ).get("O2", 0.0)
+    fO2_after_hour = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+    assert coproduct_mol > 0.0
+    stored_before = sim.atom_ledger.mol_by_account(
+        "terminal.oxygen_melt_offgas_stored"
+    ).get("O2", 0.0)
+    vented_before = sim.atom_ledger.mol_by_account(
+        "terminal.oxygen_melt_offgas_vented_to_vacuum"
+    ).get("O2", 0.0)
+    sim._dispatch_overhead_bleed(force_drain_all=True)
+    stored_after = sim.atom_ledger.mol_by_account(
+        "terminal.oxygen_melt_offgas_stored"
+    ).get("O2", 0.0)
+    vented_after = sim.atom_ledger.mol_by_account(
+        "terminal.oxygen_melt_offgas_vented_to_vacuum"
+    ).get("O2", 0.0)
+    assert stored_after - stored_before == pytest.approx(coproduct_mol)
+    assert vented_after == pytest.approx(vented_before, abs=1.0e-12)
+    # The bleed moves gas. It does not republish the metal line.
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(
+        fO2_after_hour, abs=1.0e-9,
+    )
 
 
 def test_pn2_sweep_coproduct_cannot_ferricize_at_large_redox_capacity(
     vapor_pressure_data, feedstocks_data, setpoints_data, monkeypatch,
 ):
-    """A huge C_m keeps the reducing tangent tiny, so Kress still wants
-    ferric at the starting fO2. The coproduct must still not fund it.
+    """No congruent tangent, at a huge C_m as well. The coproduct must
+    not fund ferric. Published fO2 is the post-hour metal line, and the
+    source integral stays zero at this C_m too.
     """
 
     sim = _build_sim(
