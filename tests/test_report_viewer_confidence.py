@@ -110,7 +110,7 @@ context.__artifact = JSON.parse(process.argv[4]);
 vm.createContext(context);
 vm.runInContext(fs.readFileSync(process.argv[2], "utf8"), context);
 vm.runInContext(fs.readFileSync(process.argv[3], "utf8"), context);
-vm.runInContext(`
+vm.runInContext(`(() => {
   const root = document.createElement("root");
   appendRunDiagnostics(root, globalThis.__artifact);
   const section = root.children[0];
@@ -120,7 +120,7 @@ vm.runInContext(`
     lines: list.children.map((item) => item.textContent),
     itemChildCounts: list.children.map((item) => item.children.length),
   };
-`, context);
+})();`, context);
 process.stdout.write(JSON.stringify(context.__diagnostics));
 """
     completed = subprocess.run(
