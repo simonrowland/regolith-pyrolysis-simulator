@@ -1383,16 +1383,11 @@ def test_gate_curve_memo_reuse_is_ineligible_without_verifiable_producer_provena
     )
     assert evidence.producer_evidence == "unproven"
     assert not evidence.eligible
-    record = admission.write_gate_curve_memo_record(
-        sim,
-        SYNTHETIC_CURVE,
-        evidence=evidence,
-        provider_outcome=GateCurveProviderOutcome.PRODUCED,
-    )
+    origin = {"producer_evidence": evidence.producer_evidence}
     assert not admission.gate_curve_memo_reuse_eligible(
         sim,
         SYNTHETIC_CURVE,
-        record["origin"],
+        origin,
         fresh_evidence=False,
         evidence=evidence,
     )

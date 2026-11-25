@@ -6101,7 +6101,7 @@ def test_pt1_stale_replacement_publishes_fresh_measured_disclosure(
     with disclosure_scope(inherit=False) as published:
         assert replay._lookup("equilibrium_post_record", key) == payload
         assert published.snapshot() == fresh_disclosures
-    assert replay._accepted_hit_disclosures == fresh_disclosures
+    assert replay._accepted_hit_disclosures == list(fresh_disclosures)
 
 
 @pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))

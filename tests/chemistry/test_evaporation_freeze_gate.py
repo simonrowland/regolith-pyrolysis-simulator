@@ -6336,7 +6336,11 @@ def test_redox_operation_holds_failed_authority_until_recovery_next_operation(
             'liquidus_T_C': 1700.0,
         }
         curve = _freeze_gate_curve_fixture(sim, curve)
-        return gate_curve_memo_record(curve, None, (), 'live')
+        return engine_binding_admission.write_gate_curve_memo_record(
+            sim,
+            curve,
+            provider_outcome=GateCurveProviderOutcome.PRODUCED,
+        )
 
     monkeypatch.setattr(
         sim,
