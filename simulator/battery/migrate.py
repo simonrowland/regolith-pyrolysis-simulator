@@ -28673,27 +28673,7 @@ class Migrator:
             )
         )
         if source_projection is not None:
-            identity_composition = source_projection.state
-            if (
-                q_token is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
-                and source_projection.state.is_value
-                and isinstance(source_projection.state.value, Composition)
-            ):
-                scored_phase_composition = composition_with_provenance(
-                    source_projection.state.value, SCORED_PHASE_ANALYSIS
-                )
-                self_input = input_composition_echo_detail(
-                    Identity(
-                        quantity=q_token,
-                        species=species,
-                        composition=State.of(scored_phase_composition),
-                    )
-                )
-                if self_input is not None:
-                    identity_composition = State.unknown(
-                        str(self_input["reason"])
-                    )
-            ident_kwargs["composition"] = identity_composition
+            ident_kwargs["composition"] = source_projection.state
         elif explicit_composition is not None:
             ident_kwargs["composition"] = explicit_composition.state
         elif explicit_composition_refusal is not None:
@@ -29576,6 +29556,7 @@ class Migrator:
                 )
         if (
             q_token is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+            and source_projection is None
             and str(values.get("basis") or "").strip() == ELEMENT_WT_PERCENT_BASIS
         ):
             ident_kwargs, point_conditions, element_notices = (
@@ -29627,6 +29608,28 @@ class Migrator:
                 mixture_binding,
                 context.get("phase_analysis_parent_ids"),
             )
+        if (
+            source_projection is not None
+            and q_token is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+            and source_projection.state.is_value
+            and isinstance(source_projection.state.value, Composition)
+        ):
+            # Apply the existing scored-phase guard after starting-bulk and
+            # basis fallbacks, so none can reattach this glass to itself.
+            scored_phase_composition = composition_with_provenance(
+                source_projection.state.value, SCORED_PHASE_ANALYSIS
+            )
+            self_input = input_composition_echo_detail(
+                Identity(
+                    quantity=q_token,
+                    species=species,
+                    composition=State.of(scored_phase_composition),
+                )
+            )
+            if self_input is not None:
+                ident_kwargs["composition"] = State.unknown(
+                    str(self_input["reason"])
+                )
         _finalize_input_provenance(
             ident_kwargs,
             quantity=q_token if isinstance(q_token, Quantity) else None,
