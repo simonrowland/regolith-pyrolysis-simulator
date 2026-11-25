@@ -182,6 +182,7 @@ def test_wang_residue_cells_emit_one_production_score_event_each(monkeypatch):
     assert set(by_reference) == set(references)
     assert len(residuals) == 432
     assert predictions_by_run_row == Counter({row_id: 1 for row_id in by_run_row})
+    _benchm1_residual_report(residuals, references)
     numeric = [residual for residual in residuals if residual.numeric is not None]
     assert numeric
     assert all(
@@ -200,8 +201,6 @@ def test_wang_residue_cells_emit_one_production_score_event_each(monkeypatch):
         )
         for residual in numeric
     )
-
-    _benchm1_residual_report(residuals, references)
 
     # Mutate the source selector back to its previous Mendybaev-only rule.
     # The same production path must then lose this already-emitted Wang event.
