@@ -550,6 +550,7 @@ def test_bulk_loader_rejects_typed_transient_equilibrium_refusal(tmp_path):
 ])
 def test_real_engine_basis_refusal_hits_before_the_worker_pipe(engine, composition, tmp_path, monkeypatch):
     from simulator.diagnostic_helpers.binary_pot_battery import (
+        DIAGNOSTIC_ARM_BOUNDARY_PRESSURE_BAR,
         BinaryPot, Po2Request, _close_isolated_cell_workers,
         close_battery_engine_handle, equilibrate_cell, open_battery_engine,
     )
@@ -576,6 +577,7 @@ def test_real_engine_basis_refusal_hits_before_the_worker_pipe(engine, compositi
         def evaluate():
             return equilibrate_cell(
                 handle, pot, temperature_K=1700.0,
+                physical_pressure_bar=DIAGNOSTIC_ARM_BOUNDARY_PRESSURE_BAR,
                 po2=Po2Request("engine_default", None), isolated=True, timeout_s=90.0,
             )
         cold = evaluate()

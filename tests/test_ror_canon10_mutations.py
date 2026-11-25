@@ -26,7 +26,9 @@ from tests.mutations.canon_fold6_restore import (
     MUTATIONS,
     _LIQUID_PAIR,
     _OXYGEN_FRAME,
-    _PRESSURE,
+    _DP002_APPLICABILITY,
+    _PRESSURE_DP002,
+    _PRESSURE_WAYPOINT,
     _count,
 )
 
@@ -106,8 +108,34 @@ def test_oxygen_frame_restoration_turns_the_printed_log_check_red(monkeypatch):
 
 def test_pressure_precedence_restoration_fails_at_the_dp002_assertion(monkeypatch):
     test_registered_method_pressure_precedes_the_unbound_default()
-    mutated, hits = _patched(score, "_condensed_pressure_for_score", _PRESSURE)
-    assert hits == 2
-    monkeypatch.setattr(score, "_condensed_pressure_for_score", mutated)
+    mutated_state, state_hits = _patched(
+        score, "_score_pressure_state", _PRESSURE_WAYPOINT
+    )
+    mutated_total, total_hits = _patched(
+        score, "_resolve_score_total_pressure", _PRESSURE_DP002
+    )
+    assert state_hits == 1
+    assert total_hits == 1
+    monkeypatch.setattr(score, "_score_pressure_state", mutated_state)
+    monkeypatch.setattr(score, "_resolve_score_total_pressure", mutated_total)
     with pytest.raises(AssertionError, match="DP-002"):
         test_registered_method_pressure_precedes_the_unbound_default()
+
+
+def test_dp002_applicability_restoration_fails_the_gas_route_guard(monkeypatch):
+    from simulator.battery import waypoints
+    from tests.battery.test_fo2_ladder import (
+        test_printed_gas_mix_rejects_unregistered_pressure_evidence,
+    )
+
+    test_printed_gas_mix_rejects_unregistered_pressure_evidence()
+    mutated, hits = _patched(
+        waypoints, "oxygen_condition", _DP002_APPLICABILITY
+    )
+    assert hits == 1
+    monkeypatch.setattr(waypoints, "oxygen_condition", mutated)
+    with pytest.raises(
+        AssertionError,
+        match="observation_gas_composition_method_implied_pressure",
+    ):
+        test_printed_gas_mix_rejects_unregistered_pressure_evidence()

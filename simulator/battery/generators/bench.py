@@ -688,6 +688,22 @@ def melt_activity_requests(
                     payload["fO2_bar"] = float(shared.pressure_pa / BAR_PA_DECIMAL)
                 elif shared.po2_bar is not None:
                     payload["fO2_bar"] = shared.po2_bar
+                if shared.policy is not None:
+                    payload["fO2_policy"] = {
+                        "id": shared.policy.id,
+                        "version": shared.policy.version,
+                        "status": shared.policy.status,
+                        "value": shared.policy.value,
+                        "units": shared.policy.units,
+                    }
+                if shared.temperature_band_status is not None:
+                    payload["fO2_temperature_band_status"] = (
+                        shared.temperature_band_status
+                    )
+                if shared.temperature_band_source is not None:
+                    payload["fO2_temperature_band_source"] = (
+                        shared.temperature_band_source
+                    )
                 routes["fO2_log"] = {
                     "waypoint": "fo2_ladder",
                     "authority": "assumed" if shared.borrowed else "derived",

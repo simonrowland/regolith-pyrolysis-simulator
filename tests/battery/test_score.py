@@ -129,6 +129,7 @@ from simulator.battery.score import (
     score_store,
 )
 from simulator.battery.validate import validate_corpus, validate_residual
+from simulator.physical_constants import ATM_PA_DECIMAL
 from tests.battery import factories as F
 
 
@@ -559,35 +560,27 @@ def _mathieu_pressure_context() -> tuple[ScoreContext, tuple[Observation, ...]]:
 @pytest.mark.parametrize(
     "engine", (Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL)
 )
-def test_mathieu_unknown_total_pressure_comparison_is_scored_and_flagged(engine) -> None:
+def test_mathieu_closed_system_unknown_pressure_uses_closed_path(engine) -> None:
     context, admitted = _mathieu_pressure_context()
     reference = admitted[0]
     experiment = context.experiments[reference.experiment_id]
-    method = experiment.method.value if experiment.method.is_value else None
-    from simulator.battery.default_policy import resolve
-    from simulator.physical_constants import PA_PER_BAR
-
-    policy_id = (
-        "DP-019"
-        if method is MethodToken.LANGMUIR_FREE_EVAPORATION
-        else "DP-001"
+    pressure_bar, pressure_state, pressure_notice, invalid = (
+        score_mod._resolve_score_total_pressure(
+            reference.identity,
+            Quantity.P_PARTIAL,
+            observation=reference,
+            experiment=experiment,
+            engine=engine,
+        )
     )
-    policy = resolve(policy_id)
-    assumed_bar, assumption_notice, invalid = score_mod.total_pressure_bar_for_score(
-        reference.identity, Quantity.P_PARTIAL, method=method
-    )
-    assert assumed_bar == float(
-        Decimal(str(policy.value)) / Decimal(str(PA_PER_BAR))
-    )
-    assert assumption_notice is not None
+    assert pressure_bar is None
+    assert pressure_state is None
+    assert pressure_notice is None
     assert invalid is None
     prediction = replace(
         _partial_prediction(engine, reference),
-        identity=replace(
-            reference.identity,
-            total_pressure_Pa=State.of(Decimal(str(policy.value))),
-        ),
-        notices=(assumption_notice,),
+        identity=reference.identity,
+        notices=(),
     )
 
     residual, _candidate = compile_residual(
@@ -597,7 +590,9 @@ def test_mathieu_unknown_total_pressure_comparison_is_scored_and_flagged(engine)
     assert residual.status is not ResidualStatus.REFUSED
     assert residual.numeric is not None
     assert residual.refusal is None
-    assert assumption_notice in residual.notices
+    assert not any(
+        notice.kind is NoticeKind.ASSUMED_PRESSURE for notice in residual.notices
+    )
     assert any(
         notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
         and "total-pressure-independent" in notice.reason
@@ -672,6 +667,31 @@ def test_mathieu_partial_pressure_prediction_is_independent_of_total_pressure(
     assert predictions[0] == predictions[1]
 
 
+def test_internal_analytical_scorer_admits_commanded_oxygen_without_total_pressure():
+    context, admitted = _mathieu_pressure_context()
+    reference = admitted[0]
+    experiment = context.experiments[reference.experiment_id]
+    reference = replace(
+        reference,
+        identity=replace(
+            reference.identity,
+            total_pressure_Pa=State.unknown("total pressure not printed"),
+        ),
+    )
+
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        reference,
+        experiment=experiment,
+        bench=context.benches.get(experiment.bench_id or ""),
+        isolated=False,
+    )
+
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert prediction.value is not None
+    assert prediction.refusal_reason is None
+
+
 def test_known_total_pressure_mismatch_still_refuses() -> None:
     experiment = F.kems_experiment()
     identity = replace(
@@ -690,7 +710,7 @@ def test_known_total_pressure_mismatch_still_refuses() -> None:
     prediction = replace(
         _partial_prediction(Engine.INTERNAL_ANALYTICAL, reference),
         identity=replace(
-            identity, total_pressure_Pa=State.of(Decimal("0.1"))
+            identity, total_pressure_Pa=State.of(ATM_PA_DECIMAL)
         ),
     )
 
@@ -775,8 +795,17 @@ def test_unknown_total_pressure_refusal_is_pinned_on_non_mathieu_row() -> None:
     assert outcome.fields == ("total_pressure_Pa",)
 
 
-def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> None:
-    experiment = F.kems_experiment()
+def test_vapour_pressure_resolution_waits_for_engine_partial_sum() -> None:
+    experiment = F.tabulation_experiment(method=MethodToken.QUENCH_EQUILIBRATION)
+    experiment = replace(
+        experiment,
+        pressure_environment=replace(
+            experiment.pressure_environment,
+            total_pressure_Pa=Located(
+                State.unknown("not printed"), locator=F.loc(page=1, table="I")
+            ),
+        ),
+    )
     identity = replace(
         _partial_identity(),
         fO2_Pa=State.of(Decimal("100000")),
@@ -788,50 +817,37 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
         identity,
         Decimal("1"),
         evidence=EvidenceClass.MEASURED_DIRECT,
-        source_id="other-source",
+        source_id="work-1",
     )
     reference = replace(reference, point_conditions=None)
-    from simulator.battery.default_policy import resolve
-    from simulator.physical_constants import PA_PER_BAR
-
-    policy = resolve("DP-001")
-    assumed_bar, assumption_notice, invalid = score_mod.total_pressure_bar_for_score(
-        identity, Quantity.P_PARTIAL, method=experiment.method.value
+    pressure = score_mod._resolve_score_total_pressure(
+        identity,
+        Quantity.P_PARTIAL,
+        observation=reference,
+        experiment=experiment,
+        engine=Engine.INTERNAL_ANALYTICAL,
     )
-    assert assumed_bar == float(
-        Decimal(str(policy.value)) / Decimal(str(PA_PER_BAR))
-    )
-    assert assumption_notice is not None
-    assert invalid is None
-    prediction = replace(
-        _partial_prediction(Engine.INTERNAL_ANALYTICAL, reference),
-        identity=replace(
-            identity,
-            total_pressure_Pa=State.of(Decimal(str(policy.value))),
-        ),
-        notices=(assumption_notice,),
-    )
+    assert pressure == (None, None, None, None)
 
     context = _context(F.work(), experiment, reference)
     residual, _candidate = compile_residual(
         reference,
         Engine.INTERNAL_ANALYTICAL,
         context=context,
-        prediction=prediction,
+        prediction=_partial_prediction(Engine.INTERNAL_ANALYTICAL, reference),
     )
 
     assert residual.status is not ResidualStatus.REFUSED
     assert residual.numeric is not None
     assert residual.refusal is None
-    assert assumption_notice in residual.notices
-    assert assumption_notice.kind is NoticeKind.ASSUMED_PRESSURE
-    assert assumption_notice.policy == NoticePolicy(**policy.payload["policy"])
-    assert "observation does not carry total_pressure_Pa" in assumption_notice.reason
-    assert f"{assumed_bar:g} bar" not in assumption_notice.reason
-    assert "not printed" in assumption_notice.reason
     assert any(
         notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
         and "total-pressure-independent" in notice.reason
+        for notice in residual.notices
+    )
+    assert not any(
+        notice.policy is not None
+        and notice.policy.id in {"DP-001", "DP-108"}
         for notice in residual.notices
     )
 
@@ -841,36 +857,15 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
         headline_rows,
     )
 
-    assert flagged_strata(residual.notices) == (
-        NoticeKind.ASSUMED_PRESSURE.value,
+    assert NoticeKind.ASSUMED_PRESSURE.value not in flagged_strata(residual.notices)
+    live_strata = flagged_stratum_rows(
+        (residual,), engines=(Engine.INTERNAL_ANALYTICAL,)
     )
-    assert [
-        (
-            row["stratum"],
-            row.get("policy_id"),
-            row.get("policy_status"),
-            row["n"],
-        )
-        for row in flagged_stratum_rows(
-            (residual,), engines=(Engine.INTERNAL_ANALYTICAL,)
-        )
-    ] == [
-        (NoticeKind.ASSUMED_PRESSURE.value, "DP-001", "canonical", 1),
-    ]
+    assert not any(row.get("policy_id") in {"DP-001", "DP-108"} for row in live_strata)
     serialized_strata = flagged_stratum_payloads(
         (residual_to_plain(residual),), (Engine.INTERNAL_ANALYTICAL,)
     )
-    assert [
-        (
-            row["stratum"],
-            row.get("policy_id"),
-            row.get("policy_status"),
-            row["n"],
-        )
-        for row in serialized_strata
-    ] == [
-        (NoticeKind.ASSUMED_PRESSURE.value, "DP-001", "canonical", 1),
-    ]
+    assert not any(row.get("policy_id") in {"DP-001", "DP-108"} for row in serialized_strata)
     payload = residual_to_plain(residual)
     aggregate = score_mod._ScorePayloadAccumulator.from_rows(
         (payload,),
@@ -878,9 +873,6 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
         engines=(Engine.INTERNAL_ANALYTICAL,),
     )
     assert aggregate.flagged_records() == serialized_strata
-    expected_flagged_rows = (
-        "| assumed_pressure | vapour | internal-analytical | DP-001 | canonical | 1 |",
-    )
     legacy_report = score_mod._render_score_report_from_payloads_legacy(
         (payload,),
         context=context,
@@ -895,14 +887,14 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
         observations=context.observations,
         origins=context.origins,
     )
-    assert all(row in legacy_report for row in expected_flagged_rows)
-    assert all(row in payload_report for row in expected_flagged_rows)
+    assert "| assumed_pressure | vapour | internal-analytical | DP-001" not in legacy_report
+    assert "| assumed_pressure | vapour | internal-analytical | DP-001" not in payload_report
     clean_residual = replace(
         residual,
         notices=tuple(
             notice
             for notice in residual.notices
-            if notice.kind is not NoticeKind.ASSUMED_PRESSURE
+            if notice.policy is None or notice.policy.id not in {"DP-001", "DP-108"}
         ),
     )
 
@@ -916,10 +908,8 @@ def test_unknown_total_pressure_independent_path_scores_non_mathieu_row() -> Non
             and item["engine"] == Engine.INTERNAL_ANALYTICAL.value
         )
 
-    assert measured_headline_count(residual) == 0
+    assert measured_headline_count(residual) == 1
     assert measured_headline_count(clean_residual) == 1
-
-
 def _partial_prediction(engine, observation, **_kwargs):
     return EnginePrediction(
         engine=engine,
@@ -4535,6 +4525,11 @@ def test_green_thermo_residual_is_score_eligible() -> None:
         [residual],
     )
     assert report.ok, [i.detail for i in report.issues]
+    assert candidate.identity.total_pressure_Pa == ident.total_pressure_Pa
+    assert not any(
+        notice.policy is not None and notice.policy.id == "DP-001"
+        for notice in residual.notices
+    )
 
 
 def test_refused_never_numeric() -> None:

@@ -82,7 +82,10 @@ def _git_sha() -> str:
 
 
 def _capture(handle: Any, pot: Any, po2_request: Any) -> dict[str, Any]:
-    from simulator.diagnostic_helpers.binary_pot_battery import equilibrate_cell
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        DIAGNOSTIC_ARM_BOUNDARY_PRESSURE_BAR,
+        equilibrate_cell,
+    )
     from simulator.melt_backend.base import EquilibriumResult
 
     backend = handle.backend
@@ -104,6 +107,7 @@ def _capture(handle: Any, pot: Any, po2_request: Any) -> dict[str, Any]:
                 pot,
                 temperature_K=TEMPERATURE_K,
                 po2=po2_request,
+                physical_pressure_bar=DIAGNOSTIC_ARM_BOUNDARY_PRESSURE_BAR,
                 timeout_s=90.0,
                 isolated=False,
             )

@@ -13,6 +13,8 @@ import pytest
 
 from simulator.battery.enums import (
     Authority,
+    AmountBasis,
+    AmbientPressureEvidenceClass,
     CellMaterial,
     Engine,
     EvidenceClass,
@@ -30,24 +32,30 @@ from simulator.battery.enums import (
 )
 from simulator.battery.fo2_ladder import (
     ResolvedFo2,
+    fo2_tier_notice,
     resolve_row_fo2,
 )
 from simulator.battery.records import (
+    AmbientPressureEvidence,
     ApproxPressure,
     BandBasis,
+    Composition,
     FO2Control,
     State,
     Value,
 )
 from simulator.battery.score import (
     FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND,
+    FLAGGED_STRATUM_PROPOSED_POLICY,
     ScoreContext,
     _cell_oxygen_class,
+    _headline_payload_admits,
     composition_wt_pct,
     compile_residual,
     flagged_strata,
     load_score_context,
-    _predict_with_engine,
+    _predict_engine_from_supplied_inputs,
+    _resolve_score_total_pressure,
     predict_with_engine,
     residual_to_plain,
     score_store,
@@ -156,7 +164,7 @@ def _feo_case(**kwargs):
 def test_comparison_path_shares_the_effusion_closure_condition() -> None:
     """Tier-3 effusion shares the closure, not a private number per engine."""
 
-    source = inspect.getsource(_predict_with_engine)
+    source = inspect.getsource(_predict_engine_from_supplied_inputs)
     assert "PO2_OXYGEN_BALANCE_EFFUSION" in source
     assert "_borrow_internal_analytical_effusion" in source
 
@@ -282,6 +290,10 @@ def test_tier2_printed_ferric_fraction_is_the_kress_inverse() -> None:
     experiment, bench, observation = _feo_case()
     observation = replace(
         observation,
+        identity=replace(
+            observation.identity,
+            total_pressure_Pa=State.of(Decimal("100000")),
+        ),
         point_conditions={
             **observation.point_conditions,
             "Fe3_over_sum_Fe": F.located(Decimal("0.2")),
@@ -291,7 +303,7 @@ def test_tier2_printed_ferric_fraction_is_the_kress_inverse() -> None:
     assert payload["fO2_tier"] == 2
     assert payload["fO2_borrowed"] is False
     assert payload["fO2_route"].startswith("kress_inverse:Fe3_over_sum_Fe;")
-    assert "kress_reference_1_bar" in payload["fO2_route"]
+    assert "identity.total_pressure_Pa" in payload["fO2_route"]
     composition = observation.identity.composition.value
     weights = composition_wt_pct(composition)
     expected = kress91_log10_fO2_from_fe3_over_sigma_fe(
@@ -308,6 +320,96 @@ def test_tier2_printed_ferric_fraction_is_the_kress_inverse() -> None:
         replace(observation, value=Value.point_of(observation.value.point * Decimal("1.7"))),
     )
     assert _fo2_input(changed) == _fo2_input(resolved)
+
+
+def test_tier2_knudsen_ferric_inverse_deliberately_omits_pressure_term() -> None:
+    experiment, bench, observation = _feo_case()
+    observation = replace(
+        observation,
+        point_conditions={
+            **observation.point_conditions,
+            "Fe3_over_sum_Fe": F.located(Decimal("0.2")),
+        },
+    )
+    resolved = resolve_row_fo2(
+        experiment, bench, observation, quantity=Quantity.ACTIVITY
+    )
+    assert resolved is not None
+    assert resolved.route.startswith("kress_inverse:Fe3_over_sum_Fe;")
+    assert "pressure_term_omitted" in resolved.route
+    assert "pressure_bar=None" in resolved.route
+    # Published inverse at Fe3+/sumFe=0.2, identity 1473.15 K, pressure omitted
+    # on FeO 0.2 / SiO2 0.8. This pin does not call the inverse.
+    assert resolved.log10_fO2_bar.hex() == "-0x1.96bd50d7b1045p+2"
+    notice = fo2_tier_notice(Quantity.ACTIVITY, resolved)
+    assert notice.kind is NoticeKind.FO2_FROM_PRINTED_FERRIC_RATIO
+    assert "pressure_term_omitted" in notice.reason
+    assert "pressure_bar=None" in notice.reason
+
+
+def test_tier2_out_of_band_kress_inverse_is_predicted_and_flagged() -> None:
+    experiment, bench, observation = _feo_case(
+        temperature=Value.point_of(Decimal("1973.15")),
+        pressure=Value.point_of(Decimal("1e-6")),
+    )
+    observation = replace(
+        observation,
+        identity=replace(
+            observation.identity,
+            temperature_K=State.of(Decimal("1973.15")),
+            per=State.of(PerBasis.DIMENSIONLESS),
+        ),
+        point_conditions={
+            **observation.point_conditions,
+            "Fe3_over_sum_Fe": F.located(Decimal("0.2")),
+        },
+    )
+    resolved = resolve_row_fo2(
+        experiment, bench, observation, quantity=Quantity.ACTIVITY
+    )
+    assert resolved is not None
+    assert resolved.temperature_band_status == "extrapolation_experimentally_confirmed"
+    assert resolved.log10_fO2_bar == -2.008303300370294
+    assert resolved.log10_fO2_bar.hex() == "-0x1.01101521c5071p+1"
+    notice = fo2_tier_notice(Quantity.ACTIVITY, resolved)
+    assert notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    assert notice.authority is Authority.EXTRAPOLATED
+    assert "fo2_from_printed_ferric_ratio" in notice.reason
+    assert "Kress91 temperature band" in (notice.band or "")
+    experiment = replace(experiment, bench_id=bench.id)
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        observation,
+        experiment=experiment,
+        bench=bench,
+        isolated=False,
+    )
+    assert prediction.value is not None, prediction.refusal_detail
+    context = ScoreContext(
+        works={experiment.work_id: F.work(experiment.work_id)},
+        experiments={experiment.experiment_id: experiment},
+        observations={observation.observation_id: observation},
+        extract_review={observation.source_id or "": "reviewed", "": "reviewed"},
+        hostname="test",
+        benches={bench.id: bench},
+    )
+    residual, _candidate = compile_residual(
+        observation,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        prediction=prediction,
+    )
+    scored = next(
+        item
+        for item in residual.notices
+        if item.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    )
+    assert "extrapolation_experimentally_confirmed" in (scored.band or "")
+    assert (
+        "kress91_temperature_band_status=extrapolation_experimentally_confirmed"
+        in scored.reason
+    )
+    assert FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND in flagged_strata(residual.notices)
 
 
 def test_tier2_kress_inverse_uses_banded_identity_nominal_pressure() -> None:
@@ -560,21 +662,447 @@ def test_magemin_refuses_knudsen_sio_for_missing_vapour_observable() -> None:
     assert residual.refusal.detail["observable"] == "vapour species"
 
 
-def test_tier4_borrowed_intrinsic_is_the_same_on_every_engine() -> None:
+def test_dp010_ambient_air_default_is_pinned_on_every_engine() -> None:
     experiment, bench, observation = _feo_case()
+    experiment = replace(experiment, method=State.of(MethodToken.TABULATION))
     payload = _assert_same_fo2(_melt(experiment, bench, observation))
-    weights = composition_wt_pct(observation.identity.composition.value)
-    assert payload["fO2_log"] == float(intrinsic_melt_fO2(weights, 1473.15))
+    assert payload["fO2_log"] == pytest.approx(-0.672064092852, abs=5e-13)
     assert payload["fO2_tier"] == 4
-    assert payload["fO2_route"] == "intrinsic_melt_fO2"
-    assert payload["fO2_borrowed"] is True
+    assert payload["fO2_route"] == "dp010_ambient_air_unprinted_atmosphere"
+    assert payload["fO2_borrowed"] is False
     resolved = resolve_row_fo2(experiment, bench, observation)
+    assert resolved is not None
+    assert resolved.log10_fO2_bar == pytest.approx(-0.672064092852, abs=5e-13)
+    assert resolved.po2_bar == pytest.approx(0.2127825, abs=1e-15)
+    notice = fo2_tier_notice(Quantity.ACTIVITY, resolved)
+    assert notice.kind is NoticeKind.FO2_DEFAULT_AMBIENT_AIR_UNPRINTED_ATMOSPHERE
+    assert notice.policy is not None
+    assert (notice.policy.id, notice.policy.version, notice.policy.status) == (
+        "DP-010",
+        2,
+        "proposed",
+    )
+    assert "pO2=0.21 atm" in notice.reason
+    assert "log10(fO2/bar)=-0.672064092852" in notice.reason
     changed = resolve_row_fo2(
         experiment,
         bench,
         replace(observation, value=Value.point_of(observation.value.point * Decimal("1.7"))),
     )
     assert _fo2_input(changed) == _fo2_input(resolved)
+
+
+def test_printed_gas_mix_uses_dp002_when_total_pressure_is_unprinted() -> None:
+    experiment, bench, observation = _feo_case()
+    pressure_environment = replace(
+        experiment.pressure_environment,
+        total_pressure_Pa=replace(
+            experiment.pressure_environment.total_pressure_Pa,
+            state=State.unknown("total pressure is not printed"),
+        ),
+    )
+    experiment = replace(
+        experiment,
+        method=State.of(MethodToken.TABULATION),
+        pressure_environment=pressure_environment,
+        ambient_pressure_evidence=AmbientPressureEvidence(
+            evidence_class=AmbientPressureEvidenceClass.GAS_MIXING,
+            quote="O2/Ar gas-mixing furnace",
+            locator=F.loc(page=1, paragraph="Experimental setup"),
+        ),
+    )
+    mixture = Composition(
+        basis="printed_gas_mixture",
+        components=(("O2", Decimal("0.2")), ("Ar", Decimal("0.8"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    observation = replace(
+        observation,
+        point_conditions={
+            **(observation.point_conditions or {}),
+            "gas_composition": F.located(mixture),
+        },
+    )
+
+    resolved = resolve_row_fo2(
+        experiment, bench, observation, quantity=Quantity.ACTIVITY
+    )
+
+    assert resolved is not None
+    assert resolved.route == "observation_gas_composition_method_implied_pressure"
+    assert resolved.log10_fO2_bar == pytest.approx(-0.693253391922288, abs=5e-13)
+    notice = fo2_tier_notice(Quantity.ACTIVITY, resolved)
+    assert notice.kind is NoticeKind.METHOD_IMPLIED
+    assert notice.policy is not None
+    assert notice.policy.id == "DP-002"
+    assert notice.policy.value == "101325"
+    assert "log10(fO2/bar)=-0.693253391922" in notice.reason
+
+
+def test_printed_gas_mix_rejects_unregistered_pressure_evidence() -> None:
+    from simulator.battery import waypoints
+
+    experiment, bench, observation = _feo_case()
+    pressure_environment = replace(
+        experiment.pressure_environment,
+        total_pressure_Pa=replace(
+            experiment.pressure_environment.total_pressure_Pa,
+            state=State.unknown("total pressure is not printed"),
+        ),
+    )
+    experiment = replace(
+        experiment,
+        method=State.of(MethodToken.TABULATION),
+        pressure_environment=pressure_environment,
+        ambient_pressure_evidence=AmbientPressureEvidence(
+            evidence_class=AmbientPressureEvidenceClass.GAS_FLOW,
+            quote="Argon flowed through the furnace at 5 sccm.",
+            locator=F.loc(page=1, paragraph="Experimental setup"),
+        ),
+    )
+    mixture = Composition(
+        basis="printed_gas_mixture",
+        components=(("O2", Decimal("0.2")), ("Ar", Decimal("0.8"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    observation = replace(
+        observation,
+        point_conditions={
+            **(observation.point_conditions or {}),
+            "gas_composition": F.located(mixture),
+        },
+    )
+
+    oxygen = waypoints.oxygen_condition(experiment, bench, observation)
+
+    assert not any(
+        route.route == "observation_gas_composition_method_implied_pressure"
+        for route in oxygen.routes
+    )
+
+
+def test_vacuum_fo2_proxy_is_explicitly_flagged() -> None:
+    from simulator.battery.score import composition_wt_pct
+
+    experiment, bench, observation = _feo_case()
+    experiment = replace(experiment, method=State.of(MethodToken.VACUUM_CHAMBER_PYROLYSIS))
+    resolved = resolve_row_fo2(experiment, bench, observation, quantity=Quantity.ACTIVITY)
+    assert resolved is not None
+    assert resolved.route == "fo2_vacuum_cell_proxy"
+    assert resolved.borrowed is False
+    notice = fo2_tier_notice(Quantity.ACTIVITY, resolved)
+    assert notice.kind is NoticeKind.FO2_VACUUM_CELL_PROXY
+    assert "legacy intrinsic-melt clamp" in notice.reason
+    weights = composition_wt_pct(observation.identity.composition.value)
+    assert resolved.log10_fO2_bar == float(
+        intrinsic_melt_fO2(weights, float(observation.identity.temperature_K.value))
+    )
+
+
+def test_container_buffers_use_the_existing_frost_owner() -> None:
+    from benchmarks.buffer_reproduction import PUBLISHED_BUFFERS
+    from simulator.oxygen_buffers import frost_condensed_buffer_log10_fO2_bar
+
+    temperature_K = Decimal("1200")
+    pressure_Pa = Decimal("100000")
+    _base_experiment, bench, _base_observation = _feo_case()
+    for container, token in (
+        ("Fe-metal capsule", "IW"),
+        ("Ni/NiO capsule", "NNO"),
+        ("wüstite-magnetite capsule", "WM"),
+        ("quartz-fayalite-magnetite buffer capsule", "QFM"),
+    ):
+        experiment = F.tabulation_experiment(
+            method=MethodToken.QUENCH_EQUILIBRATION,
+            T_K=temperature_K,
+            total_P=pressure_Pa,
+        )
+        experiment = replace(
+            experiment,
+            sample=replace(
+                experiment.sample,
+                container=F.located(container),
+            ),
+        )
+        oxygen = oxygen_condition(experiment, bench, None)
+        assert oxygen.selected is not None
+        assert oxygen.selected.route == "container_buffer_relation"
+        assert "experiment.sample.container" in oxygen.selected.inputs
+        buffer = PUBLISHED_BUFFERS[token]
+        expected = frost_condensed_buffer_log10_fO2_bar(
+            Decimal(str(buffer.A_K)),
+            Decimal(str(buffer.B)),
+            Decimal(str(buffer.pressure_coefficient_K_per_bar)),
+            temperature_K,
+            pressure_Pa / Decimal("100000"),
+        )
+        resolved = resolve_row_fo2(
+            experiment,
+            bench,
+            None,
+            temperature_K=float(temperature_K),
+            oxygen=oxygen,
+            quantity=Quantity.ACTIVITY,
+        )
+        assert resolved is not None
+        assert float(resolved.log10_fO2_bar) == float(expected)
+        assert resolved.route == "container_buffer_relation"
+        assert fo2_tier_notice(Quantity.ACTIVITY, resolved).kind is (
+            NoticeKind.FO2_BUFFER_FROM_CONTAINER
+        )
+
+
+def test_molybdenum_capsule_is_a_typed_gap_even_for_knudsen() -> None:
+    _base_experiment, bench, observation = _feo_case()
+    for container in (
+        "rhenium boat",
+        "ruthenium capsule",
+        "molybdenum capsule",
+        "tungsten cell",
+        "Re wire loop",
+        "Re/Ru capsule",
+        "Mo/W cell",
+        "MoO2 capsule",
+    ):
+        for method in (
+            MethodToken.QUENCH_EQUILIBRATION,
+            MethodToken.KNUDSEN_EFFUSION,
+        ):
+            experiment = F.tabulation_experiment(
+                method=method, T_K=Decimal("1473.15")
+            )
+            experiment = replace(
+                experiment,
+                sample=replace(
+                    experiment.sample,
+                    container=F.located(container),
+                ),
+            )
+            row = replace(observation, experiment_id=experiment.experiment_id)
+            oxygen = oxygen_condition(experiment, bench, row)
+            assert oxygen.selected is None, container
+            assert oxygen.absence is not None, container
+            assert oxygen.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+            resolved = resolve_row_fo2(
+                experiment,
+                bench,
+                row,
+                composition=observation.identity.composition.value,
+                temperature_K=float(observation.identity.temperature_K.value),
+                oxygen=oxygen,
+                quantity=Quantity.ACTIVITY,
+            )
+            assert resolved is not None, (container, method)
+            assert resolved.route == "dp010_ambient_air_unprinted_atmosphere", (
+                container, method, resolved.route,
+            )
+            assert resolved.policy is not None and resolved.policy.id == "DP-010"
+
+
+def test_unknown_explicit_buffer_is_flagged_dp010_not_a_vacuum_proxy() -> None:
+    _base_experiment, bench, observation = _feo_case()
+    for method in (
+        MethodToken.QUENCH_EQUILIBRATION,
+        MethodToken.KNUDSEN_EFFUSION,
+        MethodToken.VACUUM_CHAMBER_PYROLYSIS,
+    ):
+        experiment = F.tabulation_experiment(
+            method=method, T_K=Decimal("1473.15")
+        )
+        experiment = replace(
+            experiment,
+            fO2_control=FO2Control(
+                channel=F.State.of(FO2Channel.BUFFER),
+                buffer=F.located("NOT_A_REAL_BUFFER"),
+            ),
+        )
+        row = replace(observation, experiment_id=experiment.experiment_id)
+        oxygen = oxygen_condition(experiment, bench, row)
+        assert oxygen.absence is not None
+        assert oxygen.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+        resolved = resolve_row_fo2(
+            experiment,
+            bench,
+            row,
+            composition=observation.identity.composition.value,
+            temperature_K=float(observation.identity.temperature_K.value),
+            oxygen=oxygen,
+            quantity=Quantity.ACTIVITY,
+        )
+        assert resolved is not None, method
+        assert resolved.route == "dp010_ambient_air_unprinted_atmosphere"
+        assert resolved.route != "fo2_vacuum_cell_proxy"
+        assert resolved.policy is not None and resolved.policy.id == "DP-010"
+
+
+def test_vacuum_bound_does_not_hide_an_unsupported_container() -> None:
+    _base_experiment, bench, observation = _feo_case()
+    experiment = F.tabulation_experiment(
+        method=MethodToken.KNUDSEN_EFFUSION,
+        T_K=Decimal("1473.15"),
+    )
+    experiment = replace(
+        experiment,
+        sample=replace(
+            experiment.sample,
+            container=F.located("molybdenum capsule"),
+        ),
+        pressure_environment=replace(
+            experiment.pressure_environment,
+            total_pressure_Pa=F.located(
+                Decimal("1e-6"), page=1, note="chamber vacuum"
+            ),
+        ),
+    )
+    row = replace(observation, experiment_id=experiment.experiment_id)
+    oxygen = oxygen_condition(experiment, bench, row)
+    assert oxygen.selected is None
+    assert oxygen.absence is not None
+    assert oxygen.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+    assert any("molybdenum capsule" in item for item in oxygen.absence.missing)
+    resolved = resolve_row_fo2(
+        experiment,
+        bench,
+        row,
+        composition=row.identity.composition.value,
+        temperature_K=float(row.identity.temperature_K.value),
+        oxygen=oxygen,
+        quantity=Quantity.ACTIVITY,
+    )
+    assert resolved is not None
+    assert resolved.route == "dp010_ambient_air_unprinted_atmosphere"
+    assert resolved.route != "vacuum_total_pressure_upper_bound"
+    assert resolved.route != "fo2_vacuum_cell_proxy"
+    assert resolved.policy is not None and resolved.policy.id == "DP-010"
+
+    printed = replace(
+        row,
+        point_conditions={
+            **(row.point_conditions or {}),
+            "fO2_log": F.located(Decimal("-8")),
+        },
+    )
+    printed_oxygen = oxygen_condition(experiment, bench, printed)
+    assert printed_oxygen.selected is not None
+    assert printed_oxygen.selected.route == "observation_fO2_log"
+
+    plain = F.tabulation_experiment(
+        method=MethodToken.QUENCH_EQUILIBRATION,
+        T_K=Decimal("1473.15"),
+    )
+    plain = replace(
+        plain,
+        pressure_environment=replace(
+            plain.pressure_environment,
+            total_pressure_Pa=F.located(
+                Decimal("1e-6"), page=1, note="chamber vacuum"
+            ),
+        ),
+    )
+    plain_row = replace(observation, experiment_id=plain.experiment_id)
+    vacuum = oxygen_condition(plain, bench, plain_row)
+    assert vacuum.selected is not None
+    assert vacuum.selected.route == "vacuum_total_pressure_upper_bound"
+
+
+@pytest.mark.parametrize(
+    ("method", "column_note", "located", "qualifies"),
+    [
+        (MethodToken.WET_CHEMICAL_ANALYSIS, "ferrous oxide", True, True),
+        (MethodToken.MOSSBAUER_SPECTROSCOPY, "ferrous oxide", True, True),
+        (MethodToken.TABULATION, "FeO by wet-chemical analysis", True, True),
+        (MethodToken.TABULATION, "ferrous oxide", True, False),
+        (MethodToken.KNUDSEN_EFFUSION, "ferrous oxide", True, False),
+        (MethodToken.WET_CHEMICAL_ANALYSIS, "ferrous oxide", False, False),
+    ],
+)
+def test_printed_feo_fe2o3_pair_is_the_kress_inverse(
+    method: MethodToken, column_note: str, located: bool, qualifies: bool,
+) -> None:
+    experiment, bench, observation = _feo_case()
+    experiment = replace(experiment, method=State.of(method))
+    ferric = F.located(Decimal("5"))
+    observation = replace(
+        observation,
+        point_conditions={
+            **observation.point_conditions,
+            "FeO_wt_pct": F.located(Decimal("10"), page=1, note=column_note),
+            "Fe2O3_wt_pct": ferric if located else replace(ferric, locator=None),
+        },
+    )
+    resolved = resolve_row_fo2(
+        experiment, bench, observation, quantity=Quantity.ACTIVITY
+    )
+    assert resolved is not None
+    assert resolved.route.startswith(
+        "kress_inverse:FeO_wt_pct+Fe2O3_wt_pct;"
+    ) is qualifies
+
+
+def test_graphite_container_uses_closed_cco_at_printed_or_resolved_pressure() -> None:
+    from simulator.oxygen_buffers import cco_buffered_fO2
+
+    temperature_K = Decimal("1473.15")
+    _base_experiment, bench, _base_observation = _feo_case()
+    experiment = F.tabulation_experiment(
+        method=MethodToken.QUENCH_EQUILIBRATION,
+        T_K=temperature_K,
+        total_P=Decimal("100000"),
+    )
+    experiment = replace(
+        experiment,
+        sample=replace(experiment.sample, container=F.located("graphite capsule")),
+    )
+    oxygen = oxygen_condition(experiment, bench, None)
+    assert oxygen.selected is not None
+    assert oxygen.selected.route == "container_graphite_c_co_buffer"
+    expected = cco_buffered_fO2(
+        float(temperature_K), 1.0, reference_buffer=None
+    ).log10_fO2_bar
+    assert float(oxygen.selected.value.point) == float(expected)
+
+    unknown_pressure = replace(
+        experiment,
+        pressure_environment=replace(
+            experiment.pressure_environment,
+            total_pressure_Pa=replace(
+                experiment.pressure_environment.total_pressure_Pa,
+                state=State.unknown("run pressure not printed"),
+            ),
+        ),
+    )
+    unresolved = oxygen_condition(unknown_pressure, bench, None)
+    assert unresolved.selected is None
+
+    identity = replace(F.pref_identity(T_K=temperature_K), fO2_Pa=None)
+    pressure = _resolve_score_total_pressure(
+        identity,
+        Quantity.ACTIVITY,
+        experiment=unknown_pressure,
+    )
+    assert pressure[0] == 1.01325
+    assert pressure[1] == State.of(Decimal("101325"))
+    assert pressure[2] is not None
+    assert pressure[2].policy is not None
+    assert pressure[2].policy.id == "DP-001"
+    observation = F.observation(
+        "graphite-buffer-pressure-default",
+        unknown_pressure.experiment_id,
+        replace(identity, total_pressure_Pa=pressure[1]),
+        Decimal("1"),
+    )
+    observation = replace(observation, point_conditions={
+        field: control for field, control in observation.point_conditions.items()
+        if field != "total_pressure_Pa"
+    })
+    oxygen = oxygen_condition(unknown_pressure, bench, observation)
+    assert oxygen.selected is not None
+    assert oxygen.selected.route == "container_graphite_c_co_buffer"
+    assert "observation[graphite-buffer-pressure-default].identity.total_pressure_Pa" in oxygen.selected.inputs
+    expected_default_pressure = cco_buffered_fO2(
+        float(temperature_K), 1.01325, reference_buffer=None
+    ).log10_fO2_bar
+    assert float(oxygen.selected.value.point) == float(expected_default_pressure)
 
 
 def test_unresolved_tier_refuses_every_engine_alike() -> None:
@@ -613,6 +1141,7 @@ def test_non_multivalent_row_without_printed_fo2_omits_oxygen() -> None:
 
 def test_previously_refused_engines_now_predict(monkeypatch) -> None:
     seen: dict[str, float] = {}
+    physical_pressures: dict[str, float] = {}
 
     def _open(name):
         return type("Handle", (), {
@@ -621,8 +1150,9 @@ def test_previously_refused_engines_now_predict(monkeypatch) -> None:
             "unavailable_reason": None,
         })()
 
-    def _cell(handle, _pot, *, po2, **_kwargs):
+    def _cell(handle, _pot, *, po2, physical_pressure_bar, **_kwargs):
         seen[str(handle.name)] = po2.po2_bar
+        physical_pressures[str(handle.name)] = physical_pressure_bar
         return type("Cell", (), {
             "status": "ok",
             "refusal_reason": None,
@@ -645,23 +1175,31 @@ def test_previously_refused_engines_now_predict(monkeypatch) -> None:
         "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
         _cell,
     )
-    experiment, bench, observation = _feo_case()
+    low, high = Decimal("1"), Decimal("10")
+    experiment, bench, observation = _feo_case(
+        pressure=Value(ValueKind.INTERVAL, interval_low=low, interval_high=high),
+    )
+    experiment = replace(experiment, method=State.of(MethodToken.TABULATION))
     predictions = []
     for engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE, Engine.OPENIMCC):
         predictions.append(predict_with_engine(
             engine, observation, experiment=experiment, bench=bench, isolated=False,
         ))
     assert set(seen) == {"alphamelts", "thermoengine", "openimcc"}
+    assert physical_pressures == dict.fromkeys(seen, 3.1622776601683795e-5)
     assert len(set(seen.values())) == 1
     assert next(iter(seen.values())) is not None
     assert all(item.value is not None for item in predictions)
     assert all(item.refusal_reason is None for item in predictions)
     assert all(
         any(
-            notice.policy is not None
+            notice.kind is NoticeKind.FO2_DEFAULT_AMBIENT_AIR_UNPRINTED_ATMOSPHERE
+            and notice.policy is not None
             and notice.policy.id == "DP-010"
+            and "log10(fO2/bar)=-0.672064092852" in notice.reason
             and "fo2_tier=4" in notice.reason
-            and "borrowed" in notice.reason
+            and "original_reason=fO2 unprinted" in notice.reason
+            and "borrowed" not in notice.reason
             for notice in item.notices
         )
         for item in predictions
@@ -675,16 +1213,50 @@ def test_previously_refused_engines_now_predict(monkeypatch) -> None:
     )
     assert internal.value is not None
     assert internal.refusal_reason is None
+    for prediction in (*predictions, internal):
+        assert "total_pressure_interval_nominal" in flagged_strata(prediction.notices)
+        notice = next(n for n in prediction.notices if n.kind is NoticeKind.TOTAL_PRESSURE_INTERVAL_NOMINAL)
+        assert notice.policy.id == "DP-114"
+        assert notice.policy.status == "proposed"
+        assert "[1, 10] Pa" in notice.reason
+    pressure = predictions[0].identity.total_pressure_Pa.value
+    assert pressure == ApproxPressure(Decimal("3.162277660168379331998893544"), low, high, BandBasis.PRINTED)
     assert any(
-        notice.policy is not None
+        notice.kind is NoticeKind.FO2_DEFAULT_AMBIENT_AIR_UNPRINTED_ATMOSPHERE
+        and notice.policy is not None
         and notice.policy.id == "DP-010"
-        and notice.reason.startswith("DP-010 physics_rung=4:")
-        and "commanded_default_log10_bar=" in notice.reason
-        and "original_missing_evidence=" in notice.reason
-        and "fo2_tier=4" in notice.reason
-        and "borrowed" in notice.reason
+        and "log10(fO2/bar)=-0.672064092852" in notice.reason
+        and "original_reason=fO2 unprinted" in notice.reason
+        and "borrowed" not in notice.reason
         for notice in internal.notices
     )
+
+
+@pytest.mark.parametrize(("low", "high"), (
+    ("0", "10"), ("-1", "10"), ("10", "1"), ("1", "Infinity"),
+), ids=("zero", "negative", "inverted", "nonfinite"))
+def test_invalid_total_pressure_interval_refuses_before_adapter(monkeypatch, low, high):
+    recorded = Value(ValueKind.INTERVAL, interval_low=Decimal("1"), interval_high=Decimal("10"))
+    # Test the scorer's defense independently of Value's finite-edge validation.
+    object.__setattr__(recorded, "interval_low", Decimal(low))
+    object.__setattr__(recorded, "interval_high", Decimal(high))
+    experiment, bench, observation = _feo_case()
+    experiment = replace(
+        experiment, method=State.of(MethodToken.TABULATION),
+        pressure_environment=replace(
+            experiment.pressure_environment, total_pressure_Pa=F.located(recorded),
+        ),
+    )
+
+    def unexpected(*_args, **_kwargs):
+        pytest.fail("invalid recorded pressure reached the adapter")
+
+    monkeypatch.setattr("simulator.diagnostic_helpers.binary_pot_battery.open_battery_engine", unexpected)
+    prediction = predict_with_engine(
+        Engine.ALPHAMELTS, observation, experiment=experiment, bench=bench, isolated=False,
+    )
+    assert prediction.refusal_detail["reason"] == "total_pressure_invalid"
+    assert "total_pressure_interval_nominal" not in flagged_strata(prediction.notices)
 
 
 def test_tier_notice_reaches_the_residual() -> None:
@@ -695,6 +1267,9 @@ def test_tier_notice_reaches_the_residual() -> None:
         experiment,
         method=F.State.of(MethodToken.TABULATION),
         bench_id=bench.id,
+    )
+    observation = replace(
+        observation, identity=replace(observation.identity, per=State.of(PerBasis.DIMENSIONLESS)),
     )
     prediction = predict_with_engine(
         Engine.INTERNAL_ANALYTICAL,
@@ -718,16 +1293,33 @@ def test_tier_notice_reaches_the_residual() -> None:
         context=context,
         prediction=prediction,
     )
-    assert any(
-        notice.policy is not None
-        and notice.policy.id == "DP-010"
-        and notice.reason.startswith("DP-010 physics_rung=4:")
-        and "commanded_default_log10_bar=" in notice.reason
-        and "original_missing_evidence=" in notice.reason
-        and "fo2_tier=4" in notice.reason
-        and "borrowed" in notice.reason
+    ambient_notice = next(
+        notice
         for notice in residual.notices
+        if notice.kind is NoticeKind.FO2_DEFAULT_AMBIENT_AIR_UNPRINTED_ATMOSPHERE
     )
+    assert ambient_notice.policy is not None
+    assert ambient_notice.policy.id == "DP-010"
+    assert ambient_notice.policy.status == "proposed"
+    assert ambient_notice.policy.version == 2
+    assert "log10(fO2/bar)=-0.672064092852" in ambient_notice.reason
+    assert "fo2_tier=4" in ambient_notice.reason
+    assert "original_reason=fO2 unprinted" in ambient_notice.reason
+    assert "borrowed" not in ambient_notice.reason
+    assert prediction.value is not None and prediction.value.is_finite()
+    assert residual.numeric is not None
+    assert residual.numeric.value.is_finite()
+    assert FLAGGED_STRATUM_PROPOSED_POLICY in flagged_strata(residual.notices)
+    plain = residual_to_plain(residual)
+    assert _headline_payload_admits(plain, tier="measured") is False
+    plain_notice = next(
+        item
+        for item in plain["notices"]
+        if isinstance(item, dict)
+        and item.get("kind") == ambient_notice.kind.value
+    )
+    assert plain_notice["policy"]["id"] == "DP-010"
+    assert plain_notice["policy"]["status"] == "proposed"
 
 
 def test_closable_knudsen_row_is_one_effusion_closure() -> None:
@@ -1124,7 +1716,7 @@ def test_magemin_and_thermoengine_borrow_one_internal_closure(monkeypatch) -> No
     assert magemin.refusal_detail["observable"] == "vapour species"
 
 
-def test_carrier_gas_row_borrows_one_intrinsic_fo2(monkeypatch) -> None:
+def test_inert_carrier_row_uses_dp010_ambient_air(monkeypatch) -> None:
     from simulator.battery.records import SweepGas
     from tests.battery.test_silent_fills import _kems_partial
 
@@ -1192,20 +1784,16 @@ def test_carrier_gas_row_borrows_one_intrinsic_fo2(monkeypatch) -> None:
         "internal-analytical",
     }
     assert len(set(seen.values())) == 1
-    log = float(intrinsic_melt_fO2(
-        composition_wt_pct(observation.identity.composition.value),
-        float(observation.identity.temperature_K.value),
-    ))
-    assert next(iter(seen.values())) == 10.0 ** log
+    assert next(iter(seen.values())) == pytest.approx(0.2127825, abs=1e-15)
     assert all(
         any(
-            notice.policy is not None
+            notice.kind is NoticeKind.FO2_DEFAULT_AMBIENT_AIR_UNPRINTED_ATMOSPHERE
+            and notice.policy is not None
             and notice.policy.id == "DP-010"
-            and notice.reason.startswith("DP-010 physics_rung=4:")
-            and "commanded_default_log10_bar=" in notice.reason
-            and "original_missing_evidence=" in notice.reason
+            and "log10(fO2/bar)=-0.672064092852" in notice.reason
             and "fo2_tier=4" in notice.reason
-            and "borrowed" in notice.reason
+            and "original_reason=fO2 unprinted" in notice.reason
+            and "borrowed" not in notice.reason
             for notice in prediction.notices
         )
         for prediction in predictions[:-1]

@@ -112,6 +112,7 @@ def test_hot_round_trip_preserves_real_engine_consumer_view(
         cold = equilibrate_cell(
             handle, _REAL_POTS[0], temperature_K=2000.0,
             po2=Po2Request(mode="commanded", po2_bar=1e-8),
+            physical_pressure_bar=1.0,
             timeout_s=90.0, isolated=False,
         )
         assert cold.status in {"ok", "refusal"}, cold.as_payload()

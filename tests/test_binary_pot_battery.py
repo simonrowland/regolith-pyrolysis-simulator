@@ -23,6 +23,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     AUTHORITY_EXTRAPOLATED,
     BATTERY_ENGINE_NAMES,
     DEFAULT_POTS_PATH,
+    DIAGNOSTIC_ARM_BOUNDARY_PRESSURE_BAR,
     FINDING_CLASS_FALLBACK_VS_SPECIATION,
     OPENIMCC_ENGINE_NAMES,
     QUALIFICATION_SIO2_SWEEP_WT_PCT,
@@ -151,6 +152,48 @@ def test_run_engine_arm_closes_owned_handles_on_every_exit(
         assert run_engine_arm(engine_names=("fake",), pots=(pot,), grid=grid)["ok"]
 
     assert backend.close_calls == 1
+
+
+@pytest.mark.parametrize("arm", ("engine", "scoring"))
+def test_diagnostic_arms_pass_pressure_through_the_real_cell(monkeypatch, arm):
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.diagnostic_helpers import binary_pot_scoring as scoring
+    from simulator.melt_backend.base import EquilibriumResult
+
+    pressures = []
+
+    def adapter(*, pressure_bar, **_kwargs):
+        pressures.append(pressure_bar)
+        return EquilibriumResult(liquid_fraction=1.0)
+
+    handle = EngineHandle(
+        name="alphamelts", backend=SimpleNamespace(equilibrate=adapter),
+        available=True, unavailable_reason=None,
+        takes_fo2=True, supports_intrinsic_fo2=False,
+    )
+    handles = {"alphamelts": handle}
+    pot = BinaryPot("pressure-probe", None, "test fixture", {"SiO2": 80.0, "MgO": 20.0})
+    monkeypatch.setattr(
+        battery, "equilibrate_cell", partial(equilibrate_cell, isolated=False),
+    )
+    if arm == "engine":
+        run_engine_arm(
+            engine_names=("alphamelts",), handles=handles, pots=(pot,),
+            grid=BatteryGrid((1500.0,), False, (1e-8,)),
+        )
+    else:
+        scoring_pot = scoring.ScoringPot(
+            pot_id=pot.pot_id, source_id="fixture", observation_id="row",
+            sample_no=None, temperatures_K=(1500.0,), composition_basis="test",
+            composition_conversion="test", composition_as_printed=pot.composition_wt_pct,
+            composition_wt_pct=pot.composition_wt_pct, why=pot.why,
+        )
+        scoring.run_scoring_arm(
+            engine_names=("alphamelts",), handles=handles,
+            pots=(scoring_pot,), extract_paths=(),
+        )
+
+    assert pressures == [1e-6]
 
 
 def test_run_engine_arm_reopens_dead_backend_after_worker_death(
@@ -484,6 +527,115 @@ def test_nested_notice_walker_obeys_empty_quantity_scope():
         },
     }
     assert _nested_notice_flags(result) == []
+
+
+def test_reused_internal_analytical_core_drops_omitted_controls(monkeypatch):
+    import simulator.diagnostic_helpers.binary_pot_battery as battery
+    from simulator.state import Atmosphere, MeltState
+
+    snapshots: list[tuple] = []
+
+    class Core:
+        def __init__(self) -> None:
+            self.melt = MeltState()
+            self._last_vapor_pressure_diagnostic: dict = {}
+
+        def _new_atom_ledger(self):
+            return object()
+
+        def _load_ledger_account(self, *_args, **_kwargs):
+            return None
+
+        def _build_chemistry_kernel(self):
+            return None
+
+        def _refresh_vapor_pressures_from_kernel(self, equilibrium, **_kwargs):
+            reservoir = self.melt.oxygen_reservoir
+            snapshots.append(
+                (
+                    self.melt.p_total_mbar,
+                    self.melt.ambient_pressure_mbar,
+                    self.melt.atmosphere,
+                    self.melt.pO2_mbar,
+                    self.melt.fO2_log,
+                    self.melt.melt_fO2_log,
+                    reservoir.melt_intrinsic_fO2_log,
+                    reservoir.headspace_transport_pO2_bar,
+                    reservoir.headspace_ledger_pO2_bar,
+                )
+            )
+            equilibrium.vapor_pressures_Pa = {}
+            equilibrium.vapor_pressures_source = {}
+            self._last_vapor_pressure_diagnostic = {
+                "vapor_pressure_authority": {},
+            }
+
+    cores: list[Core] = []
+
+    def _new_core() -> Core:
+        core = Core()
+        cores.append(core)
+        return core
+
+    monkeypatch.setattr(battery, "_new_internal_analytical_core", _new_core)
+    composition = {"SiO2": 1.0}
+    reused = battery._InternalAnalyticalBatteryBackend()
+    reused.equilibrate(
+        1200.0,
+        composition,
+        pressure_bar=2.5,
+        po2_request=Po2Request(mode=battery.PO2_COMMANDED, po2_bar=1.0e-4),
+    )
+    pressureless = Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
+    reused.equilibrate(
+        1300.0,
+        composition,
+        pressure_bar=None,
+        po2_request=pressureless,
+    )
+    fresh = battery._InternalAnalyticalBatteryBackend()
+    fresh.equilibrate(
+        1300.0,
+        composition,
+        pressure_bar=None,
+        po2_request=pressureless,
+    )
+
+    assert len(cores) == 2
+    assert cores[0] is reused._core
+    assert snapshots[0][0] == 2500.0
+    assert snapshots[0][2] is Atmosphere.CONTROLLED_O2
+    assert snapshots[1] == snapshots[2]
+    assert snapshots[1][0] == 0.0
+    assert snapshots[1][1] == 0.0
+    assert snapshots[1][2] is Atmosphere.HARD_VACUUM
+    assert snapshots[1][3] == 0.0
+    assert snapshots[1][4] == -9.0
+    assert snapshots[1][5] == -9.0
+    assert snapshots[0] != snapshots[1]
+
+    before = len(snapshots)
+    reused.equilibrate(
+        1200.0,
+        composition,
+        pressure_bar=None,
+        po2_request=Po2Request(mode=battery.PO2_COMMANDED, po2_bar=1.0e-8),
+    )
+    assert len(snapshots) == before + 1
+    assert snapshots[-1][0] == 0.0
+    assert snapshots[-1][2] is Atmosphere.CONTROLLED_O2
+    assert snapshots[-1][3] == 1.0e-5
+
+    commanded = Po2Request(mode=battery.PO2_COMMANDED, po2_bar=3.0e-7)
+    reused.equilibrate(
+        1200.0, composition, pressure_bar=1.25, po2_request=commanded
+    )
+    reused.equilibrate(
+        1200.0, composition, pressure_bar=1.25, po2_request=commanded
+    )
+    assert snapshots[-1] == snapshots[-2]
+    assert snapshots[-1][0] == 1250.0
+    assert snapshots[-1][2] is Atmosphere.CONTROLLED_O2
 
 
 def test_internal_analytical_observation_oxygen_reaches_transport_unchanged(monkeypatch):
@@ -984,7 +1136,7 @@ def test_equilibrate_cell_refuses_invalid_fraction_without_assemblage():
     assert cell.refusal_reason == "liquid_fraction_invalid"
 
 
-def test_magemin_native_activity_uses_backend_fo2_default_when_uncommanded() -> None:
+def test_magemin_native_activity_receives_explicit_fo2_control() -> None:
     captured = {}
 
     class _Backend:
@@ -995,7 +1147,7 @@ def test_magemin_native_activity_uses_backend_fo2_default_when_uncommanded() -> 
             composition_kg,
             composition_mol,
             pressure_bar,
-            fO2_log=-9.0,
+            fO2_log,
             call_timeout_s=None,
             native_activity_formula=None,
         ):
@@ -1028,7 +1180,7 @@ def test_magemin_native_activity_uses_backend_fo2_default_when_uncommanded() -> 
     pot = BinaryPot(
         pot_id="magemin-uncommanded-fo2",
         kato_1993_table4_system=None,
-        why="native activity uses MAGEMin's declared default redox seed",
+        why="native activity receives a declared transport control",
         composition_wt_pct={"MgO": 50.0, "SiO2": 50.0},
     )
 
@@ -1036,7 +1188,7 @@ def test_magemin_native_activity_uses_backend_fo2_default_when_uncommanded() -> 
         handle,
         pot,
         temperature_K=1800.0,
-        po2=Po2Request(mode="not_an_input", po2_bar=None),
+        po2=Po2Request(mode="commanded", po2_bar=1e-9),
         native_activity_formula="MgO",
     )
 
@@ -1265,6 +1417,24 @@ def test_extract_preserves_valid_partial_pressures_and_reports_invalid_names() -
     assert invalid_pressures == ("Na2",)
 
 
+def test_invalid_gas_channel_diagnostics_survive_the_backend_cache_codec():
+    from simulator.melt_backend.base import (
+        INVALID_GAS_PARTIAL_PRESSURE_COMPONENTS,
+        EquilibriumResult,
+    )
+
+    result = EquilibriumResult(
+        status="non_authoritative",
+        diagnostics={INVALID_GAS_PARTIAL_PRESSURE_COMPONENTS: ["O2"]},
+    )
+    result.vaporock_full_speciation_Pa = {"K": 100.0}
+    restored = EquilibriumResult.from_engine_cache_value(
+        result.to_engine_cache_value(engine_id="vaporock"), engine_id="vaporock",
+    )
+    assert extract_reported_quantities(result) == ({}, {"K": 100.0}, ("O2",))
+    assert extract_reported_quantities(restored) == extract_reported_quantities(result)
+
+
 def test_alphamelts_cell_passes_isothermal_subprocess_run_mode() -> None:
     pot = BinaryPot(
         pot_id="fixture_pot",
@@ -1300,7 +1470,13 @@ def test_alphamelts_cell_passes_isothermal_subprocess_run_mode() -> None:
         takes_fo2=True,
         supports_intrinsic_fo2=False,
     )
-    cell = equilibrate_cell(handle, pot, temperature_K=1500.0, po2=po2)
+    cell = equilibrate_cell(
+        handle,
+        pot,
+        temperature_K=1500.0,
+        po2=po2,
+        physical_pressure_bar=1.0,
+    )
     assert cell.status == "ok"
     assert captured["subprocess_run_mode"] == "isothermal"
     assert captured["fO2_log"] is None
@@ -1309,6 +1485,42 @@ def test_alphamelts_cell_passes_isothermal_subprocess_run_mode() -> None:
     assert cell.melt_activities == {"SiO2": 0.5}
     assert cell.gas_partial_pressures_Pa == {"Na": 1.0}
     assert handle.available is True
+
+
+def test_alphamelts_without_physical_pressure_returns_input_refusal() -> None:
+    pot = BinaryPot(
+        pot_id="fixture_pot",
+        kato_1993_table4_system="CaO-Al2O3-SiO2",
+        why="fixture",
+        composition_wt_pct={"SiO2": 50.0, "CaO": 25.0, "Al2O3": 25.0},
+    )
+    po2 = Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
+
+    class _Backend:
+        _mode = "subprocess"
+
+        def equilibrate(self, **_kwargs):
+            raise AssertionError("AlphaMELTS must not receive an invented pressure")
+
+    handle = EngineHandle(
+        name="alphamelts",
+        backend=_Backend(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=False,
+    )
+    cell = equilibrate_cell(
+        handle,
+        pot,
+        temperature_K=1500.0,
+        po2=po2,
+        isolated=False,
+    )
+
+    assert cell.status == "refusal"
+    assert cell.refusal_reason == "total_pressure_required"
+    assert cell.engine_status == "input_refusal"
 
 
 def test_psat_without_fo2_on_fe_melt_keeps_green_scorer_request() -> None:
@@ -1399,6 +1611,7 @@ def test_multivalent_not_an_input_keeps_alphamelts_intrinsic_refusal() -> None:
         pot,
         temperature_K=1673.15,
         po2=Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None),
+        physical_pressure_bar=1.0,
         isolated=False,
         timeout_s=2.0,
     )
@@ -1490,6 +1703,7 @@ def test_not_an_input_refusal_stays_at_backend_boundary_for_multivalent_cell(
         pot,
         temperature_K=1673.15,
         po2=Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None),
+        physical_pressure_bar=1.0,
         isolated=False,
         timeout_s=2.0,
     )
@@ -2587,6 +2801,7 @@ def test_qualification_cell_carries_gate_notice_and_extrapolated_authority() -> 
         pot,
         temperature_K=1700.0,
         po2=po2,
+        physical_pressure_bar=DIAGNOSTIC_ARM_BOUNDARY_PRESSURE_BAR,
         qualification=True,
         isolated=False,
     )
@@ -3292,6 +3507,7 @@ def test_qualification_inline_adapter_gate_is_gate_refused_in_adapter() -> None:
         pot,
         temperature_K=1700.0,
         po2=po2,
+        physical_pressure_bar=DIAGNOSTIC_ARM_BOUNDARY_PRESSURE_BAR,
         qualification=True,
         isolated=False,
     )
@@ -3366,6 +3582,7 @@ def _inline_death_cell(*, annotated: bool):
         pot,
         temperature_K=1700.0,
         po2=po2,
+        physical_pressure_bar=DIAGNOSTIC_ARM_BOUNDARY_PRESSURE_BAR,
         qualification=True,
         isolated=False,
     )

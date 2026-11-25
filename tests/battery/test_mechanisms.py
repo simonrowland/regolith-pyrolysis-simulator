@@ -3155,6 +3155,9 @@ def test_r04_domain_extrapolation_projection_are_unknown_kinds() -> None:
     with pytest.raises(ValueError):
         NoticeKind("projection")
     assert NoticeKind.OUT_OF_CERTIFIED_BAND.value == "out_of_certified_band"
+    assert NoticeKind.ASSUMED_PRESSURE.value == "assumed_pressure"
+    assert NoticeKind.METHOD_IMPLIED.value == "method_implied"
+    assert NoticeKind.ASSUMED_FO2.value == "assumed_fo2"
     assert NoticeKind.COMPOSITION_PROJECTED.value == "composition_projected"
     assert (
         NoticeKind.COMPOSITION_BINARY_COMPLEMENT.value

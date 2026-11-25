@@ -115,6 +115,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterator, List, Mapping, NoReturn, Optional, Sequence, Tuple
 
 from engines.domain_reason import OutOfDomainReason
+from engines.magemin.constants import MAGEMIN_NOMINAL_FO2_LOG
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.fe_redox import RedoxState, normalize_redox_state
 from simulator.oxygen_buffers import (
@@ -1817,7 +1818,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         self,
         temperature_C: float,
         composition_kg: Optional[Dict[str, float]] = None,
-        fO2_log: float = -9.0,
+        fO2_log: Optional[float] = None,
         pressure_bar: float = 1e-6,
         *,
         composition_mol: Optional[Dict[str, float]] = None,
@@ -1865,6 +1866,15 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             )
 
         prior_warnings: List[str] = []
+        omitted_oxygen = fO2_log is None
+        if omitted_oxygen:
+            # d-460: MAGEMin is callable, so use its declared nominal
+            # transport control and preserve the omission as a per-call flag.
+            fO2_log = MAGEMIN_NOMINAL_FO2_LOG
+            prior_warnings.append(
+                f'MAGEMin used nominal fO2_log={MAGEMIN_NOMINAL_FO2_LOG} '
+                'because oxygen was omitted'
+            )
         dropped_accounts: List[str] = []
         dropped_account_species: Dict[str, Tuple[str, ...]] = {}
         if projected_oxide_wt_pct is not None:
@@ -1995,6 +2005,11 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 bulk_projection
             ),
         )
+        if omitted_oxygen:
+            result_diagnostics['magemin_omitted_oxygen_default'] = {
+                'value': MAGEMIN_NOMINAL_FO2_LOG,
+                'reason': 'oxygen input omitted; nominal MAGEMin transport control applied',
+            }
         if bulk_projection.dropped_components:
             # A result for a different (projected) bulk is not a result for
             # this one. Do not call MAGEMin on the truncated vector.
@@ -2279,7 +2294,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
     def find_liquidus_solidus(
         self,
         composition_kg: Optional[Dict[str, float]] = None,
-        fO2_log: float = -9.0,
+        fO2_log: float = MAGEMIN_NOMINAL_FO2_LOG,
         pressure_bar: float = 1e-6,
         *,
         composition_mol: Optional[Dict[str, float]] = None,
@@ -4344,7 +4359,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 bulk_projection=projection,
                 temperature_C=temperature_C,
                 pressure_kbar=pressure_kbar,
-                fO2_log=-9.0,
+                fO2_log=MAGEMIN_NOMINAL_FO2_LOG,
                 capture_native_activities=True,
             )
         )
@@ -4396,7 +4411,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         # This accessor reads pre-minimisation standard-state endmember G,
         # not an equilibrium at -9. Preserve the native control failure as
         # a notice rather than certifying the probe's arbitrary redox input.
-        control = self._fo2_operating_point(-9.0, native_log, buffer_present)
+        control = self._fo2_operating_point(
+            MAGEMIN_NOMINAL_FO2_LOG, native_log, buffer_present
+        )
         buffer_warnings.append(
             f'MAGEMin pure-phase native fO2 readback: {control}'
         )

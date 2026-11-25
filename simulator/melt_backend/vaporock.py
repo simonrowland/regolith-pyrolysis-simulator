@@ -135,6 +135,7 @@ from simulator.engine_pool import (
     WarmEngineWorker,
 )
 from simulator.melt_backend.base import (
+    INVALID_GAS_PARTIAL_PRESSURE_COMPONENTS,
     CLEANED_MELT_ACCOUNT,
     DEFAULT_BACKEND_CAPABILITIES,
     EquilibriumResult,
@@ -399,19 +400,51 @@ def vaporock_liquid_fraction_admitted(
 
 
 def vaporock_pressure_bar_admitted(pressure_bar: Any) -> bool:
-    """True when *pressure_bar* is a finite positive total pressure.
+    """True when *pressure_bar* is absent or is a finite positive pressure.
 
-    Total pressure is in bar. P > 0 because a thermodynamic cell
-    coordinate cannot be zero or negative: vacuum is approached by a
-    small positive P (this adapter's default is 1e-6 bar). Non-finite
-    values are not a pressure. Applied on the ``equilibrate`` entry
-    path; this helper does not wrap other callers.
+    Total pressure is diagnostic-only on the VapoRock System path, which
+    omits its optional P argument. When a pressure is supplied, it is in
+    bar and must be positive and finite. Applied on the ``equilibrate``
+    entry path; this helper does not wrap other callers.
     """
+    if pressure_bar is None:
+        return True
     try:
         value = float(pressure_bar)
     except (TypeError, ValueError):
         return False
     return math.isfinite(value) and value > 0.0
+
+
+def _single_positive_non_oxide(composition: Mapping[str, Any] | None) -> str | None:
+    """One positive elemental component other than oxygen.
+
+    VapoRock equilibrates a silicate melt. A pure metal is the saturation
+    observable of another owner, not an omitted-fO2 melt.
+    """
+
+    if not composition:
+        return None
+    positive: list[str] = []
+    for name, amount in composition.items():
+        try:
+            number = float(amount)
+        except (TypeError, ValueError):
+            return None
+        if not math.isfinite(number) or number < 0.0:
+            return None
+        if number > 0.0:
+            positive.append(str(name))
+    if len(positive) != 1:
+        return None
+    from simulator.reference_data.janaf import formula_elements
+
+    # Element tokens, not letters: "Mo" has no oxygen. An unparseable
+    # name is not a pure metal.
+    elements = formula_elements(positive[0])
+    if elements != (positive[0],) or positive[0] == "O":
+        return None
+    return positive[0]
 
 
 def vaporock_fo2_log_admitted(fO2_log: Any) -> bool:
@@ -603,7 +636,7 @@ def _speciation_value_stats(
     for _species, raw in items:
         try:
             value = float(raw)
-        except (TypeError, ValueError):
+        except (TypeError, ValueError, OverflowError):
             stats['speciation_other_nonfinite_count'] += 1
             continue
         if math.isnan(value):
@@ -809,22 +842,16 @@ def _serialize_log10_bar_pressures(
     for species, log10_bar in items:
         try:
             value = float(log10_bar)
-        except (TypeError, ValueError):
-            continue
-        if math.isfinite(value):
-            out[str(species)] = value
-        elif math.isinf(value) and value < 0.0:
+        except (TypeError, ValueError, OverflowError):
+            value = float('nan')
+        if value == -math.inf:
             proven_empty.append(str(species))
-    if not out:
+        else:
+            out[str(species)] = value
+    if not stats['speciation_finite_count']:
         # Failed / all-nonfinite table. Do not attach the inventory
         # sidecar: -inf rows on a NaN table must not rehabilitate the
         # cell as an all-zero success.
-        if int(stats['speciation_finite_count']) != 0:
-            raise RuntimeError(
-                'serializer emptied a table that still had finite log10_bar '
-                'values; Pa conversion happens parent-side — add a '
-                'EmptySpeciationCause token'
-            )
         return {}, _serialize_cause_payload(
             EmptySpeciationCause.NO_FINITE_VALUES, stats
         )
@@ -935,8 +962,18 @@ def _call_system_eval_gas_abundances(
                 ln_activity,
                 composition_wt_pct=composition,
             )
+        else:
+            logP = eval_gas_abundances(temperature, log_fO2)
+        # System builds the gas table on the installed reaction index.
+        # Represent omissions as invalid rows before the warm worker flattens it.
+        if hasattr(logP, 'reindex'):
+            reactions = getattr(getattr(system, 'vapor', None), 'rxn_coefs', None)
+            if hasattr(reactions, 'index'):
+                missing = reactions.index.difference(logP.index)
+                if len(missing):
+                    logP = logP.reindex(logP.index.union(missing, sort=False))
+        if include_oxide_activities:
             return logP, oxide_activity
-        logP = eval_gas_abundances(temperature, log_fO2)
     except Exception as exc:
         if isinstance(exc, VapoRockCallError):
             raise
@@ -1412,6 +1449,7 @@ class VapoRockBackend(MeltBackend):
         self._last_empty_speciation_reason: Optional[str] = None
         self._last_empty_speciation_error: Optional[Dict[str, str]] = None
         self._last_silent_zero_notes: List[Dict[str, Any]] = []
+        self._last_invalid_pressure_components: set[str] = set()
         # Warm pool (DESIGN-REV5 §5.5 / VR-5). Opt-in: calibration runners
         # and live warm-path tests pass warm_worker=True. Default off so
         # the diagnostic shadow and corpus harnesses do not spawn a pool
@@ -1745,7 +1783,7 @@ class VapoRockBackend(MeltBackend):
         temperature_C: float,
         composition_kg: Optional[Dict[str, float]] = None,
         fO2_log: float = -9.0,
-        pressure_bar: float = 1e-6,
+        pressure_bar: float | None = 1e-6,
         *,
         composition_mol: Optional[Dict[str, float]] = None,
         composition_mol_by_account: Optional[
@@ -1777,9 +1815,9 @@ class VapoRockBackend(MeltBackend):
         ``pressure_bar`` remains diagnostic-only: the System path in this
         adapter does not pass total pressure through to the engine
         (upstream accepts optional ``P``; this adapter omits it).
-        Non-finite, zero, or negative ``pressure_bar``, and non-finite
-        ``fO2_log``, are refused on this entry path before any engine
-        call.
+        ``None`` therefore carries no pressure input. Non-finite, zero, or
+        negative supplied ``pressure_bar``, and non-finite ``fO2_log``, are
+        refused on this entry path before any engine call.
 
         ``EquilibriumResult.ledger_transition`` is left ``None`` and no
         phase assemblage is reported: VapoRock holds no ``AtomLedger``
@@ -1836,7 +1874,9 @@ class VapoRockBackend(MeltBackend):
                 'temperature_input_category': 'non_finite',
                 'vaporock_t_min_K': VAPOROCK_T_MIN_K,
                 'vaporock_t_max_K': VAPOROCK_T_MAX_K,
-                'requested_pressure_bar': float(pressure_bar),
+                'requested_pressure_bar': (
+                    None if pressure_bar is None else float(pressure_bar)
+                ),
                 'pressure_control_authoritative': False,
             }
             return EquilibriumResult(
@@ -1878,7 +1918,9 @@ class VapoRockBackend(MeltBackend):
                 'liquid_fraction': liquid_diag,
                 'vaporock_min_liquid_fraction': VAPOROCK_MIN_LIQUID_FRACTION,
                 'temperature_K': float(temperature_K),
-                'requested_pressure_bar': float(pressure_bar),
+                'requested_pressure_bar': (
+                    None if pressure_bar is None else float(pressure_bar)
+                ),
                 'pressure_control_authoritative': False,
             }
             return EquilibriumResult(
@@ -1931,6 +1973,35 @@ class VapoRockBackend(MeltBackend):
             )
 
         if not vaporock_fo2_log_admitted(fO2_log):
+            pure_metal = _single_positive_non_oxide(composition_kg)
+            if pure_metal is None:
+                pure_metal = _single_positive_non_oxide(composition_mol)
+            if pure_metal is not None:
+                return EquilibriumResult(
+                    temperature_C=temperature_C,
+                    pressure_bar=pressure_bar,
+                    fO2_log=fO2_log,
+                    liquid_fraction=liquid_fraction,
+                    phase_assemblage_available=False,
+                    status='out_of_domain',
+                    warnings=[
+                        'VapoRock does not compute pure-substance saturation '
+                        f'of {pure_metal}; a pure metal reservoir is not a '
+                        'silicate melt'
+                    ],
+                    diagnostics={
+                        **melt_envelope_diagnostics,
+                        'backend_status_reason': (
+                            OutOfDomainReason.UNSUPPORTED_INPUT.value
+                        ),
+                        'temperature_K': float(temperature_K),
+                        'requested_pressure_bar': (
+                            None if pressure_bar is None else float(pressure_bar)
+                        ),
+                        'pressure_control_authoritative': False,
+                        'pure_substance': pure_metal,
+                    },
+                )
             try:
                 fo2_diag: Any = float(fO2_log)
                 if not math.isfinite(fo2_diag):
@@ -1941,7 +2012,9 @@ class VapoRockBackend(MeltBackend):
                 **melt_envelope_diagnostics,
                 'backend_status_reason': OutOfDomainReason.INVALID_FO2_LOG.value,
                 'temperature_K': float(temperature_K),
-                'requested_pressure_bar': float(pressure_bar),
+                'requested_pressure_bar': (
+                    None if pressure_bar is None else float(pressure_bar)
+                ),
                 'fO2_log': fo2_diag,
                 'pressure_control_authoritative': False,
             }
@@ -2108,11 +2181,12 @@ class VapoRockBackend(MeltBackend):
             if self._temperature_units == 'K'
             else temperature_C
         )
-        pressure_value = (
-            pressure_bar * PA_PER_BAR
-            if self._pressure_units == 'Pa'
-            else pressure_bar
-        )
+        if pressure_bar is None:
+            pressure_value = None
+        elif self._pressure_units == 'Pa':
+            pressure_value = pressure_bar * PA_PER_BAR
+        else:
+            pressure_value = pressure_bar
 
         try:
             vaporock_output = self._call_vaporock(
@@ -2179,7 +2253,9 @@ class VapoRockBackend(MeltBackend):
                 'sum_pressure_bar': float(sum_bar),
                 'vaporock_max_sum_pressure_bar': VAPOROCK_MAX_SUM_PRESSURE_BAR,
                 'temperature_K': float(temperature_K),
-                'requested_pressure_bar': float(pressure_bar),
+                'requested_pressure_bar': (
+                    None if pressure_bar is None else float(pressure_bar)
+                ),
                 'pressure_control_authoritative': False,
             })
             return EquilibriumResult(
@@ -2219,7 +2295,9 @@ class VapoRockBackend(MeltBackend):
             projection_diagnostics.update({
                 'pressure_control_authoritative': False,
                 'pressure_control_reason': pressure_authority_warning,
-                'requested_pressure_bar': float(pressure_bar),
+                'requested_pressure_bar': (
+                    None if pressure_bar is None else float(pressure_bar)
+                ),
                 'temperature_K': float(temperature_K),
                 'sum_pressure_bar': float(sum_bar),
             })
@@ -2229,6 +2307,10 @@ class VapoRockBackend(MeltBackend):
             projection_diagnostics['temperature_K'] = float(temperature_K)
             projection_diagnostics['sum_pressure_bar'] = float(sum_bar)
 
+        if self._last_invalid_pressure_components:
+            projection_diagnostics[INVALID_GAS_PARTIAL_PRESSURE_COMPONENTS] = sorted(
+                self._last_invalid_pressure_components
+            )
         if self._last_silent_zero_notes:
             merge_notes_into_mapping(
                 projection_diagnostics, self._last_silent_zero_notes
@@ -2359,6 +2441,7 @@ class VapoRockBackend(MeltBackend):
         self._last_empty_speciation_reason = None
         self._last_empty_speciation_error = None
         self._last_silent_zero_notes = []
+        self._last_invalid_pressure_components.clear()
 
     def _latch_empty_speciation(
         self,
@@ -2376,7 +2459,7 @@ class VapoRockBackend(MeltBackend):
         self,
         composition_wt_pct: Dict[str, float],
         temperature: float,
-        pressure: float,
+        pressure: float | None,
         fO2_log: float,
         include_oxide_activities: bool = False,
     ) -> Any:
@@ -2818,21 +2901,19 @@ class VapoRockBackend(MeltBackend):
             parent = _parent_oxide_for_vaporock_gas(raw_species)
             if parent is None:
                 parent = _parent_oxide_for_vaporock_gas(key)
-            if parent is not None and not _parent_oxide_is_empty(
-                composition_wt_pct, parent
-            ):
+            if parent is None or not _parent_oxide_is_empty(composition_wt_pct, parent):
+                self._last_invalid_pressure_components.add(key)
                 continue
             if key in pressures and pressures[key] != 0.0:
                 continue
             pressures[key] = 0.0
-            oxide_name = parent or 'unknown_parent_oxide'
             self._last_silent_zero_notes.append(
                 note_dict(
                     ZeroBecause.PROVEN_EMPTY_INVENTORY,
                     site='vaporock.eval_gas_abundances.inventory_mask',
                     species=key,
                     field='pressure_Pa',
-                    detail=_proven_empty_inventory_detail(oxide_name),
+                    detail=_proven_empty_inventory_detail(parent),
                     doctrine_category=CATEGORY_PROVEN_ZERO,
                 )
             )
@@ -2866,7 +2947,7 @@ class VapoRockBackend(MeltBackend):
         recovered.
 
         ``NaN`` on a species whose parent oxide is present is a failed
-        evaluation of that row and is dropped, not converted to zero.
+        evaluation of that row; its name is retained as an invalid channel.
         A table with no finite log10(bar) values (the 30 NaN + 8 -inf
         failed-solve shape) still refuses: the -inf rows must not
         rehabilitate the cell as an all-zero success. A species absent
@@ -2874,6 +2955,7 @@ class VapoRockBackend(MeltBackend):
         invented here.
         """
         self._last_silent_zero_notes = []
+        self._last_invalid_pressure_components.clear()
         if raw is None:
             if self._last_empty_speciation_cause is None:
                 self._latch_empty_speciation(EmptySpeciationCause.PAYLOAD_ABSENT)
@@ -2900,16 +2982,20 @@ class VapoRockBackend(MeltBackend):
         pressures: Dict[str, float] = {}
         neginf_species: List[Any] = []
         for species, log10_bar in items:
+            key = self._strip_gas_suffix(species)
             try:
                 value = float(log10_bar)
-            except (TypeError, ValueError):
-                continue
-            if math.isfinite(value):
+                if value == -math.inf:
+                    neginf_species.append(species)
+                    continue
                 pressure_pa = (10.0 ** value) * PA_PER_BAR
-                if pressure_pa > 0.0:
-                    pressures[self._strip_gas_suffix(species)] = pressure_pa
-            elif math.isinf(value) and value < 0.0:
-                neginf_species.append(species)
+            except (TypeError, ValueError, OverflowError):
+                self._last_invalid_pressure_components.add(key)
+                continue
+            if math.isfinite(pressure_pa) and pressure_pa > 0.0:
+                pressures[key] = pressure_pa
+            else:
+                self._last_invalid_pressure_components.add(key)
         if proven_empty_species:
             neginf_species.extend(proven_empty_species)
         if not pressures:
@@ -2924,6 +3010,10 @@ class VapoRockBackend(MeltBackend):
         self._retain_proven_empty_inventory(
             pressures, neginf_species, composition_wt_pct
         )
+        # The System contract always reports molecular oxygen. A warm
+        # payload missing that row cannot establish a complete gas sum.
+        if 'O2' not in pressures:
+            self._last_invalid_pressure_components.add('O2')
         return pressures
 
     @staticmethod

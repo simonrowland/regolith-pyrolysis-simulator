@@ -1755,10 +1755,11 @@ def test_readonly_mode_serves_hits_and_solves_misses_without_writing(
 ) -> None:
     database = tmp_path / "engine-cache.sqlite"
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
-    digest = engine_cache_key("vaporock", "1", {"temperature_K": 900.0})
+    version = engine_cache.ENGINE_CHEMISTRY_VERSION["vaporock"]
+    digest = engine_cache_key("vaporock", version, {"temperature_K": 900.0})
     load_cache_rows(
         database,
-        [(digest, {"pressure": 2.0}, "vaporock", "1", "box-b", 2001)],
+        [(digest, {"pressure": 2.0}, "vaporock", str(version), "box-b", 2001)],
     )
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE_MODE", "readonly")
     _engine_cache_counters(reset=True)

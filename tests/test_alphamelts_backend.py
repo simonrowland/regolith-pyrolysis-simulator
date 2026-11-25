@@ -10920,7 +10920,8 @@ def test_battery_melts_observation_reaches_gas_projection_and_resets(
     cell = equilibrate_cell(
         EngineHandle(backend.backend_name, backend, True, None, True, False),
         BinaryPot('observation', None, 'transport receipt', _melts_domain_composition()),
-        temperature_K=1873.15, po2=Po2Request('commanded', gas_bar), isolated=False,
+        temperature_K=1873.15, po2=Po2Request('commanded', gas_bar),
+        physical_pressure_bar=1.0, isolated=False,
     )
     assert cell.status == 'ok', cell.engine_reason
     assert native_inputs == [math.log10(gas_bar)]
@@ -10971,7 +10972,10 @@ def test_battery_melts_invalid_observation_refuses_before_native(
         EngineHandle(backend.backend_name, backend, True, None, True, False),
         BinaryPot('invalid', None, 'invalid oxygen', _melts_domain_composition()),
     )
-    kwargs = dict(temperature_K=1873.15, po2=Po2Request('commanded', gas_bar), isolated=False)
+    kwargs = dict(
+        temperature_K=1873.15, po2=Po2Request('commanded', gas_bar),
+        physical_pressure_bar=1.0, isolated=False,
+    )
     if gas_bar <= 0:
         with pytest.raises(ValueError):
             equilibrate_cell(*args, **kwargs)

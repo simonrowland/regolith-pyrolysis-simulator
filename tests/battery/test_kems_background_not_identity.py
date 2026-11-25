@@ -19,7 +19,7 @@ from pathlib import Path
 import yaml
 
 from simulator.battery.consumer_inputs import collect_consumer_inputs
-from simulator.battery.enums import MethodToken, Quantity, ValueKind
+from simulator.battery.enums import MethodToken, NoticeKind, Quantity, ValueKind
 from simulator.battery.generators.bench import (
     engine_point_requests,
     kems_case,
@@ -533,8 +533,13 @@ def test_knudsen_chamber_vacuum_not_commanded_oxygen_for_melt_activity() -> None
     )
     assert resolved is not None
     assert resolved.tier == 4
-    assert resolved.route == "intrinsic_melt_fO2"
-    assert resolved.borrowed is True
+    assert resolved.route == "fo2_vacuum_cell_proxy"
+    assert resolved.borrowed is False
+    from simulator.battery.fo2_ladder import fo2_tier_notice
+
+    assert fo2_tier_notice(Quantity.ACTIVITY, resolved).kind is (
+        NoticeKind.FO2_VACUUM_CELL_PROXY
+    )
     melt = list(
         melt_activity_requests(
             inputs,
@@ -551,8 +556,8 @@ def test_knudsen_chamber_vacuum_not_commanded_oxygen_for_melt_activity() -> None
     assert commanded
     assert all(item["fO2_log"] == resolved.log10_fO2_bar for item in commanded)
     assert all(item["fO2_tier"] == 4 for item in commanded)
-    assert all(item["fO2_route"] == "intrinsic_melt_fO2" for item in commanded)
-    assert all(item["fO2_borrowed"] is True for item in commanded)
+    assert all(item["fO2_route"] == "fo2_vacuum_cell_proxy" for item in commanded)
+    assert all(item["fO2_borrowed"] is False for item in commanded)
     openimcc = activity_request_for_engine(experiment, observation, "openimcc")
     assert openimcc is not None
     assert openimcc.payload is not None

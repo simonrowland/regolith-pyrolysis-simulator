@@ -1824,7 +1824,7 @@ def test_dp002_applicability_uses_registered_pressure_evidence() -> None:
 
 
 def test_registered_method_pressure_precedes_the_unbound_default() -> None:
-    from simulator.battery.score import PA_PER_BAR_DEC, _condensed_pressure_for_score
+    from simulator.battery.score import PA_PER_BAR_DEC, _resolve_score_total_pressure
     from tests.battery import factories as F
 
     identity = replace(
@@ -1853,13 +1853,25 @@ def test_registered_method_pressure_precedes_the_unbound_default() -> None:
         )
         if point_conditions is not None:
             observation = replace(observation, point_conditions=point_conditions)
-        return _condensed_pressure_for_score(
+        (
+            pressure_bar,
+            pressure_state,
+            pressure_notice,
+            invalid,
+        ) = _resolve_score_total_pressure(
             identity,
-            observation,
-            experiment,
-            None,
             Quantity.ACTIVITY,
+            observation=observation,
+            experiment=experiment,
         )
+        assert invalid is None
+        resolved = (
+            identity
+            if pressure_state is None
+            else replace(identity, total_pressure_Pa=pressure_state)
+        )
+        notices = () if pressure_notice is None else (pressure_notice,)
+        return resolved, pressure_bar, notices
 
     gas = replace(
         without_run_pressure(F.tabulation_experiment(experiment_id="gas-mix")),
@@ -1887,9 +1899,11 @@ def test_registered_method_pressure_precedes_the_unbound_default() -> None:
     ):
         resolved, pressure_bar, notices = resolve(experiment)
         assert resolved.total_pressure_Pa == State.of(Decimal("101325"))
-        assert pressure_bar == Decimal("101325") / PA_PER_BAR_DEC
+        assert pressure_bar == float(Decimal("101325") / PA_PER_BAR_DEC)
         assert any(
-            notice.policy is not None and notice.policy.id == "DP-002" and marker in notice.reason
+            notice.policy is not None
+            and notice.policy.id == "DP-002"
+            and marker in notice.reason
             for notice in notices
         ), f"DP-002 {marker}"
         assert not any(
@@ -1902,7 +1916,7 @@ def test_registered_method_pressure_precedes_the_unbound_default() -> None:
         {"atmosphere": Located(State.of("air"), locator=Locator(note="located air"))},
     )
     assert air_identity.total_pressure_Pa == State.of(Decimal("101325"))
-    assert air_bar == Decimal("101325") / PA_PER_BAR_DEC
+    assert air_bar == float(Decimal("101325") / PA_PER_BAR_DEC)
     assert any(
         notice.policy is not None
         and notice.policy.id == "DP-002"
@@ -1912,7 +1926,7 @@ def test_registered_method_pressure_precedes_the_unbound_default() -> None:
 
     unbound_identity, unbound_bar, unbound_notices = resolve(unbound)
     assert unbound_identity.total_pressure_Pa == State.of(Decimal("101325"))
-    assert unbound_bar == Decimal("101325") / PA_PER_BAR_DEC
+    assert unbound_bar == float(Decimal("101325") / PA_PER_BAR_DEC)
     assert any(
         notice.policy is not None
         and notice.policy.id == "DP-001"
@@ -1924,10 +1938,14 @@ def test_registered_method_pressure_precedes_the_unbound_default() -> None:
         for notice in unbound_notices
     )
 
-    chamber_identity, _chamber_bar, chamber_notices = resolve(knudsen)
-    assert chamber_identity.total_pressure_Pa == State.of(Decimal("101325"))
-    assert chamber_identity.total_pressure_Pa != State.of(Decimal("1e-6"))
+    chamber_identity, chamber_bar, chamber_notices = resolve(knudsen)
+    assert chamber_bar is None
+    assert chamber_identity.total_pressure_Pa == identity.total_pressure_Pa
     assert any(
+        notice.policy is not None and notice.policy.id == "DP-004"
+        for notice in chamber_notices
+    )
+    assert not any(
         notice.policy is not None and notice.policy.id == "DP-001"
         for notice in chamber_notices
     )

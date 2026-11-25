@@ -87,7 +87,7 @@ _AIR = (
     ),
 )
 
-_PRESSURE = (
+_PRESSURE_WAYPOINT = (
     (
         ROOT / "simulator/battery/score.py",
         """        waypoint = _prediction_pressure_waypoint(
@@ -98,23 +98,38 @@ _PRESSURE = (
         """        waypoint = pressure_boundary(experiment, bench, observation).selected
 """,
     ),
+)
+
+_PRESSURE_DP002 = (
     (
         ROOT / "simulator/battery/score.py",
-        """        policy_pa, policy_notice = _dp002_pressure_default(
+        """        policy_pressure, policy_notice = _dp002_pressure_default(
             experiment.ambient_pressure_evidence,
             quantity,
             atmosphere_condition=(observation.point_conditions or {}).get(
                 "atmosphere"
-            ),
-        )
-        if policy_pa is not None:
-            return (
-                replace(identity, total_pressure_Pa=State.of(policy_pa)),
-                policy_pa / PA_PER_BAR_DEC,
-                () if policy_notice is None else (policy_notice,),
             )
+            if observation is not None
+            else None,
+        )
 """,
-        "",
+        """        policy_pressure, policy_notice = None, None
+""",
+    ),
+)
+
+_PRESSURE = _PRESSURE_WAYPOINT + _PRESSURE_DP002
+
+_DP002_APPLICABILITY = (
+    (
+        ROOT / "simulator/battery/waypoints.py",
+        """                if pressure is None and _dp002_applicability(
+                    experiment.ambient_pressure_evidence,
+                    atmosphere_condition=atmosphere_condition,
+                ) is not None:
+""",
+        """                if pressure is None and experiment.ambient_pressure_evidence is not None:
+""",
     ),
 )
 
@@ -326,6 +341,12 @@ MUTATIONS = {
         "tests/battery/test_printed_oxygen_identity.py::"
         "test_registered_method_pressure_precedes_the_unbound_default",
         "DP-002",
+    ),
+    "dp002-applicability": (
+        _DP002_APPLICABILITY,
+        "tests/battery/test_fo2_ladder.py::"
+        "test_printed_gas_mix_rejects_unregistered_pressure_evidence",
+        "observation_gas_composition_method_implied_pressure",
     ),
     "phase-census": (
         _PHASE_CENSUS,

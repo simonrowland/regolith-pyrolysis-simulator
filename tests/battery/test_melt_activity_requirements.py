@@ -5,8 +5,8 @@ point temperature, and a reference state that matches the engine. For melt
 activity, oxygen is required when the composition or measured species holds
 a multivalent element. That oxygen is one fO2 from the row ladder, the same
 value on every engine. Other quantities follow their identity input profile.
-Pressure is not an input, and a missing required input is refused rather than
-defaulted.
+Pressure is not an activity input; the fO2 ladder applies its stated fallback
+when needed.
 """
 
 from dataclasses import replace
@@ -435,8 +435,8 @@ def test_no_iron_without_oxygen_is_ready_and_engine_point_stays_gap():
     )
 
 
-def test_iron_without_oxygen_is_a_typed_refusal():
-    """No printed fO2: every liquid-basis engine gets the same borrowed fO2.
+def test_iron_without_oxygen_uses_dp010_ambient_air():
+    """No printed ferric ratio or controlling apparatus: use proposed DP-010.
 
     MAGEMin still refuses the liquid reference. engine_point stays on the
     oxygen gap; the ladder does not fill that consumer.
@@ -458,8 +458,15 @@ def test_iron_without_oxygen_is_a_typed_refusal():
     assert all(item.payload is not None for item in comparable)
     assert len({item.payload["fO2_log"] for item in comparable}) == 1
     assert all(item.payload["fO2_tier"] == 4 for item in comparable)
-    assert all(item.payload["fO2_route"] == "intrinsic_melt_fO2" for item in comparable)
-    assert all(item.payload["fO2_borrowed"] is True for item in comparable)
+    assert all(
+        item.payload["fO2_route"] == "dp010_ambient_air_unprinted_atmosphere"
+        for item in comparable
+    )
+    assert all(item.payload["fO2_borrowed"] is False for item in comparable)
+    assert all(
+        item.payload["fO2_log"] == pytest.approx(-0.672064092852, abs=5e-13)
+        for item in comparable
+    )
     magemin = next(item for item in results if item.readiness.engine == "magemin")
     assert magemin.readiness.status is ReadinessStatus.NOT_APPLICABLE
     assert magemin.payload is None

@@ -153,21 +153,43 @@ policies:
     canonized_at: "2026-11-23"
     history: []
   - id: DP-010
-    condition: "fO2 unprinted on a phase, redox, or activity row after printed and registered source evidence"
-    formula: "the oxygen ladder's existing last rung: intrinsic melt fO2 (fo2_tier_notice, tier 4)"
-    formula_owner: "simulator.battery.fo2_ladder.fo2_tier_notice"
+    condition: "fO2 unprinted and no printed ferric ratio or determining method/apparatus control"
+    formula: "pO2 = 0.21 atm; log10(fO2/bar) = log10(pO2/1 bar)"
+    formula_owner: "simulator.battery.fo2_ladder.resolve_row_fo2"
     units: "log10(bar)"
-    physical_basis: "d-460; ladder already implemented"
-    bias: rung-specific
-    flag: assumed_fo2
-    ruling: d-460
-    version: 1
-    status: canonical
-    proposed_by: null
-    proposed_at: null
+    physical_basis: "physics owner DP-010 v2: with no printed ferric data, method or container, the proposed default is ambient air at 0.21 atm"
+    bias: "categorical atmosphere assumption; redox-sensitive predictions may move substantially"
+    flag: fo2_default_ambient_air_unprinted_atmosphere
+    ruling: "physics owner DP-010 v2"
+    version: 2
+    status: proposed
+    proposed_by: "physics owner"
+    proposed_at: "2026-11-23"
     evidence: null
-    canonized_by: owner
-    canonized_at: "2026-11-23"
+    canonized_by: null
+    canonized_at: null
+    history:
+      - version: 1
+        status: canonical
+        formula: "the oxygen ladder's existing last rung: intrinsic melt fO2 (fo2_tier_notice, tier 4)"
+        flag: assumed_fo2
+        ruling: d-460
+  - id: DP-108
+    condition: "vapour equilibrium row with condensed phase; method unstated and total pressure unprinted"
+    formula: "P_total = sum of predicted gas partial pressures"
+    formula_owner: "simulator.battery.score._sum_gas_partial_pressures_pa"
+    units: Pa
+    physical_basis: "closed equilibrium has no background gas; equilibrium partials are independent of an inert background to Poynting order V*dP/RT, as in DP-001"
+    bias: "the engine predicts a closed equilibrium with no background gas"
+    flag: assumed_pressure
+    ruling: "controller pressure ruling 2026-11-23"
+    version: 1
+    status: proposed
+    proposed_by: owner
+    proposed_at: "2026-11-23"
+    evidence: null
+    canonized_by: null
+    canonized_at: null
     history: []
   - id: DP-011
     condition: "measurement method unprinted"
@@ -384,7 +406,7 @@ policies:
     proposed_by: w1123cvmq2
     proposed_at: '2026-11-22T00:00:00+00:00'
     evidence:
-    - row-level printed technique resolves to one closed method token
+      - row-level printed technique resolves to one closed method token
     canonized_by: null
     canonized_at: null
     history: []
@@ -403,6 +425,23 @@ policies:
     proposed_by: w1123canon
     proposed_at: "2026-11-23T07:55:03Z"
     evidence: "7,119 numeric marker rows in the eight target sources; Borisov-Veksler supplement cells and parent methods text"
+    canonized_by: null
+    canonized_at: null
+    history: []
+  - id: DP-114
+    condition: "total pressure recorded as a positive interval [lo, hi]"
+    formula: "nominal = sqrt(lo * hi); band = [lo, hi]"
+    formula_owner: "simulator.battery.default_policy.resolve"
+    units: Pa
+    physical_basis: "log-scale midpoint of the reported pressure interval"
+    bias: "the reported band does not identify the exact experimental pressure"
+    flag: total_pressure_interval_nominal
+    ruling: "t-1923 round 10"
+    version: 1
+    status: proposed
+    proposed_by: controller
+    proposed_at: "2026-11-23"
+    evidence: "ror-cvpress9x1123 positive 1–10 Pa interval probe"
     canonized_by: null
     canonized_at: null
     history: []

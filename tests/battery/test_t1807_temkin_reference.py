@@ -265,17 +265,17 @@ def test_temkin_rejection_arms_are_behavioral(migration, consumer: str) -> None:
             )
             is None
         )
-        # The shared ladder owns fO2 resolution now. A Temkin activity target
-        # cannot supply its own fO2 through the retired saturation shortcut.
-        assert (
-            resolve_row_fo2(
-                experiment,
-                None,
-                activity,
-                quantity=Quantity.ACTIVITY,
-            )
-            is None
+        # The measured activity does not supply its own oxygen input. A
+        # callable row receives DP-010's flagged ambient-air default.
+        resolved = resolve_row_fo2(
+            experiment,
+            None,
+            activity,
+            quantity=Quantity.ACTIVITY,
         )
+        assert resolved is not None
+        assert resolved.policy is not None
+        assert resolved.policy.id == "DP-010"
         return
     if consumer == "bench":
         assert _reference_matches(

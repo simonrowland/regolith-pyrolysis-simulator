@@ -42,6 +42,7 @@ DEFAULT_BACKEND_CAPABILITIES = {
 REDOX_MODE_NOT_AN_INPUT = 'not_an_input'
 
 ANTOINE_FALLBACK_SOURCE_PREFIX = 'antoine_fallback_from_vaporock'
+INVALID_GAS_PARTIAL_PRESSURE_COMPONENTS = 'invalid_gas_partial_pressure_components'
 _EQUILIBRIUM_CACHE_CONSUMED_DIAGNOSTICS = frozenset({
     'authority',
     'authoritative_for_requested_vapor_pressure',
@@ -61,6 +62,7 @@ _EQUILIBRIUM_CACHE_CONSUMED_DIAGNOSTICS = frozenset({
     'reported_activity_coefficients',
     'subprocess_failure',
     'vapor_pressure_diagnostic',
+    INVALID_GAS_PARTIAL_PRESSURE_COMPONENTS,
 })
 
 # Append-only wire table for consumer-visible engine notices and warnings.

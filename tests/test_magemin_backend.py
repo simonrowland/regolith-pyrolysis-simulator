@@ -358,6 +358,34 @@ def _make_pooled_subprocess_backend(exception):
     return backend
 
 
+def test_magemin_omitted_oxygen_uses_flagged_nominal_control(monkeypatch):
+    from simulator.melt_backend import magemin as magemin_module
+
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = "subprocess"
+    calls = []
+
+    def native_call(**kwargs):
+        calls.append(kwargs)
+        raise magemin_module._MAGEMinEngineCallError("TestFailure", "probe")
+
+    monkeypatch.setattr(backend, "_call_magemin", native_call)
+    result = backend.equilibrate(
+        1500.0,
+        composition_mol={"SiO2": 1.0},
+        pressure_bar=1.0,
+    )
+
+    assert result.status == "not_converged"
+    assert calls and calls[0]["fO2_log"] == -9.0
+    assert result.diagnostics["magemin_omitted_oxygen_default"] == {
+        "value": -9.0,
+        "reason": "oxygen input omitted; nominal MAGEMin transport control applied",
+    }
+    assert any("oxygen was omitted" in warning for warning in result.warnings)
+
+
 @pytest.mark.parametrize(
     ('database', 'capture_error', 'nonfinite_projection'),
     [
@@ -1264,6 +1292,7 @@ def test_magemin_equilibrate_surfaces_typed_hang_without_disabling_backend():
     with pytest.raises(EngineWorkerTimeout) as raised:
         backend.equilibrate(
             1200.0,
+            fO2_log=-9.0,
             composition_mol={'SiO2': 1.0, 'MgO': 1.0},
         )
 
@@ -4382,6 +4411,7 @@ def test_magemin_nonfinite_requested_native_activity_returns_not_converged(
     )
     result = backend.equilibrate(
         1200.0,
+        fO2_log=-9.0,
         composition_kg={"SiO2": 49.0, "MgO": 9.0, "Al2O3": 42.0},
         pressure_bar=1e-6,
         native_activity_formula="MgO",
@@ -4622,6 +4652,53 @@ def _run_magemin_adapter_buffer_probe(
     modes = tuple(float(x) for x in mode_match.group(1).split())
     assert len(phases) == len(modes)
     return gam[8], phases, modes
+
+
+@pytest.mark.skipif(
+    _LIVE_MAGEMIN_BINARY is None,
+    reason="No compiled MAGEMin binary found (build per pyproject.toml [magemin])",
+)
+def test_magemin_live_iron_free_phase_output_is_oxygen_insensitive(request, monkeypatch):
+    from decimal import Decimal
+
+    from simulator.battery import score
+    from simulator.battery.enums import Engine, PhaseRole, Quantity, RefusalReason
+    from tests.battery import factories as F
+    from tests.battery.test_phase_composition_rows import _phase_identity
+
+    backend = MAGEMinBackend()
+    request.addfinalizer(backend.close)
+    assert backend.initialize({"binary_path": str(_LIVE_MAGEMIN_BINARY)})
+    results = [
+        backend.equilibrate(
+            1450.0,
+            composition_kg={"SiO2": 60.0, "MgO": 40.0},
+            pressure_bar=1.0,
+            fO2_log=log_fo2,
+        )
+        for log_fo2 in (-12.0, -4.0)
+    ]
+    identity = _phase_identity("SiO2", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, role=PhaseRole.MELT)
+    row = F.observation("magemin-native-mass-only", "exp", identity, Decimal("60"))
+    native_responses = iter(results)
+    monkeypatch.setattr(
+        score, "_equilibrate_phase_assemblage", lambda *args, **kwargs: next(native_responses),
+    )
+    for result in results:
+        assert result.status == "ok", result.diagnostics
+        assert result.phases_present and result.phase_masses_kg
+        assert result.liquid_fraction is not None
+        prediction = score.predict_with_engine(Engine.MAGEMIN, row)
+        # W2 / d-446 owns the native per-phase composition pin.
+        assert prediction.value is None
+        assert prediction.refusal_reason is RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION
+        assert prediction.refusal_detail["reason"] == "phase_composition_unavailable"
+        assert prediction.refusal_detail["engine"] == "magemin"
+        assert result.fO2_log is None
+    reduced, oxidized = results
+    assert reduced.phases_present == oxidized.phases_present
+    assert reduced.phase_masses_kg == oxidized.phase_masses_kg
+    assert reduced.liquid_fraction == oxidized.liquid_fraction
 
 
 @pytest.mark.skipif(

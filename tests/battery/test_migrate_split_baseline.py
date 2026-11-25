@@ -8,7 +8,10 @@ compares the writer's complete output map against the checked-in derived store.
 
 from __future__ import annotations
 
+import base64
 import json
+import lzma
+import re
 from pathlib import Path
 from unittest.mock import patch
 
@@ -164,40 +167,199 @@ def _observation_rows(output: bytes) -> dict[str, dict[str, object]]:
     if not isinstance(document, dict) or not isinstance(document.get("observations"), list):
         return {}
     return {
-        str(row["observation_id"]): {
-            "identity": row.get("identity"),
-            "value": row.get("value"),
-            "point_conditions": row.get("point_conditions"),
-            "locator": row.get("locator"),
-        }
+        str(row["observation_id"]): row
         for row in document["observations"]
         if isinstance(row, dict) and row.get("observation_id") is not None
     }
 
 
+def _field_differences(path: str, stored: object, regenerated: object) -> list[str]:
+    if isinstance(stored, dict) and isinstance(regenerated, dict):
+        differences = []
+        for key in sorted(stored.keys() | regenerated.keys(), key=str):
+            if key not in stored or key not in regenerated:
+                old = stored[key] if key in stored else "<absent>"
+                new = regenerated[key] if key in regenerated else "<absent>"
+                differences.append(
+                    f"{path}.{key}: stored={json.dumps(old, sort_keys=True, default=str)}; "
+                    f"regenerated={json.dumps(new, sort_keys=True, default=str)}"
+                )
+                continue
+            differences.extend(_field_differences(
+                f"{path}.{key}", stored[key], regenerated[key],
+            ))
+        return differences
+    if isinstance(stored, list) and isinstance(regenerated, list):
+        if len(stored) != len(regenerated):
+            return [
+                f"{path}: stored={json.dumps(stored, sort_keys=True, default=str)}; "
+                f"regenerated={json.dumps(regenerated, sort_keys=True, default=str)}"
+            ]
+        differences = []
+        for index, (old, new) in enumerate(zip(stored, regenerated)):
+            differences.extend(_field_differences(f"{path}[{index}]", old, new))
+        return differences
+    if stored == regenerated:
+        return []
+    return [
+        f"{path}: stored={json.dumps(stored, sort_keys=True, default=str)}; "
+        f"regenerated={json.dumps(regenerated, sort_keys=True, default=str)}"
+    ]
+
+
+def _compact_difference_paths(differences: list[str], prefix: str) -> str:
+    fields = [difference.split(": stored=", 1)[0] for difference in differences]
+    indexed: dict[str, list[int]] = {}
+    compact = []
+    marker = f"{prefix}.experiments["
+    for field in fields:
+        if not field.startswith(marker):
+            compact.append(field.removeprefix(f"{prefix}."))
+            continue
+        closing = field.find("]", len(marker))
+        if closing == -1:
+            compact.append(field.removeprefix(f"{prefix}."))
+            continue
+        try:
+            index = int(field[len(marker):closing])
+        except ValueError:
+            compact.append(field.removeprefix(f"{prefix}."))
+            continue
+        suffix = field[closing + 1:]
+        indexed.setdefault(suffix, []).append(index)
+    for suffix, indices in sorted(indexed.items()):
+        ordered = sorted(set(indices))
+        ranges = []
+        start = previous = ordered[0]
+        for index in ordered[1:]:
+            if index == previous + 1:
+                previous = index
+                continue
+            ranges.append(str(start) if start == previous else f"{start}-{previous}")
+            start = previous = index
+        ranges.append(str(start) if start == previous else f"{start}-{previous}")
+        compact.append(f"experiments[{','.join(ranges)}]{suffix}")
+    return ", ".join(compact)
+
+
+def _compact_observation_ids(observation_ids: list[str]) -> list[dict[str, object]]:
+    remaining = set(observation_ids)
+    compact = []
+    while remaining:
+        templates: dict[str, list[tuple[tuple[str, ...], str]]] = {}
+        for observation_id in sorted(remaining):
+            matches = list(re.finditer(r"\d+", observation_id))
+            if not matches:
+                continue
+            pieces = []
+            numbers = []
+            previous = 0
+            for match in matches:
+                pieces.extend((observation_id[previous:match.start()], "{n}"))
+                numbers.append(match.group())
+                previous = match.end()
+            pieces.append(observation_id[previous:])
+            template = "".join(pieces)
+            templates.setdefault(template, []).append((tuple(numbers), observation_id))
+        candidates = {
+            template: members
+            for template, members in templates.items()
+            if len(members) > 1
+        }
+        if not candidates:
+            break
+        template, members = max(
+            candidates.items(),
+            key=lambda item: len(item[1]),
+        )
+        number_tuples = sorted({numbers for numbers, _ in members})
+        one_numeric_token = all(len(numbers) == 1 for numbers in number_tuples)
+        canonical_numbers = one_numeric_token and all(
+            number == "0" or not number.startswith("0")
+            for numbers in number_tuples
+            for number in numbers
+        )
+        if canonical_numbers:
+            numbers = sorted(int(number_tuple[0]) for number_tuple in number_tuples)
+            ranges = []
+            start = previous = numbers[0]
+            for number in numbers[1:]:
+                if number == previous + 1:
+                    previous = number
+                    continue
+                ranges.append(str(start) if start == previous else f"{start}-{previous}")
+                start = previous = number
+            ranges.append(str(start) if start == previous else f"{start}-{previous}")
+            compact.append({"template": template, "numbers": ranges})
+        else:
+            compact.append({
+                "template": template,
+                "values": [list(numbers) for numbers in number_tuples],
+            })
+        remaining.difference_update(observation_id for _, observation_id in members)
+    if remaining:
+        compact.append({"ids": sorted(remaining)})
+    return compact
+
+
 def _store_difference_details(
     stored: dict[str, bytes], regenerated: dict[str, bytes], paths: list[str]
 ) -> str:
-    details = []
+    details = {
+        "changed_store_paths": len(paths),
+        "observations": {},
+        "work": [],
+        "other": [],
+    }
     for path in paths:
         stored_bytes = stored.get(path)
         regenerated_bytes = regenerated.get(path)
         if stored_bytes is None or regenerated_bytes is None:
             present_bytes = stored_bytes if stored_bytes is not None else regenerated_bytes
-            details.append(
+            details["other"].append(
                 f"{path}: {'missing from store' if stored_bytes is None else 'unexpected in store'}"
             )
             if present_bytes is not None:
-                for observation_id, row in sorted(_observation_rows(present_bytes).items()):
-                    details.append(
-                        f"{path}::{observation_id}: {json.dumps(row, sort_keys=True)}"
-                    )
+                observation_ids = sorted(_observation_rows(present_bytes))
+                details["observations"][path] = {
+                    "fields": [
+                        "row missing from store" if stored_bytes is None else "unexpected row"
+                    ],
+                    "ids": _compact_observation_ids(
+                        [
+                            observation_id.removeprefix(f"{Path(path).stem}::")
+                            for observation_id in observation_ids
+                        ]
+                    ),
+                }
             continue
         if path.endswith(".md"):
-            details.append(
+            details["other"].append(
                 f"{path}: bytes differ ({len(stored_bytes)} stored, "
                 f"{len(regenerated_bytes)} regenerated)"
             )
+            continue
+        if path.startswith("data/literature/works/"):
+            stored_work = yaml.load(stored_bytes, Loader=_FAST_SAFE_YAML_LOADER)
+            regenerated_work = yaml.load(regenerated_bytes, Loader=_FAST_SAFE_YAML_LOADER)
+            differences = _field_differences("work", stored_work, regenerated_work)
+            work = stored_work.get("work") if isinstance(stored_work, dict) else None
+            if not isinstance(work, dict) and isinstance(regenerated_work, dict):
+                work = regenerated_work.get("work")
+            source_ids = work.get("source_ids", []) if isinstance(work, dict) else []
+            work_id = work.get("work_id") if isinstance(work, dict) else None
+            source_label = (
+                ",".join(map(str, source_ids))
+                if source_ids
+                else f"work_id={work_id}"
+            )
+            details["work"].append({
+                "path": path,
+                "source": source_label,
+                "fields": _compact_difference_paths(differences, "work")
+                if differences
+                else "bytes differ without a YAML field difference",
+            })
             continue
         stored_rows = _observation_rows(stored_bytes)
         regenerated_rows = _observation_rows(regenerated_bytes)
@@ -207,18 +369,35 @@ def _store_difference_details(
             if stored_rows.get(observation_id) != regenerated_rows.get(observation_id)
         ]
         if changed_rows:
+            source_fields = set()
             for observation_id in changed_rows:
-                details.append(
-                    f"{path}::{observation_id}\n"
-                    f"  stored: {json.dumps(stored_rows.get(observation_id), sort_keys=True)}\n"
-                    f"  regenerated: {json.dumps(regenerated_rows.get(observation_id), sort_keys=True)}"
+                differences = _field_differences(
+                    "observation",
+                    stored_rows.get(observation_id),
+                    regenerated_rows.get(observation_id),
                 )
+                field_paths = [
+                    difference.split(": stored=", 1)[0]
+                    for difference in differences
+                ] or ["bytes differ without a YAML field difference"]
+                source_fields.update(field_paths)
+            details["observations"][path] = {
+                "fields": sorted(source_fields),
+                "ids": _compact_observation_ids(
+                    [
+                        observation_id.removeprefix(f"{Path(path).stem}::")
+                        for observation_id in changed_rows
+                    ]
+                ),
+            }
         else:
-            details.append(
+            details["other"].append(
                 f"{path}: bytes differ ({len(stored_bytes)} stored, "
                 f"{len(regenerated_bytes)} regenerated); no observation-row difference"
             )
-    return "\n".join(details)
+    raw = json.dumps(details, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    payload = base64.b64encode(lzma.compress(raw, preset=9)).decode("ascii")
+    return f"store_delta_lzma_base64={payload}"
 
 
 def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) -> None:
@@ -525,7 +704,7 @@ def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) ->
           "relation": "Torr_to_Pa"
         },
         "locator": {
-          "note": "TABLE 1. Results of 12 tests with the prototype system from 2005",
+          "note": "TABLE 1. Results of 12 tests with the prototype system from 2005; printed_cell=[\"0.23 Torr\", \"Torr\"]",
           "pdf_page_index": 3,
           "table": "1"
         },
@@ -2166,7 +2345,8 @@ def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) ->
   }
 }
     ''')
-    assert actual == expected, json.dumps(actual, sort_keys=True, separators=(",", ":"), default=str)
+    differences = _field_differences("observations", expected, actual)
+    assert not differences, "\n".join(differences)
 
 
 def test_storing_a_charge_conversion_derivation_breaks_the_baseline(

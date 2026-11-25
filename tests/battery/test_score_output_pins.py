@@ -43,6 +43,8 @@ from simulator.battery.enums import (
 from simulator.battery.identity import State
 from simulator.battery.records import (
     CandidateRequest,
+    Notice,
+    NoticePolicy,
     Species,
     Value,
 )
@@ -2601,13 +2603,18 @@ def test_unknown_candidate_request_quantity_is_serialized_as_null() -> None:
 def test_missing_pressure_notice_uses_resolved_policy_and_preserves_version_type(
     string_version: bool,
 ) -> None:
+    assert NoticeKind.ASSUMED_PRESSURE.value == "assumed_pressure"
+    assert NoticeKind.METHOD_IMPLIED.value == "method_implied"
+    assert NoticeKind.ASSUMED_FO2.value == "assumed_fo2"
+    assert NoticeKind.EFFUSION_REGIME_ASSUMED.value == "effusion_regime_assumed"
+
     from simulator.battery.default_policy import resolve
 
     resolved = resolve("DP-001")
-    notice = score_mod._assumption_notice(
+    notice = score_mod._default_policy_notice(
+        resolved,
         Quantity.P_PARTIAL,
         "observation does not carry total_pressure_Pa",
-        resolved,
     )
     assert notice.policy is not None
     assert notice.kind is resolved.flag

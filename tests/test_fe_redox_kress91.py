@@ -16,6 +16,7 @@ from simulator.fe_redox import (
     KRESS91_LN_FO2_COEFFICIENT,
     floor_vacuum_pressure_bar,
     intrinsic_melt_fO2,
+    _kress91_ln_ratio,
     kress91_fe3_over_sigma_fe,
     kress91_ferrous_feo_activity,
     kress91_log10_fO2_from_fe3_over_sigma_fe,
@@ -279,6 +280,32 @@ def test_kress91_valid_finite_controls_stay_exactly_golden_neutral() -> None:
     }
 
 
+def test_kress91_high_pressure_forward_fold_matches_green_bits() -> None:
+    """Adding the three pressure terms one by one is the green fold.
+
+    The recorded hex is the forward ln(ratio) at this input on 220c9b2dd9.
+    Pre-summing the terms and adding once lands one ulp away.
+    """
+
+    fold = _kress91_ln_ratio(
+        fO2_log=-5.656474576654471,
+        mol_fractions={'Al2O3': 0.2, 'FeOt': 0.1},
+        T_K=1715.8225584989978,
+        pressure_bar=7952.140462091401,
+    )
+    assert fold.hex() == '-0x1.bcb3962b1664bp+1'
+
+
+def test_kress91_public_inverse_refuses_omitted_pressure() -> None:
+    with pytest.raises(Kress91InvalidControls, match='pressure_bar'):
+        kress91_log10_fO2_from_fe3_over_sigma_fe(
+            fe3_over_sigma_fe=0.2,
+            mol_fractions=KRESS91_MOL_FRACTIONS,
+            T_K=1843.15,
+            pressure_bar=None,
+        )
+
+
 @pytest.mark.parametrize(
     ('reference_C', 'target_C', 'expected_error_dex'),
     [
@@ -503,6 +530,14 @@ def test_kress91_invalid_pressure_fails_loudly(pressure_bar: float) -> None:
             mol_fractions=KRESS91_MOL_FRACTIONS,
             T_K=1873.15,
             pressure_bar=pressure_bar,
+        )
+
+
+def test_kress91_public_forward_refuses_omitted_pressure() -> None:
+    with pytest.raises(Kress91InvalidControls, match="pressure_bar"):
+        kress91_fe3_over_sigma_fe(
+            fO2_log=-9.0, mol_fractions={"FeOt": 0.1}, T_K=1500.0,
+            pressure_bar=None,
         )
 
 

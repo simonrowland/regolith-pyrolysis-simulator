@@ -1087,9 +1087,13 @@ class Notice:
                 raise TypeError("Notice.policy must be NoticePolicy or absent")
             if self.kind not in DEFAULT_POLICY_NOTICE_KINDS:
                 raise ValueError("policy notice kind must name a default-policy flag")
-        if self.kind in {NoticeKind.ASSUMED_PRESSURE, NoticeKind.METHOD_IMPLIED}:
-            if self.policy is None:
-                raise ValueError(f"{self.kind.value} requires policy metadata")
+        if self.kind in {
+            NoticeKind.ASSUMED_PRESSURE,
+            NoticeKind.ASSUMED_FO2,
+            NoticeKind.METHOD_IMPLIED,
+            NoticeKind.EFFUSION_REGIME_ASSUMED,
+        } and self.policy is None:
+            raise ValueError(f"{self.kind.value} requires policy metadata")
         if self.original is not None:
             object.__setattr__(self, "original", as_decimal(self.original))
         if self.dropped_mass_fraction is not None:

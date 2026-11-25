@@ -482,8 +482,8 @@ def cacheable_refusal(result) -> bool:
 ENGINE_CHEMISTRY_VERSION = {
     "openimcc": 4,
     "internal-analytical": 5,
-    "vaporock": 1,
-    "magemin": 4,
+    "vaporock": 2,
+    "magemin": 5,
     # The subprocess EquilibriumResult includes the builtin provider's
     # Holzheid-weighted Fe pressure, so old alphaMELTS rows can serve stale Fe.
     "alphamelts": 5,
@@ -499,6 +499,7 @@ ENGINE_CHEMISTRY_VERSION = {
 # magemin v1: 2026-11-08 MAGEMin commit 40ed109d07d4246001cab59382596d33fed79086 - initial cache version
 # magemin v2: 2026-11-11 MAGEMin binary pin unchanged, b257r landing 982a8d9fa - d-367 mode-vector closure before liquid-fraction and composition extraction (cd48a78fe)
 # vaporock v1: 2026-11-08 VapoRock 0159678a8eefb51dfe3f12bb646dc38507a07230 - initial cache version
+# vaporock v2: 2026-11-23 t-1923 pressure/fO2 car, round 7 - retain gas-channel completeness for DP-108
 # internal-analytical v1: 2026-11-08 simulator code at d5e6b8dc2 - initial cache version
 # openimcc v1: 2026-11-08 initial cache version at OpenIMCC 66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84.
 # Species-local pin moves stay on v1; the live commit comes from
@@ -515,6 +516,7 @@ ENGINE_CHEMISTRY_VERSION = {
 # internal-analytical v4 (green branch): 2026-11-23 b-1124 / d-339 Holzheid gamma regular-solution extrapolation.
 # internal-analytical v5: 2026-11-24 b-1124 Holzheid FeO continuation layered over b274 v4; new chemistry invalidates both independent v4 identities.
 # magemin v4: 2026-11-18 MAGEMin pin unchanged, b265 e7fbd4c052 onto b-1244 71806e046 - positive SiO2 outside [30, 80] wt% is predicted and flagged; Fe-free cells leave fO2 indeterminate
+# magemin v5: 2026-11-23 t-1923 pressure/fO2 car, round 15 - omitted oxygen uses the nominal transport control with a typed per-call flag
 # alphamelts v4: 2026-11-18 alphaMELTS binary pin unchanged, b265 e7fbd4c052 onto b-1244 71806e046 - subfloor oxygen extrapolation notice and freeze-gate cooling path
 # thermoengine v4: 2026-11-18 ThermoEngine pin unchanged, b265 e7fbd4c052 onto b-1244 71806e046 - same subfloor oxygen extrapolation notice
 # alphamelts v5: 2026-11-23 b-1124 / d-339 subprocess result embeds builtin Holzheid-weighted Fe pressure

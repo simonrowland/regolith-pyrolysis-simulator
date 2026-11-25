@@ -2748,9 +2748,10 @@ def test_hastie_initial_charges_use_flagged_proxies_for_figure_points(
         quantity=Quantity.ACTIVITY_COEFFICIENT,
     )
     assert moved_fo2 is not None
-    assert moved_fo2.route == "intrinsic_melt_fO2"
+    assert moved_fo2.route == "dp010_ambient_air_unprinted_atmosphere"
     assert moved_fo2.tier == 4
-    assert moved_fo2.borrowed
+    assert not moved_fo2.borrowed
+    assert moved_fo2.policy is not None and moved_fo2.policy.id == "DP-010"
     moved_prediction = predict_with_engine(
         Engine.OPENIMCC,
         moved_observation,

@@ -96,7 +96,8 @@ def _capture_comparison_identities(monkeypatch):
 
     def capture(identity, reference, prediction, **kwargs):
         result = original(identity, reference, prediction, **kwargs)
-        compared.append(result)
+        # The scorer returns the comparison identity and its pressure notice.
+        compared.append(result[0])
         return result
 
     monkeypatch.setattr(score, "_comparison_identity", capture)

@@ -52,6 +52,7 @@ from simulator.physical_constants import (
 from simulator.policy.default_policy import DP_019_VACUUM_BOUNDARY_BAR
 from simulator.melt_backend.base import (
     ANTOINE_FALLBACK_SOURCE_PREFIX,
+    INVALID_GAS_PARTIAL_PRESSURE_COMPONENTS,
     REDOX_MODE_NOT_AN_INPUT,
     _call_with_hard_timeout,
     vapor_pressure_source_code,
@@ -122,19 +123,21 @@ def _hostname() -> str:
 
 
 def _openimcc_gas_channels_and_omission_notices(
-    parent_oxides: Sequence[str], datapack: Any, gas_result: Any | None = None
+    parent_oxides: Sequence[str], datapack: Any, gas_result: Any | None = None,
+    *, temperature_K: float | None = None,
 ) -> tuple[list[Any], tuple[dict[str, Any], ...]]:
     """Return the active gas reactions and typed notices for omitted channels."""
 
     from openimcc.gas import _default_reactions
 
-    channels, default_omissions = _default_reactions(parent_oxides, datapack)
+    channels, default_omissions = _default_reactions(parent_oxides, datapack, temperature_K)
     omitted_channels = getattr(gas_result, "omitted_channels", default_omissions)
     table_path = str(datapack.gas_path)
     notices = tuple(
         {
             "kind": NoticeKind.INPUT_OMITTED.value,
             "authority": None,
+            "species": name,
             "reason": (
                 f"gas channel {name} omitted: {reason}; table_path_diagnostic: {table_path}"
             ),
@@ -261,6 +264,10 @@ _IMCC_OUT_OF_BASIS_CODES = frozenset(
 # Gram-scale reference charge when an analytical Knudsen source omits mass.
 # It sets the physical scale of the loader cutoff and its trace-tail bounds.
 DEFAULT_ANALYTICAL_KNUDSEN_CHARGE_KG = 1e-3
+# Diagnostic arms are not the observation scorer. They pass this labelled
+# boundary from the central policy owner into the shared cell. The cell does
+# not apply a default itself, and the observation scorer resolves DP-019 there.
+DIAGNOSTIC_ARM_BOUNDARY_PRESSURE_BAR = DP_019_VACUUM_BOUNDARY_BAR
 _DEFAULT_FO2_LOG = -9.0
 _WT_PCT_SUM_TOLERANCE = 1.0e-9
 
@@ -1673,13 +1680,16 @@ def extract_reported_quantities(
         or {}
     )
     pressures: dict[str, float] = {}
-    invalid_pressure_components: list[str] = []
+    diagnostics = getattr(result, "diagnostics", None) or {}
+    invalid_pressure_components = set(
+        diagnostics.get(INVALID_GAS_PARTIAL_PRESSURE_COMPONENTS, ())
+    )
     for name, value in dict(raw_pressures).items():
         number = finite_float(value)
         if number is not None and number > 0.0:
             pressures[str(name)] = number
         elif number is None or number < 0.0:
-            invalid_pressure_components.append(str(name))
+            invalid_pressure_components.add(str(name))
     return activities, pressures, tuple(sorted(invalid_pressure_components))
 
 
@@ -3621,6 +3631,10 @@ class _OpenImccBatteryBackend:
         pressures: dict[str, float] = {}
         vapor_sources: dict[str, str] = {}
         gas_diagnostics: dict[str, Any] = {}
+        gas_result = None
+        solved_notice = None
+        cell_oxide_sources: Mapping[str, Any] = {}
+        invalid_channels: set[str] = set()
         engine_binding_identity = self._identity.get("engine_binding_identity") or {}
         gas_table_lineage = (
             "openimcc-gas-table:sha256:"
@@ -3715,17 +3729,7 @@ class _OpenImccBatteryBackend:
                 gas_pressures.update(
                     {name: all_gas[name] for name in cell_info["cell_oxide_janaf_sources"] if name != "buffer_phase"}
                 )
-            _channels, omission_notices = (
-                _openimcc_gas_channels_and_omission_notices(
-                    result.parent_oxides, self._gas, gas_result
-                )
-            )
-            notices.extend(omission_notices)
-            gas_diagnostics = {
-                "domain_flags": dict(getattr(gas_result, "domain_flags", {})),
-                "provenance_class": dict(getattr(gas_result, "provenance_class", {})),
-                "oxygen_balance": dict(balance),
-            }
+            gas_diagnostics["oxygen_balance"] = dict(balance)
             solved_notice = {
                     "kind": "fo2_oxygen_balance_effusion_solved",
                     "pO2_bar": float(po2_bar),
@@ -3744,33 +3748,7 @@ class _OpenImccBatteryBackend:
                 solved_notice["cell_oxide_janaf_sources"] = cell_info[
                     "cell_oxide_janaf_sources"
                 ]
-            notices.append(solved_notice)
-            for name, value in gas_pressures.items():
-                number = finite_float(value)
-                if number is None or number <= 0.0:
-                    continue
-                pressures[str(name)] = number * PA_PER_BAR
-                if cell_material is not None and name in cell_info[
-                    "cell_oxide_janaf_sources"
-                ]:
-                    source = cell_info["cell_oxide_janaf_sources"][name]
-                    vapor_sources[str(name)] = (
-                        f"cell_shared_janaf:{source['table_id']}:"
-                        f"{source['source_sha256']}"
-                    )
-                else:
-                    vapor_sources[str(name)] = gas_table_lineage
-            for name, flag in getattr(gas_result, "domain_flags", {}).items():
-                if flag:
-                    notices.append(
-                        {
-                            "kind": "openimcc_gas_flag",
-                            "authority": AUTHORITY_EXTRAPOLATED,
-                            "species": str(name),
-                            "reason": str(flag),
-                        }
-                    )
-                    authority = AUTHORITY_EXTRAPOLATED
+            cell_oxide_sources = cell_info.get("cell_oxide_janaf_sources", {})
         elif fO2_log is not None:
             if self._gas is None:
                 notices.append(
@@ -3792,33 +3770,50 @@ class _OpenImccBatteryBackend:
                     parent_oxides=result.parent_oxides,
                     allow_extrapolation=True,
                 )
-                _channels, omission_notices = (
-                    _openimcc_gas_channels_and_omission_notices(
-                        result.parent_oxides, self._gas, gas_result
+                gas_pressures = dict(gas_result)
+
+        if gas_result is not None:
+            channels, omission_notices = _openimcc_gas_channels_and_omission_notices(
+                result.parent_oxides, self._gas, gas_result, temperature_K=temperature_K,
+            )
+            notices.extend(omission_notices)
+            if solved_notice is not None:
+                notices.append(solved_notice)
+            invalid_channels.update(notice["species"] for notice in omission_notices)
+            invalid_channels.update(name for name, _ in channels if name not in gas_pressures)
+            domain_flags = dict(getattr(gas_result, "domain_flags", {}))
+            gas_diagnostics.update(
+                domain_flags=domain_flags,
+                provenance_class=dict(getattr(gas_result, "provenance_class", {})),
+            )
+            for name, value in gas_pressures.items():
+                number = finite_float(value)
+                pressure = None if number is None else finite_float(number * PA_PER_BAR)
+                if pressure is None or pressure < 0.0:
+                    invalid_channels.add(str(name))
+                    continue
+                if pressure == 0.0:
+                    continue
+                pressures[str(name)] = pressure
+                if name in cell_oxide_sources:
+                    source = cell_oxide_sources[name]
+                    vapor_sources[str(name)] = (
+                        f"cell_shared_janaf:{source['table_id']}:"
+                        f"{source['source_sha256']}"
                     )
-                )
-                notices.extend(omission_notices)
-                gas_diagnostics = {
-                    "domain_flags": dict(gas_result.domain_flags),
-                    "provenance_class": dict(gas_result.provenance_class),
-                }
-                for name, value in dict(gas_result).items():
-                    number = finite_float(value)
-                    if number is None or number <= 0.0:
-                        continue
-                    pressures[str(name)] = number * PA_PER_BAR
+                else:
                     vapor_sources[str(name)] = gas_table_lineage
-                for name, flag in gas_result.domain_flags.items():
-                    if flag:
-                        notices.append(
-                            {
-                                "kind": "openimcc_gas_flag",
-                                "authority": AUTHORITY_EXTRAPOLATED,
-                                "species": str(name),
-                                "reason": str(flag),
-                            }
-                        )
-                        authority = AUTHORITY_EXTRAPOLATED
+            for name, flag in domain_flags.items():
+                if flag:
+                    notices.append(
+                        {
+                            "kind": "openimcc_gas_flag",
+                            "authority": AUTHORITY_EXTRAPOLATED,
+                            "species": str(name),
+                            "reason": str(flag),
+                        }
+                    )
+                    authority = AUTHORITY_EXTRAPOLATED
 
         provenance = {
             "package_version": result.openimcc_version,
@@ -3839,6 +3834,8 @@ class _OpenImccBatteryBackend:
             "vapor_pressure_backend_status": "openimcc",
             "authoritative_for_requested_vapor_pressure": True,
         }
+        if invalid_channels:
+            diagnostics[INVALID_GAS_PARTIAL_PRESSURE_COMPONENTS] = sorted(invalid_channels)
         reported_gammas = {
             str(name): float(row["value"])
             for name, row in result.activity_coefficients.items()
@@ -3894,7 +3891,7 @@ def _internal_analytical_vapor_pressure_adapter(
     *,
     core: Any,
     temperature_C: float,
-    pressure_bar: float,
+    pressure_bar: float | None,
     composition_kg: Mapping[str, float] | None,
     composition_mol: Mapping[str, float] | None,
     fO2_log: float | None,
@@ -3905,11 +3902,12 @@ def _internal_analytical_vapor_pressure_adapter(
     """Evaluate a battery observation through the simulator VAPOR_PRESSURE intent.
 
     The producer supplies only its observation-derived oxide inventory,
-    temperature, pressure and existing battery oxygen-condition request.
+    temperature, any consumed total pressure and the existing battery
+    oxygen-condition request.
     """
 
     from types import SimpleNamespace
-    from simulator.state import Atmosphere
+    from simulator.state import Atmosphere, OxygenReservoirState
 
     if not composition_kg and not composition_mol:
         raise _InternalAnalyticalInputRefusal(
@@ -3929,14 +3927,15 @@ def _internal_analytical_vapor_pressure_adapter(
             "internal_analytical_invalid_temperature",
             f"temperature_C must be finite and above absolute zero; got {temperature_C!r}",
         )
-    pressure = finite_float(pressure_bar)
-    if isinstance(pressure_bar, bool) or pressure is None or pressure < 0.0:
+    pressure = None if pressure_bar is None else finite_float(pressure_bar)
+    if pressure_bar is not None and (
+        isinstance(pressure_bar, bool) or pressure is None or pressure < 0.0
+    ):
         raise _InternalAnalyticalInputRefusal(
             2,
             "internal_analytical_invalid_total_pressure",
             f"pressure_bar must be finite and non-negative; got {pressure_bar!r}",
         )
-
     validated_melt_mass_kg_by_species: dict[str, float] = {}
     if composition_kg:
         for species, raw in composition_kg.items():
@@ -4053,6 +4052,9 @@ def _internal_analytical_vapor_pressure_adapter(
                 "pressure_prediction_source": "internal-analytical core",
             }
         )
+    elif po2_request.mode == PO2_NOT_AN_INPUT:
+        po2_bar = None
+        oxygen_source = "not_an_input"
     else:
         raise _InternalAnalyticalInputRefusal(
             1,
@@ -4062,7 +4064,7 @@ def _internal_analytical_vapor_pressure_adapter(
 
     # Score maps the battery's fugacity in Pa to pO2 in bar using the stated
     # ideal-gas assumption. The effusion branch uses the already-derived pO2.
-    fO2_log_used = math.log10(po2_bar)
+    fO2_log_used = None if po2_bar is None else math.log10(po2_bar)
 
     core.atom_ledger = core._new_atom_ledger()
     try:
@@ -4080,14 +4082,27 @@ def _internal_analytical_vapor_pressure_adapter(
     core.melt.composition_kg = dict(validated_melt_mass_kg_by_species)
     core.melt.update_total_mass()
     core.melt.temperature_C = temperature
-    core.melt.p_total_mbar = pressure * 1000.0
-    core.melt.atmosphere = Atmosphere.CONTROLLED_O2
-    core.melt.pO2_mbar = po2_bar * 1000.0
-    core.melt.fO2_log = fO2_log_used
-    core.melt.melt_fO2_log = fO2_log_used
-    core.melt.oxygen_reservoir.melt_intrinsic_fO2_log = fO2_log_used
-    core.melt.oxygen_reservoir.headspace_transport_pO2_bar = po2_bar
-    core.melt.oxygen_reservoir.headspace_ledger_pO2_bar = po2_bar
+    # Omitted controls must not keep the previous cell. A fresh MeltState
+    # is hard vacuum, zero total pressure, and the -9 fO2 seed.
+    if pressure is None:
+        core.melt.p_total_mbar = 0.0
+        core.melt.ambient_pressure_mbar = 0.0
+    else:
+        core.melt.p_total_mbar = pressure * 1000.0
+    if po2_bar is None:
+        core.melt.atmosphere = Atmosphere.HARD_VACUUM
+        core.melt.pO2_mbar = 0.0
+        core.melt.fO2_log = -9.0
+        core.melt.melt_fO2_log = -9.0
+        core.melt.oxygen_reservoir = OxygenReservoirState()
+    else:
+        core.melt.atmosphere = Atmosphere.CONTROLLED_O2
+        core.melt.pO2_mbar = po2_bar * 1000.0
+        core.melt.fO2_log = fO2_log_used
+        core.melt.melt_fO2_log = fO2_log_used
+        core.melt.oxygen_reservoir.melt_intrinsic_fO2_log = fO2_log_used
+        core.melt.oxygen_reservoir.headspace_transport_pO2_bar = po2_bar
+        core.melt.oxygen_reservoir.headspace_ledger_pO2_bar = po2_bar
     core._chem_kernel = core._build_chemistry_kernel()
 
     equilibrium = SimpleNamespace(
@@ -4097,16 +4112,18 @@ def _internal_analytical_vapor_pressure_adapter(
         warnings=[],
     )
     if include_diagnostic_shadows:
-        core._refresh_vapor_pressures_from_kernel(
-            equilibrium,
-            observation_pO2_bar=po2_bar,
-        )
+        if po2_bar is None:
+            core._refresh_vapor_pressures_from_kernel(equilibrium)
+        else:
+            core._refresh_vapor_pressures_from_kernel(
+                equilibrium,
+                observation_pO2_bar=po2_bar,
+            )
     else:
-        core._refresh_vapor_pressures_from_kernel(
-            equilibrium,
-            include_diagnostic_shadows=False,
-            observation_pO2_bar=po2_bar,
-        )
+        refresh_kwargs = {"include_diagnostic_shadows": False}
+        if po2_bar is not None:
+            refresh_kwargs["observation_pO2_bar"] = po2_bar
+        core._refresh_vapor_pressures_from_kernel(equilibrium, **refresh_kwargs)
     core_diagnostic = dict(core._last_vapor_pressure_diagnostic)
     core_flags: list[dict[str, Any]] = []
     for field_name in (
@@ -4271,7 +4288,7 @@ def internal_analytical_residue_vapor_pressure(
     *,
     core: Any,
     temperature_C: float,
-    pressure_bar: float,
+    pressure_bar: float | None,
     composition_kg: Mapping[str, float] | None,
     composition_mol: Mapping[str, float] | None,
     fO2_log: float | None,
@@ -4396,7 +4413,7 @@ class _InternalAnalyticalBatteryBackend:
         temperature_C: float,
         composition_kg: Mapping[str, float] | None = None,
         fO2_log: float | None = None,
-        pressure_bar: float = 1.0e-6,
+        pressure_bar: float | None = 1.0e-6,
         *,
         composition_mol: Mapping[str, float] | None = None,
         po2_request: Po2Request | None = None,
@@ -5775,12 +5792,23 @@ def _equilibrate_cell_uncached(
     composition_kg, composition_mol = composition_kg_and_mol(pot.composition_wt_pct)
     temperature_C = float(temperature_K) - CELSIUS_TO_KELVIN_OFFSET
     fo2_log = _fo2_log_for_request(handle, po2)
-    if physical_pressure_bar is None:
-        physical_pressure_bar = DP_019_VACUUM_BOUNDARY_BAR
-    else:
+    if physical_pressure_bar is not None:
         physical_pressure_bar = float(physical_pressure_bar)
     pressure_bar = physical_pressure_bar
     if handle.name == "alphamelts":
+        if physical_pressure_bar is None:
+            return _done(
+                status="refusal",
+                refusal_reason="total_pressure_required",
+                engine_status="input_refusal",
+                engine_reason=(
+                    "alphaMELTS requires an explicit physical pressure; "
+                    "the scoring pressure resolver supplied none"
+                ),
+                melt_activities={},
+                gas_partial_pressures_Pa={},
+                liquid_fraction=None,
+            )
         from simulator.alphamelts_reference_pressure import (
             alphamelts_condensed_phase_pressure_bar,
         )
@@ -6140,6 +6168,7 @@ def run_engine_arm(
                                 po2=po2,
                                 qualification=job.qualification,
                                 arm=job.arm,
+                                physical_pressure_bar=DIAGNOSTIC_ARM_BOUNDARY_PRESSURE_BAR,
                             )
                             if not battery_engine_handle_is_live(handle) and (
                                 had_live_handle
@@ -6535,7 +6564,7 @@ def build_report(
                 "engine_default": grid.engine_default_po2,
                 "commanded": list(grid.commanded_po2_bar),
             },
-            "pressure_bar": DP_019_VACUUM_BOUNDARY_BAR,
+            "pressure_bar": DIAGNOSTIC_ARM_BOUNDARY_PRESSURE_BAR,
         },
         "pots": [
             {

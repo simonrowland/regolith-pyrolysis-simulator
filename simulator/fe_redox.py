@@ -298,12 +298,24 @@ def _kress91_temperature_pressure_term(
             f'value or None, got {pressure_bar!r}'
         )
     p_pa = max(p_bar, 1.0e-9) * PA_PER_BAR
+    inv_t, d_t, squared = _kress91_pressure_terms(float(T_K), p_pa)
+    return term + inv_t + d_t + squared
+
+
+def _kress91_pressure_terms(T_K: float, p_pa: float) -> tuple[float, float, float]:
+    """The three Kress91 pressure terms, returned separately.
+
+    Callers add them. Pre-summing and then adding once is a different
+    float from adding each term in the published order. ``T_K`` is used
+    as given: the temperature helper passes ``float(T_K)`` and the
+    forward fold passes the caller's ``T_K``.
+    """
+
     return (
-        term
-        + KRESS91_PRESSURE_INV_T_COEFFICIENT * (p_pa / float(T_K))
-        + KRESS91_PRESSURE_D_T_COEFFICIENT
-        * (((float(T_K) - KRESS91_NONLINEAR_REFERENCE_T_K) * p_pa) / float(T_K))
-        + KRESS91_PRESSURE_SQUARED_COEFFICIENT * ((p_pa ** 2.0) / float(T_K))
+        KRESS91_PRESSURE_INV_T_COEFFICIENT * (p_pa / T_K),
+        KRESS91_PRESSURE_D_T_COEFFICIENT
+        * (((T_K - KRESS91_NONLINEAR_REFERENCE_T_K) * p_pa) / T_K),
+        KRESS91_PRESSURE_SQUARED_COEFFICIENT * ((p_pa ** 2.0) / T_K),
     )
 
 
@@ -462,30 +474,33 @@ FEO_ACTIVITY_DIAGNOSTIC_SOURCES = {
 CALPHAD_AUTHORITY_BLEND_WIDTH_LOG10 = 1.0
 
 
+def _kress91_require_control(name: str, value: float, *, positive: bool) -> float:
+    try:
+        number = float(value)
+    except (TypeError, ValueError) as exc:
+        raise Kress91InvalidControls(
+            f'Kress91 invalid control {name}: expected finite'
+            f'{" positive" if positive else ""} value, got {value!r}'
+        ) from exc
+    if not math.isfinite(number) or (positive and number <= 0.0):
+        raise Kress91InvalidControls(
+            f'Kress91 invalid control {name}: expected finite'
+            f'{" positive" if positive else ""} value, got {value!r}'
+        )
+    return number
+
+
 def _validate_kress91_controls(
     *,
     fO2_log: float,
     T_K: float,
     pressure_bar: float,
 ) -> None:
-    controls = {
-        'fO2_log': (fO2_log, False),
-        'T_K': (T_K, True),
-        'pressure_bar': (pressure_bar, True),
-    }
-    for name, (value, positive) in controls.items():
-        try:
-            number = float(value)
-        except (TypeError, ValueError) as exc:
-            raise Kress91InvalidControls(
-                f'Kress91 invalid control {name}: expected finite'
-                f'{" positive" if positive else ""} value, got {value!r}'
-            ) from exc
-        if not math.isfinite(number) or (positive and number <= 0.0):
-            raise Kress91InvalidControls(
-                f'Kress91 invalid control {name}: expected finite'
-                f'{" positive" if positive else ""} value, got {value!r}'
-            )
+    """Finite controls for the forward fold. Pressure is required."""
+
+    _kress91_require_control('fO2_log', fO2_log, positive=False)
+    _kress91_require_control('T_K', T_K, positive=True)
+    _kress91_require_control('pressure_bar', pressure_bar, positive=True)
 
 
 def floor_vacuum_pressure_bar(
@@ -1148,7 +1163,7 @@ def _kress91_ln_ratio(
     fO2_log: float,
     mol_fractions: Mapping[str, float],
     T_K: float,
-    pressure_bar: float,
+    pressure_bar: float | None,
     fo2_term: float | None = None,
 ) -> float:
     """Left fold of Kress91 ln(Fe2O3/FeO).
@@ -1159,15 +1174,24 @@ def _kress91_ln_ratio(
     inverse-temperature term; the other terms keep ``T_K`` as given.
     """
 
-    _validate_kress91_controls(fO2_log=fO2_log, T_K=T_K, pressure_bar=pressure_bar)
+    if pressure_bar is None:
+        # The ruled inverse omits pressure. Do not validate it and do not
+        # add a zero stand-in: absence and a zero term are different folds.
+        _kress91_require_control('fO2_log', fO2_log, positive=False)
+        _kress91_require_control('T_K', T_K, positive=True)
+    else:
+        _validate_kress91_controls(
+            fO2_log=fO2_log,
+            T_K=T_K,
+            pressure_bar=pressure_bar,
+        )
     if fo2_term is None:
         # a*ln(fO2) with fO2 = 10**fO2_log, computed as fO2_log*ln(10).
         # 10.0**fO2_log underflows to 0.0 at extreme-reducing fO2 and then
         # math.log(0.0) raises (BUG-159). This product is the canonical term.
         fo2_term = KRESS91_LN_FO2_COEFFICIENT * float(fO2_log) * math.log(10.0)
     x = mol_fractions
-    p_pa = max(float(pressure_bar), 1.0e-9) * PA_PER_BAR
-    return (
+    fold = (
         fo2_term
         + KRESS91_INV_T_COEFFICIENT_K / float(T_K)
         - 6.675
@@ -1181,12 +1205,12 @@ def _kress91_ln_ratio(
             - (KRESS91_NONLINEAR_REFERENCE_T_K / T_K)
             - math.log(T_K / KRESS91_NONLINEAR_REFERENCE_T_K)
         )
-        + KRESS91_PRESSURE_INV_T_COEFFICIENT * (p_pa / T_K)
-        + KRESS91_PRESSURE_D_T_COEFFICIENT * (
-            ((T_K - KRESS91_NONLINEAR_REFERENCE_T_K) * p_pa) / T_K
-        )
-        + KRESS91_PRESSURE_SQUARED_COEFFICIENT * ((p_pa ** 2.0) / T_K)
     )
+    if pressure_bar is None:
+        return fold
+    p_pa = max(float(pressure_bar), 1.0e-9) * PA_PER_BAR
+    inv_t, d_t, squared = _kress91_pressure_terms(T_K, p_pa)
+    return fold + inv_t + d_t + squared
 
 
 def _kress91_fe2o3_over_feo_molar(
@@ -1196,6 +1220,10 @@ def _kress91_fe2o3_over_feo_molar(
     T_K: float,
     pressure_bar: float,
 ) -> float:
+    # Public forwards require pressure. The private inverse still passes
+    # None into ``_kress91_ln_ratio`` and is the only omission.
+    if pressure_bar is None:
+        _kress91_require_control("pressure_bar", pressure_bar, positive=True)
     ln_ratio = _kress91_ln_ratio(
         fO2_log=fO2_log,
         mol_fractions=mol_fractions,
@@ -1217,7 +1245,26 @@ def kress91_log10_fO2_from_fe3_over_sigma_fe(
     q = 2*ratio/(2*ratio+1), so ratio = q/(2*(1-q)). q of 0 or 1 has no
     finite oxygen fugacity. This inverts the unclamped ln(ratio) equation;
     the forward exp() clamp is a numerical guard, not part of the relation.
+    Pressure stays required here. Only the private inverse may omit it.
     """
+
+    _kress91_require_control('pressure_bar', pressure_bar, positive=True)
+    return _kress91_log10_fO2_from_fe3_over_sigma_fe(
+        fe3_over_sigma_fe=fe3_over_sigma_fe,
+        mol_fractions=mol_fractions,
+        T_K=T_K,
+        pressure_bar=pressure_bar,
+    )
+
+
+def _kress91_log10_fO2_from_fe3_over_sigma_fe(
+    *,
+    fe3_over_sigma_fe: float,
+    mol_fractions: Mapping[str, float],
+    T_K: float,
+    pressure_bar: float | None,
+) -> float:
+    """Invert Kress91, optionally omitting the pressure term by ruling."""
 
     try:
         fraction = float(fe3_over_sigma_fe)

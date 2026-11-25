@@ -2143,6 +2143,7 @@ def _identity_equal(
     allow_unknown_species_polymorph: bool = False,
     ignore_fO2: bool = False,
     same_row_residue_extent: bool = False,
+    ignore_total_pressure: bool = False,
 ) -> IdentityEqualOutcome:
     """Compare identities with the narrow caller-selected axis allowances."""
 
@@ -2207,6 +2208,8 @@ def _identity_equal(
         # The caller uses this only for an explicit intrinsic-mode residual,
         # whose engine received no fO2 input.
         if ignore_fO2 and name == "fO2_Pa":
+            continue
+        if ignore_total_pressure and name == "total_pressure_Pa":
             continue
         required = name in profile.required
         permitted_na = name in profile.permitted_not_applicable
@@ -2303,6 +2306,14 @@ def _same_row_residue_extent_identity_equal(
         allow_unknown_species_phase=allow_unknown_species_phase,
         same_row_residue_extent=True,
     )
+
+
+def _same_row_knudsen_residue_identity_equal(
+    left: Identity, right: Identity,
+) -> IdentityEqualOutcome:
+    """Compare a same-row Knudsen extent request using the shared rule."""
+
+    return _same_row_residue_extent_identity_equal(left, right)
 
 
 def _same_row_redox_identity_equal(

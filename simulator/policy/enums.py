@@ -108,11 +108,17 @@ class NoticeKind(StrEnum):
     # d-460 default-policy flags. Policy metadata is stored separately on
     # Notice.policy; each token names the applied table rule.
     ASSUMED_PRESSURE = "assumed_pressure"
+    TOTAL_PRESSURE_INTERVAL_NOMINAL = "total_pressure_interval_nominal"
     METHOD_IMPLIED = "method_implied"
     EFFUSION_REGIME_ASSUMED = "effusion_regime_assumed"
     ALPHA_ASSUMED = "alpha_assumed"
     KNOB_DEFAULTED = "knob_defaulted"
     ASSUMED_FO2 = "assumed_fo2"
+    FO2_DEFAULT_AMBIENT_AIR_UNPRINTED_ATMOSPHERE = (
+        "fo2_default_ambient_air_unprinted_atmosphere"
+    )
+    # Retained for serialized notices from the superseded vacuum proxy.
+    FO2_VACUUM_CELL_PROXY = "fo2_vacuum_cell_proxy"
     METHOD_ASSUMED = "method_assumed"
     KEMS_CALIBRATION_BY_SOURCE = "kems_calibration_by_source"
     BASIS_CONVERTED = "basis_converted"
@@ -124,11 +130,13 @@ class NoticeKind(StrEnum):
 DEFAULT_POLICY_NOTICE_KINDS = frozenset(
     {
         NoticeKind.ASSUMED_PRESSURE,
+        NoticeKind.TOTAL_PRESSURE_INTERVAL_NOMINAL,
         NoticeKind.METHOD_IMPLIED,
         NoticeKind.EFFUSION_REGIME_ASSUMED,
         NoticeKind.ALPHA_ASSUMED,
         NoticeKind.KNOB_DEFAULTED,
         NoticeKind.ASSUMED_FO2,
+        NoticeKind.FO2_DEFAULT_AMBIENT_AIR_UNPRINTED_ATMOSPHERE,
         NoticeKind.METHOD_ASSUMED,
         NoticeKind.KEMS_CALIBRATION_BY_SOURCE,
         NoticeKind.BASIS_CONVERTED,

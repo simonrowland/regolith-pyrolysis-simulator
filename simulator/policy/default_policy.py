@@ -198,6 +198,14 @@ def _resolved_value(
         return Decimal(str(DP_019_VACUUM_BOUNDARY_BAR)) * Decimal(
             str(PA_PER_BAR)
         )
+    if policy_id == "DP-114":
+        if "low" not in context or "high" not in context:
+            raise ValueError("DP-114 requires the owning printed pressure interval")
+        low = _decimal(context["low"], context_name="DP-114 low pressure in Pa")
+        high = _decimal(context["high"], context_name="DP-114 high pressure in Pa")
+        if low <= 0 or high < low:
+            raise ValueError("DP-114 pressure interval must be positive and ordered")
+        return (low * high).sqrt()
     if policy_id == "DP-012" and "printed_value" in context:
         return context["printed_value"]
     if policy_id in {"DP-010", "DP-112"}:
