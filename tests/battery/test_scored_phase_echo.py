@@ -202,6 +202,29 @@ def test_analysed_glass_major_is_refused() -> None:
     assert detail["formula"] == "MgO"
 
 
+@pytest.mark.parametrize("formula", ("H2O", "CO2"))
+def test_scored_glass_is_refused_for_every_phase_composition_component(
+    formula: str,
+) -> None:
+    composition = _glass("scored_phase_analysis", SiO2="0.5", MgO="0.5")
+    detail = _input_composition_echo_detail(_identity(formula, composition))
+    assert detail is not None
+    assert (
+        detail["reason"]
+        == RefusalReason.INPUT_COMPOSITION_IS_SCORED_PHASE_ANALYSIS.value
+    )
+
+
+def test_noninput_melt_formula_stays_allowed_for_capacity() -> None:
+    composition = _glass("scored_phase_analysis", SiO2="0.5", MgO="0.5")
+    assert (
+        _input_composition_echo_detail(
+            _identity("H2O", composition, Quantity.CHLORIDE_CAPACITY)
+        )
+        is None
+    )
+
+
 def test_printed_starting_bulk_is_not_refused() -> None:
     composition = _glass(
         "printed_starting_bulk",

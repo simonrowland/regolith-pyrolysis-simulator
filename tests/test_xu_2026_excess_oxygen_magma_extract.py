@@ -8,16 +8,12 @@ import pytest
 import yaml
 
 from simulator.battery.enums import (
-    AmountBasis,
     Phase,
     PhaseRole,
     Quantity,
     RawInputStatus,
     UncertaintyKind,
     ValueKind,
-)
-from simulator.battery.composition import (
-    _element_wt_percent_stoichiometric_oxide_projection,
 )
 from simulator.battery.identity import celsius_to_kelvin
 from tests.battery.factories import migrate_one_extract
@@ -209,30 +205,14 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
         observation = observations[row["observation_id"]]
         raw_values = raw_observations[row["observation_id"]]["values"]
         assert raw_values["oxygen_source_as_published"] == row["oxygen_source"]
-        assert (
-            raw_observations[row["observation_id"]]["point_conditions"][
-                "composition"
-            ]["state"]["tag"]
-            == "value"
+        assert "composition" not in (
+            raw_observations[row["observation_id"]].get("point_conditions") or {}
         )
-        assert observation.identity.composition.is_value
-        composition = observation.identity.composition.value
-        assert composition.basis == "stoichiometric_oxide_projection"
-        assert composition.amount_basis is AmountBasis.MOLE_FRACTION
-        located_composition = observation.point_conditions["composition"]
-        assert located_composition.inference is not None
+        assert observation.identity.composition.is_unknown
         assert (
-            located_composition.inference.relation
-            == "element_wt_percent_stoichiometric_oxide_projection"
+            observation.identity.composition.reason
+            == "input_composition_is_scored_phase_analysis"
         )
-        assert located_composition.inference.output_unit == "mole_fraction"
-        group_prefix = row["observation_id"].rsplit("_", 1)[0]
-        expected_inputs = {
-            "xu-2026-excess-oxygen-magma::" + observation_id
-            for observation_id in raw_observations
-            if observation_id.rsplit("_", 1)[0] == group_prefix
-        }
-        assert set(located_composition.inference.inputs) == expected_inputs
         assert observation.value.kind is ValueKind.POINT
         assert observation.value.point == Decimal(row["component_amount"])
         assert observation.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
@@ -315,61 +295,6 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
     assert fe.derivation.raw_inputs.locator.section == "Mössbauer spectroscopic analysis"
     assert not fe.derived_from
     assert not fe.notices
-
-    table1_lvp1 = [
-        raw_observations[row["observation_id"]]
-        for row in table1
-        if row["experiment"] == "xu_2026_lvp_1"
-    ]
-    elemental_wt_percent = {
-        row["values"]["formula"]: row["values"]["component_amount_as_published"]
-        for row in table1_lvp1
-    }
-    lvp1_composition = observations[table1_lvp1[0]["observation_id"].split("::", 1)[-1]]
-    projection_derivation = lvp1_composition.point_conditions["composition"].inference
-    projection_parameters = dict(projection_derivation.parameters)
-    assert "source_formula_valence_Fe" not in projection_parameters
-    assert projection_parameters["assumed_valence_Fe"].state.value == 3
-    valences = {
-        name.removeprefix("source_formula_valence_"): int(parameter.state.value)
-        for name, parameter in projection_derivation.parameters
-        if name.startswith("source_formula_valence_")
-    }
-    valences["Fe"] = int(projection_parameters["assumed_valence_Fe"].state.value)
-    retained_components = tuple(
-        name for name in ("Cl", "CO2", "H2O") if name in elemental_wt_percent
-    )
-    projected = _element_wt_percent_stoichiometric_oxide_projection(
-        elemental_wt_percent,
-        valence_by_element=valences,
-        retained_components=retained_components,
-    )
-    assert dict(lvp1_composition.identity.composition.value.components) == dict(
-        projected.components
-    )
-    assert dict(projected.components)["Cl"] > 0
-    assert projection_parameters[
-        "oxygen_closure_residual_wt_percent"
-    ].state.value == projected.oxygen_closure_residual_wt_percent
-    oxygen_changed = dict(elemental_wt_percent)
-    oxygen_changed["O"] = str(Decimal(oxygen_changed["O"]) + 1)
-    oxygen_check_only = _element_wt_percent_stoichiometric_oxide_projection(
-        oxygen_changed,
-        valence_by_element=valences,
-        retained_components=retained_components,
-    )
-    assert oxygen_check_only.components == projected.components
-    assert (
-        oxygen_check_only.oxygen_closure_residual_wt_percent
-        == projected.oxygen_closure_residual_wt_percent + 1
-    )
-    cation_changed = dict(elemental_wt_percent)
-    cation_changed["Si"] = str(Decimal(cation_changed["Si"]) + 1)
-    assert _element_wt_percent_stoichiometric_oxide_projection(
-        cation_changed,
-        valence_by_element=valences,
-        retained_components=retained_components,
-    ).components != projected.components
 
     all_observations = list(observations.values())
     assert all(row.value.kind is ValueKind.POINT for row in all_observations)

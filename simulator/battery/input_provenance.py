@@ -308,6 +308,8 @@ def input_composition_echo_detail(identity: Identity) -> dict[str, object] | Non
         if total_iron:
             return None
         return refused("input_composition_is_scored_phase_analysis")
+    if quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION:
+        return refused("input_composition_is_scored_phase_analysis")
     if formula and formula not in names and formula in _NON_INPUT_MELT_FORMULAS:
         return None
     return refused("input_composition_is_scored_phase_analysis")
