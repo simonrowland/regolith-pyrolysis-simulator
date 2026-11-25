@@ -49,6 +49,14 @@ def polys():
     return load_buffer_polynomials()
 
 
+def test_default_cea_extract_loads_outside_repository_cwd(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+
+    polys = load_buffer_polynomials()
+
+    assert set(polys) == {"H2", "H2O", "O2", "CO", "CO2"}
+
+
 def test_buffer_polynomial_source_values_are_pinned_before_loader_reuse(polys):
     assert set(polys) == {"H2", "H2O", "O2", "CO", "CO2"}
     expected_g_over_rt_at_1800_K = {

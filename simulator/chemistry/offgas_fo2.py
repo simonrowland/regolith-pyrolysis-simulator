@@ -108,7 +108,10 @@ from simulator.yaml_cache import load_cached_safe_yaml
 #: Species whose CEA records this module needs. Both couples plus O2.
 BUFFER_SPECIES: tuple[str, ...] = ("H2", "H2O", "O2", "CO", "CO2")
 
-DEFAULT_CEA_EXTRACT = pathlib.Path("data/literature/extracts/nasa-cea-thermo.yaml")
+DEFAULT_CEA_EXTRACT = (
+    pathlib.Path(__file__).resolve().parents[2]
+    / "data/literature/extracts/nasa-cea-thermo.yaml"
+)
 
 #: Coupling modes, closed vocabulary.
 WGS_EQUILIBRATED = "wgs_equilibrated"
