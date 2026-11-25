@@ -211,9 +211,9 @@ def assert_table1_grid_matches_render(extract: dict, rendered: dict[str, list[st
                 assert point["locator"]["pdf_page_index"] == page - 1, (label, sample)
                 assert point["locator"]["table"] == "1", (label, sample)
                 assert point["locator"]["row"] == sample, (label, sample)
-                # The major-oxide ion series is formula-keyed; its separate WO3
-                # condition series must carry the explicit printed column.
-                if group == "IM" and formula != "WO3":
+                # Major-oxide composition series are formula-keyed; the separate
+                # WO3 condition series must carry the explicit printed column.
+                if group in {"EM", "IM"} and formula != "WO3":
                     assert point["locator"].get("column", formula) == formula, (
                         label,
                         sample,
