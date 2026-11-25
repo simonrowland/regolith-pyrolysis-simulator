@@ -14,6 +14,7 @@ from pathlib import Path
 import pytest
 
 from simulator.battery.enums import (
+    AdmissionStatus,
     AmountBasis,
     Engine,
     EvidenceClass,
@@ -24,7 +25,9 @@ from simulator.battery.enums import (
 )
 from simulator.battery.identity import Identity
 from simulator.battery.input_provenance import (
+    COMPOSITION_FROM_SINGLE_LIQUID_GLASS,
     PRINTED_STARTING_BULK,
+    SINGLE_LIQUID_GLASS_REDOX_FEOT_ONLY,
     phase_map_provenance,
     printed_single_melt_evidence,
     single_phase_printed_bulk_policy,
@@ -274,6 +277,35 @@ def test_redox_split_is_refused_and_feo_t_is_not() -> None:
     assert (
         _input_composition_echo_detail(_identity("Fe", total, Quantity.FE3_FE2_RATIO))
         is None
+    )
+
+
+def test_single_liquid_glass_normalized_feot_passes_only_without_split() -> None:
+    total = replace(
+        _glass(COMPOSITION_FROM_SINGLE_LIQUID_GLASS, SiO2="0.50", FeO="0.07"),
+        analysis_selection_rule=SINGLE_LIQUID_GLASS_REDOX_FEOT_ONLY,
+    )
+    split = replace(
+        _glass(
+            COMPOSITION_FROM_SINGLE_LIQUID_GLASS,
+            SiO2="0.50",
+            FeO="0.05",
+            Fe2O3="0.02",
+        ),
+        analysis_selection_rule=SINGLE_LIQUID_GLASS_REDOX_FEOT_ONLY,
+    )
+    assert (
+        _input_composition_echo_detail(
+            _identity("Fe", total, Quantity.FE3_FE2_RATIO)
+        )
+        is None
+    )
+    refusal = _input_composition_echo_detail(
+        _identity("Fe", split, Quantity.FE3_FE2_RATIO)
+    )
+    assert refusal is not None
+    assert refusal["reason"] == (
+        RefusalReason.INPUT_COMPOSITION_IS_SCORED_PHASE_ANALYSIS.value
     )
 
 
@@ -678,30 +710,20 @@ def test_printed_bulk_refuses_a_single_liquid_when_assemblage_is_unstated(
     )
 
 
-def test_migrated_bonnand_bare_glass_is_not_stamped_and_scores(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """Phase 'glass' is not printed evidence that the map is analysed glass.
+def test_migrated_bonnand_single_liquid_glass_is_consumed_as_condition() -> None:
+    """The measured glass is retained as a condition, not scored as itself."""
 
-    Provenance stays unset, so the echo guard does not fire and the pre-d-323
-    path scores a mocked liquid.
-    """
-
-    monkeypatch.setattr(
-        "simulator.battery.score._equilibrate_phase_assemblage",
-        lambda *_a, **_k: _liquid(1.0, {"MgO": 10.0}),
-    )
-    observation, experiment = _observation(
+    observation, _experiment = _observation(
         "bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite.yaml",
         "bonnand_2020_A1_mgo",
     )
     composition = observation.identity.composition
     assert composition is not None and composition.is_value
-    assert composition.value.input_provenance is None
-    assert _input_composition_echo_detail(observation.identity) is None
-    prediction = _predict(observation, observation.identity, experiment)
-    assert prediction.refusal_reason is None
-    assert prediction.value == Decimal("10.0")
+    assert composition.value.input_provenance == COMPOSITION_FROM_SINGLE_LIQUID_GLASS
+    assert observation.admission.status is AdmissionStatus.REJECTED
+    assert observation.admission.reason == (
+        RefusalReason.INPUT_COMPOSITION_IS_SCORED_PHASE_ANALYSIS.value
+    )
 
 
 def test_migrated_borisov_2004_row_refuses_the_echo(

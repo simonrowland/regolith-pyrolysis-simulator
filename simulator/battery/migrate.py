@@ -113,13 +113,18 @@ from simulator.battery.polymorph_dictionary import (
 )
 from simulator.battery.input_provenance import (
     ANALYSED_MELT_MINUS_SCORED,
+    COMPOSITION_FROM_SINGLE_LIQUID_GLASS,
     NAMED_MATERIAL_MIXTURE,
     PRINTED_STARTING_BULK,
     SAME_RUN_INITIAL_ANALYSED_MELT,
     SCORED_PHASE_ANALYSIS,
+    SINGLE_LIQUID_GLASS_REDOX_FEOT_ONLY,
+    SingleLiquidGlassDecision,
     analysed_melt_decision,
     collect_run_texts,
     composition_with_provenance,
+    decide_single_liquid_glass_composition,
+    input_composition_echo_detail,
     is_d323_candidate,
     label_marks_final,
     label_marks_initial,
@@ -6972,6 +6977,55 @@ def wt_pct_to_mole_fraction(wt: Mapping[str, Decimal]) -> Composition:
     return _wt_percent_conversion_or_raise(
         wt, closure_context=wt, declared_component_map=wt
     )
+
+
+def _single_liquid_glass_oxide_map(
+    observation: Mapping[str, Any], formula: str,
+) -> Mapping[str, Decimal] | None:
+    """Project oxide maps for the glass-identity owner.
+
+    Non-oxide or partial analyses remain unsupported here until the Q7 oxide
+    projection owner lands; that projection must feed this same run-composition
+    owner rather than attaching a vector to the glass's own rows. The d-470
+    owner still consumes same-run glass component rows it cannot use as oxides.
+    """
+
+    values = observation.get("values")
+    if not isinstance(values, Mapping):
+        return None
+    complete = _oxide_map_from_mapping(values, closure_context=values)
+    if complete:
+        return complete
+    amount_payload = values.get("component_amount")
+    if isinstance(amount_payload, Mapping):
+        amount_payload = amount_payload.get("value")
+    amount = _as_dec_or_none(amount_payload)
+    printed_formula = str(values.get("formula") or values.get("formula_as_published") or formula).strip()
+    component = _kume_formula_unit_oxide(
+        _mass_percent_component_key(printed_formula)[0]
+    )
+    if amount is None or component is None:
+        return None
+    oxide, _factor = component
+    return {oxide: amount}
+
+
+def _single_liquid_glass_composition(
+    oxide_weights: Mapping[str, Decimal], locator: Locator | None
+) -> Composition | None:
+    """Use the migration oxide-to-mole owner for a located glass analysis."""
+
+    del locator  # The located condition carries the source location separately.
+    try:
+        return wt_pct_to_mole_fraction(oxide_weights)
+    except (ArithmeticError, ValueError):
+        return None
+
+
+def _single_liquid_glass_locator(value: object) -> Locator | None:
+    if isinstance(value, Mapping) and isinstance(value.get("locator"), Mapping):
+        return locator_from_mapping(value["locator"])
+    return None
 
 
 def _uses_elemental_mass_percent_vocabulary(
@@ -26350,6 +26404,21 @@ class Migrator:
             phase_analysis_parent_ids
         )
         source_context["same_run_initial_melts"] = _same_run_initial_melts(rows)
+        source_context["single_liquid_glass_decisions"] = (
+            decide_single_liquid_glass_composition(
+                experiments=tuple(
+                    row for row in raw_experiments if isinstance(row, Mapping)
+                ),
+                observations=tuple(
+                    (str(row.get("observation_id")), formula, row)
+                    for formula, row in rows
+                    if row.get("observation_id") not in (None, "")
+                ),
+                oxide_map_for_row=_single_liquid_glass_oxide_map,
+                composition_for_oxides=_single_liquid_glass_composition,
+                locator_for=_single_liquid_glass_locator,
+            )
+        )
         source_context["fidelity_samples"] = doc.get("fidelity_samples")
         source_context["same_row_composition_closure_components"] = (
             _same_row_composition_closure_components(rows)
@@ -26661,6 +26730,16 @@ class Migrator:
         else:
             values = {}
         context = source_context or {}
+        single_liquid_glass_decisions = context.get(
+            "single_liquid_glass_decisions"
+        )
+        single_liquid_glass_decision = (
+            single_liquid_glass_decisions.get(raw_obs_id)
+            if isinstance(single_liquid_glass_decisions, Mapping)
+            else None
+        )
+        if not isinstance(single_liquid_glass_decision, SingleLiquidGlassDecision):
+            single_liquid_glass_decision = None
         closure_components_by_observation = context.get(
             "same_row_composition_closure_components"
         )
@@ -29144,11 +29223,114 @@ class Migrator:
             ),
             analysed_phase_text=_analysed_phase_text(obs, values),
         )
+        single_liquid_glass_notice: Notice | None = None
+        if (
+            single_liquid_glass_decision is not None
+            and single_liquid_glass_decision.status == "applied"
+            and single_liquid_glass_decision.composition is not None
+            and single_liquid_glass_decision.composition_locator is not None
+        ):
+            current_composition = ident_kwargs.get("composition")
+            current_condition = (point_conditions or {}).get("composition")
+            condition_composition = (
+                current_condition.state.value
+                if isinstance(current_condition, Located)
+                and current_condition.state.is_value
+                else current_condition.value
+                if isinstance(current_condition, State)
+                and current_condition.is_value
+                else None
+            )
+            has_current_composition = (
+                isinstance(current_composition, State)
+                and current_composition.is_value
+            )
+            has_current_condition = condition_composition is not None
+            if (
+                single_liquid_glass_decision.consumed_as_condition
+                or not (has_current_composition or has_current_condition)
+            ):
+                glass_composition = single_liquid_glass_decision.composition
+                glass_locator = single_liquid_glass_decision.composition_locator
+                glass_derivation = wt_pct_to_mole_fraction_derivation(
+                    dict(single_liquid_glass_decision.composition_wt_percent),
+                    glass_locator,
+                    source_note=(
+                        f"d-305 {SINGLE_LIQUID_GLASS_REDOX_FEOT_ONLY}"
+                        if SINGLE_LIQUID_GLASS_REDOX_FEOT_ONLY
+                        in (glass_composition.analysis_selection_rule or "")
+                        else None
+                    ),
+                )
+                located_glass_composition = Located(
+                    State.of(glass_composition),
+                    locator=glass_locator,
+                    inference=glass_derivation,
+                )
+                point_conditions = {
+                    **(point_conditions or {}),
+                    "composition": located_glass_composition,
+                }
+                ident_kwargs["composition"] = State.of(glass_composition)
+                observation_provenance = {
+                    **(observation_provenance or {}),
+                    COMPOSITION_FROM_SINGLE_LIQUID_GLASS: {
+                        "status": (
+                            "consumed_as_condition"
+                            if single_liquid_glass_decision.consumed_as_condition
+                            else "applied"
+                        ),
+                        "reason": single_liquid_glass_decision.reason,
+                        "run_id": single_liquid_glass_decision.run_id,
+                        "glass_observation_ids": list(
+                            single_liquid_glass_decision.glass_observation_ids
+                        ),
+                        "volatile_loss": to_plain(
+                            single_liquid_glass_decision.volatile_loss
+                        ),
+                        "container_exchange": to_plain(
+                            single_liquid_glass_decision.container_exchange
+                        ),
+                    },
+                }
+                if isinstance(q_token, Quantity):
+                    single_liquid_glass_notice = Notice(
+                        kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                        affected_quantities=(q_token,),
+                        reason=(
+                            f"{COMPOSITION_FROM_SINGLE_LIQUID_GLASS}: "
+                            f"condition from {glass_composition.proxy_source}; "
+                            "volatile_loss and container_exchange are recorded "
+                            "in observation provenance"
+                        ),
+                        origin=obs_id,
+                        source=glass_composition.proxy_source,
+                    )
         identity = fill_identity(
             quantity,
             None if q_token is Quantity.LOG10_K_REACTION else species,
             **ident_kwargs,
         )
+        if single_liquid_glass_decision is not None and (
+            single_liquid_glass_decision.consumed_as_condition
+        ):
+            consumed_composition = single_liquid_glass_decision.composition
+            if consumed_composition is None:
+                raise ValueError("consumed glass condition has no composition")
+            guard_identity = replace(
+                identity,
+                composition=State.of(consumed_composition),
+            )
+            non_scored = input_composition_echo_detail(guard_identity)
+            if non_scored is None:
+                raise ValueError(
+                    "single-liquid glass condition was not recognized by the "
+                    "shared phase-analysis echo guard"
+                )
+            admission = Admission(
+                status=AdmissionStatus.REJECTED,
+                reason=str(non_scored["reason"]),
+            )
         partial_total_condition = _partial_pressure_point_condition(
             ident_kwargs,
             locator,
@@ -29845,6 +30027,8 @@ class Migrator:
         observation_notices.extend(
             _notice_from_plain(notice) for notice in (obs.get("notices") or ())
         )
+        if single_liquid_glass_notice is not None:
+            observation_notices.append(single_liquid_glass_notice)
         if ambient_pressure_notice is not None:
             observation_notices.append(ambient_pressure_notice)
         if obs.get("standard_pressure") == "not_printed":

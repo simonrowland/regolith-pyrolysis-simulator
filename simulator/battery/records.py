@@ -769,6 +769,9 @@ class Composition:
     #     printed analysis; the scorer removes the scored components.
     #   same_run_initial_analysed_melt
     #     KC91 Table 3 initial analysis bound onto the final row.
+    #   composition_from_single_liquid_glass
+    #     same-run liquid/glass analysis used only when source evidence proves
+    #     one liquid without crystals or a second liquid.
     input_provenance: str | None = None
 
     def __post_init__(self) -> None:

@@ -10,6 +10,16 @@ import yaml
 from openpyxl import load_workbook
 
 from simulator.battery.enums import NoticeKind
+from simulator.battery.input_provenance import (
+    COMPOSITION_FROM_SINGLE_LIQUID_GLASS,
+    decide_single_liquid_glass_composition,
+)
+from simulator.battery.migrate import (
+    _single_liquid_glass_composition,
+    _single_liquid_glass_locator,
+    _single_liquid_glass_oxide_map,
+    iter_extract_observations,
+)
 from tests.battery.factories import migrate_one_extract
 from tests.helpers.corpus_paths import regolith_corpus_root
 
@@ -242,3 +252,59 @@ def test_context_preserves_unlabelled_and_formula_cells(migrated_extract) -> Non
         for row in formula["formula_rows_as_published"]
         for cell in row["cells"]
     )
+
+
+def test_natural_immiscible_liquid_records_are_not_used_as_run_composition(
+    migrated_extract,
+) -> None:
+    document, result = migrated_extract
+    natural_rows = [
+        row
+        for row in document["species"]["SiO2"]["observations"]
+        if row.get("locator", {}).get("table") == "natural immiscible liquids"
+    ]
+    assert len(natural_rows) == 1_120
+
+    natural_experiment_ids = {
+        str(row.get("experiment")) for row in natural_rows
+    }
+    decisions = decide_single_liquid_glass_composition(
+        experiments=tuple(
+            experiment
+            for experiment in document["experiments"]
+            if experiment.get("experiment_id") in natural_experiment_ids
+        ),
+        observations=tuple(
+            (str(row["observation_id"]), formula, row)
+            for formula, row in iter_extract_observations(document)
+            if row.get("experiment") in natural_experiment_ids
+        ),
+        oxide_map_for_row=_single_liquid_glass_oxide_map,
+        composition_for_oxides=_single_liquid_glass_composition,
+        locator_for=_single_liquid_glass_locator,
+    )
+    unexpected = [
+        (
+            str(row["observation_id"]),
+            decisions[str(row["observation_id"])].status,
+            decisions[str(row["observation_id"])].reason,
+        )
+        for row in natural_rows
+        if decisions[str(row["observation_id"])].status != "skipped"
+        or decisions[str(row["observation_id"])].reason != "two_liquid_assemblage"
+    ]
+    assert not unexpected, unexpected[:20]
+
+    for row in natural_rows:
+        observation = result.observations[f"{SOURCE_ID}::{row['observation_id']}"]
+        composition_state = observation.identity.composition
+        assert not (
+            composition_state is not None
+            and composition_state.is_value
+            and composition_state.value.input_provenance
+            == COMPOSITION_FROM_SINGLE_LIQUID_GLASS
+        )
+        assert COMPOSITION_FROM_SINGLE_LIQUID_GLASS not in (
+            observation.provenance or {}
+        )
+        assert "consumed_as_condition" not in (observation.admission.reason or "")
