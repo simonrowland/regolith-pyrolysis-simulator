@@ -7346,8 +7346,10 @@ def _capture_recursive_equilibrium_row(
         sim.melt.fO2_log = -9.0
         if hasattr(sim.melt, "melt_fO2_log"):
             sim.melt.melt_fO2_log = -9.0
-    sim.backend.is_available = lambda: True
-    result = sim._get_equilibrium()
+    result = sim._record_equilibrium_status(
+        _fixture_result,
+        run_post_equilibrium_sulfsat=False,
+    )
     assert store.capture_sequence[-1]["artifact"] == "equilibrium_post_record"
     key = store._equilibrium_key(sim)
     payload = copy.deepcopy(store._entries[_key_hash(key)]["payload"])
@@ -7363,10 +7365,9 @@ def _capture_recursive_gate_row(
         "capture",
         db_path=db_path if persistent else None,
     )
-    sim, _ = _pt0_equilibrium_capture_context(capture)
+    sim = _build_pt0_sim(capture)
     with pytest.MonkeyPatch.context() as monkeypatch:
-        _install_magemin_subprocess_gate(sim, monkeypatch)
-        sim.start_campaign(CampaignPhase.C2A_STAGED)
+        _configure_recursive_gate_sim(sim, monkeypatch)
         curve = sim._freeze_gate_curve()
     assert capture.capture_sequence[-1]["artifact"] == "freeze_gate_curve"
     key = copy.deepcopy(capture.capture_sequence[-1]["key"])
@@ -7629,6 +7630,32 @@ def _exercise_gate_replay_consumer(
     assert isinstance(liquid_fraction, float)
 
 
+def _accepted_hit_disclosures_for_test(store: PT0DeterminismStore) -> Any:
+    return copy.deepcopy(getattr(store, "_accepted_hit_disclosures", None))
+
+
+def _configure_recursive_gate_sim(
+    sim: Any,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    sim.start_campaign(CampaignPhase.C2A_STAGED)
+    sim._liquid_fraction_provider = "magemin"
+    register_synthetic_gate_curve_producer(sim)
+    _install_magemin_subprocess_gate(sim, monkeypatch)
+    alpha_provider = sim._chem_registry.gate_provider_order[1]
+    monkeypatch.setattr(alpha_provider, "_ensure_backend", lambda: None)
+    if not callable(getattr(sim.backend, "equilibrate", None)):
+        def unexpected_equilibrium(
+            *,
+            composition_mol_by_account: Any = None,
+        ) -> None:
+            raise AssertionError(
+                "gate cache fixture unexpectedly used the equilibrium backend"
+            )
+
+        sim.backend.equilibrate = unexpected_equilibrium
+
+
 def _exercise_cache_payload_replay(
     store: PT0DeterminismStore,
     artifact: str,
@@ -7636,10 +7663,9 @@ def _exercise_cache_payload_replay(
     if artifact == "equilibrium_post_record":
         _exercise_equilibrium_replay_consumers(store)
         return
-    sim, _ = _pt0_equilibrium_capture_context(store)
+    sim = _build_pt0_sim(store)
     with pytest.MonkeyPatch.context() as monkeypatch:
-        _install_magemin_subprocess_gate(sim, monkeypatch)
-        sim.start_campaign(CampaignPhase.C2A_STAGED)
+        _configure_recursive_gate_sim(sim, monkeypatch)
         curve = sim._freeze_gate_curve()
         assert store.hits == 1
         assert store.last_cache_state == "cached_exact"
@@ -7754,9 +7780,7 @@ def test_real_cache_payload_recursive_mutations_miss_or_replay_identically(
                 persistent=persistent,
                 db_path=db_path,
             )
-            before_disclosures = copy.deepcopy(
-                getattr(reader, "_accepted_hit_disclosures", None)
-            )
+            before_disclosures = _accepted_hit_disclosures_for_test(reader)
             try:
                 hit = reader._lookup(
                     artifact,
@@ -7765,7 +7789,11 @@ def test_real_cache_payload_recursive_mutations_miss_or_replay_identically(
                 )
             except PT0CacheMiss:
                 hit = None
-                if reader.hits != 0 or reader._accepted_hit_disclosures != before_disclosures:
+                if (
+                    reader.hits != 0
+                    or _accepted_hit_disclosures_for_test(reader)
+                    != before_disclosures
+                ):
                     failures.append(
                         f"{path_name} {mutation}: miss changed hit/disclosure state"
                     )
@@ -7776,7 +7804,11 @@ def test_real_cache_payload_recursive_mutations_miss_or_replay_identically(
                 )
                 continue
             if hit is None:
-                if reader.hits != 0 or reader._accepted_hit_disclosures != before_disclosures:
+                if (
+                    reader.hits != 0
+                    or _accepted_hit_disclosures_for_test(reader)
+                    != before_disclosures
+                ):
                     failures.append(
                         f"{path_name} {mutation}: miss changed hit/disclosure state"
                     )
@@ -7952,9 +7984,7 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
                 ),
             )
             before_hits = capture.hits
-            before_disclosures = copy.deepcopy(
-                capture._accepted_hit_disclosures
-            )
+            before_disclosures = _accepted_hit_disclosures_for_test(capture)
             try:
                 result = capture._lookup_interpolated(
                     "equilibrium_post_record",
@@ -7972,7 +8002,7 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
                     failures.append(
                         f"{path_name} {mutation}: interpolation miss changed hits"
                     )
-                if capture._accepted_hit_disclosures != before_disclosures:
+                if _accepted_hit_disclosures_for_test(capture) != before_disclosures:
                     failures.append(
                         f"{path_name} {mutation}: interpolation miss changed disclosure state"
                     )
