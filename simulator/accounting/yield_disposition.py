@@ -331,29 +331,23 @@ def build_yield_disposition(
     origin_unattributed_input = _element_mol_atoms(
         ledger.initial_unattributed_atom_moles()
     )
-    # Premise: disposition closure admits at most `_CLOSURE_LIMIT_FRACTION`
-    # (5e-14, or 5e-12%) of charged atoms as a per-element residual. Algebra:
-    # for charged scale C, the limit is max(the existing 2e-18 floor, C*5e-14).
-    # Units: mol-atoms times a dimensionless fraction gives mol-atoms. Sanity:
-    # at C=1 mol-atoms, 6.9e-18 is dust while 1e-12 exceeds the 5e-14 limit.
-    closure_tolerance_by_element = {
-        element: max(
-            _ATOM_EPS,
-            _CLOSURE_LIMIT_FRACTION
-            * math.fsum(
-                (
-                    float(feedstock_input.get(element, 0.0)),
-                    float(reagent_input.get(element, 0.0)),
-                    float(origin_unattributed_input.get(element, 0.0)),
-                )
-            ),
+    # Premise: closure-scale per-element residuals are numerical dust. At
+    # charged_e mol-atoms, `_atom_tolerance` applies max(2e-18, charged_e*5e-14);
+    # the result is mol-atoms, so at charged_e=1 it admits 6.9e-18 but not 1e-12.
+    closure_tolerance_by_element = {}
+    for element in (
+        set(feedstock_input)
+        | set(reagent_input)
+        | set(origin_unattributed_input)
+    ):
+        charged_e = math.fsum(
+            (
+                float(feedstock_input.get(element, 0.0)),
+                float(reagent_input.get(element, 0.0)),
+                float(origin_unattributed_input.get(element, 0.0)),
+            )
         )
-        for element in (
-            set(feedstock_input)
-            | set(reagent_input)
-            | set(origin_unattributed_input)
-        )
-    }
+        closure_tolerance_by_element[element] = _atom_tolerance(charged_e)
     origin_dust_mol_atoms = _origin_dust_tolerance(
         ledger,
         feedstock_input,
