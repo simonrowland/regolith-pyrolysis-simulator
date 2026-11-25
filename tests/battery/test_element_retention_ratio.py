@@ -260,16 +260,20 @@ def test_sossi_printed_mn_row_reaches_the_scored_retention_path() -> None:
     )
     starting_ppm = float(values["starting_measured_ppm"])
     buffered_fO2 = float(source_row["log10_fO2"]["value"])
-    starting_ti_ppm = float(
-        source["species"]["Ti"]["observations"][0]["values"][
-            "starting_measured_ppm"
-        ]
-    )
+    starting_trace_ppm = {
+        element: float(
+            source["species"][element]["observations"][0]["values"][
+                "starting_measured_ppm"
+            ]
+        )
+        for element in residue._SOSSI_TRACE_PARENTS
+    }
+    starting_trace_ppm["Mn"] = starting_ppm
     integrated = residue._predict_sossi_residue_cohort(
         [experiment],
         load_yaml(ROOT / "data/vapor_pressures.yaml"),
         starting_trace_ppm_by_experiment={
-            run_id: {"Mn": starting_ppm, "Ti": starting_ti_ppm}
+            run_id: starting_trace_ppm
         },
         buffered_fO2_log_by_experiment={run_id: buffered_fO2},
         engine="internal-analytical",
@@ -317,8 +321,8 @@ def test_sossi_printed_mn_row_reaches_the_scored_retention_path() -> None:
 
     unavailable_reference = replace(
         q_reference,
-        observation_id=q_reference.observation_id + "::Gd",
-        identity=replace(q_reference.identity, species=Species("Gd", Phase.L)),
+        observation_id=q_reference.observation_id + "::Xe",
+        identity=replace(q_reference.identity, species=Species("Xe", Phase.L)),
     )
     unavailable_prediction = _sossi_residue_prediction(
         context, unavailable_reference, Engine.INTERNAL_ANALYTICAL, {}

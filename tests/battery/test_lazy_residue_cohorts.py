@@ -180,7 +180,7 @@ def test_sossi_selected_experiments_match_full_rows_and_integrate_only_selected(
         element: source["species"][element]["observations"][0]["values"][
             "starting_measured_ppm"
         ]
-        for element in ("Mn", "Ti")
+        for element in residue._SOSSI_TRACE_PARENTS
     }
     starting_trace_by_experiment = {
         experiment_id: starting_trace for experiment_id in experiment_ids

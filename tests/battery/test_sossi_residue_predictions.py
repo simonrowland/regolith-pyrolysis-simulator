@@ -9,6 +9,8 @@ import yaml
 
 from simulator.battery.residue import (
     _SOSSI_GEOMETRIES,
+    _SOSSI_TRACE_PARENTS,
+    _inventory_bulk_and_element_masses_kg,
     _sossi_geometry_areas,
     _sossi_initial_inventory,
 )
@@ -18,15 +20,21 @@ ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "data/literature/extracts/kems-012-sossi-2019.yaml"
 
 
+def _starting_trace_ppm(source: dict[str, object]) -> dict[str, float]:
+    return {
+        element: float(
+            source["species"][element]["observations"][0]["values"][
+                "starting_measured_ppm"
+            ]
+        )
+        for element in _SOSSI_TRACE_PARENTS
+    }
+
+
 def test_sossi_start_inventory_contains_table1_host_and_starting_trace() -> None:
     source = yaml.safe_load(SOURCE.read_text())
     experiment = source["experiments"][0]
-    starting_trace_ppm = {
-        element: source["species"][element]["observations"][0]["values"][
-            "starting_measured_ppm"
-        ]
-        for element in ("Mn", "Ti")
-    }
+    starting_trace_ppm = _starting_trace_ppm(source)
     inventory, sample_mass_kg, inventory_mass_kg = _sossi_initial_inventory(
         experiment, starting_trace_ppm
     )
@@ -38,11 +46,16 @@ def test_sossi_start_inventory_contains_table1_host_and_starting_trace() -> None
         "MgO",
         "FeO",
         "CaO",
-        "MnO",
-        "TiO2",
+        *_SOSSI_TRACE_PARENTS.values(),
     } <= set(inventory)
-    assert inventory["MnO"] > 0.0
-    assert inventory["TiO2"] > 0.0
+    for element, parent in _SOSSI_TRACE_PARENTS.items():
+        assert inventory[parent] > 0.0
+        _total_mass, element_mass = _inventory_bulk_and_element_masses_kg(
+            {parent: inventory[parent]}, 0.0, (element,)
+        )
+        assert element_mass[element] == pytest.approx(
+            starting_trace_ppm[element] * 1.0e-6 * sample_mass_kg
+        )
     assert inventory_mass_kg > 0.0
     assert experiment["sample"]["printed_composition"]["locator"]["table"] == "1"
     assert experiment["sample"]["printed_composition"]["state"]["value"] == {
@@ -94,22 +107,13 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
     source = yaml.safe_load(SOURCE.read_text())
     experiment = source["experiments"][0]
     experiment_id = experiment["experiment_id"]
-    starting_trace = {
-        element: source["species"][element]["observations"][0]["values"][
-            "starting_measured_ppm"
-        ]
-        for element in ("Mn", "Ti")
-    }
+    starting_trace = _starting_trace_ppm(source)
     initial_inventory, _, _ = residue._sossi_initial_inventory(
         experiment, starting_trace
     )
     temperature_K = residue._hashimoto_point_value(
         experiment["thermal_schedule"]["setpoints_and_holds"][0]["temperature_K"]
     )
-    expected_mno_activity = melt_oxide_activity(
-        "MnO", initial_inventory, temperature_K=temperature_K
-    )
-    assert expected_mno_activity is not None
     evaluated_compositions: list[dict[str, float]] = []
     gas_activity_inputs: list[dict[str, float]] = []
     original_melt_evaluate = openimcc_bridge._evaluate_uncached
@@ -154,6 +158,10 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
     assert "liquid_pack_digest" not in prediction.provenance
     assert evaluated_compositions
     assert all("MnO" not in composition for composition in evaluated_compositions)
+    expected_mno_activity = melt_oxide_activity(
+        "MnO", evaluated_compositions[0], temperature_K=temperature_K
+    )
+    assert expected_mno_activity is not None
     mno_inputs = [activities for activities in gas_activity_inputs if "MnO" in activities]
     assert mno_inputs
     assert mno_inputs[0]["MnO"] == pytest.approx(
@@ -163,6 +171,45 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
     assert mno_extension["authority_level"] == expected_mno_activity.evidence_tier
     assert mno_extension["certified_band_K"] is None
     assert mno_extension["activity_provenance"] == expected_mno_activity.provenance()
+    ideal_parents = {
+        parent
+        for element, parent in _SOSSI_TRACE_PARENTS.items()
+        if element in {"Gd", "La", "Sc", "V", "Yb", "Zr"}
+    }
+    assert ideal_parents <= set(prediction.provenance["melt_activity_extensions"])
+    for parent in ideal_parents:
+        extension = prediction.provenance["melt_activity_extensions"][parent]
+        assert extension["flag"] == "melt_activity_default_ideal"
+        assert extension["authority"] == "CONVENTION"
+        expected_activity = melt_oxide_activity(
+            parent, initial_inventory, temperature_K=temperature_K
+        )
+        assert expected_activity is not None
+        assert gas_activity_inputs[0][parent] == pytest.approx(
+            expected_activity.thermodynamic_parent_activity()
+        )
+    assert ideal_parents <= set(gas_activity_inputs[0])
+
+    from simulator.battery.residue import ResidueInventoryRefusal
+    import simulator.chemistry.melt_activity as melt_activity
+
+    original_activity = melt_activity.melt_oxide_activity
+
+    def refuse_ideal_default(parent, *args, **kwargs):
+        if parent in ideal_parents:
+            return None
+        return original_activity(parent, *args, **kwargs)
+
+    with monkeypatch.context() as old_default:
+        old_default.setattr(melt_activity, "melt_oxide_activity", refuse_ideal_default)
+        with pytest.raises(ResidueInventoryRefusal, match="melt_activity_unavailable"):
+            residue._predict_sossi_residue_cohort(
+                [experiment],
+                catalog,
+                starting_trace_ppm_by_experiment={experiment_id: starting_trace},
+                buffered_fO2_log_by_experiment={experiment_id: -10.0},
+                engine="openimcc",
+            )
 
 
 # engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
@@ -178,12 +225,7 @@ def test_sossi_ti_only_cohort_still_evaluates_gas(monkeypatch) -> None:
     source = yaml.safe_load(SOURCE.read_text())
     experiment = source["experiments"][0]
     experiment_id = experiment["experiment_id"]
-    starting_trace = {
-        element: source["species"][element]["observations"][0]["values"][
-            "starting_measured_ppm"
-        ]
-        for element in ("Mn", "Ti")
-    }
+    starting_trace = _starting_trace_ppm(source)
     original_channels = battery._openimcc_gas_channels_and_omission_notices
     selected: list[str] = []
 
@@ -256,12 +298,7 @@ def test_sossi_openimcc_timeout_is_typed_and_later_runs_continue(
 
     source = yaml.safe_load(SOURCE.read_text())
     experiments = source["experiments"][:2]
-    starting_trace = {
-        element: source["species"][element]["observations"][0]["values"][
-            "starting_measured_ppm"
-        ]
-        for element in ("Mn", "Ti")
-    }
+    starting_trace = _starting_trace_ppm(source)
     experiment_ids = {experiment["experiment_id"] for experiment in experiments}
     monkeypatch.setattr(
         openimcc_bridge, "DEFAULT_BACKEND_PACK_NAME", "published-core"
@@ -311,12 +348,7 @@ def test_sossi_worker_start_failure_after_residue_scoring_worker(
     )
     source = yaml.safe_load(SOURCE.read_text())
     experiment = source["experiments"][0]
-    starting_trace = {
-        element: source["species"][element]["observations"][0]["values"][
-            "starting_measured_ppm"
-        ]
-        for element in ("Mn", "Ti")
-    }
+    starting_trace = _starting_trace_ppm(source)
     experiment_id = experiment["experiment_id"]
 
     residue._predict_sossi_residue_cohort(
@@ -378,12 +410,7 @@ def _assert_sossi_worker_start_failure_recorded(
     )
     source = yaml.safe_load(SOURCE.read_text())
     experiment = source["experiments"][0]
-    starting_trace = {
-        element: source["species"][element]["observations"][0]["values"][
-            "starting_measured_ppm"
-        ]
-        for element in ("Mn", "Ti")
-    }
+    starting_trace = _starting_trace_ppm(source)
     experiment_id = experiment["experiment_id"]
 
     prediction = residue._predict_sossi_residue_cohort(
@@ -402,12 +429,12 @@ def _assert_sossi_worker_start_failure_recorded(
     assert residue._OPENIMCC_EVALUATION_WORKER is None
 
 
-def test_sossi_scorer_projects_mn_and_types_unsupported_elements(monkeypatch) -> None:
+def test_sossi_scorer_projects_trace_species_and_flags_ideal_activity(monkeypatch) -> None:
     from simulator.battery.enums import (
+        Authority,
         Engine,
         MetricOperation,
         NoticeKind,
-        RefusalReason,
     )
     from simulator.battery.score import (
         _residue_prediction_cache_entry,
@@ -441,8 +468,12 @@ def test_sossi_scorer_projects_mn_and_types_unsupported_elements(monkeypatch) ->
         return tuple(
             SimpleNamespace(
                 experiment_id=item["experiment_id"],
-                primary_element_ppm={"Mn": 900.0, "Ti": 450.0},
-                sensitivity_band_ppm={"Mn": (800.0, 1000.0), "Ti": (400.0, 500.0)},
+                primary_element_ppm={"Mn": 900.0, "Ti": 450.0, "Gd": 700.0},
+                sensitivity_band_ppm={
+                    "Mn": (800.0, 1000.0),
+                    "Ti": (400.0, 500.0),
+                    "Gd": (600.0, 800.0),
+                },
                 channel_missing_elements=(),
                 provenance={
                     "integration": {"primary": {"status": "converged"}},
@@ -451,7 +482,11 @@ def test_sossi_scorer_projects_mn_and_types_unsupported_elements(monkeypatch) ->
                             "reason": "MnO is outside the IMCC-SF04 melt-activity domain",
                             "authority_level": "UNCERTIFIED",
                             "certified_band_K": None,
-                        }
+                        },
+                        "Gd2O3": {
+                            "flag": "melt_activity_default_ideal",
+                            "authority": "CONVENTION",
+                        },
                     },
                 },
             )
@@ -463,7 +498,7 @@ def test_sossi_scorer_projects_mn_and_types_unsupported_elements(monkeypatch) ->
     prediction = _sossi_residue_prediction(
         context, manganese, Engine.OPENIMCC, cache
     )
-    refusal = _sossi_residue_prediction(
+    gadolinium_prediction = _sossi_residue_prediction(
         context, gadolinium, Engine.OPENIMCC, cache
     )
 
@@ -474,6 +509,8 @@ def test_sossi_scorer_projects_mn_and_types_unsupported_elements(monkeypatch) ->
     assert expected_run in cached_cohort
     assert prediction.execution.state.value == "produced"
     assert prediction.value == 900.0
+    assert gadolinium_prediction.execution.state.value == "produced"
+    assert gadolinium_prediction.value == 700.0
     assert prediction.identity == manganese.identity
     assert prediction.version is None
     assert "code_revision" not in prediction.refusal_detail
@@ -489,8 +526,84 @@ def test_sossi_scorer_projects_mn_and_types_unsupported_elements(monkeypatch) ->
         for notice in prediction.notices
     )
     assert metric_operation_for_identity(manganese.identity) is MetricOperation.DEX
-    assert refusal.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
-    assert refusal.refusal_detail["reason"] == "channel_missing"
+    ideal_notices = [
+        notice
+        for notice in gadolinium_prediction.notices
+        if notice.reason == "melt_activity_default_ideal"
+    ]
+    assert len(ideal_notices) == 1
+    assert ideal_notices[0].kind is NoticeKind.FALLBACK
+    assert ideal_notices[0].authority is Authority.CONVENTION
+
+    with monkeypatch.context() as old_parent_map:
+        old_parent_map.setattr(
+            residue, "_SOSSI_TRACE_PARENTS", {"Mn": "MnO", "Ti": "TiO2"}
+        )
+        mutated = _sossi_residue_prediction(
+            context, gadolinium, Engine.OPENIMCC, {}
+        )
+        with pytest.raises(AssertionError):
+            assert mutated.execution.state.value == "produced"
+
+
+@pytest.mark.engine_cache_off
+def test_sossi_trace_score_reports_pre_film_residual_metrics() -> None:
+    from simulator.battery.enums import Authority, Engine, NoticeKind, Quantity
+    from simulator.battery.score import (
+        _sossi_residue_prediction,
+        load_score_context,
+        point_magnitude,
+        quantity_token,
+    )
+
+    context = load_score_context(sources=("kems-012-sossi-2019",))
+    scored_elements = tuple(
+        element for element in _SOSSI_TRACE_PARENTS if element not in {"Mn", "Ti"}
+    )
+    target_rows = [
+        row
+        for row in context.observations.values()
+        if row.source_id == "kems-012-sossi-2019"
+        and row.admission.status.value == "admitted"
+        and quantity_token(row.identity) is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and row.identity.species.formula in scored_elements
+        and point_magnitude(row.value) is not None
+    ]
+    assert len(target_rows) == 258
+
+    cache = {}
+    errors_by_element: dict[str, list[float]] = {
+        element: [] for element in scored_elements
+    }
+    for row in target_rows:
+        element = row.identity.species.formula
+        prediction = _sossi_residue_prediction(
+            context, row, Engine.OPENIMCC, cache
+        )
+        assert prediction.execution.state.value == "produced"
+        observed = float(point_magnitude(row.value))
+        predicted = float(prediction.value)
+        assert observed > 0.0 and predicted > 0.0
+        ideal_notices = [
+            notice
+            for notice in prediction.notices
+            if notice.kind is NoticeKind.FALLBACK
+            and notice.reason == "melt_activity_default_ideal"
+        ]
+        assert len(ideal_notices) == len(scored_elements)
+        assert all(notice.authority is Authority.CONVENTION for notice in ideal_notices)
+        errors_by_element[element].append(math.log10(predicted / observed))
+
+    for element in scored_elements:
+        errors = errors_by_element[element]
+        assert len(errors) == 43
+        rms_dex = math.sqrt(math.fsum(error * error for error in errors) / len(errors))
+        max_abs_dex = max(abs(error) for error in errors)
+        print(
+            f"Sossi pre-film {element}: n={len(errors)} "
+            f"rms_dex={rms_dex:.6f} max_abs_dex={max_abs_dex:.6f}",
+            flush=True,
+        )
 
 
 def test_mixed_hashimoto_and_sossi_score_keep_separate_engine_cohorts(

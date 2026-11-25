@@ -3698,7 +3698,17 @@ def _predict_hashimoto_residue_cohort(
     return tuple(prediction_rows)
 
 
-_SOSSI_TRACE_PARENTS = {"Mn": "MnO", "Ti": "TiO2"}
+_SOSSI_TRACE_PARENTS = {
+    "Mn": "MnO",
+    "Ti": "TiO2",
+    "Gd": "Gd2O3",
+    "La": "La2O3",
+    "Sc": "Sc2O3",
+    "V": "V2O3",
+    "Yb": "Yb2O3",
+    "Zr": "ZrO2",
+}
+_SOSSI_IDEAL_ACTIVITY_FLAG = "melt_activity_default_ideal"
 _SOSSI_GEOMETRIES = (
     "pt_loop_bead_sphere_constant",
     "pt_loop_bead_sphere_shrinking",
@@ -3739,9 +3749,16 @@ def _sossi_initial_inventory(
                 "starting_component_ppm_missing", f"missing positive {element} starting ppm"
             )
         _atoms, element_molar_mass = _formula_terms(element)
+        parent_atoms, _parent_molar_mass = _formula_terms(parent)
+        element_atoms_per_parent = parent_atoms.get(element, 0.0)
+        if element_atoms_per_parent <= 0.0:
+            raise ResidueInventoryRefusal(
+                "sossi_parent_oxide_invalid",
+                f"{parent} does not contain mapped element {element}",
+            )
         element_mass_kg = ppm * 1.0e-6 * mass_kg
         inventory[parent] = inventory.get(parent, 0.0) + (
-            element_mass_kg / element_molar_mass
+            element_mass_kg / element_molar_mass / element_atoms_per_parent
         )
     return inventory, mass_kg, math.fsum(
         amount * _formula_terms(oxide)[1] for oxide, amount in inventory.items()
@@ -3961,7 +3978,7 @@ def _predict_sossi_residue_cohort(
     selected_experiment_ids: frozenset[str] | None = None,
     role_override: Mapping[str, str] | None = None,
 ) -> tuple[_SossiResiduePrediction, ...]:
-    """Predict Sossi Mn/Ti with the shared buffered inventory integrator."""
+    """Predict Sossi trace species with the shared buffered inventory integrator."""
     if engine not in {"openimcc", "internal-analytical"}:
         raise ResidueInventoryRefusal("sossi_engine_unsupported", engine)
     # Residue role defaults do not read temperature. One decision selects the
@@ -4135,11 +4152,6 @@ def _predict_sossi_residue_cohort(
                 species: (1.0 if species == "O2" else -reaction_o2 / reaction_parent)
                 for species, _parent, reaction_parent, reaction_o2 in gas_channels
             }
-            mno_channel_active = any(
-                parent == "MnO"
-                for _species, parent, _reaction_parent, _reaction_o2 in gas_channels
-            )
-
             def pressure_model(
                 composition: Mapping[str, float], log10_pO2_bar: float
             ) -> Mapping[str, float]:
@@ -4171,45 +4183,67 @@ def _predict_sossi_residue_cohort(
                         state.parent_oxide_activities
                     )
                     gas_parent_oxides = tuple(state.parent_oxides)
-                    if mno_channel_active:
+                    selected_parent_oxides = {
+                        parent for _species, parent, _alpha, _source in selected_channels
+                    }
+                    missing_activity_parents = selected_parent_oxides - set(
+                        gas_parent_oxide_activities
+                    )
+                    if "MnO" in selected_parent_oxides:
+                        missing_activity_parents.add("MnO")
+                    if missing_activity_parents:
                         from simulator.chemistry.melt_activity import (
+                            MELT_OXIDE_IDEAL_SOLUTION_MODEL,
                             melt_oxide_activity,
                         )
 
-                        mno_activity = melt_oxide_activity(
-                            "MnO", composition, temperature_K=temperature_K
-                        )
-                        if mno_activity is None:
-                            raise ResidueInventoryRefusal(
-                                "melt_activity_unavailable",
-                                "OpenIMCC Mn gas channel needs a caller-supplied MnO activity",
+                        for element, parent in _SOSSI_TRACE_PARENTS.items():
+                            if parent not in missing_activity_parents:
+                                continue
+                            activity = melt_oxide_activity(
+                                parent, composition, temperature_K=temperature_K
                             )
-                        mno_parent_activity = (
-                            mno_activity.thermodynamic_parent_activity()
-                        )
-                        if (
-                            not math.isfinite(mno_parent_activity)
-                            or mno_parent_activity < 0.0
-                        ):
-                            raise ResidueInventoryRefusal(
-                                "melt_activity_invalid",
-                                f"MnO activity extension returned {mno_parent_activity!r}",
-                            )
-                        gas_parent_oxide_activities["MnO"] = mno_parent_activity
-                        gas_parent_oxides += ("MnO",)
-                        melt_activity_extensions.setdefault(
-                            "MnO",
-                            {
-                                "reason": (
-                                    "MnO is outside the IMCC-SF04 melt-activity domain; "
-                                    "the simulator constant-gamma extension supplies the "
-                                    "activity required by the new Mn gas channel"
-                                ),
-                                "authority_level": mno_activity.evidence_tier,
-                                "certified_band_K": mno_activity.valid_range_K,
-                                "activity_provenance": mno_activity.provenance(),
-                            },
-                        )
+                            if activity is None:
+                                raise ResidueInventoryRefusal(
+                                    "melt_activity_unavailable",
+                                    f"OpenIMCC {element} gas channel needs a {parent} activity",
+                                )
+                            parent_activity = activity.thermodynamic_parent_activity()
+                            if not math.isfinite(parent_activity) or parent_activity < 0.0:
+                                raise ResidueInventoryRefusal(
+                                    "melt_activity_invalid",
+                                    f"{parent} activity extension returned {parent_activity!r}",
+                                )
+                            gas_parent_oxide_activities[parent] = parent_activity
+                            if parent not in gas_parent_oxides:
+                                gas_parent_oxides += (parent,)
+                            if parent == "MnO":
+                                melt_activity_extensions.setdefault(
+                                    parent,
+                                    {
+                                        "reason": (
+                                            "MnO is outside the IMCC-SF04 melt-activity domain; "
+                                            "the simulator constant-gamma extension supplies the "
+                                            "activity required by the new Mn gas channel"
+                                        ),
+                                        "authority_level": activity.evidence_tier,
+                                        "certified_band_K": activity.valid_range_K,
+                                        "activity_provenance": activity.provenance(),
+                                    },
+                                )
+                            elif activity.activity_model == MELT_OXIDE_IDEAL_SOLUTION_MODEL:
+                                melt_activity_extensions.setdefault(
+                                    parent,
+                                    {
+                                        "element": element,
+                                        "flag": _SOSSI_IDEAL_ACTIVITY_FLAG,
+                                        "reason": _SOSSI_IDEAL_ACTIVITY_FLAG,
+                                        "authority": "CONVENTION",
+                                        "gamma": 1.0,
+                                        "parent_oxide_activity": parent_activity,
+                                        "activity_provenance": activity.provenance(),
+                                    },
+                                )
                     gas_result = openimcc_bridge.evaluate_gas(
                         gas_parent_oxide_activities,
                         temperature_K,

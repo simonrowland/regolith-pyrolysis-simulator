@@ -17050,17 +17050,23 @@ def _sossi_residue_prediction(
     test_experiment_ids: frozenset[str] | None = None,
     role_override: Mapping[str, str] | None = None,
 ) -> EnginePrediction:
-    """Predict one Sossi Mn/Ti cell from the shared per-run inventory result."""
+    """Predict one Sossi trace cell from the shared per-run inventory result."""
     channel = ENGINE_CHANNELS[engine]
     sources = ENGINE_COEFFICIENT_SOURCES[engine]
     quantity = quantity_token(reference.identity)
     is_retention = quantity is Quantity.ELEMENT_RETENTION_RATIO
     reported_quantity = quantity or Quantity.RESIDUE_COMPONENT_COMPOSITION
     formula = reference.identity.species.formula
+    from simulator.battery.residue import (
+        _SOSSI_IDEAL_ACTIVITY_FLAG,
+        _SOSSI_TRACE_PARENTS,
+    )
+
+    sossi_trace_elements = frozenset(_SOSSI_TRACE_PARENTS)
     cohort_selection = _residue_cohort_selection(
         selected_experiment_ids, test_experiment_ids
     )
-    if formula not in {"Mn", "Ti"}:
+    if formula not in sossi_trace_elements:
         return EnginePrediction(
             engine=engine,
             channel=channel,
@@ -17118,7 +17124,7 @@ def _sossi_residue_prediction(
                 if oxygen is not None and oxygen.state.is_value:
                     buffered_fO2_by_experiment[short_id] = float(oxygen.state.value)
                 element = row.identity.species.formula
-                if element in {"Mn", "Ti"}:
+                if element in sossi_trace_elements:
                     trace = point.get("starting_component_ppm")
                     if trace is not None and trace.state.is_value:
                         trace_ppm_by_experiment.setdefault(short_id, {})[
@@ -17285,32 +17291,45 @@ def _sossi_residue_prediction(
             ),
         ]
         activity_extensions = provenance.get("melt_activity_extensions")
-        mno_activity_extension = (
-            activity_extensions.get("MnO")
-            if isinstance(activity_extensions, Mapping)
-            else None
-        )
-        if isinstance(mno_activity_extension, Mapping):
-            authority_level = str(
-                mno_activity_extension.get("authority_level") or "unknown"
-            )
-            certified_band = mno_activity_extension.get("certified_band_K")
-            notices.append(
-                Notice(
-                    kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
-                    affected_quantities=(reported_quantity,),
-                    reason=str(
-                        mno_activity_extension.get("reason")
-                        or "MnO activity uses an uncertified extension"
-                    ),
-                    origin="sossi-residue-r5",
-                    band=(
-                        f"authority_level={authority_level}; "
-                        "certified_band_K="
-                        f"{certified_band if certified_band is not None else 'none'}"
-                    ),
-                )
-            )
+        if isinstance(activity_extensions, Mapping):
+            for parent_oxide, extension in activity_extensions.items():
+                if not isinstance(extension, Mapping):
+                    continue
+                if extension.get("flag") == _SOSSI_IDEAL_ACTIVITY_FLAG:
+                    notices.append(
+                        Notice(
+                            kind=NoticeKind.FALLBACK,
+                            affected_quantities=(reported_quantity,),
+                            reason=_SOSSI_IDEAL_ACTIVITY_FLAG,
+                            origin="sossi-residue-r5",
+                            band=(
+                                f"parent_oxide={parent_oxide}; gamma=1; "
+                                "activity=Raoultian single-cation component"
+                            ),
+                            authority=Authority.CONVENTION,
+                        )
+                    )
+                elif parent_oxide == "MnO":
+                    authority_level = str(
+                        extension.get("authority_level") or "unknown"
+                    )
+                    certified_band = extension.get("certified_band_K")
+                    notices.append(
+                        Notice(
+                            kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                            affected_quantities=(reported_quantity,),
+                            reason=str(
+                                extension.get("reason")
+                                or "MnO activity uses an uncertified extension"
+                            ),
+                            origin="sossi-residue-r5",
+                            band=(
+                                f"authority_level={authority_level}; "
+                                "certified_band_K="
+                                f"{certified_band if certified_band is not None else 'none'}"
+                            ),
+                        )
+                    )
         notices.extend(
             _liquid_rows_below_floor_notices(
                 provenance.get("liquid_rows_used"),
