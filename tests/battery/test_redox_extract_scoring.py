@@ -415,7 +415,12 @@ def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
         for residual in residuals
         if (strata := score_module.flagged_strata(residual.notices))
     ]
-    assert flagged == [], f"unexpected flagged strata: {flagged!r}"
+    # Every numeric row reports total iron as FeO, so the production owner
+    # assigns the iron-oxide-convention stratum; no other stratum applies.
+    expected_flag = (score_module.FLAGGED_STRATUM_IRON_OXIDE_CONVENTION,)
+    assert flagged == [
+        (residual.reference, expected_flag) for residual in values
+    ], f"unexpected flagged strata: {flagged!r}"
     assert not any(residual.score_eligible for residual in residuals)
 
 
