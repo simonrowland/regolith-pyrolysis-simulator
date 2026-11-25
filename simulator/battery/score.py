@@ -17058,7 +17058,9 @@ def _sossi_residue_prediction(
     reported_quantity = quantity or Quantity.RESIDUE_COMPONENT_COMPOSITION
     formula = reference.identity.species.formula
     from simulator.battery.residue import (
-        _SOSSI_IDEAL_ACTIVITY_FLAG,
+        _ALPHA_ASSUMED_UNITY_RATIO,
+        _ALPHA_ASSUMED_UNITY_RATIO_FLAG,
+        _IDEAL_MELT_ACTIVITY_DEFAULT_FLAG,
         _SOSSI_TRACE_PARENTS,
     )
 
@@ -17295,12 +17297,12 @@ def _sossi_residue_prediction(
             for parent_oxide, extension in activity_extensions.items():
                 if not isinstance(extension, Mapping):
                     continue
-                if extension.get("flag") == _SOSSI_IDEAL_ACTIVITY_FLAG:
+                if extension.get("flag") == _IDEAL_MELT_ACTIVITY_DEFAULT_FLAG:
                     notices.append(
                         Notice(
                             kind=NoticeKind.FALLBACK,
                             affected_quantities=(reported_quantity,),
-                            reason=_SOSSI_IDEAL_ACTIVITY_FLAG,
+                            reason=_IDEAL_MELT_ACTIVITY_DEFAULT_FLAG,
                             origin="sossi-residue-r5",
                             band=(
                                 f"parent_oxide={parent_oxide}; gamma=1; "
@@ -17330,6 +17332,23 @@ def _sossi_residue_prediction(
                             ),
                         )
                     )
+        assumption_flags = provenance.get("assumption_flags")
+        if (
+            isinstance(assumption_flags, Mapping)
+            and assumption_flags.get(_ALPHA_ASSUMED_UNITY_RATIO_FLAG) is True
+        ):
+            notices.append(
+                Notice(
+                    kind=NoticeKind.FALLBACK,
+                    affected_quantities=(reported_quantity,),
+                    reason=_ALPHA_ASSUMED_UNITY_RATIO_FLAG,
+                    origin="sossi-residue-r5",
+                    source="unmeasured evaporation alpha",
+                    destination="DP-005 alpha_i=1 unity-ratio convention",
+                    band=f"assumed {_ALPHA_ASSUMED_UNITY_RATIO}; alpha_i set to 1",
+                    authority=Authority.CONVENTION,
+                )
+            )
         notices.extend(
             _liquid_rows_below_floor_notices(
                 provenance.get("liquid_rows_used"),

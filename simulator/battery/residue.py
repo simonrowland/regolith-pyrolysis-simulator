@@ -45,6 +45,12 @@ _HASHIMOTO_GEOMETRIES = (
 _HASHIMOTO_DENSITY_KG_M3 = 2_700.0
 _HASHIMOTO_N_CAP = 256
 _HASHIMOTO_REFINEMENT_TOLERANCE_WT_PCT = 0.05
+_ALPHA_ASSUMED_UNITY_RATIO_FLAG = "alpha_assumed_unity_ratio_not_measured_alpha"
+_ALPHA_ASSUMED_UNITY_RATIO = "alpha_i/alpha_j=1"
+_IDEAL_MELT_ACTIVITY_DEFAULT_FLAG = "melt_activity_default_ideal"
+_DP005_UNITY_RATIO_ALPHA_SOURCE = (
+    "DP-005 unity-ratio assumption; alpha_i=1 convention"
+)
 _HASHIMOTO_DENSITY_SOURCE = (
     "labelled 2700 kg/m3 fallback from the r2 geometry sensitivity probe; "
     "not printed by Hashimoto"
@@ -439,6 +445,77 @@ class ResidueChannel:
     parent_oxide: str | None
     alpha: float
     alpha_source: str
+
+
+@dataclass(frozen=True)
+class _OpenIMCCResidueParentInputs:
+    channels: tuple[ResidueChannel, ...]
+    parent_activity: float | None
+    activity: Any | None
+    activity_extension: Mapping[str, Any] | None
+
+
+def _openimcc_residue_parent_inputs(
+    parent_oxide: str,
+    gas_channels: Sequence[tuple[str, str, float, float]],
+    composition: Mapping[str, float],
+    temperature_K: float,
+    parent_oxide_activities: Mapping[str, float] | None = None,
+) -> _OpenIMCCResidueParentInputs:
+    """Resolve gas channels, activity, and DP-005 alpha for one parent oxide."""
+    channels = tuple(
+        ResidueChannel(
+            species,
+            species,
+            parent_oxide,
+            1.0,
+            _DP005_UNITY_RATIO_ALPHA_SOURCE,
+        )
+        for species, channel_parent, _reaction_n, _reaction_o2 in gas_channels
+        if channel_parent == parent_oxide
+    )
+    if not channels:
+        return _OpenIMCCResidueParentInputs((), None, None, None)
+    if parent_oxide_activities is not None and parent_oxide in parent_oxide_activities:
+        return _OpenIMCCResidueParentInputs(
+            channels,
+            float(parent_oxide_activities[parent_oxide]),
+            None,
+            None,
+        )
+
+    from simulator.chemistry.melt_activity import (
+        MELT_OXIDE_IDEAL_SOLUTION_MODEL,
+        melt_oxide_activity,
+    )
+
+    activity = melt_oxide_activity(
+        parent_oxide, composition, temperature_K=temperature_K
+    )
+    if activity is None:
+        raise ResidueInventoryRefusal(
+            "melt_activity_unavailable",
+            f"OpenIMCC gas channels need a {parent_oxide} activity",
+        )
+    parent_activity = activity.thermodynamic_parent_activity()
+    if not math.isfinite(parent_activity) or parent_activity < 0.0:
+        raise ResidueInventoryRefusal(
+            "melt_activity_invalid",
+            f"{parent_oxide} activity extension returned {parent_activity!r}",
+        )
+    extension = None
+    if activity.activity_model == MELT_OXIDE_IDEAL_SOLUTION_MODEL:
+        extension = {
+            "flag": _IDEAL_MELT_ACTIVITY_DEFAULT_FLAG,
+            "reason": _IDEAL_MELT_ACTIVITY_DEFAULT_FLAG,
+            "authority": "CONVENTION",
+            "gamma": activity.effective_gamma,
+            "parent_oxide_activity": parent_activity,
+            "activity_provenance": activity.provenance(),
+        }
+    return _OpenIMCCResidueParentInputs(
+        channels, parent_activity, activity, extension
+    )
 
 
 @dataclass(frozen=True)
@@ -3135,7 +3212,7 @@ def _hashimoto_run_setup(
                 "alpha_value": 1.0,
                 "alpha_source": common_source,
                 "alpha_assumed": True,
-                "author_ratio_assumption": "alpha_i/alpha_j=1",
+                "author_ratio_assumption": _ALPHA_ASSUMED_UNITY_RATIO,
             }
         )
         common_liquid_rows.append(row_by_channel[species])
@@ -3531,7 +3608,7 @@ def _predict_hashimoto_residue_cohort(
                 and row["liquid_row"].get("extrapolated_below_floor")
             ]
             assumption_flags = {
-                "alpha_assumed_unity_ratio_not_measured_alpha": (
+                _ALPHA_ASSUMED_UNITY_RATIO_FLAG: (
                     alpha_arm == "alpha_common_unity_sensitivity"
                 ),
                 "alpha_assumed_common_unity_sensitivity": (
@@ -3583,7 +3660,7 @@ def _predict_hashimoto_residue_cohort(
                 ),
                 "author_alpha_assumption": {
                     "extract_assumption": "assumed_unity_ratio_not_measured_alpha",
-                    "assumed_ratio": "alpha_i/alpha_j=1",
+                    "assumed_ratio": _ALPHA_ASSUMED_UNITY_RATIO,
                     "absolute_alpha_established": False,
                     "active_for_this_arm": alpha_arm == "alpha_common_unity_sensitivity",
                 },
@@ -3708,7 +3785,6 @@ _SOSSI_TRACE_PARENTS = {
     "Yb": "Yb2O3",
     "Zr": "ZrO2",
 }
-_SOSSI_IDEAL_ACTIVITY_FLAG = "melt_activity_default_ideal"
 _SOSSI_GEOMETRIES = (
     "pt_loop_bead_sphere_constant",
     "pt_loop_bead_sphere_shrinking",
@@ -4083,46 +4159,65 @@ def _predict_sossi_residue_cohort(
         if not math.isfinite(buffered_logp) or buffered_logp > 0.0:
             raise ResidueInventoryRefusal("oxygen_condition_invalid", experiment_id)
 
-        selected_channels: list[tuple[str, str, float, str]] = []
+        selected_channels: list[ResidueChannel] = []
         missing_elements: list[str] = []
         for element, parent in _SOSSI_TRACE_PARENTS.items():
-            available = [
-                item for item in gas_channels if item[1] == parent
-            ] if vapour_engine == "openimcc" else [
-                (str(row.get("formula")), parent, 1.0, 0.0)
-                for _name, row in catalog_rows
-                if row.get("formula")
-                and row.get("parent_oxide") == parent
-                and row.get("flux_dormant") is not True
-            ]
             added = 0
-            for species, channel_parent, _reaction_n, _reaction_o2 in available:
-                matches = [
-                    (name, row)
-                    for name, row in catalog_rows
-                    if str(row.get("formula")) == species
-                    and row.get("parent_oxide") == channel_parent
+            if vapour_engine == "openimcc":
+                parent_inputs = _openimcc_residue_parent_inputs(
+                    parent, gas_channels, inventory, temperature_K
+                )
+                selected_channels.extend(parent_inputs.channels)
+                added = len(parent_inputs.channels)
+            else:
+                available = [
+                    (str(row.get("formula")), parent, 1.0, 0.0)
+                    for _name, row in catalog_rows
+                    if row.get("formula")
+                    and row.get("parent_oxide") == parent
                     and row.get("flux_dormant") is not True
                 ]
-                if not matches:
-                    continue
-                catalog_name, catalog_row = matches[0]
-                alpha_spec = alpha_specs.get(catalog_name)
-                if alpha_spec is None:
-                    continue
-                alpha_context: dict[str, Any] = {"coefficient_spec": alpha_spec}
-                try:
-                    alpha = float(alpha_s(catalog_name, temperature_K, alpha_context))
-                except (TypeError, ValueError, ArithmeticError):
-                    continue
-                raw_alpha = catalog_row.get("evaporation_alpha")
-                source = (
-                    str(raw_alpha.get("source") or raw_alpha.get("cite") or catalog_name)
-                    if isinstance(raw_alpha, Mapping)
-                    else catalog_name
-                )
-                selected_channels.append((species, parent, alpha, f"{catalog_name}: {source}"))
-                added += 1
+                for species, channel_parent, _reaction_n, _reaction_o2 in available:
+                    matches = [
+                        (name, row)
+                        for name, row in catalog_rows
+                        if str(row.get("formula")) == species
+                        and row.get("parent_oxide") == channel_parent
+                        and row.get("flux_dormant") is not True
+                    ]
+                    if not matches:
+                        continue
+                    catalog_name, catalog_row = matches[0]
+                    alpha_spec = alpha_specs.get(catalog_name)
+                    if alpha_spec is None:
+                        continue
+                    alpha_context: dict[str, Any] = {"coefficient_spec": alpha_spec}
+                    try:
+                        alpha = float(
+                            alpha_s(catalog_name, temperature_K, alpha_context)
+                        )
+                    except (TypeError, ValueError, ArithmeticError):
+                        continue
+                    raw_alpha = catalog_row.get("evaporation_alpha")
+                    source = (
+                        str(
+                            raw_alpha.get("source")
+                            or raw_alpha.get("cite")
+                            or catalog_name
+                        )
+                        if isinstance(raw_alpha, Mapping)
+                        else catalog_name
+                    )
+                    selected_channels.append(
+                        ResidueChannel(
+                            species,
+                            species,
+                            parent,
+                            alpha,
+                            f"{catalog_name}: {source}",
+                        )
+                    )
+                    added += 1
             if added == 0:
                 missing_elements.append(element)
         if len(missing_elements) == len(_SOSSI_TRACE_PARENTS):
@@ -4134,9 +4229,11 @@ def _predict_sossi_residue_cohort(
         # starting inventory before evaluating the supported channel.
         for element in missing_elements:
             inventory.pop(_SOSSI_TRACE_PARENTS[element], None)
-        channels = tuple(
-            ResidueChannel(species, species, parent, alpha, source)
-            for species, parent, alpha, source in selected_channels
+        channels = tuple(selected_channels)
+        alpha_arm = (
+            "alpha_dp005_unity_ratio"
+            if vapour_engine == "openimcc"
+            else "alpha_runtime_catalog"
         )
         pressure_cache: dict[tuple[tuple[str, float], ...], Mapping[str, float]] = {}
         melt_pack_identity: dict[str, str] = {}
@@ -4184,7 +4281,9 @@ def _predict_sossi_residue_cohort(
                     )
                     gas_parent_oxides = tuple(state.parent_oxides)
                     selected_parent_oxides = {
-                        parent for _species, parent, _alpha, _source in selected_channels
+                        channel.parent_oxide
+                        for channel in selected_channels
+                        if channel.parent_oxide
                     }
                     missing_activity_parents = selected_parent_oxides - set(
                         gas_parent_oxide_activities
@@ -4192,32 +4291,33 @@ def _predict_sossi_residue_cohort(
                     if "MnO" in selected_parent_oxides:
                         missing_activity_parents.add("MnO")
                     if missing_activity_parents:
-                        from simulator.chemistry.melt_activity import (
-                            MELT_OXIDE_IDEAL_SOLUTION_MODEL,
-                            melt_oxide_activity,
-                        )
-
                         for element, parent in _SOSSI_TRACE_PARENTS.items():
                             if parent not in missing_activity_parents:
                                 continue
-                            activity = melt_oxide_activity(
-                                parent, composition, temperature_K=temperature_K
+                            available_activities = dict(
+                                gas_parent_oxide_activities
                             )
-                            if activity is None:
+                            if parent == "MnO":
+                                available_activities.pop(parent, None)
+                            parent_inputs = _openimcc_residue_parent_inputs(
+                                parent,
+                                gas_channels,
+                                composition,
+                                temperature_K,
+                                available_activities,
+                            )
+                            if parent_inputs.parent_activity is None:
                                 raise ResidueInventoryRefusal(
                                     "melt_activity_unavailable",
                                     f"OpenIMCC {element} gas channel needs a {parent} activity",
                                 )
-                            parent_activity = activity.thermodynamic_parent_activity()
-                            if not math.isfinite(parent_activity) or parent_activity < 0.0:
-                                raise ResidueInventoryRefusal(
-                                    "melt_activity_invalid",
-                                    f"{parent} activity extension returned {parent_activity!r}",
-                                )
-                            gas_parent_oxide_activities[parent] = parent_activity
+                            gas_parent_oxide_activities[parent] = (
+                                parent_inputs.parent_activity
+                            )
                             if parent not in gas_parent_oxides:
                                 gas_parent_oxides += (parent,)
-                            if parent == "MnO":
+                            if parent == "MnO" and parent_inputs.activity is not None:
+                                activity = parent_inputs.activity
                                 melt_activity_extensions.setdefault(
                                     parent,
                                     {
@@ -4231,18 +4331,11 @@ def _predict_sossi_residue_cohort(
                                         "activity_provenance": activity.provenance(),
                                     },
                                 )
-                            elif activity.activity_model == MELT_OXIDE_IDEAL_SOLUTION_MODEL:
+                            elif parent_inputs.activity_extension is not None:
+                                extension = dict(parent_inputs.activity_extension)
+                                extension["element"] = element
                                 melt_activity_extensions.setdefault(
-                                    parent,
-                                    {
-                                        "element": element,
-                                        "flag": _SOSSI_IDEAL_ACTIVITY_FLAG,
-                                        "reason": _SOSSI_IDEAL_ACTIVITY_FLAG,
-                                        "authority": "CONVENTION",
-                                        "gamma": 1.0,
-                                        "parent_oxide_activity": parent_activity,
-                                        "activity_provenance": activity.provenance(),
-                                    },
+                                    parent, extension
                                 )
                     gas_result = openimcc_bridge.evaluate_gas(
                         gas_parent_oxide_activities,
@@ -4564,14 +4657,22 @@ def _predict_sossi_residue_cohort(
                     },
                     "density_kg_m3": _HASHIMOTO_DENSITY_KG_M3,
                     "density_source": _SOSSI_DENSITY_SOURCE,
-                    "alpha_arm": "alpha_runtime_catalog",
+                    "alpha_arm": alpha_arm,
                     "alpha_by_channel": [
                         {
                             "species": channel.species,
                             "parent_oxide": channel.parent_oxide,
                             "alpha_value": channel.alpha,
-                            "alpha_assumed": True,
+                            "alpha_assumed": alpha_arm == "alpha_dp005_unity_ratio",
                             "alpha_source": channel.alpha_source,
+                            **(
+                                {
+                                    "author_ratio_assumption": _ALPHA_ASSUMED_UNITY_RATIO,
+                                    "absolute_alpha_measured": False,
+                                }
+                                if alpha_arm == "alpha_dp005_unity_ratio"
+                                else {}
+                            ),
                         }
                         for channel in channels
                     ],
@@ -4597,6 +4698,9 @@ def _predict_sossi_residue_cohort(
                         else {}
                     ),
                     "assumption_flags": {
+                        _ALPHA_ASSUMED_UNITY_RATIO_FLAG: (
+                            alpha_arm == "alpha_dp005_unity_ratio"
+                        ),
                         "pt_wire_loop_bead_geometry_assumed": True,
                         "density_fallback_2700_kg_m3": True,
                         "bc_open_furnace_langmuir_limit_diagnostic": True,

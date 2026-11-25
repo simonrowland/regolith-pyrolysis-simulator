@@ -185,6 +185,20 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
         ].items()
         if extension.get("flag") == "melt_activity_default_ideal"
     }
+    expected_ideal_parents = {
+        "Gd2O3",
+        "La2O3",
+        "Sc2O3",
+        "V2O3",
+        "Yb2O3",
+        "ZrO2",
+    }
+    assert ideal_parents == expected_ideal_parents
+    selected_parent_oxides = {
+        channel["parent_oxide"]
+        for channel in prediction.provenance["alpha_by_channel"]
+    }
+    assert expected_ideal_parents <= selected_parent_oxides
     for parent in ideal_parents:
         extension = prediction.provenance["melt_activity_extensions"][parent]
         assert extension["flag"] == "melt_activity_default_ideal"
@@ -463,6 +477,9 @@ def test_sossi_scorer_projects_trace_species_and_flags_ideal_activity(monkeypatc
                 channel_missing_elements=(),
                 provenance={
                     "integration": {"primary": {"status": "converged"}},
+                    "assumption_flags": {
+                        "alpha_assumed_unity_ratio_not_measured_alpha": True,
+                    },
                     "melt_activity_extensions": {
                         "MnO": {
                             "reason": "MnO is outside the IMCC-SF04 melt-activity domain",
@@ -520,6 +537,16 @@ def test_sossi_scorer_projects_trace_species_and_flags_ideal_activity(monkeypatc
     assert len(ideal_notices) == 1
     assert ideal_notices[0].kind is NoticeKind.FALLBACK
     assert ideal_notices[0].authority is Authority.CONVENTION
+    alpha_notices = [
+        notice
+        for notice in gadolinium_prediction.notices
+        if notice.reason == "alpha_assumed_unity_ratio_not_measured_alpha"
+    ]
+    assert len(alpha_notices) == 1
+    assert alpha_notices[0].kind is NoticeKind.FALLBACK
+    assert alpha_notices[0].authority is Authority.CONVENTION
+    assert alpha_notices[0].source == "unmeasured evaporation alpha"
+    assert alpha_notices[0].destination == "DP-005 alpha_i=1 unity-ratio convention"
 
     with monkeypatch.context() as old_parent_map:
         old_parent_map.setattr(
@@ -533,7 +560,11 @@ def test_sossi_scorer_projects_trace_species_and_flags_ideal_activity(monkeypatc
 
 
 @pytest.mark.engine_cache_off
-def test_sossi_trace_score_reports_pre_film_residual_metrics() -> None:
+@pytest.mark.parametrize("experiment_shard", (0, 1))
+def test_sossi_trace_score_reports_pre_film_residual_metrics(
+    request: pytest.FixtureRequest,
+    experiment_shard: int,
+) -> None:
     from simulator.battery.enums import Authority, Engine, NoticeKind, Quantity
     from simulator.battery.score import (
         _sossi_residue_prediction,
@@ -546,7 +577,7 @@ def test_sossi_trace_score_reports_pre_film_residual_metrics() -> None:
     scored_elements = tuple(
         element for element in _SOSSI_TRACE_PARENTS if element not in {"Mn", "Ti"}
     )
-    target_rows = [
+    all_target_rows = [
         row
         for row in context.observations.values()
         if row.source_id == "kems-012-sossi-2019"
@@ -555,7 +586,21 @@ def test_sossi_trace_score_reports_pre_film_residual_metrics() -> None:
         and row.identity.species.formula in scored_elements
         and point_magnitude(row.value) is not None
     ]
-    assert len(target_rows) == 258
+    assert len(all_target_rows) == 258
+    all_experiment_ids = tuple(
+        sorted({row.experiment_id.rsplit("::", 1)[-1] for row in all_target_rows})
+    )
+    selected_experiment_ids = frozenset(
+        experiment_id
+        for index, experiment_id in enumerate(all_experiment_ids)
+        if index % 2 == experiment_shard
+    )
+    target_rows = [
+        row
+        for row in all_target_rows
+        if row.experiment_id.rsplit("::", 1)[-1] in selected_experiment_ids
+    ]
+    assert len(target_rows) == len(selected_experiment_ids) * len(scored_elements)
 
     cache = {}
     errors_by_element: dict[str, list[float]] = {
@@ -564,7 +609,11 @@ def test_sossi_trace_score_reports_pre_film_residual_metrics() -> None:
     for row in target_rows:
         element = row.identity.species.formula
         prediction = _sossi_residue_prediction(
-            context, row, Engine.OPENIMCC, cache
+            context,
+            row,
+            Engine.OPENIMCC,
+            cache,
+            selected_experiment_ids=selected_experiment_ids,
         )
         assert prediction.execution.state.value == "produced"
         observed = float(point_magnitude(row.value))
@@ -578,18 +627,36 @@ def test_sossi_trace_score_reports_pre_film_residual_metrics() -> None:
         ]
         assert len(ideal_notices) == len(scored_elements)
         assert all(notice.authority is Authority.CONVENTION for notice in ideal_notices)
+        alpha_notices = [
+            notice
+            for notice in prediction.notices
+            if notice.kind is NoticeKind.FALLBACK
+            and notice.reason == "alpha_assumed_unity_ratio_not_measured_alpha"
+        ]
+        assert len(alpha_notices) == 1
+        assert alpha_notices[0].authority is Authority.CONVENTION
+        alpha_by_channel = prediction.refusal_detail["alpha_by_channel"]
+        assert alpha_by_channel
+        assert all(channel["alpha_value"] == 1.0 for channel in alpha_by_channel)
+        assert all(channel["alpha_assumed"] for channel in alpha_by_channel)
         errors_by_element[element].append(math.log10(predicted / observed))
 
+    reporter = request.config.pluginmanager.get_plugin("terminalreporter")
     for element in scored_elements:
         errors = errors_by_element[element]
-        assert len(errors) == 43
-        rms_dex = math.sqrt(math.fsum(error * error for error in errors) / len(errors))
+        assert len(errors) == len(selected_experiment_ids)
+        sum_squared_dex = math.fsum(error * error for error in errors)
+        rms_dex = math.sqrt(sum_squared_dex / len(errors))
         max_abs_dex = max(abs(error) for error in errors)
-        print(
-            f"Sossi pre-film {element}: n={len(errors)} "
-            f"rms_dex={rms_dex:.6f} max_abs_dex={max_abs_dex:.6f}",
-            flush=True,
+        line = (
+            f"Sossi pre-film {element} shard={experiment_shard}: n={len(errors)} "
+            f"rms_dex={rms_dex:.6f} sum_squared_dex={sum_squared_dex:.9f} "
+            f"max_abs_dex={max_abs_dex:.6f}"
         )
+        if reporter is None:
+            print(line, flush=True)
+        else:
+            reporter.write_line(line)
 
 
 def test_mixed_hashimoto_and_sossi_score_keep_separate_engine_cohorts(
