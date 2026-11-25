@@ -1526,6 +1526,7 @@ def _make_residue_pressure_model(
             internal_analytical_residue_vapor_pressure,
             _new_internal_analytical_core,
         )
+        from simulator.vacuum_oxygen_balance import _VacuumOxygenPressureValues
         from simulator.chemistry.offgas_fo2 import OffgasFO2Unavailable, _oxygen_atom_partial_pressure_bar
         from simulator.vapour_rail.nasa_cea import NasaCeaError
 
@@ -1566,6 +1567,17 @@ def _make_residue_pressure_model(
             except _InternalAnalyticalInputRefusal as exc:
                 raise ResidueInventoryRefusal(exc.code, str(exc)) from exc
             pressures: dict[str, float] = {}
+            parent_activities: dict[str, float] = {}
+            vapor_diagnostic = response.diagnostics.get(
+                "vapor_pressure_diagnostic"
+            )
+            # Read the same dispatch's reported activities; never replay an
+            # activity resolver at the secant probe points.
+            reported_activities = (
+                vapor_diagnostic.get("activities")
+                if isinstance(vapor_diagnostic, Mapping)
+                else None
+            )
             for channel, pressure in response.vapor_pressures_Pa.items():
                 try:
                     formula = _gas_formula_for_oxygen_balance(channel)
@@ -1574,6 +1586,10 @@ def _make_residue_pressure_model(
                 if formula in pressures:
                     raise ResidueInventoryRefusal("residue_pressure_channels_ambiguous", formula)
                 pressures[formula] = float(pressure)
+                if isinstance(reported_activities, Mapping):
+                    activity = reported_activities.get(channel)
+                    if activity is not None:
+                        parent_activities[formula] = float(activity)
             required = {str(species) for species, _reaction in gas_channels}
             pO2_bar = 10.0**float(log10_pO2_bar)
             if "O2" in required and "O2" not in pressures:
@@ -1644,10 +1660,13 @@ def _make_residue_pressure_model(
                         separators=(",", ":"),
                     )
                 raise ResidueInventoryRefusal(missing_channels_reason, detail)
-            return {
-                str(species): float(pressures[str(species)])
-                for species, _reaction in gas_channels
-            }
+            return _VacuumOxygenPressureValues(
+                {
+                    str(species): float(pressures[str(species)])
+                    for species, _reaction in gas_channels
+                },
+                parent_activities=parent_activities,
+            )
 
         if floor_inversion_diagnostics is not None:
             pressure_model._on_accepted_evaluation = accept_pressure_diagnostics

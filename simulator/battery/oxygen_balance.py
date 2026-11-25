@@ -201,11 +201,20 @@ def _solve_vacuum_oxygen_balance(
 
     def evaluate(
         logp: float, model_pressures: Mapping[str, float] | None = None,
-    ) -> tuple[float, dict[str, float], float, float]:
+    ) -> tuple[
+        float,
+        dict[str, float],
+        float,
+        float,
+        Mapping[str, float],
+    ]:
         if model_pressures is None:
             model_pressures = pressure_model(logp)
         if not isinstance(model_pressures, Mapping):
             raise ValueError("pressure model must return a species-to-Pa mapping")
+        parent_activities = getattr(model_pressures, "parent_activities", {})
+        if not isinstance(parent_activities, Mapping):
+            parent_activities = {}
         pressures: dict[str, float] = {}
         oxygen_flux = 0.0
         parent_flux = 0.0
@@ -224,7 +233,13 @@ def _solve_vacuum_oxygen_balance(
             flux = molar_flux(channel, pressure)
             oxygen_flux += channel.oxygen_atoms * flux
             parent_flux += channel.parent_oxygen_demand * flux
-        return oxygen_flux - parent_flux, pressures, oxygen_flux, parent_flux
+        return (
+            oxygen_flux - parent_flux,
+            pressures,
+            oxygen_flux,
+            parent_flux,
+            parent_activities,
+        )
 
     f_low = evaluate(low)[0]
     f_high = evaluate(high)[0]
@@ -268,12 +283,15 @@ def _solve_vacuum_oxygen_balance(
             maxiter=200,
         )
 
-    residual, pressures, oxygen_flux, parent_flux = evaluate(root)
+    residual, pressures, oxygen_flux, parent_flux, _root_activities = evaluate(root)
+    pressure_law_exponent_diagnostics: dict[str, dict[str, object]] = {}
     if bracket_boundary != "lower":
         probe_low = max(low, root - 0.1)
         probe_high = root + 0.1
-        lower_pressures = evaluate(probe_low)[1]
-        upper_pressures = evaluate(root + 0.1)[1]
+        lower_evaluation = evaluate(probe_low)
+        upper_evaluation = evaluate(probe_high)
+        lower_pressures, lower_activities = lower_evaluation[1], lower_evaluation[4]
+        upper_pressures, upper_activities = upper_evaluation[1], upper_evaluation[4]
         for channel in active_channels:
             pressure = pressures[channel.species]
             if pressure <= 1.0e-300:
@@ -284,13 +302,52 @@ def _solve_vacuum_oxygen_balance(
                 raise ValueError(
                     f"pressure law for {channel.species!r} is not positive around the root"
                 )
-            observed_exponent = (
+            raw_total_slope = (
                 math.log10(upper_pressure) - math.log10(lower_pressure)
             ) / (probe_high - probe_low)
-            if abs(observed_exponent - channel.pO2_exponent) > 1.0e-6:
+            lower_activity = lower_activities.get(channel.species)
+            upper_activity = upper_activities.get(channel.species)
+            parent_activity_reported = (
+                lower_activity is not None and upper_activity is not None
+            )
+            corrected_slope = raw_total_slope
+            if parent_activity_reported:
+                lower_activity = float(lower_activity)
+                upper_activity = float(upper_activity)
+                if (
+                    not math.isfinite(lower_activity)
+                    or not math.isfinite(upper_activity)
+                    or lower_activity <= 0.0
+                    or upper_activity <= 0.0
+                ):
+                    raise ValueError(
+                        f"pressure law for {channel.species!r} reported an "
+                        "invalid parent activity around the root"
+                    )
+                # Premise: P = K(T) * a_parent * pO2**n; the exponent contract
+                # is for the pressure law at fixed parent activity. Algebra:
+                # raw slope = n + d(log a_parent)/d(log pO2), so subtract the
+                # activity at each same-call probe before taking the secant.
+                # P/a_parent remains Pa, and both activity and pO2/bar are
+                # dimensionless, so the secant slope is dimensionless. Sanity:
+                # Markova A at 1748.15 K gives raw -0.5131729 and corrected
+                # -0.5 to about 1e-15.
+                corrected_slope = (
+                    (math.log10(upper_pressure) - math.log10(upper_activity))
+                    - (math.log10(lower_pressure) - math.log10(lower_activity))
+                ) / (probe_high - probe_low)
+            pressure_law_exponent_diagnostics[channel.species] = {
+                "declared_exponent": channel.pO2_exponent,
+                "raw_total_slope": raw_total_slope,
+                "corrected_fixed_parent_activity_slope": corrected_slope,
+                "parent_activity_reported": parent_activity_reported,
+            }
+            if abs(corrected_slope - channel.pO2_exponent) > 1.0e-6:
                 raise ValueError(
                     f"pressure law exponent mismatch for {channel.species!r}: "
-                    f"declared {channel.pO2_exponent}, observed {observed_exponent}"
+                    f"declared {channel.pO2_exponent}, "
+                    f"observed {corrected_slope} "
+                    f"(raw total slope {raw_total_slope})"
                 )
     if on_accepted_evaluation is not None:
         on_accepted_evaluation(root)
@@ -318,6 +375,7 @@ def _solve_vacuum_oxygen_balance(
         alpha_sources={
             channel.species: channel.alpha_source for channel in active_channels
         },
+        pressure_law_exponent_diagnostics=pressure_law_exponent_diagnostics,
     )
 
 

@@ -15,6 +15,7 @@ from simulator.battery.oxygen_balance import (
     _solve_vacuum_oxygen_balance,
 )
 from simulator.physical_constants import GAS_CONSTANT
+from simulator.vacuum_oxygen_balance import _VacuumOxygenPressureValues
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -427,6 +428,74 @@ def test_vacuum_oxygen_balance_leaves_an_interior_root_unmarked() -> None:
     )
 
     assert result.bracket_boundary is None
+
+
+def test_vacuum_oxygen_balance_checks_exponent_at_fixed_reported_activity() -> None:
+    root_logp = -12.5
+    activity_slope = -0.0131729074353426
+
+    def pressure_model(logp: float) -> _VacuumOxygenPressureValues:
+        displacement = logp - root_logp
+        activity = 10.0 ** (activity_slope * displacement)
+        return _VacuumOxygenPressureValues(
+            {
+                "O2": 10.0**displacement,
+                "Fe": 2.0 * activity * 10.0 ** (-0.5 * displacement),
+            },
+            parent_activities={"Fe": activity},
+        )
+
+    result = _solve_vacuum_oxygen_balance(
+        pressure_model,
+        _boundary_test_channels(),
+        temperature_K=1500.0,
+        bracket_log10_pO2_bar=(-20.0, -5.0),
+    )
+
+    diagnostic = result.pressure_law_exponent_diagnostics["Fe"]
+    assert diagnostic["raw_total_slope"] == pytest.approx(-0.5131729074353426)
+    assert diagnostic["corrected_fixed_parent_activity_slope"] == pytest.approx(
+        -0.5, abs=2.0e-14
+    )
+    assert diagnostic["parent_activity_reported"] is True
+
+
+def test_vacuum_oxygen_balance_refuses_wrong_power_at_fixed_activity() -> None:
+    root_logp = -12.5
+
+    def pressure_model(logp: float) -> _VacuumOxygenPressureValues:
+        displacement = logp - root_logp
+        return _VacuumOxygenPressureValues(
+            {
+                "O2": 10.0**displacement,
+                "Fe": 2.0 * 10.0 ** (-0.6 * displacement),
+            },
+            parent_activities={"Fe": 0.2},
+        )
+
+    with pytest.raises(ValueError, match="pressure law exponent mismatch"):
+        _solve_vacuum_oxygen_balance(
+            pressure_model,
+            _boundary_test_channels(),
+            temperature_K=1500.0,
+            bracket_log10_pO2_bar=(-20.0, -5.0),
+        )
+
+
+def test_vacuum_oxygen_balance_without_parent_activity_keeps_raw_check() -> None:
+    result = _solve_vacuum_oxygen_balance(
+        _boundary_test_pressure_model(-12.5),
+        _boundary_test_channels(),
+        temperature_K=1500.0,
+        bracket_log10_pO2_bar=(-20.0, -5.0),
+    )
+
+    diagnostic = result.pressure_law_exponent_diagnostics["Fe"]
+    assert diagnostic["raw_total_slope"] == pytest.approx(-0.5)
+    assert diagnostic["corrected_fixed_parent_activity_slope"] == pytest.approx(
+        diagnostic["raw_total_slope"]
+    )
+    assert diagnostic["parent_activity_reported"] is False
 
 
 def test_hashimoto_vacuum_oxygen_balance_is_engine_specific_and_alpha_weighted() -> None:

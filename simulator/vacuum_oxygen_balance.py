@@ -7,7 +7,7 @@ code must import them from this module, never from ``simulator.battery``.
 from __future__ import annotations
 
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Literal
 
 OxygenBalanceBracketBoundary = Literal["lower", "upper"]
@@ -32,6 +32,19 @@ class _VacuumOxygenChannel:
     active: bool = True
 
 
+class _VacuumOxygenPressureValues(dict[str, float]):
+    """One pressure evaluation with the parent activities it actually used."""
+
+    def __init__(
+        self,
+        pressures_Pa: Mapping[str, float],
+        *,
+        parent_activities: Mapping[str, float] | None = None,
+    ) -> None:
+        super().__init__(pressures_Pa)
+        self.parent_activities = dict(parent_activities or {})
+
+
 @dataclass(frozen=True)
 class _VacuumOxygenBalance:
     pO2_bar: float
@@ -42,3 +55,6 @@ class _VacuumOxygenBalance:
     parent_oxygen_demand_flux_mol_m2_s: float
     relative_residual: float
     alpha_sources: Mapping[str, str]
+    pressure_law_exponent_diagnostics: Mapping[str, Mapping[str, object]] = field(
+        default_factory=dict
+    )
