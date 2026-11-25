@@ -3447,7 +3447,6 @@ def test_pt0_physics_ladder_route_refuses_dependency_vector_mismatch(
         "equilibrium_post_record",
         source_entry["payload"],
         payload_codec_version=source_entry["payload_codec_version"],
-        keys=(source_entry["key"], query_key),
     )
 
     def ladder_entry(_artifact, candidate_rung, *_args, **_kwargs):
@@ -7368,6 +7367,7 @@ def _capture_recursive_gate_row(
     sim = _build_pt0_sim(capture)
     with pytest.MonkeyPatch.context() as monkeypatch:
         _configure_recursive_gate_sim(sim, monkeypatch)
+        sim._freeze_gate_curve()
         curve = sim._freeze_gate_curve()
     assert capture.capture_sequence[-1]["artifact"] == "freeze_gate_curve"
     key = copy.deepcopy(capture.capture_sequence[-1]["key"])
@@ -7536,7 +7536,6 @@ def _assert_authorityless_pt1_reads_miss_and_replace(
         "equilibrium_post_record",
         authorityless,
         payload_codec_version=entry["payload_codec_version"],
-        keys=(key,),
     ) is None
 
     persistent = capture.persistent_store
@@ -7593,8 +7592,10 @@ def _assert_authorityless_pt1_reads_miss_and_replace(
 
 def _exercise_equilibrium_replay_consumers(
     store: PT0DeterminismStore,
-) -> None:
-    sim, _ = _pt0_equilibrium_capture_context(store)
+    sim: Any | None = None,
+) -> Any:
+    if sim is None:
+        sim, _ = _pt0_equilibrium_capture_context(store)
     result = sim._get_equilibrium()
     assert store.hits == 1
     assert store.last_cache_state in {
@@ -7603,6 +7604,7 @@ def _exercise_equilibrium_replay_consumers(
         "cached_interpolated",
     }
     _exercise_equilibrium_consumers_from_result(sim, result)
+    return sim
 
 
 def _exercise_equilibrium_consumers_from_result(
@@ -7659,10 +7661,11 @@ def _configure_recursive_gate_sim(
 def _exercise_cache_payload_replay(
     store: PT0DeterminismStore,
     artifact: str,
-) -> None:
+    *,
+    sim: Any | None = None,
+) -> Any:
     if artifact == "equilibrium_post_record":
-        _exercise_equilibrium_replay_consumers(store)
-        return
+        return _exercise_equilibrium_replay_consumers(store, sim)
     sim = _build_pt0_sim(store)
     with pytest.MonkeyPatch.context() as monkeypatch:
         _configure_recursive_gate_sim(sim, monkeypatch)
@@ -7670,6 +7673,7 @@ def _exercise_cache_payload_replay(
         assert store.hits == 1
         assert store.last_cache_state == "cached_exact"
         _exercise_gate_replay_consumer(sim, curve)
+    return sim
 
 
 def _recursive_capture_for_kind(
@@ -7723,14 +7727,15 @@ def test_real_cache_payload_recursive_mutations_miss_or_replay_identically(
         persistent=persistent,
     )
     key_hash = _key_hash(key)
-    _exercise_cache_payload_replay(
-        _recursive_cache_reader(
-            capture,
-            persistent=persistent,
-            db_path=db_path,
-        ),
-        artifact,
+    reader = _recursive_cache_reader(
+        capture,
+        persistent=persistent,
+        db_path=db_path,
     )
+    replay_sim = None
+    if artifact == "equilibrium_post_record":
+        replay_sim, _ = _pt0_equilibrium_capture_context(reader)
+    _exercise_cache_payload_replay(reader, artifact, sim=replay_sim)
     if payload_kind == "equilibrium" and persistent:
         _assert_authorityless_pt1_reads_miss_and_replace(
             capture,
@@ -7741,6 +7746,15 @@ def test_real_cache_payload_recursive_mutations_miss_or_replay_identically(
     failures: list[str] = []
     paths_seen = 0
     mutation_baseline = _tupleize_recursive_sequences(baseline)
+
+    def reset_reader_for_next_row() -> None:
+        reader.hits = 0
+        reader.misses.clear()
+        reader.replay_sequence.clear()
+        reader.capture_sequence.clear()
+        reader.cache_events.clear()
+        reader.last_cache_state = None
+        reader._accepted_hit_disclosures = None
 
     for path, value in _recursive_payload_paths(mutation_baseline):
         paths_seen += 1
@@ -7774,21 +7788,20 @@ def test_real_cache_payload_recursive_mutations_miss_or_replay_identically(
                 continue
             if persistent:
                 _write_pt1_payload_for_invariant(db_path, key_hash, mutated)
-
-            reader = _recursive_cache_reader(
-                capture,
-                persistent=persistent,
-                db_path=db_path,
-            )
+                reader._entries.pop(key_hash, None)
+            else:
+                reader._entries[key_hash] = copy.deepcopy(
+                    capture._entries[key_hash]
+                )
+            reset_reader_for_next_row()
             before_disclosures = _accepted_hit_disclosures_for_test(reader)
             try:
-                hit = reader._lookup(
+                replay_sim = _exercise_cache_payload_replay(
+                    reader,
                     artifact,
-                    key,
-                    return_decoded=(artifact == "equilibrium_post_record"),
+                    sim=replay_sim,
                 )
             except PT0CacheMiss:
-                hit = None
                 if (
                     reader.hits != 0
                     or _accepted_hit_disclosures_for_test(reader)
@@ -7797,27 +7810,6 @@ def test_real_cache_payload_recursive_mutations_miss_or_replay_identically(
                     failures.append(
                         f"{path_name} {mutation}: miss changed hit/disclosure state"
                     )
-            except Exception as exc:
-                failures.append(
-                    f"{path_name} {mutation}: lookup raised "
-                    f"{type(exc).__name__}: {exc}"
-                )
-                continue
-            if hit is None:
-                if (
-                    reader.hits != 0
-                    or _accepted_hit_disclosures_for_test(reader)
-                    != before_disclosures
-                ):
-                    failures.append(
-                        f"{path_name} {mutation}: miss changed hit/disclosure state"
-                    )
-            elif reader.hits != 1:
-                failures.append(
-                    f"{path_name} {mutation}: admission lookup recorded "
-                    f"{reader.hits} hits"
-                )
-            if hit is None:
                 original = capture._entries[key_hash]
                 try:
                     capture._store(
@@ -7832,24 +7824,49 @@ def test_real_cache_payload_recursive_mutations_miss_or_replay_identically(
                         f"{type(exc).__name__}: {exc}"
                     )
                     continue
-                reader = _recursive_cache_reader(
-                    capture,
-                    persistent=persistent,
-                    db_path=db_path,
-                )
-            else:
-                reader = _recursive_cache_reader(
-                    capture,
-                    persistent=persistent,
-                    db_path=db_path,
-                )
-            try:
-                _exercise_cache_payload_replay(reader, artifact)
+                if persistent:
+                    reader._entries.pop(key_hash, None)
+                else:
+                    reader._entries[key_hash] = copy.deepcopy(
+                        capture._entries[key_hash]
+                    )
+                reset_reader_for_next_row()
+                try:
+                    recaptured = reader._lookup(
+                        artifact,
+                        key,
+                        return_decoded=(
+                            artifact == "equilibrium_post_record"
+                        ),
+                    )
+                    if recaptured is None or reader.hits != 1:
+                        failures.append(
+                            f"{path_name} {mutation}: recaptured original row "
+                            f"did not hit exactly once (hits={reader.hits})"
+                        )
+                except Exception as exc:
+                    failures.append(
+                        f"{path_name} {mutation}: recaptured original row "
+                        f"lookup raised "
+                        f"{type(exc).__name__}: {exc}"
+                    )
             except Exception as exc:
                 failures.append(
-                    f"{path_name} {mutation}: recaptured-row or cache-hit "
-                    "core/evaporation/Langmuir "
-                    f"consumer raised {type(exc).__name__}: {exc}"
+                    f"{path_name} {mutation}: cache replay raised "
+                    f"{type(exc).__name__}: {exc}"
+                )
+                continue
+            else:
+                if reader.hits != 1:
+                    failures.append(
+                        f"{path_name} {mutation}: admitted replay recorded "
+                        f"{reader.hits} hits"
+                    )
+            if reader.hits == 0 and (
+                _accepted_hit_disclosures_for_test(reader) != before_disclosures
+            ):
+                failures.append(
+                    f"{path_name} {mutation}: miss changed disclosure state"
                 )
 
     assert paths_seen > 0
@@ -7903,10 +7920,8 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
         "capture",
         db_path=db_path if persistent else None,
     )
-    sources = [
-        _capture_recursive_equilibrium_row(capture, temperature_K=1500.0),
-        _capture_recursive_equilibrium_row(capture, temperature_K=1700.0),
-    ]
+    _capture_recursive_equilibrium_row(capture, temperature_K=1599.0)
+    _capture_recursive_equilibrium_row(capture, temperature_K=1601.0)
     production_attempt = interpolation.attempt_cached_interpolation
     query_sim, _ = _pt0_equilibrium_capture_context(capture)
     query_sim.melt.temperature_C = 1600.0 - CELSIUS_TO_KELVIN_OFFSET
@@ -7932,7 +7947,7 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
             ),
             exclude_key_hash=_key_hash(query_key),
         )
-    attempt = interpolation.attempt_cached_interpolation(query_key, candidates)
+    attempt = production_attempt(query_key, candidates)
     assert attempt is not None, "production captures did not synthesize interpolation"
     baseline = copy.deepcopy(attempt["payload"])
 
@@ -7945,14 +7960,18 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
         "_entry_for_physics_ladder_bucket",
         lambda *_a, **_k: None,
     )
-    baseline_sim, _ = _pt0_equilibrium_capture_context(capture)
-    baseline_sim.melt.temperature_C = 1600.0 - CELSIUS_TO_KELVIN_OFFSET
-    baseline_sim.melt.fO2_log = -9.0
-    if hasattr(baseline_sim.melt, "melt_fO2_log"):
-        baseline_sim.melt.melt_fO2_log = -9.0
-    baseline_result = baseline_sim._get_equilibrium()
+    production_live = query_sim._get_equilibrium_live
+
+    class _CacheMissRecomputed(Exception):
+        pass
+
+    def reject_live_recompute(*_args: Any, **_kwargs: Any) -> Any:
+        raise _CacheMissRecomputed
+
+    baseline_result = query_sim._get_equilibrium()
+    assert capture.hits == 1
     assert capture.last_cache_state == "cached_interpolated"
-    _exercise_equilibrium_consumers_from_result(baseline_sim, baseline_result)
+    _exercise_equilibrium_consumers_from_result(query_sim, baseline_result)
 
     failures: list[str] = []
     mutation_baseline = _tupleize_recursive_sequences(baseline)
@@ -7983,21 +8002,23 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
                     _attempt
                 ),
             )
+            capture.hits = 0
+            capture.misses.clear()
+            capture.replay_sequence.clear()
+            capture.capture_sequence.clear()
+            capture.cache_events.clear()
+            capture.last_cache_state = None
+            capture._accepted_hit_disclosures = None
             before_hits = capture.hits
             before_disclosures = _accepted_hit_disclosures_for_test(capture)
+            monkeypatch.setattr(
+                query_sim,
+                "_get_equilibrium_live",
+                reject_live_recompute,
+            )
             try:
-                result = capture._lookup_interpolated(
-                    "equilibrium_post_record",
-                    query_key,
-                    return_decoded=True,
-                )
-            except Exception as exc:
-                failures.append(
-                    f"{path_name} {mutation}: interpolation lookup raised "
-                    f"{type(exc).__name__}: {exc}"
-                )
-                continue
-            if result is None:
+                result = query_sim._get_equilibrium()
+            except _CacheMissRecomputed:
                 if capture.hits != before_hits:
                     failures.append(
                         f"{path_name} {mutation}: interpolation miss changed hits"
@@ -8006,33 +8027,22 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
                     failures.append(
                         f"{path_name} {mutation}: interpolation miss changed disclosure state"
                     )
-                for source_sim, source_result, _source_key, _payload in sources:
-                    if persistent:
-                        capture.capture_equilibrium(source_sim, source_result)
-                    else:
-                        memory_candidates = capture.persistent_store
-                        capture.persistent_store = None
-                        try:
-                            capture.capture_equilibrium(source_sim, source_result)
-                        finally:
-                            capture.persistent_store = memory_candidates
                 monkeypatch.setattr(
                     interpolation,
                     "attempt_cached_interpolation",
                     production_attempt,
                 )
-                replay_sim, _ = _pt0_equilibrium_capture_context(capture)
-                replay_sim.melt.temperature_C = (
-                    1600.0 - CELSIUS_TO_KELVIN_OFFSET
+                monkeypatch.setattr(
+                    query_sim,
+                    "_get_equilibrium_live",
+                    production_live,
                 )
-                replay_sim.melt.fO2_log = -9.0
-                if hasattr(replay_sim.melt, "melt_fO2_log"):
-                    replay_sim.melt.melt_fO2_log = -9.0
                 try:
-                    replay_result = replay_sim._get_equilibrium()
+                    result = query_sim._get_equilibrium()
                     if capture.last_cache_state != "cached_interpolated":
                         failures.append(
-                            f"{path_name} {mutation}: recaptured source rows did not hit interpolation"
+                            f"{path_name} {mutation}: restored source captures "
+                            "did not hit interpolation"
                         )
                     if capture.hits != before_hits + 1:
                         failures.append(
@@ -8040,42 +8050,36 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
                             f"recorded {capture.hits - before_hits} hits"
                         )
                     _exercise_equilibrium_consumers_from_result(
-                        replay_sim,
-                        replay_result,
+                        query_sim,
+                        result,
                     )
                 except Exception as exc:
                     failures.append(
-                        f"{path_name} {mutation}: restored interpolation "
-                        f"consumer raised {type(exc).__name__}: {exc}"
+                        f"{path_name} {mutation}: restored interpolation replay "
+                        f"raised {type(exc).__name__}: {exc}"
                     )
                     continue
+            except Exception as exc:
+                failures.append(
+                    f"{path_name} {mutation}: interpolation replay raised "
+                    f"{type(exc).__name__}: {exc}"
+                )
+                continue
             else:
                 if capture.hits != before_hits + 1:
                     failures.append(
                         f"{path_name} {mutation}: admitted interpolation "
                         f"recorded {capture.hits - before_hits} hits"
                     )
-                replay_sim, _ = _pt0_equilibrium_capture_context(capture)
-                replay_sim.melt.temperature_C = (
-                    1600.0 - CELSIUS_TO_KELVIN_OFFSET
-                )
-                replay_sim.melt.fO2_log = -9.0
-                if hasattr(replay_sim.melt, "melt_fO2_log"):
-                    replay_sim.melt.melt_fO2_log = -9.0
                 try:
-                    replay_result = replay_sim._get_equilibrium()
                     if capture.last_cache_state != "cached_interpolated":
                         failures.append(
-                            f"{path_name} {mutation}: interpolation consumer did not use a cache hit"
-                        )
-                    if capture.hits != before_hits + 2:
-                        failures.append(
                             f"{path_name} {mutation}: interpolation consumer "
-                            f"recorded {capture.hits - before_hits} total hits"
+                            "did not use a cache hit"
                         )
                     _exercise_equilibrium_consumers_from_result(
-                        replay_sim,
-                        replay_result,
+                        query_sim,
+                        result,
                     )
                 except Exception as exc:
                     failures.append(

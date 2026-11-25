@@ -146,6 +146,15 @@ _EQUILIBRIUM_AUTHORITY_FIELDS = (
     "vapor_pressure",
 )
 _BACKEND_AUTHORITY_FIELDS = ("backend_name", "backend_class")
+_PROVIDER_AUTHORITY_FIELDS = (
+    "resolved_provider_id",
+    "resolved_role",
+    "authoritative_provider_id",
+    "fallback_provider_id",
+    "fallback_allowed",
+    "model",
+    "mode",
+)
 
 
 def _equilibrium_result_payload_fields() -> tuple[dataclasses.Field[Any], ...]:
@@ -153,6 +162,32 @@ def _equilibrium_result_payload_fields() -> tuple[dataclasses.Field[Any], ...]:
         field
         for field in dataclasses.fields(EquilibriumResult)
         if field.name != "ledger_transition"
+    )
+
+
+def _provider_authority_payload(
+    *,
+    resolved_provider_id: str | None,
+    resolved_role: str,
+    authoritative_provider_id: str | None,
+    fallback_provider_id: str | None,
+    fallback_allowed: bool,
+    model: str | None,
+    mode: str | None,
+) -> dict[str, Any]:
+    return dict(
+        zip(
+            _PROVIDER_AUTHORITY_FIELDS,
+            (
+                resolved_provider_id,
+                resolved_role,
+                authoritative_provider_id,
+                fallback_provider_id,
+                fallback_allowed,
+                model,
+                mode,
+            ),
+        )
     )
 
 
@@ -215,7 +250,6 @@ def _decode_payload_for_admission(
     payload: Any,
     *,
     payload_codec_version: int | None = None,
-    keys: Sequence[Mapping[str, Any]] = (),
     interpolation_synthesized: bool = False,
 ) -> Any | None:
     expected_version = _payload_codec_version(artifact)
@@ -246,6 +280,27 @@ def _decode_payload_for_admission(
                 return False
         return False
 
+    def has_provider_authority_shape(value: Any) -> bool:
+        return (
+            isinstance(value, Mapping)
+            and all(
+                field_name in value
+                for field_name in _PROVIDER_AUTHORITY_FIELDS
+            )
+            and isinstance(value["resolved_provider_id"], str)
+            and isinstance(value["resolved_role"], str)
+            and all(
+                value[field_name] is None or isinstance(value[field_name], str)
+                for field_name in (
+                    "authoritative_provider_id",
+                    "fallback_provider_id",
+                    "model",
+                    "mode",
+                )
+            )
+            and type(value["fallback_allowed"]) is bool
+        )
+
     if not has_finite_json_numbers(payload):
         return None
     if artifact == "freeze_gate_curve":
@@ -259,62 +314,6 @@ def _decode_payload_for_admission(
             curve = _curve_from_payload(curve_payload)
         except Exception:
             return None
-        for key in keys:
-            identity_key = key.get("freeze_gate_cache_key")
-            identity_is_required = (
-                getattr(identity_key, "magemin_domain_identity", None) is not None
-                or (
-                    isinstance(identity_key, Mapping)
-                    and identity_key.get("magemin_domain_identity") is not None
-                )
-                or (
-                    isinstance(identity_key, (list, tuple))
-                    and len(identity_key) == 9
-                    and identity_key[7] is not None
-                )
-            )
-            try:
-                identity = _magemin_identity_from_replay_key(key)
-            except (OverflowError, TypeError, ValueError):
-                identity = None
-            if identity is None and identity_is_required:
-                return None
-            if identity is None or identity.silica_verdict == "in_band":
-                continue
-            if identity.silica_verdict != "extrapolated":
-                return None
-            certified_band = curve.get("certified_band")
-            silica_bounds = (
-                certified_band.get("sio2_wt_pct")
-                if isinstance(certified_band, Mapping)
-                else None
-            )
-            parsed_silica_bounds = None
-            if (
-                isinstance(silica_bounds, (list, tuple))
-                and len(silica_bounds) == 2
-                and all(
-                    isinstance(bound, (int, float))
-                    and not isinstance(bound, bool)
-                    for bound in silica_bounds
-                )
-            ):
-                try:
-                    parsed_silica_bounds = tuple(
-                        float(bound) for bound in silica_bounds
-                    )
-                except (OverflowError, TypeError, ValueError):
-                    parsed_silica_bounds = None
-            if not (
-                identity.certified_band is not None
-                and curve.get("authority") == "extrapolated"
-                and isinstance(certified_band, Mapping)
-                and parsed_silica_bounds is not None
-                and all(math.isfinite(bound) for bound in parsed_silica_bounds)
-                and parsed_silica_bounds[0] < parsed_silica_bounds[1]
-                and parsed_silica_bounds == identity.certified_band
-            ):
-                return None
         return curve
     if artifact == "equilibrium_post_record":
         equilibrium_result = payload.get("equilibrium_result")
@@ -357,11 +356,8 @@ def _decode_payload_for_admission(
                     or not isinstance(backend_identity[field_name], str)
                     for field_name in _BACKEND_AUTHORITY_FIELDS
                 )
-                or not isinstance(provider_identity, Mapping)
-                or not isinstance(
-                    provider_identity.get("resolved_provider_id"), str
-                )
-                or not isinstance(vapor_pressure_identity, Mapping)
+                or not has_provider_authority_shape(provider_identity)
+                or not has_provider_authority_shape(vapor_pressure_identity)
             ):
                 return None
         elif "authority" in payload and not isinstance(authority, Mapping):
@@ -396,50 +392,53 @@ def _decode_payload_for_admission(
             "pO2_exponent",
             "melt_oxide_X_single_cation",
         }
+
+        def valid_activity_standard_state(value: Any) -> bool:
+            if not isinstance(value, Mapping) or any(
+                field_name not in value
+                for field_name in (
+                    "reference_pressure_bar",
+                    "reference_temperature_K",
+                )
+            ):
+                return False
+            pressure = value["reference_pressure_bar"]
+            temperature = value["reference_temperature_K"]
+            if (
+                not isinstance(pressure, (int, float))
+                or isinstance(pressure, bool)
+                or (
+                    temperature is not None
+                    and (
+                        not isinstance(temperature, (int, float))
+                        or isinstance(temperature, bool)
+                    )
+                )
+            ):
+                return False
+            try:
+                return math.isfinite(float(pressure)) and (
+                    temperature is None or math.isfinite(float(temperature))
+                )
+            except (OverflowError, TypeError, ValueError):
+                return False
+
         for diagnostic in provenance_diagnostics:
             activities = diagnostic.get("activities")
-            standard_state = diagnostic.get("activities_standard_state")
             activity_standard_state_required = (
                 isinstance(activities, Mapping) and bool(activities)
             )
-            if activity_standard_state_required and not isinstance(
-                standard_state, Mapping
+            if activity_standard_state_required and (
+                "activities_standard_state" not in diagnostic
             ):
                 return None
-            if standard_state is not None:
-                if not isinstance(standard_state, Mapping):
-                    return None
-                if any(
-                    field_name not in standard_state
-                    for field_name in (
-                        "reference_pressure_bar",
-                        "reference_temperature_K",
-                    )
-                ):
-                    return None
-                pressure = standard_state["reference_pressure_bar"]
-                temperature = standard_state["reference_temperature_K"]
-                if (
-                    not isinstance(pressure, (int, float))
-                    or isinstance(pressure, bool)
-                ):
-                    return None
-                try:
-                    if not math.isfinite(float(pressure)):
-                        return None
-                except (OverflowError, TypeError, ValueError):
-                    return None
-                if temperature is not None:
-                    if (
-                        not isinstance(temperature, (int, float))
-                        or isinstance(temperature, bool)
-                    ):
-                        return None
-                    try:
-                        if not math.isfinite(float(temperature)):
-                            return None
-                    except (OverflowError, TypeError, ValueError):
-                        return None
+            if (
+                "activities_standard_state" in diagnostic
+                and not valid_activity_standard_state(
+                    diagnostic["activities_standard_state"]
+                )
+            ):
+                return None
             if "vapor_pressure_numerator_provenance" not in diagnostic:
                 continue
             provenance = diagnostic["vapor_pressure_numerator_provenance"]
@@ -450,6 +449,13 @@ def _decode_payload_for_admission(
                     not isinstance(species, str)
                     or not isinstance(species_provenance, Mapping)
                     or any(not isinstance(field, str) for field in species_provenance)
+                ):
+                    return None
+                if (
+                    "activities_standard_state" in species_provenance
+                    and not valid_activity_standard_state(
+                        species_provenance["activities_standard_state"]
+                    )
                 ):
                     return None
                 for field_name in string_fields:
@@ -1924,7 +1930,6 @@ class PT0DeterminismStore:
                 canonical_json_bytes(entry_key),
                 str(key_hash),
                 entry,
-                admission_keys=(query_key,) if isinstance(query_key, Mapping) else (),
             )
             if decoded is not None:
                 return entry, decoded
@@ -1952,7 +1957,6 @@ class PT0DeterminismStore:
                     canonical_json_bytes(candidate_key),
                     candidate_hash,
                     candidate,
-                    admission_keys=(query_key,) if isinstance(query_key, Mapping) else (),
                 )
                 if decoded is not None:
                     return candidate, decoded
@@ -2068,7 +2072,6 @@ class PT0DeterminismStore:
                 if attempt.get("neighbors")
                 else None
             ),
-            keys=(key,),
             interpolation_synthesized=True,
         )
         if decoded is None:
@@ -2144,8 +2147,6 @@ class PT0DeterminismStore:
         key_bytes: bytes,
         key_hash: str,
         entry: Mapping[str, Any],
-        *,
-        admission_keys: Sequence[Mapping[str, Any]] = (),
     ) -> Any | None:
         payload_bytes = _payload_integrity_bytes(entry["payload"])
         if entry.get("payload_hash") != _sha256(payload_bytes):
@@ -2156,7 +2157,6 @@ class PT0DeterminismStore:
             artifact,
             entry.get("payload"),
             payload_codec_version=entry.get("payload_codec_version"),
-            keys=(key, *admission_keys),
         )
         if decoded is None:
             return None
@@ -2291,7 +2291,6 @@ class PT1PersistentEquilibriumStore:
                     key_bytes=key_bytes,
                     key_hash=key_hash,
                     return_decoded=True,
-                    admission_keys=(key,),
                 )
                 stale_payload = existing_decoded is None
                 if not stale_payload and (
@@ -2547,7 +2546,6 @@ class PT1PersistentEquilibriumStore:
                     key_bytes=key_bytes,
                     key_hash=key_hash,
                     return_decoded=True,
-                    admission_keys=(key,),
                 )
                 if decoded is None:
                     continue
@@ -2672,9 +2670,6 @@ class PT1PersistentEquilibriumStore:
                         key_bytes=row_key_bytes,
                         key_hash=row_hash,
                         return_decoded=True,
-                        admission_keys=(
-                            (query_key,) if isinstance(query_key, Mapping) else ()
-                        ),
                     )
                     if decoded is None:
                         continue
@@ -3132,7 +3127,6 @@ class PT1PersistentEquilibriumStore:
         key_bytes: bytes,
         key_hash: str,
         return_decoded: bool = False,
-        admission_keys: Sequence[Mapping[str, Any]] = (),
     ) -> Any:
         row_key_bytes = _sqlite_bytes(row["key_bytes"])
         row_payload_bytes = _sqlite_bytes(row["payload_bytes"])
@@ -3190,7 +3184,6 @@ class PT1PersistentEquilibriumStore:
             artifact,
             row_payload,
             payload_codec_version=payload_codec_version,
-            keys=(row_key, *admission_keys),
         )
         if admission is None:
             admitted_payload = copy.deepcopy(row_payload)
@@ -3240,9 +3233,6 @@ class PT1PersistentEquilibriumStore:
             key_bytes=row_key_bytes,
             key_hash=str(row["key_hash"]),
             return_decoded=True,
-            admission_keys=(
-                (query_key,) if isinstance(query_key, Mapping) else ()
-            ),
         )
         if decoded is None:
             return entry, None
@@ -3296,9 +3286,6 @@ class PT1PersistentEquilibriumStore:
             key_bytes=row_key_bytes,
             key_hash=str(row["key_hash"]),
             return_decoded=True,
-            admission_keys=(
-                (query_key,) if isinstance(query_key, Mapping) else ()
-            ),
         )
         if decoded is None:
             return entry, None
@@ -3363,7 +3350,6 @@ def _pt1_row_admission(
         str(row["artifact"]),
         payload,
         payload_codec_version=row["payload_codec_version"],
-        keys=(key,),
     ) is not None
 
 
@@ -5762,15 +5748,15 @@ def _provider_identity(
         )
         if cached_real is not None:
             return cached_real
-    return {
-        "resolved_provider_id": _provider_id(resolved),
-        "resolved_role": role if resolved is not None else "none",
-        "authoritative_provider_id": _provider_id(auth),
-        "fallback_provider_id": _provider_id(fallback),
-        "fallback_allowed": bool(fallback_allowed),
-        "model": _provider_model(resolved),
-        "mode": _provider_mode(resolved),
-    }
+    return _provider_authority_payload(
+        resolved_provider_id=_provider_id(resolved),
+        resolved_role=role if resolved is not None else "none",
+        authoritative_provider_id=_provider_id(auth),
+        fallback_provider_id=_provider_id(fallback),
+        fallback_allowed=bool(fallback_allowed),
+        model=_provider_model(resolved),
+        mode=_provider_mode(resolved),
+    )
 
 
 def _engine_version_provenance(
@@ -5836,15 +5822,15 @@ def _cached_real_provider_identity(
     if intent not in alphamelts_intents:
         return None
     if intent == ChemistryIntent.GATE_LIQUID_FRACTION and provider_role == "fallback":
-        return {
-            "resolved_provider_id": _MAGEMIN_SHADOW_PROVIDER_ID,
-            "resolved_role": "fallback",
-            "authoritative_provider_id": None,
-            "fallback_provider_id": _MAGEMIN_SHADOW_PROVIDER_ID,
-            "fallback_allowed": bool(fallback_allowed),
-            "model": "MAGEMinShadowProvider",
-            "mode": "subprocess",
-        }
+        return _provider_authority_payload(
+            resolved_provider_id=_MAGEMIN_SHADOW_PROVIDER_ID,
+            resolved_role="fallback",
+            authoritative_provider_id=None,
+            fallback_provider_id=_MAGEMIN_SHADOW_PROVIDER_ID,
+            fallback_allowed=bool(fallback_allowed),
+            model="MAGEMinShadowProvider",
+            mode="subprocess",
+        )
     fallback_provider_id = (
         _MAGEMIN_SHADOW_PROVIDER_ID
         if intent == ChemistryIntent.GATE_LIQUID_FRACTION
@@ -5866,15 +5852,15 @@ def _cached_real_provider_identity(
         )
     else:
         authorized_model = authorized_model or DEFAULT_ALPHAMELTS_MODEL
-    return {
-        "resolved_provider_id": _ALPHAMELTS_PROVIDER_ID,
-        "resolved_role": "authoritative",
-        "authoritative_provider_id": _ALPHAMELTS_PROVIDER_ID,
-        "fallback_provider_id": fallback_provider_id,
-        "fallback_allowed": bool(fallback_allowed),
-        "model": authorized_model,
-        "mode": authorized_mode,
-    }
+    return _provider_authority_payload(
+        resolved_provider_id=_ALPHAMELTS_PROVIDER_ID,
+        resolved_role="authoritative",
+        authoritative_provider_id=_ALPHAMELTS_PROVIDER_ID,
+        fallback_provider_id=fallback_provider_id,
+        fallback_allowed=bool(fallback_allowed),
+        model=authorized_model,
+        mode=authorized_mode,
+    )
 
 
 def _provider_id(provider: Any) -> str | None:
