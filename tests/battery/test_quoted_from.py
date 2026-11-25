@@ -5,8 +5,17 @@ import pytest
 import yaml
 
 from simulator.battery import migrate as M
-from simulator.battery.enums import AmountBasis, QuotedTargetKind, RefusalReason
-from simulator.battery.records import Composition, QuotedFrom, State
+from simulator.battery.enums import (
+    AmountBasis,
+    EvidenceClass,
+    Phase,
+    PhaseRole,
+    Quantity,
+    QuotedTargetKind,
+    RefusalReason,
+)
+from simulator.battery.identity import Identity
+from simulator.battery.records import Composition, QuotedFrom, Species, State
 from simulator.battery.validate import validate_corpus
 from tests.battery import factories as F
 
@@ -83,17 +92,25 @@ def test_quoted_from_roundtrips_and_resolves_either_primary_record(
     assert report.hard_issues == ()
 
 
-def test_measured_liquid_composition_cannot_stand_in_for_run_composition() -> None:
+def test_measured_liquid_phase_composition_cannot_stand_in_for_run_composition() -> None:
     measured_liquid = _composition()
     primary = F.tabulation_experiment("primary-experiment")
+    measured_liquid_identity = Identity(
+        quantity=Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        species=Species("SiO2", Phase.L),
+        subtype=State.of("mole_fraction"),
+        temperature_K=State.of(Decimal("1600")),
+        phase_role=State.of(PhaseRole.MELT),
+        composition=State.of(measured_liquid),
+        fO2_Pa=State.of(Decimal("1e-8")),
+        total_pressure_Pa=State.of(Decimal("100000")),
+    )
     measured_observation = F.observation(
         "measured-liquid-observation",
         primary.experiment_id,
-        replace(
-            F.o2_identity(),
-            composition=State.of(measured_liquid),
-        ),
+        measured_liquid_identity,
         "1",
+        evidence=EvidenceClass.MEASURED_DIRECT,
     )
     quoted = _quoted_experiment(
         QuotedFrom(
@@ -108,13 +125,13 @@ def test_measured_liquid_composition_cannot_stand_in_for_run_composition() -> No
     )
 
     assert primary.sample.initial_composition is None
-    assert measured_observation.identity.composition.value == measured_liquid
-    assert any(
-        issue.path
-        == "experiment[quoted-experiment].sample.initial_composition_inherited_from"
-        and issue.reason is RefusalReason.CONDITIONAL_FIELD
+    refusal = next(
+        issue
         for issue in report.hard_issues
+        if issue.path
+        == "experiment[quoted-experiment].sample.initial_composition_inherited_from"
     )
+    assert refusal.reason is RefusalReason.CONDITIONAL_FIELD
 
 
 def test_inherited_initial_composition_must_match_cited_run() -> None:
