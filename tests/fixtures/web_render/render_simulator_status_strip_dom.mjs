@@ -244,6 +244,12 @@ function findById(root, id) {
   return null;
 }
 
+function treeText(root) {
+  if (!root) return '';
+  return String(root.textContent || '')
+    + root.children.map(treeText).join('');
+}
+
 const emitted = [];
 class FakeSocket {
   constructor() {
@@ -449,6 +455,9 @@ function snapshot() {
     startDisabled: context.document.getElementById('btn-start').disabled,
     pauseDisabled: context.document.getElementById('btn-pause').disabled,
     resumeDisabled: context.document.getElementById('btn-resume').disabled,
+    campaignSummaryText: treeText(
+      context.document.getElementById('campaign-summaries'),
+    ),
     emittedCount: emitted.length,
     lifecycle: context.simulatorLifecycleSnapshot(),
   };

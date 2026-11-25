@@ -284,6 +284,35 @@ def test_campaign_count_uses_real_c3_staged_duration_override():
     assert campaigns_elapsed == pytest.approx(1.0 / campaign_cap)
 
 
+def test_campaign_count_combines_completed_campaigns_with_real_c5_cap():
+    session = SimSession().start(
+        _run(
+            feedstock_id="lunar_mare_low_ti",
+            campaign="C2A",
+            hours=1,
+            additives_kg={},
+        )._session_config()
+    )
+    sim = session.simulator
+    sim.melt.campaign = CampaignPhase.C5
+    sim.record.branch = "two"
+    session._step_results = [
+        SimpleNamespace(campaign_summary={"campaign": "C4"}),
+        SimpleNamespace(campaign_summary=None),
+        SimpleNamespace(campaign_summary=None),
+    ]
+
+    campaign_cap = sim.campaign_mgr._configured_max_hold_hr(
+        CampaignPhase.C5, "branch_two"
+    )
+    campaigns_elapsed = _campaigns_elapsed_from_session_history(
+        session,
+        fallback=99.0,
+    )
+
+    assert campaigns_elapsed == pytest.approx(1.0 + 2.0 / campaign_cap)
+
+
 def test_run_metadata_projects_execution_campaign_count_over_override():
     run = _run(
         run_metadata_overrides={

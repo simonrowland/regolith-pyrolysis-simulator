@@ -126,6 +126,9 @@ class RunExecution:
     # One record per completed campaign: campaign, stop_reason, duration_h,
     # detail, and typed flags when the endpoint recorded them.
     campaign_stops: tuple[Mapping[str, Any], ...] = ()
+    # Run-level typed flags, including session-budget truncation. These do not
+    # belong in campaign_stops because the active campaign did not complete.
+    run_flags: tuple[Mapping[str, Any], ...] = ()
 
 
 _CAMPAIGN_STOP_REASONS = frozenset({
@@ -286,6 +289,7 @@ class RunExecutor:
             getattr(config, "until_campaign_complete", False)
         )
         campaign_stops: list[dict[str, Any]] = []
+        run_flags: list[dict[str, Any]] = []
 
         try:
             if initial_refusal is not None:
@@ -307,7 +311,9 @@ class RunExecutor:
                 melt_before_hour = deepcopy(sim.melt)
                 try:
                     result = next(driver)
-                except StopIteration:
+                except StopIteration as stop:
+                    if isinstance(stop.value, Mapping):
+                        run_flags.append(dict(stop.value))
                     break
                 except _ALL_TYPED_PHYSICS_REFUSALS:
                     sim.atom_ledger = ledger_before_hour
@@ -566,6 +572,7 @@ class RunExecutor:
                 ),
                 campaigns_elapsed_start=campaigns_elapsed_start,
                 campaign_stops=tuple(campaign_stops),
+                run_flags=tuple(run_flags),
             )
         except Exception as envelope_exc:  # noqa: BLE001 -- reporting must survive
             if failure_exc is None:
@@ -654,6 +661,7 @@ class RunExecutor:
                 ),
                 campaigns_elapsed_start=campaigns_elapsed_start,
                 campaign_stops=tuple(campaign_stops),
+                run_flags=tuple(run_flags),
             )
 
 

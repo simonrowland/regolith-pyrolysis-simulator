@@ -282,6 +282,7 @@ class SimSession:
         self._paused = False
         self._step_results: list[StepResult] = []
         self._operator_decisions: list[dict[str, Any]] = []
+        self._run_flags: list[dict[str, Any]] = []
         self._result_document: Mapping[str, Any] | None = None
         self._poisoned_error: RuntimeError | None = None
 
@@ -513,6 +514,7 @@ class SimSession:
         self._paused = False
         self._step_results = []
         self._operator_decisions = []
+        self._run_flags = []
         self._result_document = None
         self._poisoned_error = None
 
@@ -811,6 +813,10 @@ class SimSession:
     def operator_decisions(self) -> list[dict[str, Any]]:
         return list(self._operator_decisions)
 
+    @property
+    def run_flags(self) -> tuple[Mapping[str, Any], ...]:
+        return tuple(copy.deepcopy(self._run_flags))
+
     def _record_operator_decision(self, event: dict[str, Any]) -> None:
         self._operator_decisions.append(event)
 
@@ -902,9 +908,47 @@ def drive_session(
 
     if not is_declared_real_scalar(hours, allow_numeric_str=True):
         raise TypeError(f"hours must be numeric, not {type(hours).__name__}")
+    session._run_flags = []
     step_index = 0
     while True:
         if not until_campaign_complete and step_index >= int(hours):
+            # d-473: a finite budget that cuts an active campaign is a
+            # run-level truncation, not a completed campaign stop. Zero-hour
+            # projections do not describe an executed budget.
+            if (
+                step_index > 0
+                and not session.is_complete()
+                and session.pending_decision() is None
+            ):
+                sim = session.simulator
+                phase = sim.melt.campaign
+                if phase not in (CampaignPhase.IDLE, CampaignPhase.COMPLETE):
+                    campaign_mgr = sim.campaign_mgr
+                    successors = copy.copy(campaign_mgr).auto_apply_sequence(
+                        phase,
+                        copy.deepcopy(sim.record),
+                    )
+                    session._run_flags = [{
+                        "kind": "run_truncation",
+                        "code": "run_hour_budget_exhausted_mid_campaign",
+                        "detail": {
+                            "active_campaign": phase.name,
+                            "hours_run_in_campaign": int(
+                                sim.melt.campaign_hour
+                            ),
+                            "campaign_cap_hours": float(
+                                campaign_mgr._active_campaign_max_hold_hr(
+                                    phase,
+                                    sim.record,
+                                )
+                            ),
+                            "successors_not_reached": [
+                                successor.name for successor in successors[1:]
+                            ],
+                            "ruling": "d-473",
+                        },
+                    }]
+                    return dict(session.run_flags[0])
             return
         step_index += 1
         if stop_at_stage0_exit and _at_stage0_exit(session):

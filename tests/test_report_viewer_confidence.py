@@ -55,6 +55,14 @@ globalThis.__qaResult = {
   provenance: provenanceSection(globalThis.__artifact),
   p9: globalThis.ReportPanels.find((panel) => panel.id === "sec-p9-provenance")
     .render(globalThis.__artifact, [], [], {}),
+  runFlagText: (() => {
+    const target = { textContent: "" };
+    renderRunFlags(
+      target,
+      globalThis.__artifact.terminal.run_metadata.run_flags,
+    );
+    return target.textContent;
+  })(),
 };
 `,
   context,
@@ -153,6 +161,31 @@ def test_exactly_one_provenance_surface_renders_the_run_level_grade() -> None:
     assert "data-run-level-confidence" not in p9
     assert "No confidence tier is computed" in p9
     assert "deferred to the report provenance section" in p9
+
+
+def test_run_truncation_flag_is_rendered_as_text_in_artifact_provenance() -> None:
+    artifact = _minimal_artifact(include_confidence_key=False)
+    artifact["terminal"]["run_metadata"]["run_flags"] = [{
+        "kind": "run_truncation",
+        "code": "run_hour_budget_exhausted_mid_campaign",
+        "detail": {
+            "active_campaign": "C2A",
+            "hours_run_in_campaign": 3,
+            "campaign_cap_hours": 160,
+            "successors_not_reached": ["C6"],
+            "ruling": "d-473",
+            "untrusted_text": "<script>not markup</script>",
+        },
+    }]
+
+    rendered = _render_surfaces(artifact)
+
+    assert 'data-run-flags' in rendered["provenance"]
+    assert "run_hour_budget_exhausted_mid_campaign" in rendered["runFlagText"]
+    assert '"campaign_cap_hours":160' in rendered["runFlagText"]
+    assert '"successors_not_reached":["C6"]' in rendered["runFlagText"]
+    assert "<script>not markup</script>" in rendered["runFlagText"]
+    assert "<script>not markup</script>" not in rendered["provenance"]
 
 
 def test_viewer_source_does_not_fold_or_alias_confidence() -> None:

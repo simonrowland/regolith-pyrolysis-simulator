@@ -1506,6 +1506,9 @@ class PyrolysisRun:
             lambda: float(execution.campaigns_elapsed),
             section="run_metadata.campaigns_elapsed",
         )
+        run_flags = _execution_run_flags(execution)
+        if run_flags:
+            run_metadata["run_flags"] = run_flags
         run_metadata.update(
             {
                 "backend_status": str(execution.backend_status),
@@ -5845,6 +5848,19 @@ def _execution_hours_completed(execution: RunExecution | None) -> Any:
     )
 
 
+def _execution_run_flags(execution: RunExecution | None) -> list[Any]:
+    if execution is None:
+        return []
+    return _safe_failure_value(
+        lambda: _json_safe([
+            dict(flag)
+            for flag in (getattr(execution, "run_flags", ()) or ())
+            if isinstance(flag, Mapping)
+        ]),
+        section="run_metadata.run_flags",
+    )
+
+
 def _shuttle_refusal_history_report(sim: Any) -> list[Any]:
     return list(sim._shuttle_refusal_history)
 
@@ -5963,6 +5979,9 @@ def _runner_failure_result(
         ),
         section="run_metadata.campaigns_elapsed",
     )
+    run_flags = _execution_run_flags(execution)
+    if run_flags:
+        run_metadata["run_flags"] = run_flags
     run_metadata.update(
         canonicalize_fidelity_emission(
             backend_name=backend_name,

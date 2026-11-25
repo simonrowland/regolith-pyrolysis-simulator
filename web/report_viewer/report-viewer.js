@@ -678,6 +678,7 @@ function costSection(artifact, energy) {
 function provenanceSection(artifact) {
   const meta = artifact.terminal.run_metadata || {};
   const closure = artifact.terminal.mass_balance_closure || {};
+  const runFlags = Array.isArray(meta.run_flags) ? meta.run_flags : [];
   const confidence = artifact.terminal.confidence;
   const confidenceGrade = confidence && typeof confidence === "object" && !Array.isArray(confidence)
     && typeof confidence.grade === "string" && confidence.grade.trim()
@@ -708,7 +709,27 @@ function provenanceSection(artifact) {
     ["Kernel commit", artifact.header.engine_identity?.kernel_commit_sha ?? "not emitted"],
     ["Engine cache version", artifact.header.engine_identity?.cache_version ?? "not emitted"]
   ];
-  return section(9, "Provenance & confidence", "Status-bearing metadata preserved from the frozen artifact. Copied from the emitted key when present; no tier is computed here.", `<div class="table-wrap"><table><tbody>${facts.map(([key, value]) => `<tr><th>${esc(key)}</th><td class="mono">${esc(value)}</td></tr>`).join("")}</tbody></table></div>${confidenceContent}`);
+  const runFlagsContent = runFlags.length
+    ? `<div class="note" data-run-flags></div>`
+    : "";
+  return section(9, "Provenance & confidence", "Status-bearing metadata preserved from the frozen artifact. Copied from the emitted key when present; no tier is computed here.", `<div class="table-wrap"><table><tbody>${facts.map(([key, value]) => `<tr><th>${esc(key)}</th><td class="mono">${esc(value)}</td></tr>`).join("")}</tbody></table></div>${confidenceContent}${runFlagsContent}`);
+}
+
+function renderRunFlags(target, runFlags) {
+  if (!target) return;
+  const lines = Array.isArray(runFlags)
+    ? runFlags
+      .filter((flag) => flag && typeof flag === "object" && !Array.isArray(flag))
+      .map((flag) => {
+        const code = typeof flag.code === "string" && flag.code.trim()
+          ? flag.code.trim()
+          : "run_flag";
+        return flag.detail === undefined
+          ? code
+          : `${code}: ${JSON.stringify(flag.detail)}`;
+      })
+    : [];
+  target.textContent = lines.length ? `Run flags: ${lines.join("; ")}` : "";
 }
 
 function panelRegistry() {
@@ -825,6 +846,10 @@ function render(artifact) {
     panelSectionsHtml(artifact, rows, spans, energy) +
     costSection(artifact, energy) + provenanceSection(artifact) +
     `<footer class="footer"><span>Frozen flatfile report · engine-free · artifact-only rendering</span><a href="./settings.html${RUN_QUERY}">Captured settings</a><span class="mono">${esc(artifact.header.run_id)}</span></footer>`;
+  renderRunFlags(
+    $("#report [data-run-flags]"),
+    artifact.terminal.run_metadata?.run_flags,
+  );
   if (rows.length) {
     const stepper = $("#stepper");
     stepper.addEventListener("input", () => renderCurrent(artifact, Number(stepper.value)));

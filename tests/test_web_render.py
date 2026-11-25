@@ -1079,15 +1079,56 @@ def test_furnace_material_catalog_failure_is_reported():
 
 
 def test_campaign_summary_renders_typed_stop_flags_as_text():
-    controls = _SIMULATOR_CONTROLS_JS.read_text(encoding="utf-8")
-
-    assert (
-        "const flags = Array.isArray(summary.flags) ? summary.flags : [];"
-        in controls
+    rendered = _render_status_strip(
+        sequence=[
+            {
+                "event": "campaign_complete_summary",
+                "payload": {
+                    "campaign": "C0",
+                    "duration_h": 1,
+                    "start_mass_kg": 1000.0,
+                    "end_mass_kg": 999.0,
+                    "mass_lost_kg": 1.0,
+                    "energy_electrical_plus_evaporation_kWh": 2.0,
+                    "energy_scope": "partial",
+                    "furnace_heat_status": "partial",
+                    "O2_kg": 0.0,
+                    "species_extracted": {},
+                    "flags": [
+                        {
+                            "kind": "campaign_stop",
+                            "code": "campaign_time_cap_unconverged",
+                            "detail": {
+                                "campaign": "C0",
+                                "successor": "C0B",
+                                "ruling": "d-471",
+                            },
+                        },
+                    ],
+                    "run_flags": [
+                        {
+                            "kind": "run_truncation",
+                            "code": "run_hour_budget_exhausted_mid_campaign",
+                            "detail": {
+                                "active_campaign": "C2A",
+                                "hours_run_in_campaign": 1,
+                                "campaign_cap_hours": 3.0,
+                                "successors_not_reached": ["C6"],
+                                "ruling": "d-473",
+                            },
+                        },
+                    ],
+                },
+            },
+        ]
     )
-    assert "flagValue.textContent = flags.map((flag) => {" in controls
-    assert "String(flag?.code || 'campaign_stop')" in controls
-    assert "JSON.stringify(flag.detail)" in controls
+    summary_text = rendered["steps"][0]["campaignSummaryText"]
+
+    assert "campaign_time_cap_unconverged" in summary_text
+    assert '"successor":"C0B"' in summary_text
+    assert "run_hour_budget_exhausted_mid_campaign" in summary_text
+    assert '"campaign_cap_hours":3' in summary_text
+    assert '"successors_not_reached":["C6"]' in summary_text
 
 
 def test_duplicate_pending_starts_accept_only_latest_generation():

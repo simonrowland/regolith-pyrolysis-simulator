@@ -3317,13 +3317,22 @@ def _start_background_loop(
                 ):
                     break
 
-                if step_result.campaign_summary is not None:
+                campaign_summary = step_result.campaign_summary
+                if (
+                    isinstance(campaign_summary, Mapping)
+                    and session.run_flags
+                ):
+                    campaign_summary = dict(campaign_summary)
+                    campaign_summary['run_flags'] = [
+                        dict(flag) for flag in session.run_flags
+                    ]
+                if campaign_summary is not None:
                     if not _emit_if_current(
                         socketio,
                         sid,
                         run_id,
                         'campaign_complete_summary',
-                        step_result.campaign_summary,
+                        campaign_summary,
                     ):
                         break
             except Exception as exc:  # noqa: BLE001 -- loop boundary

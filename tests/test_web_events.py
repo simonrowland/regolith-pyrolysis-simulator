@@ -6040,6 +6040,11 @@ def test_socketio_continues_after_binding_c6_refusal_and_retains_diagnostic(
             "reason_refused": "c6_hold_target_not_acquired",
         },
     }
+    run_flag = {
+        "kind": "run_truncation",
+        "code": "run_hour_budget_exhausted_mid_campaign",
+        "detail": {"active_campaign": "C2A", "ruling": "d-473"},
+    }
     calls = {"n": 0}
 
     def continues_after_c6_drive(session, *args, **kwargs):
@@ -6047,6 +6052,7 @@ def test_socketio_continues_after_binding_c6_refusal_and_retains_diagnostic(
         # Avoid real liquidus/snapshot work in this composition unit test.
         snapshot = SimpleNamespace(hour=calls["n"])
         if calls["n"] == 1:
+            session._run_flags = [run_flag]
             return iter([
                 SimpleNamespace(
                     snapshot=snapshot,
@@ -6130,6 +6136,7 @@ def test_socketio_continues_after_binding_c6_refusal_and_retains_diagnostic(
             and event["args"][0].get("campaign") == "C6"
         ]
         assert c6_summaries
+        assert c6_summaries[0]["run_flags"] == [run_flag]
         assert c6_summaries[0]["c6_refusal_diagnostic"]["diagnostic"][
             "reason_refused"
         ] == "c6_hold_target_not_acquired"
