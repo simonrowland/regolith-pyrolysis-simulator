@@ -5242,7 +5242,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     ) -> _MeltRedoxGateAuthority:
         redox_state_kwargs = _non_absolute_redox_state_kwargs(redox_state)
         if gate_authority is _RESOLVE_MELT_REDOX_GATE_AUTHORITY:
-            has_pin, pinned_authority, reestablish_pin = (
+            has_pin, pinned_authority, _ = (
                 self._melt_redox_gate_current_hour_pin(
                     **redox_state_kwargs,
                 )
@@ -5251,11 +5251,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 if isinstance(pinned_authority, Mapping):
                     return pinned_authority['curve']
                 return pinned_authority
-            if reestablish_pin:
-                return self._establish_melt_redox_gate_authority_for_current_hour(
-                    **redox_state_kwargs,
-                )
-            return self._melt_redox_liquidus_gate_curve(
+            return self._establish_melt_redox_gate_authority_for_current_hour(
                 **redox_state_kwargs,
             )
         if gate_authority is None:
