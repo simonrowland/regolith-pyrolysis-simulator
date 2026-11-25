@@ -300,6 +300,7 @@ def test_xanes_tables_and_deferred_figures_preserve_printed_evidence() -> None:
         if row.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
     ]
     assert len(migrated) == 381
+    assert all(row.identity.composition.is_unknown for row in migrated)
     assert all(row.identity.temperature_K.value == Decimal("1673.15") for row in migrated)
     assert all(row.point_conditions["T_C"].state.value == Decimal("1400") for row in migrated)
     assert all(row.locator.page in {7, 8} and row.locator.published_page in {6853, 6854} for row in migrated)

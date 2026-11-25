@@ -105,6 +105,10 @@ def test_isolated_migration_preserves_phase_conditions_and_printed_values(tmp_pa
     result = migrate(isolated_root(tmp_path, document), write=False)
     assert len(result.observations) == 452
     assert not result.validation.hard_issues
+    assert all(
+        observation.identity.composition.is_unknown
+        for observation in result.observations.values()
+    )
 
     model_context = next(
         row

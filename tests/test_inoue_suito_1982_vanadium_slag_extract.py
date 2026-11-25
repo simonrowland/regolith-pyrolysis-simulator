@@ -137,6 +137,7 @@ def test_inoue_suito_phase_compositions_migrate_with_sample_identity_and_tempera
         if row.source_id == "inoue-suito-1982-vanadium-mgo-saturated-slag"
     }
     assert len(rows) == 61 * 9
+    assert all(row.identity.composition.is_unknown for row in rows.values())
 
     measured_slag = rows["inoue_suito_1982_t02_sample_253_slag_CaO"]
     assert measured_slag.value.point == Decimal("26.70")

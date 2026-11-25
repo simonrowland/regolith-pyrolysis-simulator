@@ -42,6 +42,58 @@ def test_printed_recipe_is_pinned_but_measured_glass_is_not_run_input() -> None:
         "T15": {"value": "15", "approximate": True},
         "T25": {"value": "25", "approximate": True},
     }
+    expected_fidelity_pins = {
+        f"species.TiO2.context[{RECIPE_ID}].values.components_as_printed.SiO2": (
+            "56.9",
+            "2",
+        ),
+        f"species.TiO2.context[{RECIPE_ID}].values.components_as_printed.Al2O3": (
+            "10.1",
+            "3",
+        ),
+        f"species.TiO2.context[{RECIPE_ID}].values.components_as_printed.MgO": (
+            "9.4",
+            "4",
+        ),
+        f"species.TiO2.context[{RECIPE_ID}].values.components_as_printed.CaO": (
+            "10.1",
+            "5",
+        ),
+        f"species.TiO2.context[{RECIPE_ID}].values.components_as_printed.ZrO2": (
+            "13.5",
+            "6",
+        ),
+        f"species.TiO2.context[{RECIPE_ID}].values.TiO2_target_wt_percent_as_printed.T8.value": (
+            "8",
+            "7",
+        ),
+        f"species.TiO2.context[{RECIPE_ID}].values.TiO2_target_wt_percent_as_printed.T15.value": (
+            "15",
+            "8",
+        ),
+        f"species.TiO2.context[{RECIPE_ID}].values.TiO2_target_wt_percent_as_printed.T25.value": (
+            "25",
+            "9",
+        ),
+    }
+    recipe_pins = {
+        sample["path"]: (sample["value"], sample["locator"]["line_range"])
+        for sample in document["fidelity_samples"]
+        if sample.get("path", "").startswith(
+            f"species.TiO2.context[{RECIPE_ID}]."
+        )
+    }
+    assert recipe_pins == expected_fidelity_pins
+    assert all(
+        sample["locator"]["source_path"] == recipe["locator"]["source_path"]
+        and sample["locator"]["page"] == 2
+        and sample["locator"]["published_page"] == 498
+        and sample["locator"]["pdf_page_index"] == 1
+        for sample in document["fidelity_samples"]
+        if sample.get("path", "").startswith(
+            f"species.TiO2.context[{RECIPE_ID}]."
+        )
+    )
     assert check_all_fidelity_samples_match(document, label=EXTRACT.stem) == []
 
     experiments = {row["experiment_id"]: row for row in document["experiments"]}
