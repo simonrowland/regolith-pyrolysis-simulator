@@ -8021,6 +8021,8 @@ def test_real_cache_payload_recursive_mutations_miss_or_replay_identically(
                     key,
                     return_decoded=(artifact == "equilibrium_post_record"),
                 )
+            except PT0CacheMiss:
+                admitted = None
             except Exception as exc:
                 failures.append(
                     f"{path_name} {mutation}: admission lookup raised "
@@ -8105,6 +8107,7 @@ def test_real_cache_payload_recursive_mutations_miss_or_replay_identically(
                 )
 
     assert paths_seen > 0
+    assert not failures, "\n".join(failures)
     assert len(outcomes) == cases_expected
     assert all(outcome in {"miss", "admitted"} for outcome in outcomes.values()), (
         "recursive mutation cases did not each take exactly one admission branch: "
@@ -8114,7 +8117,6 @@ def test_real_cache_payload_recursive_mutations_miss_or_replay_identically(
     )
     assert "miss" in outcomes.values()
     assert "admitted" in outcomes.values()
-    assert not failures, "\n".join(failures)
 
 
 class _MemoryInterpolationCandidates:
@@ -8192,7 +8194,29 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
             exclude_key_hash=_key_hash(query_key),
         )
     attempt = production_attempt(query_key, candidates)
-    assert attempt is not None, "production captures did not synthesize interpolation"
+    if attempt is None:
+        neighbors = interpolation.greedy_nearest_neighbors(
+            query_key,
+            candidates,
+        )
+        gate = interpolation.interpolation_validity_gate(
+            query_key,
+            neighbors,
+        )
+        weight_info = interpolation.barycentric_interpolation_weights(
+            query_key,
+            neighbors,
+        )
+        dependency_matches = [
+            rrd.replay_dependency_vectors_match(query_key, candidate["key"])
+            for candidate in candidates
+        ]
+        pytest.fail(
+            "production captures did not synthesize interpolation: "
+            f"candidates={len(candidates)}, neighbors={len(neighbors)}, "
+            f"dependency_matches={dependency_matches}, gate={gate}, "
+            f"weight_info={weight_info}"
+        )
     baseline = copy.deepcopy(attempt["payload"])
 
     if not persistent:
