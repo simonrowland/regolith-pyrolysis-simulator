@@ -16411,6 +16411,35 @@ def _openimcc_liquid_row_extrapolated_notice(
     )
 
 
+def _residue_gas_film_notices(
+    provenance: Mapping[str, Any],
+    reported_quantity: Quantity,
+    *,
+    origin: str,
+) -> tuple[Notice, ...]:
+    """Copy film notices the integrator already recorded.
+
+    Score does not choose the carrier, the Sherwood number, or the regime.
+    """
+
+    film = provenance.get("gas_film")
+    if not isinstance(film, Mapping):
+        return ()
+    raw = film.get("notices")
+    if not isinstance(raw, Mapping):
+        return ()
+    return tuple(
+        Notice(
+            kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+            affected_quantities=(reported_quantity,),
+            reason=str(reason),
+            origin=origin,
+            band=None if band is None else str(band),
+        )
+        for reason, band in raw.items()
+    )
+
+
 def _liquid_rows_below_floor_notices(
     liquid_rows_used: object, *, origin: str
 ) -> tuple[Notice, ...]:
@@ -16803,6 +16832,13 @@ def _hashimoto_residue_prediction(
             _liquid_rows_below_floor_notices(
                 primary.provenance.get("liquid_rows_used"),
                 origin="hashimoto-residue-addendum-a",
+            )
+        )
+        notices.extend(
+            _residue_gas_film_notices(
+                primary.provenance,
+                reported_quantity,
+                origin="hashimoto-residue-r4",
             )
         )
         return EnginePrediction(
@@ -17272,16 +17308,14 @@ def _sossi_residue_prediction(
             Notice(
                 kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
                 affected_quantities=(reported_quantity,),
-                reason="bc_open_furnace_langmuir_limit_diagnostic",
-                origin="sossi-residue-r5",
-                band="open furnace at 101325 Pa; no gas-film resistance",
-            ),
-            Notice(
-                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
-                affected_quantities=(reported_quantity,),
                 reason="pt_wire_loop_bead_geometry_assumed",
                 origin="sossi-residue-r5",
                 band=str(band) if band is not None else None,
+            ),
+            *_residue_gas_film_notices(
+                provenance,
+                reported_quantity,
+                origin="sossi-residue-r5",
             ),
         ]
         activity_extensions = provenance.get("melt_activity_extensions")

@@ -446,6 +446,11 @@ def test_sossi_scorer_projects_mn_and_types_unsupported_elements(monkeypatch) ->
                 channel_missing_elements=(),
                 provenance={
                     "integration": {"primary": {"status": "converged"}},
+                    "gas_film": {
+                        "notices": {
+                            "bead_diameter_not_printed": "stated_default",
+                        },
+                    },
                     "melt_activity_extensions": {
                         "MnO": {
                             "reason": "MnO is outside the IMCC-SF04 melt-activity domain",
@@ -478,7 +483,11 @@ def test_sossi_scorer_projects_mn_and_types_unsupported_elements(monkeypatch) ->
     assert prediction.version is None
     assert "code_revision" not in prediction.refusal_detail
     assert any(
-        notice.reason == "bc_open_furnace_langmuir_limit_diagnostic"
+        notice.reason == "bead_diameter_not_printed"
+        for notice in prediction.notices
+    )
+    assert all(
+        notice.reason != "bc_open_furnace_langmuir_limit_diagnostic"
         for notice in prediction.notices
     )
     assert any(

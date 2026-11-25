@@ -304,6 +304,14 @@ _LENNARD_JONES_PARAMS: dict[str, tuple[float, float, float]] = {
     'CO2': _carrier_lennard_jones_params('CO2'),  # BSL Table E.1
     'O2':  _carrier_lennard_jones_params('O2'),  # BSL Table E.1
     'He':  _carrier_lennard_jones_params('He'),  # BSL Table E.1
+    # CO is a diffusion partner (Sossi CO–CO2), not an operator carrier.
+    # sigma is COLLISION_DIAMETERS_M['CO'] (3.690 A). eps/k = 91.7 K and
+    # M = 28.010 g/mol are the same BSL Table E.1 / Poling row.
+    'CO': (
+        round(COLLISION_DIAMETERS_M['CO'] * 1e10, 3),
+        91.7,
+        28.010,
+    ),
     'Na':  (3.567, 1375.0, 22.990),  # Svehla 1962 vapor
     'K':   (3.987, 1305.0, 39.098),  # Svehla 1962 vapor
     'Ca':  (3.880, 1224.0, 40.078),  # BSL extension
@@ -341,6 +349,10 @@ _LENNARD_JONES_PROVENANCE: dict[str, dict[str, str]] = {
     'He': {
         'status': 'sourced',
         'source': 'Bird/Stewart/Lightfoot Table E.1',
+    },
+    'CO': {
+        'status': 'sourced',
+        'source': 'Bird/Stewart/Lightfoot Table E.1; diffusion partner, not a furnace carrier',
     },
     'Na': {
         'status': 'sourced',
@@ -1728,6 +1740,34 @@ def _stirring_enhanced_sherwood(
     return float(sherwood_laminar) * math.sqrt(sh_input)
 
 
+def _sphere_ranz_marshall_sherwood(reynolds: float, schmidt: float) -> float:
+    """Sherwood number for a sphere in a flowing gas.
+
+    Diffusion to a sphere in a stagnant medium gives the molar rate
+    ``4*pi*r*D*Δc``. The film coefficient defined on the surface is
+    ``k_c = D/r = 2*D/d``, so ``Sh = k_c*d/D = 2``. Ranz and Marshall
+    add the forced-convection term:
+
+        Sh = 2 + 0.6 * Re**(1/2) * Sc**(1/3)
+
+    Re, Sc and Sh are dimensionless. ``k_c`` is m/s when ``D`` is
+    m^2/s and ``d`` is the sphere diameter in m. The series-resistance
+    flux uses ``k = Sh*D/(d*R*T)``; with Sh = 2 that is ``D/(r*R*T)``.
+    As Kn tends to infinity the series owner drops the gas weight, so
+    ``R_gas`` is zero and the flux is the Hertz–Knudsen interface term.
+    This is not the pipe correlation in ``_stirring_enhanced_sherwood``.
+    """
+
+    if (
+        not math.isfinite(reynolds)
+        or reynolds < 0.0
+        or not math.isfinite(schmidt)
+        or schmidt <= 0.0
+    ):
+        raise ValueError("sphere Sherwood needs Re >= 0 and Sc > 0")
+    return 2.0 + 0.6 * math.sqrt(reynolds) * schmidt ** (1.0 / 3.0)
+
+
 def read_gram_lab_exposed_melt_area(
     lab_geometry: Mapping[str, Any] | None,
 ) -> float | None:
@@ -1896,7 +1936,7 @@ def _chapman_enskog_d_ab_m2_s(
     """
     if species_params is None:
         species_params = _LENNARD_JONES_PARAMS.get(species)
-    carrier_key = _canonical_carrier_gas_key(carrier)
+    carrier_key = _diffusion_carrier_key(carrier)
     carrier_params = _LENNARD_JONES_PARAMS.get(carrier_key)
     if species_params is None or carrier_params is None:
         return 0.0
@@ -1919,6 +1959,77 @@ def _chapman_enskog_d_ab_m2_s(
            * (sigma_ab ** 2) * omega_d)
     )
     return D_AB_cm2_s * 1.0e-4
+
+
+def _blanc_mixture_d_ab_m2_s(
+    species: str,
+    T_K: float,
+    pressure_pa: float,
+    mole_fractions: Mapping[str, float],
+    *,
+    species_params: tuple[float, float, float] | None = None,
+) -> float:
+    """Trace diffusivity of ``species`` in a stagnant carrier mixture.
+
+    Blanc's law: ``1/D_i,mix = Σ_j y_j / D_ij``. Each ``D_ij`` is
+    ``_chapman_enskog_d_ab_m2_s`` (m^2/s). ``y_j`` must sum to 1. A
+    missing binary diffusivity returns 0, the same signal the binary
+    helper uses for an unknown pair. A pure carrier (one ``y_j`` of 1)
+    returns that binary value.
+    """
+
+    total = 0.0
+    inverse = 0.0
+    for carrier, fraction in mole_fractions.items():
+        try:
+            weight = float(fraction)
+        except (TypeError, ValueError):
+            return 0.0
+        if not math.isfinite(weight) or weight < 0.0:
+            return 0.0
+        total += weight
+        if weight == 0.0:
+            continue
+        binary = _chapman_enskog_d_ab_m2_s(
+            species,
+            T_K,
+            pressure_pa,
+            carrier=str(carrier),
+            species_params=species_params,
+        )
+        if not math.isfinite(binary) or binary <= 0.0:
+            return 0.0
+        inverse += weight / binary
+    if not math.isfinite(total) or not math.isclose(total, 1.0, rel_tol=0.0, abs_tol=1.0e-4):
+        return 0.0
+    if inverse <= 0.0:
+        return 0.0
+    return total / inverse
+
+
+def _mixture_collision_diameter_m(mole_fractions: Mapping[str, float]) -> float:
+    """Hard-sphere diameter whose cross section is the mole-weighted mean.
+
+    ``σ_eff^2 = Σ y_j σ_j^2`` with ``σ`` from ``COLLISION_DIAMETERS_M``.
+    The mean free path then uses one diameter. ``y_j`` must sum to 1.
+    """
+
+    total = 0.0
+    cross_section = 0.0
+    for name, fraction in mole_fractions.items():
+        weight = float(fraction)
+        if not math.isfinite(weight) or weight < 0.0:
+            raise ValueError("mixture mole fraction must be non-negative")
+        total += weight
+        sigma_m = COLLISION_DIAMETERS_M[str(name)]
+        cross_section += weight * sigma_m * sigma_m
+    if (
+        not math.isfinite(total)
+        or not math.isclose(total, 1.0, rel_tol=0.0, abs_tol=1.0e-4)
+        or cross_section <= 0.0
+    ):
+        raise ValueError("mixture collision diameter needs mole fractions summing to 1")
+    return math.sqrt(cross_section / total)
 
 
 # Chapman–Enskog viscosity. μ [Pa·s] = 2.6693e-6 * sqrt(M[g/mol] * T[K])
@@ -1977,7 +2088,7 @@ def _chapman_enskog_viscosity_pa_s(carrier_gas: str, temperature_K: float) -> fl
     invent a viscosity.
     """
 
-    carrier_key = _canonical_carrier_gas_key(carrier_gas)
+    carrier_key = _diffusion_carrier_key(carrier_gas)
     row = _LENNARD_JONES_PARAMS.get(carrier_key)
     if row is None:
         raise DepositionInputRefusal(
@@ -2230,6 +2341,24 @@ def _unsupported_carrier_gas_error(carrier_gas: Any) -> ValueError:
         f'Unsupported condensation carrier_gas {carrier_gas!r}; '
         f'supported carrier gases: {SUPPORTED_CARRIER_GAS_LABELS}'
     )
+
+
+def _diffusion_carrier_key(carrier_gas: Any) -> str:
+    """Catalog alias, or a Lennard-Jones row that is not an operator carrier.
+
+    Chapman–Enskog needs CO for Sossi's printed CO–CO2 mixture. CO is
+    not in ``CARRIER_GAS_CATALOG``; adding it there would put it on the
+    furnace gas list. A token that is already a diffusion row is accepted
+    after the catalog lookup misses.
+    """
+
+    try:
+        return _canonical_carrier_gas_key(carrier_gas)
+    except ValueError:
+        token = str(carrier_gas).strip()
+        if token in _LENNARD_JONES_PARAMS:
+            return token
+        raise
 
 
 def _canonical_carrier_gas_key(

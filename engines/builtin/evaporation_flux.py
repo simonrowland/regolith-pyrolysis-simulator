@@ -128,6 +128,69 @@ _EVAPORATION_LJ_PROXY_MOLAR_MASSES = {
 }
 
 
+def _optional_positive_control(
+    value: Any,
+    name: str,
+) -> tuple[float | None, str | None]:
+    """Return ``(number, None)`` or ``(None, refusal reason)``.
+
+    Absent is ``(None, None)``. A present value must be a finite
+    positive declared scalar.
+    """
+
+    if value is None:
+        return None, None
+    if not is_declared_real_scalar(value, allow_numeric_str=True):
+        return None, f"invalid_{name}"
+    number = float(value)
+    if not math.isfinite(number) or number <= 0.0:
+        return None, f"invalid_{name}"
+    return number, None
+
+
+def _carrier_mole_fractions_control(
+    value: Any,
+) -> tuple[dict[str, float] | None, str | None]:
+    """Blanc weights. Absent is no mixture. Present weights must sum to 1."""
+
+    if value is None:
+        return None, None
+    if not isinstance(value, Mapping) or not value:
+        return None, "invalid_carrier_mole_fractions"
+    fractions: dict[str, float] = {}
+    total = 0.0
+    for name, fraction in value.items():
+        if not is_declared_real_scalar(fraction, allow_numeric_str=True):
+            return None, "invalid_carrier_mole_fractions"
+        number = float(fraction)
+        if not math.isfinite(number) or number < 0.0:
+            return None, "invalid_carrier_mole_fractions"
+        fractions[str(name)] = number
+        total += number
+    if not math.isclose(total, 1.0, rel_tol=0.0, abs_tol=1.0e-4):
+        return None, "invalid_carrier_mole_fractions"
+    return fractions, None
+
+
+def _evaporation_proxy_molar_mass_g_mol(species: str) -> float | None:
+    """Formula mass for a SiO-class continuum proxy.
+
+    One row per species. Furnace gas ids that collide with an oxide
+    name carry a ``_gas`` suffix (``TiO2_gas``). A residue channel names
+    the oxide (``TiO2``). Use the existing suffixed row when the bare
+    name is absent. Do not store a second mass. ``FeO`` does not
+    resolve: its row is ``FeO_association_gas``, not ``FeO_gas``.
+    """
+
+    mass = _EVAPORATION_LJ_PROXY_MOLAR_MASSES.get(species)
+    if mass is not None:
+        return mass
+    suffixed = f"{species}_gas"
+    if suffixed in _EVAPORATION_LJ_PROXY_MOLAR_MASSES:
+        return _EVAPORATION_LJ_PROXY_MOLAR_MASSES[suffixed]
+    return None
+
+
 class EvaporationFluxConfigurationError(ValueError):
     """Invalid or unsupported transport inputs for authoritative flux."""
 
@@ -690,18 +753,37 @@ def _series_resistance_evaporation_flux_kg_m2_s(
     melt_surface_renewal_source: str = DEFAULT_MELT_SURFACE_RENEWAL_SOURCE,
     gas_resistance_enabled: bool = True,
     extrapolate_continuum: bool = False,
+    sherwood: float | None = None,
+    carrier_mole_fractions: Mapping[str, float] | None = None,
+    molecular_diameter_m: float | None = None,
 ) -> SeriesEvaporationFlux:
     """Series-resistance evaporation source in kg/(m^2*s).
 
     The sole driving pressure is ``max(0, P_eq_pa - P_bulk_pa)``. External
     pressure regime and stirring terms only add or remove resistances; they
     never inflate the intrinsic Hertz-Knudsen alpha.
+
+    ``sherwood`` replaces the pipe correlation when the caller has a
+    sphere. Diffusion to a sphere is ``4*pi*r*D*Δc``, so ``k_c = D/r``
+    and ``Sh = k_c*d/D = 2`` in a stagnant gas. This function's
+    conductance is ``k = Sh*D/(d*R*T)`` with ``d = pipe_diameter_m``
+    (m), ``D`` in m^2/s and ``R*T`` in J/mol, so ``k`` is
+    mol/(m^2 s Pa) before it is multiplied by the molar mass to
+    kg/(m^2 s Pa). ``Sh = 2`` and ``d = 2r`` give ``k_c = D/r``.
+    As Kn tends to infinity the gas weight below is zero, ``R_gas``
+    is zero, and the flux is the Hertz–Knudsen interface term.
+
+    ``carrier_mole_fractions`` selects Blanc's law for a mixture.
+    Omit it for a single carrier. ``molecular_diameter_m`` is the
+    hard-sphere diameter for Kn when the carrier is not an operator
+    gas; omit it to use the carrier catalog.
     """
 
     from simulator.condensation import (
         DEFAULT_CARRIER_GAS,
         GAS_CONSTANT_J_MOL_K,
         _LENNARD_JONES_PARAMS,
+        _blanc_mixture_d_ab_m2_s,
         _chapman_enskog_d_ab_m2_s,
         _knudsen_number,
         _stirring_enhanced_sherwood,
@@ -803,11 +885,15 @@ def _series_resistance_evaporation_flux_kg_m2_s(
         )
 
     if knudsen_number is None:
+        knudsen_diameter_m = _finite_float(molecular_diameter_m, 0.0)
         knudsen = _knudsen_number(
             overhead_pa,
             max(effective_T_gas_K, 1.0),
             diameter_m,
             carrier_gas=str(carrier_gas or DEFAULT_CARRIER_GAS),
+            molecular_diameter_m=(
+                knudsen_diameter_m if knudsen_diameter_m > 0.0 else None
+            ),
         )
     else:
         try:
@@ -840,14 +926,21 @@ def _series_resistance_evaporation_flux_kg_m2_s(
     k_mt_kg_s_m2_pa = 0.0
     d_ab_m2_s = 0.0
     if gas_weight > 0.0:
-        sherwood_eff = _stirring_enhanced_sherwood(
-            radial_stir_factor=radial_stir_applied
-        )
+        if sherwood is None:
+            sherwood_eff = _stirring_enhanced_sherwood(
+                radial_stir_factor=radial_stir_applied
+            )
+        else:
+            sherwood_eff = _finite_float(sherwood, math.nan)
+            if not math.isfinite(sherwood_eff) or sherwood_eff <= 0.0:
+                raise EvaporationFluxConfigurationError(
+                    "sherwood must be finite and positive"
+                )
         if overhead_pa <= 0.0:
             raise EvaporationFluxConfigurationError(
                 "gas resistance requires positive overhead_pressure_pa"
             )
-        proxy_molar_mass = _EVAPORATION_LJ_PROXY_MOLAR_MASSES.get(species)
+        proxy_molar_mass = _evaporation_proxy_molar_mass_g_mol(species)
         species_params = None
         if proxy_molar_mass is not None:
             sio_sigma, sio_epsilon, _sio_molar_mass = _LENNARD_JONES_PARAMS["SiO"]
@@ -856,13 +949,22 @@ def _series_resistance_evaporation_flux_kg_m2_s(
                 sio_epsilon,
                 proxy_molar_mass,
             )
-        d_ab_m2_s = _chapman_enskog_d_ab_m2_s(
-            species,
-            max(effective_T_gas_K, 1.0),
-            overhead_pa,
-            carrier=str(carrier_gas or DEFAULT_CARRIER_GAS),
-            species_params=species_params,
-        )
+        if carrier_mole_fractions:
+            d_ab_m2_s = _blanc_mixture_d_ab_m2_s(
+                species,
+                max(effective_T_gas_K, 1.0),
+                overhead_pa,
+                carrier_mole_fractions,
+                species_params=species_params,
+            )
+        else:
+            d_ab_m2_s = _chapman_enskog_d_ab_m2_s(
+                species,
+                max(effective_T_gas_K, 1.0),
+                overhead_pa,
+                carrier=str(carrier_gas or DEFAULT_CARRIER_GAS),
+                species_params=species_params,
+            )
         if not math.isfinite(d_ab_m2_s) or d_ab_m2_s <= 0.0:
             raise EvaporationFluxConfigurationError(
                 "missing Chapman-Enskog transport parameters for "
@@ -1591,6 +1693,50 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         )
         gas_temperature_K = _finite_float(controls.get("gas_temperature_K"), T_K)
         carrier_gas = str(controls.get("carrier_gas") or "N2")
+        sherwood_number, sherwood_refusal = _optional_positive_control(
+            controls.get("sherwood_number"),
+            "sherwood_number",
+        )
+        if sherwood_refusal is not None:
+            return IntentResult(
+                intent=ChemistryIntent.EVAPORATION_FLUX,
+                status="refused",
+                transition=None,
+                control_audit=control_audit,
+                diagnostic={
+                    "evaporation_flux_kg_hr": {},
+                    "reason": sherwood_refusal,
+                },
+            )
+        carrier_mole_fractions, fraction_refusal = _carrier_mole_fractions_control(
+            controls.get("carrier_mole_fractions")
+        )
+        if fraction_refusal is not None:
+            return IntentResult(
+                intent=ChemistryIntent.EVAPORATION_FLUX,
+                status="refused",
+                transition=None,
+                control_audit=control_audit,
+                diagnostic={
+                    "evaporation_flux_kg_hr": {},
+                    "reason": fraction_refusal,
+                },
+            )
+        molecular_diameter_m, diameter_refusal = _optional_positive_control(
+            controls.get("molecular_diameter_m"),
+            "molecular_diameter_m",
+        )
+        if diameter_refusal is not None:
+            return IntentResult(
+                intent=ChemistryIntent.EVAPORATION_FLUX,
+                status="refused",
+                transition=None,
+                control_audit=control_audit,
+                diagnostic={
+                    "evaporation_flux_kg_hr": {},
+                    "reason": diameter_refusal,
+                },
+            )
         cold_skull_envelope = controls.get("cold_skull_envelope")
         melt_resistance_enabled = bool(
             series_config.get(
@@ -1730,7 +1876,20 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
         )
         domain_refusal = None
         continuum_extrapolation = None
-        if gas_resistance_enabled and overhead_pressure_pa > 0.0:
+        # Residue bead films set this false. The gate is the furnace
+        # pipe Poiseuille domain: transitional Kn is refused or pasted
+        # a full continuum film. On a bead, the series owner's own Kn
+        # step is the regime rule (gas weight 0 outside the viscous
+        # band, so R_gas is 0 and the flux is Hertz–Knudsen). Absent
+        # stays the furnace gate.
+        apply_viscous_domain_gate = (
+            controls.get("apply_viscous_p_bulk_domain_gate", True) is not False
+        )
+        if (
+            apply_viscous_domain_gate
+            and gas_resistance_enabled
+            and overhead_pressure_pa > 0.0
+        ):
             kn_domain = _kn_eval(
                 overhead_pressure_pa,
                 max(gas_temperature_K, 1.0),
@@ -1933,6 +2092,9 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                     extrapolate_continuum=continuum_extrapolation is not None,
                     melt_surface_renewal_base_kg_s_m2_pa=melt_surface_renewal_base,
                     melt_surface_renewal_source=melt_surface_renewal_source,
+                    sherwood=sherwood_number,
+                    carrier_mole_fractions=carrier_mole_fractions,
+                    molecular_diameter_m=molecular_diameter_m,
                 )
             except EvaporationFluxConfigurationError as exc:
                 missing_transport_parameters[species] = {
