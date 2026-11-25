@@ -331,18 +331,22 @@ def _decode_payload_for_admission(
         else:
             if not valid_projection_band(projection_band):
                 return False
+            if any(
+                field_name not in certified_band
+                for field_name in ("min_T_C", "max_T_C", "source")
+            ):
+                return False
+            if (
+                not all(
+                    is_finite_number(certified_band[field_name])
+                    for field_name in ("min_T_C", "max_T_C")
+                )
+                or not isinstance(certified_band["source"], str)
+                or not certified_band["source"]
+            ):
+                return False
             if "engine" in certified_band and not valid_projection_band(
                 certified_band
-            ):
-                return False
-            if any(
-                field_name in certified_band
-                and not is_finite_number(certified_band[field_name])
-                for field_name in ("min_T_C", "max_T_C")
-            ):
-                return False
-            if "source" in certified_band and not isinstance(
-                certified_band["source"], str
             ):
                 return False
         dropped_components = value["dropped_components"]
@@ -432,6 +436,7 @@ def _decode_payload_for_admission(
             and not valid_composition_projected_notice(projected_notice)
         ):
             return None
+        magemin_identities = []
         for key in keys:
             if not isinstance(key, Mapping):
                 return None
@@ -454,9 +459,25 @@ def _decode_payload_for_admission(
                 identity = None
             if identity is None and identity_is_required:
                 return None
-            if identity is None or identity.silica_verdict == "in_band":
+            if identity is None:
                 continue
-            if identity.silica_verdict != "extrapolated":
+            if identity.silica_verdict not in {"in_band", "extrapolated"}:
+                return None
+            magemin_identities.append(identity)
+        extrapolated_identities = [
+            identity
+            for identity in magemin_identities
+            if identity.silica_verdict == "extrapolated"
+        ]
+        if extrapolated_identities:
+            stored_or_query_identity = extrapolated_identities[0]
+            if (
+                len(keys) > 1
+                and len(magemin_identities) != len(keys)
+            ) or any(
+                not stored_or_query_identity.matches(identity)
+                for identity in magemin_identities
+            ):
                 return None
             certified_band = curve.get("certified_band")
             silica_bounds = (
@@ -469,10 +490,10 @@ def _decode_payload_for_admission(
                 or isinstance(silica_bounds, (str, bytes))
                 or len(silica_bounds) != 2
                 or not all(is_finite_number(bound) for bound in silica_bounds)
-                or identity.certified_band is None
+                or stored_or_query_identity.certified_band is None
                 or curve.get("authority") != "extrapolated"
                 or tuple(float(bound) for bound in silica_bounds)
-                != identity.certified_band
+                != stored_or_query_identity.certified_band
             ):
                 return None
         return curve
@@ -2116,7 +2137,9 @@ class PT0DeterminismStore:
                 str(key_hash),
                 entry,
                 admission_keys=(
-                    query_key if query_key is not None else entry_key,
+                    (entry_key, query_key)
+                    if query_key is not None
+                    else (entry_key,)
                 ),
             )
             if decoded is not None:
@@ -2146,7 +2169,9 @@ class PT0DeterminismStore:
                     candidate_hash,
                     candidate,
                     admission_keys=(
-                        query_key if query_key is not None else candidate_key,
+                        (candidate_key, query_key)
+                        if query_key is not None
+                        else (candidate_key,)
                     ),
                 )
                 if decoded is not None:
@@ -2866,7 +2891,9 @@ class PT1PersistentEquilibriumStore:
                         key_hash=row_hash,
                         return_decoded=True,
                         admission_keys=(
-                            query_key if query_key is not None else row_key,
+                            (row_key, query_key)
+                            if query_key is not None
+                            else (row_key,)
                         ),
                     )
                     if decoded is None:
@@ -3433,7 +3460,11 @@ class PT1PersistentEquilibriumStore:
             key_bytes=row_key_bytes,
             key_hash=str(row["key_hash"]),
             return_decoded=True,
-            admission_keys=(query_key if query_key is not None else row_key,),
+            admission_keys=(
+                (row_key, query_key)
+                if query_key is not None
+                else (row_key,)
+            ),
         )
         if decoded is None:
             return entry, None
@@ -3487,7 +3518,11 @@ class PT1PersistentEquilibriumStore:
             key_bytes=row_key_bytes,
             key_hash=str(row["key_hash"]),
             return_decoded=True,
-            admission_keys=(query_key if query_key is not None else row_key,),
+            admission_keys=(
+                (row_key, query_key)
+                if query_key is not None
+                else (row_key,)
+            ),
         )
         if decoded is None:
             return entry, None

@@ -5645,6 +5645,94 @@ def test_extrapolated_gate_admission_uses_query_identity_at_each_reader(
         query_key=wrong_query_key,
     ) == []
 
+    # The inverse mismatch also matters: an extrapolated row can be valid
+    # for its stored identity and still be incompatible with an in-band query.
+    stored_wrong_band_key = copy.deepcopy(rrd._json_ready(key))
+    stored_identity_payload = stored_wrong_band_key[
+        "freeze_gate_cache_key"
+    ][7]
+    stored_identity_payload["certified_band"] = [0.0, 100.0]
+    in_band_query_key = copy.deepcopy(rrd._json_ready(key))
+    in_band_identity_payload = in_band_query_key[
+        "freeze_gate_cache_key"
+    ][7]
+    in_band_identity_payload["silica_verdict"] = "in_band"
+    in_band_identity_payload["certified_band"] = None
+    stored_identity = rrd._magemin_identity_from_replay_key(
+        stored_wrong_band_key
+    )
+    in_band_identity = rrd._magemin_identity_from_replay_key(
+        in_band_query_key
+    )
+    assert stored_identity is not None
+    assert stored_identity.silica_verdict == "extrapolated"
+    assert stored_identity.certified_band == (0.0, 100.0)
+    assert in_band_identity is not None
+    assert in_band_identity.silica_verdict == "in_band"
+    assert in_band_identity.certified_band is None
+
+    wrong_band_store = PT0DeterminismStore(
+        "capture",
+        db_path=tmp_path / "d447-stored-identity-readers.sqlite",
+    )
+    wrong_band_store._store(
+        "freeze_gate_curve",
+        stored_wrong_band_key,
+        payload_for([0.0, 100.0]),
+        law_disclosures=[],
+    )
+    stored_bucket_key = canonical_physics_bucket_key_from_replay_key(
+        stored_wrong_band_key
+    )
+    in_band_bucket_key = canonical_physics_bucket_key_from_replay_key(
+        in_band_query_key
+    )
+    assert stored_bucket_key == in_band_bucket_key
+    stored_bucket_bytes = canonical_json_bytes(stored_bucket_key)
+    stored_bucket_hash = rrd._sha256(stored_bucket_bytes)
+    assert wrong_band_store._entry_for_physics_bucket(
+        "freeze_gate_curve",
+        stored_bucket_key,
+        query_key=in_band_query_key,
+    ) is None
+    wrong_band_persistent = wrong_band_store.persistent_store
+    assert wrong_band_persistent is not None
+    assert wrong_band_persistent._get_by_physics_bucket(
+        artifact="freeze_gate_curve",
+        physics_bucket_key=in_band_bucket_key,
+        physics_bucket_bytes=stored_bucket_bytes,
+        physics_bucket_hash=stored_bucket_hash,
+        query_key=in_band_query_key,
+    ) is None
+    stored_rung_key = rrd.canonical_physics_ladder_bucket_key_from_replay_key(
+        stored_wrong_band_key,
+        rung_tag,
+    )
+    in_band_rung_key = rrd.canonical_physics_ladder_bucket_key_from_replay_key(
+        in_band_query_key,
+        rung_tag,
+    )
+    assert stored_rung_key == in_band_rung_key
+    stored_rung_hash = rrd._sha256(canonical_json_bytes(stored_rung_key))
+    assert wrong_band_store._entry_for_physics_ladder_bucket(
+        "freeze_gate_curve",
+        rung_tag,
+        in_band_rung_key,
+        query_key=in_band_query_key,
+    ) is None
+    assert wrong_band_persistent._get_by_physics_ladder_bucket(
+        artifact="freeze_gate_curve",
+        rung_tag=rung_tag,
+        rung_key=in_band_rung_key,
+        rung_hash=stored_rung_hash,
+        query_key=in_band_query_key,
+    ) is None
+    assert wrong_band_persistent._list_interpolation_candidates(
+        artifact="freeze_gate_curve",
+        replay_scope_sha256=rrd._replay_scope_hash(in_band_bucket_key),
+        query_key=in_band_query_key,
+    ) == []
+
 
 def test_legacy_magemin_gate_curve_replays_with_d447_feo_flag(
     tmp_path: Path,
@@ -7692,6 +7780,85 @@ def _recursive_cache_reader(
         capture.physics_bucket_entries
     )
     return reader
+
+
+@pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))
+@pytest.mark.parametrize(
+    "missing_field",
+    ("empty", "min_T_C", "max_T_C", "source", "empty-source"),
+    ids=(
+        "empty-band",
+        "missing-min",
+        "missing-max",
+        "missing-source",
+        "empty-source",
+    ),
+)
+def test_projected_floor_cache_notice_requires_full_producer_certified_band(
+    tmp_path: Path,
+    persistent: bool,
+    missing_field: str,
+) -> None:
+    db_path = tmp_path / f"projected-floor-band-{persistent}.sqlite"
+    capture, sim, _curve, key, baseline = _capture_recursive_gate_row(
+        db_path,
+        persistent=persistent,
+    )
+    _, projection_notice = _lunar_composition_projected_diagnostic(sim)
+    floor_curve = sim._freeze_gate_kress_floor_curve(projection_notice, [])
+    assert floor_curve is not None
+    floor_notice = floor_curve["composition_projected_notice"]
+    assert floor_notice["projection_certified_band"]
+    assert {
+        "min_T_C",
+        "max_T_C",
+        "source",
+    }.issubset(floor_notice["certified_band"])
+
+    valid_payload = copy.deepcopy(baseline)
+    valid_payload["curve"]["composition_projected_notice"] = copy.deepcopy(
+        floor_notice
+    )
+    malformed_payload = copy.deepcopy(valid_payload)
+    certified_band = malformed_payload["curve"][
+        "composition_projected_notice"
+    ]["certified_band"]
+    if missing_field == "empty":
+        malformed_payload["curve"]["composition_projected_notice"][
+            "certified_band"
+        ] = {}
+    elif missing_field == "empty-source":
+        certified_band["source"] = ""
+    else:
+        del certified_band[missing_field]
+
+    key_hash = _key_hash(key)
+    capture._entries[key_hash]["payload"] = copy.deepcopy(malformed_payload)
+    capture._entries[key_hash]["payload_hash"] = rrd._sha256(
+        canonical_json_bytes(malformed_payload)
+    )
+    if persistent:
+        _write_pt1_payload_for_invariant(db_path, key_hash, malformed_payload)
+    reader = _recursive_cache_reader(
+        capture,
+        persistent=persistent,
+        db_path=db_path,
+    )
+    with pytest.raises(PT0CacheMiss):
+        reader._lookup("freeze_gate_curve", key)
+    assert reader.hits == 0
+
+    original_entry = capture._entries[key_hash]
+    capture._store(
+        "freeze_gate_curve",
+        key,
+        valid_payload,
+        law_disclosures=original_entry.get("law_disclosures", ()),
+    )
+    if not persistent:
+        reader._entries[key_hash] = copy.deepcopy(capture._entries[key_hash])
+    assert reader._lookup("freeze_gate_curve", key) == valid_payload
+    assert reader.hits == 1
 
 
 def _assert_authorityless_pt1_reads_miss_and_replace(
