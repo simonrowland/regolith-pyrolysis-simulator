@@ -37,6 +37,8 @@ from engines.builtin.vapor_pressure import (
     _is_noncertifying_pseudo_vapor_pressure_runtime,
     _raise_invalid_antoine_coefficient,
     _range_tuple,
+    coefficient_block_is_fe008_saturation,
+    fe008_saturation,
     vapor_pressure_antoine_coefficients,
     vapor_pressure_source_label,
     vapor_pressure_valid_range_K,
@@ -384,25 +386,29 @@ def _analytical_vapor_pressures_from_activities(
             temperature_K=T_K,
         ):
             continue
-        try:
-            A, B, C = _read_antoine_coefficients(antoine)
-        except _AntoineCoefficientRefusal as exc:
-            if not _is_missing_antoine_intercept(exc):
-                _raise_invalid_antoine_for_volatility_diagnostic(
-                    exc,
-                    species=str(species),
+        direct_fe008 = coefficient_block_is_fe008_saturation(antoine)
+        if not direct_fe008:
+            try:
+                A, B, C = _read_antoine_coefficients(antoine)
+            except _AntoineCoefficientRefusal as exc:
+                if not _is_missing_antoine_intercept(exc):
+                    _raise_invalid_antoine_for_volatility_diagnostic(
+                        exc,
+                        species=str(species),
+                    )
+                _append_antoine_skip_notice(
+                    warnings,
+                    antoine_skip_notice_keys,
+                    antoine,
+                    species=species,
+                    site="alphamelts_volatility.metal_antoine",
+                    temperature_K=T_K,
+                    reason=_antoine_skip_reason_for_refusal(exc),
                 )
-            _append_antoine_skip_notice(
-                warnings,
-                antoine_skip_notice_keys,
-                antoine,
-                species=species,
-                site="alphamelts_volatility.metal_antoine",
-                temperature_K=T_K,
-                reason=_antoine_skip_reason_for_refusal(exc),
-            )
-            continue
-        if T_K <= 300.0:
+                continue
+            if T_K <= 300.0:
+                continue
+        elif not math.isfinite(T_K) or T_K <= 0.0:
             continue
         activity = float(activities.get(parent_oxide, 0.0) or 0.0)
         wt_activity = max(0.0, float(comp_wt.get(parent_oxide, 0.0) or 0.0) / 100.0)
@@ -422,10 +428,13 @@ def _analytical_vapor_pressures_from_activities(
                     "valid_range_K": (valid_low, valid_high),
                         "authority_status": "extrapolation_limited",
                 }
-        P_reference_Pa = _pow10(
-            _antoine_log10_pressure(A, B, C, T_K),
-            species=species,
-        )
+        if direct_fe008:
+            P_reference_Pa = fe008_saturation(T_K).pressure_pa
+        else:
+            P_reference_Pa = _pow10(
+                _antoine_log10_pressure(A, B, C, T_K),
+                species=species,
+            )
         if str(sp_data.get("fit_target", "") or "") == FIT_TARGET_STANDARD_REACTION:
             activity_exponent = float(
                 sp_data.get("oxide_activity_exponent", 1.0) or 1.0

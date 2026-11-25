@@ -40,6 +40,8 @@ from engines.builtin.evaporation_flux import (
 from engines.builtin.vapor_pressure import (
     FIT_TARGET_STANDARD_REACTION,
     VaporPressureComputationError,
+    coefficient_block_is_fe008_saturation,
+    fe008_saturation,
     vapor_pressure_antoine_coefficients,
 )
 from simulator.condensation import GAS_CONSTANT_J_MOL_K, alpha_s
@@ -377,6 +379,8 @@ def pseudo_antoine_p_eq_pa(species: str, T_K: float) -> float:
             f"invalid_antoine_temperature: species={species} T_K={T_K!r}"
         )
 
+    if coefficient_block_is_fe008_saturation(antoine):
+        return fe008_saturation(T_K).pressure_pa
     log10_p = _antoine_log10_pressure(A, B, C, T_K)
     return 10.0 ** log10_p
 

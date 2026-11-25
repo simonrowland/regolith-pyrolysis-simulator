@@ -1115,6 +1115,9 @@ def _legacy_species_row(species_id: str) -> Mapping[str, Any]:
 def _pure_component_antoine_pa(row: Mapping[str, Any], T_K: float) -> float | None:
     """P_sat in Pa from the pure-component row.
 
+    A block marked ``janaf_fe008_formation_gibbs`` is evaluated from Fe-008,
+    not with the Antoine expression below.
+
     Sodium is the Browning-Potter owner in engines/builtin/sodium_saturation.py.
     Other metals still use the catalog pure_component_antoine sidecar:
     log10(P/Pa) = A − B/(T+C), so P_Pa = 10**(A − B/(T+C)).
@@ -1138,6 +1141,17 @@ def _pure_component_antoine_pa(row: Mapping[str, Any], T_K: float) -> float | No
     pca = row.get("pure_component_antoine")
     if not isinstance(pca, Mapping):
         return None
+    from engines.builtin.vapor_pressure import (
+        VaporPressureComputationError,
+        coefficient_block_is_fe008_saturation,
+        fe008_saturation,
+    )
+
+    if coefficient_block_is_fe008_saturation(pca):
+        try:
+            return fe008_saturation(float(T_K)).pressure_pa
+        except (TypeError, ValueError, VaporPressureComputationError):
+            return None
     try:
         A, B, C = _read_antoine_coefficients(pca)
     except _AntoineCoefficientRefusal:

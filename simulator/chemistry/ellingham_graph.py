@@ -241,11 +241,25 @@ def _antoine_reference_pressure_Pa(
     computable cold-T diagnostics.
     """
     try:
-        A, B, C = _read_antoine_coefficients(antoine)
         T_K = float(temperature_K)
     except (TypeError, ValueError):
         return None
     if not math.isfinite(T_K):
+        return None
+    from engines.builtin.vapor_pressure import (
+        VaporPressureComputationError,
+        coefficient_block_is_fe008_saturation,
+        fe008_saturation,
+    )
+
+    if coefficient_block_is_fe008_saturation(antoine):
+        try:
+            return fe008_saturation(T_K).pressure_pa
+        except VaporPressureComputationError:
+            return None
+    try:
+        A, B, C = _read_antoine_coefficients(antoine)
+    except (TypeError, ValueError):
         return None
     # Category (2): T may be outside the historical comfort band; still evaluate.
     log_P = _antoine_log10_pressure(A, B, C, T_K)

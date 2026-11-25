@@ -8927,6 +8927,8 @@ def _antoine_psat_pa(
         VaporPressureComputationError,
         VaporPressureRangeError,
         _coefficient_mapping,
+        coefficient_block_is_fe008_saturation,
+        fe008_saturation,
         reconstructed_vapor_pressure_authority_limit,
         require_antoine_source_certified_temperature,
         vapor_pressure_source_equation_range_K,
@@ -9016,7 +9018,8 @@ def _antoine_psat_pa(
             (A, T_K),
             "requires A > 0 and T > 0",
         )
-    if T_K + C <= 0.0:
+    direct_fe008 = coefficient_block_is_fe008_saturation(antoine)
+    if T_K + C <= 0.0 and not direct_fe008:
         refusal = WallSaturationPressureRefusal(species, T_K,
             f"no extrapolation available: Antoine denominator T+C <= 0; valid_range_K={source_band}")
         refusal.valid_range_K = source_band
@@ -9047,9 +9050,12 @@ def _antoine_psat_pa(
                 "reason": domain_reason,
                 "status": "extrapolated",
             }
-    # Same Antoine form used by equilibrium.py and builtin vapor pressure.
+    # Pure Fe uses the Fe-008 formation-Gibbs law; other rows use Antoine.
     try:
-        pressure_pa = 10.0 ** _antoine_log10_pressure(A, B, C, T_K)
+        if direct_fe008:
+            pressure_pa = fe008_saturation(T_K).pressure_pa
+        else:
+            pressure_pa = 10.0 ** _antoine_log10_pressure(A, B, C, T_K)
     except OverflowError:
         pressure_pa = math.inf
     if not math.isfinite(pressure_pa) or pressure_pa <= 0.0:

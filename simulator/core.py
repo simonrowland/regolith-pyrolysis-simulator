@@ -57,11 +57,6 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import Any, Dict, Literal, Mapping, Optional, Sequence, Tuple
 
-from engines.antoine import (
-    _AntoineCoefficientRefusal,
-    _antoine_log10_pressure,
-    _read_antoine_coefficients,
-)
 from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     C0_FORECAST_ENGINE_NAMES,
@@ -8271,7 +8266,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         from engines.builtin.vapor_pressure import (
             COEFF_BLOCK_PURE_COMPONENT,
             VaporPressureComputationError,
-            _pow10_pressure_or_raise,
+            _vapor_pressure_temperature_extrapolation_notice,
+            coefficient_block_is_fe008_saturation,
+            fe008_saturation,
             vapor_pressure_antoine_coefficients,
             vapor_pressure_source_label,
         )
@@ -8283,25 +8280,28 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         except VaporPressureComputationError as exc:
             raise AccountingError(str(exc)) from exc
-        if coefficient_block != COEFF_BLOCK_PURE_COMPONENT:
+        if (
+            coefficient_block != COEFF_BLOCK_PURE_COMPONENT
+            or not coefficient_block_is_fe008_saturation(antoine)
+        ):
             raise AccountingError(
                 'native Fe vapor partition requires metals.Fe.'
-                'pure_component_antoine; refusing legacy Fe vapor fit'
+                'pure_component_antoine evaluated as JANAF Fe-008 '
+                'formation Gibbs energy'
             )
+        # Premise: Fe(ref) -> Fe(g), K = P/p0, dfG = -RT ln K, p0 = 1 bar.
+        # Fe-008's reference state spans the solid phases and liquid. Algebra:
+        # log10(P/bar) = -dfG(Fe,g;T)/(R T ln 10), with dfG in kJ/mol and
+        # R = 8.31441 J mol^-1 K^-1; P/Pa = 10**log10(P/bar) * 1e5.
+        # Unit check: p0 = 0.1 MPa = 1 bar = 1e5 Pa. Interpolate log10 P in
+        # 1/T and flag end-slope extrapolation outside 298.15-3100 K. Sanity:
+        # about 8.06 Pa at 1873 K and 1.01e5 Pa near the 3135 K boil; the
+        # liquid Antoine cross-check is about 8.04 Pa at 1873 K.
         try:
-            A, B, C = _read_antoine_coefficients(antoine)
-        except _AntoineCoefficientRefusal as exc:
+            saturation = fe008_saturation(T_K)
+        except VaporPressureComputationError as exc:
             raise AccountingError(str(exc)) from exc
-        if T_K + C <= 0.0:
-            raise AccountingError(
-                'native Fe vapor partition received invalid Fe '
-                'pure_component_antoine coefficients'
-            )
-        P_reference_Pa = _pow10_pressure_or_raise(
-            _antoine_log10_pressure(A, B, C, T_K),
-            species='Fe',
-            field='P_reference_Pa',
-        )
+        P_reference_Pa = saturation.pressure_pa
 
         molar_mass_g_mol = float(fe_row.get('molar_mass_g_mol', 0.0) or 0.0)
         if molar_mass_g_mol <= 0.0:
@@ -8421,6 +8421,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         tap_mol = native_fe_available_mol - vapor_mol
         pool = native_fe_available_mol
         series_diag = series_flux.as_diagnostic()
+        source_label = vapor_pressure_source_label(
+            'native_fe_partition',
+            fe_row,
+            coefficient_block=coefficient_block,
+            temperature_K=T_K,
+        )
+        if saturation.extrapolated:
+            source_label = (
+                f'{source_label}:extrapolated_beyond_valid_range_K'
+            )
         if domain_diag is not None:
             # Relabel series diagnostic with the typed continuum-validity
             # vocabulary. Pyrolysis refusals still suppress flux; bakeout
@@ -8479,12 +8489,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'alpha_Fe': float(alpha),
             'alpha_source': str(alpha_data.get('source', '')),
             'alpha_s_evaluation': dict(alpha_evaluation),
-            'source_label': vapor_pressure_source_label(
-                'native_fe_partition',
-                fe_row,
-                coefficient_block=coefficient_block,
-                temperature_K=T_K,
-            ),
+            'source_label': source_label,
             'series_resistance': series_diag,
         }
         if domain_diag is not None:
@@ -8506,6 +8511,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'campaign_name': domain_diag.get('campaign_name'),
                     'asking_site': domain_diag.get('asking_site'),
                 }
+            )
+        if saturation.extrapolated:
+            diagnostic['extrapolation_notice'] = (
+                _vapor_pressure_temperature_extrapolation_notice(
+                    temperature_K=T_K,
+                    valid_range_K=saturation.valid_range_K,
+                    reason='metal_vapor_pressure_out_of_validated_range',
+                )
             )
         return diagnostic
 

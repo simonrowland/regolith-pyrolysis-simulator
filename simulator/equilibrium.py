@@ -385,6 +385,8 @@ class EquilibriumMixin:
             _o2_channel_term_and_potential,
             _pow10_pressure_or_raise,
             _raise_invalid_antoine_coefficient,
+            coefficient_block_is_fe008_saturation,
+            fe008_saturation,
             _range_tuple,
             _require_finite_vapor_value,
             _standard_reaction_pressure_Pa,
@@ -673,7 +675,10 @@ class EquilibriumMixin:
             # --- Pressure reference rail ---
             #
             # Condensed-rail log10(P/Pa) = A - B/(T_K + C) (modified
-            # Antoine, evaluated below). When C = 0 this is linear in 1/T
+            # Antoine, evaluated below), except the pure-Fe block marked
+            # janaf_fe008_formation_gibbs. That block uses Fe-008 dfG and
+            # log10(P/bar) = -dfG(Fe,g;T) / (R T ln 10), interpolated in 1/T.
+            # When C = 0 this Antoine form is linear in 1/T
             # (Clausius-Clapeyron in log10). When C ≠ 0 the fit has a
             # pole at T_K = -C; that pole is not a physical continuation
             # of Clausius-Clapeyron, so the C = 0 form does not license
@@ -688,8 +693,9 @@ class EquilibriumMixin:
             # extrapolation "minor."
             #
             # FeO decomposition in silicate melt is physically real below
-            # the Fe melting point; pure-component P_sat below melt is
-            # still an extrapolation. The Ellingham segment selector used
+            # the Fe melting point. Fe's pure-component pressure there is
+            # the Fe-008 solid branch, inside the printed table, not an
+            # extrapolation of the liquid Antoine. The Ellingham segment selector used
             # on this path (`ellingham_segment_for_temperature`) switches
             # Fe(delta) → Fe(l) at 1809 K, matching the JANAF Fe(cr,l)
             # DELTA <--> LIQUID boundary (NIST-JANAF Fe-007), not the
@@ -760,29 +766,34 @@ class EquilibriumMixin:
                         sp_data,
                         coefficient_block,
                     )
+                direct_fe008 = False
                 if P_reference_Pa is None:
-                    try:
-                        A, B, C = _read_antoine_coefficients(antoine)
-                    except _AntoineCoefficientRefusal as exc:
-                        if not _is_missing_antoine_intercept(exc):
-                            _raise_invalid_antoine_coefficient(
-                                exc,
+                    direct_fe008 = coefficient_block_is_fe008_saturation(antoine)
+                    if not direct_fe008:
+                        try:
+                            A, B, C = _read_antoine_coefficients(antoine)
+                        except _AntoineCoefficientRefusal as exc:
+                            if not _is_missing_antoine_intercept(exc):
+                                _raise_invalid_antoine_coefficient(
+                                    exc,
+                                    species=species,
+                                    field="P_reference_Antoine_Pa",
+                                )
+                            reason = _antoine_skip_reason_for_refusal(exc)
+                            _append_antoine_skip_notice(
+                                warnings,
+                                antoine_skip_notice_keys,
+                                antoine,
                                 species=species,
-                                field="P_reference_Antoine_Pa",
+                                site="equilibrium.internal_analytical.metal_antoine",
+                                temperature_K=T_K,
+                                reason=reason,
                             )
-                        reason = _antoine_skip_reason_for_refusal(exc)
-                        _append_antoine_skip_notice(
-                            warnings,
-                            antoine_skip_notice_keys,
-                            antoine,
-                            species=species,
-                            site="equilibrium.internal_analytical.metal_antoine",
-                            temperature_K=T_K,
-                            reason=reason,
-                        )
-                        _sz_missing_antoine_intercept(species, reason)
-                        continue
-                    if T_K <= 300.0:
+                            _sz_missing_antoine_intercept(species, reason)
+                            continue
+                        if T_K <= 300.0:
+                            continue
+                    elif not math.isfinite(T_K) or T_K <= 0.0:
                         continue
                 reconstructed_segment = sp_data.get(
                     RECONSTRUCTED_VAPOR_PRESSURE_SEGMENT_KEY
@@ -833,13 +844,24 @@ class EquilibriumMixin:
                                     temperature_K=T_K, valid_range_K=(valid_low, valid_high),
                                     reason='metal_vapor_pressure_out_of_validated_range',
                                 ))
-                            warnings.append(
-                                f"{species} metal Antoine fit extrapolated beyond "
-                                f"valid_range_K [{valid_low:g}, {valid_high:g}] at "
-                                f"{T_K:.3f} K"
-                            )
+                            if direct_fe008:
+                                warnings.append(
+                                    f"{species} metal JANAF Fe-008 saturation "
+                                    "extrapolated beyond "
+                                    f"valid_range_K [{valid_low:g}, {valid_high:g}] at "
+                                    f"{T_K:.3f} K"
+                                )
+                            else:
+                                warnings.append(
+                                    f"{species} metal Antoine fit extrapolated beyond "
+                                    f"valid_range_K [{valid_low:g}, {valid_high:g}] at "
+                                    f"{T_K:.3f} K"
+                                )
                     if P_reference_Pa is None:
-                        log_P = _antoine_log10_pressure(A, B, C, T_K)
+                        if direct_fe008:
+                            log_P = fe008_saturation(T_K).log10_pressure_pa
+                        else:
+                            log_P = _antoine_log10_pressure(A, B, C, T_K)
                         P_reference_Pa = _pow10_pressure_or_raise(
                             log_P,
                             species=species,

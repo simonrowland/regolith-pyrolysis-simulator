@@ -1520,19 +1520,42 @@ families:
                 remaining oxides renormalized to 100 wt%
               fit_objective: bounded minimax absolute log10 residual; |C| <= 1000 K
           pure_component_antoine:
-            source: REF-012 CRC/NIST normal boiling point; CRC/NIST dH_vap~340 kJ/mol; Clausius-Clapeyron
-              anchored at 1 atm
+            source: REF-020 NIST-JANAF 4th Fe(g) Fe-008, Chase 1998
             provenance_class: derived_from_evaluation
-            construction_support_range_K:
-            - 1809.0
-            - 3134.0
-            construction: Clausius-Clapeyron from CRC/NIST Tb + dH_vap; construction support band declared
-              for metadata honesty (audit 2026-07-20). Not a VapoRock fit. Runtime selects this pure-component
-              sidecar; the residual pseudo Antoine block is dormant/inactive and must not be retuned (t-373
-              tail).
-            A: 10.670336
-            B: 17759.430841
-            C: 0
+            evaluation: janaf_fe008_formation_gibbs
+            janaf_table_id: Fe-008
+            derivation: >-
+              Premise: Fe(ref) -> Fe(g). K = P/p0 and dfG = -RT ln K, with
+              p0 = 1 bar. Fe-008's reference state already spans crystal
+              (alpha/gamma/delta) and liquid, so those phase changes are
+              inside dfG(Fe,g). Algebra: log10(P/bar) = -dfG(Fe,g;T) / (R T ln 10),
+              dfG the printed formation_gibbs_energy in kJ/mol, R the JANAF 4th
+              constant 8.31441 J mol^-1 K^-1. P/Pa = 10**(log10(P/bar)) * 1e5.
+              Unit check: JANAF p° = 0.1 MPa = 1 bar = 1e5 Pa, not 1 atm.
+              Interpolate log10 P linearly in 1/T between printed rows at
+              T >= 298.15 K. The certified band is that series. Rows from
+              3200 K upward have dfH = dfG = 0 because the element reference
+              becomes the ideal gas; they are not a saturation pressure of
+              1 bar. The published "FUGACITY = 1 bar" line at 3133.345 K is a
+              parse note, not a formation-Gibbs row. The last condensed-reference
+              row is 3100 K. Outside 298.15-3100 K, extrapolate with the
+              end-row slope in 1/T and flag. Sanity: that slope is about 1 atm
+              near the boiling point ~3134 K. At 1873 K and 2023 K the
+              evaluation is near the liquid Antoine draft's 8.04 Pa and 48.2 Pa.
+              The liquid Antoine fit is a cross-check only: over 1809-3134 K it
+              agrees with this evaluation within 0.004690522701 dex. It is not
+              the runtime law, and it is the wrong law below the melting point
+              because Fe sublimes from the solid there. The dormant pseudo
+              Antoine block must not be retuned (t-373 tail).
+            valid_range_K:
+            - 298.15
+            - 3100
+            fit_node_count: 13
+            max_abs_log10_residual_vs_source: 0.001805094984
+            max_abs_log10_residual_vs_invT_band: 0.004690522701
+            A: 10.5800108010
+            B: 16600.8522745789
+            C: -157.2155777135
           boiling_point_C: 2862
           notes: 'Prior 0.023 dex basalt-grid residual did not re-confirm against the
 

@@ -46,7 +46,8 @@ import math
 import warnings as runtime_warnings
 from collections.abc import Mapping
 from dataclasses import replace
-from typing import TYPE_CHECKING, Any
+from functools import lru_cache
+from typing import TYPE_CHECKING, Any, NamedTuple
 
 if TYPE_CHECKING:
     # Annotations only; the runtime import stays lazy because simulator
@@ -2281,6 +2282,16 @@ def _pure_segment_usable(
 
     if not selected:
         return False
+    if coefficient_block_is_fe008_saturation(selected):
+        # The direct law has no Antoine pole. A cold temperature is an
+        # extrapolation of the printed series, not a reason to drop the block.
+        if temperature_K is None:
+            return True
+        try:
+            temperature = float(temperature_K)
+        except (TypeError, ValueError):
+            return False
+        return math.isfinite(temperature) and temperature > 0.0
     try:
         A, B, C = _read_antoine_coefficients(selected)
     except _AntoineCoefficientRefusal as exc:
@@ -2354,6 +2365,162 @@ def _raise_invalid_antoine_coefficient(
     ) from refusal
 
 
+# Direct Fe saturation from NIST-JANAF 4th Fe(g), table Fe-008.
+# Premise: Fe(ref) -> Fe(g). The table's reference state already spans
+# crystal (alpha/gamma/delta) and liquid, so those phase changes are
+# inside dfG. K = P/p0, dfG = -RT ln K, p0 = 1 bar.
+# Algebra: log10(P/bar) = -dfG(Fe,g;T) / (R T ln 10), with dfG the
+# printed formation_gibbs_energy in kJ/mol and R the JANAF 4th printed
+# constant 8.31441 J mol^-1 K^-1. P/Pa = 10**log10(P/bar) * 1e5.
+# Unit check: 1 bar = 1e5 Pa. Interpolate log10 P linearly in 1/T
+# between printed rows at T >= 298.15 K. Rows with dfH = dfG = 0 are the
+# ideal-gas reference, not saturation nodes. Outside the printed band,
+# extrapolate with the end-row slope and flag. Sanity: Fe-008 gives about
+# 8.06 Pa at 1873 K and 1.01e5 Pa near the 3135 K boiling point; the liquid
+# Antoine cross-check is about 8.04 Pa at 1873 K. That Antoine fit
+# (A=10.5800108010, B=16600.8522745789, C=-157.2155777135) agrees within
+# 0.004690522701 dex on 1809-3134 K and is not the runtime law.
+_FE008_EVALUATION = "janaf_fe008_formation_gibbs"
+_FE008_TABLE_ID = "Fe-008"
+_FE008_CERTIFIED_FLOOR_K = 298.15
+
+
+class Fe008Saturation(NamedTuple):
+    pressure_pa: float
+    log10_pressure_pa: float
+    valid_range_K: tuple[float, float]
+    extrapolated: bool
+
+
+def coefficient_block_is_fe008_saturation(block: Mapping[str, Any] | None) -> bool:
+    """True when the sidecar is the direct Fe-008 formation-Gibbs law."""
+
+    if not isinstance(block, Mapping):
+        return False
+    return (
+        block.get("evaluation") == _FE008_EVALUATION
+        and str(block.get("janaf_table_id") or "") == _FE008_TABLE_ID
+    )
+
+
+@lru_cache(maxsize=1)
+def _fe008_saturation_nodes() -> tuple[tuple[float, float], ...]:
+    """Printed (T_K, log10(P/bar)) nodes of the condensed-reference series."""
+
+    from simulator.reference_data.janaf import (
+        JANAF_R_J_MOL_K,
+        TABLES_DIR,
+        load_table_document,
+    )
+
+    document = load_table_document(TABLES_DIR / f"{_FE008_TABLE_ID}.yaml")
+    table = document.get("table") if isinstance(document, Mapping) else None
+    values = table.get("values") if isinstance(table, Mapping) else None
+    if not isinstance(values, list):
+        raise VaporPressureComputationError(
+            f"{_FE008_TABLE_ID}: JANAF table values are missing"
+        )
+    gas_constant = float(JANAF_R_J_MOL_K)
+    ln10 = math.log(10.0)
+    nodes: list[tuple[float, float]] = []
+    for row in values:
+        if not isinstance(row, Mapping):
+            continue
+        temperature = (row.get("temperature") or {}).get("value")
+        gibbs = (row.get("formation_gibbs_energy") or {}).get("value")
+        enthalpy_cell = row.get("formation_enthalpy") or {}
+        enthalpy = (
+            enthalpy_cell.get("value")
+            if isinstance(enthalpy_cell, Mapping)
+            else None
+        )
+        if temperature is None or gibbs is None:
+            continue
+        temperature_K = float(temperature)
+        gibbs_kJ = float(gibbs)
+        if temperature_K < _FE008_CERTIFIED_FLOOR_K:
+            continue
+        # Ideal-gas reference tail: both formation columns are zero, so the
+        # rows are not saturation pressures of 1 bar.
+        if enthalpy is not None and float(enthalpy) == 0.0 and gibbs_kJ == 0.0:
+            break
+        log10_p_bar = -gibbs_kJ * 1000.0 / (
+            gas_constant * temperature_K * ln10
+        )
+        nodes.append((temperature_K, log10_p_bar))
+    if len(nodes) < 2:
+        raise VaporPressureComputationError(
+            f"{_FE008_TABLE_ID}: saturation series has fewer than two printed rows"
+        )
+    return tuple(nodes)
+
+
+def _log10_linear_in_inv_temperature(
+    nodes: tuple[tuple[float, float], ...],
+    temperature_K: float,
+) -> tuple[float, bool]:
+    """Linear interpolation of log10 P in 1/T, with end-row extrapolation."""
+
+    if temperature_K < nodes[0][0]:
+        left, right = nodes[0], nodes[1]
+        extrapolated = True
+    elif temperature_K > nodes[-1][0]:
+        left, right = nodes[-2], nodes[-1]
+        extrapolated = True
+    else:
+        extrapolated = False
+        left, right = nodes[0], nodes[1]
+        for left, right in zip(nodes, nodes[1:]):
+            if left[0] <= temperature_K <= right[0]:
+                break
+    if temperature_K == left[0]:
+        return left[1], extrapolated
+    if temperature_K == right[0]:
+        return right[1], extrapolated
+    left_u = 1.0 / left[0]
+    right_u = 1.0 / right[0]
+    weight = (1.0 / temperature_K - left_u) / (right_u - left_u)
+    return left[1] + (right[1] - left[1]) * weight, extrapolated
+
+
+def fe008_saturation(temperature_K: float) -> Fe008Saturation:
+    """Pure Fe saturation pressure from JANAF-4th Fe-008 formation Gibbs energy."""
+
+    try:
+        temperature = float(temperature_K)
+    except (TypeError, ValueError) as exc:
+        raise VaporPressureComputationError(
+            f"Fe-008 saturation requires a positive temperature_K, got {temperature_K!r}"
+        ) from exc
+    if not math.isfinite(temperature) or temperature <= 0.0:
+        raise VaporPressureComputationError(
+            f"Fe-008 saturation requires a positive temperature_K, got {temperature_K!r}"
+        )
+    nodes = _fe008_saturation_nodes()
+    log10_p_bar, extrapolated = _log10_linear_in_inv_temperature(
+        nodes, temperature
+    )
+    log10_p_pa = log10_p_bar + 5.0
+    pressure_pa = _pow10_pressure_or_raise(
+        log10_p_pa,
+        species="Fe",
+        field="P_reference_Pa",
+    )
+    return Fe008Saturation(
+        pressure_pa=pressure_pa,
+        log10_pressure_pa=log10_p_pa,
+        valid_range_K=(nodes[0][0], nodes[-1][0]),
+        extrapolated=extrapolated,
+    )
+
+
+def fe008_saturation_band_K() -> tuple[float, float]:
+    """Certified printed band of the Fe-008 saturation series."""
+
+    nodes = _fe008_saturation_nodes()
+    return nodes[0][0], nodes[-1][0]
+
+
 def vapor_pressure_valid_range_K(
     row: Mapping[str, Any] | None,
     coefficient_block: str | None,
@@ -2364,6 +2531,10 @@ def vapor_pressure_valid_range_K(
         coefficient_block,
         temperature_K=temperature_K,
     )
+    if coefficient_block_is_fe008_saturation(block):
+        # The printed JANAF rows own the Fe-008 band's endpoints.
+        low, high = fe008_saturation_band_K()
+        return [low, high]
     if _is_mapping(block) and block.get("valid_range_K") is not None:
         return block.get("valid_range_K")
     if (
@@ -3127,27 +3298,32 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                         sp_data,
                         coefficient_block,
                     )
+                direct_fe008 = False
                 if compiled_reference_Pa is None:
-                    try:
-                        A, B, C = _read_antoine_coefficients(antoine)
-                    except _AntoineCoefficientRefusal as exc:
-                        if not _is_missing_antoine_intercept(exc):
-                            _raise_invalid_antoine_coefficient(
-                                exc,
+                    direct_fe008 = coefficient_block_is_fe008_saturation(antoine)
+                    if not direct_fe008:
+                        try:
+                            A, B, C = _read_antoine_coefficients(antoine)
+                        except _AntoineCoefficientRefusal as exc:
+                            if not _is_missing_antoine_intercept(exc):
+                                _raise_invalid_antoine_coefficient(
+                                    exc,
+                                    species=species,
+                                    field="P_reference_Antoine_Pa",
+                                )
+                            _append_antoine_skip_notice(
+                                warnings,
+                                antoine_skip_notice_keys,
+                                antoine,
                                 species=species,
-                                field="P_reference_Antoine_Pa",
+                                site="builtin_vapor_pressure.metal_antoine",
+                                temperature_K=T_K,
+                                reason=_antoine_skip_reason_for_refusal(exc),
                             )
-                        _append_antoine_skip_notice(
-                            warnings,
-                            antoine_skip_notice_keys,
-                            antoine,
-                            species=species,
-                            site="builtin_vapor_pressure.metal_antoine",
-                            temperature_K=T_K,
-                            reason=_antoine_skip_reason_for_refusal(exc),
-                        )
-                        continue
-                    if T_K <= 300.0:
+                            continue
+                        if T_K <= 300.0:
+                            continue
+                    elif not math.isfinite(T_K) or T_K <= 0.0:
                         continue
                 reconstructed_segment = sp_data.get(
                     RECONSTRUCTED_VAPOR_PRESSURE_SEGMENT_KEY
@@ -3202,13 +3378,23 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                                     reason="metal_vapor_pressure_out_of_validated_range",
                                 )
                             )
-                            warnings.append(
-                                f"{species} metal Antoine fit extrapolated beyond "
-                                f"valid_range_K [{valid_low:g}, {valid_high:g}] at "
-                                f"{T_K:.3f} K"
-                            )
+                            if direct_fe008:
+                                warnings.append(
+                                    f"{species} metal JANAF Fe-008 saturation "
+                                    "extrapolated beyond "
+                                    f"valid_range_K [{valid_low:g}, {valid_high:g}] at "
+                                    f"{T_K:.3f} K"
+                                )
+                            else:
+                                warnings.append(
+                                    f"{species} metal Antoine fit extrapolated beyond "
+                                    f"valid_range_K [{valid_low:g}, {valid_high:g}] at "
+                                    f"{T_K:.3f} K"
+                                )
                     if compiled_reference_Pa is not None:
                         P_reference_Pa = compiled_reference_Pa
+                    elif direct_fe008:
+                        P_reference_Pa = fe008_saturation(T_K).pressure_pa
                     else:
                         log_P = _antoine_log10_pressure(A, B, C, T_K)
                         P_reference_Pa = _pow10_pressure_or_raise(

@@ -2342,11 +2342,17 @@ def test_fe_pure_component_antoine_provider_pressure_pin(vapor_pressure_data):
     result = BuiltinVaporPressureProvider(vapor_pressure_data).dispatch(request)
     provenance = result.diagnostic["vapor_pressure_numerator_provenance"]["Fe"]
 
+    # d-383: Fe now uses JANAF Fe-008 formation Gibbs energy. At 1650 K it
+    # lies inside the printed 298.15-3100 K band, so no extrapolation is flagged.
     assert provenance["P_reference_Antoine_Pa"].hex() == (
-        "0x1.9d58c589d10a1p-1"
+        "0x1.1962502517206p-2"
     )
     assert result.diagnostic["vapor_pressures_Pa"]["Fe"].hex() == (
-        "0x1.1f0c7cf66d4d7p-3"
+        "0x1.86d07fedea783p-5"
+    )
+    assert "Fe" not in result.diagnostic["extrapolated_beyond_valid_range_K"]
+    assert result.diagnostic["vapor_pressures_source"]["Fe"] == (
+        "builtin_authoritative:pure_component_derived_from_evaluation"
     )
 
 
@@ -3373,13 +3379,14 @@ def test_legacy_fallback_keeps_fe_pure_sidecar_above_pseudo_fit_range(
     )
     assert coefficients is fe_data["pure_component_antoine"]
     assert coefficient_block == vapor_pressure_module.COEFF_BLOCK_PURE_COMPONENT
+    # d-383 takes this interval from the Fe-008 condensed-reference rows.
     assert (
         vapor_pressure_module.vapor_pressure_valid_range_K(
             fe_data,
             coefficient_block,
             temperature_K=2250.0,
         )
-        is None
+        == [298.15, 3100.0]
     )
 
     result = _LegacyInternalAnalyticalModel(

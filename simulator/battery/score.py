@@ -14338,7 +14338,9 @@ def _predict_with_engine(
                 COEFF_BLOCK_PURE_COMPONENT,
                 VaporPressureComputationError,
                 _pow10_pressure_or_raise,
+                coefficient_block_is_fe008_saturation,
                 declared_antoine_segment_phase,
+                fe008_saturation,
                 vapor_pressure_valid_range_K,
                 wall_condensation_antoine_coefficients,
             )
@@ -14447,8 +14449,11 @@ def _predict_with_engine(
                     identity=identity,
                 )
             try:
-                A, B, C = _read_antoine_coefficients(coefficients)
-                log_pressure = _antoine_log10_pressure(A, B, C, float(T))
+                if coefficient_block_is_fe008_saturation(coefficients):
+                    log_pressure = fe008_saturation(float(T)).log10_pressure_pa
+                else:
+                    A, B, C = _read_antoine_coefficients(coefficients)
+                    log_pressure = _antoine_log10_pressure(A, B, C, float(T))
                 pressure = _pow10_pressure_or_raise(
                     log_pressure,
                     species=formula,

@@ -10,6 +10,8 @@ import yaml
 
 from engines.builtin.vapor_pressure import (
     BuiltinVaporPressureProvider,
+    coefficient_block_is_fe008_saturation,
+    fe008_saturation,
     vapor_pressure_antoine_coefficients,
     vapor_pressure_source_label,
 )
@@ -234,6 +236,8 @@ def _pure_component_antoine_pa(entry: dict, temperature_K: float) -> float:
     else:
         coeff, block = vapor_pressure_antoine_coefficients(entry, temperature_K)
         assert block == "pure_component_antoine"
+    if coefficient_block_is_fe008_saturation(coeff):
+        return fe008_saturation(temperature_K).pressure_pa
     return 10.0 ** (
         float(coeff["A"])
         - float(coeff["B"]) / (float(temperature_K) + float(coeff.get("C", 0.0)))
