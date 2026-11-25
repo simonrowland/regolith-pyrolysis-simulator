@@ -1564,20 +1564,24 @@ def absorbed_focal_power_W(
     enter the melt balance. Solar absorptance is not the thermal
     emissivity. Window transmittance is a separate factor.
 
-    Algebra::
+    Algebra (uniform-disk area ratio)::
 
-        intercept = (d_pellet / d_spot) ** 2
+        A_pellet / A_spot = (π d_pellet² / 4) / (π d_spot² / 4)
+        intercept = min(1, (d_pellet / d_spot) ** 2)
         P_abs = P_focal * intercept * alpha * tau
 
-    Units: diameters in metres, both powers in watts, alpha and tau
-    dimensionless.
+    Units: both diameters use metres, so their ratio and the intercept are
+    dimensionless; power remains watts after multiplying by alpha and tau.
 
     Sanity: 13 mm in a 20 mm spot intercepts (13/20)**2 = 0.4225.
     At the digitized peak 1468.819694 W, alpha 1 and tau 1, the pellet
     absorbs 620.576 W. The other 848 W hits the holder annulus.
+    In the small-pellet limit the intercept tends to zero; at or above
+    the spot diameter the cap gives an intercept of 1, so the pellet
+    receives the whole focal disk, never more than it.
     """
 
-    intercept = (pellet_diameter_m / focal_spot_diameter_m) ** 2
+    intercept = min(1.0, (pellet_diameter_m / focal_spot_diameter_m) ** 2)
     absorbed = (
         focal_power_W
         * intercept
