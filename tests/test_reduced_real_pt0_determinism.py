@@ -1922,19 +1922,29 @@ def _c3a_ladder_key(
 
 
 def _put_c3a_payload(db_path: Path, key: dict, label: str) -> None:
+    result = EquilibriumResult(
+        status="ok",
+        temperature_C=1200.0,
+        pressure_bar=0.001,
+        fO2_log=-9.0,
+        liquid_fraction=0.5,
+        phase_assemblage_available=True,
+        liquidus_T_C=1300.0,
+        vapor_pressures_Pa={},
+        vapor_pressures_source={},
+        warnings=[],
+    )
+    result_payload = {
+        field.name: rrd._json_ready(getattr(result, field.name))
+        for field in rrd._equilibrium_result_payload_fields()
+        if not (
+            field.name in rrd._EQUILIBRIUM_RESULT_FIELDS_OMITTED_WHEN_NONE
+            and getattr(result, field.name) is None
+        )
+    }
     payload = {
         "authority": _alphamelts_record_authority(),
-        "equilibrium_result": {
-            "status": "ok",
-            "temperature_C": 1200.0,
-            "pressure_bar": 0.001,
-            "liquid_fraction": 0.5,
-            "phase_assemblage_available": True,
-            "liquidus_T_C": 1300.0,
-            "vapor_pressures_Pa": {},
-            "vapor_pressures_source": {},
-            "warnings": [],
-        },
+        "equilibrium_result": result_payload,
         "last_vapor_pressures_source": {},
         "last_vapor_pressure_diagnostic": {},
         "label": label,
@@ -6213,6 +6223,132 @@ def test_missing_equilibrium_replay_field_misses_and_is_replaceable(
         monkeypatch=monkeypatch,
         sim=sim,
     )
+
+
+@pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))
+@pytest.mark.parametrize(
+    "field_path",
+    (
+        ("equilibrium_result", "temperature_C"),
+        ("equilibrium_result", "pressure_bar"),
+        ("equilibrium_result", "fO2_log"),
+        ("equilibrium_result", "status"),
+        ("last_vapor_pressures_source",),
+        ("last_vapor_pressure_diagnostic",),
+    ),
+    ids=(
+        "temperature_C",
+        "pressure_bar",
+        "fO2_log",
+        "status",
+        "last_vapor_pressures_source",
+        "last_vapor_pressure_diagnostic",
+    ),
+)
+def test_missing_encoder_equilibrium_field_misses_and_is_replaceable(
+    tmp_path: Path,
+    persistent: bool,
+    field_path: tuple[str, ...],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    db_path = tmp_path / "missing-encoder-equilibrium-field.sqlite" if persistent else None
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    sim, result = _pt0_equilibrium_capture_context(capture)
+    key = capture._equilibrium_key(sim)
+    current_payload = rrd.canonical_replay_output_projection(
+        "equilibrium_post_record", sim, result
+    )
+    corrupt_payload = copy.deepcopy(current_payload)
+    parent = corrupt_payload
+    for path_part in field_path[:-1]:
+        parent = parent[path_part]
+    parent.pop(field_path[-1])
+
+    _assert_corrupt_cache_row_misses_and_replaces(
+        capture,
+        artifact="equilibrium_post_record",
+        key=key,
+        corrupt_payload=corrupt_payload,
+        current_payload=current_payload,
+        persistent=persistent,
+        db_path=db_path,
+        monkeypatch=monkeypatch,
+        sim=sim,
+    )
+
+
+@pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))
+def test_equilibrium_vapor_provenance_rejects_wrong_consumer_field_types(
+    tmp_path: Path,
+    persistent: bool,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    db_path = tmp_path / "bad-vapor-provenance-type.sqlite" if persistent else None
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    sim, result = _pt0_equilibrium_capture_context(capture)
+    key = capture._equilibrium_key(sim)
+    current_payload = rrd.canonical_replay_output_projection(
+        "equilibrium_post_record", sim, result
+    )
+    corrupt_payload = copy.deepcopy(current_payload)
+    corrupt_payload["last_vapor_pressure_diagnostic"][
+        "vapor_pressure_numerator_provenance"
+    ] = {"Fe": {"pressure_rail": ["condensed_raoult_psat"]}}
+
+    _assert_corrupt_cache_row_misses_and_replaces(
+        capture,
+        artifact="equilibrium_post_record",
+        key=key,
+        corrupt_payload=corrupt_payload,
+        current_payload=current_payload,
+        persistent=persistent,
+        db_path=db_path,
+        monkeypatch=monkeypatch,
+        sim=sim,
+    )
+
+
+def test_pt1_non_mapping_payload_misses_and_is_replaceable(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.vapour_rail import run_disclosure
+
+    db_path = tmp_path / "pt1-non-mapping-payload.sqlite"
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    sim, result = _pt0_equilibrium_capture_context(capture)
+    key = capture._equilibrium_key(sim)
+    current_payload = rrd.canonical_replay_output_projection(
+        "equilibrium_post_record", sim, result
+    )
+    capture._store("equilibrium_post_record", key, current_payload, law_disclosures=[])
+    key_hash = _key_hash(key)
+    corrupt_bytes = b"[7]"
+    with sqlite3.connect(db_path) as connection:
+        connection.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+            "SET payload_bytes = ?, payload_sha256 = ? WHERE key_hash = ?",
+            (corrupt_bytes, rrd._sha256(corrupt_bytes), key_hash),
+        )
+
+    disclosure_calls: list[None] = []
+    original_accept = run_disclosure.accept_stored_memo
+
+    def record_disclosure(*args: Any, **kwargs: Any) -> Any:
+        disclosure_calls.append(None)
+        return original_accept(*args, **kwargs)
+
+    monkeypatch.setattr(run_disclosure, "accept_stored_memo", record_disclosure)
+    replay = PT0DeterminismStore("replay", db_path=db_path)
+    with pytest.raises(PT0CacheMiss):
+        replay._lookup("equilibrium_post_record", key, sim=sim)
+    assert replay.hits == 0
+    assert disclosure_calls == []
+
+    capture._store("equilibrium_post_record", key, current_payload, law_disclosures=[])
+    replay = PT0DeterminismStore("replay", db_path=db_path)
+    assert replay._lookup("equilibrium_post_record", key, sim=sim) == current_payload
+    assert replay.hits == 1
 
 
 def test_equilibrium_replay_result_is_deep_copied_from_cached_payload() -> None:

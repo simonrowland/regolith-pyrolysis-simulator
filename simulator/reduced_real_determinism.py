@@ -130,6 +130,21 @@ GATE_CURVE_DOMAIN_KEYS = ('authority', 'certified_band')
 PT0_GATE_CURVE_CODEC_VERSION = 3
 PT1_EQUILIBRIUM_PAYLOAD_CODEC_VERSION = 2
 _EQUILIBRIUM_RESULT_FIELD_TYPES = get_type_hints(EquilibriumResult)
+_EQUILIBRIUM_RESULT_FIELDS_OMITTED_WHEN_NONE = frozenset(
+    {"requested_fO2_log", "printed_fO2_echo_log"}
+)
+_EQUILIBRIUM_REPLAY_SIDE_FIELDS = (
+    "last_vapor_pressures_source",
+    "last_vapor_pressure_diagnostic",
+)
+
+
+def _equilibrium_result_payload_fields() -> tuple[dataclasses.Field[Any], ...]:
+    return tuple(
+        field
+        for field in dataclasses.fields(EquilibriumResult)
+        if field.name != "ledger_transition"
+    )
 
 
 @dataclasses.dataclass(frozen=True)
@@ -192,6 +207,7 @@ def _decode_payload_for_admission(
     *,
     payload_codec_version: int | None = None,
     keys: Sequence[Mapping[str, Any]] = (),
+    interpolation_synthesized: bool = False,
 ) -> Any | None:
     expected_version = _payload_codec_version(artifact)
     if expected_version is None:
@@ -270,13 +286,16 @@ def _decode_payload_for_admission(
         return curve
     if artifact == "equilibrium_post_record":
         equilibrium_result = payload.get("equilibrium_result")
-        if not isinstance(equilibrium_result, Mapping) or any(
-            field_name not in equilibrium_result
-            for field_name in (
-                "vapor_pressures_Pa",
-                "vapor_pressures_source",
-                "warnings",
-            )
+        required_result_fields = {
+            field.name
+            for field in _equilibrium_result_payload_fields()
+            if field.name not in _EQUILIBRIUM_RESULT_FIELDS_OMITTED_WHEN_NONE
+        }
+        if (
+            not isinstance(equilibrium_result, Mapping)
+            or not required_result_fields.issubset(equilibrium_result)
+            or any(field_name not in payload for field_name in _EQUILIBRIUM_REPLAY_SIDE_FIELDS)
+            or (not interpolation_synthesized and "authority" not in payload)
         ):
             return None
         try:
@@ -291,19 +310,82 @@ def _decode_payload_for_admission(
         )
         if isinstance(feo_activity, Mapping) and "notices" in feo_activity:
             return None
-        provenance = decoded.vapor_pressure_diagnostic.get(
-            "vapor_pressure_numerator_provenance"
-        )
-        if "vapor_pressure_numerator_provenance" in decoded.vapor_pressure_diagnostic and (
-            not isinstance(provenance, Mapping)
-            or any(
-                not isinstance(species, str)
-                or not isinstance(species_provenance, Mapping)
-                or any(not isinstance(field, str) for field in species_provenance)
-                for species, species_provenance in provenance.items()
-            )
-        ):
-            return None
+        provenance_diagnostics = [decoded.vapor_pressure_diagnostic]
+        if isinstance(decoded.result.diagnostics, Mapping):
+            provenance_diagnostics.append(decoded.result.diagnostics)
+        string_fields = {
+            "pressure_rail",
+            "melt_oxide_component",
+            "melt_activity_parent_oxide",
+            "melt_activity_flag",
+        }
+        nullable_string_fields = {"oxygen_fugacity_channel"}
+        finite_number_fields = {
+            "activity_factor",
+            "raw_metal_activity_root",
+            "P_reference_Antoine_Pa",
+            "pO2_bar",
+            "pO2_exponent",
+            "melt_oxide_X_single_cation",
+        }
+        for diagnostic in provenance_diagnostics:
+            if "vapor_pressure_numerator_provenance" not in diagnostic:
+                continue
+            provenance = diagnostic["vapor_pressure_numerator_provenance"]
+            if not isinstance(provenance, Mapping):
+                return None
+            for species, species_provenance in provenance.items():
+                if (
+                    not isinstance(species, str)
+                    or not isinstance(species_provenance, Mapping)
+                    or any(not isinstance(field, str) for field in species_provenance)
+                ):
+                    return None
+                for field_name in string_fields:
+                    if field_name in species_provenance and not isinstance(
+                        species_provenance[field_name], str
+                    ):
+                        return None
+                for field_name in nullable_string_fields:
+                    value = species_provenance.get(field_name)
+                    if (
+                        field_name in species_provenance
+                        and value is not None
+                        and not isinstance(value, str)
+                    ):
+                        return None
+                for field_name in finite_number_fields:
+                    value = species_provenance.get(field_name)
+                    if field_name in species_provenance and value is not None:
+                        if (
+                            not isinstance(value, (int, float))
+                            or isinstance(value, bool)
+                        ):
+                            return None
+                        try:
+                            finite = math.isfinite(float(value))
+                        except (OverflowError, TypeError, ValueError):
+                            finite = False
+                        if not finite:
+                            return None
+                if (
+                    "melt_activity_fallback" in species_provenance
+                    and type(species_provenance["melt_activity_fallback"]) is not bool
+                ):
+                    return None
+                refusal = species_provenance.get("openimcc_refusal")
+                if refusal is not None:
+                    if not isinstance(refusal, Mapping) or any(
+                        field_name in refusal
+                        and value is not None
+                        and not isinstance(value, str)
+                        for field_name, value in (
+                            ("code", refusal.get("code")),
+                            ("detail", refusal.get("detail")),
+                            ("reason", refusal.get("reason")),
+                        )
+                    ):
+                        return None
         return decoded
     return None
 
@@ -1857,6 +1939,7 @@ class PT0DeterminismStore:
                 else None
             ),
             keys=(key,),
+            interpolation_synthesized=True,
         )
         if decoded is None:
             return None
@@ -3002,9 +3085,22 @@ class PT1PersistentEquilibriumStore:
             raise PT1PersistentStoreCorrupt(
                 f"PT-1 row canonical request mismatch: {key_hash}"
             )
-        validate_reduced_real_equilibrium_record_key(
-            artifact, row_key, row_payload
-        )
+        if isinstance(row_payload, Mapping):
+            validate_reduced_real_equilibrium_record_key(
+                artifact, row_key, row_payload
+            )
+            admitted_payload = copy.deepcopy(dict(row_payload))
+        else:
+            if _decode_payload_for_admission(
+                artifact,
+                row_payload,
+                payload_codec_version=row["payload_codec_version"],
+                keys=(row_key,),
+            ) is not None:
+                raise PT1PersistentStoreCorrupt(
+                    f"PT-1 row has a non-mapping payload for {artifact}: {key_hash}"
+                )
+            admitted_payload = copy.deepcopy(row_payload)
         repair_notices_json = _row_repair_notices(row)
         validate_repair_notices_json(repair_notices_json)
         return {
@@ -3012,7 +3108,7 @@ class PT1PersistentEquilibriumStore:
             "key": copy.deepcopy(dict(row_key)),
             "key_hash": key_hash,
             "key_bytes": row_key_bytes.decode("utf-8"),
-            "payload": copy.deepcopy(dict(row_payload)),
+            "payload": admitted_payload,
             "payload_hash": row["payload_sha256"],
             "payload_codec_version": (
                 row["payload_codec_version"]
@@ -4771,21 +4867,20 @@ def canonical_replay_output_projection(
                 and isinstance(result_diagnostics, Mapping)
                 else _json_ready(getattr(result, field.name))
             )
-            for field in dataclasses.fields(EquilibriumResult)
-            if field.name != "ledger_transition"
-            and not (
-                field.name in {"requested_fO2_log", "printed_fO2_echo_log"}
+            for field in _equilibrium_result_payload_fields()
+            if not (
+                field.name in _EQUILIBRIUM_RESULT_FIELDS_OMITTED_WHEN_NONE
                 and getattr(result, field.name) is None
             )
         },
-        "last_vapor_pressures_source": dict(
-            getattr(sim, "_last_vapor_pressures_source", {}) or {}
-        ),
-        "last_vapor_pressure_diagnostic": _cache_payload_diagnostic(
-            getattr(sim, "_last_vapor_pressure_diagnostic", {}) or {},
-            temperature_K=temperature_K,
-        ),
     }
+    payload[_EQUILIBRIUM_REPLAY_SIDE_FIELDS[0]] = dict(
+        getattr(sim, "_last_vapor_pressures_source", {}) or {}
+    )
+    payload[_EQUILIBRIUM_REPLAY_SIDE_FIELDS[1]] = _cache_payload_diagnostic(
+        getattr(sim, "_last_vapor_pressure_diagnostic", {}) or {},
+        temperature_K=temperature_K,
+    )
     sulfur = getattr(result, "sulfur_saturation", None)
     payload["equilibrium_result"]["sulfur_saturation"] = _json_ready(sulfur)
     if hasattr(result, "alphamelts_diagnostics"):

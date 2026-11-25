@@ -9,6 +9,7 @@ from typing import Any
 
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.reduced_real_determinism import (
+    _EQUILIBRIUM_REPLAY_SIDE_FIELDS,
     _composition_items,
     _physics_bucket_consumes_log_fO2,
     _physics_bucket_consumes_pO2_bar,
@@ -436,15 +437,13 @@ def interpolate_equilibrium_payload(
         interpolated_result["diagnostics"] = diagnostics
         interpolated_result["status"] = "out_of_domain"
 
-    payload = {
-        "equilibrium_result": interpolated_result,
-        "last_vapor_pressures_source": dict(
-            interpolated_result.get("vapor_pressures_source") or {}
-        ),
-        "last_vapor_pressure_diagnostic": {
-            "source": "cached_interpolated",
-            "interpolation_mode": "linear",
-        },
+    payload = {"equilibrium_result": interpolated_result}
+    payload[_EQUILIBRIUM_REPLAY_SIDE_FIELDS[0]] = dict(
+        interpolated_result.get("vapor_pressures_source") or {}
+    )
+    payload[_EQUILIBRIUM_REPLAY_SIDE_FIELDS[1]] = {
+        "source": "cached_interpolated",
+        "interpolation_mode": "linear",
     }
     return payload
 

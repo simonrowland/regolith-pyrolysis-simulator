@@ -60,7 +60,28 @@ def _interpolation_payload(
     phases: list[str] | None = None,
     status: str = "ok",
 ) -> dict:
-    return {
+    result = EquilibriumResult(
+        status=status,
+        phases_present=phases or ["liquid"],
+        phase_masses_kg={"liquid": liquid_fraction, "solid": 1.0 - liquid_fraction},
+        liquid_fraction=liquid_fraction,
+        vapor_pressures_Pa={"SiO": sio_pa, "O2": sio_pa * 0.1},
+        vapor_pressures_source={"SiO": "exact", "O2": "exact"},
+        temperature_C=1000.0,
+        pressure_bar=0.01,
+        fO2_log=-9.0,
+        liquid_composition_wt_pct={"SiO2": 45.0, "FeO": 10.0},
+        activity_coefficients={"SiO2": 1.0},
+    )
+    result_payload = {
+        field.name: rrd._json_ready(getattr(result, field.name))
+        for field in rrd._equilibrium_result_payload_fields()
+        if not (
+            field.name in rrd._EQUILIBRIUM_RESULT_FIELDS_OMITTED_WHEN_NONE
+            and getattr(result, field.name) is None
+        )
+    }
+    payload = {
         "authority": {
             "schema": "reduced-real-authority-v1",
             "evidence_class": "melts",
@@ -83,21 +104,13 @@ def _interpolation_payload(
                 "fallback_allowed": False,
             },
         },
-        "equilibrium_result": {
-            "status": status,
-            "phases_present": phases or ["liquid"],
-            "phase_masses_kg": {"liquid": liquid_fraction, "solid": 1.0 - liquid_fraction},
-            "liquid_fraction": liquid_fraction,
-            "vapor_pressures_Pa": {"SiO": sio_pa, "O2": sio_pa * 0.1},
-            "vapor_pressures_source": {"SiO": "exact", "O2": "exact"},
-            "temperature_C": 1000.0,
-            "pressure_bar": 0.01,
-            "fO2_log": -9.0,
-            "liquid_composition_wt_pct": {"SiO2": 45.0, "FeO": 10.0},
-            "activity_coefficients": {"SiO2": 1.0},
-            "warnings": [],
-        }
+        "equilibrium_result": result_payload,
     }
+    payload[rrd._EQUILIBRIUM_REPLAY_SIDE_FIELDS[0]] = dict(
+        result_payload["vapor_pressures_source"]
+    )
+    payload[rrd._EQUILIBRIUM_REPLAY_SIDE_FIELDS[1]] = {}
+    return payload
 
 
 def _put_interpolation_row(
@@ -381,6 +394,7 @@ def test_lookup_optional_returns_cached_interpolated(tmp_path: Path) -> None:
     )
 
     assert payload is not None
+    assert store.hits == 1
     assert store.last_cache_state == "cached_interpolated"
     assert store.replay_sequence[-1]["cache_state"] == "cached_interpolated"
     uncertainty = store.replay_sequence[-1]["interpolation_uncertainty"]
