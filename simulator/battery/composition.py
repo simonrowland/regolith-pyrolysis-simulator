@@ -8,8 +8,9 @@ not keep a second copy of the excess algebra.
 from __future__ import annotations
 
 import math
+import re
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from decimal import Decimal
 
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
@@ -21,8 +22,9 @@ from simulator.battery.enums import (
     RefusalReason,
 )
 from simulator.battery.input_provenance import PRINTED_STARTING_BULK
-from simulator.battery.records import Composition
+from simulator.battery.records import Composition, Derivation, Located, Locator
 from simulator.reference_data.janaf import formula_composition
+from simulator.state_types import State
 
 # Spaces, underscores, hyphens, and dashes are not part of the scale token.
 _VOLUME_BASIS_DROPS = str.maketrans("", "", " _-\u2013\u2014")
@@ -112,6 +114,74 @@ def composition_wt_pct(composition: Composition) -> dict[str, float] | None:
     if total <= 0.0:
         return None
     return {key: 100.0 * value / total for key, value in masses.items() if value > 0.0}
+
+
+def _named_formula_oxide_composition(
+    formula: str,
+    *,
+    locator: Locator,
+    composition: Composition | None = None,
+) -> Located[Composition] | None:
+    """Return a located charge and its formula-unit-to-wt% derivation.
+
+    Formula-unit moles are multiplied by the existing oxide molar masses in
+    ``composition_wt_pct``. For Na2O.3SiO2, one mole Na2O weighs 61.97853856 g
+    and three moles SiO2 weigh 180.249 g, giving 25.5869/74.4131 wt%.
+    Units: mol × g/mol = g, then 100 × g/g = wt%.
+    """
+
+    if composition is None:
+        if not isinstance(formula, str) or not formula.strip():
+            return None
+        formula_units: dict[str, Decimal] = {}
+        for raw_unit in re.split(r"[.·⋅∙]", formula):
+            match = re.fullmatch(r"(?:(\d+))?([A-Z][A-Za-z0-9]*)", raw_unit.strip())
+            if match is None:
+                return None
+            oxide = match.group(2)
+            parsed = formula_composition(oxide)
+            if parsed is None or not any(
+                element == "O" and count > 0 for element, count in parsed
+            ):
+                return None
+            amount = Decimal(match.group(1) or "1")
+            formula_units[oxide] = formula_units.get(oxide, Decimal("0")) + amount
+        total = sum(formula_units.values(), Decimal("0"))
+        if total <= 0:
+            return None
+        composition = Composition(
+            basis="named_formula_oxide_moles",
+            components=tuple(
+                (oxide, amount / total) for oxide, amount in formula_units.items()
+            ),
+            amount_basis=AmountBasis.MOLE_FRACTION,
+        )
+    composition = replace(
+        composition,
+        proxy_flag="calculated_from_named_formula",
+        proxy_source=formula,
+        input_provenance=PRINTED_STARTING_BULK,
+    )
+    weights = composition_wt_pct(composition)
+    if weights is None:
+        return None
+    derivation = Derivation(
+        relation="oxide_wt_pct_from_named_formula",
+        inputs=(),
+        parameters=tuple(
+            (
+                f"{oxide}_wt_pct",
+                Located(State.of(Decimal(str(weight))), locator=locator),
+            )
+            for oxide, weight in weights.items()
+        ),
+        output_unit="wt%",
+        method=Located(
+            State.of(f"formula-unit stoichiometry: {formula}"),
+            locator=locator,
+        ),
+    )
+    return Located(State.of(composition), locator=locator, inference=derivation)
 
 
 def mass_weighted_mixture_wt_pct(

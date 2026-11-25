@@ -1,12 +1,22 @@
 from __future__ import annotations
 
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
+import yaml
 
 from simulator.battery.composition import composition_wt_pct
-from simulator.battery.enums import NoticeKind, Quantity
-from tests.battery.test_migrate import _migrate_real_extract
+from simulator.battery.enums import (
+    NoticeKind,
+    Quantity,
+    RefusalReason,
+    ResidualStatus,
+    SourceRelation,
+)
+from simulator.battery.score import build_conjuncts
+from simulator.battery.validity import GateOutcome
+from tests.battery.test_migrate import REPO_ROOT, _migrate_real_extract
 
 
 def _partial_pressure_rows(result: object, source_id: str) -> list[object]:
@@ -43,17 +53,26 @@ def test_shornikov_2008_pure_oxide_rows_derive_from_the_named_formulas(
         oxide = expected_oxide[row.identity.species.formula]
         assert composition.proxy_flag == "calculated_from_named_formula"
         assert composition.proxy_source == oxide
-        assert composition_wt_pct(composition) == pytest.approx({oxide: 100.0})
+        assert composition.basis == "pure_oxide_system"
+        assert composition.components == ((oxide, Decimal("1")),)
         located = row.point_conditions["composition"]
         assert located.locator.page == 3
         assert located.locator.published_page == 726
         assert located.locator.table == "1"
         assert located.inference.relation == "oxide_wt_pct_from_named_formula"
         assert any(
-            notice.kind is NoticeKind.FALLBACK
-            and "source-named pure formula" in notice.reason
+            notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+            and "composition_input_calculated_from_named_formula" in notice.reason
+            and oxide in notice.reason
             for notice in row.notices
         )
+        if row.identity.species.formula == "Fe":
+            assert any(
+                "nominal ferrous starting charge; no valence ratio or fO2 inferred"
+                in notice.reason
+                for notice in row.notices
+            )
+            assert row.identity.fO2_Pa is None or not row.identity.fO2_Pa.is_value
 
 
 def test_kassis_na2o_silicate_recipe_derives_hand_computed_oxide_weights(
@@ -84,7 +103,130 @@ def test_kassis_na2o_silicate_recipe_derives_hand_computed_oxide_weights(
         assert located.locator.section == "Experimental method"
         assert located.inference.relation == "oxide_wt_pct_from_named_formula"
         assert any(
-            notice.kind is NoticeKind.FALLBACK
-            and notice.source == "Na2O.3SiO2"
+            notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+            and "Na2O.3SiO2" in notice.reason
             for notice in row.notices
         )
+
+
+def test_shornikov_derived_charge_flag_does_not_block_vapour_qualification(
+    tmp_path: Path,
+) -> None:
+    source_id = "shornikov-2008-redox-oxide-evaporation"
+    result = _migrate_real_extract(tmp_path, f"{source_id}.yaml", write=False)
+    row = next(
+        row
+        for row in _partial_pressure_rows(result, source_id)
+        if "shornikov_2008_t1_ca_reducing" in row.observation_id
+    )
+
+    assert row.identity.composition.value.proxy_flag == "calculated_from_named_formula"
+    assert any(
+        notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        and "calculated_from_named_formula" in notice.reason
+        for notice in row.notices
+    )
+    conjuncts = build_conjuncts(
+        status=ResidualStatus.NO_BAND,
+        reference=row,
+        candidate=None,
+        numeric=None,
+        source_relation=SourceRelation.UNKNOWN,
+        lineage_complete=False,
+        gates=GateOutcome(passed=True),
+        extract_review_status=None,
+        comparison_ids=set(),
+        notices=tuple(
+            notice
+            for notice in row.notices
+            if notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        ),
+    )
+    assert conjuncts.no_blocking_qualification
+
+
+def test_named_rubidium_charge_is_composed_for_all_partial_pressure_rows(
+    tmp_path: Path,
+) -> None:
+    source_id = "kassis-frischat-1981-silicate-glass-vapour"
+    result = _migrate_real_extract(tmp_path, f"{source_id}.yaml", write=False)
+    rows = [
+        row
+        for row in _partial_pressure_rows(result, source_id)
+        if row.identity.species.formula == "Rb"
+    ]
+
+    assert len(rows) == 4
+    for row in rows:
+        composition = row.identity.composition.value
+        assert composition.proxy_flag == "calculated_from_named_formula"
+        assert composition.proxy_source == "Rb2O.3SiO2"
+        # M(Rb2O)=186.9346 g/mol and 3 M(SiO2)=180.249 g/mol.
+        assert composition_wt_pct(composition) == pytest.approx(
+            {"Rb2O": 50.91, "SiO2": 49.09}, abs=0.01
+        )
+
+
+def test_natural_murchison_charge_stays_refused_even_with_an_oxide_label(
+    tmp_path: Path,
+) -> None:
+    source_id = "kems-028-yakovlev-1984"
+    path = REPO_ROOT / "data" / "literature" / "extracts" / f"{source_id}.yaml"
+    extract_doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+    observation = next(
+        item
+        for item in extract_doc["species"]["SiO"]["observations"]
+        if item["observation_id"] == "yakovlev_1984_fig1_Murchison_SiO_digitized"
+    )
+    observation["values"]["points"][0]["oxide_as_printed"] = "SiO2"
+
+    result = _migrate_real_extract(
+        tmp_path,
+        f"{source_id}.yaml",
+        write=False,
+        extract_doc=extract_doc,
+    )
+    row = next(
+        row
+        for row in _partial_pressure_rows(result, source_id)
+        if "yakovlev_1984_fig1_Murchison_SiO_digitized" in row.observation_id
+    )
+    assert row.identity.composition.is_unknown
+    assert row.identity.composition.reason == "numerical_bulk_composition_not_published"
+    assert row.point_conditions["composition"].state.is_unknown
+    assert row.point_conditions["composition"].state.reason == (
+        "numerical_bulk_composition_not_published"
+    )
+
+
+def test_malformed_shornikov_charge_keeps_its_typed_refusal(
+    tmp_path: Path,
+) -> None:
+    source_id = "shornikov-2008-redox-oxide-evaporation"
+    path = REPO_ROOT / "data" / "literature" / "extracts" / f"{source_id}.yaml"
+    extract_doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+    observation = next(
+        item
+        for item in extract_doc["species"]["Ca"]["observations"]
+        if item["observation_id"] == "shornikov_2008_t1_ca_reducing"
+    )
+    observation["values"]["points"][0]["composition_mol"]["CaO"] = "not-a-number"
+
+    result = _migrate_real_extract(
+        tmp_path,
+        f"{source_id}.yaml",
+        write=False,
+        extract_doc=extract_doc,
+    )
+    row = next(
+        row
+        for row in _partial_pressure_rows(result, source_id)
+        if "shornikov_2008_t1_ca_reducing" in row.observation_id
+    )
+    assert row.identity.composition.is_unknown
+    assert "malformed declared amount" in row.identity.composition.reason
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and "not-a-number" in (issue.detail or "")
+        for issue in result.validation.hard_issues
+    )

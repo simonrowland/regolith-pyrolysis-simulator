@@ -91,6 +91,7 @@ from simulator.battery.source_declarations import (
     B2131_SOURCE_ID as _B2131_SOURCE_ID,
     KEMS_137_SOURCE_ID as _KEMS_137_SOURCE_ID,
     SOURCE_DECLARATIONS,
+    declared_named_formula_charge,
 )
 from simulator.source_ids import SOSSI_FEGLEY_SOURCE_ID
 from simulator.battery.oxygen_identity import (
@@ -129,7 +130,7 @@ from simulator.battery.composition import (
     ELEMENT_WT_PERCENT_FEO_T_BASIS,
     SLAG_METAL_CHARGE_BASIS,
     ElementMassFractionRedox,
-    composition_wt_pct,
+    _named_formula_oxide_composition,
     canonical_element_symbol,
     element_mass_fraction_redox,
     element_wt_percent_map_from_row,
@@ -7554,161 +7555,6 @@ def _wt_percent_conversion_state(
             else "mass-percent composition is not usable"
         )
     return State.of(result.composition)
-
-
-def _named_formula_composition_for_point(
-    *,
-    quantity: Quantity | None,
-    identity_composition: State[Any] | None,
-    point_composition: Located[Any] | None,
-    point_catalogue: Located[Any] | None,
-    point_condition_composition: Located[Any] | None,
-    composition_refusal: Located[Any] | None,
-    point_source_values: Located[Any] | None,
-    parent_source_values: Located[Any] | None,
-    experiment_sample_composition: Located[Any] | None,
-    point_formula: Located[Any] | None,
-    parent_formula: Located[Any] | None,
-) -> Located[Composition] | None:
-    """Derive a vapor-point composition only from its located pure oxide formula.
-
-    Existing located compositions keep precedence. Formula candidates are
-    checked together, so disagreement leaves the existing unknown in place.
-    The accepted expression is a single oxide formula or a dot-separated
-    oxide formula-unit recipe such as Na2O.3SiO2.
-    """
-
-    if quantity is not Quantity.P_PARTIAL:
-        return None
-    for existing in (
-        identity_composition,
-        point_composition.state if point_composition is not None else None,
-        point_catalogue.state if point_catalogue is not None else None,
-        (
-            point_condition_composition.state
-            if point_condition_composition is not None
-            else None
-        ),
-    ):
-        if isinstance(existing, State) and existing.is_value:
-            return None
-
-    candidates = (
-        experiment_sample_composition,
-        point_formula,
-        parent_formula,
-    )
-    formula_candidates: list[tuple[str, Locator]] = []
-    for candidate in candidates:
-        if candidate is None or not candidate.state.is_value:
-            continue
-        value = candidate.state.value
-        if not isinstance(value, str):
-            # A located sample composition map is already a higher-priority
-            # source input, even if another parser could not consume it.
-            return None
-        if candidate.locator is None:
-            continue
-        formula_candidates.append((value.strip(), candidate.locator))
-    if not formula_candidates:
-        return None
-    if len({formula for formula, _locator in formula_candidates}) != 1:
-        return None
-    formula, formula_locator = formula_candidates[0]
-    if (
-        composition_refusal is not None
-        and composition_refusal.state.is_value
-        and composition_refusal.state.value
-    ):
-        return None
-
-    formula_unit_moles: dict[str, Decimal] = {}
-    for raw_unit in re.split(r"[.·⋅∙]", formula):
-        token = raw_unit.strip()
-        match = re.fullmatch(r"(?:(\d+))?([A-Z][A-Za-z0-9]*)", token)
-        if match is None:
-            return None
-        multiplier = Decimal(match.group(1) or "1")
-        mapped = _kume_formula_unit_oxide(match.group(2))
-        if mapped is None:
-            return None
-        oxide, formula_unit_factor = mapped
-        formula_unit_moles[oxide] = formula_unit_moles.get(
-            oxide, Decimal("0")
-        ) + multiplier * formula_unit_factor
-    total_formula_units = sum(formula_unit_moles.values(), Decimal("0"))
-    if total_formula_units <= 0:
-        return None
-    for source_values in (point_source_values, parent_source_values):
-        if (
-            source_values is None
-            or not source_values.state.is_value
-            or not isinstance(source_values.state.value, Mapping)
-        ):
-            continue
-        values = source_values.state.value
-        if any(
-            isinstance(values.get(key), Mapping)
-            for key in _PRINTED_COMPOSITION_MAP_KEYS
-        ):
-            return None
-        for key in ("composition_mol", "composition_mole_fraction"):
-            raw_map = values.get(key)
-            if not isinstance(raw_map, Mapping):
-                continue
-            printed_moles, omitted = _kume_mole_amounts_from_mapping(raw_map)
-            printed_total = sum(printed_moles.values(), Decimal("0"))
-            if omitted or printed_total <= 0 or set(printed_moles) != set(
-                formula_unit_moles
-            ):
-                return None
-            if any(
-                printed_moles[oxide] / printed_total
-                != formula_unit_moles[oxide] / total_formula_units
-                for oxide in formula_unit_moles
-            ):
-                return None
-
-    # Formula -> oxide wt% uses the shared composition_wt_pct owner:
-    # m_i = n_i M_i and w_i = 100 m_i / Σm_j. For the printed Na2O.3SiO2
-    # recipe, M(Na2O)=61.97853856 g/mol and M(SiO2)=60.083 g/mol, so 1 mol
-    # and 3 mol weigh 61.97853856 g and 180.249 g: 25.5869/74.4131 wt%.
-    # Unit check:
-    # mol × g/mol = g, then 100 × g/g = wt%. The listed weights are retained
-    # in the Located derivation, while the engine input stays mole fraction.
-    composition = Composition(
-        basis="named_formula_oxide_moles",
-        components=tuple(
-            (oxide, amount / total_formula_units)
-            for oxide, amount in formula_unit_moles.items()
-        ),
-        amount_basis=AmountBasis.MOLE_FRACTION,
-        proxy_flag="calculated_from_named_formula",
-        proxy_source=formula,
-        input_provenance=PRINTED_STARTING_BULK,
-    )
-    weights = composition_wt_pct(composition)
-    if weights is None:
-        return None
-    derivation = Derivation(
-        relation="oxide_wt_pct_from_named_formula",
-        inputs=(),
-        parameters=tuple(
-            (
-                f"{oxide}_wt_pct",
-                Located(State.of(Decimal(str(weight))), locator=formula_locator),
-            )
-            for oxide, weight in weights.items()
-        ),
-        output_unit="wt%",
-        method=Located(
-            State.of(f"formula-unit stoichiometry: {formula}"),
-            locator=formula_locator,
-        ),
-    )
-    return Located(
-        State.of(composition), locator=formula_locator, inference=derivation
-    )
 
 
 def _mass_percent_composition_state(
@@ -32039,43 +31885,62 @@ class Migrator:
             else None
         )
         point_condition_composition = (point_conditions or {}).get("composition")
-        named_formula_composition = _named_formula_composition_for_point(
+        named_formula_charge = declared_named_formula_charge(
+            source_id,
+            parent_id,
             quantity=q_token_point,
-            identity_composition=identity.composition,
-            point_composition=point_composition_located,
-            point_catalogue=point_catalogue,
-            point_condition_composition=(
+            located_compositions=(
+                identity.composition,
+                point_composition_located,
+                point_printed_composition,
+                point_catalogue,
                 point_condition_composition
                 if isinstance(point_condition_composition, Located)
-                else None
+                else None,
+                experiment_sample_composition,
+                point_formula,
+                parent_formula,
             ),
-            composition_refusal=(
-                Located(State.of(tuple(point_composition_refusal)), point_locator)
-                if point_composition_refusal
-                else None
+            refusal_reasons=tuple(point_composition_refusal)
+            + (
+                (point_composition_role_refusal,)
+                if point_composition_role_refusal is not None
+                else ()
             ),
-            point_source_values=(
-                Located(State.of(raw_item), point_locator)
-                if isinstance(raw_item, Mapping)
-                else None
-            ),
-            parent_source_values=(
-                Located(State.of(parent_values), locator)
-                if isinstance(parent_values, Mapping)
-                else None
-            ),
-            experiment_sample_composition=experiment_sample_composition,
-            point_formula=point_formula,
-            parent_formula=parent_formula,
+            malformed_composition_reason=malformed_composition_amount,
+            omitted_components=point_composition_omitted_components,
         )
-        if named_formula_composition is not None:
-            identity = replace(
-                identity, composition=named_formula_composition.state
-            )
-            point_conditions = {
-                **(point_conditions or {}),
-                "composition": named_formula_composition,
-            }
+        named_formula_composition: Located[Composition] | None = None
+        if named_formula_charge is not None:
+            if named_formula_charge.composition_mol_basis is not None:
+                source_values = (
+                    dict(raw_item) if isinstance(raw_item, Mapping) else {}
+                )
+                source_values["composition_mol_basis"] = (
+                    named_formula_charge.composition_mol_basis
+                )
+                composition, omitted = _mole_fraction_composition_from_values(
+                    source_values
+                )
+                if composition is not None and not omitted:
+                    named_formula_composition = _named_formula_oxide_composition(
+                        named_formula_charge.formula,
+                        locator=named_formula_charge.locator,
+                        composition=composition,
+                    )
+            else:
+                named_formula_composition = _named_formula_oxide_composition(
+                    named_formula_charge.formula,
+                    locator=named_formula_charge.locator,
+                )
+            if named_formula_composition is not None:
+                identity = replace(
+                    identity, composition=named_formula_composition.state
+                )
+                point_conditions = {
+                    **(point_conditions or {}),
+                    "composition": named_formula_composition,
+                }
         row_composition = (point_conditions or {}).get("composition")
         if (
             identity.quantity.is_value
@@ -32377,18 +32242,21 @@ class Migrator:
         if named_formula_composition is not None and isinstance(
             q_token_point, Quantity
         ):
-            named_formula = named_formula_composition.state.value.proxy_source
             child_notices.append(
                 Notice(
-                    kind=NoticeKind.FALLBACK,
+                    kind=NoticeKind.ENGINE_MODEL_CAVEAT,
                     affected_quantities=(q_token_point,),
                     reason=(
-                        "composition calculated by stoichiometry from the "
-                        f"source-named pure formula {named_formula!r}"
+                        "composition_input_calculated_from_named_formula: "
+                        f"{named_formula_charge.formula} at "
+                        f"{named_formula_charge.locator}"
+                        + (
+                            f"; {named_formula_charge.note}"
+                            if named_formula_charge.note
+                            else ""
+                        )
                     ),
                     origin=point_id,
-                    source=named_formula,
-                    destination="oxide mole fraction",
                 )
             )
         if gas_volume_bases and isinstance(q_token_point, Quantity):

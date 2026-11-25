@@ -2,10 +2,12 @@
 
 from dataclasses import dataclass
 
-from simulator.battery.enums import Phase
+from simulator.battery.enums import Phase, Quantity
+from simulator.battery.records import Located, Locator
 from simulator.reference_data.robie_hemingway_fisher_1978_usgs_b1452_loader import (
     SOURCE_ID as B1452_SOURCE_ID,
 )
+from simulator.state_types import State
 from simulator.reference_data.robie_waldbaum_1968_usgs_b1259_loader import (
     SOURCE_ID as B1259_SOURCE_ID,
 )
@@ -24,6 +26,14 @@ from simulator.source_ids import (
 class SourceRule:
     value: bool | Phase | str
     reason: str
+
+
+@dataclass(frozen=True)
+class NamedFormulaCharge:
+    formula: str
+    locator: Locator
+    note: str | None = None
+    composition_mol_basis: str | None = None
 
 
 DISTIN_SOURCE_ID = "distin-1971-ferrous-silicate-melts"
@@ -158,6 +168,122 @@ SOURCE_DECLARATIONS: dict[str, dict[str, SourceRule]] = {
         ),
     },
 }
+
+_SHORNIKOV_2008_TABLE_1 = Locator(
+    page=3, published_page=726, pdf_page_index=2, table="1"
+)
+_KASSIS_FRISCHAT_EXPERIMENTAL_METHOD = Locator(
+    page=2, published_page="C-29", section="Experimental method"
+)
+NAMED_FORMULA_CHARGES: dict[str, dict[str, NamedFormulaCharge]] = {
+    "shornikov-2008-redox-oxide-evaporation": {
+        "shornikov_2008_t1_ca_reducing": NamedFormulaCharge(
+            "CaO", _SHORNIKOV_2008_TABLE_1, composition_mol_basis="pure_oxide_system"
+        ),
+        "shornikov_2008_t1_ca_neutral": NamedFormulaCharge(
+            "CaO", _SHORNIKOV_2008_TABLE_1, composition_mol_basis="pure_oxide_system"
+        ),
+        "shornikov_2008_t1_mg_reducing": NamedFormulaCharge(
+            "MgO", _SHORNIKOV_2008_TABLE_1, composition_mol_basis="pure_oxide_system"
+        ),
+        "shornikov_2008_t1_mg_neutral": NamedFormulaCharge(
+            "MgO", _SHORNIKOV_2008_TABLE_1, composition_mol_basis="pure_oxide_system"
+        ),
+        "shornikov_2008_t1_fe_reducing": NamedFormulaCharge(
+            "FeO",
+            _SHORNIKOV_2008_TABLE_1,
+            "nominal ferrous starting charge; no valence ratio or fO2 inferred",
+            "pure_oxide_system",
+        ),
+        "shornikov_2008_t1_fe_neutral": NamedFormulaCharge(
+            "FeO",
+            _SHORNIKOV_2008_TABLE_1,
+            "nominal ferrous starting charge; no valence ratio or fO2 inferred",
+            "pure_oxide_system",
+        ),
+        "shornikov_2008_t1_al_reducing": NamedFormulaCharge(
+            "Al2O3", _SHORNIKOV_2008_TABLE_1, composition_mol_basis="pure_oxide_system"
+        ),
+        "shornikov_2008_t1_al_neutral": NamedFormulaCharge(
+            "Al2O3", _SHORNIKOV_2008_TABLE_1, composition_mol_basis="pure_oxide_system"
+        ),
+        "shornikov_2008_t1_sio_reducing": NamedFormulaCharge(
+            "SiO2", _SHORNIKOV_2008_TABLE_1, composition_mol_basis="pure_oxide_system"
+        ),
+        "shornikov_2008_t1_sio_neutral": NamedFormulaCharge(
+            "SiO2", _SHORNIKOV_2008_TABLE_1, composition_mol_basis="pure_oxide_system"
+        ),
+    },
+    "kassis-frischat-1981-silicate-glass-vapour": {
+        "kassis_1981_fig2_pna": NamedFormulaCharge(
+            "Na2O.3SiO2", _KASSIS_FRISCHAT_EXPERIMENTAL_METHOD
+        ),
+        "kassis_1981_fig2_prb": NamedFormulaCharge(
+            "Rb2O.3SiO2", _KASSIS_FRISCHAT_EXPERIMENTAL_METHOD
+        ),
+    },
+}
+
+
+def declared_named_formula_charge(
+    source_id: str,
+    parent_observation_id: str,
+    *,
+    quantity: Quantity | None,
+    located_compositions: tuple[State[object] | Located[object] | None, ...],
+    refusal_reasons: tuple[str, ...],
+    malformed_composition_reason: str | None,
+    omitted_components: tuple[str, ...],
+) -> NamedFormulaCharge | None:
+    """Return the source formula only when migration found no usable input.
+
+    Located values and typed refusals belong to the normal composition
+    resolver. An unknown ``numerical_bulk_composition_not_published`` state
+    also remains authoritative, even when an unrelated oxide formula is
+    present on a vapor row.
+    """
+
+    if (
+        quantity is not Quantity.P_PARTIAL
+        or refusal_reasons
+        or malformed_composition_reason is not None
+        or omitted_components
+    ):
+        return None
+    prefix = f"{source_id}::"
+    observation_id = (
+        parent_observation_id[len(prefix) :]
+        if parent_observation_id.startswith(prefix)
+        else parent_observation_id
+    )
+    declaration = NAMED_FORMULA_CHARGES.get(source_id, {}).get(observation_id)
+    if declaration is None:
+        return None
+
+    for candidate in located_compositions:
+        state = candidate.state if isinstance(candidate, Located) else candidate
+        if state is None:
+            continue
+        if state.is_unknown:
+            reason = (state.reason or "").casefold()
+            if (
+                "numerical_bulk_composition_not_published" in reason
+                or "invalid_source" in reason
+                or reason != "no composition mapped from source"
+            ):
+                return None
+            continue
+        if state.is_not_applicable:
+            continue
+        if state.is_value:
+            # The source-linked formula is a named reservoir, not a printed
+            # numeric map. Any other located value keeps precedence.
+            value = state.value
+            if isinstance(value, str) and value.strip() == declaration.formula:
+                continue
+            return None
+        return None
+    return declaration
 
 
 def source_rule_enabled(source_id: str | None, key: str) -> bool:
