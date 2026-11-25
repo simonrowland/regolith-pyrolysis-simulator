@@ -137,7 +137,7 @@ def test_bounded_identity_conditions_stay_on_mendybaev_points(tmp_path: Path) ->
         if observation["observation_id"]
         == "mendybaev_2013_table1_fun1_residue_composition_series"
     )
-    row["point_conditions"]["sample_mass_kg"] = {
+    bounded_mass = {
         "state": {
             "tag": "value",
             "value": {
@@ -148,6 +148,20 @@ def test_bounded_identity_conditions_stay_on_mendybaev_points(tmp_path: Path) ->
         },
         "locator": {"table": "1", "row": "FUN1-3"},
     }
+    row["point_conditions"]["sample_mass_kg"] = bounded_mass
+    for point in row["values"]["series"]:
+        if point["sample"] == "FUN1-3":
+            point["point_conditions"]["sample_mass_kg"] = {
+                "state": {
+                    "tag": "value",
+                    "value": {
+                        "kind": "bound",
+                        "bound_operator": "<=",
+                        "bound_value": "0.0001",
+                    },
+                },
+                "locator": {"table": "1", "row": "FUN1-3"},
+            }
     extract = tmp_path / EXTRACT.name
     extract.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
 
@@ -451,6 +465,63 @@ def test_table1_mass_loss_rows_retain_printed_weights_and_derived_ratios() -> No
         and row["locator"]["source_path"].endswith("pdftotext-layout.txt")
         for row in mass_fidelity
     )
+
+
+def test_all_residue_rows_receive_their_located_starting_mass_and_conditions() -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    series_rows = [
+        point
+        for observation in document["species"]["SiO2"]["observations"]
+        for point in observation["values"]["series"]
+    ]
+    assert len(series_rows) == 96
+    for point in series_rows:
+        sample = point["sample"]
+        expected_kg = Decimal(EXPECTED_MASS_LOSS[sample][0]) / Decimal("1000")
+        mass = point["point_conditions"]["sample_mass_kg"]
+        assert mass["state"]["tag"] == "value"
+        assert Decimal(mass["state"]["value"]) == expected_kg
+        assert mass["locator"] == {
+            "page": 5,
+            "published_page": 372,
+            "pdf_page_index": 4,
+            "table": "1",
+            "row": sample,
+            "column_header": "Initial weight, g",
+        }
+
+    migrator = Migrator(root=ROOT, index={}, aliases={})
+    migrator._migrate_extract(EXTRACT)
+    migrator.finalize()
+    residue_rows = [
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    ]
+    assert len(residue_rows) == 96
+    for observation in residue_rows:
+        sample = observation.locator.note.removeprefix("row=")
+        expected_kg = Decimal(EXPECTED_MASS_LOSS[sample][0]) / Decimal("1000")
+        assert observation.identity.sample_mass_kg.is_value
+        assert observation.identity.sample_mass_kg.value == expected_kg
+        assert (
+            observation.point_conditions["sample_mass_kg"].state.value
+            == expected_kg
+        )
+        assert observation.identity.temperature_K.value == Decimal("2173.15")
+        assert (
+            observation.point_conditions["time_min"].state.value
+            == Decimal(EXPECTED_RUN_MINUTES[sample])
+        )
+
+    assert len(document["experiments"]) == 2
+    for experiment in document["experiments"]:
+        assert "2.5 mm diameter iridium wire loops" in experiment["method_locator"]["note"]
+        assert experiment["method_locator"]["published_page"] == 371
+        family = experiment["experiment_id"].removeprefix("mendybaev-")[:4].upper()
+        assert dict(experiment["sample"]["printed_composition"]["state"]["value"]) == (
+            EXPECTED_STARTING_WT_PCT[family]
+        )
 
 
 def test_table1_mass_loss_rows_migrate_as_separate_fun_experiments() -> None:

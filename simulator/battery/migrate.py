@@ -11235,6 +11235,24 @@ def _explicit_point_conditions(
     }
 
 
+def _identity_state_from_point_condition(
+    name: str, condition: object
+) -> State[Any] | None:
+    if not isinstance(condition, Located):
+        return None
+    state = condition.state
+    if state.is_value:
+        if name == "composition":
+            if not isinstance(state.value, Composition):
+                return None
+        else:
+            try:
+                state = State.of(as_decimal(state.value))
+            except (ArithmeticError, TypeError, ValueError):
+                return None
+    return state
+
+
 def _point_pressure_for_identity(
     identity: Identity | None,
     point_conditions: Mapping[str, Located[Any]] | None,
@@ -29292,18 +29310,10 @@ class Migrator:
             point_conditions = residue_conditions or None
             if isinstance(point_conditions, Mapping):
                 for name in ("composition", "total_pressure_Pa", "sample_mass_kg"):
-                    condition = point_conditions.get(name)
-                    if isinstance(condition, Located):
-                        state = condition.state
-                        if state.is_value:
-                            if name == "composition":
-                                if not isinstance(state.value, Composition):
-                                    continue
-                            else:
-                                try:
-                                    state = State.of(as_decimal(state.value))
-                                except (ArithmeticError, TypeError, ValueError):
-                                    continue
+                    state = _identity_state_from_point_condition(
+                        name, point_conditions.get(name)
+                    )
+                    if state is not None:
                         ident_kwargs[name] = state
                 duration = point_conditions.get("duration_h")
                 if isinstance(duration, Located):
@@ -32534,6 +32544,13 @@ class Migrator:
                     **(point_conditions or {}),
                     **explicit_point_conditions,
                 }
+                if q_token_point is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+                    mass_state = _identity_state_from_point_condition(
+                        "sample_mass_kg",
+                        explicit_point_conditions.get("sample_mass_kg"),
+                    )
+                    if mass_state is not None:
+                        identity = replace(identity, sample_mass_kg=mass_state)
             if q_token_point is Quantity.RESIDUE_COMPONENT_COMPOSITION:
                 vf = _as_dec_or_none(raw_item.get("VF_wt_pct"))
                 if vf is not None:

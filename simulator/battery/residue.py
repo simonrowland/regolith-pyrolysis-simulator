@@ -2995,7 +2995,68 @@ def predict_langmuir_residue_composition(
         raise ResidueInventoryRefusal("printed_temperature_path_missing_or_invalid")
     temperature_K = float(temperature.value)
     wt_pct = _initial_oxide_wt_percent(experiment.sample)
-    initial = _oxide_wt_percent_to_mol_inventory(wt_pct)
+    mass_condition = (reference.point_conditions or {}).get("sample_mass_kg")
+    mass_states = (
+        (
+            "point_conditions.sample_mass_kg",
+            getattr(mass_condition, "state", None),
+        ),
+        ("identity.sample_mass_kg", reference.identity.sample_mass_kg),
+    )
+    mass_inputs: list[tuple[str, float]] = []
+    for origin, state in mass_states:
+        if state is None or not getattr(state, "is_value", False):
+            continue
+        raw_mass = state.value
+        if isinstance(raw_mass, Value):
+            if raw_mass.kind is not ValueKind.POINT or raw_mass.point is None:
+                continue
+            raw_mass = raw_mass.point
+        try:
+            candidate_mass_kg = float(raw_mass)
+        except (TypeError, ValueError, OverflowError) as exc:
+            raise ResidueInventoryRefusal(
+                "sample_mass_invalid", f"{origin}: {raw_mass!r}"
+            ) from exc
+        if not math.isfinite(candidate_mass_kg) or candidate_mass_kg <= 0.0:
+            raise ResidueInventoryRefusal(
+                "sample_mass_invalid", f"{origin}: {raw_mass!r}"
+            )
+        mass_inputs.append((origin, candidate_mass_kg))
+    has_consistent_mass = mass_inputs and all(
+        value == mass_inputs[0][1] for _, value in mass_inputs[1:]
+    )
+    if has_consistent_mass:
+        sample_mass_kg = mass_inputs[0][1]
+        sample_mass_origin = ", ".join(origin for origin, _ in mass_inputs)
+        sample_mass_default_reason = None
+    else:
+        sample_mass_kg = _OXIDE_WT_PERCENT_REFERENCE_MASS_KG
+        if mass_inputs:
+            unknown_reason = "located mass alternatives disagree: " + ", ".join(
+                f"{origin}={value} kg" for origin, value in mass_inputs
+            )
+        else:
+            unknown_reason = next(
+                (
+                    state.reason
+                    for _, state in mass_states
+                    if state is not None
+                    and getattr(state, "is_unknown", False)
+                    and getattr(state, "reason", None)
+                ),
+                None,
+            )
+        sample_mass_default_reason = (
+            f"sample mass defaulted to {sample_mass_kg:g} kg reference inventory "
+            f"because {unknown_reason or 'no exact per-run mass was located'}; "
+            "residue composition is normalized to inventory scale."
+        )
+        sample_mass_origin = "stated 1 kg reference inventory default"
+    initial = {
+        oxide: amount * sample_mass_kg / _OXIDE_WT_PERCENT_REFERENCE_MASS_KG
+        for oxide, amount in _oxide_wt_percent_to_mol_inventory(wt_pct).items()
+    }
 
     pressure_environment = experiment.pressure_environment
     pressure_record = next(
@@ -3086,6 +3147,15 @@ def predict_langmuir_residue_composition(
             origin="Langmuir residue pressure",
         ),
     ]
+    if sample_mass_default_reason is not None:
+        notices.append(
+            Notice(
+                kind=NoticeKind.INPUT_OMITTED,
+                affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+                reason=sample_mass_default_reason,
+                origin="Langmuir starting inventory",
+            )
+        )
     fallback_row = replace(
         reference,
         provenance={
@@ -3131,6 +3201,7 @@ def predict_langmuir_residue_composition(
             total_pressure_Pa=p_bulk_Pa,
             engine_metadata=metadata,
             engine_flags=flags,
+            starting_inventory=initial,
             missing_channels_reason="residue_pressure_channels_missing",
             caller="Langmuir residue prediction",
         )
@@ -3154,6 +3225,8 @@ def predict_langmuir_residue_composition(
             "temperature_path": [(xi, temperature_K)],
             "p_bulk_Pa": p_bulk_Pa,
             "printed_pressure": pressure_source,
+            "sample_mass_kg": sample_mass_kg,
+            "sample_mass_origin": sample_mass_origin,
             "initial_inventory_mol": dict(initial),
             "final_inventory_mol": dict(result.residue_mol),
             "atom_closure_mol": dict(result.atom_closure_mol),
@@ -3172,6 +3245,8 @@ def predict_langmuir_residue_composition(
             "temperature_path": [(xi, temperature_K)],
             "p_bulk_Pa": p_bulk_Pa,
             "printed_pressure": pressure_source,
+            "sample_mass_kg": sample_mass_kg,
+            "sample_mass_origin": sample_mass_origin,
         }
         exc.notices = tuple(notices)
         raise
