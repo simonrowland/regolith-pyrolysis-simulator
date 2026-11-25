@@ -696,6 +696,46 @@ def test_resumed_terminal_execution_does_not_export_prior_budget_flag():
     )
 
 
+def test_driver_replaces_budget_flag_after_each_advancing_call():
+    run = _run(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C7_CA_ALUMINOTHERMIC",
+        hours=1,
+        additives_kg={},
+        runtime_campaign_overrides={"C7": {"max_hours": 2}},
+    )
+    session = _started_internal_session(run)
+
+    list(drive_auto_apply(session, 1))
+    assert not session.is_complete()
+    assert any(
+        flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+        for flag in session._run_flags
+    )
+
+    list(drive_auto_apply(session, 1))
+    assert session.is_complete()
+    assert not any(
+        flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+        for flag in session._run_flags
+    )
+
+    projected_execution = RunExecutor().execute_session(session, hours=0)
+
+    assert not any(
+        flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+        for flag in projected_execution.run_flags
+    )
+    artifact = build_run_artifact(
+        run._build_output(projected_execution),
+        run_id="driver-resumed-terminal-run",
+    )
+    assert not any(
+        flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+        for flag in artifact["terminal"]["run_metadata"].get("run_flags", ())
+    )
+
+
 def test_zero_hour_campaign_completion_exports_only_new_run_flags():
     run = _run(
         feedstock_id="lunar_mare_low_ti",

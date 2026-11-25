@@ -346,18 +346,6 @@ class RunExecutor:
         )
         failure_exc: Exception | None = None
         hours = _coerce_nonnegative_hours(hours)
-        run_flags_start = len(tuple(getattr(session, "_run_flags", ()) or ()))
-        execution_advanced = False
-
-        def execution_run_flags() -> tuple[dict[str, Any], ...]:
-            run_flags = tuple(getattr(session, "_run_flags", ()) or ())
-            if not execution_advanced:
-                return run_flags
-            run_flags = run_flags[run_flags_start:]
-            stored_run_flags = getattr(session, "_run_flags", None)
-            if isinstance(stored_run_flags, list):
-                stored_run_flags[:] = run_flags
-            return run_flags
 
         snapshot_start = len(
             tuple(getattr(getattr(sim, "record", None), "snapshots", ()))
@@ -405,7 +393,6 @@ class RunExecutor:
                     sim.melt = melt_before_hour
                     sim._chem_kernel = sim._build_chemistry_kernel()
                     raise
-                execution_advanced = True
                 per_hour_summary = dict(result.per_hour_summary)
                 cache_state = getattr(sim, "_last_reduced_real_cache_state", None)
                 if cache_state is not None:
@@ -657,7 +644,7 @@ class RunExecutor:
                     ),
                 ),
                 campaigns_elapsed_start=campaigns_elapsed_start,
-                run_flags=execution_run_flags(),
+                run_flags=tuple(getattr(session, "_run_flags", ()) or ()),
                 campaign_stops=tuple(campaign_stops),
             )
         except Exception as envelope_exc:  # noqa: BLE001 -- reporting must survive
@@ -746,7 +733,7 @@ class RunExecutor:
                     ),
                 ),
                 campaigns_elapsed_start=campaigns_elapsed_start,
-                run_flags=execution_run_flags(),
+                run_flags=tuple(getattr(session, "_run_flags", ()) or ()),
                 campaign_stops=tuple(campaign_stops),
             )
 

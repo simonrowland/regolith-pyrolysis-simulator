@@ -41,6 +41,7 @@ from simulator.state import (
 
 
 _ALLOWED_SESSION_TRACKS = frozenset({"pyrolysis", "mre_baseline"})
+_RUN_HOUR_BUDGET_FLAG_CODE = "run_hour_budget_exhausted_mid_campaign"
 
 
 def _canonical_runtime_campaign_overrides(
@@ -939,6 +940,7 @@ def drive_session(
         finite_budget = bool(budget_intent)
         delattr(session, "_finite_budget_intent")
     step_index = 0
+    advanced = False
     while True:
         if not until_campaign_complete and step_index >= int(hours):
             if step_index > 0 and finite_budget:
@@ -974,6 +976,13 @@ def drive_session(
         elif decision is not None:
             raise ValueError(f"unsupported decision policy {policy!r}")
         result = session.advance()
+        if not advanced:
+            session._run_flags[:] = [
+                flag
+                for flag in session._run_flags
+                if flag.get("code") != _RUN_HOUR_BUDGET_FLAG_CODE
+            ]
+            advanced = True
         yield result
         if stop_at_stage0_exit and _at_stage0_exit(session):
             return
@@ -1143,7 +1152,7 @@ def _hour_budget_exhausted_flag(session: SimSession) -> dict[str, Any] | None:
             detail["decision_dependent"] = decision_dependent
         return {
             "kind": "run_diagnostic",
-            "code": "run_hour_budget_exhausted_mid_campaign",
+            "code": _RUN_HOUR_BUDGET_FLAG_CODE,
             "detail": detail,
         }
     except Exception as exc:
@@ -1155,6 +1164,6 @@ def _hour_budget_exhausted_flag(session: SimSession) -> dict[str, Any] | None:
             unresolved_detail["pending_decision"] = pending_decision
         return {
             "kind": "run_diagnostic",
-            "code": "run_hour_budget_exhausted_mid_campaign",
+            "code": _RUN_HOUR_BUDGET_FLAG_CODE,
             "detail": unresolved_detail,
         }
