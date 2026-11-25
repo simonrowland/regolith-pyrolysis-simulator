@@ -92,6 +92,19 @@ def _assert_openimcc_pin() -> None:
     assert tree_hash == "308672269d6e"
 
 
+def _residual_rms_by_oxide(residuals, observations) -> dict[str, float]:
+    values_by_oxide: dict[str, list[float]] = {}
+    for residual in residuals:
+        if residual.numeric is None:
+            continue
+        oxide = observations[residual.reference].identity.species.formula
+        values_by_oxide.setdefault(oxide, []).append(float(residual.numeric.value))
+    return {
+        oxide: (sum(value * value for value in values) / len(values)) ** 0.5
+        for oxide, values in values_by_oxide.items()
+    }
+
+
 def test_zhang_zero_time_path_applies_the_printed_hold_only_at_1200c() -> None:
     source_id = "zhang-2021-acsesc-si"
     _context, observations, _experiments, _source_observations = _residue_context(
@@ -488,6 +501,20 @@ def test_time_forward_residue_rows_reach_the_engine_and_emit_residuals(
         stacklevel=1,
     )
     if source_id == "ivanova-2018-spinel-rich-cai-evaporation":
+        warnings.warn(
+            "IVANOVA_OPENIMCC_RESIDUAL_RMS "
+            + json.dumps(
+                {
+                    oxide: format(value, ".12g")
+                    for oxide, value in _residual_rms_by_oxide(
+                        residuals, observations
+                    ).items()
+                },
+                sort_keys=True,
+            ),
+            UserWarning,
+            stacklevel=1,
+        )
         import simulator.battery.residue as residue_module
 
         sensitivity_observations = {
@@ -760,6 +787,20 @@ def test_internal_analytical_route_emits_score_events(
                     }
                     for row in numeric_rows
                 ],
+                sort_keys=True,
+            ),
+            UserWarning,
+            stacklevel=1,
+        )
+        warnings.warn(
+            "IVANOVA_INTERNAL_ANALYTICAL_RESIDUAL_RMS "
+            + json.dumps(
+                {
+                    oxide: format(value, ".12g")
+                    for oxide, value in _residual_rms_by_oxide(
+                        numeric_rows, observations
+                    ).items()
+                },
                 sort_keys=True,
             ),
             UserWarning,
