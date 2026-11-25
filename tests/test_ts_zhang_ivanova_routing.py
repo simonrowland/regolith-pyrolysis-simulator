@@ -105,6 +105,31 @@ def _residual_rms_by_oxide(residuals, observations) -> dict[str, float]:
     }
 
 
+def _assert_ivanova_residual_rms_pin(
+    engine: Engine, actual_by_oxide: dict[str, float]
+) -> None:
+    expected_by_engine = {
+        Engine.OPENIMCC: {
+            oxide: ("TODO-PENDING-RECEIPT", "TODO-PENDING-RECEIPT")
+            for oxide in ("SiO2", "Al2O3", "MgO", "CaO")
+        },
+        Engine.INTERNAL_ANALYTICAL: {
+            oxide: ("TODO-PENDING-RECEIPT", "TODO-PENDING-RECEIPT")
+            for oxide in ("SiO2", "Al2O3", "MgO", "CaO")
+        },
+    }
+    expected_and_spread_by_oxide = expected_by_engine[engine]
+    assert set(actual_by_oxide) == set(expected_and_spread_by_oxide)
+    assert all(
+        isinstance(expected, (float, int)) and isinstance(spread, (float, int))
+        for expected, spread in expected_and_spread_by_oxide.values()
+    ), f"TODO-PENDING-RECEIPT: {engine.value} per-oxide RMS and run spread"
+    for oxide, (expected, spread) in expected_and_spread_by_oxide.items():
+        assert actual_by_oxide[oxide] == pytest.approx(
+            expected, rel=0.0, abs=float(spread)
+        )
+
+
 def test_zhang_zero_time_path_applies_the_printed_hold_only_at_1200c() -> None:
     source_id = "zhang-2021-acsesc-si"
     _context, observations, _experiments, _source_observations = _residue_context(
@@ -501,14 +526,13 @@ def test_time_forward_residue_rows_reach_the_engine_and_emit_residuals(
         stacklevel=1,
     )
     if source_id == "ivanova-2018-spinel-rich-cai-evaporation":
+        residual_rms = _residual_rms_by_oxide(residuals, observations)
         warnings.warn(
             "IVANOVA_OPENIMCC_RESIDUAL_RMS "
             + json.dumps(
                 {
-                    oxide: format(value, ".12g")
-                    for oxide, value in _residual_rms_by_oxide(
-                        residuals, observations
-                    ).items()
+                    oxide: format(value, ".17g")
+                    for oxide, value in residual_rms.items()
                 },
                 sort_keys=True,
             ),
@@ -591,6 +615,7 @@ def test_time_forward_residue_rows_reach_the_engine_and_emit_residuals(
                 row["A_over_m_factor"] == factor and row["delta"] != "0"
                 for row in sensitivity_rows
             )
+        _assert_ivanova_residual_rms_pin(Engine.OPENIMCC, residual_rms)
 
 
 @pytest.mark.parametrize("source_id, _count, _path", SOURCES)
@@ -761,6 +786,7 @@ def test_internal_analytical_route_emits_score_events(
         stacklevel=1,
     )
     if source_id == "ivanova-2018-spinel-rich-cai-evaporation":
+        residual_rms = _residual_rms_by_oxide(numeric_rows, observations)
         warnings.warn(
             "INTERNAL_ANALYTICAL_IVANOVA_TABLE "
             + json.dumps(
@@ -796,15 +822,16 @@ def test_internal_analytical_route_emits_score_events(
             "IVANOVA_INTERNAL_ANALYTICAL_RESIDUAL_RMS "
             + json.dumps(
                 {
-                    oxide: format(value, ".12g")
-                    for oxide, value in _residual_rms_by_oxide(
-                        numeric_rows, observations
-                    ).items()
+                    oxide: format(value, ".17g")
+                    for oxide, value in residual_rms.items()
                 },
                 sort_keys=True,
             ),
             UserWarning,
             stacklevel=1,
+        )
+        _assert_ivanova_residual_rms_pin(
+            Engine.INTERNAL_ANALYTICAL, residual_rms
         )
     if source_id == "zhang-2021-acsesc-si":
         mass_loss_observations = {
