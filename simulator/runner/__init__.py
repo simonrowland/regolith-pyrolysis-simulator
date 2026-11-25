@@ -2968,7 +2968,41 @@ def build_per_hour_summary(
         getattr(sim, "_last_high_t_melt_activity", {}) or {}
     )
     if high_t_melt_activity:
-        summary["high_t_melt_activity"] = _json_safe(high_t_melt_activity)
+        summary_high_t_activity = dict(high_t_melt_activity)
+        selected_standard_states = summary_high_t_activity.get(
+            "selected_parent_activities_standard_state"
+        )
+        if (
+            isinstance(selected_standard_states, Mapping)
+            and selected_standard_states
+            and all(
+                isinstance(value, Mapping)
+                for value in selected_standard_states.values()
+            )
+        ):
+            # Keep the historical aggregate projection stable. The per-parent
+            # standard-state triples remain on the vapor-pressure diagnostics;
+            # they are diagnostic metadata, not per-hour runner observables.
+            vapor_diagnostic = getattr(
+                sim, "_last_vapor_pressure_diagnostic", {}
+            ) or {}
+            aggregate_standard_state = (
+                vapor_diagnostic.get("activities_standard_state")
+                if isinstance(vapor_diagnostic, Mapping)
+                else None
+            )
+            if isinstance(aggregate_standard_state, Mapping):
+                summary_high_t_activity[
+                    "selected_parent_activities_standard_state"
+                ] = {
+                    **aggregate_standard_state,
+                    "component_basis": "parent_oxide_formula",
+                }
+            else:
+                summary_high_t_activity.pop(
+                    "selected_parent_activities_standard_state", None
+                )
+        summary["high_t_melt_activity"] = _json_safe(summary_high_t_activity)
     capture_ledger_snapshot(sim, snapshot)
     return _json_safe(summary)
 
