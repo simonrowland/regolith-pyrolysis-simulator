@@ -556,9 +556,9 @@ def test_repo_hybrid_index_count_pins_match_green_plus_stack_deltas() -> None:
         "located": 206,
         "inbox": 1244,
         "in_progress": 198,
-        "ingested_partial": 183,
+        "ingested_partial": 184,
         "ingested_complete": 149,
-        "unknown": 358,
+        "unknown": 357,
     }
 
 

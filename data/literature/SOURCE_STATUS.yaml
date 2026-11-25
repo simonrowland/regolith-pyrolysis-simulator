@@ -10,12 +10,12 @@ scan:
 counts:
   sources: 2338
   by_stage:
-    unknown: 358
+    unknown: 357
     in_progress: 198
     inbox: 1244
     ingested_complete: 149
     located: 206
-    ingested_partial: 183
+    ingested_partial: 184
 anti_loss:
   corpus_uncommitted:
     count: 0
@@ -31902,14 +31902,13 @@ sources:
   total_rows: 26
   inbox_exclusion_reason: null
 - source_id: shornikov-2000-titania-melts
-  stage: unknown
+  stage: ingested_partial
   evidence:
-    decided_by: unknown
+    decided_by: ingested_partial
     artefacts:
     - data/literature/extracts-v2/shornikov-2000-titania-melts.yaml
-    reason: v2.1 store present but 0 of 301 rows are battery-usable (measured evidence class AND known
-      quantity AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
-  usable_rows: 0
+    reason: v2.1 store present; 108/301 rows battery-usable
+  usable_rows: 108
   total_rows: 301
   inbox_exclusion_reason: null
 - source_id: shornikov-2001-mgalumina-silica-vaporization
