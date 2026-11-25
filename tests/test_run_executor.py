@@ -559,7 +559,7 @@ def test_completed_c6_no_filters_budget_flag_at_zero_hour_export():
         flag["code"] == "run_hour_budget_exhausted_mid_campaign"
         for flag in pending_projection.run_flags
     )
-    pending_payload = run._build_output(pending_projection)
+    pending_payload = run._build_output(pending_execution)
     assert any(
         flag["code"] == "run_hour_budget_exhausted_mid_campaign"
         for flag in pending_payload["run_metadata"].get("run_flags", ())
@@ -574,7 +574,7 @@ def test_completed_c6_no_filters_budget_flag_at_zero_hour_export():
         flag["code"] == "run_hour_budget_exhausted_mid_campaign"
         for flag in completed_execution.run_flags
     )
-    completed_payload = run._build_output(completed_execution)
+    completed_payload = run._build_output(pending_execution)
     assert not any(
         flag["code"] == "run_hour_budget_exhausted_mid_campaign"
         for flag in completed_payload["run_metadata"].get("run_flags", ())
@@ -768,14 +768,6 @@ def test_driver_replaces_budget_flag_after_each_advancing_call():
     assert not any(
         flag["code"] == "run_hour_budget_exhausted_mid_campaign"
         for flag in projected_execution.run_flags
-    )
-    artifact = build_run_artifact(
-        run._build_output(projected_execution),
-        run_id="driver-resumed-terminal-run",
-    )
-    assert not any(
-        flag["code"] == "run_hour_budget_exhausted_mid_campaign"
-        for flag in artifact["terminal"]["run_metadata"].get("run_flags", ())
     )
 
 

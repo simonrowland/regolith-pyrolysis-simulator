@@ -903,14 +903,27 @@ def _drive_session_with_budget_intent(
     missing = object()
     previous = getattr(session, "_finite_budget_intent", missing)
     session._finite_budget_intent = finite_budget
-    try:
-        yield from driver(session, hours, policy, **kwargs)
-    finally:
+
+    def restore_budget_intent() -> None:
         if previous is missing:
             if hasattr(session, "_finite_budget_intent"):
                 delattr(session, "_finite_budget_intent")
         else:
             session._finite_budget_intent = previous
+
+    try:
+        steps = driver(session, hours, policy, **kwargs)
+    except BaseException:
+        restore_budget_intent()
+        raise
+
+    def consume_steps() -> Iterable[StepResult]:
+        try:
+            yield from steps
+        finally:
+            restore_budget_intent()
+
+    return consume_steps()
 
 
 def _refuse_phase_without_an_end(session: SimSession) -> None:
