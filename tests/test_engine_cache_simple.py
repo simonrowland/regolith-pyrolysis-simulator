@@ -933,7 +933,7 @@ def test_stateless_internal_analytical_cache_call_hits(
 
 @pytest.mark.parametrize(
     ("engine_name", "old_version", "new_version"),
-    (("openimcc", 1, 2), ("internal-analytical", 3, 4)),
+    (("openimcc", 1, 4), ("internal-analytical", 4, 5)),
 )
 def test_scored_projection_chemistry_version_change_is_a_miss(
     tmp_path: Path,

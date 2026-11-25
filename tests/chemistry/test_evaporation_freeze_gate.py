@@ -1044,24 +1044,33 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
         got = observed.get(name, [])
         if got == pinned:
             continue
-        def ends(row):
-            return row[:4]
-
         mismatch = next(
             (
-                (index, ends(row), ends(pinned_row))
+                index
                 for index, (row, pinned_row) in enumerate(zip(got, pinned))
                 if row != pinned_row
             ),
             None,
         )
+        campaign_names = list(dict.fromkeys(row[0] for row in got))
+        curve_sources = list(dict.fromkeys(row[1] for row in got))
+        observed_curve_summary = []
+        for row in got:
+            path_shape = ''.join(
+                'S' if point == (row[2], 0.0)
+                else 'L' if point == (row[3], 1.0)
+                else f'({point[0]!r},{point[1]!r})'
+                for point in row[4]
+            )
+            observed_curve_summary.append(
+                f'{campaign_names.index(row[0])}:{row[2]!r}>'
+                f'{row[3]!r}:{path_shape}'
+            )
         raise AssertionError(
-            f'{name}: got {len(got)} pinned {len(pinned)} '
-            f'mismatch={mismatch} '
-            f'observed_rows={got!r} pinned_rows={pinned!r} '
-            f'extra={[ends(row) for row in got[len(pinned):]]!r} '
-            f'missing={[ends(row) for row in pinned[len(got):]]!r} '
-            f'floor={floor_refusals.get(name)!r}'
+            f'{name}: {len(got)}/{len(pinned)}; '
+            f'at={mismatch}; '
+            f'names={campaign_names!r}; src={curve_sources!r}; '
+            f'curves={observed_curve_summary!r}'
         )
 
 
