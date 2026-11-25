@@ -165,12 +165,17 @@ def test_robinot_power_trace_steps_at_one_minute_and_flags_the_prediction():
     assert ramp == pytest.approx(abs(target - previous))
     knobs = {notice["knob"]: notice for notice in record["notices"]}
     assert set(knobs) == {
+        "focal_spot_diameter_m",
         "melt_emissivity",
         "solar_absorptance",
         "window_transmittance",
         "pellet_conductivity_W_m_K",
         "cold_boundary_K",
     }
+    assert knobs["focal_spot_diameter_m"]["qualifier"] == "approximate"
+    assert knobs["focal_spot_diameter_m"]["reason"] == (
+        "focal_spot_diameter_approximate"
+    )
     assert knobs["melt_emissivity"]["kind"] == "knob_defaulted"
     assert knobs["solar_absorptance"]["kind"] == "knob_defaulted"
     assert knobs["window_transmittance"]["kind"] == "typed_unknown"
@@ -193,6 +198,7 @@ def test_robinot_power_trace_steps_at_one_minute_and_flags_the_prediction():
     assert knobs["solar_absorptance"]["band_high"] == pytest.approx(0.906)
     for _target, _ramp, step_record, _previous in rows:
         assert {(notice["kind"], notice["knob"]) for notice in step_record["notices"]} == {
+            ("typed_unknown", "focal_spot_diameter_m"),
             ("knob_defaulted", "melt_emissivity"),
             ("knob_defaulted", "solar_absorptance"),
             ("typed_unknown", "window_transmittance"),

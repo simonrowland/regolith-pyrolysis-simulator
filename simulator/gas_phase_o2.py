@@ -292,6 +292,7 @@ def gas_phase_o2_trajectory(
 
     lagged = 0.0
     points: list[dict[str, Any]] = []
+    structural_zero_noted = False
     for index, step in enumerate(steps):
         if not isinstance(step, Mapping):
             raise GasPhaseO2Error(
@@ -305,6 +306,26 @@ def gas_phase_o2_trajectory(
                 f"steps[{index}] has no time_s",
             )
         rate = _molar_flow_mol_min(step, index)
+        if (
+            rate == 0.0
+            and step.get("anchor") != "pre_step_baseline"
+            and not structural_zero_noted
+        ):
+            notices.append(
+                {
+                    "kind": "typed_unknown",
+                    "field": "melt_offgas_O2_mol_hr",
+                    "value": 0.0,
+                    "unit": "mol per step",
+                    "reason": "melt_offgas_o2_structural_zero",
+                    "source": (
+                        "The bleed integral defaults to zero when no melt-O2 "
+                        "amount is booked. This structural zero is not evidence "
+                        "that evaporation released no coproduct oxygen."
+                    ),
+                }
+            )
+            structural_zero_noted = True
         mole_fraction = None
         ppm_instant = None
         if rate is not None and carrier is not None:

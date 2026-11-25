@@ -10,13 +10,17 @@ import pytest
 import yaml
 
 from simulator.diagnostic_helpers.reproduction_compare import (
-    O2_RELEASE_RATE_DEPENDENCY,
     STANDARD_MOLAR_VOLUME_L_PER_MOL,
     TimeSeriesComparisonRefusal,
     compare_o2_release_time_series,
     compare_time_series,
     o2_release_molar_flow_to_ppm,
 )
+import simulator.diagnostic_helpers.vacuum_pyrolysis as vacuum_pyrolysis_module
+from simulator.diagnostic_helpers.vacuum_pyrolysis import (
+    evaluate_vacuum_pyrolysis_comparison,
+)
+from simulator.runner import _gas_phase_o2_trajectory_for_run
 from simulator.corpus_paths import regolith_corpus_root
 
 
@@ -366,7 +370,9 @@ def test_missing_runtime_sample_refuses_instead_of_becoming_zero() -> None:
     assert record.residual == pytest.approx(-points[missing_index]["expected_value"])
 
 
-def test_o2_release_rates_map_to_ppm_and_missing_rates_name_timestep_dependency() -> None:
+def test_o2_release_rates_map_to_ppm_and_flag_production_structural_zero(
+    monkeypatch,
+) -> None:
     preset = _preset()
     argon_flow = preset["lab_schedule"]["gas_boundary"]["imposed_flow"]["value"]
     argon_mol_min = argon_flow / STANDARD_MOLAR_VOLUME_L_PER_MOL
@@ -429,26 +435,84 @@ def test_o2_release_rates_map_to_ppm_and_missing_rates_name_timestep_dependency(
     )
     assert mutated_records[1].residual != pytest.approx(0.0)
 
-    points = _observation_points(
-        _observable(preset, "robinot_o2_ppm_time_series")
+    class Snapshot:
+        def __init__(self, step_index: int) -> None:
+            self.hour = step_index
+            self.t_s = step_index * 30.0
+            self.duration_h = 30.0 / 3600.0
+            # This is the current dataclass default path: no bleed integral
+            # has been booked, so the trajectory must preserve that fact.
+            self.melt_offgas_O2_mol_hr = 0.0
+
+    snapshots = [Snapshot(index) for index in range(1, 120)]
+    trajectory = _gas_phase_o2_trajectory_for_run(
+        preset["lab_schedule"],
+        snapshots,
     )
-    with pytest.raises(TimeSeriesComparisonRefusal) as refusal:
-        compare_o2_release_time_series(
-            case_id="robinot_2026",
-            source_id="kems-044-robinot-2026",
-            observable_id="robinot_o2_ppm_time_series",
-            observation_points=points,
-            runtime_rate_samples=None,
-            argon_flow_nl_min=argon_flow,
-            evidence_scope="analyzer_visible_o2_in_argon_carrier",
-            source_locator={"figure": "4a"},
-            recipe=preset,
-            observation={"points": points},
-            runtime={},
+    runtime = {
+        "status": "ok",
+        "run_metadata": {
+            "feedstock_id": preset["pair"]["faithful"]["feedstock_id"],
+            "mass_kg": preset["lab_geometry"]["sample"]["mass_g"] / 1000.0,
+        },
+        "per_hour_summary": [
+            {
+                "hour": 119,
+                "t_s": 119 * 30.0,
+                "O2_source_side_potential_kg_cumulative": 0.0,
+                "vapor_species_kg_hr": {},
+            }
+        ],
+        "final": {"pump_outlet_by_species_kg": {}},
+        "gas_phase_o2_trajectory": trajectory,
+    }
+    sidecar = yaml.safe_load(
+        (ROOT / "data/literature/vacuum_pyrolysis_measurements.yaml").read_text(
+            encoding="utf-8"
         )
-    assert refusal.value.reason_code == "o2_release_rate_series_missing"
-    assert refusal.value.dependency == O2_RELEASE_RATE_DEPENDENCY
-    assert "gas_phase_o2_trajectory" in refusal.value.dependency
+    )
+    feedstocks = yaml.safe_load(
+        (ROOT / "data/feedstocks.yaml").read_text(encoding="utf-8")
+    )
+
+    def assert_production_fig4a_comparison(records) -> None:
+        fig4a = [
+            record
+            for record in records
+            if record.observable_id == "robinot_o2_ppm_time_series"
+        ]
+        assert len(fig4a) == 121
+        assert all(record.status == "assumed-input" for record in fig4a)
+        assert all(record.actual_value == 0.0 for record in fig4a)
+
+    comparison = evaluate_vacuum_pyrolysis_comparison(
+        preset,
+        sidecar,
+        runtime,
+        feedstocks=feedstocks,
+    )
+    assert any(
+        notice.get("reason") == "melt_offgas_o2_structural_zero"
+        for notice in trajectory["notices"]
+    )
+    assert_production_fig4a_comparison(comparison.records)
+
+    # Mutation: removing the production caller makes the comparison artifact
+    # omit Fig. 4a. The zero is flagged because it is a dataclass default, not
+    # evidence that evaporation released no coproduct oxygen.
+    monkeypatch.setattr(
+        vacuum_pyrolysis_module,
+        "compare_o2_release_time_series",
+        lambda **_kwargs: (),
+    )
+    with pytest.raises(AssertionError):
+        mutated = evaluate_vacuum_pyrolysis_comparison(
+            preset,
+            sidecar,
+            runtime,
+            feedstocks=feedstocks,
+        )
+        assert_production_fig4a_comparison(mutated.records)
 
 
 def _series_rows(path: Path) -> dict[str, list[dict[str, float]]]:

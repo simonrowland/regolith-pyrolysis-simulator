@@ -2245,6 +2245,19 @@ def melt_temperature_from_furnace_power(
         missing="power_trace_does_not_bracket",
         invalid="power_trace_does_not_bracket",
     )
+    focal_qualifier = str(
+        driver.get("focal_spot_diameter_qualifier") or ""
+    ).strip()
+    if focal_qualifier:
+        record["notices"] = tuple(record["notices"]) + ({
+            "kind": TYPED_UNKNOWN,
+            "knob": "focal_spot_diameter_m",
+            "value": driver.get("focal_spot_diameter_m"),
+            "unit": "m",
+            "qualifier": focal_qualifier,
+            "reason": "focal_spot_diameter_approximate",
+            "source": "furnace_power_driver.focal_spot_diameter_qualifier",
+        },)
     return record
 
 

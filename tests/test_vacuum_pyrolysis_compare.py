@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 import yaml
+import simulator.diagnostic_helpers.vacuum_pyrolysis as vacuum_pyrolysis_module
 
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL, parse_formula
 from simulator.diagnostic_helpers.vacuum_pyrolysis import (
@@ -118,6 +119,11 @@ def test_hourly_runtime_selectors_keep_their_current_float_bits() -> None:
     selectors = (
         ({"kind": "final_o2_mass_kg"}, {}, 0.03),
         (
+            {"kind": "final_o2_mass_kg"},
+            {"time_h": 2.0},
+            0.03,
+        ),
+        (
             {"kind": "window_o2_mass_kg"},
             {"start_h": 1.0, "end_h": 2.0},
             float.fromhex("0x1.47ae147ae147ap-6"),
@@ -141,6 +147,94 @@ def test_hourly_runtime_selectors_keep_their_current_float_bits() -> None:
         )
         assert actual is not None
         assert actual.hex() == expected.hex()
+
+
+def _subhour_runtime(
+    *,
+    include_t_s: bool = True,
+    include_hour: bool = True,
+) -> dict:
+    rows = []
+    for step in range(1, 121):
+        row = {
+            "O2_source_side_potential_kg_cumulative": step * 0.001,
+            "vapor_species_kg_hr": {"SiO": float(step)},
+        }
+        if include_hour:
+            row["hour"] = step
+        if include_t_s:
+            row["t_s"] = step * 30.0
+        rows.append(row)
+    return {
+        "status": "ok",
+        "run_metadata": {"process_dt_s": 30.0},
+        "per_hour_summary": rows,
+        "final": {"pump_outlet_by_species_kg": {}},
+    }
+
+
+def _assert_subhour_selectors_use_elapsed_time(runtime: dict) -> None:
+    actual = (
+        resolve_vacuum_observable(
+            {"kind": "window_o2_mass_kg"},
+            {"start_h": 0.0, "end_h": 1.0},
+            runtime,
+            feedstocks=_feedstocks(),
+        )[0],
+        resolve_vacuum_observable(
+            {"kind": "final_o2_mass_kg"},
+            {"time_h": 0.5},
+            runtime,
+            feedstocks=_feedstocks(),
+        )[0],
+        resolve_vacuum_observable(
+            {
+                "kind": "species_time_series_kg_hr",
+                "species": "SiO",
+                "aggregation": "point",
+            },
+            {"time_h": 1.0},
+            runtime,
+            feedstocks=_feedstocks(),
+        )[0],
+        resolve_vacuum_observable(
+            {
+                "kind": "species_time_series_kg_hr",
+                "species": "SiO",
+                "aggregation": "sum",
+            },
+            {"start_h": 0.0, "end_h": 1.0},
+            runtime,
+            feedstocks=_feedstocks(),
+        )[0],
+    )
+    assert actual == pytest.approx((0.12, 0.06, 120.0, 7260.0))
+
+
+@pytest.mark.parametrize(
+    ("include_t_s", "include_hour"),
+    [(True, True), (False, True), (True, False)],
+)
+def test_subhour_summary_selectors_use_elapsed_time(
+    include_t_s: bool,
+    include_hour: bool,
+) -> None:
+    # `hour` is the step index here; a one-hour window must include 120 rows.
+    _assert_subhour_selectors_use_elapsed_time(
+        _subhour_runtime(include_t_s=include_t_s, include_hour=include_hour)
+    )
+
+
+def test_subhour_elapsed_time_mutation_probe_detects_hour_index_selection(
+    monkeypatch,
+) -> None:
+    monkeypatch.setattr(
+        vacuum_pyrolysis_module,
+        "_elapsed_time_h",
+        lambda row: float(row["hour"]),
+    )
+    with pytest.raises(AssertionError):
+        _assert_subhour_selectors_use_elapsed_time(_subhour_runtime())
 
 
 def test_feed_oxygen_selector_uses_feed_oxide_oxygen_mass() -> None:

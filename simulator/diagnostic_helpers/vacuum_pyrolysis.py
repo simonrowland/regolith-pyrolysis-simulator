@@ -12,9 +12,11 @@ import yaml
 from simulator.yaml_cache import load_cached_safe_yaml
 
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
+from simulator.process_timestep import PROCESS_HOUR_S
 from simulator.diagnostic_helpers.reproduction_compare import (
     COMPARISON_ARTIFACT_SCHEMA_VERSION,
     ComparisonRecord,
+    compare_o2_release_time_series,
     compare_values,
     content_digest,
     records_to_markdown,
@@ -234,6 +236,7 @@ def evaluate_vacuum_pyrolysis_comparison(
             )
         )
 
+    records.extend(_trajectory_o2_comparison_records(recipe, runtime))
     qualitative = _validated_qualitative_observations(
         measurement.get("qualitative_comparison_observations", ())
     )
@@ -243,6 +246,109 @@ def evaluate_vacuum_pyrolysis_comparison(
         recipe_digest=recipe_digest,
         source_digest=source_digest,
         result_digest=result_digest,
+    )
+
+
+def _trajectory_o2_comparison_records(
+    recipe: Mapping[str, Any],
+    runtime: Mapping[str, Any],
+) -> list[ComparisonRecord]:
+    trajectory_comparison = recipe.get("trajectory_comparison")
+    runtime_trajectory = runtime.get("gas_phase_o2_trajectory")
+    if not isinstance(trajectory_comparison, Mapping) or not isinstance(
+        runtime_trajectory,
+        Mapping,
+    ):
+        return []
+    observables = trajectory_comparison.get("observables")
+    if not isinstance(observables, Sequence) or isinstance(observables, (str, bytes)):
+        return []
+    observable = next(
+        (
+            item
+            for item in observables
+            if isinstance(item, Mapping)
+            and item.get("observable_id") == "robinot_o2_ppm_time_series"
+        ),
+        None,
+    )
+    if not isinstance(observable, Mapping):
+        return []
+    fields = [
+        str(field)
+        for field in _sequence(
+            observable.get("point_fields"),
+            "trajectory_comparison.robinot_o2_ppm_time_series.point_fields",
+        )
+    ]
+    points = []
+    for index, raw_point in enumerate(
+        _sequence(
+            observable.get("points"),
+            "trajectory_comparison.robinot_o2_ppm_time_series.points",
+        )
+    ):
+        values = _sequence(
+            raw_point,
+            f"trajectory_comparison.robinot_o2_ppm_time_series.points[{index}]",
+        )
+        if len(values) != len(fields):
+            raise VacuumPyrolysisComparisonError(
+                "O2 trajectory comparison point field count does not match "
+                "point_fields"
+            )
+        row = dict(zip(fields, values))
+        points.append(
+            {
+                "time_min": row["time_min"],
+                "expected_value": row["expected_value"],
+                "expected_uncertainty": {
+                    "kind": "absolute",
+                    "value": row["combined_uncertainty"],
+                },
+                "source_locator": {"point_index": index},
+            }
+        )
+
+    notices = runtime_trajectory.get("notices")
+    notice_rows = (
+        notices
+        if isinstance(notices, Sequence) and not isinstance(notices, (str, bytes))
+        else ()
+    )
+    assumed_input = any(
+        isinstance(notice, Mapping)
+        and notice.get("reason")
+        in {
+            "melt_offgas_o2_structural_zero",
+            "analyzer_response_time_not_printed",
+        }
+        for notice in notice_rows
+    )
+    flagged_runtime = dict(runtime)
+    flagged_runtime["assumed_input"] = assumed_input
+    return list(
+        compare_o2_release_time_series(
+            case_id=str(recipe.get("paper_id") or ""),
+            source_id=str(recipe.get("paper_citation_id") or ""),
+            observable_id=str(observable.get("observable_id") or ""),
+            observation_points=points,
+            runtime_rate_samples=runtime_trajectory.get("points"),
+            argon_flow_nl_min=_required_finite_float(
+                runtime_trajectory.get("carrier_flow_nl_min"),
+                "gas_phase_o2_trajectory.carrier_flow_nl_min",
+            ),
+            evidence_scope="analyzer_visible_o2_in_argon_carrier",
+            source_locator={
+                "figure": "4a",
+                "source_pin": observable.get("source_pin"),
+                "provenance_pin": observable.get("provenance_pin"),
+                "provenance_section": observable.get("provenance_section"),
+            },
+            recipe=recipe,
+            observation={"trajectory_comparison": dict(trajectory_comparison)},
+            runtime=flagged_runtime,
+        )
     )
 
 
@@ -261,7 +367,7 @@ def resolve_vacuum_observable(
     runtime = _mapping(runtime_result, "runtime_result")
     rows = _runtime_rows(runtime)
     if kind == "final_o2_mass_kg":
-        return _final_o2_mass_kg(rows), False
+        return _final_o2_mass_kg(rows, coordinate), False
     if kind == "window_o2_mass_kg":
         return _window_o2_mass_kg(rows, coordinate), False
     if kind == "o2_mass_yield_fraction":
@@ -409,19 +515,60 @@ def _runtime_rows(runtime: Mapping[str, Any]) -> list[Mapping[str, Any]]:
     rows = runtime.get("per_hour_summary")
     if not isinstance(rows, Sequence) or isinstance(rows, (str, bytes)):
         return []
+    metadata = runtime.get("run_metadata")
+    raw_dt_s = (
+        metadata.get("process_dt_s")
+        if isinstance(metadata, Mapping)
+        else None
+    )
+    dt_s = (
+        float(PROCESS_HOUR_S)
+        if raw_dt_s is None
+        else _required_finite_float(raw_dt_s, "run_metadata.process_dt_s")
+    )
+    if dt_s <= 0.0:
+        raise VacuumPyrolysisComparisonError(
+            "run_metadata.process_dt_s must be positive"
+        )
+    normalized = []
+    for row in rows:
+        if not isinstance(row, Mapping):
+            continue
+        if _finite(row.get("t_s")):
+            elapsed_s = float(row["t_s"])
+        elif _finite(row.get("hour")):
+            elapsed_s = float(row["hour"]) * dt_s
+        else:
+            continue
+        normalized_row = dict(row)
+        normalized_row["_elapsed_t_s"] = elapsed_s
+        normalized.append(normalized_row)
     return sorted(
-        (
-            row
-            for row in rows
-            if isinstance(row, Mapping) and _finite(row.get("hour"))
-        ),
-        key=lambda row: float(row["hour"]),
+        normalized,
+        key=_elapsed_time_h,
     )
 
 
-def _final_o2_mass_kg(rows: Sequence[Mapping[str, Any]]) -> float | None:
+def _elapsed_time_h(row: Mapping[str, Any]) -> float:
+    """Elapsed process time normalized by ``_runtime_rows``."""
+
+    return _required_finite_float(
+        row.get("_elapsed_t_s"),
+        "per_hour_summary.elapsed_time_s",
+    ) / float(PROCESS_HOUR_S)
+
+
+def _final_o2_mass_kg(
+    rows: Sequence[Mapping[str, Any]],
+    coordinate: Mapping[str, Any],
+) -> float | None:
     if not rows:
         return None
+    if "time_h" in coordinate:
+        return _cumulative_o2_at(
+            rows,
+            _required_finite_float(coordinate["time_h"], "coordinate.time_h"),
+        )
     return _optional_finite_float(
         rows[-1].get("O2_source_side_potential_kg_cumulative"),
         "O2_source_side_potential_kg_cumulative",
@@ -446,7 +593,7 @@ def _cumulative_o2_at(
 ) -> float | None:
     if math.isclose(time_h, 0.0, rel_tol=0.0, abs_tol=1e-12):
         return 0.0
-    eligible = [row for row in rows if float(row["hour"]) <= time_h + 1e-12]
+    eligible = [row for row in rows if _elapsed_time_h(row) <= time_h + 1e-12]
     if not eligible:
         return None
     return _optional_finite_float(
@@ -489,7 +636,7 @@ def _species_time_series_value(
             row
             for row in rows
             if math.isclose(
-                float(row["hour"]),
+                _elapsed_time_h(row),
                 time_h,
                 rel_tol=0.0,
                 abs_tol=1e-9,
@@ -500,7 +647,7 @@ def _species_time_series_value(
         selected = [
             row
             for row in rows
-            if start_h < float(row["hour"]) <= end_h + 1e-12
+            if start_h < _elapsed_time_h(row) <= end_h + 1e-12
         ]
     values = [
         float(row["vapor_species_kg_hr"][species])
@@ -532,7 +679,7 @@ def _coordinate_window(
         coordinate.get("start_h", 0.0),
         "coordinate.start_h",
     )
-    default_end_h = float(rows[-1]["hour"]) if rows else start_h
+    default_end_h = _elapsed_time_h(rows[-1]) if rows else start_h
     end_h = _required_finite_float(
         coordinate.get("end_h", default_end_h),
         "coordinate.end_h",

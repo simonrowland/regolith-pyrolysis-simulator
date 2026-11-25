@@ -16,6 +16,7 @@ from pathlib import Path
 import pytest
 import yaml
 import simulator.runner as runner_module
+import simulator.gas_phase_o2 as gas_phase_module
 
 from simulator.account_ids import (
     OXYGEN_MELT_OFFGAS_ACCOUNT,
@@ -445,7 +446,7 @@ def test_carrier_flow_scales_ppm_and_not_the_molar_integral() -> None:
     )
 
 
-def test_booked_zero_bleed_flags_every_fig4a_point() -> None:
+def test_structural_zero_bleed_flags_every_fig4a_point() -> None:
     preset = _preset()
     observations = _observation_points(preset)
     assert len(observations) == 120
@@ -482,6 +483,12 @@ def test_booked_zero_bleed_flags_every_fig4a_point() -> None:
     assert all(point["ppm_analyzer"] == 0.0 for point in trajectory["points"])
     assert any(
         item["reason"] == "analyzer_response_time_not_printed"
+        for item in trajectory["notices"]
+    )
+    assert any(
+        item["kind"] == "typed_unknown"
+        and item["field"] == "melt_offgas_O2_mol_hr"
+        and item["reason"] == "melt_offgas_o2_structural_zero"
         for item in trajectory["notices"]
     )
     samples = [
@@ -541,6 +548,51 @@ def test_booked_zero_bleed_flags_every_fig4a_point() -> None:
         f"integral_actual=0 integral_residual={integrals[0].residual:.6f} "
         "model_ppm=0 status=assumed-input"
     )
+
+
+def test_structural_zero_notice_regression_probe_detects_suppression(
+    monkeypatch,
+) -> None:
+    steps = [
+        {
+            "time_s": 30.0,
+            "dt_s": _DT_S,
+            "melt_offgas_o2_step_mol": 0.0,
+        }
+    ]
+    kwargs = {
+        "carrier_flow_nl_min": _CARRIER_NL_MIN,
+        "chamber_pressure_mbar": _CHAMBER_MBAR,
+        "analyzer_tau_s": 30.0,
+    }
+
+    def assert_structural_zero_notice(trajectory: dict) -> None:
+        assert any(
+            notice.get("reason") == "melt_offgas_o2_structural_zero"
+            for notice in trajectory["notices"]
+        )
+
+    assert_structural_zero_notice(gas_phase_module.gas_phase_o2_trajectory(steps, **kwargs))
+    production_trajectory = gas_phase_module.gas_phase_o2_trajectory
+
+    def old_silent_zero(steps, **call_kwargs):
+        trajectory = production_trajectory(steps, **call_kwargs)
+        trajectory["notices"] = [
+            notice
+            for notice in trajectory["notices"]
+            if notice.get("reason") != "melt_offgas_o2_structural_zero"
+        ]
+        return trajectory
+
+    monkeypatch.setattr(
+        gas_phase_module,
+        "gas_phase_o2_trajectory",
+        old_silent_zero,
+    )
+    with pytest.raises(AssertionError):
+        assert_structural_zero_notice(
+            gas_phase_module.gas_phase_o2_trajectory(steps, **kwargs)
+        )
 
 
 def test_robinot_deck_brackets_fig4a_without_using_area_as_radiation() -> None:

@@ -306,6 +306,7 @@ def compare_o2_release_time_series(
         recipe=recipe,
         observation=observation,
         runtime=runtime,
+        assumed_input=runtime.get("assumed_input") is True,
     )
 
 
