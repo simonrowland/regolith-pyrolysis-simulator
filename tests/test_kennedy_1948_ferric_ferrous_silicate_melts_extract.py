@@ -350,7 +350,11 @@ def test_kennedy_regime_and_crystal_qualifications_reach_scoring(tmp_path: Path)
             headline = score.headline_payloads([payload], [engine])
             assert [
                 item["n_scored"] for item in headline if item["rail"] == "redox"
-            ] == [1]
+            ] == [0]
+            flagged = score.flagged_stratum_payloads([payload], [engine])
+            explicit_pressure_strata = {item["stratum"] for item in flagged}
+            assert "approximate-pressure" not in explicit_pressure_strata
+            assert "source-internally-inconsistent" in explicit_pressure_strata
 
             # The supplied identity takes precedence over the conflicting point
             # pressure on green. The backend command and candidate must agree.
