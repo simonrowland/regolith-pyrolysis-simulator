@@ -563,7 +563,9 @@ def test_real_analytical_closure_and_extent_preserve_exponent_contract_refusal()
         _residue_oxygen_balance(_channel_terms(channels), inventory,
                                 lambda p: pressure(inventory, p), 1905.15)
     assert root.value.reason == "residue_pressure_law_exponent_mismatch"
-    assert "'Fe': declared -0.5, observed " in root.value.detail
+    # d-474 fixes Fe at fixed activity; FeO(g)'s +1/2 still reflects the
+    # d-369 a_Fe=1 metal-saturation cap segment, which remains pending.
+    assert "'FeO': declared 0.0, observed 0.5" in root.value.detail
     with pytest.raises(ResidueInventoryRefusal) as extent:
         integrate_knudsen_residue_inventory(
             inventory, channels, lambda n, p, temperature: pressure(n, p),
@@ -601,7 +603,7 @@ def test_parentless_oxygen_pressure_is_required_and_validated(oxygen_parent, oxy
     (1749.15, 0.0117, {"SiO2": 52.32, "Al2O3": 19.13, "FeO": 9.37, "MgO": 6.25, "CaO": 12.93}),
 ))
 def test_real_markova_first_interval_zeroes_omitted_al_and_keeps_exponent_refusal(temperature_K, extent, wt):
-    """Al is no longer a missing channel. The iron pressure-law refusal remains."""
+    """Al is present and the capped FeO(g) pressure-law refusal remains."""
     from simulator.accounting.formulas import parse_formula
     from simulator.battery.residue import _channel_terms, _residue_oxygen_balance
     inventory = {s: w / 100 / float(parse_formula(s).molar_mass_kg_per_mol()) for s, w in wt.items()}
@@ -612,8 +614,10 @@ def test_real_markova_first_interval_zeroes_omitted_al_and_keeps_exponent_refusa
         _residue_oxygen_balance(_channel_terms(channels), inventory,
                                 lambda p: pressure(inventory, p), temperature_K)
     assert root.value.reason == "residue_pressure_law_exponent_mismatch"
+    # d-474 fixes Fe at fixed activity; d-369's a_Fe=1 cap segment is pending,
+    # so FeO(g)'s raw +1/2 exponent must remain a typed refusal.
     assert root.value.detail.startswith(
-        "pressure law exponent mismatch for 'Fe': declared -0.5, observed "
+        "pressure law exponent mismatch for 'FeO': declared 0.0, observed 0.5 "
     )
     al_notices = [
         notice for notice in pressure.below_threshold_omission_notices
