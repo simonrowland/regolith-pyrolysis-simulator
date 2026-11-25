@@ -132,7 +132,7 @@ class RunExecution:
 
     @property
     def run_flags(self) -> tuple[Any, ...]:
-        return _run_flags_for_export(self.session)
+        return tuple(_run_flags_for_export(self.session))
 
 
 _CAMPAIGN_STOP_REASONS = frozenset({

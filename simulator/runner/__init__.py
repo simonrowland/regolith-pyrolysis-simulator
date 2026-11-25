@@ -148,6 +148,7 @@ from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.session import (
     SimSession,
     SimSessionConfig,
+    _UNSET_RUN_FLAGS,
     _run_flags_for_export,
     _write_run_flags_to_metadata,
 )
@@ -5882,18 +5883,22 @@ def _attach_execution_diagnostics(
     execution: RunExecution | None = None,
     *,
     session: SimSession | None = None,
-    run_flags: Any = None,
+    run_flags: Any = _UNSET_RUN_FLAGS,
     campaign_stops: Sequence[Mapping[str, Any]] | None = None,
 ) -> None:
     if execution is not None:
         session = getattr(execution, "session", session)
         campaign_stops = getattr(execution, "campaign_stops", ())
-    if run_flags is None:
-        run_flags = run_metadata.get("run_flags", ())
+    run_flags_were_explicit = run_flags is not _UNSET_RUN_FLAGS
+    stored_run_flags = run_metadata.get("run_flags", _UNSET_RUN_FLAGS)
+    if not run_flags_were_explicit:
+        run_flags = run_metadata.get("run_flags", [])
+    recorded_run_flags = run_flags
     run_flags = _run_flags_for_export(session, run_flags)
-    if isinstance(run_flags, (list, tuple)):
-        run_flags = _json_safe(list(run_flags))
-    _write_run_flags_to_metadata(run_metadata, run_flags)
+    if run_flags is not recorded_run_flags or (
+        run_flags_were_explicit and stored_run_flags is not recorded_run_flags
+    ):
+        _write_run_flags_to_metadata(run_metadata, run_flags)
     campaign_stops = list(campaign_stops or ())
     if any(
         isinstance(stop, Mapping) and stop.get("flags")

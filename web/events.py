@@ -2912,16 +2912,15 @@ def _available_runner_payload(
         metadata['refusal_diagnostic'] = copy.deepcopy(
             dict(refusal_diagnostic)
         )
-    run_flags = (
-        metadata_overrides.get('run_flags')
-        if isinstance(metadata_overrides, Mapping)
-        else None
-    )
+    if (
+        isinstance(metadata_overrides, Mapping)
+        and 'run_flags' in metadata_overrides
+    ):
+        metadata['run_flags'] = copy.deepcopy(metadata_overrides['run_flags'])
     campaign_stops = _campaign_stops_for_trace(session)
     _attach_execution_diagnostics(
         metadata,
         session=session,
-        run_flags=run_flags,
         campaign_stops=campaign_stops,
     )
     for attach_notice in (

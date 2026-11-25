@@ -42,6 +42,7 @@ from simulator.state import (
 
 _ALLOWED_SESSION_TRACKS = frozenset({"pyrolysis", "mre_baseline"})
 _RUN_HOUR_BUDGET_FLAG_CODE = "run_hour_budget_exhausted_mid_campaign"
+_UNSET_RUN_FLAGS = object()
 
 
 def _canonical_runtime_campaign_overrides(
@@ -815,18 +816,16 @@ class SimSession:
         run_metadata = payload.get("run_metadata")
         has_run_metadata = isinstance(run_metadata, Mapping)
         recorded_flags = (
-            run_metadata.get("run_flags", ())
+            run_metadata.get("run_flags", [])
             if has_run_metadata
-            else ()
+            else []
         )
         run_flags = _run_flags_for_export(self, recorded_flags)
-        if has_run_metadata:
-            run_metadata = dict(run_metadata)
-        elif isinstance(run_flags, (list, tuple)) and run_flags:
-            run_metadata = {}
-        else:
+        if not has_run_metadata and not run_flags:
             return payload
-        _write_run_flags_to_metadata(run_metadata, run_flags)
+        run_metadata = dict(run_metadata) if has_run_metadata else {}
+        if run_flags is not recorded_flags:
+            _write_run_flags_to_metadata(run_metadata, run_flags)
         payload["run_metadata"] = run_metadata
         return payload
 
@@ -848,10 +847,10 @@ class SimSession:
         if isinstance(run_metadata, Mapping):
             run_metadata = dict(run_metadata)
             if "run_flags" in run_metadata:
-                run_flags = _recorded_run_flags_without_budget(
-                    run_metadata["run_flags"]
-                )
-                _write_run_flags_to_metadata(run_metadata, run_flags)
+                recorded_flags = run_metadata["run_flags"]
+                run_flags = _recorded_run_flags_without_budget(recorded_flags)
+                if run_flags is not recorded_flags:
+                    run_metadata["run_flags"] = run_flags
             payload["run_metadata"] = run_metadata
         self._result_document = payload
 
@@ -893,25 +892,24 @@ class SimSession:
 
 def _run_flags_for_export(
     session: Any,
-    recorded_flags: Any = (),
+    recorded_flags: Any = _UNSET_RUN_FLAGS,
 ) -> Any:
     """Preserve offline records and derive the live budget flag on read."""
 
+    if recorded_flags is _UNSET_RUN_FLAGS:
+        recorded_flags = []
     run_flags = recorded_flags
     sim = getattr(session, "_sim", None)
     pending_decision: dict[str, Any] | None = None
+    should_add_budget_flag = False
     try:
-        if not isinstance(recorded_flags, (list, tuple)):
-            return recorded_flags
-        run_flags = tuple(recorded_flags)
         if sim is None:
             return run_flags
-        run_flags = _recorded_run_flags_without_budget(run_flags)
-        if (
-            getattr(session, "_last_drive_stop", None) != "hour_budget"
-            or sim.is_complete()
-        ):
-            return run_flags
+        should_add_budget_flag = (
+            getattr(session, "_last_drive_stop", None) == "hour_budget"
+        )
+        if not should_add_budget_flag or sim.is_complete():
+            return _recorded_run_flags_without_budget(run_flags)
 
         pending = session.pending_decision()
         pending_decision = _decision_event(pending) if pending is not None else None
@@ -967,40 +965,51 @@ def _run_flags_for_export(
         })
         if decision_dependent is not None:
             detail["decision_dependent"] = decision_dependent
-        return (*run_flags, {
+        budget_flag = {
             "kind": "run_diagnostic",
             "code": _RUN_HOUR_BUDGET_FLAG_CODE,
             "detail": detail,
-        })
+        }
     except Exception as exc:
+        if not should_add_budget_flag:
+            return _recorded_run_flags_without_budget(run_flags)
         unresolved_detail: dict[str, Any] = {
             "unresolved": True,
             "error_type": type(exc).__name__,
         }
         if pending_decision is not None:
             unresolved_detail["pending_decision"] = pending_decision
-        if not isinstance(run_flags, tuple):
-            return run_flags
-        return (*run_flags, {
+        budget_flag = {
             "kind": "run_diagnostic",
             "code": _RUN_HOUR_BUDGET_FLAG_CODE,
             "detail": unresolved_detail,
-        })
+        }
+    if isinstance(run_flags, list):
+        base_flags = _recorded_run_flags_without_budget(run_flags)
+    else:
+        base_flags = [run_flags]
+    return [*base_flags, budget_flag]
 
 
 def _recorded_run_flags_without_budget(
     recorded_flags: Any,
 ) -> Any:
-    if not isinstance(recorded_flags, (list, tuple)):
+    if not isinstance(recorded_flags, list):
         return recorded_flags
-    return tuple(
+    if not any(
+        isinstance(flag, Mapping)
+        and flag.get("code") == _RUN_HOUR_BUDGET_FLAG_CODE
+        for flag in recorded_flags
+    ):
+        return recorded_flags
+    return [
         flag
         for flag in recorded_flags
         if not (
             isinstance(flag, Mapping)
             and flag.get("code") == _RUN_HOUR_BUDGET_FLAG_CODE
         )
-    )
+    ]
 
 
 def _write_run_flags_to_metadata(
@@ -1008,10 +1017,7 @@ def _write_run_flags_to_metadata(
     run_flags: Any,
 ) -> None:
     if isinstance(run_flags, (list, tuple)):
-        if run_flags:
-            run_metadata["run_flags"] = list(run_flags)
-        else:
-            run_metadata.pop("run_flags", None)
+        run_metadata["run_flags"] = list(run_flags)
     else:
         run_metadata["run_flags"] = run_flags
 

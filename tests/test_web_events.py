@@ -4434,6 +4434,26 @@ def test_web_projection_preserves_recorded_flags_without_live_session():
     ]["run_flags"]
 
 
+@pytest.mark.parametrize("legacy_flags", [[], None])
+def test_reduced_projection_preserves_empty_and_null_run_flags(legacy_flags):
+    payload = web_events._available_runner_payload(
+        SimpleNamespace(
+            _config=None,
+            simulator=None,
+            per_hour_summaries=lambda: [],
+        ),
+        projector=SimpleNamespace(
+            run_metadata_overrides={"run_flags": legacy_flags}
+        ),
+        status="ok",
+        reason="",
+        error_message="",
+        refusal_diagnostic=None,
+    )
+
+    assert payload["run_metadata"]["run_flags"] == legacy_flags
+
+
 def test_recorded_web_projection_adds_live_flag_without_recorded_metadata(
     monkeypatch,
 ):

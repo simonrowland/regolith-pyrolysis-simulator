@@ -929,6 +929,40 @@ def test_non_sequence_run_flags_round_trip_without_coercion(legacy_flags):
     assert metadata["run_flags"] == legacy_flags
 
 
+def test_batch_budget_flag_is_appended_to_legacy_scalar_override():
+    run = _run(
+        campaign="C2A",
+        hours=1,
+        run_metadata_overrides={"run_flags": "legacy"},
+    )
+    execution = RunExecutor().execute(run._session_config())
+
+    payload = run._build_output(execution)
+    run_flags = payload["run_metadata"]["run_flags"]
+
+    assert run_flags[0] == "legacy"
+    assert run_flags[1]["code"] == "run_hour_budget_exhausted_mid_campaign"
+
+
+@pytest.mark.parametrize("legacy_flags", [[], None])
+def test_offline_run_flag_values_survive_result_and_runner_projection(
+    legacy_flags,
+):
+    session = SimSession()
+    session._set_result_document({
+        "status": "ok",
+        "run_metadata": {"run_flags": legacy_flags},
+    })
+
+    assert session.result_document()["run_metadata"]["run_flags"] == legacy_flags
+
+    from simulator.runner import _attach_execution_diagnostics
+
+    metadata = {"run_flags": legacy_flags}
+    _attach_execution_diagnostics(metadata)
+    assert metadata["run_flags"] == legacy_flags
+
+
 def test_budget_flag_contains_json_safe_unresolved_cyclic_limit():
     session = _started_internal_session(_run(campaign="C2A", hours=1))
     cyclic_limit = []
