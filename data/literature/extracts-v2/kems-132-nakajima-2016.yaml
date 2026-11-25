@@ -55,17 +55,6 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
-    affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''kems_second_third_law''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-132-nakajima-2016::nakajima_2016_fig1_cs_ion_current_figure_only
-    policy:
-      id: DP-107
-      version: 1
-      status: proposed
-      value: knudsen_effusion
-      units: method token
   source_id: kems-132-nakajima-2016
   locator:
     published_page: Page 3 of 6
@@ -132,17 +121,6 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
-    affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''kems_second_third_law''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-132-nakajima-2016::nakajima_2016_fig2_csbo2_psat_figure_only
-    policy:
-      id: DP-107
-      version: 1
-      status: proposed
-      value: knudsen_effusion
-      units: method token
   source_id: kems-132-nakajima-2016
   locator:
     published_page: Page 3 of 6
@@ -153,7 +131,7 @@ observations:
   provenance:
     printed_phase: CsBO2_s
 - observation_id: kems-132-nakajima-2016::nakajima_2016_fig3_eq12_sigma_plot_figure_only
-  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016
+  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -208,16 +186,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''kems_second_third_law''
-      is not a closed method token (kems_effusion alone is insufficient)'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: second_law_fit'
     origin: kems-132-nakajima-2016::nakajima_2016_fig3_eq12_sigma_plot_figure_only
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-132-nakajima-2016
   locator:
@@ -230,7 +207,7 @@ observations:
   provenance:
     printed_phase: CsBO2_second_law_sigma_plot
 - observation_id: kems-132-nakajima-2016::nakajima_2016_fig4_third_law_H_vs_T_figure_only
-  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016
+  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -283,16 +260,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''kems_second_third_law''
-      is not a closed method token (kems_effusion alone is insufficient)'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: third_law_fit'
     origin: kems-132-nakajima-2016::nakajima_2016_fig4_third_law_H_vs_T_figure_only
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-132-nakajima-2016
   locator:
@@ -304,7 +280,7 @@ observations:
   provenance:
     printed_phase: CsBO2_third_law_evaluation
 - observation_id: kems-132-nakajima-2016::nakajima_2016_fig5_ag_psat_figure_only
-  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016
+  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -359,16 +335,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''kems_second_third_law''
-      is not a closed method token (kems_effusion alone is insufficient)'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: literature_compilation'
     origin: kems-132-nakajima-2016::nakajima_2016_fig5_ag_psat_figure_only
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-132-nakajima-2016
   locator:
@@ -380,7 +355,7 @@ observations:
   provenance:
     printed_phase: Ag_s_l
 - observation_id: kems-132-nakajima-2016::nakajima_2016_fig6_eq12_ag_figure_only
-  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016
+  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -434,16 +409,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''kems_second_third_law''
-      is not a closed method token (kems_effusion alone is insufficient)'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: second_law_fit'
     origin: kems-132-nakajima-2016::nakajima_2016_fig6_eq12_ag_figure_only
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-132-nakajima-2016
   locator:
@@ -456,7 +430,7 @@ observations:
   provenance:
     printed_phase: Ag_second_law_sigma_plot
 - observation_id: kems-132-nakajima-2016::nakajima_2016_fig7_third_law_H_vs_T_ag_figure_only
-  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016
+  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -509,16 +483,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''kems_second_third_law''
-      is not a closed method token (kems_effusion alone is insufficient)'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: third_law_fit'
     origin: kems-132-nakajima-2016::nakajima_2016_fig7_third_law_H_vs_T_ag_figure_only
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-132-nakajima-2016
   locator:
@@ -586,7 +559,7 @@ observations:
   provenance:
     printed_phase: CsBO2_prepared_from_Cs2CO3_and_H3BO3
 - observation_id: kems-132-nakajima-2016::nakajima_2016_t1_literature_second_third_law::points:h=085f1d0db9b2
-  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016
+  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -631,16 +604,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''kems_second_third_law''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-132-nakajima-2016::nakajima_2016_t1_literature_second_third_law::points:h=085f1d0db9b2
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: literature_second_third_law'
+    origin: kems-132-nakajima-2016::nakajima_2016_t1_literature_second_third_law
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-132-nakajima-2016
   locator:
@@ -652,7 +624,7 @@ observations:
   provenance:
     printed_phase: CsBO2_s_and_l_literature
 - observation_id: kems-132-nakajima-2016::nakajima_2016_t1_literature_second_third_law::points:h=8a78f624bd22
-  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016
+  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -697,16 +669,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''kems_second_third_law''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-132-nakajima-2016::nakajima_2016_t1_literature_second_third_law::points:h=8a78f624bd22
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: literature_second_third_law'
+    origin: kems-132-nakajima-2016::nakajima_2016_t1_literature_second_third_law
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-132-nakajima-2016
   locator:
@@ -718,7 +689,7 @@ observations:
   provenance:
     printed_phase: CsBO2_s_and_l_literature
 - observation_id: kems-132-nakajima-2016::nakajima_2016_t1_literature_second_third_law::points:h=ca95659d1e29
-  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016
+  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -763,16 +734,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''kems_second_third_law''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-132-nakajima-2016::nakajima_2016_t1_literature_second_third_law::points:h=ca95659d1e29
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: literature_second_third_law'
+    origin: kems-132-nakajima-2016::nakajima_2016_t1_literature_second_third_law
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-132-nakajima-2016
   locator:
@@ -784,7 +754,7 @@ observations:
   provenance:
     printed_phase: CsBO2_s_and_l_literature
 - observation_id: kems-132-nakajima-2016::nakajima_2016_t1_this_work_second_third_law::points:h=431fc8ca6be8
-  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016
+  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -829,16 +799,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''kems_second_third_law''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-132-nakajima-2016::nakajima_2016_t1_this_work_second_third_law::points:h=431fc8ca6be8
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_second_third_law'
+    origin: kems-132-nakajima-2016::nakajima_2016_t1_this_work_second_third_law
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-132-nakajima-2016
   locator:
@@ -850,7 +819,7 @@ observations:
   provenance:
     printed_phase: CsBO2_s
 - observation_id: kems-132-nakajima-2016::nakajima_2016_t1_this_work_second_third_law::points:h=4dc503d8830c
-  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016
+  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -895,16 +864,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''kems_second_third_law''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-132-nakajima-2016::nakajima_2016_t1_this_work_second_third_law::points:h=4dc503d8830c
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_second_third_law'
+    origin: kems-132-nakajima-2016::nakajima_2016_t1_this_work_second_third_law
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-132-nakajima-2016
   locator:
@@ -916,7 +884,7 @@ observations:
   provenance:
     printed_phase: CsBO2_s
 - observation_id: kems-132-nakajima-2016::nakajima_2016_t1_this_work_second_third_law::points:h=6dd9f5821738
-  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016
+  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -961,16 +929,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''kems_second_third_law''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-132-nakajima-2016::nakajima_2016_t1_this_work_second_third_law::points:h=6dd9f5821738
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_second_third_law'
+    origin: kems-132-nakajima-2016::nakajima_2016_t1_this_work_second_third_law
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-132-nakajima-2016
   locator:
@@ -982,7 +949,7 @@ observations:
   provenance:
     printed_phase: CsBO2_s
 - observation_id: kems-132-nakajima-2016::nakajima_2016_t2_ag_second_third_law::points:h=19e0cad4b623
-  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016
+  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1027,16 +994,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''kems_second_third_law''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-132-nakajima-2016::nakajima_2016_t2_ag_second_third_law::points:h=19e0cad4b623
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: literature_second_third_law'
+    origin: kems-132-nakajima-2016::nakajima_2016_t2_ag_second_third_law
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-132-nakajima-2016
   locator:
@@ -1048,7 +1014,7 @@ observations:
   provenance:
     printed_phase: Ag_s_l
 - observation_id: kems-132-nakajima-2016::nakajima_2016_t2_ag_second_third_law::points:h=3e7eb0690d93
-  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016
+  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1093,16 +1059,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''kems_second_third_law''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-132-nakajima-2016::nakajima_2016_t2_ag_second_third_law::points:h=3e7eb0690d93
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: literature_second_third_law'
+    origin: kems-132-nakajima-2016::nakajima_2016_t2_ag_second_third_law
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-132-nakajima-2016
   locator:
@@ -1114,7 +1079,7 @@ observations:
   provenance:
     printed_phase: Ag_s_l
 - observation_id: kems-132-nakajima-2016::nakajima_2016_t2_ag_second_third_law::points:h=4f1f5f532393
-  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016
+  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1159,16 +1124,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''kems_second_third_law''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-132-nakajima-2016::nakajima_2016_t2_ag_second_third_law::points:h=4f1f5f532393
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: literature_second_third_law'
+    origin: kems-132-nakajima-2016::nakajima_2016_t2_ag_second_third_law
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-132-nakajima-2016
   locator:
@@ -1180,7 +1144,7 @@ observations:
   provenance:
     printed_phase: Ag_s_l
 - observation_id: kems-132-nakajima-2016::nakajima_2016_t2_ag_second_third_law::points:h=5f97ed41b493
-  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016
+  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1225,16 +1189,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''kems_second_third_law''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-132-nakajima-2016::nakajima_2016_t2_ag_second_third_law::points:h=5f97ed41b493
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: literature_second_third_law'
+    origin: kems-132-nakajima-2016::nakajima_2016_t2_ag_second_third_law
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-132-nakajima-2016
   locator:
@@ -1246,7 +1209,7 @@ observations:
   provenance:
     printed_phase: Ag_s_l
 - observation_id: kems-132-nakajima-2016::nakajima_2016_t2_ag_second_third_law::points:h=8c68dd4d7ea9
-  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016
+  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1291,16 +1254,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''kems_second_third_law''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-132-nakajima-2016::nakajima_2016_t2_ag_second_third_law::points:h=8c68dd4d7ea9
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: literature_second_third_law'
+    origin: kems-132-nakajima-2016::nakajima_2016_t2_ag_second_third_law
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-132-nakajima-2016
   locator:
@@ -1312,7 +1274,7 @@ observations:
   provenance:
     printed_phase: Ag_s_l
 - observation_id: kems-132-nakajima-2016::nakajima_2016_t2_ag_second_third_law::points:h=957166fbad20
-  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016
+  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1357,16 +1319,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''kems_second_third_law''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-132-nakajima-2016::nakajima_2016_t2_ag_second_third_law::points:h=957166fbad20
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: literature_second_third_law'
+    origin: kems-132-nakajima-2016::nakajima_2016_t2_ag_second_third_law
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-132-nakajima-2016
   locator:
@@ -1378,7 +1339,7 @@ observations:
   provenance:
     printed_phase: Ag_s_l
 - observation_id: kems-132-nakajima-2016::nakajima_2016_t2_ag_second_third_law::points:h=a43944ff273c
-  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016
+  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1423,16 +1384,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''kems_second_third_law''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-132-nakajima-2016::nakajima_2016_t2_ag_second_third_law::points:h=a43944ff273c
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: literature_second_third_law'
+    origin: kems-132-nakajima-2016::nakajima_2016_t2_ag_second_third_law
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-132-nakajima-2016
   locator:
@@ -1444,7 +1404,7 @@ observations:
   provenance:
     printed_phase: Ag_s_l
 - observation_id: kems-132-nakajima-2016::nakajima_2016_t2_ag_second_third_law::points:h=f1fc9be6fac7
-  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016
+  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1489,16 +1449,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''kems_second_third_law''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-132-nakajima-2016::nakajima_2016_t2_ag_second_third_law::points:h=f1fc9be6fac7
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: literature_second_third_law'
+    origin: kems-132-nakajima-2016::nakajima_2016_t2_ag_second_third_law
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-132-nakajima-2016
   locator:
@@ -1510,7 +1469,7 @@ observations:
   provenance:
     printed_phase: Ag_s_l
 - observation_id: kems-132-nakajima-2016::nakajima_2016_t2_ag_second_third_law::points:h=f26ace4574f5
-  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016
+  experiment_id: 10.5702/massspectrometry.s0055::kems-132-nakajima-2016::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1555,16 +1514,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''kems_second_third_law''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-132-nakajima-2016::nakajima_2016_t2_ag_second_third_law::points:h=f26ace4574f5
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: literature_second_third_law'
+    origin: kems-132-nakajima-2016::nakajima_2016_t2_ag_second_third_law
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-132-nakajima-2016
   locator:

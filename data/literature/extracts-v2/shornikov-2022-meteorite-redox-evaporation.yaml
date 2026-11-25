@@ -325,7 +325,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - mass_loss_fraction
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: The source does not assign
+      a separate mass-loss bound to either reducing apparatus.'
     origin: shornikov-2022-meteorite-redox-evaporation::shornikov_2022_perovskite_residue_mass_loss_bound
     policy:
       id: DP-106

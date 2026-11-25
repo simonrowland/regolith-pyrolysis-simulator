@@ -34,8 +34,8 @@ experiments:
 - experiment_id: 10.1038/s41598-020-62312-4::engelschion-2020-eac1a-simulant
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'air_drying_before_density_measurement' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: unspecified
   sample: {}
   conditions:
     temperature_K:
@@ -63,11 +63,71 @@ experiments:
     page: 2
     section: Density
     note: standard=ASTM D4442
-- experiment_id: 10.1038/s41598-020-62312-4::experiment::dsc-simulant-series
+- experiment_id: 10.1038/s41598-020-62312-4::engelschion-2020-eac1a-simulant::declared:10.1038/s41598-020-62312-4::experiment::dsc-simulant-series::method:unspecified
   kind: literature
   method:
     tag: value
-    value: calorimetry
+    value: unspecified
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Six lunar regolith simulants, including EAC-1
+      locator:
+        page: 5
+        section: DSC
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_numeric
+      locator:
+        page: 5
+        section: DSC
+        note: Starts at room temperature; no numerical start temperature printed
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1038/s41598-020-62312-4
+  locator:
+    page: 5
+    section: DSC
+    note: Six lunar-regolith simulants measured under argon
+  bench_id: 10.1038/s41598-020-62312-4::bench::pegasus-dsc-404c
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Heated from room temperature to 1,200 C at 10 K/minute
+      locator:
+        page: 5
+        section: DSC
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 5
+        section: DSC
+        note: Heating rate and endpoints are printed, but no duration is stated
+- experiment_id: 10.1038/s41598-020-62312-4::experiment::dsc-simulant-series
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'differential_scanning_calorimetry' is not a closed method token (kems_effusion alone is insufficient)
   sample:
     printed_composition:
       state:

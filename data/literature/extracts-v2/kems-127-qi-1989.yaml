@@ -382,7 +382,7 @@ observations:
   provenance:
     printed_phase: liquid_Ag-In_and_Ag-Ga
 - observation_id: kems-127-qi-1989::qi_1989_table1_ionization_potentials_crc
-  experiment_id: 10.2320/matertrans1989.30.575::kems-127-qi-1989
+  experiment_id: 10.2320/matertrans1989.30.575::kems-127-qi-1989::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -429,6 +429,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_compilation'
+    origin: kems-127-qi-1989::qi_1989_table1_ionization_potentials_crc
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-127-qi-1989
   locator:
     published_page: 577
@@ -496,7 +506,7 @@ observations:
   provenance:
     printed_phase: vapor_over_Ag-In_and_Ag-Ga
 - observation_id: kems-127-qi-1989::qi_1989_table2_second_law_deltaH298
-  experiment_id: 10.2320/matertrans1989.30.575::kems-127-qi-1989
+  experiment_id: 10.2320/matertrans1989.30.575::kems-127-qi-1989::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -545,6 +555,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_third_law_thermochemistry'
+    origin: kems-127-qi-1989::qi_1989_table2_second_law_deltaH298
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-127-qi-1989
   locator:
     published_page: 577

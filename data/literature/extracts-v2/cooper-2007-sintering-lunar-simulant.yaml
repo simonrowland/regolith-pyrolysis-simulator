@@ -52,6 +52,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: sintering'
+    origin: cooper-2007-sintering-lunar-simulant::cooper_2007_apollo14_glass_sintering_minutes_800c
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: cooper-2007-sintering-lunar-simulant
   locator:
     pdf_page_index: 1
@@ -139,6 +149,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: simulant_characterisation'
+    origin: cooper-2007-sintering-lunar-simulant::cooper_2007_jsc1a_grain_size_statistics
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: cooper-2007-sintering-lunar-simulant
   locator:
     pdf_page_index: 8
@@ -226,6 +246,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: sintering'
+    origin: cooper-2007-sintering-lunar-simulant::cooper_2007_jsc1a_sintering_1050c_three_hours
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -348,6 +379,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: sintering'
+    origin: cooper-2007-sintering-lunar-simulant::cooper_2007_jsc1a_sintering_1100c_quoted
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -440,6 +482,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: sintering'
+    origin: cooper-2007-sintering-lunar-simulant::cooper_2007_jsc1af_figure1_sintering_threshold
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: cooper-2007-sintering-lunar-simulant
   locator:
     pdf_page_index: 2
@@ -503,6 +555,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: simulant_characterisation'
+    origin: cooper-2007-sintering-lunar-simulant::cooper_2007_jsc1af_grain_size_statistics
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: cooper-2007-sintering-lunar-simulant
   locator:
     pdf_page_index: 8

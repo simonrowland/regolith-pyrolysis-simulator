@@ -86,22 +86,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'missing input: printed air fO2 requires stated total pressure'
-    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_a::T=1873.15:row=1:h=ad6d3f98d591
   - kind: method_unstated
     affected_quantities:
     - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_a::T=1873.15:row=1:h=ad6d3f98d591
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: optical absorption spectroscopy
+      and ESR; row-specific allocation not stated'
+    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_a
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_a::T=1873.15:row=1:h=ad6d3f98d591
   source_id: leister-ehrt-2000-polyvalent-redox
   locator:
     page: 5
@@ -288,22 +289,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'missing input: printed air fO2 requires stated total pressure'
-    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_a::T=1873.15:row=2:h=0eb58827bfd8
   - kind: method_unstated
     affected_quantities:
     - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_a::T=1873.15:row=2:h=0eb58827bfd8
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: optical absorption spectroscopy
+      and ESR; row-specific allocation not stated'
+    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_a
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_a::T=1873.15:row=2:h=0eb58827bfd8
   source_id: leister-ehrt-2000-polyvalent-redox
   locator:
     page: 5
@@ -493,8 +495,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_a::T=2073.15:row=3:h=67e2f92a5723
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: optical absorption spectroscopy
+      and ESR; row-specific allocation not stated'
+    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_a
     policy:
       id: DP-106
       version: 1
@@ -671,22 +674,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'missing input: printed air fO2 requires stated total pressure'
-    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_b::T=1773.15:row=iron:h=62d1fb7bb45d
   - kind: method_unstated
     affected_quantities:
     - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_b::T=1773.15:row=iron:h=62d1fb7bb45d
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: optical absorption spectroscopy
+      and ESR; row-specific allocation not stated'
+    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_b
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_b::T=1773.15:row=iron:h=62d1fb7bb45d
   source_id: leister-ehrt-2000-polyvalent-redox
   locator:
     page: 3
@@ -876,22 +880,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'missing input: printed air fO2 requires stated total pressure'
-    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_b::T=1873.15:row=1:h=0729256e08e2
   - kind: method_unstated
     affected_quantities:
     - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_b::T=1873.15:row=1:h=0729256e08e2
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: optical absorption spectroscopy
+      and ESR; row-specific allocation not stated'
+    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_b
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_b::T=1873.15:row=1:h=0729256e08e2
   source_id: leister-ehrt-2000-polyvalent-redox
   locator:
     page: 5
@@ -1078,22 +1083,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'missing input: printed air fO2 requires stated total pressure'
-    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_b::T=1873.15:row=2:h=a6361cadef9c
   - kind: method_unstated
     affected_quantities:
     - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_b::T=1873.15:row=2:h=a6361cadef9c
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: optical absorption spectroscopy
+      and ESR; row-specific allocation not stated'
+    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_b
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_b::T=1873.15:row=2:h=a6361cadef9c
   source_id: leister-ehrt-2000-polyvalent-redox
   locator:
     page: 5
@@ -1283,8 +1289,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_b::T=2073.15:row=3:h=ecfb59e0dd04
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: optical absorption spectroscopy
+      and ESR; row-specific allocation not stated'
+    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_b
     policy:
       id: DP-106
       version: 1
@@ -1464,8 +1471,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_b::T=2073.15:row=5:h=fb992e8c9550
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: optical absorption spectroscopy
+      and ESR; row-specific allocation not stated'
+    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_b
     policy:
       id: DP-106
       version: 1
@@ -1645,8 +1653,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_b::T=2273.15:row=4:h=82c2f572b23e
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: optical absorption spectroscopy
+      and ESR; row-specific allocation not stated'
+    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_b
     policy:
       id: DP-106
       version: 1
@@ -1827,22 +1836,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'missing input: printed air fO2 requires stated total pressure'
-    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_c::T=1873.15:row=1:h=ac46444fa1a6
   - kind: method_unstated
     affected_quantities:
     - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_c::T=1873.15:row=1:h=ac46444fa1a6
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: optical absorption spectroscopy
+      and ESR; row-specific allocation not stated'
+    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_c
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_c::T=1873.15:row=1:h=ac46444fa1a6
   source_id: leister-ehrt-2000-polyvalent-redox
   locator:
     page: 5
@@ -2033,22 +2043,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'missing input: printed air fO2 requires stated total pressure'
-    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_c::T=1873.15:row=2:h=18497705bdc4
   - kind: method_unstated
     affected_quantities:
     - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_c::T=1873.15:row=2:h=18497705bdc4
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: optical absorption spectroscopy
+      and ESR; row-specific allocation not stated'
+    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_c
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_c::T=1873.15:row=2:h=18497705bdc4
   source_id: leister-ehrt-2000-polyvalent-redox
   locator:
     page: 5
@@ -2242,8 +2253,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_c::T=2073.15:row=3:h=00b1ab593e2a
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: optical absorption spectroscopy
+      and ESR; row-specific allocation not stated'
+    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_c
     policy:
       id: DP-106
       version: 1
@@ -2427,8 +2439,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_c::T=2073.15:row=5:h=0fa7e4911530
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: optical absorption spectroscopy
+      and ESR; row-specific allocation not stated'
+    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_c
     policy:
       id: DP-106
       version: 1
@@ -2612,8 +2625,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_c::T=2273.15:row=4:h=2ffba02b3d02
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: optical absorption spectroscopy
+      and ESR; row-specific allocation not stated'
+    origin: leister-ehrt-2000-polyvalent-redox::leister_2000_fe_table1_glass_c
     policy:
       id: DP-106
       version: 1

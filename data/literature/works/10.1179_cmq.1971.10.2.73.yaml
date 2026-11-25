@@ -31,7 +31,7 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.1179/cmq.1971.10.2.73
 experiments:
-- experiment_id: 10.1179/cmq.1971.10.2.73::experiment::distin1971-1785c
+- experiment_id: 10.1179/cmq.1971.10.2.73::distin-1971-ferrous-silicate-melts::declared:10.1179/cmq.1971.10.2.73::experiment::distin1971-1785c::method:unspecified
   kind: literature
   method:
     tag: value
@@ -90,7 +90,7 @@ experiments:
       parameters: []
       output_unit: as_published
       references: []
-- experiment_id: 10.1179/cmq.1971.10.2.73::experiment::distin1971-1880c
+- experiment_id: 10.1179/cmq.1971.10.2.73::distin-1971-ferrous-silicate-melts::declared:10.1179/cmq.1971.10.2.73::experiment::distin1971-1880c::method:unspecified
   kind: literature
   method:
     tag: value
@@ -149,11 +149,191 @@ experiments:
       parameters: []
       output_unit: as_published
       references: []
-- experiment_id: 10.1179/cmq.1971.10.2.73::experiment::distin1971-1960c
+- experiment_id: 10.1179/cmq.1971.10.2.73::distin-1971-ferrous-silicate-melts::declared:10.1179/cmq.1971.10.2.73::experiment::distin1971-1960c::method:unspecified
   kind: literature
   method:
     tag: value
     value: unspecified
+  sample: {}
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1960'
+          approximate: false
+      locator:
+        page: 74
+        table: Experimental results
+    atmosphere:
+      state:
+        tag: unknown
+        reason: condition atmosphere is not a scalar numeric value
+      locator:
+        page: 74
+        section: Experimental
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1179/cmq.1971.10.2.73
+  locator:
+    page: 74
+    table: Experimental results
+  fe_metal_saturated:
+    state:
+      tag: value
+      value: true
+    locator:
+      page: 73
+    inference:
+      relation: extract_inference
+      inputs:
+      - inferred=true
+      - 'Inferred, not printed: the p. 73 equilibrium contact between liquid iron and liquid slag, together with the p. 74
+        activity definition against pure FeO, supports Fe-metal saturation. The paper does not name a buffer or report fO2.'
+      parameters: []
+      output_unit: as_published
+      references: []
+- experiment_id: 10.1179/cmq.1971.10.2.73::experiment::distin1971-1785c
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'electromagnetic levitation slag-metal equilibration' is not a closed method token (kems_effusion alone
+      is insufficient)
+  sample: {}
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1785'
+          approximate: false
+      locator:
+        page: 74
+        table: Experimental results
+    atmosphere:
+      state:
+        tag: unknown
+        reason: condition atmosphere is not a scalar numeric value
+      locator:
+        page: 74
+        section: Experimental
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1179/cmq.1971.10.2.73
+  locator:
+    page: 74
+    table: Experimental results
+  fe_metal_saturated:
+    state:
+      tag: value
+      value: true
+    locator:
+      page: 73
+    inference:
+      relation: extract_inference
+      inputs:
+      - inferred=true
+      - 'Inferred, not printed: the p. 73 equilibrium contact between liquid iron and liquid slag, together with the p. 74
+        activity definition against pure FeO, supports Fe-metal saturation. The paper does not name a buffer or report fO2.'
+      parameters: []
+      output_unit: as_published
+      references: []
+- experiment_id: 10.1179/cmq.1971.10.2.73::experiment::distin1971-1880c
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'electromagnetic levitation slag-metal equilibration' is not a closed method token (kems_effusion alone
+      is insufficient)
+  sample: {}
+  conditions:
+    temperature_C_as_printed:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1880'
+          approximate: false
+      locator:
+        page: 74
+        table: Experimental results
+    atmosphere:
+      state:
+        tag: unknown
+        reason: condition atmosphere is not a scalar numeric value
+      locator:
+        page: 74
+        section: Experimental
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1179/cmq.1971.10.2.73
+  locator:
+    page: 74
+    table: Experimental results
+  fe_metal_saturated:
+    state:
+      tag: value
+      value: true
+    locator:
+      page: 73
+    inference:
+      relation: extract_inference
+      inputs:
+      - inferred=true
+      - 'Inferred, not printed: the p. 73 equilibrium contact between liquid iron and liquid slag, together with the p. 74
+        activity definition against pure FeO, supports Fe-metal saturation. The paper does not name a buffer or report fO2.'
+      parameters: []
+      output_unit: as_published
+      references: []
+- experiment_id: 10.1179/cmq.1971.10.2.73::experiment::distin1971-1960c
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'electromagnetic levitation slag-metal equilibration' is not a closed method token (kems_effusion alone
+      is insufficient)
   sample: {}
   conditions:
     temperature_C_as_printed:

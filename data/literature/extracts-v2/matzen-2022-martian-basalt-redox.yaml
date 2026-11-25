@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/matzen-2022-martian-basalt-redox.yaml
 observations:
 - observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_11_method_a
-  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-11
+  experiment_id: 10.2138/am-2021-7682::matzen-2022-martian-basalt-redox::declared:10.2138/am-2021-7682::experiment::matzen-run-11::method:mossbauer_spectroscopy
   identity:
     quantity:
       tag: value
@@ -86,17 +86,6 @@ observations:
     - fe3_fe2_ratio
     reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
     origin: matzen-2022-martian-basalt-redox::matzen_2022_run_11_method_a
-  - kind: method_unstated
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_11_method_a
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -141,7 +130,7 @@ observations:
   provenance:
     printed_phase: quenched synthetic Martian basalt glass
 - observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_11_method_b
-  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-11
+  experiment_id: 10.2138/am-2021-7682::matzen-2022-martian-basalt-redox::declared:10.2138/am-2021-7682::experiment::matzen-run-11::method:mossbauer_spectroscopy
   identity:
     quantity:
       tag: value
@@ -224,17 +213,6 @@ observations:
     - fe3_fe2_ratio
     reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
     origin: matzen-2022-martian-basalt-redox::matzen_2022_run_11_method_b
-  - kind: method_unstated
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_11_method_b
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -279,7 +257,7 @@ observations:
   provenance:
     printed_phase: quenched synthetic Martian basalt glass
 - observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_13_method_a
-  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-13
+  experiment_id: 10.2138/am-2021-7682::matzen-2022-martian-basalt-redox::declared:10.2138/am-2021-7682::experiment::matzen-run-13::method:mossbauer_spectroscopy
   identity:
     quantity:
       tag: value
@@ -362,17 +340,6 @@ observations:
     - fe3_fe2_ratio
     reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
     origin: matzen-2022-martian-basalt-redox::matzen_2022_run_13_method_a
-  - kind: method_unstated
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_13_method_a
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -417,7 +384,7 @@ observations:
   provenance:
     printed_phase: quenched synthetic Martian basalt glass
 - observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_13_method_b
-  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-13
+  experiment_id: 10.2138/am-2021-7682::matzen-2022-martian-basalt-redox::declared:10.2138/am-2021-7682::experiment::matzen-run-13::method:mossbauer_spectroscopy
   identity:
     quantity:
       tag: value
@@ -500,17 +467,6 @@ observations:
     - fe3_fe2_ratio
     reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
     origin: matzen-2022-martian-basalt-redox::matzen_2022_run_13_method_b
-  - kind: method_unstated
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_13_method_b
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -555,7 +511,7 @@ observations:
   provenance:
     printed_phase: quenched synthetic Martian basalt glass
 - observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_15_method_a
-  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-15
+  experiment_id: 10.2138/am-2021-7682::matzen-2022-martian-basalt-redox::declared:10.2138/am-2021-7682::experiment::matzen-run-15::method:mossbauer_spectroscopy
   identity:
     quantity:
       tag: value
@@ -638,17 +594,6 @@ observations:
     - fe3_fe2_ratio
     reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
     origin: matzen-2022-martian-basalt-redox::matzen_2022_run_15_method_a
-  - kind: method_unstated
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_15_method_a
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -693,7 +638,7 @@ observations:
   provenance:
     printed_phase: quenched synthetic Martian basalt glass
 - observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_15_method_b
-  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-15
+  experiment_id: 10.2138/am-2021-7682::matzen-2022-martian-basalt-redox::declared:10.2138/am-2021-7682::experiment::matzen-run-15::method:mossbauer_spectroscopy
   identity:
     quantity:
       tag: value
@@ -776,17 +721,6 @@ observations:
     - fe3_fe2_ratio
     reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
     origin: matzen-2022-martian-basalt-redox::matzen_2022_run_15_method_b
-  - kind: method_unstated
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_15_method_b
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -831,7 +765,7 @@ observations:
   provenance:
     printed_phase: quenched synthetic Martian basalt glass
 - observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_20_method_a
-  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-20
+  experiment_id: 10.2138/am-2021-7682::matzen-2022-martian-basalt-redox::declared:10.2138/am-2021-7682::experiment::matzen-run-20::method:mossbauer_spectroscopy
   identity:
     quantity:
       tag: value
@@ -914,17 +848,6 @@ observations:
     - fe3_fe2_ratio
     reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
     origin: matzen-2022-martian-basalt-redox::matzen_2022_run_20_method_a
-  - kind: method_unstated
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_20_method_a
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -969,7 +892,7 @@ observations:
   provenance:
     printed_phase: quenched synthetic Martian basalt glass
 - observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_20_method_b
-  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-20
+  experiment_id: 10.2138/am-2021-7682::matzen-2022-martian-basalt-redox::declared:10.2138/am-2021-7682::experiment::matzen-run-20::method:mossbauer_spectroscopy
   identity:
     quantity:
       tag: value
@@ -1052,17 +975,6 @@ observations:
     - fe3_fe2_ratio
     reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
     origin: matzen-2022-martian-basalt-redox::matzen_2022_run_20_method_b
-  - kind: method_unstated
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_20_method_b
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -1107,7 +1019,7 @@ observations:
   provenance:
     printed_phase: quenched synthetic Martian basalt glass
 - observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_21_method_a
-  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-21
+  experiment_id: 10.2138/am-2021-7682::matzen-2022-martian-basalt-redox::declared:10.2138/am-2021-7682::experiment::matzen-run-21::method:mossbauer_spectroscopy
   identity:
     quantity:
       tag: value
@@ -1185,17 +1097,6 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_unstated
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_21_method_a
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -1240,7 +1141,7 @@ observations:
   provenance:
     printed_phase: quenched synthetic Martian basalt glass
 - observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_21_method_b
-  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-21
+  experiment_id: 10.2138/am-2021-7682::matzen-2022-martian-basalt-redox::declared:10.2138/am-2021-7682::experiment::matzen-run-21::method:mossbauer_spectroscopy
   identity:
     quantity:
       tag: value
@@ -1318,17 +1219,6 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_unstated
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_21_method_b
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -1373,7 +1263,7 @@ observations:
   provenance:
     printed_phase: quenched synthetic Martian basalt glass
 - observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_27_method_a
-  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-27
+  experiment_id: 10.2138/am-2021-7682::matzen-2022-martian-basalt-redox::declared:10.2138/am-2021-7682::experiment::matzen-run-27::method:mossbauer_spectroscopy
   identity:
     quantity:
       tag: value
@@ -1456,17 +1346,6 @@ observations:
     - fe3_fe2_ratio
     reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
     origin: matzen-2022-martian-basalt-redox::matzen_2022_run_27_method_a
-  - kind: method_unstated
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_27_method_a
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -1511,7 +1390,7 @@ observations:
   provenance:
     printed_phase: quenched synthetic Martian basalt glass
 - observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_27_method_b
-  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-27
+  experiment_id: 10.2138/am-2021-7682::matzen-2022-martian-basalt-redox::declared:10.2138/am-2021-7682::experiment::matzen-run-27::method:mossbauer_spectroscopy
   identity:
     quantity:
       tag: value
@@ -1594,17 +1473,6 @@ observations:
     - fe3_fe2_ratio
     reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
     origin: matzen-2022-martian-basalt-redox::matzen_2022_run_27_method_b
-  - kind: method_unstated
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_27_method_b
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -1649,7 +1517,7 @@ observations:
   provenance:
     printed_phase: quenched synthetic Martian basalt glass
 - observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_30_method_a
-  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-30
+  experiment_id: 10.2138/am-2021-7682::matzen-2022-martian-basalt-redox::declared:10.2138/am-2021-7682::experiment::matzen-run-30::method:mossbauer_spectroscopy
   identity:
     quantity:
       tag: value
@@ -1732,17 +1600,6 @@ observations:
     - fe3_fe2_ratio
     reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
     origin: matzen-2022-martian-basalt-redox::matzen_2022_run_30_method_a
-  - kind: method_unstated
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_30_method_a
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -1787,7 +1644,7 @@ observations:
   provenance:
     printed_phase: quenched synthetic Martian basalt glass
 - observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_30_method_b
-  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-30
+  experiment_id: 10.2138/am-2021-7682::matzen-2022-martian-basalt-redox::declared:10.2138/am-2021-7682::experiment::matzen-run-30::method:mossbauer_spectroscopy
   identity:
     quantity:
       tag: value
@@ -1871,17 +1728,6 @@ observations:
     - fe3_fe2_ratio
     reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
     origin: matzen-2022-martian-basalt-redox::matzen_2022_run_30_method_b
-  - kind: method_unstated
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_30_method_b
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   source_id: matzen-2022-martian-basalt-redox
   locator:
     page: 39
@@ -1911,7 +1757,7 @@ observations:
   provenance:
     printed_phase: quenched synthetic Martian basalt glass
 - observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_31_method_a
-  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-31
+  experiment_id: 10.2138/am-2021-7682::matzen-2022-martian-basalt-redox::declared:10.2138/am-2021-7682::experiment::matzen-run-31::method:mossbauer_spectroscopy
   identity:
     quantity:
       tag: value
@@ -1994,17 +1840,6 @@ observations:
     - fe3_fe2_ratio
     reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
     origin: matzen-2022-martian-basalt-redox::matzen_2022_run_31_method_a
-  - kind: method_unstated
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_31_method_a
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -2049,7 +1884,7 @@ observations:
   provenance:
     printed_phase: quenched synthetic Martian basalt glass
 - observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_31_method_b
-  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-31
+  experiment_id: 10.2138/am-2021-7682::matzen-2022-martian-basalt-redox::declared:10.2138/am-2021-7682::experiment::matzen-run-31::method:mossbauer_spectroscopy
   identity:
     quantity:
       tag: value
@@ -2132,17 +1967,6 @@ observations:
     - fe3_fe2_ratio
     reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
     origin: matzen-2022-martian-basalt-redox::matzen_2022_run_31_method_b
-  - kind: method_unstated
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_31_method_b
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -2187,7 +2011,7 @@ observations:
   provenance:
     printed_phase: quenched synthetic Martian basalt glass
 - observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_57_method_a
-  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-57
+  experiment_id: 10.2138/am-2021-7682::matzen-2022-martian-basalt-redox::declared:10.2138/am-2021-7682::experiment::matzen-run-57::method:mossbauer_spectroscopy
   identity:
     quantity:
       tag: value
@@ -2270,17 +2094,6 @@ observations:
     - fe3_fe2_ratio
     reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
     origin: matzen-2022-martian-basalt-redox::matzen_2022_run_57_method_a
-  - kind: method_unstated
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_57_method_a
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -2325,7 +2138,7 @@ observations:
   provenance:
     printed_phase: quenched synthetic Martian basalt glass
 - observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_57_method_b
-  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-57
+  experiment_id: 10.2138/am-2021-7682::matzen-2022-martian-basalt-redox::declared:10.2138/am-2021-7682::experiment::matzen-run-57::method:mossbauer_spectroscopy
   identity:
     quantity:
       tag: value
@@ -2409,17 +2222,6 @@ observations:
     - fe3_fe2_ratio
     reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
     origin: matzen-2022-martian-basalt-redox::matzen_2022_run_57_method_b
-  - kind: method_unstated
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_57_method_b
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   source_id: matzen-2022-martian-basalt-redox
   locator:
     page: 39
@@ -2443,7 +2245,7 @@ observations:
   provenance:
     printed_phase: quenched synthetic Martian basalt glass
 - observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_60_method_a
-  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-60
+  experiment_id: 10.2138/am-2021-7682::matzen-2022-martian-basalt-redox::declared:10.2138/am-2021-7682::experiment::matzen-run-60::method:mossbauer_spectroscopy
   identity:
     quantity:
       tag: value
@@ -2526,17 +2328,6 @@ observations:
     - fe3_fe2_ratio
     reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
     origin: matzen-2022-martian-basalt-redox::matzen_2022_run_60_method_a
-  - kind: method_unstated
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_60_method_a
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -2581,7 +2372,7 @@ observations:
   provenance:
     printed_phase: quenched synthetic Martian basalt glass
 - observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_60_method_b
-  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-60
+  experiment_id: 10.2138/am-2021-7682::matzen-2022-martian-basalt-redox::declared:10.2138/am-2021-7682::experiment::matzen-run-60::method:mossbauer_spectroscopy
   identity:
     quantity:
       tag: value
@@ -2664,17 +2455,6 @@ observations:
     - fe3_fe2_ratio
     reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
     origin: matzen-2022-martian-basalt-redox::matzen_2022_run_60_method_b
-  - kind: method_unstated
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_60_method_b
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -2719,7 +2499,7 @@ observations:
   provenance:
     printed_phase: quenched synthetic Martian basalt glass
 - observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_61_method_a
-  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-61
+  experiment_id: 10.2138/am-2021-7682::matzen-2022-martian-basalt-redox::declared:10.2138/am-2021-7682::experiment::matzen-run-61::method:mossbauer_spectroscopy
   identity:
     quantity:
       tag: value
@@ -2802,17 +2582,6 @@ observations:
     - fe3_fe2_ratio
     reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
     origin: matzen-2022-martian-basalt-redox::matzen_2022_run_61_method_a
-  - kind: method_unstated
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_61_method_a
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -2857,7 +2626,7 @@ observations:
   provenance:
     printed_phase: quenched synthetic Martian basalt glass
 - observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_61_method_b
-  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-61
+  experiment_id: 10.2138/am-2021-7682::matzen-2022-martian-basalt-redox::declared:10.2138/am-2021-7682::experiment::matzen-run-61::method:mossbauer_spectroscopy
   identity:
     quantity:
       tag: value
@@ -2940,17 +2709,6 @@ observations:
     - fe3_fe2_ratio
     reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
     origin: matzen-2022-martian-basalt-redox::matzen_2022_run_61_method_b
-  - kind: method_unstated
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_61_method_b
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -2995,7 +2753,7 @@ observations:
   provenance:
     printed_phase: quenched synthetic Martian basalt glass
 - observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_7_method_a
-  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-7
+  experiment_id: 10.2138/am-2021-7682::matzen-2022-martian-basalt-redox::declared:10.2138/am-2021-7682::experiment::matzen-run-7::method:mossbauer_spectroscopy
   identity:
     quantity:
       tag: value
@@ -3073,17 +2831,6 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_unstated
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_7_method_a
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -3128,7 +2875,7 @@ observations:
   provenance:
     printed_phase: quenched synthetic Martian basalt glass
 - observation_id: matzen-2022-martian-basalt-redox::matzen_2022_run_7_method_b
-  experiment_id: 10.2138/am-2021-7682::experiment::matzen-run-7
+  experiment_id: 10.2138/am-2021-7682::matzen-2022-martian-basalt-redox::declared:10.2138/am-2021-7682::experiment::matzen-run-7::method:mossbauer_spectroscopy
   identity:
     quantity:
       tag: value
@@ -3206,17 +2953,6 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_unstated
-    affected_quantities:
-    - fe3_fe2_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: matzen-2022-martian-basalt-redox::matzen_2022_run_7_method_b
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio

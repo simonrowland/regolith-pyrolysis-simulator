@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/lpsc-2024-bennu-pyrolysis-vandam.yaml
 observations:
 - observation_id: lpsc-2024-bennu-pyrolysis-vandam::mojarro_2024_ql_alanine_glycine_vs_murchison
-  experiment_id: 8b79bdb9022f5df4da0a30d1c4bc731d1e2bf5895fbebf188091571818833877::experiment::wet-chemistry-pyrolysis-250C
+  experiment_id: 8b79bdb9022f5df4da0a30d1c4bc731d1e2bf5895fbebf188091571818833877::lpsc-2024-bennu-pyrolysis-vandam::declared:8b79bdb9022f5df4da0a30d1c4bc731d1e2bf5895fbebf188091571818833877::experiment::wet-chemistry-pyrolysis-250C::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -52,6 +52,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: wet_chemistry_silylation_py_gc_qqq_ms'
+    origin: lpsc-2024-bennu-pyrolysis-vandam::mojarro_2024_ql_alanine_glycine_vs_murchison
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: lpsc-2024-bennu-pyrolysis-vandam
   locator:
     pdf_page_index: 1

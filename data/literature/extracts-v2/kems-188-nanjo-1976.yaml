@@ -250,6 +250,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_compilation'
+    origin: kems-188-nanjo-1976::nanjo_1976_table1_literature_deltaHvap
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-188-nanjo-1976
   locator:
     published_page: 960

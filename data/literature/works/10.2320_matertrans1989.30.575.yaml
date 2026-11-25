@@ -149,3 +149,121 @@ experiments:
           pdf_page_index: 2
           figure: '1'
           note: Hitachi RM-6K; alumina Knudsen cell; 0.5 mm orifice
+- experiment_id: 10.2320/matertrans1989.30.575::kems-127-qi-1989::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0015'
+          approximate: false
+      locator:
+        published_page: 576
+        pdf_page_index: 2
+        figure: '1'
+        note: Hitachi RM-6K; alumina Knudsen cell; 0.5 mm orifice
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=1.5 g
+        - printed=sample_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1.5'
+            locator:
+              published_page: 576
+              pdf_page_index: 2
+              figure: '1'
+              note: Hitachi RM-6K; alumina Knudsen cell; 0.5 mm orifice
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              published_page: 576
+              pdf_page_index: 2
+              figure: '1'
+              note: Hitachi RM-6K; alumina Knudsen cell; 0.5 mm orifice
+        output_unit: kg
+        references: []
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00007'
+          approximate: false
+      locator:
+        published_page: 577
+        pdf_page_index: 3
+        note: The vacuum in the furnace could be maintained at 7 x 10^-5 Pa
+      inference:
+        relation: identity:Pa
+        inputs:
+        - as_published=7e-5 Pa as printed (furnace vacuum)
+        - printed=pressure_Pa
+        - as_printed=7e-5 Pa as printed (furnace vacuum)
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.00007'
+            locator:
+              published_page: 577
+              pdf_page_index: 3
+              note: The vacuum in the furnace could be maintained at 7 x 10^-5 Pa
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2320/matertrans1989.30.575
+  locator:
+    published_page: 576
+    pdf_page_index: 2
+    figure: '1'
+    note: Hitachi RM-6K; alumina Knudsen cell; 0.5 mm orifice
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'Alumina Knudsen cell (Hitachi RM-6K single-focus mass spectrometer). Fig. 2: inner diameter 8.5 mm, outer
+          diameter 10.5 mm, inner height 9.7 mm, orifice-lid thickness 0.6 mm, orifice 0.5 mm. Cell holder: text says molybdenum;
+          Fig. 2 caption says tantalum (both recorded). Ta cell supporter; Mo radiation shields; BN insulator. Main heater
+          W; sub-heater double-wound 0.3 mm W wire. Pt/Pt-Rh thermocouple at the bottom of the cell holder (%Rh unstated).
+          Orifices 0.3 and 0.5 mm tested; 0.5 mm used.'
+      locator:
+        published_page: 576
+        pdf_page_index: 2
+        figure: '1'
+        note: Hitachi RM-6K; alumina Knudsen cell; 0.5 mm orifice
+    ionization:
+      electron_energy_eV:
+        state:
+          tag: value
+          value: unstated
+        locator:
+          published_page: 576
+          pdf_page_index: 2
+          figure: '1'
+          note: Hitachi RM-6K; alumina Knudsen cell; 0.5 mm orifice

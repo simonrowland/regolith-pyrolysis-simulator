@@ -165,7 +165,7 @@ observations:
     reaction_as_printed: 2[Cr]Cu + (3/2)O2(g) = <Cr2O3>
     printed_phase: cr
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_eq24_log_gamma_Cr
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::experiment::iwahashi-2021-cr-oxide-solid-activities-activity-equilibration-series
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::declared:10.2355/isijinternational.isijint-2020-752::experiment::iwahashi-2021-cr-oxide-solid-activities-activity-equilibration-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -249,7 +249,20 @@ observations:
         pdf_page_index: 4
         equation: '24'
         note: Eq. 24 reports log gamma_Cr = 1.54 at 1 573 K; regression range X_Cr < 10^-2.
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Henry-law range X_Cr
+      < 10^-2; printed source evidence: Henry-law regression intercept from the authors'' equilibrium measurements in pure
+      Cr2O3 crucibles, using Eq. 14 and Eq. 23.'
+    origin: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_eq24_log_gamma_Cr
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: iwahashi-2021-cr-oxide-solid-activities
   locator:
     page: 5
@@ -343,7 +356,7 @@ observations:
     printed_value: '1.54'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_eq26_log_activity_Cr2O3
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::experiment::iwahashi-2021-cr-oxide-solid-activities-activity-equilibration-series
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::declared:10.2355/isijinternational.isijint-2020-752::experiment::iwahashi-2021-cr-oxide-solid-activities-activity-equilibration-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -435,7 +448,20 @@ observations:
         pdf_page_index: 5
         equation: '26'
         note: Eq. (26) prints log a_Cr2O3 = -1.33 ± 0.09 for CaO + CaCr2O4.
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: solid-phase assemblage;
+      printed source evidence: Activity reduced by the authors from equilibrium X_Cr versus log(P_O2/atm) data using Eq. 25;
+      the source states no confidence level for the printed ± width.'
+    origin: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_eq26_log_activity_Cr2O3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: iwahashi-2021-cr-oxide-solid-activities
   locator:
     page: 6
@@ -540,7 +566,7 @@ observations:
     printed_value: '-1.33'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_eq27_log_activity_Cr2O3
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::experiment::iwahashi-2021-cr-oxide-solid-activities-activity-equilibration-series
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::declared:10.2355/isijinternational.isijint-2020-752::experiment::iwahashi-2021-cr-oxide-solid-activities-activity-equilibration-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -632,7 +658,20 @@ observations:
         pdf_page_index: 5
         equation: '27'
         note: Eq. (27) prints log a_Cr2O3 = -0.35 ± 0.08 for CaSiO3 + SiO2 + Ca3Cr2Si3O12.
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: solid-phase assemblage;
+      printed source evidence: Activity reduced by the authors from equilibrium X_Cr versus log(P_O2/atm) data using Eq. 25;
+      the source states no confidence level for the printed ± width.'
+    origin: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_eq27_log_activity_Cr2O3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: iwahashi-2021-cr-oxide-solid-activities
   locator:
     page: 6
@@ -830,7 +869,21 @@ observations:
         pdf_page_index: 3
         table: '2'
         note: row_label=1-1; column_header=X_Cu, Equilibrium (printed header); interpreted as X_Cr by Eq. 15 and prose
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: equilibration; printed
+      source evidence: Liquid Cu–Cr alloy equilibrated with the printed oxide crucible in an Ar + H2 + CO2 gas mixture at
+      1 573 K. Chromium contents in the alloy samples were analyzed with an inductively coupled plasma spectrometer; samples
+      were cooled inside the furnace tube before analysis.'
+    origin: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p004_t02_r04_c07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: iwahashi-2021-cr-oxide-solid-activities
   locator:
     page: 4
@@ -1003,7 +1056,21 @@ observations:
         pdf_page_index: 3
         table: '2'
         note: row_label=1-2; column_header=X_Cu, Equilibrium (printed header); interpreted as X_Cr by Eq. 15 and prose
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: equilibration; printed
+      source evidence: Liquid Cu–Cr alloy equilibrated with the printed oxide crucible in an Ar + H2 + CO2 gas mixture at
+      1 573 K. Chromium contents in the alloy samples were analyzed with an inductively coupled plasma spectrometer; samples
+      were cooled inside the furnace tube before analysis.'
+    origin: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p004_t02_r05_c07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: iwahashi-2021-cr-oxide-solid-activities
   locator:
     page: 4
@@ -1176,7 +1243,21 @@ observations:
         pdf_page_index: 3
         table: '2'
         note: row_label=2-1; column_header=X_Cu, Equilibrium (printed header); interpreted as X_Cr by Eq. 15 and prose
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: equilibration; printed
+      source evidence: Liquid Cu–Cr alloy equilibrated with the printed oxide crucible in an Ar + H2 + CO2 gas mixture at
+      1 573 K. Chromium contents in the alloy samples were analyzed with an inductively coupled plasma spectrometer; samples
+      were cooled inside the furnace tube before analysis.'
+    origin: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p004_t02_r06_c07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: iwahashi-2021-cr-oxide-solid-activities
   locator:
     page: 4
@@ -1349,7 +1430,21 @@ observations:
         pdf_page_index: 3
         table: '2'
         note: row_label=2-2; column_header=X_Cu, Equilibrium (printed header); interpreted as X_Cr by Eq. 15 and prose
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: equilibration; printed
+      source evidence: Liquid Cu–Cr alloy equilibrated with the printed oxide crucible in an Ar + H2 + CO2 gas mixture at
+      1 573 K. Chromium contents in the alloy samples were analyzed with an inductively coupled plasma spectrometer; samples
+      were cooled inside the furnace tube before analysis.'
+    origin: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p004_t02_r07_c07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: iwahashi-2021-cr-oxide-solid-activities
   locator:
     page: 4
@@ -1522,7 +1617,21 @@ observations:
         pdf_page_index: 3
         table: '2'
         note: row_label=3-1; column_header=X_Cu, Equilibrium (printed header); interpreted as X_Cr by Eq. 15 and prose
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: equilibration; printed
+      source evidence: Liquid Cu–Cr alloy equilibrated with the printed oxide crucible in an Ar + H2 + CO2 gas mixture at
+      1 573 K. Chromium contents in the alloy samples were analyzed with an inductively coupled plasma spectrometer; samples
+      were cooled inside the furnace tube before analysis.'
+    origin: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p004_t02_r08_c07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: iwahashi-2021-cr-oxide-solid-activities
   locator:
     page: 4
@@ -1695,7 +1804,21 @@ observations:
         pdf_page_index: 3
         table: '2'
         note: row_label=3-2; column_header=X_Cu, Equilibrium (printed header); interpreted as X_Cr by Eq. 15 and prose
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: equilibration; printed
+      source evidence: Liquid Cu–Cr alloy equilibrated with the printed oxide crucible in an Ar + H2 + CO2 gas mixture at
+      1 573 K. Chromium contents in the alloy samples were analyzed with an inductively coupled plasma spectrometer; samples
+      were cooled inside the furnace tube before analysis.'
+    origin: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p004_t02_r09_c07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: iwahashi-2021-cr-oxide-solid-activities
   locator:
     page: 4
@@ -1868,7 +1991,21 @@ observations:
         pdf_page_index: 3
         table: '2'
         note: row_label=4-1; column_header=X_Cu, Equilibrium (printed header); interpreted as X_Cr by Eq. 15 and prose
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: equilibration; printed
+      source evidence: Liquid Cu–Cr alloy equilibrated with the printed oxide crucible in an Ar + H2 + CO2 gas mixture at
+      1 573 K. Chromium contents in the alloy samples were analyzed with an inductively coupled plasma spectrometer; samples
+      were cooled inside the furnace tube before analysis.'
+    origin: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p004_t02_r10_c07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: iwahashi-2021-cr-oxide-solid-activities
   locator:
     page: 4
@@ -2041,7 +2178,21 @@ observations:
         pdf_page_index: 3
         table: '2'
         note: row_label=4-2; column_header=X_Cu, Equilibrium (printed header); interpreted as X_Cr by Eq. 15 and prose
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: equilibration; printed
+      source evidence: Liquid Cu–Cr alloy equilibrated with the printed oxide crucible in an Ar + H2 + CO2 gas mixture at
+      1 573 K. Chromium contents in the alloy samples were analyzed with an inductively coupled plasma spectrometer; samples
+      were cooled inside the furnace tube before analysis.'
+    origin: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p004_t02_r11_c07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: iwahashi-2021-cr-oxide-solid-activities
   locator:
     page: 4
@@ -2214,7 +2365,21 @@ observations:
         pdf_page_index: 3
         table: '2'
         note: row_label=5-1; column_header=X_Cu, Equilibrium (printed header); interpreted as X_Cr by Eq. 15 and prose
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: equilibration; printed
+      source evidence: Liquid Cu–Cr alloy equilibrated with the printed oxide crucible in an Ar + H2 + CO2 gas mixture at
+      1 573 K. Chromium contents in the alloy samples were analyzed with an inductively coupled plasma spectrometer; samples
+      were cooled inside the furnace tube before analysis.'
+    origin: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p004_t02_r12_c07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: iwahashi-2021-cr-oxide-solid-activities
   locator:
     page: 4
@@ -2387,7 +2552,21 @@ observations:
         pdf_page_index: 3
         table: '2'
         note: row_label=5-2; column_header=X_Cu, Equilibrium (printed header); interpreted as X_Cr by Eq. 15 and prose
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: equilibration; printed
+      source evidence: Liquid Cu–Cr alloy equilibrated with the printed oxide crucible in an Ar + H2 + CO2 gas mixture at
+      1 573 K. Chromium contents in the alloy samples were analyzed with an inductively coupled plasma spectrometer; samples
+      were cooled inside the furnace tube before analysis.'
+    origin: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p004_t02_r13_c07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: iwahashi-2021-cr-oxide-solid-activities
   locator:
     page: 4
@@ -2560,7 +2739,21 @@ observations:
         pdf_page_index: 3
         table: '2'
         note: row_label=6-1a; column_header=X_Cu, Equilibrium (printed header); interpreted as X_Cr by Eq. 15 and prose
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: equilibration; printed
+      source evidence: Liquid Cu–Cr alloy equilibrated with the printed oxide crucible in an Ar + H2 + CO2 gas mixture at
+      1 573 K. Chromium contents in the alloy samples were analyzed with an inductively coupled plasma spectrometer; samples
+      were cooled inside the furnace tube before analysis.'
+    origin: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p004_t02_r14_c07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: iwahashi-2021-cr-oxide-solid-activities
   locator:
     page: 4
@@ -2733,7 +2926,21 @@ observations:
         pdf_page_index: 3
         table: '2'
         note: row_label=6-2a; column_header=X_Cu, Equilibrium (printed header); interpreted as X_Cr by Eq. 15 and prose
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: equilibration; printed
+      source evidence: Liquid Cu–Cr alloy equilibrated with the printed oxide crucible in an Ar + H2 + CO2 gas mixture at
+      1 573 K. Chromium contents in the alloy samples were analyzed with an inductively coupled plasma spectrometer; samples
+      were cooled inside the furnace tube before analysis.'
+    origin: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p004_t02_r15_c07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: iwahashi-2021-cr-oxide-solid-activities
   locator:
     page: 4
@@ -2906,7 +3113,21 @@ observations:
         pdf_page_index: 3
         table: '2'
         note: row_label=7-1b; column_header=X_Cu, Equilibrium (printed header); interpreted as X_Cr by Eq. 15 and prose
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: equilibration; printed
+      source evidence: Liquid Cu–Cr alloy equilibrated with the printed oxide crucible in an Ar + H2 + CO2 gas mixture at
+      1 573 K. Chromium contents in the alloy samples were analyzed with an inductively coupled plasma spectrometer; samples
+      were cooled inside the furnace tube before analysis.'
+    origin: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p004_t02_r16_c07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: iwahashi-2021-cr-oxide-solid-activities
   locator:
     page: 4
@@ -3079,7 +3300,21 @@ observations:
         pdf_page_index: 3
         table: '2'
         note: row_label=7-2b; column_header=X_Cu, Equilibrium (printed header); interpreted as X_Cr by Eq. 15 and prose
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: equilibration; printed
+      source evidence: Liquid Cu–Cr alloy equilibrated with the printed oxide crucible in an Ar + H2 + CO2 gas mixture at
+      1 573 K. Chromium contents in the alloy samples were analyzed with an inductively coupled plasma spectrometer; samples
+      were cooled inside the furnace tube before analysis.'
+    origin: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p004_t02_r17_c07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: iwahashi-2021-cr-oxide-solid-activities
   locator:
     page: 4
@@ -3252,7 +3487,21 @@ observations:
         pdf_page_index: 3
         table: '2'
         note: row_label=8-1b; column_header=X_Cu, Equilibrium (printed header); interpreted as X_Cr by Eq. 15 and prose
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: equilibration; printed
+      source evidence: Liquid Cu–Cr alloy equilibrated with the printed oxide crucible in an Ar + H2 + CO2 gas mixture at
+      1 573 K. Chromium contents in the alloy samples were analyzed with an inductively coupled plasma spectrometer; samples
+      were cooled inside the furnace tube before analysis.'
+    origin: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p004_t02_r18_c07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: iwahashi-2021-cr-oxide-solid-activities
   locator:
     page: 4
@@ -3425,7 +3674,21 @@ observations:
         pdf_page_index: 3
         table: '2'
         note: row_label=8-2b; column_header=X_Cu, Equilibrium (printed header); interpreted as X_Cr by Eq. 15 and prose
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: equilibration; printed
+      source evidence: Liquid Cu–Cr alloy equilibrated with the printed oxide crucible in an Ar + H2 + CO2 gas mixture at
+      1 573 K. Chromium contents in the alloy samples were analyzed with an inductively coupled plasma spectrometer; samples
+      were cooled inside the furnace tube before analysis.'
+    origin: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p004_t02_r19_c07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: iwahashi-2021-cr-oxide-solid-activities
   locator:
     page: 4
@@ -3598,7 +3861,21 @@ observations:
         pdf_page_index: 3
         table: '2'
         note: row_label=9-1b; column_header=X_Cu, Equilibrium (printed header); interpreted as X_Cr by Eq. 15 and prose
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: equilibration; printed
+      source evidence: Liquid Cu–Cr alloy equilibrated with the printed oxide crucible in an Ar + H2 + CO2 gas mixture at
+      1 573 K. Chromium contents in the alloy samples were analyzed with an inductively coupled plasma spectrometer; samples
+      were cooled inside the furnace tube before analysis.'
+    origin: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p004_t02_r20_c07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: iwahashi-2021-cr-oxide-solid-activities
   locator:
     page: 4
@@ -3771,7 +4048,21 @@ observations:
         pdf_page_index: 3
         table: '2'
         note: row_label=9-2b; column_header=X_Cu, Equilibrium (printed header); interpreted as X_Cr by Eq. 15 and prose
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: equilibration; printed
+      source evidence: Liquid Cu–Cr alloy equilibrated with the printed oxide crucible in an Ar + H2 + CO2 gas mixture at
+      1 573 K. Chromium contents in the alloy samples were analyzed with an inductively coupled plasma spectrometer; samples
+      were cooled inside the furnace tube before analysis.'
+    origin: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p004_t02_r21_c07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: iwahashi-2021-cr-oxide-solid-activities
   locator:
     page: 4
@@ -3944,7 +4235,21 @@ observations:
         pdf_page_index: 3
         table: '2'
         note: row_label=10-1; column_header=X_Cu, Equilibrium (printed header); interpreted as X_Cr by Eq. 15 and prose
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: equilibration; printed
+      source evidence: Liquid Cu–Cr alloy equilibrated with the printed oxide crucible in an Ar + H2 + CO2 gas mixture at
+      1 573 K. Chromium contents in the alloy samples were analyzed with an inductively coupled plasma spectrometer; samples
+      were cooled inside the furnace tube before analysis.'
+    origin: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p004_t02_r22_c07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: iwahashi-2021-cr-oxide-solid-activities
   locator:
     page: 4
@@ -4117,7 +4422,21 @@ observations:
         pdf_page_index: 3
         table: '2'
         note: row_label=10-2; column_header=X_Cu, Equilibrium (printed header); interpreted as X_Cr by Eq. 15 and prose
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: equilibration; printed
+      source evidence: Liquid Cu–Cr alloy equilibrated with the printed oxide crucible in an Ar + H2 + CO2 gas mixture at
+      1 573 K. Chromium contents in the alloy samples were analyzed with an inductively coupled plasma spectrometer; samples
+      were cooled inside the furnace tube before analysis.'
+    origin: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p004_t02_r23_c07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: iwahashi-2021-cr-oxide-solid-activities
   locator:
     page: 4
@@ -4290,7 +4609,21 @@ observations:
         pdf_page_index: 3
         table: '2'
         note: row_label=11-1; column_header=X_Cu, Equilibrium (printed header); interpreted as X_Cr by Eq. 15 and prose
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: equilibration; printed
+      source evidence: Liquid Cu–Cr alloy equilibrated with the printed oxide crucible in an Ar + H2 + CO2 gas mixture at
+      1 573 K. Chromium contents in the alloy samples were analyzed with an inductively coupled plasma spectrometer; samples
+      were cooled inside the furnace tube before analysis.'
+    origin: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p004_t02_r24_c07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: iwahashi-2021-cr-oxide-solid-activities
   locator:
     page: 4
@@ -4463,7 +4796,21 @@ observations:
         pdf_page_index: 3
         table: '2'
         note: row_label=11-2; column_header=X_Cu, Equilibrium (printed header); interpreted as X_Cr by Eq. 15 and prose
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: equilibration; printed
+      source evidence: Liquid Cu–Cr alloy equilibrated with the printed oxide crucible in an Ar + H2 + CO2 gas mixture at
+      1 573 K. Chromium contents in the alloy samples were analyzed with an inductively coupled plasma spectrometer; samples
+      were cooled inside the furnace tube before analysis.'
+    origin: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p004_t02_r25_c07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: iwahashi-2021-cr-oxide-solid-activities
   locator:
     page: 4
@@ -4636,7 +4983,21 @@ observations:
         pdf_page_index: 3
         table: '2'
         note: row_label=12-1; column_header=X_Cu, Equilibrium (printed header); interpreted as X_Cr by Eq. 15 and prose
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: equilibration; printed
+      source evidence: Liquid Cu–Cr alloy equilibrated with the printed oxide crucible in an Ar + H2 + CO2 gas mixture at
+      1 573 K. Chromium contents in the alloy samples were analyzed with an inductively coupled plasma spectrometer; samples
+      were cooled inside the furnace tube before analysis.'
+    origin: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p004_t02_r26_c07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: iwahashi-2021-cr-oxide-solid-activities
   locator:
     page: 4
@@ -4809,7 +5170,21 @@ observations:
         pdf_page_index: 3
         table: '2'
         note: row_label=12-2; column_header=X_Cu, Equilibrium (printed header); interpreted as X_Cr by Eq. 15 and prose
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: equilibration; printed
+      source evidence: Liquid Cu–Cr alloy equilibrated with the printed oxide crucible in an Ar + H2 + CO2 gas mixture at
+      1 573 K. Chromium contents in the alloy samples were analyzed with an inductively coupled plasma spectrometer; samples
+      were cooled inside the furnace tube before analysis.'
+    origin: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p004_t02_r27_c07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: iwahashi-2021-cr-oxide-solid-activities
   locator:
     page: 4
@@ -4885,7 +5260,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r02_c02
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
   identity:
     quantity:
       tag: value
@@ -5037,7 +5412,7 @@ observations:
     printed_value: '0'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r02_c03
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
   identity:
     quantity:
       tag: value
@@ -5189,7 +5564,7 @@ observations:
     printed_value: '-4.81'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r02_c04
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
   identity:
     quantity:
       tag: value
@@ -5341,7 +5716,7 @@ observations:
     printed_value: '-1.33'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r03_c02
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
   identity:
     quantity:
       tag: value
@@ -5493,7 +5868,7 @@ observations:
     printed_value: '-0.02'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r03_c03
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
   identity:
     quantity:
       tag: value
@@ -5645,7 +6020,7 @@ observations:
     printed_value: '-4.75'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r03_c04
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
   identity:
     quantity:
       tag: value
@@ -5797,7 +6172,7 @@ observations:
     printed_value: '-1.31'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r04_c02
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
   identity:
     quantity:
       tag: value
@@ -5949,7 +6324,7 @@ observations:
     printed_value: '-1.33'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r04_c03
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
   identity:
     quantity:
       tag: value
@@ -6101,7 +6476,7 @@ observations:
     printed_value: '-2.12'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r04_c04
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
   identity:
     quantity:
       tag: value
@@ -6253,7 +6628,7 @@ observations:
     printed_value: '0'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r05_c02
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
   identity:
     quantity:
       tag: value
@@ -6405,7 +6780,7 @@ observations:
     printed_value: '-1.66'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r05_c03
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
   identity:
     quantity:
       tag: value
@@ -6557,7 +6932,7 @@ observations:
     printed_value: '-1.46'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r05_c04
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
   identity:
     quantity:
       tag: value
@@ -6709,7 +7084,7 @@ observations:
     printed_value: '0'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r06_c02
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
   identity:
     quantity:
       tag: value
@@ -6861,7 +7236,7 @@ observations:
     printed_value: '-1.84'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r06_c03
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
   identity:
     quantity:
       tag: value
@@ -7013,7 +7388,7 @@ observations:
     printed_value: '-1.20'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r06_c04
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
   identity:
     quantity:
       tag: value
@@ -7165,7 +7540,7 @@ observations:
     printed_value: '0'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r07_c02
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
   identity:
     quantity:
       tag: value
@@ -7317,7 +7692,7 @@ observations:
     printed_value: '-2.07'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r07_c03
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
   identity:
     quantity:
       tag: value
@@ -7469,7 +7844,7 @@ observations:
     printed_value: '-0.85'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r07_c04
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
   identity:
     quantity:
       tag: value
@@ -7621,7 +7996,7 @@ observations:
     printed_value: '-0.35'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r08_c02
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
   identity:
     quantity:
       tag: value
@@ -7773,7 +8148,7 @@ observations:
     printed_value: '-2.92'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r08_c03
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
   identity:
     quantity:
       tag: value
@@ -7925,7 +8300,7 @@ observations:
     printed_value: '0'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r08_c04
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
   identity:
     quantity:
       tag: value
@@ -8077,7 +8452,7 @@ observations:
     printed_value: '-0.35'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r09_c02
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
   identity:
     quantity:
       tag: value
@@ -8229,7 +8604,7 @@ observations:
     printed_value: '-3.04'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r09_c03
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
   identity:
     quantity:
       tag: value
@@ -8381,7 +8756,7 @@ observations:
     printed_value: '0'
     printed_form: log10
 - observation_id: iwahashi-2021-cr-oxide-solid-activities::iwahashi_2021_cr_oxide_solid_activities_p007_t03_r09_c04
-  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities
+  experiment_id: 10.2355/isijinternational.isijint-2020-752::iwahashi-2021-cr-oxide-solid-activities::method:tabulation
   identity:
     quantity:
       tag: value

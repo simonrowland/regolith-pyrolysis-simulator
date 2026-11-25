@@ -53,6 +53,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermogravimetry_surface_controlled_evaporation'
+    origin: ta-yamanaka-1997-metsoc::yamanaka_1997_na_alpha_figure_only
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -113,6 +123,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermodynamic_input_to_author_model'
+    origin: ta-yamanaka-1997-metsoc::yamanaka_1997_na_compiled_thermodynamic_inputs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-yamanaka-1997-metsoc
   locator:
     page: 1
@@ -214,6 +234,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Hertz-Knudsen_surface_process'
+    origin: ta-yamanaka-1997-metsoc::yamanaka_1997_na_hkl_and_least_squares_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-yamanaka-1997-metsoc
   locator:
     page: 1
@@ -256,7 +287,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermogravimetry_surface_controlled_evaporation'
+    origin: ta-yamanaka-1997-metsoc::yamanaka_1997_na_measured_evaporation_mass_fit
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-yamanaka-1997-metsoc
   locator:
     page: 1
@@ -266,7 +307,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: ta-yamanaka-1997-metsoc::yamanaka_1997_na_thermogravimetry_conditions
-  experiment_id: 0aeb508db97cd3a0df5fd8d5f0762c45b09654125b4d860c320067ae510543c5::experiment::yamanaka-1997-na-evaporation-series
+  experiment_id: 0aeb508db97cd3a0df5fd8d5f0762c45b09654125b4d860c320067ae510543c5::ta-yamanaka-1997-metsoc::declared:0aeb508db97cd3a0df5fd8d5f0762c45b09654125b4d860c320067ae510543c5::experiment::yamanaka-1997-na-evaporation-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -321,6 +362,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermogravimetry_low_pressure_gas_mixing'
+    origin: ta-yamanaka-1997-metsoc::yamanaka_1997_na_thermogravimetry_conditions
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-yamanaka-1997-metsoc
   locator:
     page: 1

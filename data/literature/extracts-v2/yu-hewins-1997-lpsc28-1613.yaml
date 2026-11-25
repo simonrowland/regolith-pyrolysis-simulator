@@ -167,8 +167,8 @@ observations:
       tag: unknown
       reason: no fO2_Pa mapped from source
     total_pressure_Pa:
-      tag: value
-      value: '0.799934'
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
     sweep_gas:
       tag: unknown
       reason: no sweep_gas mapped from source
@@ -227,13 +227,6 @@ observations:
         pdf_page_index: 0
         section: Experimental results
         note: The authors give the 10^-5 atm K rate as a calculated example and refer to Figure 1.
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:yu-hewins-1997-lpsc28-1613
-    parameters: []
-    output_unit: Pa
-    references: []
   provenance:
     printed_phase: silicate_melt
 - observation_id: yu-hewins-1997-lpsc28-1613::yu_hewins_1997_k_flash_mass_loss

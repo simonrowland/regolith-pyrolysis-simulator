@@ -390,7 +390,7 @@ observations:
     output_unit: Pa
     references: []
 - observation_id: boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_hg_retention_1300c
-  experiment_id: 10.1016/j.chemgeo.2025.123018::experiment::ssas-hg-volatile-series
+  experiment_id: 10.1016/j.chemgeo.2025.123018::boulliung-2025-mercury-volatile-metals-magmatic::declared:10.1016/j.chemgeo.2025.123018::experiment::ssas-hg-volatile-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -436,6 +436,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Direct Mercury Analyzer'
+    origin: boulliung-2025-mercury-volatile-metals-magmatic::boulliung_2025_hg_retention_1300c
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: boulliung-2025-mercury-volatile-metals-magmatic
   locator:
     pdf_page_index: 13

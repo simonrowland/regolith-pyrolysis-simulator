@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/lpsc-2014-2057.yaml
 observations:
 - observation_id: lpsc-2014-2057::lpsc_2014_2057_chlorine_release_windows
-  experiment_id: 810e5b37ab0da50e4dcc764ba86954f54fb2e947f04b1ab08e32e92fa00c2d0c::lpsc-2014-2057
+  experiment_id: 810e5b37ab0da50e4dcc764ba86954f54fb2e947f04b1ab08e32e92fa00c2d0c::lpsc-2014-2057::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -46,16 +46,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''differential_scanning_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: evolved_gas_qms'
     origin: lpsc-2014-2057::lpsc_2014_2057_chlorine_release_windows
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   source_id: lpsc-2014-2057
   locator:
@@ -65,7 +64,7 @@ observations:
   provenance:
     printed_phase: calcium_perchlorate_iron_mineral_mixture
 - observation_id: lpsc-2014-2057::lpsc_2014_2057_cl_qualitative_release
-  experiment_id: 810e5b37ab0da50e4dcc764ba86954f54fb2e947f04b1ab08e32e92fa00c2d0c::lpsc-2014-2057
+  experiment_id: 810e5b37ab0da50e4dcc764ba86954f54fb2e947f04b1ab08e32e92fa00c2d0c::lpsc-2014-2057::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -108,16 +107,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''differential_scanning_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: evolved_gas_qms'
     origin: lpsc-2014-2057::lpsc_2014_2057_cl_qualitative_release
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   source_id: lpsc-2014-2057
   locator:
@@ -172,8 +170,8 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''differential_scanning_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: differential_scanning_calorimetry'
     origin: lpsc-2014-2057::lpsc_2014_2057_dsc_peak_shifts
     policy:
       id: DP-107
@@ -189,7 +187,7 @@ observations:
   provenance:
     printed_phase: calcium_perchlorate_iron_mineral_mixture
 - observation_id: lpsc-2014-2057::lpsc_2014_2057_dsc_qms_method_difference
-  experiment_id: 810e5b37ab0da50e4dcc764ba86954f54fb2e947f04b1ab08e32e92fa00c2d0c::lpsc-2014-2057
+  experiment_id: 810e5b37ab0da50e4dcc764ba86954f54fb2e947f04b1ab08e32e92fa00c2d0c::lpsc-2014-2057::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -232,16 +230,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''differential_scanning_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: dsc_vs_qms_comparison'
     origin: lpsc-2014-2057::lpsc_2014_2057_dsc_qms_method_difference
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   source_id: lpsc-2014-2057
   locator:
@@ -251,7 +248,7 @@ observations:
   provenance:
     printed_phase: calcium_perchlorate_iron_mineral_mixture
 - observation_id: lpsc-2014-2057::lpsc_2014_2057_figure_only_oxygen_and_thermal_curves
-  experiment_id: 810e5b37ab0da50e4dcc764ba86954f54fb2e947f04b1ab08e32e92fa00c2d0c::lpsc-2014-2057
+  experiment_id: 810e5b37ab0da50e4dcc764ba86954f54fb2e947f04b1ab08e32e92fa00c2d0c::lpsc-2014-2057::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -294,16 +291,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''differential_scanning_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: dsc_qms_plotted_curve'
     origin: lpsc-2014-2057::lpsc_2014_2057_figure_only_oxygen_and_thermal_curves
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   source_id: lpsc-2014-2057
   locator:
@@ -313,7 +309,7 @@ observations:
   provenance:
     printed_phase: calcium_perchlorate_iron_mineral_mixture
 - observation_id: lpsc-2014-2057::lpsc_2014_2057_hcl_qualitative_release
-  experiment_id: 810e5b37ab0da50e4dcc764ba86954f54fb2e947f04b1ab08e32e92fa00c2d0c::lpsc-2014-2057
+  experiment_id: 810e5b37ab0da50e4dcc764ba86954f54fb2e947f04b1ab08e32e92fa00c2d0c::lpsc-2014-2057::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -355,16 +351,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''differential_scanning_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: evolved_gas_qms'
     origin: lpsc-2014-2057::lpsc_2014_2057_hcl_qualitative_release
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   source_id: lpsc-2014-2057
   locator:
@@ -374,7 +369,7 @@ observations:
   provenance:
     printed_phase: fayalite_calcium_perchlorate_mixture
 - observation_id: lpsc-2014-2057::lpsc_2014_2057_hwmk919_material_characterisation
-  experiment_id: 810e5b37ab0da50e4dcc764ba86954f54fb2e947f04b1ab08e32e92fa00c2d0c::lpsc-2014-2057
+  experiment_id: 810e5b37ab0da50e4dcc764ba86954f54fb2e947f04b1ab08e32e92fa00c2d0c::lpsc-2014-2057::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -417,16 +412,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''differential_scanning_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: sample_characterisation'
     origin: lpsc-2014-2057::lpsc_2014_2057_hwmk919_material_characterisation
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   source_id: lpsc-2014-2057
   locator:
@@ -436,7 +430,7 @@ observations:
   provenance:
     printed_phase: amorphous_martian_soil_analog
 - observation_id: lpsc-2014-2057::lpsc_2014_2057_qms_peak_shifts
-  experiment_id: 810e5b37ab0da50e4dcc764ba86954f54fb2e947f04b1ab08e32e92fa00c2d0c::lpsc-2014-2057
+  experiment_id: 810e5b37ab0da50e4dcc764ba86954f54fb2e947f04b1ab08e32e92fa00c2d0c::lpsc-2014-2057::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -479,16 +473,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''differential_scanning_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: evolved_oxygen_qms'
     origin: lpsc-2014-2057::lpsc_2014_2057_qms_peak_shifts
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   source_id: lpsc-2014-2057
   locator:
@@ -498,7 +491,7 @@ observations:
   provenance:
     printed_phase: calcium_perchlorate_iron_mineral_mixture
 - observation_id: lpsc-2014-2057::lpsc_2014_2057_rocknest_reported_fe_oxide_abundance
-  experiment_id: 810e5b37ab0da50e4dcc764ba86954f54fb2e947f04b1ab08e32e92fa00c2d0c::lpsc-2014-2057
+  experiment_id: 810e5b37ab0da50e4dcc764ba86954f54fb2e947f04b1ab08e32e92fa00c2d0c::lpsc-2014-2057::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -542,16 +535,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''differential_scanning_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_attributed'
     origin: lpsc-2014-2057::lpsc_2014_2057_rocknest_reported_fe_oxide_abundance
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   source_id: lpsc-2014-2057
   locator:
@@ -561,7 +553,7 @@ observations:
   provenance:
     printed_phase: Rocknest_eolian_deposit
 - observation_id: lpsc-2014-2057::lpsc_2014_2057_rocknest_reported_hematite_abundance
-  experiment_id: 810e5b37ab0da50e4dcc764ba86954f54fb2e947f04b1ab08e32e92fa00c2d0c::lpsc-2014-2057
+  experiment_id: 810e5b37ab0da50e4dcc764ba86954f54fb2e947f04b1ab08e32e92fa00c2d0c::lpsc-2014-2057::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -605,16 +597,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''differential_scanning_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_attributed'
     origin: lpsc-2014-2057::lpsc_2014_2057_rocknest_reported_hematite_abundance
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   source_id: lpsc-2014-2057
   locator:
@@ -624,7 +615,7 @@ observations:
   provenance:
     printed_phase: Rocknest_eolian_deposit
 - observation_id: lpsc-2014-2057::lpsc_2014_2057_thermal_program
-  experiment_id: 810e5b37ab0da50e4dcc764ba86954f54fb2e947f04b1ab08e32e92fa00c2d0c::experiment::lpsc-2014-thermal-program
+  experiment_id: 810e5b37ab0da50e4dcc764ba86954f54fb2e947f04b1ab08e32e92fa00c2d0c::lpsc-2014-2057::declared:810e5b37ab0da50e4dcc764ba86954f54fb2e947f04b1ab08e32e92fa00c2d0c::experiment::lpsc-2014-thermal-program::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -670,6 +661,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: dsc_qms_heated_carrier_gas'
+    origin: lpsc-2014-2057::lpsc_2014_2057_thermal_program
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: lpsc-2014-2057
   locator:
     page: 1

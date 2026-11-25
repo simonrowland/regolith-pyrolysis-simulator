@@ -38,7 +38,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: langmuir_knudsen_comparison_review'
+    origin: kems-003-pound-1972::pound_1972_ag_solid_alpha_wessel_mp
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-003-pound-1972
   locator:
     page: 8
@@ -142,6 +152,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: langmuir_knudsen_comparison_review'
+    origin: kems-003-pound-1972::pound_1972_b_mp_alpha_burns
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -250,6 +271,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: langmuir_knudsen_comparison_review'
+    origin: kems-003-pound-1972::pound_1972_be_solid_alpha_holden
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -347,6 +379,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: langmuir_knudsen_comparison_review'
+    origin: kems-003-pound-1972::pound_1972_c_graphite_alpha_marshall_norton
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -406,6 +449,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: review_compilation'
+    origin: kems-003-pound-1972::pound_1972_clausing_method_discussion
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-003-pound-1972
   locator:
     section: Experimental Methods / Criteria
@@ -468,6 +521,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: review_compilation'
+    origin: kems-003-pound-1972::pound_1972_completeness_ledger
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-003-pound-1972
   locator:
     page: 7
@@ -532,6 +595,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: review_compilation'
+    origin: kems-003-pound-1972::pound_1972_cr_parent_row_complements
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-003-pound-1972
   locator:
     page: 7
@@ -624,6 +697,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: langmuir_knudsen_comparison_review'
+    origin: kems-003-pound-1972::pound_1972_cr_solid_alpha_mccabe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -715,6 +799,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: langmuir_knudsen_comparison_review'
+    origin: kems-003-pound-1972::pound_1972_cr_solid_class_b1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -785,6 +880,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: review_compilation'
+    origin: kems-003-pound-1972::pound_1972_fe_1600_1800_not_a_printed_band
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-003-pound-1972
   locator:
     page: 7
@@ -849,6 +954,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: review_compilation'
+    origin: kems-003-pound-1972::pound_1972_fe_parent_row_complements
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-003-pound-1972
   locator:
     page: 7
@@ -940,6 +1055,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: langmuir_knudsen_comparison_review'
+    origin: kems-003-pound-1972::pound_1972_fe_solid_alpha_mccabe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -1038,6 +1164,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: langmuir_knudsen_comparison_review'
+    origin: kems-003-pound-1972::pound_1972_fe_solid_alpha_wessel
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -1129,6 +1266,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: langmuir_knudsen_comparison_review'
+    origin: kems-003-pound-1972::pound_1972_fe_solid_class_b1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -1224,6 +1372,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: langmuir_knudsen_comparison_review'
+    origin: kems-003-pound-1972::pound_1972_k_liquid_alpha_neumann
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -1275,7 +1434,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: condensation_high_supersaturation_review'
+    origin: kems-003-pound-1972::pound_1972_pt_condensation_alpha_chupka_1500k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-003-pound-1972
   locator:
     page: 11
@@ -1333,7 +1502,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: condensation_high_supersaturation_review'
+    origin: kems-003-pound-1972::pound_1972_rh_condensation_alpha_chupka_1500k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-003-pound-1972
   locator:
     page: 11
@@ -1395,7 +1574,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: condensation_high_supersaturation_review'
+    origin: kems-003-pound-1972::pound_1972_w_condensation_alpha_chupka_2200k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-003-pound-1972
   locator:
     page: 12

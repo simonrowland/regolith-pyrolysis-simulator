@@ -33,8 +33,8 @@ experiments:
 - experiment_id: 38e49dbf5f302e7c282ac3d9e161b1b5ad7b28c733a4ef29dd09ad056c2c2dad::experiment::schreiber_1977_redox_glasses_and_diopside
   kind: literature
   method:
-    tag: value
-    value: quench_equilibration
+    tag: unknown
+    reason: experiment method not published
   sample: {}
   conditions:
     temperature_K:
@@ -141,6 +141,39 @@ experiments:
               section: Results and discussion
         output_unit: Pa
         references: []
+- experiment_id: 38e49dbf5f302e7c282ac3d9e161b1b5ad7b28c733a4ef29dd09ad056c2c2dad::schreiber-1977-tetravalent-cr-diopside::declared:38e49dbf5f302e7c282ac3d9e161b1b5ad7b28c733a4ef29dd09ad056c2c2dad::experiment::schreiber_1977_redox_glasses_and_diopside::method:quench_equilibration
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 38e49dbf5f302e7c282ac3d9e161b1b5ad7b28c733a4ef29dd09ad056c2c2dad
+  locator:
+    page: 2
+    published_page: 523
+    pdf_page_index: 1
+    section: Experimental methods
 context:
 - observation_id: schreiber_1977_blue_diopside_criv_inference
   type: assessment

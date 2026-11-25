@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/engelschion-2020-eac1a-simulant.yaml
 observations:
 - observation_id: engelschion-2020-eac1a-simulant::engelschion_2020_eac1_dsc
-  experiment_id: 10.1038/s41598-020-62312-4::experiment::dsc-simulant-series
+  experiment_id: 10.1038/s41598-020-62312-4::engelschion-2020-eac1a-simulant::declared:10.1038/s41598-020-62312-4::experiment::dsc-simulant-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -48,16 +48,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''argon_dsc''
-      is not a closed method token (kems_effusion alone is insufficient)'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: argon_dsc'
     origin: engelschion-2020-eac1a-simulant::engelschion_2020_eac1_dsc
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   source_id: engelschion-2020-eac1a-simulant
   locator:
@@ -158,6 +157,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: air_drying_before_density_measurement'
+    origin: engelschion-2020-eac1a-simulant::engelschion_2020_eac1a_water_release
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction

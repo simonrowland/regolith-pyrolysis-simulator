@@ -107,17 +107,6 @@ experiments:
     section: II.3. EMF measurement
     note: EMF was measured in the beta-alumina galvanic cell after temperature stabilization; the water-cooled copper-plate
       quench in p. 737 §II is sample preparation for the vitrified charge.
-  apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: β-alumina solid electrolyte (Toshiba ceramics closed-end tubes, φ10×φ8×100 mm and φ16×φ14×200 mm); Pt electrodes;
-          Na2CO3 standard electrode in a Pt crucible
-      locator:
-        page: 2
-        published_page: 737
-        figure: '1'
-        paragraph: 2. 試料および電解質 / 3. 起電力測定
   bench_id: 10.2320/jinstmet1952.47.9_736::bench::beta-alumina-emf-cell
   thermal_schedule:
     method:
@@ -1070,6 +1059,130 @@ experiments:
     page: 738
     table: '1'
     note: Table 1 binary charge X_Na2O=0.601
+  bench_id: 10.2320/jinstmet1952.47.9_736::bench::beta-alumina-emf-cell
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: EMF recorded after temperature became constant and remained within 1 mV for at least 1 h; heating and cooling
+          reversibility repeated at least twice.
+      locator:
+        page: 738
+        section: II.3. EMF measurement
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: interval
+            interval_low: '1173'
+            interval_high: '1673'
+            approximate: false
+        locator:
+          page: 738
+          section: II.3. EMF measurement
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 738
+        section: II.3. EMF measurement
+        note: Stability criterion is a lower bound after temperature stabilization, not a universal total duration.
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Water-cooled copper plate used for sampling quench
+      locator:
+        page: 737
+        section: II. Samples and electrolyte
+- experiment_id: 10.2320/jinstmet1952.47.9_736::yam1983::declared:10.2320/jinstmet1952.47.9_736::experiment::na2o-sio2-emf-series::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: X_Na2O 0.2-0.6 Na2O-SiO2 melt compositions
+      locator:
+        page: 736
+        section: Abstract
+        note: Label retained on the mixed series; seven Table 1 X_Na2O charges live on na2o-sio2-xna2o-*
+    form:
+      state:
+        tag: value
+        value: Pulverized vitrified sample
+      locator:
+        page: 737
+        section: II. Samples and electrolyte
+    characterization:
+      state:
+        tag: value
+        value: Batch compositions used; relative composition error estimated within 2-3 percent
+      locator:
+        page: 737
+        section: II. Samples and electrolyte
+    pretreatment:
+      state:
+        tag: value
+        value: Dried at 393 K for at least 48 h, melted in platinum crucible at 1473-1573 K for at least 24 h, then pulverized.
+      locator:
+        page: 737
+        section: II. Samples and electrolyte
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 738
+        section: II.3. EMF measurement
+        note: Multiple measurement temperatures; no single series setpoint.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 738
+        section: II.3. EMF measurement
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: Pure O2 or Ar+O2; reference-cell gas includes Ar+O2+CO2
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 738
+        section: II.3. EMF measurement
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2320/jinstmet1952.47.9_736
+  locator:
+    page: 738
+    section: II.3. EMF measurement
+    note: EMF was measured in the beta-alumina galvanic cell after temperature stabilization; the water-cooled copper-plate
+      quench in p. 737 §II is sample preparation for the vitrified charge.
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: β-alumina solid electrolyte (Toshiba ceramics closed-end tubes, φ10×φ8×100 mm and φ16×φ14×200 mm); Pt electrodes;
+          Na2CO3 standard electrode in a Pt crucible
+      locator:
+        page: 2
+        published_page: 737
+        figure: '1'
+        paragraph: 2. 試料および電解質 / 3. 起電力測定
   bench_id: 10.2320/jinstmet1952.47.9_736::bench::beta-alumina-emf-cell
   thermal_schedule:
     method:

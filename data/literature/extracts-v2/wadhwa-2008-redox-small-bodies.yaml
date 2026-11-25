@@ -50,6 +50,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - fugacity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: review_compilation'
+    origin: wadhwa-2008-redox-small-bodies::wadh08_ureilite_fo2_temperatures
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: wadhwa-2008-redox-small-bodies
   locator:
     page: 4
@@ -114,6 +125,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - fugacity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: review_compilation'
+    origin: wadhwa-2008-redox-small-bodies::wadh08_ureilite_fo2_temperatures
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: wadhwa-2008-redox-small-bodies
   locator:
     page: 4

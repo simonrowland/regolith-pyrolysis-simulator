@@ -176,8 +176,8 @@ experiments:
 - experiment_id: ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::experiment::taniguchi-1997-table1-101-metal
   kind: literature
   method:
-    tag: value
-    value: unspecified
+    tag: unknown
+    reason: regime 'gas_metal_equilibration' is not a closed method token (kems_effusion alone is insufficient)
   sample:
     printed_composition:
       state:
@@ -217,58 +217,11 @@ experiments:
     pdf_page_index: 1
     table: '1'
     note: row=101
-  fO2_control:
-    channel:
-      tag: unknown
-      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
-    oxygen_partial_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.000009261105'
-          approximate: false
-      locator:
-        page: 2
-        published_page: 957
-        pdf_page_index: 1
-        table: '1'
-        note: row=101; column=pO2
-      inference:
-        relation: atm_to_Pa
-        inputs:
-        - P_Pa = P_atm × 101325
-        - original_unit=atm
-        - as_published=9.14e-11 atm
-        - printed=oxygen_partial_pressure
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.0000000000914'
-            locator:
-              page: 2
-              published_page: 957
-              pdf_page_index: 1
-              table: '1'
-              note: row=101; column=pO2
-        - - factor
-          - state:
-              tag: value
-              value: '101325'
-            locator:
-              page: 2
-              published_page: 957
-              pdf_page_index: 1
-              table: '1'
-              note: row=101; column=pO2
-        output_unit: Pa
-        references: []
 - experiment_id: ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::experiment::taniguchi-1997-table1-102-metal
   kind: literature
   method:
-    tag: value
-    value: unspecified
+    tag: unknown
+    reason: regime 'gas_metal_equilibration' is not a closed method token (kems_effusion alone is insufficient)
   sample:
     printed_composition:
       state:
@@ -308,58 +261,11 @@ experiments:
     pdf_page_index: 1
     table: '1'
     note: row=102
-  fO2_control:
-    channel:
-      tag: unknown
-      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
-    oxygen_partial_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.00000057856575'
-          approximate: false
-      locator:
-        page: 2
-        published_page: 957
-        pdf_page_index: 1
-        table: '1'
-        note: row=102; column=pO2
-      inference:
-        relation: atm_to_Pa
-        inputs:
-        - P_Pa = P_atm × 101325
-        - original_unit=atm
-        - as_published=5.71e-12 atm
-        - printed=oxygen_partial_pressure
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.00000000000571'
-            locator:
-              page: 2
-              published_page: 957
-              pdf_page_index: 1
-              table: '1'
-              note: row=102; column=pO2
-        - - factor
-          - state:
-              tag: value
-              value: '101325'
-            locator:
-              page: 2
-              published_page: 957
-              pdf_page_index: 1
-              table: '1'
-              note: row=102; column=pO2
-        output_unit: Pa
-        references: []
 - experiment_id: ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::experiment::taniguchi-1997-table1-103-metal
   kind: literature
   method:
-    tag: value
-    value: unspecified
+    tag: unknown
+    reason: regime 'gas_metal_equilibration' is not a closed method token (kems_effusion alone is insufficient)
   sample:
     printed_composition:
       state:
@@ -399,58 +305,11 @@ experiments:
     pdf_page_index: 1
     table: '1'
     note: row=103
-  fO2_control:
-    channel:
-      tag: unknown
-      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
-    oxygen_partial_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.000001033515'
-          approximate: false
-      locator:
-        page: 2
-        published_page: 957
-        pdf_page_index: 1
-        table: '1'
-        note: row=103; column=pO2
-      inference:
-        relation: atm_to_Pa
-        inputs:
-        - P_Pa = P_atm × 101325
-        - original_unit=atm
-        - as_published=1.02e-11 atm
-        - printed=oxygen_partial_pressure
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.0000000000102'
-            locator:
-              page: 2
-              published_page: 957
-              pdf_page_index: 1
-              table: '1'
-              note: row=103; column=pO2
-        - - factor
-          - state:
-              tag: value
-              value: '101325'
-            locator:
-              page: 2
-              published_page: 957
-              pdf_page_index: 1
-              table: '1'
-              note: row=103; column=pO2
-        output_unit: Pa
-        references: []
 - experiment_id: ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::experiment::taniguchi-1997-table1-104-metal
   kind: literature
   method:
-    tag: value
-    value: unspecified
+    tag: unknown
+    reason: regime 'gas_metal_equilibration' is not a closed method token (kems_effusion alone is insufficient)
   sample:
     printed_composition:
       state:
@@ -490,58 +349,11 @@ experiments:
     pdf_page_index: 1
     table: '1'
     note: row=104
-  fO2_control:
-    channel:
-      tag: unknown
-      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
-    oxygen_partial_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.000002857365'
-          approximate: false
-      locator:
-        page: 2
-        published_page: 957
-        pdf_page_index: 1
-        table: '1'
-        note: row=104; column=pO2
-      inference:
-        relation: atm_to_Pa
-        inputs:
-        - P_Pa = P_atm × 101325
-        - original_unit=atm
-        - as_published=2.82e-11 atm
-        - printed=oxygen_partial_pressure
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.0000000000282'
-            locator:
-              page: 2
-              published_page: 957
-              pdf_page_index: 1
-              table: '1'
-              note: row=104; column=pO2
-        - - factor
-          - state:
-              tag: value
-              value: '101325'
-            locator:
-              page: 2
-              published_page: 957
-              pdf_page_index: 1
-              table: '1'
-              note: row=104; column=pO2
-        output_unit: Pa
-        references: []
 - experiment_id: ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::experiment::taniguchi-1997-table1-105-metal
   kind: literature
   method:
-    tag: value
-    value: unspecified
+    tag: unknown
+    reason: regime 'gas_metal_equilibration' is not a closed method token (kems_effusion alone is insufficient)
   sample:
     printed_composition:
       state:
@@ -581,58 +393,11 @@ experiments:
     pdf_page_index: 1
     table: '1'
     note: row=105
-  fO2_control:
-    channel:
-      tag: unknown
-      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
-    oxygen_partial_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0000003708495'
-          approximate: false
-      locator:
-        page: 2
-        published_page: 957
-        pdf_page_index: 1
-        table: '1'
-        note: row=105; column=pO2
-      inference:
-        relation: atm_to_Pa
-        inputs:
-        - P_Pa = P_atm × 101325
-        - original_unit=atm
-        - as_published=3.66e-12 atm
-        - printed=oxygen_partial_pressure
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.00000000000366'
-            locator:
-              page: 2
-              published_page: 957
-              pdf_page_index: 1
-              table: '1'
-              note: row=105; column=pO2
-        - - factor
-          - state:
-              tag: value
-              value: '101325'
-            locator:
-              page: 2
-              published_page: 957
-              pdf_page_index: 1
-              table: '1'
-              note: row=105; column=pO2
-        output_unit: Pa
-        references: []
 - experiment_id: ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::experiment::taniguchi-1997-table1-106-metal
   kind: literature
   method:
-    tag: value
-    value: unspecified
+    tag: unknown
+    reason: regime 'gas_metal_equilibration' is not a closed method token (kems_effusion alone is insufficient)
   sample:
     printed_composition:
       state:
@@ -672,58 +437,11 @@ experiments:
     pdf_page_index: 1
     table: '1'
     note: row=106
-  fO2_control:
-    channel:
-      tag: unknown
-      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
-    oxygen_partial_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.00000071434125'
-          approximate: false
-      locator:
-        page: 2
-        published_page: 957
-        pdf_page_index: 1
-        table: '1'
-        note: row=106; column=pO2
-      inference:
-        relation: atm_to_Pa
-        inputs:
-        - P_Pa = P_atm × 101325
-        - original_unit=atm
-        - as_published=7.05e-12 atm
-        - printed=oxygen_partial_pressure
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.00000000000705'
-            locator:
-              page: 2
-              published_page: 957
-              pdf_page_index: 1
-              table: '1'
-              note: row=106; column=pO2
-        - - factor
-          - state:
-              tag: value
-              value: '101325'
-            locator:
-              page: 2
-              published_page: 957
-              pdf_page_index: 1
-              table: '1'
-              note: row=106; column=pO2
-        output_unit: Pa
-        references: []
 - experiment_id: ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::experiment::taniguchi-1997-table1-107-metal
   kind: literature
   method:
-    tag: value
-    value: unspecified
+    tag: unknown
+    reason: regime 'gas_metal_equilibration' is not a closed method token (kems_effusion alone is insufficient)
   sample:
     printed_composition:
       state:
@@ -763,53 +481,6 @@ experiments:
     pdf_page_index: 1
     table: '1'
     note: row=107
-  fO2_control:
-    channel:
-      tag: unknown
-      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
-    oxygen_partial_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0000013678875'
-          approximate: false
-      locator:
-        page: 2
-        published_page: 957
-        pdf_page_index: 1
-        table: '1'
-        note: row=107; column=pO2
-      inference:
-        relation: atm_to_Pa
-        inputs:
-        - P_Pa = P_atm × 101325
-        - original_unit=atm
-        - as_published=1.35e-11 atm
-        - printed=oxygen_partial_pressure
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.0000000000135'
-            locator:
-              page: 2
-              published_page: 957
-              pdf_page_index: 1
-              table: '1'
-              note: row=107; column=pO2
-        - - factor
-          - state:
-              tag: value
-              value: '101325'
-            locator:
-              page: 2
-              published_page: 957
-              pdf_page_index: 1
-              table: '1'
-              note: row=107; column=pO2
-        output_unit: Pa
-        references: []
 - experiment_id: ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::experiment::taniguchi-1997-table4-201-metal
   kind: literature
   method:
@@ -5802,6 +5473,643 @@ experiments:
               pdf_page_index: 4
               table: '5'
               section: Table 5 caption
+        output_unit: Pa
+        references: []
+- experiment_id: ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::taniguchi-1997-feo-cas::declared:ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::experiment::taniguchi-1997-table1-101-metal::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe: '0.437'
+      locator:
+        page: 2
+        published_page: 957
+        pdf_page_index: 1
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3
+  locator:
+    page: 2
+    published_page: 957
+    pdf_page_index: 1
+    table: '1'
+    note: row=101
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000009261105'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 957
+        pdf_page_index: 1
+        table: '1'
+        note: row=101; column=pO2
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=9.14e-11 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000000914'
+            locator:
+              page: 2
+              published_page: 957
+              pdf_page_index: 1
+              table: '1'
+              note: row=101; column=pO2
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 2
+              published_page: 957
+              pdf_page_index: 1
+              table: '1'
+              note: row=101; column=pO2
+        output_unit: Pa
+        references: []
+- experiment_id: ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::taniguchi-1997-feo-cas::declared:ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::experiment::taniguchi-1997-table1-102-metal::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe: '2.42'
+      locator:
+        page: 2
+        published_page: 957
+        pdf_page_index: 1
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3
+  locator:
+    page: 2
+    published_page: 957
+    pdf_page_index: 1
+    table: '1'
+    note: row=102
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00000057856575'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 957
+        pdf_page_index: 1
+        table: '1'
+        note: row=102; column=pO2
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=5.71e-12 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.00000000000571'
+            locator:
+              page: 2
+              published_page: 957
+              pdf_page_index: 1
+              table: '1'
+              note: row=102; column=pO2
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 2
+              published_page: 957
+              pdf_page_index: 1
+              table: '1'
+              note: row=102; column=pO2
+        output_unit: Pa
+        references: []
+- experiment_id: ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::taniguchi-1997-feo-cas::declared:ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::experiment::taniguchi-1997-table1-103-metal::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe: '1.67'
+      locator:
+        page: 2
+        published_page: 957
+        pdf_page_index: 1
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3
+  locator:
+    page: 2
+    published_page: 957
+    pdf_page_index: 1
+    table: '1'
+    note: row=103
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000001033515'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 957
+        pdf_page_index: 1
+        table: '1'
+        note: row=103; column=pO2
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=1.02e-11 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000000102'
+            locator:
+              page: 2
+              published_page: 957
+              pdf_page_index: 1
+              table: '1'
+              note: row=103; column=pO2
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 2
+              published_page: 957
+              pdf_page_index: 1
+              table: '1'
+              note: row=103; column=pO2
+        output_unit: Pa
+        references: []
+- experiment_id: ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::taniguchi-1997-feo-cas::declared:ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::experiment::taniguchi-1997-table1-104-metal::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe: '0.921'
+      locator:
+        page: 2
+        published_page: 957
+        pdf_page_index: 1
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3
+  locator:
+    page: 2
+    published_page: 957
+    pdf_page_index: 1
+    table: '1'
+    note: row=104
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000002857365'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 957
+        pdf_page_index: 1
+        table: '1'
+        note: row=104; column=pO2
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=2.82e-11 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000000282'
+            locator:
+              page: 2
+              published_page: 957
+              pdf_page_index: 1
+              table: '1'
+              note: row=104; column=pO2
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 2
+              published_page: 957
+              pdf_page_index: 1
+              table: '1'
+              note: row=104; column=pO2
+        output_unit: Pa
+        references: []
+- experiment_id: ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::taniguchi-1997-feo-cas::declared:ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::experiment::taniguchi-1997-table1-105-metal::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe: '3.27'
+      locator:
+        page: 2
+        published_page: 957
+        pdf_page_index: 1
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3
+  locator:
+    page: 2
+    published_page: 957
+    pdf_page_index: 1
+    table: '1'
+    note: row=105
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000003708495'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 957
+        pdf_page_index: 1
+        table: '1'
+        note: row=105; column=pO2
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=3.66e-12 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.00000000000366'
+            locator:
+              page: 2
+              published_page: 957
+              pdf_page_index: 1
+              table: '1'
+              note: row=105; column=pO2
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 2
+              published_page: 957
+              pdf_page_index: 1
+              table: '1'
+              note: row=105; column=pO2
+        output_unit: Pa
+        references: []
+- experiment_id: ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::taniguchi-1997-feo-cas::declared:ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::experiment::taniguchi-1997-table1-106-metal::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe: '1.97'
+      locator:
+        page: 2
+        published_page: 957
+        pdf_page_index: 1
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3
+  locator:
+    page: 2
+    published_page: 957
+    pdf_page_index: 1
+    table: '1'
+    note: row=106
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00000071434125'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 957
+        pdf_page_index: 1
+        table: '1'
+        note: row=106; column=pO2
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=7.05e-12 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.00000000000705'
+            locator:
+              page: 2
+              published_page: 957
+              pdf_page_index: 1
+              table: '1'
+              note: row=106; column=pO2
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 2
+              published_page: 957
+              pdf_page_index: 1
+              table: '1'
+              note: row=106; column=pO2
+        output_unit: Pa
+        references: []
+- experiment_id: ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::taniguchi-1997-feo-cas::declared:ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3::experiment::taniguchi-1997-table1-107-metal::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Fe: '1.39'
+      locator:
+        page: 2
+        published_page: 957
+        pdf_page_index: 1
+        table: '1'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: ef9602031be6c975567c0839c00f9ab5f11f84dd89ad16b6af68d2421cd21aa3
+  locator:
+    page: 2
+    published_page: 957
+    pdf_page_index: 1
+    table: '1'
+    note: row=107
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: printed oxygen partial pressure; extract does not classify an fO2 channel
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0000013678875'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 957
+        pdf_page_index: 1
+        table: '1'
+        note: row=107; column=pO2
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=1.35e-11 atm
+        - printed=oxygen_partial_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000000135'
+            locator:
+              page: 2
+              published_page: 957
+              pdf_page_index: 1
+              table: '1'
+              note: row=107; column=pO2
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 2
+              published_page: 957
+              pdf_page_index: 1
+              table: '1'
+              note: row=107; column=pO2
         output_unit: Pa
         references: []
 context:

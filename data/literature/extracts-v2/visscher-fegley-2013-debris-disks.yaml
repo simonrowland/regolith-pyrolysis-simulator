@@ -93,6 +93,17 @@ observations:
       status: canonical
       value: g
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_sat
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: MAGMA_IMCC_equilibrium'
+    origin: visscher-fegley-2013-debris-disks::visscher_2013_bse_total_vapor_pressure_fit
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: visscher-fegley-2013-debris-disks
   locator:
     published_page: 4
@@ -219,6 +230,17 @@ observations:
       status: canonical
       value: g
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_sat
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: MAGMA_IMCC_equilibrium'
+    origin: visscher-fegley-2013-debris-disks::visscher_2013_bsm_total_vapor_pressure_fit
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: visscher-fegley-2013-debris-disks
   locator:
     published_page: 4
@@ -300,6 +322,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: MAGMA_equilibrium_fO2_constraint'
+    origin: visscher-fegley-2013-debris-disks::visscher_2013_carbon_dioxide_ratio_constraint
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: visscher-fegley-2013-debris-disks
   locator:
     published_page: 5
@@ -380,6 +412,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: MAGMA_IMCC_equilibrium'
+    origin: visscher-fegley-2013-debris-disks::visscher_2013_figure2_vapor_species_trends
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: visscher-fegley-2013-debris-disks
   locator:
     published_page: 3
@@ -480,6 +522,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - evolved_gas_yield
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: MAGMA_IMCC_equilibrium'
+    origin: visscher-fegley-2013-debris-disks::visscher_2013_low_temperature_volatile_dominance
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: visscher-fegley-2013-debris-disks
   locator:
     published_page: 3
@@ -601,6 +654,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - evolved_gas_yield
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: MAGMA_IMCC_equilibrium'
+    origin: visscher-fegley-2013-debris-disks::visscher_2013_low_temperature_volatile_dominance_zinc
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: visscher-fegley-2013-debris-disks
   locator:
     published_page: 3
@@ -725,6 +789,17 @@ observations:
       status: canonical
       value: g
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: MAGMA_IMCC_equilibrium'
+    origin: visscher-fegley-2013-debris-disks::visscher_2013_saturated_vapor_oxygen_fugacity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: visscher-fegley-2013-debris-disks
   locator:
     published_page: 5
@@ -853,6 +928,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_sat
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: MAGMA_equilibrium_model_comparison'
+    origin: visscher-fegley-2013-debris-disks::visscher_2013_sio2_pure_melt_vapor_pressure_fit
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: visscher-fegley-2013-debris-disks
   locator:
     published_page: 4
@@ -953,6 +1039,17 @@ observations:
       status: canonical
       value: g
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: MAGMA_IMCC_equilibrium'
+    origin: visscher-fegley-2013-debris-disks::visscher_2013_sio_partial_pressure_equilibrium
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: visscher-fegley-2013-debris-disks
   locator:
     published_page: 4
@@ -1036,6 +1133,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: MAGMA_IMCC_model_input'
+    origin: visscher-fegley-2013-debris-disks::visscher_2013_table1_bulk_silicate_compositions
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: visscher-fegley-2013-debris-disks
   locator:
     published_page: 2
@@ -1133,6 +1240,17 @@ observations:
       status: canonical
       value: g
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_sat
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: MAGMA_IMCC_equilibrium'
+    origin: visscher-fegley-2013-debris-disks::visscher_2013_total_vapor_pressure_sum
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: visscher-fegley-2013-debris-disks
   locator:
     published_page: 4
@@ -1215,6 +1333,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: MAGMA_equilibrium_fO2_constraint'
+    origin: visscher-fegley-2013-debris-disks::visscher_2013_water_ratio_constraint
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: visscher-fegley-2013-debris-disks
   locator:
     published_page: 5

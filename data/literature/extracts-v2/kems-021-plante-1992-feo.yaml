@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/kems-021-plante-1992-feo.yaml
 observations:
 - observation_id: kems-021-plante-1992-feo::plante_1992_fig1_IT_vs_T_figure_only_blocked
-  experiment_id: 10.2355/isijinternational.32.1276::kems-021-plante-1992-feo
+  experiment_id: 10.2355/isijinternational.32.1276::kems-021-plante-1992-feo::method:knudsen_effusion
   identity:
     quantity:
       tag: unknown
@@ -119,6 +119,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_this_work_and_foreign_overlays'
+    origin: kems-021-plante-1992-feo::plante_1992_fig4_activity_figure_only_blocked
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-021-plante-1992-feo
   locator:
     page: 1278

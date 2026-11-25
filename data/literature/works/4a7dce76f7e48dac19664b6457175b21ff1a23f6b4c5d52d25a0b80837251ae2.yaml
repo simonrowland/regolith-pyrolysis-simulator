@@ -63,11 +63,86 @@ experiments:
     pdf_page_index: 5
     table: '3'
     record: Table 3 row -0.68*; AD; Cr2+/SumCr cell
-- experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::experiment::berry_2004_table3_one_bar
+- experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::berry-oneill-2004-chromium-xanes::declared:4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::experiment::berry_2004_table3_one_bar::method:xanes_spectroscopy
   kind: literature
   method:
     tag: value
     value: xanes_spectroscopy
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        published_page: 791
+        pdf_page_index: 2
+        section: Experimental methods
+        record: Cr3C2/CO experiments at 1 bar
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 791
+        pdf_page_index: 2
+        section: Experimental methods
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2
+  locator:
+    published_page: 794
+    pdf_page_index: 5
+    table: '3'
+    record: Table 3 log fO2 -16.13 CO cells
+- experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::berry-oneill-2004-chromium-xanes::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2
+  locator:
+    published_page: 794
+    pdf_page_index: 5
+    table: '3'
+    record: Table 3 row -0.68*; AD; Cr2+/SumCr cell
+- experiment_id: 4a7dce76f7e48dac19664b6457175b21ff1a23f6b4c5d52d25a0b80837251ae2::experiment::berry_2004_table3_one_bar
+  kind: literature
+  method:
+    tag: unknown
+    reason: not_mapped
   sample: {}
   conditions:
     temperature_K:

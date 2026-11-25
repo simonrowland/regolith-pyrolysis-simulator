@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/kems-137-bischof-2023.yaml
 observations:
 - observation_id: kems-137-bischof-2023::bischof_2023_ga2o3_henrian_log10_gamma_model
-  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  experiment_id: 10.1016/j.gca.2023.08.027::kems-137-bischof-2023::declared:10.1016/j.gca.2023.08.027::experiment::an-di-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -50,16 +50,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''model''
-      is not a closed method token (kems_effusion alone is insufficient)'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: model'
     origin: kems-137-bischof-2023::bischof_2023_ga2o3_henrian_log10_gamma_model
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-137-bischof-2023
   locator:
@@ -20507,7 +20506,7 @@ observations:
   provenance:
     printed_phase: anorthite_diopside_eutectic_silicate_melt
 - observation_id: kems-137-bischof-2023::bischof_2023_in2o3_henrian_log10_gamma_model
-  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  experiment_id: 10.1016/j.gca.2023.08.027::kems-137-bischof-2023::declared:10.1016/j.gca.2023.08.027::experiment::an-di-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -20554,16 +20553,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''model''
-      is not a closed method token (kems_effusion alone is insufficient)'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: model'
     origin: kems-137-bischof-2023::bischof_2023_in2o3_henrian_log10_gamma_model
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-137-bischof-2023
   locator:
@@ -23240,18 +23238,6 @@ observations:
       status: canonical
       value: l
       units: phase token
-  - kind: method_inferred
-    affected_quantities:
-    - activity_coefficient
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_preferred_1674k
-    policy:
-      id: DP-107
-      version: 1
-      status: proposed
-      value: knudsen_effusion
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -23420,18 +23406,6 @@ observations:
     origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::T=1586.4:h=de65de78e851
     band: '0.0074'
     authority: extrapolated
-  - kind: method_inferred
-    affected_quantities:
-    - activity_coefficient
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::T=1586.4:h=de65de78e851
-    policy:
-      id: DP-107
-      version: 1
-      status: proposed
-      value: knudsen_effusion
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -23708,18 +23682,6 @@ observations:
     origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::T=1598.0:h=f35e64983559
     band: '0.0074'
     authority: extrapolated
-  - kind: method_inferred
-    affected_quantities:
-    - activity_coefficient
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::T=1598.0:h=f35e64983559
-    policy:
-      id: DP-107
-      version: 1
-      status: proposed
-      value: knudsen_effusion
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -23996,18 +23958,6 @@ observations:
     origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::T=1608.6:h=4a2219a85cba
     band: '0.0074'
     authority: extrapolated
-  - kind: method_inferred
-    affected_quantities:
-    - activity_coefficient
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::T=1608.6:h=4a2219a85cba
-    policy:
-      id: DP-107
-      version: 1
-      status: proposed
-      value: knudsen_effusion
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -24284,18 +24234,6 @@ observations:
     origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::T=1619.2:h=7f9f33ef20f7
     band: '0.0075'
     authority: extrapolated
-  - kind: method_inferred
-    affected_quantities:
-    - activity_coefficient
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::T=1619.2:h=7f9f33ef20f7
-    policy:
-      id: DP-107
-      version: 1
-      status: proposed
-      value: knudsen_effusion
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -24572,18 +24510,6 @@ observations:
     origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::T=1630.8:h=d490d87fbcbb
     band: '0.0075'
     authority: extrapolated
-  - kind: method_inferred
-    affected_quantities:
-    - activity_coefficient
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::T=1630.8:h=d490d87fbcbb
-    policy:
-      id: DP-107
-      version: 1
-      status: proposed
-      value: knudsen_effusion
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -24860,18 +24786,6 @@ observations:
     origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::T=1642.5:h=9b674cc8620b
     band: '0.0077'
     authority: extrapolated
-  - kind: method_inferred
-    affected_quantities:
-    - activity_coefficient
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::T=1642.5:h=9b674cc8620b
-    policy:
-      id: DP-107
-      version: 1
-      status: proposed
-      value: knudsen_effusion
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -25149,18 +25063,6 @@ observations:
     origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::T=1653.0:h=3cd2123dd0c0
     band: '0.0076'
     authority: extrapolated
-  - kind: method_inferred
-    affected_quantities:
-    - activity_coefficient
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::T=1653.0:h=3cd2123dd0c0
-    policy:
-      id: DP-107
-      version: 1
-      status: proposed
-      value: knudsen_effusion
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -25438,18 +25340,6 @@ observations:
     origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::T=1664.7:h=ac5496c84508
     band: '0.0077'
     authority: extrapolated
-  - kind: method_inferred
-    affected_quantities:
-    - activity_coefficient
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::T=1664.7:h=ac5496c84508
-    policy:
-      id: DP-107
-      version: 1
-      status: proposed
-      value: knudsen_effusion
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -25727,18 +25617,6 @@ observations:
     origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::T=1674.2:h=63df6d37454c
     band: '0.0078'
     authority: extrapolated
-  - kind: method_inferred
-    affected_quantities:
-    - activity_coefficient
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::T=1674.2:h=63df6d37454c
-    policy:
-      id: DP-107
-      version: 1
-      status: proposed
-      value: knudsen_effusion
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -26016,18 +25894,6 @@ observations:
     origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::T=1684.8:h=0bad2efaf33d
     band: '0.0078'
     authority: extrapolated
-  - kind: method_inferred
-    affected_quantities:
-    - activity_coefficient
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::T=1684.8:h=0bad2efaf33d
-    policy:
-      id: DP-107
-      version: 1
-      status: proposed
-      value: knudsen_effusion
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -26305,18 +26171,6 @@ observations:
     origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::T=1695.4:h=a4ad4b9bda48
     band: '0.0079'
     authority: extrapolated
-  - kind: method_inferred
-    affected_quantities:
-    - activity_coefficient
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm::T=1695.4:h=a4ad4b9bda48
-    policy:
-      id: DP-107
-      version: 1
-      status: proposed
-      value: knudsen_effusion
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -26594,18 +26448,6 @@ observations:
     origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1740.8:h=035174f258ce
     band: '0.0081'
     authority: extrapolated
-  - kind: method_inferred
-    affected_quantities:
-    - activity_coefficient
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1740.8:h=035174f258ce
-    policy:
-      id: DP-107
-      version: 1
-      status: proposed
-      value: knudsen_effusion
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -26883,18 +26725,6 @@ observations:
     origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1740.8:h=0aec3e1195bc
     band: '0.0081'
     authority: extrapolated
-  - kind: method_inferred
-    affected_quantities:
-    - activity_coefficient
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1740.8:h=0aec3e1195bc
-    policy:
-      id: DP-107
-      version: 1
-      status: proposed
-      value: knudsen_effusion
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -27172,18 +27002,6 @@ observations:
     origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1740.8:h=5fc43e6d2e25
     band: '0.0081'
     authority: extrapolated
-  - kind: method_inferred
-    affected_quantities:
-    - activity_coefficient
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1740.8:h=5fc43e6d2e25
-    policy:
-      id: DP-107
-      version: 1
-      status: proposed
-      value: knudsen_effusion
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -27461,18 +27279,6 @@ observations:
     origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1740.8:h=6459724fddd1
     band: '0.0081'
     authority: extrapolated
-  - kind: method_inferred
-    affected_quantities:
-    - activity_coefficient
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1740.8:h=6459724fddd1
-    policy:
-      id: DP-107
-      version: 1
-      status: proposed
-      value: knudsen_effusion
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -27750,18 +27556,6 @@ observations:
     origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1740.8:h=72232e446a5f
     band: '0.0081'
     authority: extrapolated
-  - kind: method_inferred
-    affected_quantities:
-    - activity_coefficient
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1740.8:h=72232e446a5f
-    policy:
-      id: DP-107
-      version: 1
-      status: proposed
-      value: knudsen_effusion
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -28039,18 +27833,6 @@ observations:
     origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1740.8:h=c298c2871011
     band: '0.0081'
     authority: extrapolated
-  - kind: method_inferred
-    affected_quantities:
-    - activity_coefficient
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1740.8:h=c298c2871011
-    policy:
-      id: DP-107
-      version: 1
-      status: proposed
-      value: knudsen_effusion
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -28328,18 +28110,6 @@ observations:
     origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1740.8:h=e4bde7af2461
     band: '0.0081'
     authority: extrapolated
-  - kind: method_inferred
-    affected_quantities:
-    - activity_coefficient
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1740.8:h=e4bde7af2461
-    policy:
-      id: DP-107
-      version: 1
-      status: proposed
-      value: knudsen_effusion
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -28617,18 +28387,6 @@ observations:
     origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1740.8:h=f5a01fae85df
     band: '0.0081'
     authority: extrapolated
-  - kind: method_inferred
-    affected_quantities:
-    - activity_coefficient
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1740.8:h=f5a01fae85df
-    policy:
-      id: DP-107
-      version: 1
-      status: proposed
-      value: knudsen_effusion
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -28906,18 +28664,6 @@ observations:
     origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1741.9:h=1695c52531fd
     band: '0.008'
     authority: extrapolated
-  - kind: method_inferred
-    affected_quantities:
-    - activity_coefficient
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1741.9:h=1695c52531fd
-    policy:
-      id: DP-107
-      version: 1
-      status: proposed
-      value: knudsen_effusion
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -29195,18 +28941,6 @@ observations:
     origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1741.9:h=239571a699df
     band: '0.008'
     authority: extrapolated
-  - kind: method_inferred
-    affected_quantities:
-    - activity_coefficient
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1741.9:h=239571a699df
-    policy:
-      id: DP-107
-      version: 1
-      status: proposed
-      value: knudsen_effusion
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -29484,18 +29218,6 @@ observations:
     origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1741.9:h=34f50eb53ce9
     band: '0.008'
     authority: extrapolated
-  - kind: method_inferred
-    affected_quantities:
-    - activity_coefficient
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1741.9:h=34f50eb53ce9
-    policy:
-      id: DP-107
-      version: 1
-      status: proposed
-      value: knudsen_effusion
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -29773,18 +29495,6 @@ observations:
     origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1741.9:h=4f0584ece45a
     band: '0.008'
     authority: extrapolated
-  - kind: method_inferred
-    affected_quantities:
-    - activity_coefficient
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1741.9:h=4f0584ece45a
-    policy:
-      id: DP-107
-      version: 1
-      status: proposed
-      value: knudsen_effusion
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -30062,18 +29772,6 @@ observations:
     origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1741.9:h=6073483dbdfe
     band: '0.008'
     authority: extrapolated
-  - kind: method_inferred
-    affected_quantities:
-    - activity_coefficient
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1741.9:h=6073483dbdfe
-    policy:
-      id: DP-107
-      version: 1
-      status: proposed
-      value: knudsen_effusion
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -30351,18 +30049,6 @@ observations:
     origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1741.9:h=8d38657b9fac
     band: '0.008'
     authority: extrapolated
-  - kind: method_inferred
-    affected_quantities:
-    - activity_coefficient
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1741.9:h=8d38657b9fac
-    policy:
-      id: DP-107
-      version: 1
-      status: proposed
-      value: knudsen_effusion
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -30640,18 +30326,6 @@ observations:
     origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1743.0:h=227712ef4837
     band: '0.008'
     authority: extrapolated
-  - kind: method_inferred
-    affected_quantities:
-    - activity_coefficient
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1743.0:h=227712ef4837
-    policy:
-      id: DP-107
-      version: 1
-      status: proposed
-      value: knudsen_effusion
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -30929,18 +30603,6 @@ observations:
     origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1743.0:h=a47b3a969c72
     band: '0.008'
     authority: extrapolated
-  - kind: method_inferred
-    affected_quantities:
-    - activity_coefficient
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm::T=1743.0:h=a47b3a969c72
-    policy:
-      id: DP-107
-      version: 1
-      status: proposed
-      value: knudsen_effusion
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -41714,7 +41376,7 @@ observations:
   provenance:
     printed_phase: anorthite_diopside_eutectic_silicate_melt
 - observation_id: kems-137-bischof-2023::bischof_2023_t50c_ga_factsage_table9::rows:h=6c804341a8cf
-  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  experiment_id: 10.1016/j.gca.2023.08.027::kems-137-bischof-2023::declared:10.1016/j.gca.2023.08.027::experiment::an-di-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -41760,16 +41422,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-137-bischof-2023::bischof_2023_t50c_ga_factsage_table9::rows:h=6c804341a8cf
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: model'
+    origin: kems-137-bischof-2023::bischof_2023_t50c_ga_factsage_table9
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-137-bischof-2023
   locator:
@@ -41781,7 +41442,7 @@ observations:
   provenance:
     printed_phase: anorthite_diopside_eutectic_silicate_melt
 - observation_id: kems-137-bischof-2023::bischof_2023_t50c_ga_factsage_table9::rows:h=aa3d21adafc2
-  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  experiment_id: 10.1016/j.gca.2023.08.027::kems-137-bischof-2023::declared:10.1016/j.gca.2023.08.027::experiment::an-di-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -41827,16 +41488,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-137-bischof-2023::bischof_2023_t50c_ga_factsage_table9::rows:h=aa3d21adafc2
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: model'
+    origin: kems-137-bischof-2023::bischof_2023_t50c_ga_factsage_table9
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-137-bischof-2023
   locator:
@@ -41848,7 +41508,7 @@ observations:
   provenance:
     printed_phase: anorthite_diopside_eutectic_silicate_melt
 - observation_id: kems-137-bischof-2023::bischof_2023_t50c_ga_factsage_table9::rows:h=db266f8fab28
-  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  experiment_id: 10.1016/j.gca.2023.08.027::kems-137-bischof-2023::declared:10.1016/j.gca.2023.08.027::experiment::an-di-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -41894,16 +41554,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-137-bischof-2023::bischof_2023_t50c_ga_factsage_table9::rows:h=db266f8fab28
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: model'
+    origin: kems-137-bischof-2023::bischof_2023_t50c_ga_factsage_table9
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-137-bischof-2023
   locator:
@@ -41915,7 +41574,7 @@ observations:
   provenance:
     printed_phase: anorthite_diopside_eutectic_silicate_melt
 - observation_id: kems-137-bischof-2023::bischof_2023_t50c_in_factsage_table9::rows:h=45d2277779c3
-  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  experiment_id: 10.1016/j.gca.2023.08.027::kems-137-bischof-2023::declared:10.1016/j.gca.2023.08.027::experiment::an-di-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -41961,16 +41620,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-137-bischof-2023::bischof_2023_t50c_in_factsage_table9::rows:h=45d2277779c3
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: model'
+    origin: kems-137-bischof-2023::bischof_2023_t50c_in_factsage_table9
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-137-bischof-2023
   locator:
@@ -41982,7 +41640,7 @@ observations:
   provenance:
     printed_phase: anorthite_diopside_eutectic_silicate_melt
 - observation_id: kems-137-bischof-2023::bischof_2023_t50c_in_factsage_table9::rows:h=466e2fdb3a17
-  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  experiment_id: 10.1016/j.gca.2023.08.027::kems-137-bischof-2023::declared:10.1016/j.gca.2023.08.027::experiment::an-di-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -42028,16 +41686,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-137-bischof-2023::bischof_2023_t50c_in_factsage_table9::rows:h=466e2fdb3a17
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: model'
+    origin: kems-137-bischof-2023::bischof_2023_t50c_in_factsage_table9
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-137-bischof-2023
   locator:
@@ -42049,7 +41706,7 @@ observations:
   provenance:
     printed_phase: anorthite_diopside_eutectic_silicate_melt
 - observation_id: kems-137-bischof-2023::bischof_2023_t50c_in_factsage_table9::rows:h=a60632fa1d18
-  experiment_id: 10.1016/j.gca.2023.08.027::experiment::an-di-series
+  experiment_id: 10.1016/j.gca.2023.08.027::kems-137-bischof-2023::declared:10.1016/j.gca.2023.08.027::experiment::an-di-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -42095,16 +41752,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-137-bischof-2023::bischof_2023_t50c_in_factsage_table9::rows:h=a60632fa1d18
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: model'
+    origin: kems-137-bischof-2023::bischof_2023_t50c_in_factsage_table9
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-137-bischof-2023
   locator:

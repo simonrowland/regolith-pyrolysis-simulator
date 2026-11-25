@@ -2793,7 +2793,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - transition_temperature
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: NIST-WB phase page lists
+      Ttriple; Tfus not separately tabulated (use Ttriple as melt proxy)'
     origin: nist-webbook::K_triple_point_temperature
     policy:
       id: DP-106
@@ -3095,7 +3096,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - transition_temperature
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Use as melting anchor
+      (WebBook lists Ttriple, not separate Tfus)'
     origin: nist-webbook::Mg_triple_point_temperature
     policy:
       id: DP-106

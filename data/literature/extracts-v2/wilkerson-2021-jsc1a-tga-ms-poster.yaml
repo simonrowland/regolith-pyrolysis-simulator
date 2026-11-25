@@ -37,7 +37,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: tga_ms_he_and_stated_equivalent_in_vacuum'
+    origin: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_co2_release_window_500_750_C
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: wilkerson-2021-jsc1a-tga-ms-poster
   locator:
     pdf_page_index: 4
@@ -128,6 +138,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: tga_ms_heat_treatment_unspecified_on_table'
+    origin: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_co2_total_loss_wt_pct
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -177,7 +198,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: tga_ms_he_and_stated_equivalent_in_vacuum'
+    origin: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_h2o_release_window_50_200_C
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: wilkerson-2021-jsc1a-tga-ms-poster
   locator:
     pdf_page_index: 4
@@ -268,6 +299,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: tga_ms_heat_treatment_unspecified_on_table'
+    origin: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_h2o_total_loss_wt_pct
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -332,6 +374,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: tga_ms_plotted_curve'
+    origin: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_he_tga_ms_co2_page4_figure_only
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: wilkerson-2021-jsc1a-tga-ms-poster
   locator:
     pdf_page_index: 4
@@ -390,6 +442,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: tga_ms_plotted_curve'
+    origin: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_he_tga_ms_h2o_page4_figure_only
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: wilkerson-2021-jsc1a-tga-ms-poster
   locator:
     pdf_page_index: 4
@@ -448,6 +510,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: tga_ms_plotted_curve'
+    origin: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_he_tga_ms_so2_page4_figure_only
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: wilkerson-2021-jsc1a-tga-ms-poster
   locator:
     pdf_page_index: 4
@@ -506,6 +578,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: tga_ms_plotted_curve'
+    origin: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_idealized_ht_tg_page8_figure_only
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: wilkerson-2021-jsc1a-tga-ms-poster
   locator:
     pdf_page_index: 8
@@ -607,6 +689,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: tga_idealized_heat_treatment_he_then_ar_h2'
+    origin: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_jsc1a_arh2_750C_2hr_hold_mass_loss
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -675,6 +768,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: tga_ms_reducing_ar_5h2'
+    origin: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_jsc1a_arh2_thermal_program
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: wilkerson-2021-jsc1a-tga-ms-poster
   locator:
     pdf_page_index: 6
@@ -729,6 +832,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: tga_ms_flowing_he'
+    origin: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_jsc1a_he_thermal_program
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: wilkerson-2021-jsc1a-tga-ms-poster
   locator:
     pdf_page_index: 4
@@ -783,6 +896,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: conventional_vacuum_furnace_ms'
+    origin: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_jsc1a_vacuum_thermal_program
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: wilkerson-2021-jsc1a-tga-ms-poster
   locator:
     pdf_page_index: 5
@@ -823,7 +946,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: tga_ms_he_and_stated_equivalent_in_vacuum'
+    origin: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_so2_release_window_1000_C_plus
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: wilkerson-2021-jsc1a-tga-ms-poster
   locator:
     pdf_page_index: 4
@@ -914,6 +1047,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: tga_ms_heat_treatment_unspecified_on_table'
+    origin: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_so2_total_loss_wt_pct
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -973,6 +1117,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: authors_hypothesis'
+    origin: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_suspected_reactions_hypothesis
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: wilkerson-2021-jsc1a-tga-ms-poster
   locator:
     pdf_page_index: 7
@@ -1029,6 +1183,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_heat_treatment'
+    origin: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_vacuum_bubbling_above_1100_C_qualitative
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: wilkerson-2021-jsc1a-tga-ms-poster
   locator:
     pdf_page_index: 11
@@ -1096,6 +1260,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: tga_ms_plotted_curve'
+    origin: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_vacuum_ms_h2o_page5_figure_only
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: wilkerson-2021-jsc1a-tga-ms-poster
   locator:
     pdf_page_index: 5

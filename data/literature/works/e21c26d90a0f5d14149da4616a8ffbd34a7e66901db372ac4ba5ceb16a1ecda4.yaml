@@ -39,8 +39,8 @@ experiments:
 - experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::calvet-inverse-drop-series
   kind: literature
   method:
-    tag: value
-    value: calorimetry
+    tag: unknown
+    reason: 'unmapped published method: inverse-drop and drop-solution calorimetry'
   sample:
     form:
       state:
@@ -174,8 +174,8 @@ experiments:
 - experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::high-temperature-drop-calorimetry-series
   kind: literature
   method:
-    tag: value
-    value: calorimetry
+    tag: unknown
+    reason: 'unmapped published method: high-temperature diphenyl-ether drop calorimetry'
   sample: {}
   conditions:
     temperature_K:
@@ -245,6 +245,170 @@ experiments:
   locator:
     page: PDF p. 6 / printed p. 722
     table: '4'
+- experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983::declared:e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::calvet-inverse-drop-series::method:calorimetry
+  kind: literature
+  method:
+    tag: value
+    value: calorimetry
+  sample:
+    form:
+      state:
+        tag: value
+        value: glass pieces; capsule cores produced as cylinders about 3 mm diameter
+      locator:
+        published_page: 718
+        section: Experimental methods
+    pretreatment:
+      state:
+        tag: value
+        value: glasses prepared by quenching liquids in the drop calorimeter
+      locator:
+        published_page: 718
+        section: Experimental methods
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '981'
+      locator:
+        published_page: 718
+        section: Experimental methods
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 718
+        section: Experimental methods
+        note: No measurement pressure is printed.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 717
+        section: Experimental methods
+        note: Diphenyl ether is the calorimeter medium, not a published sweep-gas record.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4
+  locator:
+    published_page: 718
+    section: Experimental methods
+    note: Own inverse-drop and drop-solution measurements.
+  bench_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::bench::twin-calvet-microcalorimeter-981k
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: inverse-drop and drop-solution calorimetry
+      locator:
+        published_page: 718
+        section: Experimental methods
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 718
+        section: Experimental methods
+        note: Heat effects were observable for about 50 min; this is not a printed run duration.
+    cooling_or_quench:
+      state:
+        tag: value
+        value: glasses quenched from liquids in the drop calorimeter
+      locator:
+        published_page: 718
+        section: Experimental methods
+- experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983::declared:e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::high-temperature-drop-calorimetry-series::method:calorimetry
+  kind: literature
+  method:
+    tag: value
+    value: calorimetry
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 717-718
+        section: Experimental methods
+        note: Sample temperatures vary by run and are reported in Tables 3 and 5; the calorimeter reference temperature is
+          300 K on the bench.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 718
+        section: Experimental methods
+        note: No measurement pressure is printed.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 717
+        section: Experimental methods
+        note: Diphenyl ether is the calorimeter medium, not a published sweep-gas record.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4
+  locator:
+    published_page: 717
+    section: Experimental methods
+    note: Own high-temperature enthalpy measurements.
+  bench_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::bench::high-temperature-diphenyl-ether-drop-calorimeter
+- experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983::declared:e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::high-temperature-drop-calorimetry-series::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 717-718
+        section: Experimental methods
+        note: Sample temperatures vary by run and are reported in Tables 3 and 5; the calorimeter reference temperature is
+          300 K on the bench.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 718
+        section: Experimental methods
+        note: No measurement pressure is printed.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 717
+        section: Experimental methods
+        note: Diphenyl ether is the calorimeter medium, not a published sweep-gas record.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4
+  locator:
+    published_page: 717
+    section: Experimental methods
+    note: Own high-temperature enthalpy measurements.
+  bench_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::bench::high-temperature-diphenyl-ether-drop-calorimeter
 benches:
 - id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::bench::high-temperature-diphenyl-ether-drop-calorimeter
   work_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4

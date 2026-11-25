@@ -3543,7 +3543,7 @@ observations:
   provenance:
     printed_phase: g
 - observation_id: metsoc-2019-6005::shornikov_yakovlev_2019_metsoc6005_perovskite_delta_fH
-  experiment_id: 1f4c477fa58c8598475d468871c12ff15c652023b8d5213b30c7538c2db4d05d::experiment::shornikov-2019-mo-kems
+  experiment_id: 1f4c477fa58c8598475d468871c12ff15c652023b8d5213b30c7538c2db4d05d::metsoc-2019-6005::declared:1f4c477fa58c8598475d468871c12ff15c652023b8d5213b30c7538c2db4d05d::experiment::shornikov-2019-mo-kems::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -3588,6 +3588,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: knudsen_cell_mass_spectrometry_CaO_TiO2'
+    origin: metsoc-2019-6005::shornikov_yakovlev_2019_metsoc6005_perovskite_delta_fH
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: metsoc-2019-6005
   locator:
     page: 1
@@ -3600,7 +3610,7 @@ observations:
   provenance:
     printed_phase: solid_perovskite
 - observation_id: metsoc-2019-6005::shornikov_yakovlev_2019_metsoc6005_perovskite_delta_fS
-  experiment_id: 1f4c477fa58c8598475d468871c12ff15c652023b8d5213b30c7538c2db4d05d::experiment::shornikov-2019-mo-kems
+  experiment_id: 1f4c477fa58c8598475d468871c12ff15c652023b8d5213b30c7538c2db4d05d::metsoc-2019-6005::declared:1f4c477fa58c8598475d468871c12ff15c652023b8d5213b30c7538c2db4d05d::experiment::shornikov-2019-mo-kems::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -3645,6 +3655,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: knudsen_cell_mass_spectrometry_CaO_TiO2'
+    origin: metsoc-2019-6005::shornikov_yakovlev_2019_metsoc6005_perovskite_delta_fS
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: metsoc-2019-6005
   locator:
     page: 1
@@ -3656,7 +3676,7 @@ observations:
   provenance:
     printed_phase: solid_perovskite
 - observation_id: metsoc-2019-6005::shornikov_yakovlev_2019_metsoc6005_perovskite_melting
-  experiment_id: 1f4c477fa58c8598475d468871c12ff15c652023b8d5213b30c7538c2db4d05d::experiment::shornikov-2019-mo-kems
+  experiment_id: 1f4c477fa58c8598475d468871c12ff15c652023b8d5213b30c7538c2db4d05d::metsoc-2019-6005::declared:1f4c477fa58c8598475d468871c12ff15c652023b8d5213b30c7538c2db4d05d::experiment::shornikov-2019-mo-kems::method:unspecified
   identity:
     quantity:
       tag: value
@@ -3748,6 +3768,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: knudsen_cell_mass_spectrometry_CaO_TiO2'
+    origin: metsoc-2019-6005::shornikov_yakovlev_2019_metsoc6005_perovskite_melting
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion

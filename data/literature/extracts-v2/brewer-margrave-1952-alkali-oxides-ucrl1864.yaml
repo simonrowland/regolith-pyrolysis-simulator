@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/brewer-margrave-1952-alkali-oxides-ucrl1864.yaml
 observations:
 - observation_id: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_approximate_high_temperature_na_pressure
-  experiment_id: 28c4d50ff7385789ce08a9b68d3ff59937fbf9306d38c7d74fe8a1fb6ee5fbbc::brewer-margrave-1952-alkali-oxides-ucrl1864
+  experiment_id: 28c4d50ff7385789ce08a9b68d3ff59937fbf9306d38c7d74fe8a1fb6ee5fbbc::brewer-margrave-1952-alkali-oxides-ucrl1864::method:unspecified
   identity:
     quantity:
       tag: value
@@ -107,17 +107,16 @@ observations:
       status: canonical
       value: g
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - p_partial
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
-      ''Knudsen effusion'' is not a closed method token (kems_effusion alone is insufficient)'
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
     origin: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_approximate_high_temperature_na_pressure
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: brewer-margrave-1952-alkali-oxides-ucrl1864
   locator:
@@ -226,9 +225,9 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - mass_loss_rate
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
-      ''Knudsen effusion'' is not a closed method token (kems_effusion alone is insufficient)'
-    origin: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_table3_total_mass_loss::T=1006:row=6:h=7ac60ec11a1f
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=source
+      method text: Knudsen effusion'
+    origin: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_table3_total_mass_loss
     policy:
       id: DP-107
       version: 1
@@ -347,9 +346,9 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - mass_loss_rate
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
-      ''Knudsen effusion'' is not a closed method token (kems_effusion alone is insufficient)'
-    origin: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_table3_total_mass_loss::T=1241:row=4:h=32f054211f0b
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=source
+      method text: Knudsen effusion'
+    origin: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_table3_total_mass_loss
     policy:
       id: DP-107
       version: 1
@@ -468,9 +467,9 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - mass_loss_rate
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
-      ''Knudsen effusion'' is not a closed method token (kems_effusion alone is insufficient)'
-    origin: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_table3_total_mass_loss::T=1260:row=3:h=819d15c848c0
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=source
+      method text: Knudsen effusion'
+    origin: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_table3_total_mass_loss
     policy:
       id: DP-107
       version: 1
@@ -589,9 +588,9 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - mass_loss_rate
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
-      ''Knudsen effusion'' is not a closed method token (kems_effusion alone is insufficient)'
-    origin: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_table3_total_mass_loss::T=1467:row=1:h=73ef0f153d5c
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=source
+      method text: Knudsen effusion'
+    origin: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_table3_total_mass_loss
     policy:
       id: DP-107
       version: 1
@@ -710,9 +709,9 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - mass_loss_rate
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
-      ''Knudsen effusion'' is not a closed method token (kems_effusion alone is insufficient)'
-    origin: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_table3_total_mass_loss::T=918:row=2:h=2eba3cba4908
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=source
+      method text: Knudsen effusion'
+    origin: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_table3_total_mass_loss
     policy:
       id: DP-107
       version: 1
@@ -831,9 +830,9 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - mass_loss_rate
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
-      ''Knudsen effusion'' is not a closed method token (kems_effusion alone is insufficient)'
-    origin: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_table3_total_mass_loss::T=943:row=5:h=fdbb02c94538
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=source
+      method text: Knudsen effusion'
+    origin: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_table3_total_mass_loss
     policy:
       id: DP-107
       version: 1
@@ -952,9 +951,9 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - mass_loss_rate
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
-      ''Knudsen effusion'' is not a closed method token (kems_effusion alone is insufficient)'
-    origin: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_table3_total_mass_loss::T=998:row=7:h=0cf8c2a228f7
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=source
+      method text: Knudsen effusion'
+    origin: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_table3_total_mass_loss
     policy:
       id: DP-107
       version: 1

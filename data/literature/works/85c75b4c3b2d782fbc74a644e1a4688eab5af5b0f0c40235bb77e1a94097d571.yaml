@@ -889,8 +889,8 @@ experiments:
 - experiment_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571::ntrs-19650014783
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'author_pooled_least_squares_fit' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: unspecified
   sample: {}
   conditions:
     temperature_K:
@@ -918,6 +918,77 @@ experiments:
     published_page: 8
     pdf_page_index: 10
     equation: '2'
+- experiment_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571::ntrs-19650014783::declared:85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571::experiment::sodium-vapor-pressure-series::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+    cell_internal_pressure_note:
+      state:
+        tag: value
+        value: evacuated to 10^-4 Torr before sodium injection (preparation; not measurement pressure)
+      locator:
+        published_page: 4
+        pdf_page_index: 6
+        section: Procedure
+        note: printed p. 4 / PDF 6; preparation evacuation before Na injection
+  work_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571
+  locator:
+    published_page: 2
+    pdf_page_index: 4
+    section: Experiment - Apparatus and Procedure
+    note: Series-level sodium vapor-pressure context; per-run experiments remain declared below
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 90 percent tantalum and 10 percent tungsten alloy capsule
+      locator:
+        published_page: 2
+        pdf_page_index: 4
+        section: Experiment - Apparatus
+    calibration:
+      calibration:
+        state:
+          tag: value
+          value: all transducers calibrated at 120 C with a standard dead-weight piston gage
+        locator:
+          published_page: 2
+          pdf_page_index: 4
+          section: Experiment - Apparatus and Procedure
+    temperature_measurement:
+      temperature_calibration:
+        state:
+          tag: value
+          value: Pt-Pt-13Rh against NBS standardized thermocouple; W-Re against Pt-Pt-13Rh from 845 to 1820 K, extrapolated
+            to 2200 K with deviation no more than 6 K
+        locator:
+          published_page: 4
+          pdf_page_index: 6
+          section: Temperature measurements
+  bench_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571::bench::static-sodium-capsule
 benches:
 - id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571::bench::static-sodium-capsule
   work_id: 85c75b4c3b2d782fbc74a644e1a4688eab5af5b0f0c40235bb77e1a94097d571

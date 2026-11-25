@@ -49,6 +49,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: FED_HRD_HBD_model_grid'
+    origin: tachibana-tsuchiyama-1998-forsterite-dust-lpsc::tachibana_1998_forsterite_fig1_model_grid
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tachibana-tsuchiyama-1998-forsterite-dust-lpsc
   locator:
     page: 2
@@ -101,6 +111,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: dynamic_and_equilibrium_nebula_model'
+    origin: tachibana-tsuchiyama-1998-forsterite-dust-lpsc::tachibana_1998_forsterite_fig2_dynamic_static_comparison
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tachibana-tsuchiyama-1998-forsterite-dust-lpsc
   locator:
     page: 2
@@ -155,6 +175,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_gas_equilibrium'
+    origin: tachibana-tsuchiyama-1998-forsterite-dust-lpsc::tachibana_1998_forsterite_gas_chemistry_species_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tachibana-tsuchiyama-1998-forsterite-dust-lpsc
   locator:
     page: 1
@@ -254,6 +284,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: H2O_H2_buffer_dominated'
+    origin: tachibana-tsuchiyama-1998-forsterite-dust-lpsc::tachibana_1998_forsterite_hbd_alpha_assumption
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -346,7 +387,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_rate
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: free_or_buffered_evaporation_model'
+    origin: tachibana-tsuchiyama-1998-forsterite-dust-lpsc::tachibana_1998_forsterite_hkl_flux_equation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tachibana-tsuchiyama-1998-forsterite-dust-lpsc
   locator:
     page: 1
@@ -447,6 +499,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: free_evaporation_dominated_or_hydrogen_reaction_dominated'
+    origin: tachibana-tsuchiyama-1998-forsterite-dust-lpsc::tachibana_1998_forsterite_prior_experiment_alpha_constraint
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha

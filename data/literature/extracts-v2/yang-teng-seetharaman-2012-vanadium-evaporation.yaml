@@ -79,11 +79,6 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - mass_loss_fraction
-    reason: invalid total pressure for printed air fO2; no value assigned
-    origin: yang-teng-seetharaman-2012-vanadium-evaporation::yang_2012_results_air_mass_loss_fraction
   - kind: method_unstated
     affected_quantities:
     - mass_loss_fraction
@@ -95,6 +90,11 @@ observations:
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - mass_loss_fraction
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: yang-teng-seetharaman-2012-vanadium-evaporation::yang_2012_results_air_mass_loss_fraction
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction

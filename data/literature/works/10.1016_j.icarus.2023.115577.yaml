@@ -94,39 +94,11 @@ experiments:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: extract pressure_mbar is a bound or approximate value, not a point; extract_value=<1x10^-4 mbar (continuous
-          turbo; vacuum TGA runs); upper_bound=true    <1x10^-4 mbar (continuous turbo; vacuum TGA runs)
+        reason: not_published
       locator:
         pdf_page_index: 6
         section: 2.1 Thermal Analysis and Mass Spectroscopy
         note: Icarus journal pre-proof; no printed pagination.
-      inference:
-        relation: extract_limit
-        inputs:
-        - P_Pa = P_mbar × 100
-        - original_unit=mbar
-        - as_published=<1x10^-4 mbar (continuous turbo; vacuum TGA runs)
-        - printed=pressure_mbar
-        - as_printed=<1x10^-4 mbar (continuous turbo; vacuum TGA runs)
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.0001'
-            locator:
-              pdf_page_index: 6
-              section: 2.1 Thermal Analysis and Mass Spectroscopy
-              note: Icarus journal pre-proof; no printed pagination.
-        - - factor
-          - state:
-              tag: value
-              value: '100'
-            locator:
-              pdf_page_index: 6
-              section: 2.1 Thermal Analysis and Mass Spectroscopy
-              note: Icarus journal pre-proof; no printed pagination.
-        output_unit: Pa
-        references: []
     sweep_gas:
       state:
         tag: unknown
@@ -144,15 +116,6 @@ experiments:
     pdf_page_index: 6
     section: 2.1 Thermal Analysis and Mass Spectroscopy
     note: Icarus journal pre-proof; no printed pagination.
-  apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: Large volume TGA crucibles (material not named)
-      locator:
-        pdf_page_index: 6
-        section: 2.1 Thermal Analysis and Mass Spectroscopy
-        note: Icarus journal pre-proof; no printed pagination.
   bench_id: 10.1016/j.icarus.2023.115577::bench::setrys-tga-ms
   thermal_schedule:
     ramps:
@@ -480,6 +443,745 @@ experiments:
       regime_class:
         tag: unknown
         reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0001'
+            approximate: true
+        locator:
+          pdf_page_index: 7
+          section: 2.1 Thermal Analysis and Mass Spectroscopy
+          note: Printed approximately 1x10^-6 mbar base pressure; unit conversion only.
+        inference:
+          relation: mbar_to_Pa
+          inputs:
+          - P_Pa = P_mbar × 100
+          - original_unit=mbar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.000001'
+              locator:
+                pdf_page_index: 7
+                section: 2.1 Thermal Analysis and Mass Spectroscopy
+                note: Printed approximately 1x10^-6 mbar base pressure; unit conversion only.
+          - - factor
+            - state:
+                tag: value
+                value: '100'
+              locator:
+                pdf_page_index: 7
+                section: 2.1 Thermal Analysis and Mass Spectroscopy
+                note: Printed approximately 1x10^-6 mbar base pressure; unit conversion only.
+          output_unit: Pa
+          references: []
+  work_id: 10.1016/j.icarus.2023.115577
+  locator:
+    pdf_page_index: 7
+    section: 2.1 Thermal Analysis and Mass Spectroscopy
+    note: Icarus journal pre-proof; no printed pagination.
+  bench_id: 10.1016/j.icarus.2023.115577::bench::custom-vacuum-ms
+  thermal_schedule:
+    ramps:
+    - rate_K_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.04166666666666666666666666667'
+            approximate: false
+        locator:
+          pdf_page_index: 7
+          section: 2.1 Thermal Analysis and Mass Spectroscopy
+          note: Printed 2.5 C/min; unit conversion only.
+        inference:
+          relation: C_per_min_to_K_per_s
+          inputs:
+          - rate_K_s = rate_C_per_min / 60
+          - original_unit=C/min
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '2.5'
+              locator:
+                pdf_page_index: 7
+                section: 2.1 Thermal Analysis and Mass Spectroscopy
+                note: Printed 2.5 C/min; unit conversion only.
+          - - factor
+            - state:
+                tag: value
+                value: '60'
+              locator:
+                pdf_page_index: 7
+                section: 2.1 Thermal Analysis and Mass Spectroscopy
+                note: Printed 2.5 C/min; unit conversion only.
+          output_unit: K/s
+          references: []
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: interval
+            interval_low: '298.15'
+            interval_high: '1473.15'
+            approximate: false
+        locator:
+          pdf_page_index: 7
+          section: 2.1 Thermal Analysis and Mass Spectroscopy
+          note: Heated up to printed 1200 C; initial temperature not printed.
+- experiment_id: 10.1016/j.icarus.2023.115577::wilkerson-2023-jsc1a-outgassing
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/j.icarus.2023.115577
+  locator:
+    pdf_page_index: 6
+    paragraph: LOI of 0.71
+    note: Icarus journal pre-proof; no printed pagination.
+- experiment_id: 10.1016/j.icarus.2023.115577::wilkerson-2023-jsc1a-outgassing::declared:10.1016/j.icarus.2023.115577::experiment::tga-atmosphere-series::method:mossbauer_spectroscopy
+  kind: literature
+  method:
+    tag: value
+    value: mossbauer_spectroscopy
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0015'
+          approximate: false
+      locator:
+        pdf_page_index: 6
+        section: 2.1 Thermal Analysis and Mass Spectroscopy
+        note: Printed 1500 mg specimen; unit conversion only.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              pdf_page_index: 6
+              section: 2.1 Thermal Analysis and Mass Spectroscopy
+              note: Printed 1500 mg specimen; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              pdf_page_index: 6
+              section: 2.1 Thermal Analysis and Mass Spectroscopy
+              note: Printed 1500 mg specimen; unit conversion only.
+        output_unit: kg
+        references: []
+    form:
+      state:
+        tag: value
+        value: JSC-1A powder
+      locator:
+        pdf_page_index: 6
+        section: 2.1 Thermal Analysis and Mass Spectroscopy
+        note: Icarus journal pre-proof; no printed pagination.
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 6
+        section: 2.1 Thermal Analysis and Mass Spectroscopy
+        note: Multiple programmed temperatures; no single series setpoint.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 6
+        section: 2.1 Thermal Analysis and Mass Spectroscopy
+        note: Icarus journal pre-proof; no printed pagination.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 6
+        section: 2.1 Thermal Analysis and Mass Spectroscopy
+        note: He, 5%H2/Ar, and vacuum are separate arms; no one series sweep gas.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.icarus.2023.115577
+  locator:
+    pdf_page_index: 6
+    section: 2.1 Thermal Analysis and Mass Spectroscopy
+    note: Icarus journal pre-proof; no printed pagination.
+  bench_id: 10.1016/j.icarus.2023.115577::bench::setrys-tga-ms
+  thermal_schedule:
+    ramps:
+    - rate_K_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.04166666666666666666666666667'
+            approximate: false
+        locator:
+          pdf_page_index: 6
+          section: 2.1 Thermal Analysis and Mass Spectroscopy
+          note: Printed 2.5 C/min; unit conversion only.
+        inference:
+          relation: C_per_min_to_K_per_s
+          inputs:
+          - rate_K_s = rate_C_per_min / 60
+          - original_unit=C/min
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '2.5'
+              locator:
+                pdf_page_index: 6
+                section: 2.1 Thermal Analysis and Mass Spectroscopy
+                note: Printed 2.5 C/min; unit conversion only.
+          - - factor
+            - state:
+                tag: value
+                value: '60'
+              locator:
+                pdf_page_index: 6
+                section: 2.1 Thermal Analysis and Mass Spectroscopy
+                note: Printed 2.5 C/min; unit conversion only.
+          output_unit: K/s
+          references: []
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: interval
+            interval_low: '298.15'
+            interval_high: '1473.15'
+            approximate: false
+        locator:
+          pdf_page_index: 6
+          section: 2.1 Thermal Analysis and Mass Spectroscopy
+          note: Printed 25-1200 C; unit conversion only.
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original_low
+            - state:
+                tag: value
+                value: '25'
+              locator:
+                pdf_page_index: 6
+                section: 2.1 Thermal Analysis and Mass Spectroscopy
+                note: Printed 25-1200 C; unit conversion only.
+          - - original_high
+            - state:
+                tag: value
+                value: '1200'
+              locator:
+                pdf_page_index: 6
+                section: 2.1 Thermal Analysis and Mass Spectroscopy
+                note: Printed 25-1200 C; unit conversion only.
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                pdf_page_index: 6
+                section: 2.1 Thermal Analysis and Mass Spectroscopy
+                note: Printed 25-1200 C; unit conversion only.
+          output_unit: K
+          references: []
+- experiment_id: 10.1016/j.icarus.2023.115577::wilkerson-2023-jsc1a-outgassing::declared:10.1016/j.icarus.2023.115577::experiment::tga-atmosphere-series::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0015'
+          approximate: false
+      locator:
+        pdf_page_index: 6
+        section: 2.1 Thermal Analysis and Mass Spectroscopy
+        note: Printed 1500 mg specimen; unit conversion only.
+      inference:
+        relation: mg_to_kg
+        inputs:
+        - m_kg = m_mg / 1e6
+        - original_unit=mg
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              pdf_page_index: 6
+              section: 2.1 Thermal Analysis and Mass Spectroscopy
+              note: Printed 1500 mg specimen; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000000'
+            locator:
+              pdf_page_index: 6
+              section: 2.1 Thermal Analysis and Mass Spectroscopy
+              note: Printed 1500 mg specimen; unit conversion only.
+        output_unit: kg
+        references: []
+    form:
+      state:
+        tag: value
+        value: JSC-1A powder
+      locator:
+        pdf_page_index: 6
+        section: 2.1 Thermal Analysis and Mass Spectroscopy
+        note: Icarus journal pre-proof; no printed pagination.
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 6
+        section: 2.1 Thermal Analysis and Mass Spectroscopy
+        note: Multiple programmed temperatures; no single series setpoint.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: extract pressure_mbar is a bound or approximate value, not a point; extract_value=<1x10^-4 mbar (continuous
+          turbo; vacuum TGA runs); upper_bound=true    <1x10^-4 mbar (continuous turbo; vacuum TGA runs)
+      locator:
+        pdf_page_index: 6
+        section: 2.1 Thermal Analysis and Mass Spectroscopy
+        note: Icarus journal pre-proof; no printed pagination.
+      inference:
+        relation: extract_limit
+        inputs:
+        - P_Pa = P_mbar × 100
+        - original_unit=mbar
+        - as_published=<1x10^-4 mbar (continuous turbo; vacuum TGA runs)
+        - printed=pressure_mbar
+        - as_printed=<1x10^-4 mbar (continuous turbo; vacuum TGA runs)
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0001'
+            locator:
+              pdf_page_index: 6
+              section: 2.1 Thermal Analysis and Mass Spectroscopy
+              note: Icarus journal pre-proof; no printed pagination.
+        - - factor
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              pdf_page_index: 6
+              section: 2.1 Thermal Analysis and Mass Spectroscopy
+              note: Icarus journal pre-proof; no printed pagination.
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 6
+        section: 2.1 Thermal Analysis and Mass Spectroscopy
+        note: He, 5%H2/Ar, and vacuum are separate arms; no one series sweep gas.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.icarus.2023.115577
+  locator:
+    pdf_page_index: 6
+    section: 2.1 Thermal Analysis and Mass Spectroscopy
+    note: Icarus journal pre-proof; no printed pagination.
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Large volume TGA crucibles (material not named)
+      locator:
+        pdf_page_index: 6
+        section: 2.1 Thermal Analysis and Mass Spectroscopy
+        note: Icarus journal pre-proof; no printed pagination.
+  bench_id: 10.1016/j.icarus.2023.115577::bench::setrys-tga-ms
+  thermal_schedule:
+    ramps:
+    - rate_K_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.04166666666666666666666666667'
+            approximate: false
+        locator:
+          pdf_page_index: 6
+          section: 2.1 Thermal Analysis and Mass Spectroscopy
+          note: Printed 2.5 C/min; unit conversion only.
+        inference:
+          relation: C_per_min_to_K_per_s
+          inputs:
+          - rate_K_s = rate_C_per_min / 60
+          - original_unit=C/min
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '2.5'
+              locator:
+                pdf_page_index: 6
+                section: 2.1 Thermal Analysis and Mass Spectroscopy
+                note: Printed 2.5 C/min; unit conversion only.
+          - - factor
+            - state:
+                tag: value
+                value: '60'
+              locator:
+                pdf_page_index: 6
+                section: 2.1 Thermal Analysis and Mass Spectroscopy
+                note: Printed 2.5 C/min; unit conversion only.
+          output_unit: K/s
+          references: []
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: interval
+            interval_low: '298.15'
+            interval_high: '1473.15'
+            approximate: false
+        locator:
+          pdf_page_index: 6
+          section: 2.1 Thermal Analysis and Mass Spectroscopy
+          note: Printed 25-1200 C; unit conversion only.
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original_low
+            - state:
+                tag: value
+                value: '25'
+              locator:
+                pdf_page_index: 6
+                section: 2.1 Thermal Analysis and Mass Spectroscopy
+                note: Printed 25-1200 C; unit conversion only.
+          - - original_high
+            - state:
+                tag: value
+                value: '1200'
+              locator:
+                pdf_page_index: 6
+                section: 2.1 Thermal Analysis and Mass Spectroscopy
+                note: Printed 25-1200 C; unit conversion only.
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                pdf_page_index: 6
+                section: 2.1 Thermal Analysis and Mass Spectroscopy
+                note: Printed 25-1200 C; unit conversion only.
+          output_unit: K
+          references: []
+- experiment_id: 10.1016/j.icarus.2023.115577::wilkerson-2023-jsc1a-outgassing::declared:10.1016/j.icarus.2023.115577::experiment::tga-heat-treatment-series::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample:
+    form:
+      state:
+        tag: value
+        value: JSC-1A powder
+      locator:
+        pdf_page_index: 6
+        section: 2.1 Thermal Analysis and Mass Spectroscopy
+        note: Icarus journal pre-proof; no printed pagination.
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 17
+        section: 3.3 Heat Treatment Design
+        note: Ramp plus 750 C hold; no one constant series setpoint.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 17
+        section: 3.3 Heat Treatment Design
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 17
+        section: 3.3 Heat Treatment Design
+        note: He ramp and Ar/5%H2 hold are separate schedule stages.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.icarus.2023.115577
+  locator:
+    pdf_page_index: 17
+    section: 3.3 Heat Treatment Design
+    note: Icarus journal pre-proof; idealized TGA heat-treatment schedule.
+  bench_id: 10.1016/j.icarus.2023.115577::bench::setrys-tga-ms
+  thermal_schedule:
+    ramps:
+    - rate_K_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.04166666666666666666666666667'
+            approximate: false
+        locator:
+          pdf_page_index: 17
+          section: 3.3 Heat Treatment Design
+          note: Printed 2.5 C/min; unit conversion only.
+        inference:
+          relation: C_per_min_to_K_per_s
+          inputs:
+          - rate_K_s = rate_C_per_min / 60
+          - original_unit=C/min
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '2.5'
+              locator:
+                pdf_page_index: 17
+                section: 3.3 Heat Treatment Design
+                note: Printed 2.5 C/min; unit conversion only.
+          - - factor
+            - state:
+                tag: value
+                value: '60'
+              locator:
+                pdf_page_index: 17
+                section: 3.3 Heat Treatment Design
+                note: Printed 2.5 C/min; unit conversion only.
+          output_unit: K/s
+          references: []
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1023.15'
+            approximate: false
+        locator:
+          pdf_page_index: 17
+          section: 3.3 Heat Treatment Design
+          note: Printed 750 C; unit conversion only.
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '750'
+              locator:
+                pdf_page_index: 17
+                section: 3.3 Heat Treatment Design
+                note: Printed 750 C; unit conversion only.
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                pdf_page_index: 17
+                section: 3.3 Heat Treatment Design
+                note: Printed 750 C; unit conversion only.
+          output_unit: K
+          references: []
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '7200'
+            approximate: false
+        locator:
+          pdf_page_index: 17
+          section: 3.3 Heat Treatment Design
+          note: Printed two-hour hold; unit conversion only.
+        inference:
+          relation: h_to_s
+          inputs:
+          - t_s = t_h × 3600
+          - original_unit=h
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '2'
+              locator:
+                pdf_page_index: 17
+                section: 3.3 Heat Treatment Design
+                note: Printed two-hour hold; unit conversion only.
+          - - factor
+            - state:
+                tag: value
+                value: '3600'
+              locator:
+                pdf_page_index: 17
+                section: 3.3 Heat Treatment Design
+                note: Printed two-hour hold; unit conversion only.
+          output_unit: s
+          references: []
+- experiment_id: 10.1016/j.icarus.2023.115577::wilkerson-2023-jsc1a-outgassing::declared:10.1016/j.icarus.2023.115577::experiment::vacuum-ms-series::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.023'
+          approximate: true
+      locator:
+        pdf_page_index: 7
+        section: 2.1 Thermal Analysis and Mass Spectroscopy
+        note: Printed approximately 23 g; unit conversion only.
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '23'
+            locator:
+              pdf_page_index: 7
+              section: 2.1 Thermal Analysis and Mass Spectroscopy
+              note: Printed approximately 23 g; unit conversion only.
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              pdf_page_index: 7
+              section: 2.1 Thermal Analysis and Mass Spectroscopy
+              note: Printed approximately 23 g; unit conversion only.
+        output_unit: kg
+        references: []
+    form:
+      state:
+        tag: value
+        value: JSC-1A powder sealed in quartz tubes
+      locator:
+        pdf_page_index: 7
+        section: 2.1 Thermal Analysis and Mass Spectroscopy
+        note: Icarus journal pre-proof; no printed pagination.
+    pretreatment:
+      state:
+        tag: value
+        value: Carefully evacuated through a leak valve to avoid powder-bed fluidization
+      locator:
+        pdf_page_index: 7
+        section: 2.1 Thermal Analysis and Mass Spectroscopy
+        note: Icarus journal pre-proof; no printed pagination.
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 7
+        section: 2.1 Thermal Analysis and Mass Spectroscopy
+        note: Program ramped to 1200 C; no single series setpoint.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        pdf_page_index: 7
+        section: 2.1 Thermal Analysis and Mass Spectroscopy
+        note: Sample pressure changed from base through operating and outgassing peaks; no single run pressure.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        pdf_page_index: 7
+        section: 2.1 Thermal Analysis and Mass Spectroscopy
+        note: Icarus journal pre-proof; no printed pagination.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
     gauge:
       pressure_gauge:
         state:
@@ -606,38 +1308,6 @@ experiments:
           pdf_page_index: 7
           section: 2.1 Thermal Analysis and Mass Spectroscopy
           note: Heated up to printed 1200 C; initial temperature not printed.
-- experiment_id: 10.1016/j.icarus.2023.115577::wilkerson-2023-jsc1a-outgassing
-  kind: literature
-  method:
-    tag: unknown
-    reason: regime 'quoted_literature' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
-          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
-          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
-          / P_test_Torr in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.1016/j.icarus.2023.115577
-  locator:
-    pdf_page_index: 6
-    paragraph: LOI of 0.71
-    note: Icarus journal pre-proof; no printed pagination.
 benches:
 - id: 10.1016/j.icarus.2023.115577::bench::custom-vacuum-ms
   work_id: 10.1016/j.icarus.2023.115577

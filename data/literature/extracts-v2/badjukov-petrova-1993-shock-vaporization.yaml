@@ -81,7 +81,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: shock_fusion_vaporization'
+    origin: badjukov-petrova-1993-shock-vaporization::badj93_albite_shock_vaporized_mass
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: badjukov-petrova-1993-shock-vaporization
   locator:
     page: 1
@@ -240,7 +251,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: shock_fusion_vaporization'
+    origin: badjukov-petrova-1993-shock-vaporization::badj93_jadeite_shock_vaporized_mass
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: badjukov-petrova-1993-shock-vaporization
   locator:
     page: 1
@@ -399,7 +421,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: shock_fusion_vaporization'
+    origin: badjukov-petrova-1993-shock-vaporization::badj93_pyrex_shock_vaporized_mass
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: badjukov-petrova-1993-shock-vaporization
   locator:
     page: 1

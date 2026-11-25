@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/ta-mendybaev-2020-lpsc.yaml
 observations:
 - observation_id: ta-mendybaev-2020-lpsc::mendybaev_2020_gamma_si_from_tga
-  experiment_id: 7ec3fe9fa2b6061b03cb4605140886a7244d4b260743cae7b2f7fc6336d49fe0::experiment::sio2-langmuir-ir-loop-1800C
+  experiment_id: 7ec3fe9fa2b6061b03cb4605140886a7244d4b260743cae7b2f7fc6336d49fe0::ta-mendybaev-2020-lpsc::declared:7ec3fe9fa2b6061b03cb4605140886a7244d4b260743cae7b2f7fc6336d49fe0::experiment::sio2-langmuir-ir-loop-1800C::method:unspecified
   identity:
     quantity:
       tag: value
@@ -95,6 +95,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: langmuir_over_knudsen_ratio'
+    origin: ta-mendybaev-2020-lpsc::mendybaev_2020_gamma_si_from_tga
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-mendybaev-2020-lpsc
   locator:
     pdf_page_index: 2
@@ -111,7 +122,7 @@ observations:
   provenance:
     printed_phase: molten_SiO2
 - observation_id: ta-mendybaev-2020-lpsc::mendybaev_2020_sio2_knudsen_rate_cell
-  experiment_id: 7ec3fe9fa2b6061b03cb4605140886a7244d4b260743cae7b2f7fc6336d49fe0::experiment::sio2-knudsen-ir-cell-1800C
+  experiment_id: 7ec3fe9fa2b6061b03cb4605140886a7244d4b260743cae7b2f7fc6336d49fe0::ta-mendybaev-2020-lpsc::declared:7ec3fe9fa2b6061b03cb4605140886a7244d4b260743cae7b2f7fc6336d49fe0::experiment::sio2-knudsen-ir-cell-1800C::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -159,6 +170,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_tga_knudsen_equilibrium'
+    origin: ta-mendybaev-2020-lpsc::mendybaev_2020_sio2_knudsen_rate_cell
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-mendybaev-2020-lpsc
   locator:
     pdf_page_index: 2
@@ -175,7 +196,7 @@ observations:
   provenance:
     printed_phase: molten_SiO2_or_SiO2_plus_Ir
 - observation_id: ta-mendybaev-2020-lpsc::mendybaev_2020_sio2_langmuir_rate_loop
-  experiment_id: 7ec3fe9fa2b6061b03cb4605140886a7244d4b260743cae7b2f7fc6336d49fe0::experiment::sio2-langmuir-ir-loop-1800C
+  experiment_id: 7ec3fe9fa2b6061b03cb4605140886a7244d4b260743cae7b2f7fc6336d49fe0::ta-mendybaev-2020-lpsc::declared:7ec3fe9fa2b6061b03cb4605140886a7244d4b260743cae7b2f7fc6336d49fe0::experiment::sio2-langmuir-ir-loop-1800C::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -223,6 +244,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: vacuum_tga_free_surface_langmuir'
+    origin: ta-mendybaev-2020-lpsc::mendybaev_2020_sio2_langmuir_rate_loop
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-mendybaev-2020-lpsc
   locator:
     pdf_page_index: 2

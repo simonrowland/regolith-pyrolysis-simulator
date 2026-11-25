@@ -1750,7 +1750,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - transition_temperature
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table footnote: calculated
+      accounting for ΔHm(Al2O3) = 118.407 kJ/mol (Bale et al., 2016).'
     origin: shornikov-2025-ca-al-inclusion-thermodynamics::shornikov_2025_table3_zherbetsov_melting
     policy:
       id: DP-106
@@ -1958,7 +1959,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - transition_temperature
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table footnote: calculated
+      accounting for ΔHm(Al2O3) = 118.407 kJ/mol (Bale et al., 2016).'
     origin: shornikov-2025-ca-al-inclusion-thermodynamics::shornikov_2025_table4_zherbetsov_decomposition
     policy:
       id: DP-106

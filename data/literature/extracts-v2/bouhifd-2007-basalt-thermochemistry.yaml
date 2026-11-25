@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/bouhifd-2007-basalt-thermochemistry.yaml
 observations:
 - observation_id: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_sfb_liquidus_temperature_dta
-  experiment_id: 10.1007/s00410-006-0170-8::bouhifd-2007-basalt-thermochemistry
+  experiment_id: 10.1007/s00410-006-0170-8::bouhifd-2007-basalt-thermochemistry::method:dta_dsc
   identity:
     quantity:
       tag: value
@@ -84,7 +84,7 @@ observations:
     affected_quantities:
     - transition_temperature
     reason: 'method_inferred: value=dta_dsc; evidence=source text names ''differential thermal analysis''; original_reason=source
-      does not state method'
+      method text: Preliminary differential thermal analysis liquidus for bulk SFB basalt; no numeric uncertainty is printed.'
     origin: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_sfb_liquidus_temperature_dta
     policy:
       id: DP-107
@@ -198,23 +198,23 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Spinel is stated to be
+      the first liquidus phase. The same temperature was observed crystallizing on heating and disappearing in cooling.'
+    origin: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_sfb_spinel_first_liquidus_phase
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: input_omitted
     affected_quantities:
     - transition_temperature
     reason: 'missing input: printed air fO2 requires stated total pressure'
     origin: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_sfb_spinel_first_liquidus_phase
-  - kind: method_inferred
-    affected_quantities:
-    - transition_temperature
-    reason: 'method_inferred: value=dta_dsc; evidence=source text names ''differential thermal analysis''; original_reason=source
-      does not state method'
-    origin: bouhifd-2007-basalt-thermochemistry::bouhifd_2007_sfb_spinel_first_liquidus_phase
-    policy:
-      id: DP-107
-      version: 1
-      status: proposed
-      value: dta_dsc
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
