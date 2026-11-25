@@ -4230,6 +4230,9 @@ def _predict_sossi_residue_cohort(
         # starting inventory before evaluating the supported channel.
         for element in missing_elements:
             inventory.pop(_SOSSI_TRACE_PARENTS[element], None)
+        unavailable_activity_parents = {
+            _SOSSI_TRACE_PARENTS[element] for element in missing_elements
+        }
         channels = tuple(selected_channels)
         alpha_arm = (
             "alpha_dp005_unity_ratio"
@@ -4283,7 +4286,7 @@ def _predict_sossi_residue_cohort(
                     gas_parent_oxides = tuple(state.parent_oxides)
                     selected_parent_oxides = {
                         channel.parent_oxide
-                        for channel in selected_channels
+                        for channel in channels
                         if channel.parent_oxide
                     }
                     missing_activity_parents = selected_parent_oxides - set(
@@ -4291,6 +4294,9 @@ def _predict_sossi_residue_cohort(
                     )
                     if "MnO" in selected_parent_oxides:
                         missing_activity_parents.add("MnO")
+                    missing_activity_parents.difference_update(
+                        unavailable_activity_parents
+                    )
                     if missing_activity_parents:
                         for element, parent in _SOSSI_TRACE_PARENTS.items():
                             if parent not in missing_activity_parents:
@@ -4310,6 +4316,7 @@ def _predict_sossi_residue_cohort(
                             if parent_inputs.parent_activity is None:
                                 if element not in missing_elements:
                                     missing_elements.append(element)
+                                unavailable_activity_parents.add(parent)
                                 gas_parent_oxide_activities.pop(parent, None)
                                 gas_parent_oxides = tuple(
                                     oxide
@@ -4369,8 +4376,9 @@ def _predict_sossi_residue_cohort(
                     species: float(base.get(species, 0.0))
                     * pO2_bar ** pO2_exponents[species]
                     * PA_PER_BAR
-                    for species, _parent, _n, _o2 in gas_channels
+                    for species, parent, _n, _o2 in gas_channels
                     if species in pO2_exponents
+                    and parent not in unavailable_activity_parents
                 }
                 if sossi_decision is not None:
                     _record_residue_handoff(

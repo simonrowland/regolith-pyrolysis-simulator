@@ -2546,7 +2546,17 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_OUT_OF_GAMMA_DOMAIN)
     if NoticeKind.QUENCH_ALTERED.value in kinds:
         strata.append(FLAGGED_STRATUM_QUENCH_ALTERED)
-    if NoticeKind.FALLBACK.value in kinds:
+    if any(kind == NoticeKind.FALLBACK.value for kind, _reason in notices):
+        from simulator.battery.residue import _IDEAL_MELT_ACTIVITY_DEFAULT_FLAG
+
+        ideal_activity_default = any(
+            kind == NoticeKind.FALLBACK.value
+            and reason == _IDEAL_MELT_ACTIVITY_DEFAULT_FLAG
+            for kind, reason in notices
+        )
+    else:
+        ideal_activity_default = False
+    if ideal_activity_default:
         strata.append(FLAGGED_STRATUM_FALLBACK)
     return tuple(strata)
 
@@ -14660,6 +14670,7 @@ def _predict_with_engine(
         from simulator.battery.records import Composition as OxideComposition
         from simulator.chemistry.melt_activity import (
             MELT_OXIDE_CATIONS_PER_FORMULA,
+            MELT_OXIDE_IDEAL_SOLUTION_MODEL,
         )
 
         if (
@@ -14814,6 +14825,24 @@ def _predict_with_engine(
                             authority=Authority.EXTRAPOLATED,
                         )
                     )
+            elif activity.activity_model == MELT_OXIDE_IDEAL_SOLUTION_MODEL:
+                from simulator.battery.residue import (
+                    _IDEAL_MELT_ACTIVITY_DEFAULT_FLAG,
+                )
+
+                notices.append(
+                    Notice(
+                        kind=NoticeKind.FALLBACK,
+                        affected_quantities=(Quantity.ACTIVITY,),
+                        reason=_IDEAL_MELT_ACTIVITY_DEFAULT_FLAG,
+                        origin=(
+                            "simulator.chemistry.melt_activity.melt_oxide_activity"
+                        ),
+                        source="no measured parent-oxide activity",
+                        destination="Raoultian gamma=1 ideal-activity convention",
+                        authority=Authority.CONVENTION,
+                    )
+                )
             elif activity.evidence_tier == "UNCERTIFIED" or activity.warning:
                 notices.append(
                     Notice(
@@ -17309,7 +17338,7 @@ def _sossi_residue_prediction(
                             affected_quantities=(reported_quantity,),
                             reason=_IDEAL_MELT_ACTIVITY_DEFAULT_FLAG,
                             origin="sossi-residue-r5",
-                            source="measured parent-oxide activity",
+                            source="no measured parent-oxide activity",
                             destination="Raoultian gamma=1 ideal-activity convention",
                             band=(
                                 f"parent_oxide={parent_oxide}; "

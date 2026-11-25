@@ -459,6 +459,7 @@ def test_prediction_refusal_reports_unknown_composition_component() -> None:
 
 
 def test_activity_fallback_notice_has_validated_from_and_to(monkeypatch) -> None:
+    from simulator.battery.score import FLAGGED_STRATUM_FALLBACK
     from simulator.battery.validate import _check_notice
     from simulator.chemistry.melt_activity import MeltOxideActivity
     import simulator.chemistry.melt_activity as melt_activity
@@ -499,9 +500,43 @@ def test_activity_fallback_notice_has_validated_from_and_to(monkeypatch) -> None
     )
     assert notice.source == "certified melt-activity evidence"
     assert notice.destination == "uncertified melt-activity bridge result"
+    assert score_mod.flagged_strata((notice,)) == ()
     issues = []
     _check_notice("activity-fallback", notice, issues)
     assert issues == []
+
+    ideal_activity = replace(
+        activity,
+        activity_model=melt_activity.MELT_OXIDE_IDEAL_SOLUTION_MODEL,
+        evidence_tier=melt_activity.MELT_OXIDE_IDEAL_ASSERTION_TIER,
+        warning="declared ideal-solution assertion",
+    )
+    monkeypatch.setattr(
+        melt_activity,
+        "melt_oxide_activity",
+        lambda *_args, **_kwargs: ideal_activity,
+    )
+    ideal_prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        observation,
+        experiment=experiment,
+        isolated=False,
+    )
+    ideal_notice = next(
+        notice
+        for notice in ideal_prediction.notices
+        if notice.kind is NoticeKind.FALLBACK
+    )
+    assert ideal_notice.reason == "melt_activity_default_ideal"
+    assert ideal_notice.source == "no measured parent-oxide activity"
+    assert ideal_notice.destination == "Raoultian gamma=1 ideal-activity convention"
+    assert ideal_notice.authority is Authority.CONVENTION
+    assert score_mod.flagged_strata((ideal_notice,)) == (
+        FLAGGED_STRATUM_FALLBACK,
+    )
+    ideal_issues = []
+    _check_notice("activity-ideal-default", ideal_notice, ideal_issues)
+    assert ideal_issues == []
 
 
 def test_feot_conversion_notice_reaches_scorer_residual() -> None:
@@ -8657,6 +8692,56 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
             ]
         }
     )
+
+
+def test_non_ideal_fallbacks_remain_unflagged_and_preserve_no_band_reasons() -> None:
+    from simulator.battery.score import (
+        _headline_payload_admits,
+        _owner_no_band_reasons,
+        flagged_strata,
+    )
+
+    for reason in (
+        "derived_band_insufficient_sources",
+        "zero_scatter_aligned_group",
+    ):
+        notice = Notice(
+            kind=NoticeKind.FALLBACK,
+            affected_quantities=(Quantity.P_PARTIAL,),
+            reason=reason,
+            origin="decision-band",
+        )
+        assert flagged_strata((notice,)) == ()
+        assert _owner_no_band_reasons((notice,)) == (reason,)
+        assert _headline_payload_admits(
+            {
+                "rail": "vapour",
+                "notices": [
+                    {"kind": NoticeKind.FALLBACK.value, "reason": reason}
+                ],
+            },
+            tier="all_numeric",
+        ) is True
+
+    mass_loss = Notice(
+        kind=NoticeKind.FALLBACK,
+        affected_quantities=(Quantity.MASS_LOSS_FRACTION,),
+        reason="mass_loss_oxygen_escape_assumption",
+        origin="simulator.battery.residue.predict_mass_loss_fraction",
+    )
+    assert flagged_strata((mass_loss,)) == ()
+    assert _headline_payload_admits(
+        {
+            "rail": "mass-loss",
+            "notices": [
+                {
+                    "kind": NoticeKind.FALLBACK.value,
+                    "reason": mass_loss.reason,
+                }
+            ],
+        },
+        tier="all_numeric",
+    ) is True
 
 
 def test_knudsen_absolute_flux_requires_orifice_area() -> None:

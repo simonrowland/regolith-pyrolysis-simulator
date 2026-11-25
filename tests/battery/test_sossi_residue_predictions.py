@@ -284,7 +284,11 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
     assert late_gadolinium_activity_calls >= 2
     assert late_partial_prediction.provenance.get("run_refusal") is None
     assert "Gd" in late_partial_prediction.channel_missing_elements
+    assert "Gd" not in late_partial_prediction.primary_element_ppm
     assert late_partial_prediction.primary_element_ppm["La"] > 0.0
+    assert "Gd2O3" not in late_partial_prediction.provenance[
+        "initial_inventory_mol"
+    ]
     assert "Gd2O3" not in gas_activity_inputs[-1]
     assert "Gd2O3" not in gas_parent_oxide_inputs[-1]
 
@@ -522,6 +526,7 @@ def test_sossi_scorer_projects_trace_species_and_flags_ideal_activity(monkeypatc
     )
     import simulator.battery.score as score_module
     import simulator.battery.residue as residue
+    real_sossi_cohort = residue._predict_sossi_residue_cohort
 
     context = load_score_context(sources=("kems-012-sossi-2019",))
     monkeypatch.setattr(
@@ -631,7 +636,10 @@ def test_sossi_scorer_projects_trace_species_and_flags_ideal_activity(monkeypatc
     assert len(ideal_notices) == 2
     assert all(notice.kind is NoticeKind.FALLBACK for notice in ideal_notices)
     assert all(notice.authority is Authority.CONVENTION for notice in ideal_notices)
-    assert all(notice.source == "measured parent-oxide activity" for notice in ideal_notices)
+    assert all(
+        notice.source == "no measured parent-oxide activity"
+        for notice in ideal_notices
+    )
     assert all(
         notice.destination == "Raoultian gamma=1 ideal-activity convention"
         for notice in ideal_notices
@@ -674,11 +682,15 @@ def test_sossi_scorer_projects_trace_species_and_flags_ideal_activity(monkeypatc
     assert alpha_notices[0].authority is Authority.CONVENTION
     assert alpha_notices[0].source == "unmeasured evaporation alpha"
     assert alpha_notices[0].destination == "DP-005 alpha_i=1 unity-ratio convention"
+    assert score_module.flagged_strata(tuple(alpha_notices)) == ()
 
     assert gadolinium_prediction.execution.call_evidence.endswith(
         f":{gadolinium_prediction.refusal_detail['alpha_arm']}"
     )
 
+    monkeypatch.setattr(
+        residue, "_predict_sossi_residue_cohort", real_sossi_cohort
+    )
     internal_prediction = _sossi_residue_prediction(
         context,
         gadolinium,
