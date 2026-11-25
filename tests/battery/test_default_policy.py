@@ -465,7 +465,11 @@ def test_formula_results_cannot_be_overridden_by_a_value_context() -> None:
             {"value": "fixture composition", "flag": "composition_from_run_siblings"},
             "owning formula result",
         ),
-        ("DP-112", {"value": Decimal("1")}),
+        (
+            "DP-112",
+            {"value": Decimal("1")},
+            "DP-112 requires the owning formula result",
+        ),
     )
     for policy_id, context, expected in cases:
         with pytest.raises(ValueError, match=expected):
