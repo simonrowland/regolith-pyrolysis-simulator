@@ -129,6 +129,7 @@ def test_wang_residue_cells_emit_one_production_score_event_each(monkeypatch):
     assert starting.locator is not None
     assert starting.locator.page == 4 and starting.locator.table == "1"
     for reference in references.values():
+        assert reference.identity.species.phase.is_unknown
         temperature = reference.identity.temperature_K
         time = (reference.point_conditions or {}).get("time_min")
         assert temperature is not None and temperature.is_value
@@ -216,7 +217,7 @@ def test_wang_residue_cells_emit_one_production_score_event_each(monkeypatch):
 
     _benchm1_residual_report(residuals, references)
     numeric = [residual for residual in residuals if residual.numeric is not None]
-    assert numeric
+    assert len(numeric) == len(residuals)
     assert all(
         any(
             notice.kind.value == "input_omitted"
