@@ -24,6 +24,8 @@ class NoticeKind(StrEnum):
     WUSTITE_REFERENCE_CONVERSION = "wustite_reference_conversion"
     PRESSURE_PROVENANCE_UNKNOWN = "pressure_provenance_unknown"
     TOTAL_PRESSURE_AMBIENT_OPEN_FURNACE = "total_pressure_ambient_open_furnace"
+    FO2_FROM_PRINTED_FERRIC_RATIO = "fo2_from_printed_ferric_ratio"
+    FO2_BUFFER_FROM_CONTAINER = "fo2_buffer_from_container"
     SOURCE_DISAGREEMENT = "source_disagreement"
     # A nonblocking limitation of an engine model or how it is applied. The
     # reason carries detail; it adds no stratum and does not change authority.
@@ -34,6 +36,11 @@ class NoticeKind(StrEnum):
     # An input was left out because this row does not take it. The reason
     # says which input and why. Not a blocking qualification.
     INPUT_OMITTED = "input_omitted"
+    OXYGEN_INPUT_REQUIRED_BY_ENGINE = "oxygen_input_required_by_engine"
+    CONDITION_EXCLUDED_AMBIGUOUS_TARGET_CELL = "condition_excluded_ambiguous_target_cell"
+    CONDITION_EXCLUDED_TARGET_DEPENDENCY = "condition_excluded_target_dependency"
+    CONDITION_EXCLUDED_ORIGINAL_RUN_MISMATCH = "condition_excluded_original_run_mismatch"
+    TARGET_IS_IMPOSED_CONTROL = "target_is_imposed_control"
     FO2_FRAME_FROM_PRINTED_ATMOSPHERE = "fo2_frame_from_printed_atmosphere"
     COMPARISON_METHOD_CELL_CONSTANT_CANCELS = "comparison_method_cell_constant_cancels"
     PROBABLE_SOURCE_MISPRINT = "probable_source_misprint"

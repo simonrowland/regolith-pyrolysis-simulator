@@ -73,6 +73,26 @@ def test_battery_policy_tokens_reexport_single_owner_definitions() -> None:
     assert DEFAULT_POLICY_NOTICE_KINDS is OWNER_DEFAULT_POLICY_NOTICE_KINDS
 
 
+def test_every_notice_kind_reference_in_simulator_resolves() -> None:
+    simulator_root = Path(__file__).resolve().parents[2] / "simulator"
+    referenced: set[str] = set()
+    for source_path in simulator_root.rglob("*.py"):
+        tree = ast.parse(source_path.read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Attribute):
+                continue
+            owner = node.value
+            if isinstance(owner, ast.Name) and owner.id == "NoticeKind":
+                referenced.add(node.attr)
+            elif isinstance(owner, ast.Attribute) and owner.attr == "NoticeKind":
+                referenced.add(node.attr)
+
+    missing = sorted(
+        name for name in referenced if not hasattr(OwnerNoticeKind, name)
+    )
+    assert not missing, f"unresolved NoticeKind references: {missing}"
+
+
 def _policy_json_bytes(policy: object) -> bytes:
     return json.dumps(policy, sort_keys=True, separators=(",", ":")).encode(
         "utf-8"

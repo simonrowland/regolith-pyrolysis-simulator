@@ -56,6 +56,9 @@ from simulator.transport_constants import COLLISION_DIAMETERS_M, FREE_MOLECULAR_
 from simulator.source_ids import SOSSI_SOURCE_ID
 
 
+VACUUM_PRESSURE_UPPER_BOUND_ROUTE = "vacuum_total_pressure_upper_bound"
+
+
 class WaypointAuthority(StrEnum):
     PRINTED = "printed"
     DERIVED = "derived"
@@ -2260,7 +2263,7 @@ def route_source_pressure_pa(
         return _positive_stored_pa(
             _printed_run_oxygen_pa(experiment, "oxygen_partial_pressure_Pa")
         )
-    if route == "vacuum_total_pressure_upper_bound":
+    if route == VACUUM_PRESSURE_UPPER_BOUND_ROUTE:
         return vacuum_bound_pressure_pa(experiment, bench, observation)
     if route == "observation_gas_composition":
         return observation_gas_oxygen_pa(experiment, bench, observation)
@@ -2646,7 +2649,7 @@ def oxygen_condition(
             vacuum_waypoint = Waypoint(
                 "oxygen_condition",
                 value,
-                "vacuum_total_pressure_upper_bound",
+                VACUUM_PRESSURE_UPPER_BOUND_ROUTE,
                 WaypointAuthority.EXTRAPOLATED,
                 (*boundary.inputs, "Dalton: pO2 <= P_total"),
                 notice=(

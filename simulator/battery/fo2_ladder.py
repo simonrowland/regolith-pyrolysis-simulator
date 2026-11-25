@@ -72,6 +72,7 @@ from simulator.battery.waypoints import (
     EXPERIMENT_RUN_OXYGEN_ROUTES,
     PredictionPressure,
     TYPED_RUN_OXYGEN_ROUTES,
+    VACUUM_PRESSURE_UPPER_BOUND_ROUTE,
     Waypoint,
     WaypointAuthority,
     WaypointResult,
@@ -98,7 +99,6 @@ _TIER3_ATMOSPHERE_ROUTES = (
     "observation_gas_couple_equilibrium",
     *_BUFFER_ROUTES,
 )
-_VACUUM_ROUTE = "vacuum_total_pressure_upper_bound"
 _EFFUSION_ROUTE = "effusion_oxygen_balance"
 _BLANK_CARRIER = frozenset({"", "none", "n/a", "na", "absent", "unknown", "null"})
 _TEMPERATURE_UNSET = object()
@@ -287,7 +287,7 @@ def fo2_tier_notice(
         fo2_mode=Fo2Mode.SHARED_LADDER,
         policy=policy,
     )
-    if resolved.route == _VACUUM_ROUTE:
+    if resolved.route == VACUUM_PRESSURE_UPPER_BOUND_ROUTE:
         notice = replace(
             notice,
             kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
@@ -599,7 +599,7 @@ def resolve_row_fo2(
     if not unsupported_print:
         if bench is not None:
             for route in routes:
-                if route.route == _VACUUM_ROUTE:
+                if route.route == VACUUM_PRESSURE_UPPER_BOUND_ROUTE:
                     admitted = admit_waypoint_oxygen(
                         route, experiment, observation, bench=bench, tier=3
                     )
@@ -966,7 +966,7 @@ _PA_BACKED_OXYGEN_ROUTES = (
     | EXPERIMENT_RUN_OXYGEN_ROUTES
     | frozenset({
         "observation_fO2_Pa_to_log_fO2",
-        "vacuum_total_pressure_upper_bound",
+        VACUUM_PRESSURE_UPPER_BOUND_ROUTE,
         "observation_gas_composition",
     })
 )
