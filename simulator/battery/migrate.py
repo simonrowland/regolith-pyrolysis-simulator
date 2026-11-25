@@ -14668,19 +14668,91 @@ def _pressure_hit_is_model_calculation(
     )
 
 
-def _pressure_hit_is_chamber_condition(
+def _pressure_evidence_is_chamber_background(
+    evidence_text: str,
+    method: State[MethodToken] | None,
+    knudsen_cell: bool,
+) -> bool:
+    has_chamber_context = bool(
+        _PRESSURE_CHAMBER_RE.search(evidence_text)
+    )
+    if not has_chamber_context:
+        return False
+
+    is_closed_knudsen_method = (
+        method is not None
+        and method.is_value
+        and method.value is MethodToken.KNUDSEN_EFFUSION
+    )
+    if knudsen_cell and not is_closed_knudsen_method:
+        # A method-specific split can leave a Knudsen apparatus on an
+        # UNSPECIFIED row. The chamber reading remains background evidence;
+        # only the closed effusion token keeps it on the experiment for KEMS.
+        return True
+    if (
+        re.search(r"\bfurnace\b", evidence_text, re.IGNORECASE)
+        and re.search(r"\bvacuum\b", evidence_text, re.IGNORECASE)
+        and not is_closed_knudsen_method
+    ):
+        # A quoted furnace vacuum is background evidence for a non-Knudsen
+        # sibling, even when a method split copied it from the shared run.
+        return True
+    return False
+
+
+def _experiment_pressure_is_chamber_background(
+    experiment: Experiment,
+    method: State[MethodToken] | None,
+) -> bool:
+    pressure = experiment.pressure_environment.total_pressure_Pa
+    if pressure is None:
+        return False
+    evidence_text = " ".join(
+        (
+            pressure.locator.note or ""
+            if pressure.locator is not None
+            else "",
+            *(
+                pressure.inference.inputs
+                if pressure.inference is not None
+                else ()
+            ),
+        )
+    )
+    apparatus_text = _extract_text(to_plain(experiment.apparatus))
+    knudsen_cell = bool(
+        re.search(r"\bknudsen\b", apparatus_text, re.IGNORECASE)
+        and not re.search(
+            r"\b(?:not|non[- ])\s*knudsen\b",
+            apparatus_text,
+            re.IGNORECASE,
+        )
+    )
+    return _pressure_evidence_is_chamber_background(
+        evidence_text, method, knudsen_cell
+    )
+
+
+def _pressure_hit_is_not_in_cell_total(
     hit: LabHit,
     values: Mapping[str, Any],
     method: State[MethodToken] | None,
     knudsen_cell: bool,
 ) -> bool:
-    if not _PRESSURE_CHAMBER_RE.search(hit.path):
-        return False
-    if knudsen_cell and (method is None or not method.is_value):
-        # With no resolved method, an explicitly identified Knudsen cell means
-        # this chamber value cannot establish the in-cell total.
+    if (
+        hit.path.casefold().startswith("values.")
+        and hit.entry.printed.casefold() == "pressure_pa"
+        and str(values.get("quantity") or "").strip().casefold()
+        in {"partial_pressure", Quantity.P_PARTIAL.value}
+    ):
         return True
+
     mapping = hit.mapping or {}
+    mapping_text = _extract_text(mapping)
+    if _pressure_evidence_is_chamber_background(
+        f"{hit.path} {mapping_text}", method, knudsen_cell
+    ):
+        return True
     if str(mapping.get("kind") or "").casefold() in {
         "about_nominal", "approximate", "pump_ultimate", "ultimate_vacuum", "ultimate-vacuum"
     }:
@@ -20610,7 +20682,7 @@ def pressure_from_equipment(
         hit
         for hit in _hits_for(hits, field)
         if not _pressure_hit_is_model_calculation(hit, payload_values, payload_values)
-        and not _pressure_hit_is_chamber_condition(
+        and not _pressure_hit_is_not_in_cell_total(
             hit, payload_values, method, knudsen_cell
         )
     ]
@@ -25800,6 +25872,12 @@ class Migrator:
             # KEMS validity gates — never the pressure a prediction is made at.
             skip_identity_fill = _knudsen_effusion_chamber_background_not_for_identity(
                 effective_method
+            ) or (
+                pressure is not None
+                and pressure_source.startswith("experiment.")
+                and _experiment_pressure_is_chamber_background(
+                    experiment, effective_method
+                )
             )
             if pressure is None and not skip_identity_fill:
                 sweep = experiment.pressure_environment.sweep_gas
@@ -26628,6 +26706,8 @@ class Migrator:
         self,
         experiment_id: str,
         printed: Located[Mapping[str, Any]],
+        *,
+        declared_experiment_id: str | None,
     ) -> bool:
         """True when ``printed`` restates the registry-declared sample map.
 
@@ -26638,9 +26718,15 @@ class Migrator:
         100 wt% non-oxide). A row printing a different map still attaches.
         """
 
-        if experiment_id not in self._registry_printed_composition_experiments:
+        registry_owner_id = (
+            declared_experiment_id
+            if declared_experiment_id
+            in self._registry_printed_composition_experiments
+            else experiment_id
+        )
+        if registry_owner_id not in self._registry_printed_composition_experiments:
             return False
-        experiment = self.result.experiments.get(experiment_id)
+        experiment = self.result.experiments.get(registry_owner_id)
         declared = None if experiment is None else experiment.sample.printed_composition
         if declared is None or not declared.state.is_value:
             return False
@@ -29167,7 +29253,9 @@ class Migrator:
                 locator=locator,
             )
             and not self._repeats_declared_sample_map(
-                experiment_id, row_sample.printed_composition
+                experiment_id,
+                row_sample.printed_composition,
+                declared_experiment_id=declared_experiment_id,
             )
         ):
             # An observation-level printed wt% map is the datum's composition.

@@ -214,3 +214,51 @@ def test_missing_row_method_inherits_only_a_declared_experiment_method(tmp_path)
         not any(notice.kind is NoticeKind.METHOD_UNSTATED for notice in row.notices)
         for row in observations
     )
+
+
+BRITT_SOURCE = "britt-2019-asteroid-simulants"
+BRITT_FILENAME = f"{BRITT_SOURCE}.yaml"
+BRITT_CI_ROW = "britt_2019_ci_table3_xrf_major_oxide_composition"
+BRITT_DECLARED_EXPERIMENT = f"{BRITT_SOURCE}::experiment::xrf-ci"
+
+
+def _assert_britt_registry_map_is_not_repeated(result):
+    rows = _rows_for_local_id(result, BRITT_SOURCE, BRITT_CI_ROW)
+    assert rows
+    assert any(row.experiment_id != BRITT_DECLARED_EXPERIMENT for row in rows)
+    assert all(
+        "printed_composition" not in (row.point_conditions or {})
+        for row in rows
+    )
+
+
+def test_britt_registry_sample_map_stays_owned_after_method_split(tmp_path):
+    result = _migrate_real_extract(
+        tmp_path, BRITT_FILENAME
+    )
+    _assert_britt_registry_map_is_not_repeated(result)
+
+
+def test_britt_registry_repeat_mutation_restores_post_split_key_bug(
+    tmp_path, monkeypatch
+):
+    original = Migrator._repeats_declared_sample_map
+
+    def legacy_post_split_key(self, experiment_id, printed, *, declared_experiment_id):
+        return original(
+            self,
+            experiment_id,
+            printed,
+            declared_experiment_id=None,
+        )
+
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            Migrator, "_repeats_declared_sample_map", legacy_post_split_key
+        )
+        result = _migrate_real_extract(
+            tmp_path / "mutated", BRITT_FILENAME
+        )
+
+    with pytest.raises(AssertionError):
+        _assert_britt_registry_map_is_not_repeated(result)
