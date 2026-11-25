@@ -1445,88 +1445,114 @@ def _iron_oxide_mass_kg(
     return mass_kg
 
 
-def _supply_iron_gas_absent_from_melt_account(
+# Current iron mass counts Fe2O3 with FeO. The vapour path's FeOt account
+# is empty only when both are at or below the ledger floor. Starting still
+# requires printed FeO, which is the parent on the Fe and FeO gas channels.
+_CURRENT_PARENT_OXIDES = {"FeO": ("FeO", "Fe2O3")}
+
+
+def _supply_exhausted_parent_vapour(
     pressures: dict[str, float],
     inventory: Mapping[str, float],
     required: set[str],
     *,
+    parents: Mapping[str, str],
     starting_inventory: Mapping[str, float] | None,
     step: int | None,
     notices: list[Any],
     noticed_step: list[int | None],
+    noticed_species: set[str] | None = None,
 ) -> None:
-    """Publish 0 Pa for Fe and FeO after the run itself exhausts printed FeO.
+    """Publish 0 Pa after the run itself exhausts a printed parent oxide.
 
     Premise: the vapor adapter loads the residue inventory through
     ``_positive_species_kg``, which drops every species with mass
-    <= 1e-12 kg. With no FeO and no Fe2O3 above that floor the account
-    has no FeOt, and the existing Fe(g) and FeO(g) evaluations publish
-    neither channel and record no below-threshold omission.
+    <= 1e-12 kg. A gas channel whose parent is below that floor is
+    absent from the returned pressures and records no below-threshold
+    omission. The residue model still has to return every gas channel.
 
-    The published iron law is P_Fe = K(T) * a_FeO * pO2^(-1/2) at the
-    parent activity the vapour path used. Algebra: as a_FeO -> 0,
-    P_Fe -> 0. FeO(g) is the association channel of the same parent, so
-    it goes to 0 with that parent. The ledger is the numerical form of
-    that limit. m = n_FeO * M_FeO + n_Fe2O3 * M_Fe2O3, with M from the
-    formula parser in kg/mol. The account is iron-free when m <= 1e-12 kg.
-    FeO's molar mass is 0.071844 kg/mol, so the FeO-only floor is
-    n = 1e-12 / 0.071844 = 1.392e-11 mol.
+    The vapour path already evaluates those channels while the parent is
+    in the account. Iron is P_Fe = K(T) * a_FeO * pO2^(-1/2) at the
+    parent activity that path used (reaction Fe = (FeO, 1, 0.5)).
+    Magnesium has the same shape, P_Mg = K(T) * a_MgO * pO2^(-1/2)
+    (reaction Mg = (MgO, 1, 0.5)). Algebra: as a_parent -> 0, P -> 0.
+    The oxide gas (FeO, MgO) is the association channel of that parent,
+    so it goes to 0 with the parent. The ledger is the numerical form of
+    that limit. m = sum n_i * M_i over the parent's current oxides, with
+    M from the formula parser in kg/mol. FeO's molar mass is 0.071844
+    kg/mol, so the FeO-only floor is n = 1e-12 / 0.071844 = 1.392e-11 mol.
+    The same 1e-12 kg bound applies to every other printed parent.
 
-    This fill runs only when three facts are known together. The printed
-    starting inventory contained FeO heavier than the ledger floor, so
-    FeO was loaded and then removed by the integration. The current
-    iron-oxide mass is at or below that floor. The integrator has marked
-    this call with a step number >= 1. A starting composition that never
-    printed FeO, an unknown start, a non-finite inventory, or a call
-    outside an integration step stays a typed missing-channel refusal.
-    The zero is not a new pressure fit, and it does not change the Fe
-    pO2 exponent or the activity standard state.
+    This fill runs only when three facts are known together for that
+    parent. The printed starting inventory contained the channel's parent
+    oxide heavier than the ledger floor. The current parent-oxide mass
+    is at or below that floor. The integrator has marked this call with
+    a step number >= 1. A parent the start never printed, an unknown
+    start, a non-finite inventory, or a call outside an integration step
+    stays a typed missing-channel refusal. The zero is not a new
+    pressure fit, and it does not change a pO2 exponent or an activity
+    standard state. O and O2 have no parent and are not filled here.
 
-    Limiting case: n_FeO = 0 after a charge that started with FeO gives
-    m = 0, so both pressures are 0 Pa. A Hashimoto charge (~4.9e-4 mol
-    FeO) stays on the published path until the integrator exhausts it.
+    Limiting case: n_parent = 0 after a charge that started with that
+    parent gives m = 0, so each of its missing gas pressures is 0 Pa.
     """
 
-    missing = [
-        name
-        for name in ("Fe", "FeO")
-        if name in required and name not in pressures
-    ]
-    if not missing:
-        return
     # bool is a subclass of int; a flag is not a step number.
     if isinstance(step, bool) or not isinstance(step, int) or step < 1:
         return
     if starting_inventory is None:
         return
-    starting_feo_kg = _iron_oxide_mass_kg(starting_inventory, ("FeO",))
-    if (
-        starting_feo_kg is None
-        or starting_feo_kg <= _LEDGER_POSITIVE_SPECIES_KG
-    ):
+    missing_by_parent: dict[str, list[str]] = {}
+    for species in required:
+        if species in pressures:
+            continue
+        parent = str(parents.get(species) or "")
+        if not parent:
+            continue
+        missing_by_parent.setdefault(parent, []).append(species)
+    filled_by_parent: dict[str, list[str]] = {}
+    for parent, species_names in missing_by_parent.items():
+        starting_kg = _iron_oxide_mass_kg(starting_inventory, (parent,))
+        if starting_kg is None or starting_kg <= _LEDGER_POSITIVE_SPECIES_KG:
+            continue
+        current_oxides = _CURRENT_PARENT_OXIDES.get(parent, (parent,))
+        current_kg = _iron_oxide_mass_kg(inventory, current_oxides)
+        if current_kg is None or current_kg > _LEDGER_POSITIVE_SPECIES_KG:
+            continue
+        ordered = sorted(species_names)
+        for name in ordered:
+            pressures[name] = 0.0
+        filled_by_parent[parent] = ordered
+    if not filled_by_parent:
         return
-    current_iron_kg = _iron_oxide_mass_kg(inventory, ("FeO", "Fe2O3"))
-    if current_iron_kg is None or current_iron_kg > _LEDGER_POSITIVE_SPECIES_KG:
-        return
-    for name in missing:
-        pressures[name] = 0.0
-    if noticed_step[0] == step:
-        return
-    noticed_step[0] = step
+    if noticed_step[0] != step:
+        noticed_step[0] = step
+        if noticed_species is not None:
+            noticed_species.clear()
     from simulator.battery.enums import NoticeKind, Quantity
     from simulator.battery.records import Notice
 
-    notices.append(
-        Notice(
-            kind=NoticeKind.ENGINE_MODEL_CAVEAT,
-            affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
-            reason=(
-                "parent_oxide_exhausted_zero_vapour: "
-                f"species={','.join(missing)}; step={step}; parent=FeO"
-            ),
-            origin="internal-analytical residue pressure model",
+    for parent, species_names in sorted(filled_by_parent.items()):
+        fresh = [
+            name
+            for name in species_names
+            if noticed_species is None or name not in noticed_species
+        ]
+        if noticed_species is not None:
+            noticed_species.update(species_names)
+        if not fresh:
+            continue
+        notices.append(
+            Notice(
+                kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+                reason=(
+                    "parent_oxide_exhausted_zero_vapour: "
+                    f"species={','.join(fresh)}; step={step}; parent={parent}"
+                ),
+                origin="internal-analytical residue pressure model",
+            )
         )
-    )
 
 
 def _make_residue_pressure_model(
@@ -1659,6 +1685,12 @@ def _make_residue_pressure_model(
         noticed_omissions: set[str] = set()
         evaluation_step: list[int | None] = [None]
         noticed_exhaustion_step: list[int | None] = [None]
+        noticed_exhaustion_species: set[str] = set()
+        channel_parents = {
+            str(species): str(reaction[0])
+            for species, reaction in gas_channels
+            if reaction and str(reaction[0])
+        }
 
         def set_residue_evaluation_step(step: int | None) -> None:
             evaluation_step[0] = step
@@ -1723,14 +1755,16 @@ def _make_residue_pressure_model(
                 omission_records,
                 noticed_omissions,
             )
-            _supply_iron_gas_absent_from_melt_account(
+            _supply_exhausted_parent_vapour(
                 pressures,
                 inventory,
                 required,
+                parents=channel_parents,
                 starting_inventory=starting_inventory_mol,
                 step=evaluation_step[0],
                 notices=omission_notices,
                 noticed_step=noticed_exhaustion_step,
+                noticed_species=noticed_exhaustion_species,
             )
             if floor_inversion_diagnostics is not None:
                 vapor_diagnostic = response.diagnostics.get(

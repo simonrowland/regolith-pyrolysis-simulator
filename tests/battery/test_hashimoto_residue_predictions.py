@@ -711,24 +711,27 @@ def test_hashimoto_internal_analytical_residue_closes_oxygen_balance() -> None:
     from simulator.evaporation import _load_evaporation_alpha_by_species
     from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
 
-    # Outside an integration step, or when the start never printed FeO,
-    # a missing Fe channel stays missing. 0 Pa is only the exhausted-parent limit.
+    # Outside an integration step, or when the start never printed the parent,
+    # a missing channel stays missing. 0 Pa is only the exhausted-parent limit.
+    iron_parents = {"Fe": "FeO", "FeO": "FeO"}
     notices: list = []
     noticed_step: list[int | None] = [None]
     pressures: dict[str, float] = {}
-    residue._supply_iron_gas_absent_from_melt_account(
+    residue._supply_exhausted_parent_vapour(
         pressures,
         {"SiO2": 1.0},
         {"Fe", "FeO"},
+        parents=iron_parents,
         starting_inventory={"FeO": 1.0e-4},
         step=None,
         notices=notices,
         noticed_step=noticed_step,
     )
-    residue._supply_iron_gas_absent_from_melt_account(
+    residue._supply_exhausted_parent_vapour(
         pressures,
         {"SiO2": 1.0},
         {"Fe", "FeO"},
+        parents=iron_parents,
         starting_inventory={"SiO2": 1.0},
         step=1,
         notices=notices,
@@ -736,10 +739,11 @@ def test_hashimoto_internal_analytical_residue_closes_oxygen_balance() -> None:
     )
     assert pressures == {}
     assert notices == []
-    residue._supply_iron_gas_absent_from_melt_account(
+    residue._supply_exhausted_parent_vapour(
         pressures,
         {"SiO2": 1.0},
         {"Fe", "FeO"},
+        parents=iron_parents,
         starting_inventory={"FeO": 1.0e-4},
         step=4,
         notices=notices,
@@ -751,6 +755,36 @@ def test_hashimoto_internal_analytical_residue_closes_oxygen_balance() -> None:
         "parent_oxide_exhausted_zero_vapour: species=Fe,FeO; step=4; parent=FeO"
     )
     assert notices[0].kind.value == "engine_model_caveat"
+    magnesium_parents = {"Mg": "MgO", "MgO": "MgO"}
+    magnesium_pressures: dict[str, float] = {}
+    magnesium_notices: list = []
+    residue._supply_exhausted_parent_vapour(
+        magnesium_pressures,
+        {"SiO2": 1.0},
+        {"Mg", "MgO"},
+        parents=magnesium_parents,
+        starting_inventory={"SiO2": 1.0},
+        step=4,
+        notices=magnesium_notices,
+        noticed_step=[None],
+    )
+    assert magnesium_pressures == {}
+    assert magnesium_notices == []
+    residue._supply_exhausted_parent_vapour(
+        magnesium_pressures,
+        {"SiO2": 1.0},
+        {"Mg", "MgO"},
+        parents=magnesium_parents,
+        starting_inventory={"MgO": 1.0e-4},
+        step=5,
+        notices=magnesium_notices,
+        noticed_step=[None],
+    )
+    assert magnesium_pressures == {"Mg": 0.0, "MgO": 0.0}
+    assert len(magnesium_notices) == 1
+    assert magnesium_notices[0].reason == (
+        "parent_oxide_exhausted_zero_vapour: species=Mg,MgO; step=5; parent=MgO"
+    )
 
     experiments, _measured_rows, preform_dimensions_mm = _source_data()
     catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
