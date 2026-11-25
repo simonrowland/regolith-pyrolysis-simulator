@@ -403,28 +403,26 @@ species:
           sample: '12065'
           qualifier: approximate
           as_printed: ~4e-09
-          composition_from_sample_catalog: true
-          composition_source: Smales et al. 1971, Proc. Second Lunar Science Conf. 2, Tables 1–3, pp. 1254–1255
-          composition_source_observation_id: smales_1971_apollo_12065_bulk_composition_tables1_2_3
-          sample_oxide_composition_wt_pct: {SiO2: 47.1, Al2O3: 9.8, FeO: 20.0, MgO: 9.2, CaO: 10.1, Na2O: 0.24, K2O: 0.063, TiO2: 3.1, MnO: 0.26}
+          <<: &external_12065_analysis
+            external_sample_analysis: true
+            charge_sample_type: rock
+            composition_source_id: maxwell-wiik-1971-apollo12-major-composition
+            composition_source_observation_id: maxwell_wiik_1971_apollo12_sample_12065_84_gsf_bulk_composition_table1
+            composition_heterogeneity_caveat: >-
+              Maxwell & Wiik analyzed split 12065,84; De Maria quotes the earlier run as sample 12065.
+              Heterogeneity between splits may change the bulk composition.
         - T_K: 1400.0
           p_atm: 8.30e-09
           p_Pa: 8.41e-04
           run: '12065'
           sample: '12065'
-          composition_from_sample_catalog: true
-          composition_source: Smales et al. 1971, Proc. Second Lunar Science Conf. 2, Tables 1–3, pp. 1254–1255
-          composition_source_observation_id: smales_1971_apollo_12065_bulk_composition_tables1_2_3
-          sample_oxide_composition_wt_pct: {SiO2: 47.1, Al2O3: 9.8, FeO: 20.0, MgO: 9.2, CaO: 10.1, Na2O: 0.24, K2O: 0.063, TiO2: 3.1, MnO: 0.26}
+          <<: *external_12065_analysis
         - T_K: 1500.0
           p_atm: 1.30e-07
           p_Pa: 0.01317225
           run: '12065'
           sample: '12065'
-          composition_from_sample_catalog: true
-          composition_source: Smales et al. 1971, Proc. Second Lunar Science Conf. 2, Tables 1–3, pp. 1254–1255
-          composition_source_observation_id: smales_1971_apollo_12065_bulk_composition_tables1_2_3
-          sample_oxide_composition_wt_pct: {SiO2: 47.1, Al2O3: 9.8, FeO: 20.0, MgO: 9.2, CaO: 10.1, Na2O: 0.24, K2O: 0.063, TiO2: 3.1, MnO: 0.26}
+          <<: *external_12065_analysis
     - observation_id: demaria_1973_na_psat_fig1_figure_only
       type: psat_series
       locator:
@@ -576,14 +574,20 @@ species:
           p_atm: 3.20e-09
           p_Pa: 3.24e-04
           run: '12065'
+          sample: '12065'
+          <<: *external_12065_analysis
         - T_K: 1500.0
           p_atm: 2.60e-08
           p_Pa: 0.00263445
           run: '12065'
+          sample: '12065'
+          <<: *external_12065_analysis
         - T_K: 1600.0
           p_atm: 1.60e-07
           p_Pa: 0.016212
           run: '12065'
+          sample: '12065'
+          <<: *external_12065_analysis
     - observation_id: demaria_1973_fe_psat_fig3_figure_only
       type: psat_series
       locator:
@@ -740,10 +744,14 @@ species:
           p_atm: 3.60e-09
           p_Pa: 3.65e-04
           run: '12065'
+          sample: '12065'
+          <<: *external_12065_analysis
         - T_K: 1900.0
           p_atm: 1.70e-08
           p_Pa: 0.001722525
           run: '12065'
+          sample: '12065'
+          <<: *external_12065_analysis
   SiO:
     observations:
     - observation_id: demaria_1973_sio_psat_table1_this_work
@@ -848,14 +856,20 @@ species:
           p_atm: 3.10e-07
           p_Pa: 0.03141075
           run: '12065'
+          sample: '12065'
+          <<: *external_12065_analysis
         - T_K: 1900.0
           p_atm: 1.20e-07
           p_Pa: 0.012159
           run: '12065'
+          sample: '12065'
+          <<: *external_12065_analysis
         - T_K: 2000.0
           p_atm: 3.50e-06
           p_Pa: 0.3546375
           run: '12065'
+          sample: '12065'
+          <<: *external_12065_analysis
     - observation_id: demaria_1973_sio_psat_fig2_figure_only
       type: psat_series
       locator:
@@ -992,10 +1006,14 @@ species:
           p_atm: 3.30e-08
           p_Pa: 0.0033437249999999996
           run: '12065'
+          sample: '12065'
+          <<: *external_12065_analysis
         - T_K: 2000.0
           p_atm: 1.20e-07
           p_Pa: 0.012159
           run: '12065'
+          sample: '12065'
+          <<: *external_12065_analysis
   TiO:
     observations:
     - observation_id: demaria_1973_tio_psat_table1_this_work
@@ -1190,6 +1208,8 @@ species:
           run: '12065'
           qualifier: approximate
           as_printed: ~9e-08
+          sample: '12065'
+          <<: *external_12065_analysis
   Al:
     observations:
     - observation_id: demaria_1973_al_psat_table1_this_work
@@ -1267,6 +1287,8 @@ species:
           p_atm: 2.60e-07
           p_Pa: 0.0263445
           run: '12065'
+          sample: '12065'
+          <<: *external_12065_analysis
   K:
     observations:
     - observation_id: demaria_1973_k_detected_not_tabulated

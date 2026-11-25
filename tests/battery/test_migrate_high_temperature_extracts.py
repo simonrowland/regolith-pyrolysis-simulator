@@ -360,6 +360,62 @@ def test_demaria_table4_points_use_external_analysis_for_sample_12065(
     _assert_demaria_bulk_analysis_composition(table4)
 
 
+def test_demaria_1973_quoted_12065_points_link_exact_bulk_analysis(
+    migrated_targets,
+) -> None:
+    quoted = [
+        observation
+        for observation in _source_observations(
+            migrated_targets, "kems-023-demaria-1973"
+        )
+        if "quoted_demaria_1971" in observation.observation_id
+        and ":row=12065" in observation.observation_id
+        and observation.value.kind is ValueKind.POINT
+    ]
+
+    assert len(quoted) == 15
+    for observation in quoted:
+        composition = observation.identity.composition
+        assert composition is not None and composition.is_value
+        assert composition.value.proxy_flag == "external_sample_analysis"
+        assert "maxwell-wiik-1971-apollo12-major-composition" in (
+            composition.value.proxy_source
+        )
+        assert "Table 1" in composition.value.proxy_source
+        assert "p. 286" in composition.value.proxy_source
+        assert "row 12065,84 GSF" in composition.value.proxy_source
+        notices = [
+            notice
+            for notice in observation.notices
+            if notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+            and notice.reason.startswith("external_sample_analysis:")
+        ]
+        assert notices
+        assert blocking_qualifications(Quantity.P_PARTIAL, tuple(notices)) == ()
+
+
+def test_demaria_external_sample_analysis_row_deltas(migrated_targets) -> None:
+    expected_counts = {
+        "kems-022-demaria-1971": 49,
+        "kems-023-demaria-1973": 15,
+    }
+    for source_id, expected in expected_counts.items():
+        linked = [
+            observation
+            for observation in _source_observations(migrated_targets, source_id)
+            if observation.identity.composition is not None
+            and observation.identity.composition.is_value
+            and observation.identity.composition.value.proxy_flag
+            == "external_sample_analysis"
+        ]
+        assert len(linked) == expected
+        assert all(
+            "maxwell-wiik-1971-apollo12-major-composition"
+            in observation.identity.composition.value.proxy_source
+            for observation in linked
+        )
+
+
 def _assert_demaria_bulk_analysis_composition(observations) -> None:
     for observation in observations:
         composition = observation.identity.composition
