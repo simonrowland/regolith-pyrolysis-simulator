@@ -617,12 +617,6 @@ def test_richter_time_series_residue_routes_to_owner_and_dependencies(
             missing_anchor_rows.append((row, experiment))
     assert len(anchor_pairs) == 200
     assert len(missing_anchor_rows) == 4
-    anchored_row, anchored_experiment = anchor_pairs[0]
-    prediction = score_module._extent_residue_prediction(
-        context07, anchored_row, Engine.INTERNAL_ANALYTICAL
-    )
-    assert prediction is not None
-    assert prediction.value is not None, prediction.refusal_detail
     missing_row, _missing_experiment = missing_anchor_rows[0]
     prediction = score_module._extent_residue_prediction(
         context07, missing_row, Engine.INTERNAL_ANALYTICAL
@@ -631,6 +625,12 @@ def test_richter_time_series_residue_routes_to_owner_and_dependencies(
     assert prediction.refusal_detail["reason"] == (
         "awaits_time_forward_langmuir_route"
     )
+    anchored_row, anchored_experiment = anchor_pairs[0]
+    prediction = score_module._extent_residue_prediction(
+        context07, anchored_row, Engine.INTERNAL_ANALYTICAL
+    )
+    assert prediction is not None
+    assert prediction.value is not None, prediction.refusal_detail
 
     # Mutation probe: restore the old source lock and show the real score-run
     # consumer loses both Richter residue series.
