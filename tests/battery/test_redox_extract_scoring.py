@@ -410,9 +410,12 @@ def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
         assert backlog["engine_model_caveat"] == 178
         assert backlog["admission_defaulted"] == 18
         assert backlog["total_iron_reported_as_feo"] == 18
-    assert all(
-        not score_module.flagged_strata(residual.notices) for residual in residuals
-    )
+    flagged = [
+        (residual.reference, strata)
+        for residual in residuals
+        if (strata := score_module.flagged_strata(residual.notices))
+    ]
+    assert flagged == [], f"unexpected flagged strata: {flagged!r}"
     assert not any(residual.score_eligible for residual in residuals)
 
 
