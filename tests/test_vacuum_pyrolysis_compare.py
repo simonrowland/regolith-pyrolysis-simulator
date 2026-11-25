@@ -113,6 +113,36 @@ def test_resolve_vacuum_observable(
     assert unsupported_speciation is False
 
 
+def test_hourly_runtime_selectors_keep_their_current_float_bits() -> None:
+    runtime = _runtime()
+    selectors = (
+        ({"kind": "final_o2_mass_kg"}, {}, 0.03),
+        (
+            {"kind": "window_o2_mass_kg"},
+            {"start_h": 1.0, "end_h": 2.0},
+            float.fromhex("0x1.47ae147ae147ap-6"),
+        ),
+        (
+            {
+                "kind": "species_time_series_kg_hr",
+                "species": "SiO",
+                "aggregation": "point",
+            },
+            {"time_h": 2.0},
+            0.004,
+        ),
+    )
+    for selector, coordinate, expected in selectors:
+        actual, _ = resolve_vacuum_observable(
+            selector,
+            coordinate,
+            runtime,
+            feedstocks=_feedstocks(),
+        )
+        assert actual is not None
+        assert actual.hex() == expected.hex()
+
+
 def test_feed_oxygen_selector_uses_feed_oxide_oxygen_mass() -> None:
     actual, unsupported_speciation = resolve_vacuum_observable(
         {"kind": "feed_oxygen_extraction_fraction"},
