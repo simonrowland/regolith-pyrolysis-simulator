@@ -1550,6 +1550,80 @@ def test_named_initial_map_unknown_mass_is_refused_and_trace_is_noticed() -> Non
     assert "unknown-component=0.3 wt%" in notice.reason
 
 
+def _masuda_residue_rows(result):
+    return [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == "masuda-tanaka-1979-vacuum-condensates"
+        and observation.identity.quantity.is_value
+        and observation.identity.quantity.value
+        is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    ]
+
+
+def _assert_masuda_residue_identity_mass_is_unchanged(result) -> None:
+    rows = _masuda_residue_rows(result)
+    assert len(rows) == 13
+    assert all(
+        row.identity.sample_mass_kg
+        == State.unknown("source has no located point sample mass for this run")
+        for row in rows
+    )
+
+
+def test_masuda_unknown_point_masses_do_not_replace_identity_mass(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(
+        tmp_path, "masuda-tanaka-1979-vacuum-condensates.yaml"
+    )
+
+    _assert_masuda_residue_identity_mass_is_unchanged(result)
+
+
+def test_masuda_identity_mass_regression_detects_blind_point_mass_promotion(
+    monkeypatch, tmp_path: Path
+) -> None:
+    original_add_observation = Migrator._add_observation
+
+    def promote_unknown_point_mass(
+        self, observation, source_key, *, source_row_index=None
+    ):
+        condition = (observation.point_conditions or {}).get("sample_mass_kg")
+        if (
+            observation.source_id == "masuda-tanaka-1979-vacuum-condensates"
+            and observation.identity.quantity.is_value
+            and observation.identity.quantity.value
+            is Quantity.RESIDUE_COMPONENT_COMPOSITION
+            and isinstance(condition, Located)
+            and condition.locator is not None
+            and condition.state.is_unknown
+        ):
+            observation = replace(
+                observation,
+                identity=replace(
+                    observation.identity,
+                    sample_mass_kg=condition.state,
+                ),
+            )
+        return original_add_observation(
+            self,
+            observation,
+            source_key,
+            source_row_index=source_row_index,
+        )
+
+    monkeypatch.setattr(
+        Migrator, "_add_observation", promote_unknown_point_mass
+    )
+    result = _migrate_real_extract(
+        tmp_path, "masuda-tanaka-1979-vacuum-condensates.yaml"
+    )
+
+    with pytest.raises(AssertionError):
+        _assert_masuda_residue_identity_mass_is_unchanged(result)
+
+
 def test_merge_preserves_selected_initial_without_incoming_initial() -> None:
     path = REPO_ROOT / "data/literature/extracts/kems-010-richter-2007.yaml"
     source = yaml.safe_load(path.read_text(encoding="utf-8"))

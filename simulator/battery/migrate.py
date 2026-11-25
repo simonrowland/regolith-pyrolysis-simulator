@@ -32545,11 +32545,17 @@ class Migrator:
                     **explicit_point_conditions,
                 }
                 if q_token_point is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+                    located_mass = explicit_point_conditions.get("sample_mass_kg")
                     mass_state = _identity_state_from_point_condition(
                         "sample_mass_kg",
-                        explicit_point_conditions.get("sample_mass_kg"),
+                        located_mass,
                     )
-                    if mass_state is not None:
+                    if (
+                        isinstance(located_mass, Located)
+                        and located_mass.locator is not None
+                        and mass_state is not None
+                        and mass_state.is_value
+                    ):
                         identity = replace(identity, sample_mass_kg=mass_state)
             if q_token_point is Quantity.RESIDUE_COMPONENT_COMPOSITION:
                 vf = _as_dec_or_none(raw_item.get("VF_wt_pct"))

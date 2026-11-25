@@ -32,14 +32,14 @@ from simulator.vacuum_oxygen_balance import (
     PressureLawExponentMismatch,
     iron_mean_oxygen_per_atom,
 )
-from simulator.battery.records import nominal_pressure_pa
+from simulator.battery.records import as_decimal, nominal_pressure_pa
 from simulator.source_ids import (
     HASHIMOTO_SOURCE_ID,
     SOSSI_SOURCE_ID as _SOSSI_SOURCE_ID,
 )
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.fe_redox import _engine_fe_speciation
-from simulator.physical_constants import PA_PER_BAR
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET, PA_PER_BAR
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
 
 
@@ -3003,7 +3003,7 @@ def predict_langmuir_residue_composition(
         ),
         ("identity.sample_mass_kg", reference.identity.sample_mass_kg),
     )
-    mass_inputs: list[tuple[str, float]] = []
+    mass_inputs: list[tuple[str, Decimal]] = []
     for origin, state in mass_states:
         if state is None or not getattr(state, "is_value", False):
             continue
@@ -3013,12 +3013,12 @@ def predict_langmuir_residue_composition(
                 continue
             raw_mass = raw_mass.point
         try:
-            candidate_mass_kg = float(raw_mass)
+            candidate_mass_kg = as_decimal(raw_mass)
         except (TypeError, ValueError, OverflowError) as exc:
             raise ResidueInventoryRefusal(
                 "sample_mass_invalid", f"{origin}: {raw_mass!r}"
             ) from exc
-        if not math.isfinite(candidate_mass_kg) or candidate_mass_kg <= 0.0:
+        if not candidate_mass_kg.is_finite() or candidate_mass_kg <= 0:
             raise ResidueInventoryRefusal(
                 "sample_mass_invalid", f"{origin}: {raw_mass!r}"
             )
@@ -3027,7 +3027,7 @@ def predict_langmuir_residue_composition(
         value == mass_inputs[0][1] for _, value in mass_inputs[1:]
     )
     if has_consistent_mass:
-        sample_mass_kg = mass_inputs[0][1]
+        sample_mass_kg = float(mass_inputs[0][1])
         sample_mass_origin = ", ".join(origin for origin, _ in mass_inputs)
         sample_mass_default_reason = None
     else:
@@ -3136,7 +3136,8 @@ def predict_langmuir_residue_composition(
             affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
             reason=(
                 "xi includes the furnace ramp; the scored extent path is isothermal "
-                "at 1900 C and does not model ramp evaporation."
+                f"at {temperature_K - CELSIUS_TO_KELVIN_OFFSET:g} C and does not "
+                "model ramp evaporation."
             ),
             origin="Langmuir residue extent",
         ),
