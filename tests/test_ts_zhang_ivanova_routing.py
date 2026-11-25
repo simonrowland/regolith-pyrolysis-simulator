@@ -108,22 +108,24 @@ def _residual_rms_by_oxide(residuals, observations) -> dict[str, float]:
 def _assert_ivanova_residual_rms_pin(
     engine: Engine, actual_by_oxide: dict[str, float]
 ) -> None:
+    # Two Studio receipts matched at .17g for every engine/oxide, so the
+    # measured run-to-run absolute spread (and pin tolerance) is zero.
     expected_by_engine = {
         Engine.OPENIMCC: {
-            oxide: ("TODO-PENDING-RECEIPT", "TODO-PENDING-RECEIPT")
-            for oxide in ("SiO2", "Al2O3", "MgO", "CaO")
+            "Al2O3": (20.284040235175265, 0.0),
+            "CaO": (6.247579275778299, 0.0),
+            "MgO": (9.91686034538475, 0.0),
+            "SiO2": (15.250769748580682, 0.0),
         },
         Engine.INTERNAL_ANALYTICAL: {
-            oxide: ("TODO-PENDING-RECEIPT", "TODO-PENDING-RECEIPT")
-            for oxide in ("SiO2", "Al2O3", "MgO", "CaO")
+            "Al2O3": (21.76049765903121, 0.0),
+            "CaO": (7.189327413563964, 0.0),
+            "MgO": (10.234786656963221, 0.0),
+            "SiO2": (18.767677790121965, 0.0),
         },
     }
     expected_and_spread_by_oxide = expected_by_engine[engine]
     assert set(actual_by_oxide) == set(expected_and_spread_by_oxide)
-    assert all(
-        isinstance(expected, (float, int)) and isinstance(spread, (float, int))
-        for expected, spread in expected_and_spread_by_oxide.values()
-    ), f"TODO-PENDING-RECEIPT: {engine.value} per-oxide RMS and run spread"
     for oxide, (expected, spread) in expected_and_spread_by_oxide.items():
         assert actual_by_oxide[oxide] == pytest.approx(
             expected, rel=0.0, abs=float(spread)
