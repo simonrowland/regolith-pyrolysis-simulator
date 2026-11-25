@@ -43,6 +43,9 @@ REDOX_MODE_NOT_AN_INPUT = 'not_an_input'
 
 ANTOINE_FALLBACK_SOURCE_PREFIX = 'antoine_fallback_from_vaporock'
 INVALID_GAS_PARTIAL_PRESSURE_COMPONENTS = 'invalid_gas_partial_pressure_components'
+MAGEMIN_OMITTED_OXYGEN_DEFAULT_DIAGNOSTIC = (
+    'magemin_omitted_oxygen_default'
+)
 _EQUILIBRIUM_CACHE_CONSUMED_DIAGNOSTICS = frozenset({
     'authority',
     'authoritative_for_requested_vapor_pressure',
@@ -57,6 +60,7 @@ _EQUILIBRIUM_CACHE_CONSUMED_DIAGNOSTICS = frozenset({
     'backend_failure_reason_code',
     'backend_failure_category',
     'input_composition_projection',
+    MAGEMIN_OMITTED_OXYGEN_DEFAULT_DIAGNOSTIC,
     'engine_reason',
     'backend_failure_disposition',
     'reported_activity_coefficients',

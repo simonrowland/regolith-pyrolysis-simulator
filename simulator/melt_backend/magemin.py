@@ -128,6 +128,7 @@ from simulator.melt_backend.base import (
     CLEANED_MELT_ACCOUNT,
     DEFAULT_BACKEND_CAPABILITIES,
     EquilibriumResult,
+    MAGEMIN_OMITTED_OXYGEN_DEFAULT_DIAGNOSTIC,
     MeltBackend,
     MeltCompositionError,
     MeltOxideProjection,
@@ -2006,7 +2007,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             ),
         )
         if omitted_oxygen:
-            result_diagnostics['magemin_omitted_oxygen_default'] = {
+            result_diagnostics[MAGEMIN_OMITTED_OXYGEN_DEFAULT_DIAGNOSTIC] = {
                 'value': MAGEMIN_NOMINAL_FO2_LOG,
                 'reason': 'oxygen input omitted; nominal MAGEMin transport control applied',
             }
