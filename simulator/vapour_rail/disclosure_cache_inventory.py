@@ -933,7 +933,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/core.py:rates_cache': {
         "path": 'simulator/core.py',
-        "line": 8025,
+        "line": 8029,
         "kind": 'store',
         "name": 'rates_cache',
         "carries_disclosure": False,
@@ -1317,7 +1317,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/core.py:published_cache': {
         "path": 'simulator/core.py',
-        "line": 5660,
+        "line": 5664,
         "kind": 'store',
         "name": 'published_cache',
         "carries_disclosure": False,
