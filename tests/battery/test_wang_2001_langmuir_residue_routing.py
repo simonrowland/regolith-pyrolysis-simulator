@@ -159,8 +159,11 @@ def test_wang_residue_cells_emit_one_production_score_event_each(monkeypatch):
     assert all(
         row.identity.species.formula == "WO3"
         and row.admission.status.value == "rejected"
-        and row.admission.reason
-        == "container_contamination_not_evaporation_observable"
+        and row.admission.reason.startswith(
+            "container_contamination_not_evaporation_observable"
+        )
+        and "derived from either the heating element in the furnace or the heat shields "
+        "surrounding the sample and heating element" in row.admission.reason
         for row in condition_rows.values()
     )
     experiment_ids = {reference.experiment_id for reference in all_references.values()}

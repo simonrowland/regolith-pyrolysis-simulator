@@ -23605,12 +23605,14 @@ species:
         pdf_page_index: 3
         table: '1'
         column: WO3
-        note: Ion-microprobe WO3 residue values; treated as container or wire pickup, not evaporation.
+        note: Ion-microprobe WO3 residue values; the paper states tungsten in the residues is derived from either
+          the heating element in the furnace or the heat shields surrounding the sample and heating element.
       phase: unknown
       regime: langmuir_free_evaporation
       units: wt%
       admission_status: typed_refusal
-      refusal_reason: container_contamination_not_evaporation_observable
+      refusal_reason: container_contamination_not_evaporation_observable; derived from either the heating element in
+        the furnace or the heat shields surrounding the sample and heating element
       uncertainty:
         confidence_level: one_sigma
         note: “Uncertainties are ±1σ standard errors calculated from replicate analyses.”

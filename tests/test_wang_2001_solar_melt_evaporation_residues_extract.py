@@ -271,6 +271,22 @@ def test_rendered_table_grids_and_cell_mutations() -> None:
             assert_table1_grid_matches_render(changed_extract, rendered)
 
 
+def test_wo3_condition_series_uses_the_paper_tungsten_attribution() -> None:
+    extract = yaml.safe_load(EXTRACT.read_text())
+    observation = extract["species"]["W"]["observations"][0]
+    attribution = (
+        "derived from either the heating element in the furnace or the heat "
+        "shields surrounding the sample and heating element"
+    )
+
+    assert observation["observation_id"] == (
+        "wang_2001_table1_ion_microprobe_wo3_conditions"
+    )
+    assert observation["admission_status"] == "typed_refusal"
+    assert attribution in observation["locator"]["note"]
+    assert attribution in observation["refusal_reason"]
+
+
 def test_table2_and_table4_rendered_rows_are_bound_to_samples() -> None:
     extract = yaml.safe_load(EXTRACT.read_text())
     printed_rows = {}
