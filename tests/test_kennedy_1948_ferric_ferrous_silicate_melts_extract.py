@@ -741,7 +741,7 @@ def test_kennedy_table2_fidelity_pin_covers_the_observation():
     assert {sample["locator"]["line_range"] for sample in prose_pins} == {
         "87",
         "89",
-        "259",
+        "214",
     }
     warnings = vle.fidelity_source_warnings(source, label=EXTRACT.stem)
     coverage_warnings = {
