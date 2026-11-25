@@ -326,7 +326,7 @@ def test_hashimoto_openimcc_primary_numeric_output_is_pinned() -> None:
     # Fe speciation, so residue oxygen balance uses Kress91 and flags
     # residue_fe_speciation_kress91_fallback. Provenance also records
     # engine_flags and an empty pressure_law_diagnostics.
-    # Final integration-tip remote output must replace these provisional pins.
+    # Studio receipt c55251f9bb measured the final OpenIMCC 4 cohort output.
     assert _hashimoto_prediction_tuple_digest(predictions) == (
         "8b0fde172e9f906fd8dec68f7b9d305707e2a6fc67820579bc32e3755475f0ad"
     ), _hashimoto_prediction_tuple_digest(predictions)
@@ -341,8 +341,8 @@ def test_hashimoto_openimcc_primary_numeric_output_is_pinned() -> None:
         for oxide, value in primary.primary_oxide_wt_pct.items()
     } == {
         "SiO2": "0x1.6c50f5b58d934p+5",
-        "Al2O3": "0x1.2463317df0cf2p+2",
-        "FeO": "0x1.c200702b15732p+3",
+        "Al2O3": "0x1.23c77e4d99000p+2",
+        "FeO": "0x1.c5d0d445df444p+3",
         "MgO": "0x1.015f883f95dfcp+5",
         "CaO": "0x1.d42ffd059164ep+1",
     }
