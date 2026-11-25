@@ -213,6 +213,11 @@ def test_passive_exchange_respeciation_settles_same_buffer_once(absorbing) -> No
 @pytest.mark.parametrize("liquid", [True, False])
 def test_collapsing_ferric_capacity_routes_evaporative_o2_to_gas(monkeypatch, liquid) -> None:
     sim = _make_sim()
+    # The hour reset is the owner of the internal-capacity counter. It
+    # starts at zero. Congruent Fe loss does not increment it, and this
+    # probe does not plant the private attribute. Settle reads the counter
+    # the hour published.
+    sim._reset_redox_source_diagnostics_for_hour()
     sim.melt.temperature_C = 1600.0
     sim.melt.p_total_mbar = 0.2
     sim.atom_ledger.load_external_mol(
