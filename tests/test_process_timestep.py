@@ -391,6 +391,7 @@ def _write_lab_preset(
               equipment_sizing: lab_fixed_geometry
               sample:
                 mass_g: 2.0
+                exposed_melt_area_m2: 0.0001  # fixture face; not a printed measurement
               surfaces:
                 - id: witness
                   role: condenser

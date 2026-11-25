@@ -6035,8 +6035,12 @@ class EvaporationMixin:
         if evaporation_transition is None:
             return {}
 
+        # The evaporation credit books rate * dt. The route's remaining
+        # figure is still a rate. Debiting the unscaled difference asks
+        # overhead for an hour of vapor on a short step and overdrafts.
+        dt_hr = self.process_dt_hr()
         condensed_kg = max(
-            0.0, rate_kg_hr - remaining_kg_hr,
+            0.0, (rate_kg_hr - remaining_kg_hr) * dt_hr,
         )
         credited_condensed_kg = self._dispatch_condensation_route(
             species, condensed_kg, sp_data, route_result,
@@ -6047,7 +6051,7 @@ class EvaporationMixin:
 
         return {
             'credited_condensed_kg': float(credited_condensed_kg),
-            'remaining_kg': float(max(0.0, remaining_kg_hr)),
+            'remaining_kg': float(max(0.0, remaining_kg_hr) * dt_hr),
             'evaporation_transition': evaporation_transition,
         }
 
