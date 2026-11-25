@@ -20,7 +20,13 @@ from simulator.battery.migrate import (
     _printed_point_phase_kind,
     _printed_point_phase_text,
 )
-from simulator.battery.records import ApproxPressure, BandBasis, Located, State
+from simulator.battery.records import (
+    ApproxPressure,
+    BandBasis,
+    Located,
+    State,
+    is_initial_charge_only_proxy_notice,
+)
 from simulator.physical_constants import PA_PER_BAR
 import tools.validate_literature_extracts as vle
 from simulator.yaml_cache import yaml_mapping_source_issues
@@ -79,6 +85,14 @@ def test_kennedy_table2_runs_migrate_with_printed_conditions_and_composition():
     assert all(o.value.kind.value == "point" for o in observations)
     assert all(o.identity.temperature_K.is_value for o in observations)
     assert all(o.identity.composition.is_value for o in observations)
+    assert all(
+        o.identity.composition.value.proxy_flag == "initial_charge_only"
+        for o in observations
+    )
+    assert all(
+        any(is_initial_charge_only_proxy_notice(notice) for notice in o.notices)
+        for o in observations
+    )
     assert all(o.admission.status.value == "pending" for o in observations)
     assert all(
         o.point_conditions["T_C"].state.is_value
@@ -277,6 +291,20 @@ def test_kennedy_regime_and_crystal_qualifications_reach_scoring(tmp_path: Path)
                 backend.reset_mock()
                 residual, _ = score.compile_residual(row, engine, context=context)
                 backend.assert_called_once()
+                if engine is Engine.INTERNAL_ANALYTICAL:
+                    material = score._fe_redox_material(
+                        row,
+                        row.identity,
+                        context.experiments.get(row.experiment_id),
+                    )
+                    assert isinstance(material, score._FeRedoxMaterial)
+                    basis = score._fe_redox_kress_basis(material.composition_wt)
+                    assert isinstance(basis, score._FeRedoxKressBasis)
+                    kress_input = kress.call_args.kwargs["mol_fractions"]
+                    assert kress_input == basis.mol_fractions
+                    assert "FeOt" in kress_input
+                    assert "FeO" not in kress_input
+                    assert "Fe2O3" not in kress_input
                 assert residual.numeric is not None, residual.refusal
                 assert set(score.flagged_strata(residual.notices)) & {
                     "non_equilibrium_run",
