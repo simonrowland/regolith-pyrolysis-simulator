@@ -250,6 +250,7 @@ def _decode_payload_for_admission(
     payload: Any,
     *,
     payload_codec_version: int | None = None,
+    keys: Sequence[Mapping[str, Any]] = (),
     interpolation_synthesized: bool = False,
 ) -> Any | None:
     expected_version = _payload_codec_version(artifact)
@@ -263,6 +264,14 @@ def _decode_payload_for_admission(
     if not isinstance(payload, Mapping):
         return None
 
+    def is_finite_number(value: Any) -> bool:
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            return False
+        try:
+            return math.isfinite(float(value))
+        except (OverflowError, TypeError, ValueError):
+            return False
+
     def has_finite_json_numbers(value: Any) -> bool:
         if isinstance(value, Mapping):
             return all(
@@ -274,11 +283,112 @@ def _decode_payload_for_admission(
         if isinstance(value, bool) or value is None or isinstance(value, str):
             return True
         if isinstance(value, (int, float)):
-            try:
-                return math.isfinite(float(value))
-            except (OverflowError, TypeError, ValueError):
-                return False
+            return is_finite_number(value)
         return False
+
+    def valid_string_sequence(value: Any) -> bool:
+        return (
+            isinstance(value, (list, tuple))
+            and not isinstance(value, (str, bytes))
+            and all(isinstance(item, str) for item in value)
+        )
+
+    def valid_composition_projected_notice(value: Any) -> bool:
+        if not isinstance(value, Mapping):
+            return False
+        required_fields = {
+            "kind",
+            "reason",
+            "authority",
+            "certified_band",
+            "dropped_components",
+        }
+        if not required_fields.issubset(value) or any(
+            not isinstance(value[field_name], str)
+            for field_name in ("kind", "reason", "authority")
+        ):
+            return False
+
+        def valid_projection_band(band: Any) -> bool:
+            return (
+                isinstance(band, Mapping)
+                and all(
+                    field_name in band
+                    for field_name in ("engine", "database", "bulk_components")
+                )
+                and isinstance(band["engine"], str)
+                and isinstance(band["database"], str)
+                and valid_string_sequence(band["bulk_components"])
+            )
+
+        certified_band = value["certified_band"]
+        if not isinstance(certified_band, Mapping):
+            return False
+        projection_band = value.get("projection_certified_band")
+        if projection_band is None:
+            if not valid_projection_band(certified_band):
+                return False
+        else:
+            if not valid_projection_band(projection_band):
+                return False
+            if "engine" in certified_band and not valid_projection_band(
+                certified_band
+            ):
+                return False
+            if any(
+                field_name in certified_band
+                and not is_finite_number(certified_band[field_name])
+                for field_name in ("min_T_C", "max_T_C")
+            ):
+                return False
+            if "source" in certified_band and not isinstance(
+                certified_band["source"], str
+            ):
+                return False
+        dropped_components = value["dropped_components"]
+        if (
+            not isinstance(dropped_components, (list, tuple))
+            or isinstance(dropped_components, (str, bytes))
+            or not dropped_components
+        ):
+            return False
+        for row in dropped_components:
+            if (
+                not isinstance(row, Mapping)
+                or "component" not in row
+                or "mass_fraction" not in row
+                or not isinstance(row["component"], str)
+                or not row["component"]
+                or not is_finite_number(row["mass_fraction"])
+            ):
+                return False
+        if "bounds_source" in value and not isinstance(
+            value["bounds_source"], str
+        ):
+            return False
+        if "projected_bounds" in value:
+            projected_bounds = value["projected_bounds"]
+            if projected_bounds == "invalid" and "bounds_source" in value:
+                pass
+            elif (
+                not isinstance(projected_bounds, (list, tuple))
+                or isinstance(projected_bounds, (str, bytes))
+                or len(projected_bounds) != 2
+                or not all(is_finite_number(bound) for bound in projected_bounds)
+            ):
+                return False
+        if "floor_T_C" in value and not is_finite_number(value["floor_T_C"]):
+            return False
+        for field_name in (
+            "temperature_band_case",
+            "temperature_band_status",
+            "temperature_band_source",
+        ):
+            if field_name in value and value[field_name] is not None and not isinstance(
+                value[field_name], str
+            ):
+                return False
+        return True
 
     def has_provider_authority_shape(value: Any) -> bool:
         return (
@@ -304,6 +414,8 @@ def _decode_payload_for_admission(
     if not has_finite_json_numbers(payload):
         return None
     if artifact == "freeze_gate_curve":
+        if not keys:
+            return None
         curve_payload = payload.get("curve")
         if not isinstance(curve_payload, Mapping):
             return None
@@ -314,6 +426,55 @@ def _decode_payload_for_admission(
             curve = _curve_from_payload(curve_payload)
         except Exception:
             return None
+        projected_notice = curve.get("composition_projected_notice")
+        if (
+            "composition_projected_notice" in curve
+            and not valid_composition_projected_notice(projected_notice)
+        ):
+            return None
+        for key in keys:
+            if not isinstance(key, Mapping):
+                return None
+            identity_key = key.get("freeze_gate_cache_key")
+            identity_is_required = (
+                getattr(identity_key, "magemin_domain_identity", None) is not None
+                or (
+                    isinstance(identity_key, Mapping)
+                    and identity_key.get("magemin_domain_identity") is not None
+                )
+                or (
+                    isinstance(identity_key, (list, tuple))
+                    and len(identity_key) == 9
+                    and identity_key[7] is not None
+                )
+            )
+            try:
+                identity = _magemin_identity_from_replay_key(key)
+            except (OverflowError, TypeError, ValueError):
+                identity = None
+            if identity is None and identity_is_required:
+                return None
+            if identity is None or identity.silica_verdict == "in_band":
+                continue
+            if identity.silica_verdict != "extrapolated":
+                return None
+            certified_band = curve.get("certified_band")
+            silica_bounds = (
+                certified_band.get("sio2_wt_pct")
+                if isinstance(certified_band, Mapping)
+                else None
+            )
+            if (
+                not isinstance(silica_bounds, (list, tuple))
+                or isinstance(silica_bounds, (str, bytes))
+                or len(silica_bounds) != 2
+                or not all(is_finite_number(bound) for bound in silica_bounds)
+                or identity.certified_band is None
+                or curve.get("authority") != "extrapolated"
+                or tuple(float(bound) for bound in silica_bounds)
+                != identity.certified_band
+            ):
+                return None
         return curve
     if artifact == "equilibrium_post_record":
         equilibrium_result = payload.get("equilibrium_result")
@@ -425,6 +586,15 @@ def _decode_payload_for_admission(
 
         for diagnostic in provenance_diagnostics:
             activities = diagnostic.get("activities")
+            if "activities" in diagnostic and (
+                not isinstance(activities, Mapping)
+                or any(
+                    not isinstance(species, str)
+                    or not is_finite_number(activity)
+                    for species, activity in activities.items()
+                )
+            ):
+                return None
             activity_standard_state_required = (
                 isinstance(activities, Mapping) and bool(activities)
             )
@@ -1930,6 +2100,9 @@ class PT0DeterminismStore:
                 canonical_json_bytes(entry_key),
                 str(key_hash),
                 entry,
+                admission_keys=(
+                    query_key if query_key is not None else entry_key,
+                ),
             )
             if decoded is not None:
                 return entry, decoded
@@ -1957,6 +2130,9 @@ class PT0DeterminismStore:
                     canonical_json_bytes(candidate_key),
                     candidate_hash,
                     candidate,
+                    admission_keys=(
+                        query_key if query_key is not None else candidate_key,
+                    ),
                 )
                 if decoded is not None:
                     return candidate, decoded
@@ -2072,6 +2248,7 @@ class PT0DeterminismStore:
                 if attempt.get("neighbors")
                 else None
             ),
+            keys=(key,),
             interpolation_synthesized=True,
         )
         if decoded is None:
@@ -2147,6 +2324,8 @@ class PT0DeterminismStore:
         key_bytes: bytes,
         key_hash: str,
         entry: Mapping[str, Any],
+        *,
+        admission_keys: Sequence[Mapping[str, Any]] | None = None,
     ) -> Any | None:
         payload_bytes = _payload_integrity_bytes(entry["payload"])
         if entry.get("payload_hash") != _sha256(payload_bytes):
@@ -2157,6 +2336,7 @@ class PT0DeterminismStore:
             artifact,
             entry.get("payload"),
             payload_codec_version=entry.get("payload_codec_version"),
+            keys=tuple(admission_keys) if admission_keys is not None else (key,),
         )
         if decoded is None:
             return None
@@ -2670,6 +2850,9 @@ class PT1PersistentEquilibriumStore:
                         key_bytes=row_key_bytes,
                         key_hash=row_hash,
                         return_decoded=True,
+                        admission_keys=(
+                            query_key if query_key is not None else row_key,
+                        ),
                     )
                     if decoded is None:
                         continue
@@ -3127,6 +3310,7 @@ class PT1PersistentEquilibriumStore:
         key_bytes: bytes,
         key_hash: str,
         return_decoded: bool = False,
+        admission_keys: Sequence[Mapping[str, Any]] | None = None,
     ) -> Any:
         row_key_bytes = _sqlite_bytes(row["key_bytes"])
         row_payload_bytes = _sqlite_bytes(row["payload_bytes"])
@@ -3184,6 +3368,7 @@ class PT1PersistentEquilibriumStore:
             artifact,
             row_payload,
             payload_codec_version=payload_codec_version,
+            keys=tuple(admission_keys) if admission_keys is not None else (key,),
         )
         if admission is None:
             admitted_payload = copy.deepcopy(row_payload)
@@ -3233,6 +3418,7 @@ class PT1PersistentEquilibriumStore:
             key_bytes=row_key_bytes,
             key_hash=str(row["key_hash"]),
             return_decoded=True,
+            admission_keys=(query_key if query_key is not None else row_key,),
         )
         if decoded is None:
             return entry, None
@@ -3286,6 +3472,7 @@ class PT1PersistentEquilibriumStore:
             key_bytes=row_key_bytes,
             key_hash=str(row["key_hash"]),
             return_decoded=True,
+            admission_keys=(query_key if query_key is not None else row_key,),
         )
         if decoded is None:
             return entry, None
@@ -3350,6 +3537,7 @@ def _pt1_row_admission(
         str(row["artifact"]),
         payload,
         payload_codec_version=row["payload_codec_version"],
+        keys=(key,),
     ) is not None
 
 
