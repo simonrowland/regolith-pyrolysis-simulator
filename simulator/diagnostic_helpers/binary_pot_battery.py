@@ -5069,7 +5069,12 @@ class _IsolatedCellWorker:
         request["engine_settings"] = engine_cache_settings(
             self.engine, normalize_engine_settings(self.engine, self.engine_settings),
         )
-        result = cached_engine_call(self.engine, request, solve)
+        if self.engine == "openimcc":
+            from simulator.melt_backend.openimcc_bridge import _cached_openimcc_call
+
+            result = _cached_openimcc_call(request, solve)
+        else:
+            result = cached_engine_call(self.engine, request, solve)
         # EquilibrateCell.from_hot/as_payload keeps cell fields. A mask
         # flag on a mapping or on a list subclass has to be copied back
         # after that projection.

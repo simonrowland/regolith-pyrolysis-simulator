@@ -392,7 +392,7 @@ def _cached_isolated_openimcc_state(
     Nonconvergence, transport errors, and timeouts propagate unstored.
     """
 
-    from simulator.engine_cache import CACHEABLE_REFUSAL_CODES, cached_engine_call
+    from simulator.engine_cache import CACHEABLE_REFUSAL_CODES
     from simulator.melt_backend import openimcc_bridge
     from simulator.melt_backend.openimcc_bridge import (
         ISOLATED_OPENIMCC_CACHEABLE_ERRORS,
@@ -421,8 +421,7 @@ def _cached_isolated_openimcc_state(
                 "detail": exc.detail,
             }
 
-    payload = cached_engine_call(
-        "openimcc",
+    payload = openimcc_bridge._cached_openimcc_call(
         _evaluate_request_vector(
             composition_mol=composition_mol,
             temperature_K=temperature_K,

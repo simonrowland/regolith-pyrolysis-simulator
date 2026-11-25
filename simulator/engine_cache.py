@@ -3564,11 +3564,18 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
     with _LOCK:
         try:
             row = None if connection is None or _definitely_absent(connection, cache_key) else connection.execute(
-                f"SELECT value, provenance_id, source_box, row_seq FROM {_TABLE} WHERE key=?",
+                f"SELECT value, provenance_id, source_box, row_seq, engine, chem_version "
+                f"FROM {_TABLE} WHERE key=?",
                 (cache_key,),
             ).fetchone()
         except sqlite3.Error:
             counts["read_error"] += 1
+            row = None
+        if row is not None and (
+            row[4] != engine_id or row[5] != str(chem_version)
+        ):
+            # The key is authoritative for lookup, but persisted metadata is
+            # also checked so a mislabeled row cannot masquerade as current.
             row = None
         if row is not None:
             try:

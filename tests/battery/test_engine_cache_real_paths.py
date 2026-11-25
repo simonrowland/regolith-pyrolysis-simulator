@@ -2722,7 +2722,7 @@ def test_openimcc_cache_settings_use_selected_opener_pack() -> None:
     )
 
 
-def test_openimcc_gas_cache_key_tracks_pack_selection_only(
+def test_non_default_openimcc_gas_pack_is_not_cached(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -2762,17 +2762,11 @@ def test_openimcc_gas_cache_key_tracks_pack_selection_only(
         *common, second_pack, gas_pack_selection="published-ext"
     )
 
-    assert first == same_selection
-    assert first["CO(g)"] != other_selection["CO(g)"]
-    assert calls == 2
-    assert engine_cache.engine_cache_counters(reset=True)["openimcc"] == {
-        "hits": 1,
-        "misses": 2,
-        "stores": 2,
-        "store_error": 0,
-        "read_error": 0,
-        "conflicts": 0,
-    }
+    assert first["CO(g)"] == 1.0
+    assert same_selection["CO(g)"] == 2.0
+    assert abs(same_selection["CO(g)"] - first["CO(g)"]) == 1.0
+    assert other_selection["CO(g)"] == 2.0
+    assert calls == 3
 
 
 def test_runtime_identity_is_captured_once_when_each_engine_opens(

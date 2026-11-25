@@ -589,6 +589,136 @@ def test_green_fixture_detects_an_in_memory_coefficient_mutation() -> None:
     )
 
 
+def test_non_default_pack_content_change_is_not_hidden_by_cache(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _openimcc_or_skip()
+    import openimcc
+    import simulator.melt_backend.openimcc_bridge as bridge
+
+    from simulator import engine_cache
+    from openimcc import label_research_datapack
+
+    fixture = json.loads("\n".join(
+        line for line in GREEN_ACTIVITY_FIXTURE.read_text().splitlines()
+        if not line.startswith("#")
+    ))
+    row = next(row for row in fixture["rows"] if row["pack"] == "v1.0.2")
+    composition, basis_type = COMPOSITIONS[row["composition"]]
+    kwargs = {"temperature_K": row["temperature_K"], "pack": "published-core"}
+    kwargs["composition_kg" if basis_type == "wt" else "composition_mol"] = composition
+
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "openimcc-cache.sqlite"))
+    engine_cache._MEMORY_CACHE.clear()
+    original_load_pack = bridge._load_pack
+    original_pack = original_load_pack("published-core")
+    kernel = replace(
+        original_pack.kernel_datapack,
+        A=original_pack.kernel_datapack.A.copy(),
+    )
+    kernel.A[0] += 0.1
+    mutated_pack = label_research_datapack(
+        kernel, model_id="IMCC-SF04-cache-mutation", coverage="cache-mutation-probe"
+    )
+
+    original = bridge.evaluate(**kwargs)
+    monkeypatch.setattr(
+        bridge,
+        "_load_pack",
+        lambda name: mutated_pack if name == "published-core" else original_load_pack(name),
+    )
+    changed = bridge.evaluate(**kwargs)
+
+    assert original.pack_digest != changed.pack_digest
+    log10_activity_delta = max(
+        abs(math.log10(changed.parent_oxide_activities[name] / original.parent_oxide_activities[name]))
+        for name in original.parent_oxide_activities
+        if original.parent_oxide_activities[name] > 0.0
+        and changed.parent_oxide_activities.get(name, 0.0) > 0.0
+    )
+    assert log10_activity_delta > 0.01, (
+        "the real OpenIMCC pack mutation moved no parent activity by 0.01 log10"
+    )
+
+
+def test_non_default_gas_table_change_is_not_hidden_by_cache(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    openimcc = _openimcc_or_skip()
+    import pandas as pd
+    import simulator.melt_backend.openimcc_bridge as bridge
+
+    from openimcc.gas import ImccGasDatapack
+    from simulator import engine_cache
+
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "openimcc-gas-cache.sqlite"))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "s1")
+    monkeypatch.delenv("OPENIMCC_VAPOROCK_ROOT", raising=False)
+    engine_cache._MEMORY_CACHE.clear()
+    engine_cache.engine_cache_counters(reset=True)
+
+    melt = bridge.evaluate(
+        composition_mol={"SiO2": 0.7, "FeO": 0.2, "Na2O": 0.1},
+        temperature_K=2200.0,
+        pack="default",
+    )
+    gas_pack = openimcc.load_gas_datapack()
+    gas_df = pd.DataFrame(gas_pack.gas_df).copy(deep=True)
+    gas_df["F"] += 1.0
+    mutated_pack = ImccGasDatapack(
+        gas_df=gas_df,
+        oxide_df=pd.DataFrame(gas_pack.oxide_df).copy(deep=True),
+        gas_path=gas_pack.gas_path,
+        oxide_path=gas_pack.oxide_path,
+    )
+
+    original = bridge.evaluate_gas(
+        melt.parent_oxide_activities,
+        2200.0,
+        1.0e-6,
+        gas_pack,
+        gas_pack_selection="default",
+    )
+    changed = bridge.evaluate_gas(
+        melt.parent_oxide_activities,
+        2200.0,
+        1.0e-6,
+        mutated_pack,
+        gas_pack_selection="default",
+    )
+
+    log10_pressure_delta = max(
+        abs(math.log10(changed[name] / original[name]))
+        for name in original
+        if original[name] > 0.0 and changed.get(name, 0.0) > 0.0
+    )
+    assert gas_pack.gas_table_digest != mutated_pack.gas_table_digest
+    assert log10_pressure_delta > 0.01, (
+        "the real OpenIMCC gas-table mutation moved no pressure by 0.01 log10"
+    )
+
+
+def test_unexpected_packaged_gas_signature_error_propagates(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    openimcc = _openimcc_or_skip()
+    import openimcc.gas as openimcc_gas
+    import simulator.melt_backend.openimcc_bridge as bridge
+
+    gas_pack = openimcc.load_gas_datapack()
+
+    def fail_signature_read() -> tuple[str, str, frozenset, frozenset]:
+        raise RuntimeError("unexpected packaged signature failure")
+
+    monkeypatch.setattr(
+        openimcc_gas, "_packaged_pressure_signatures", fail_signature_read
+    )
+    with pytest.raises(RuntimeError, match="unexpected packaged signature failure"):
+        bridge._openimcc_cache_decision({}, gas_pack=gas_pack)
+
+
 def test_pack_digest_preserves_the_published_binding_value() -> None:
     _openimcc_or_skip()
     expected = "ae979b68295f6e653fb1c37d6b381f06cb0be8d4c5b421e673420a6e4596357c"
