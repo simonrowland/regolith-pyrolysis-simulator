@@ -27,7 +27,7 @@ from simulator.config import load_config_bundle
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.recipe_io import load_recipe_patch, read_recipe_metadata, write_recipe_patch
 from simulator.runner import PyrolysisRun, build_per_hour_summary
-from simulator.session import drive_auto_apply
+from simulator.session import SimSession, drive_auto_apply
 from simulator.state import CampaignPhase, DecisionPoint, DecisionType, EvaporationFlux
 from web.events import (
     BackendUnavailableError,
@@ -6040,11 +6040,6 @@ def test_socketio_continues_after_binding_c6_refusal_and_retains_diagnostic(
             "reason_refused": "c6_hold_target_not_acquired",
         },
     }
-    run_flag = {
-        "kind": "run_truncation",
-        "code": "run_hour_budget_exhausted_mid_campaign",
-        "detail": {"active_campaign": "C2A", "ruling": "d-473"},
-    }
     calls = {"n": 0}
 
     def continues_after_c6_drive(session, *args, **kwargs):
@@ -6052,7 +6047,6 @@ def test_socketio_continues_after_binding_c6_refusal_and_retains_diagnostic(
         # Avoid real liquidus/snapshot work in this composition unit test.
         snapshot = SimpleNamespace(hour=calls["n"])
         if calls["n"] == 1:
-            session._run_flags = [run_flag]
             return iter([
                 SimpleNamespace(
                     snapshot=snapshot,
@@ -6119,6 +6113,7 @@ def test_socketio_continues_after_binding_c6_refusal_and_retains_diagnostic(
         new_sids = set(_simulations) - before
         assert len(new_sids) == 1
         sid = new_sids.pop()
+        web_session = _simulations[sid]["session"]
         # Background task runs the full operator loop synchronously here.
         names = [event["name"] for event in events]
         statuses = [
@@ -6136,7 +6131,9 @@ def test_socketio_continues_after_binding_c6_refusal_and_retains_diagnostic(
             and event["args"][0].get("campaign") == "C6"
         ]
         assert c6_summaries
-        assert c6_summaries[0]["run_flags"] == [run_flag]
+        assert "run_flags" not in c6_summaries[0]
+        assert web_session._config.hours == 0
+        assert web_session.run_flags == ()
         assert c6_summaries[0]["c6_refusal_diagnostic"]["diagnostic"][
             "reason_refused"
         ] == "c6_hold_target_not_acquired"
@@ -6159,6 +6156,45 @@ def test_socketio_continues_after_binding_c6_refusal_and_retains_diagnostic(
         client.disconnect()
         for sid in set(_simulations) - before:
             _clear_simulation_state(sid)
+
+
+def test_web_runner_projection_preserves_existing_run_flags_at_zero_hours():
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C2A",
+        hours=0,
+        additives_kg={},
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+        run_metadata_overrides={
+            "started_at_utc": "2026-05-30T00:00:00Z",
+            "kernel_commit_sha": "web-run-flag-projection",
+        },
+    )
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    session = SimSession().start(run._session_config(), backend=backend)
+    flag = {
+        "kind": "run_truncation",
+        "code": "run_hour_budget_exhausted_mid_campaign",
+        "detail": {
+            "active_campaign": "C2A",
+            "hours_run_in_campaign": 1,
+            "campaign_cap_hours": 160.0,
+            "successors_not_reached": ["C6"],
+            "ruling": "d-473",
+        },
+    }
+    session._run_flags = [flag]
+
+    payload = web_events._full_runner_payload(
+        session,
+        projector=run,
+        status="ok",
+    )
+
+    assert session._config.hours == 0
+    assert payload["run_metadata"]["run_flags"] == [flag]
 
 
 class RaisingCleanedMeltLedger:

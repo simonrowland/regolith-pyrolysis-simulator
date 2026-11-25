@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import copy
 import hashlib
 import json
 from copy import deepcopy
@@ -10,6 +9,7 @@ from types import SimpleNamespace
 import pytest
 
 from simulator.accounting.ledger import AtomLedger, snapshot_atom_ledger
+from simulator.accounting.run_artifact import build_run_artifact
 from simulator.campaigns import (
     CampaignHoldTargetRefusal,
     CampaignPressureSetpointRefusal,
@@ -74,7 +74,12 @@ def test_hour_budget_mid_campaign_records_typed_run_truncation_flag():
         runtime_campaign_overrides={"C2A": {"max_hours": 3}},
     )
 
-    execution = RunExecutor().execute(run._session_config())
+    session = SimSession()
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    session.start(run._session_config(), backend=backend)
+    session.simulator.record.path = "A"
+    execution = RunExecutor().execute_session(session, hours=1)
 
     assert execution.status == "ok"
     assert execution.simulator.melt.campaign is CampaignPhase.C2A
@@ -90,19 +95,88 @@ def test_hour_budget_mid_campaign_records_typed_run_truncation_flag():
     assert detail["campaign_cap_hours"] == (
         execution.simulator.campaign_mgr._max_hold_hr(CampaignPhase.C2A)
     )
-    expected_sequence = copy.copy(
-        execution.simulator.campaign_mgr
-    ).auto_apply_sequence(
-        CampaignPhase.C2A,
-        copy.deepcopy(execution.simulator.record),
-    )
     assert detail["successors_not_reached"] == [
-        phase.name for phase in expected_sequence[1:]
+        "C3_K",
+        "C3_NA",
+        "C4",
+        "C2A",
+        "C6",
     ]
     assert detail["ruling"] == "d-473"
 
     run_record = run._build_output(execution)
     assert run_record["run_metadata"]["run_flags"] == [dict(flag)]
+    artifact = build_run_artifact(run_record, run_id="budget-truncated")
+    assert artifact["terminal"]["run_metadata"]["run_flags"] == [dict(flag)]
+
+
+def test_hour_budget_lookahead_records_route_conflict_without_failing_run():
+    run = _run(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C6",
+        hours=1,
+        additives_kg={},
+    )
+    session = SimSession()
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    session.start(run._session_config(), backend=backend)
+    sim = session.simulator
+    sim.record.branch = "two"
+    sim.campaign_mgr.campaigns["C7"]["enabled"] = True
+    sim.campaign_mgr.campaigns["C4"]["optional_Ca_harvest"]["enabled"] = True
+
+    execution = RunExecutor().execute_session(session, hours=1)
+
+    assert execution.status == "ok"
+    assert len(execution.run_flags) == 1
+    detail = execution.run_flags[0]["detail"]
+    assert detail["successors_not_reached"] == ["C7_CA_ALUMINOTHERMIC"]
+    assert detail["unresolved_successors"] == [
+        {
+            "campaign": "C7_CA_ALUMINOTHERMIC",
+            "kind": "campaign_route",
+            "code": "c4_ca_harvest_conflicts_with_c7",
+        }
+    ]
+
+
+def test_hour_budget_reports_c5_max_hours_override_as_active_cap():
+    run = _run(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C5",
+        hours=1,
+        additives_kg={},
+        runtime_campaign_overrides={"C5": {"max_hours": 3}},
+    )
+
+    execution = RunExecutor().execute(run._session_config())
+
+    assert execution.status == "ok"
+    flag = execution.run_flags[0]
+    assert flag["detail"]["active_campaign"] == "C5"
+    assert flag["detail"]["campaign_cap_hours"] == 3.0
+
+
+def test_hour_budget_does_not_flag_a_completed_terminal_campaign():
+    run = _run(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C3_K",
+        hours=1,
+        additives_kg={},
+        runtime_campaign_overrides={"C3": {"staged_duration_h": 1}},
+    )
+    session = SimSession()
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    session.start(run._session_config(), backend=backend)
+    session.simulator.record.path = "A_staged"
+
+    execution = RunExecutor().execute_session(session, hours=1)
+
+    assert execution.status == "ok"
+    assert session.simulator.melt.campaign is CampaignPhase.COMPLETE
+    assert execution.run_flags == ()
 
 
 def test_short_run_payload_and_ledger_match_rollback_baseline_golden():
@@ -115,6 +189,17 @@ def test_short_run_payload_and_ledger_match_rollback_baseline_golden():
     payload = deterministic_gate_payload(run._build_output(execution))
     payload_bytes = (
         json.dumps(payload, sort_keys=True, indent=2, allow_nan=False) + "\n"
+    ).encode("utf-8")
+    payload_without_run_flags = deepcopy(payload)
+    payload_without_run_flags["run_metadata"].pop("run_flags")
+    payload_without_run_flags_bytes = (
+        json.dumps(
+            payload_without_run_flags,
+            sort_keys=True,
+            indent=2,
+            allow_nan=False,
+        )
+        + "\n"
     ).encode("utf-8")
 
     # Product-accounting now serializes source-account metal attribution and
@@ -151,7 +236,11 @@ def test_short_run_payload_and_ledger_match_rollback_baseline_golden():
     # Studio-3 actual for this Mars C2A 2 h payload (pins2 log, tree
     # 9666fc129 plus the de32c69ca runner regen). Mars runs diverge between
     # the laptop and studio-3, so this digest is not a laptop re-run.
-    # constack merge: repin on gate box
+    # The sole payload delta from green is run_metadata.run_flags; dropping
+    # that key restores the green payload digest, while the ledger stays pinned.
+    assert hashlib.sha256(payload_without_run_flags_bytes).hexdigest() == (
+        "718ffcf58809ccc9d85d8f125a7e418b19e711a61d8b6f22ec9279b251d4c751"
+    )
     assert hashlib.sha256(payload_bytes).hexdigest() == (
         "718ffcf58809ccc9d85d8f125a7e418b19e711a61d8b6f22ec9279b251d4c751"
     )
@@ -472,6 +561,12 @@ def test_run_executor_advances_after_c4_acquisition_time_cap_without_c6_mislabel
     assert cap_flag["kind"] == "campaign_stop"
     assert cap_flag["detail"]["successor"] == "C2A"
     assert cap_flag["detail"]["ruling"] == "d-471"
+    assert len(execution.run_flags) == 1
+    truncation_detail = execution.run_flags[0]["detail"]
+    assert truncation_detail["active_campaign"] == "C2A"
+    assert truncation_detail["hours_run_in_campaign"] == 0
+    assert truncation_detail["at_campaign_boundary"] is True
+    assert truncation_detail["just_completed_campaign"] == "C4"
     na_flag = next(
         flag for flag in c4_stop["flags"]
         if flag["code"] == "c4_time_capped_without_na_endpoint"
