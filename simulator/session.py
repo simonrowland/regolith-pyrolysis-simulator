@@ -284,7 +284,7 @@ class SimSession:
         self._paused = False
         self._step_results: list[StepResult] = []
         self._operator_decisions: list[dict[str, Any]] = []
-        self._run_flags: list[dict[str, Any]] = []
+        self._last_drive_stop: str | None = None
         self._result_document: Mapping[str, Any] | None = None
         self._poisoned_error: RuntimeError | None = None
 
@@ -516,7 +516,7 @@ class SimSession:
         self._paused = False
         self._step_results = []
         self._operator_decisions = []
-        self._run_flags = []
+        self._last_drive_stop = None
         self._result_document = None
         self._poisoned_error = None
 
@@ -804,10 +804,27 @@ class SimSession:
 
     def result_document(self) -> Mapping[str, Any]:
         if self._result_document is not None:
-            return self._result_document
-        if self._config and self._config.result_document_factory is not None:
-            return self._config.result_document_factory(self)
-        raise RuntimeError("no result document has been recorded")
+            document = self._result_document
+        elif self._config and self._config.result_document_factory is not None:
+            document = self._config.result_document_factory(self)
+        else:
+            raise RuntimeError("no result document has been recorded")
+        if not isinstance(document, Mapping):
+            return document
+        payload = dict(document)
+        run_metadata = payload.get("run_metadata")
+        if isinstance(run_metadata, Mapping):
+            run_metadata = dict(run_metadata)
+            run_flags = _run_flags_for_export(
+                self,
+                run_metadata.get("run_flags", ()),
+            )
+            if run_flags:
+                run_metadata["run_flags"] = list(run_flags)
+            else:
+                run_metadata.pop("run_flags", None)
+            payload["run_metadata"] = run_metadata
+        return payload
 
     def per_hour_summaries(self) -> list[dict[str, Any]]:
         return [result.per_hour_summary for result in self._step_results]
@@ -857,16 +874,30 @@ class SimSession:
         return build_per_hour_summary(sim, snapshot)
 
 
-def _run_flags_for_export(session: SimSession) -> tuple[dict[str, Any], ...]:
-    run_flags = tuple(getattr(session, "_run_flags", ()) or ())
+def _run_flags_for_export(
+    session: Any,
+    recorded_flags: Iterable[Mapping[str, Any]] | None = None,
+) -> tuple[dict[str, Any], ...]:
+    """Preserve offline records and derive the live budget flag on read."""
+
+    run_flags = tuple(recorded_flags or ())
     sim = getattr(session, "_sim", None)
-    if sim is None or not sim.is_complete():
+    if sim is None:
         return run_flags
-    return tuple(
+    run_flags = tuple(
         flag
         for flag in run_flags
         if flag.get("code") != _RUN_HOUR_BUDGET_FLAG_CODE
     )
+    if (
+        sim.is_complete()
+        or getattr(session, "_last_drive_stop", None) != "hour_budget"
+    ):
+        return run_flags
+    run_flag = _hour_budget_exhausted_flag(session)
+    if run_flag is None:
+        return run_flags
+    return (*run_flags, run_flag)
 
 
 def drive_auto_apply(
@@ -898,32 +929,15 @@ def _drive_session_with_budget_intent(
     finite_budget: bool,
     **kwargs: Any,
 ) -> Iterable[StepResult]:
-    """Pass execution budget intent through the existing public driver."""
+    """Pass finite-budget intent into the lazy driver without session state."""
 
-    missing = object()
-    previous = getattr(session, "_finite_budget_intent", missing)
-    session._finite_budget_intent = finite_budget
-
-    def restore_budget_intent() -> None:
-        if previous is missing:
-            if hasattr(session, "_finite_budget_intent"):
-                delattr(session, "_finite_budget_intent")
-        else:
-            session._finite_budget_intent = previous
-
-    try:
-        steps = driver(session, hours, policy, **kwargs)
-    except BaseException:
-        restore_budget_intent()
-        raise
-
-    def consume_steps() -> Iterable[StepResult]:
-        try:
-            yield from steps
-        finally:
-            restore_budget_intent()
-
-    return consume_steps()
+    return driver(
+        session,
+        hours,
+        policy,
+        finite_budget=finite_budget,
+        **kwargs,
+    )
 
 
 def _refuse_phase_without_an_end(session: SimSession) -> None:
@@ -946,6 +960,7 @@ def drive_session(
     operator_decisions: list[dict[str, Any]] | None = None,
     stop_at_stage0_exit: bool = False,
     until_campaign_complete: bool = False,
+    finite_budget: bool | None = None,
 ) -> Iterable[StepResult]:
     """Drive a session under a policy outside ``advance()``.
 
@@ -958,62 +973,65 @@ def drive_session(
     if not is_declared_real_scalar(hours, allow_numeric_str=True):
         raise TypeError(f"hours must be numeric, not {type(hours).__name__}")
     config = getattr(session, "_config", None)
-    budget_intent = getattr(session, "_finite_budget_intent", None)
-    if budget_intent is None:
+    if finite_budget is None:
         finite_budget = int(getattr(config, "hours", 0) or 0) > 0
-    else:
-        finite_budget = bool(budget_intent)
-        delattr(session, "_finite_budget_intent")
     step_index = 0
     advanced = False
-    while True:
-        if not until_campaign_complete and step_index >= int(hours):
-            if step_index > 0 and finite_budget:
-                run_flag = _hour_budget_exhausted_flag(session)
-                run_flags = getattr(session, "_run_flags", None)
-                if run_flag is not None and run_flags is not None:
-                    run_flags.append(run_flag)
-            return
-        step_index += 1
-        if stop_at_stage0_exit and _at_stage0_exit(session):
-            return
-        if session.is_complete():
-            return
-        if until_campaign_complete:
-            _refuse_phase_without_an_end(session)
-        decision = session.pending_decision()
-        if stop_at_stage0_exit and _stage0_exit_decision(session):
-            return
-        if decision is not None and policy is DecisionPolicy.OPERATOR:
-            return
-        if decision is not None and policy is DecisionPolicy.AUTO_APPLY:
-            choice = decision.recommendation or (
-                decision.options[0] if decision.options else ""
-            )
-            event = _operator_decision_event(session.simulator, decision, choice)
-            session._record_operator_decision(event)
-            if operator_decisions is not None:
-                operator_decisions.append(event)
-            session.decide(choice)
-            if stop_at_stage0_exit and _at_stage0_exit(session):
-                return
+
+    def record_stop(reason: str) -> None:
+        if advanced and hasattr(session, "_last_drive_stop"):
+            session._last_drive_stop = reason
+
+    try:
+        while True:
             if session.is_complete():
+                record_stop("campaign_complete")
                 return
-        elif decision is not None:
-            raise ValueError(f"unsupported decision policy {policy!r}")
-        result = session.advance()
-        if not advanced:
-            run_flags = getattr(session, "_run_flags", None)
-            if run_flags is not None:
-                run_flags[:] = [
-                    flag
-                    for flag in run_flags
-                    if flag.get("code") != _RUN_HOUR_BUDGET_FLAG_CODE
-                ]
+            if not until_campaign_complete and step_index >= int(hours):
+                if step_index > 0 and finite_budget:
+                    record_stop("hour_budget")
+                else:
+                    record_stop("controller")
+                return
+            step_index += 1
+            if stop_at_stage0_exit and _at_stage0_exit(session):
+                record_stop("controller")
+                return
+            if until_campaign_complete:
+                _refuse_phase_without_an_end(session)
+            decision = session.pending_decision()
+            if stop_at_stage0_exit and _stage0_exit_decision(session):
+                record_stop("controller")
+                return
+            if decision is not None and policy is DecisionPolicy.OPERATOR:
+                record_stop("controller")
+                return
+            if decision is not None and policy is DecisionPolicy.AUTO_APPLY:
+                choice = decision.recommendation or (
+                    decision.options[0] if decision.options else ""
+                )
+                event = _operator_decision_event(session.simulator, decision, choice)
+                session._record_operator_decision(event)
+                if operator_decisions is not None:
+                    operator_decisions.append(event)
+                session.decide(choice)
+                if stop_at_stage0_exit and _at_stage0_exit(session):
+                    record_stop("controller")
+                    return
+                if session.is_complete():
+                    record_stop("campaign_complete")
+                    return
+            elif decision is not None:
+                raise ValueError(f"unsupported decision policy {policy!r}")
+            result = session.advance()
             advanced = True
-        yield result
-        if stop_at_stage0_exit and _at_stage0_exit(session):
-            return
+            yield result
+            if stop_at_stage0_exit and _at_stage0_exit(session):
+                record_stop("controller")
+                return
+    except Exception:
+        record_stop("execution_failure")
+        raise
 
 
 def _at_stage0_exit(session: SimSession) -> bool:

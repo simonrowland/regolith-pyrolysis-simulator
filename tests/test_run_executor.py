@@ -605,10 +605,37 @@ def test_budget_flag_uses_live_campaign_adjustment():
 
 
 def test_unstarted_finite_driver_iterator_does_not_write_stop_state():
-    session = _started_internal_session(_run(campaign="C2A", hours=1))
+    class LoopSession:
+        _last_drive_stop = None
+        _config = SimpleNamespace(hours=1)
+        simulator = SimpleNamespace(
+            melt=SimpleNamespace(campaign=CampaignPhase.C0)
+        )
+
+        def __init__(self):
+            self.advanced = 0
+
+        def is_complete(self):
+            return False
+
+        def pending_decision(self):
+            return None
+
+        def advance(self):
+            self.advanced += 1
+            return SimpleNamespace()
+
+    session = LoopSession()
 
     steps = drive_auto_apply(session, 1)
 
+    assert session._last_drive_stop is None
+    steps.close()
+    assert session._last_drive_stop is None
+
+    steps = drive_auto_apply(session, 1)
+    next(steps)
+    assert session.advanced == 1
     assert session._last_drive_stop is None
     steps.close()
     assert session._last_drive_stop is None

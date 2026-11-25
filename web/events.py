@@ -77,7 +77,6 @@ from simulator.session import (
     DecisionPolicy,
     SimSession,
     SimSessionConfig,
-    _run_flags_for_export,
     drive_session,
     normalize_mre_policy,
 )
@@ -2835,7 +2834,7 @@ def _full_runner_payload(
         if isinstance(run_metadata, dict):
             _attach_execution_diagnostics(
                 run_metadata,
-                run_flags=_run_flags_for_export(session),
+                session=session,
             )
         recipe_snapshot = _recipe_snapshot_from_projector(projector)
         if recipe_snapshot is not None:
@@ -2909,10 +2908,15 @@ def _available_runner_payload(
         metadata['refusal_diagnostic'] = copy.deepcopy(
             dict(refusal_diagnostic)
         )
-    run_flags = _run_flags_for_export(session)
+    run_flags = (
+        metadata_overrides.get('run_flags')
+        if isinstance(metadata_overrides, Mapping)
+        else None
+    )
     campaign_stops = _campaign_stops_for_trace(session)
     _attach_execution_diagnostics(
         metadata,
+        session=session,
         run_flags=run_flags,
         campaign_stops=campaign_stops,
     )

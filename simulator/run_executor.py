@@ -129,7 +129,10 @@ class RunExecution:
     # One record per completed campaign: campaign, stop_reason, duration_h,
     # detail, and typed flags when the endpoint recorded them.
     campaign_stops: tuple[Mapping[str, Any], ...] = ()
-    run_flags: tuple[Mapping[str, Any], ...] = ()
+
+    @property
+    def run_flags(self) -> tuple[Mapping[str, Any], ...]:
+        return _run_flags_for_export(self.session)
 
 
 _CAMPAIGN_STOP_REASONS = frozenset({
@@ -645,7 +648,6 @@ class RunExecutor:
                     ),
                 ),
                 campaigns_elapsed_start=campaigns_elapsed_start,
-                run_flags=_run_flags_for_export(session),
                 campaign_stops=tuple(campaign_stops),
             )
         except Exception as envelope_exc:  # noqa: BLE001 -- reporting must survive
@@ -734,7 +736,6 @@ class RunExecutor:
                     ),
                 ),
                 campaigns_elapsed_start=campaigns_elapsed_start,
-                run_flags=_run_flags_for_export(session),
                 campaign_stops=tuple(campaign_stops),
             )
 

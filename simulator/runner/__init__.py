@@ -5880,18 +5880,16 @@ def _attach_execution_diagnostics(
     run_metadata: dict[str, Any],
     execution: RunExecution | None = None,
     *,
+    session: SimSession | None = None,
     run_flags: Sequence[Mapping[str, Any]] | None = None,
     campaign_stops: Sequence[Mapping[str, Any]] | None = None,
 ) -> None:
     if execution is not None:
-        session = getattr(execution, "session", None)
-        run_flags = (
-            _run_flags_for_export(session)
-            if isinstance(session, SimSession)
-            else getattr(execution, "run_flags", ())
-        )
+        session = getattr(execution, "session", session)
         campaign_stops = getattr(execution, "campaign_stops", ())
-    run_flags = list(run_flags or ())
+    if run_flags is None:
+        run_flags = run_metadata.get("run_flags", ())
+    run_flags = list(_run_flags_for_export(session, run_flags))
     if run_flags:
         run_metadata["run_flags"] = _json_safe(run_flags)
     else:
