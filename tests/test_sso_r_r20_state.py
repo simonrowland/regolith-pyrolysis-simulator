@@ -2628,11 +2628,18 @@ def test_exchange_target_cannot_exceed_controlled_total_pressure() -> None:
 @pytest.mark.parametrize(
     ("buffer_o2_mol", "expected_unbacked_o2_mol", "expected_fO2_log"),
     [
-        (0.0, 0.0015952259282159419, -1.0),
+        # Both remainders are the production resolver on the capped tree.
+        # 636308c53e drives the exchange from the overhead ledger partial,
+        # not from the 1.5 mbar CONTROLLED_O2 setpoint. This plant drains
+        # the headspace first, so that partial is 0 and the logarithm
+        # uses the numerical floor. The buffer clamp is unchanged, and
+        # the effervescence cap does not bind below log10(0.0015).
+        (0.0, 0.006996955022607205, -1.0),
         # 1e-6 mol is a reducing exchange. Lunar mare loads no Fe2O3, so
-        # the tangent holds fO2. The old receipt (-1.0000000153832351) was
-        # the uncapped Euler step.
-        (1.0e-6, 0.001594225928215942, -1.0),
+        # the tangent holds fO2. The old fO2 receipt
+        # (-1.0000000153832351) was the uncapped Euler step. The mol
+        # remainder is the same ledger-drive step minus this buffer.
+        (1.0e-6, 0.006995955022607205, -1.0),
     ],
 )
 def test_melt_to_headspace_exchange_reports_unbacked_buffer_oxygen(
@@ -3509,8 +3516,14 @@ def test_pn2_native_fe_partition_e2e_drains_tap_and_reports_stage3_fe_wt() -> No
     # 2026-09-22 03616bb20 corrected Chapman-Enskog's pressure prefactor
     # from the bar form used with P[atm] to 0.0018583*sqrt(2). The resulting
     # finite-series-resistance escape fraction moved with D_AB.
+    # The partition body is unchanged after that: fraction = vapor/pool,
+    # and this hour is capacity-limited, so the fraction moves only with
+    # the pool. 636308c53e published the wustite floor before the split
+    # and omitted the key. 56f42a2f45 books the extent from the unfloored
+    # ledger fO2, which changes the precipitated pool. Receipt from the
+    # production resolver on that tree.
     assert partition["native_fe_vapor_escape_fraction_of_pool"] == pytest.approx(
-        0.0019750990648993625,
+        0.002396352847836128,
         rel=0.0,
         abs=1.0e-15,
     )
