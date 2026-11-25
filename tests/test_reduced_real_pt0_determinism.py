@@ -48,7 +48,10 @@ from simulator.melt_backend.melt_envelope import (
     melt_extrapolation_diagnostic,
 )
 from simulator.optimize.determinism import deterministic_result_view
-from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+from simulator.physical_constants import (
+    CELSIUS_TO_KELVIN_OFFSET,
+    MBAR_PER_BAR,
+)
 from simulator.reduced_real_determinism import (
     ControlQuantization,
     PT0CacheMiss,
@@ -7579,7 +7582,7 @@ def _capture_recursive_equilibrium_row(
     if hasattr(sim.melt, "melt_fO2_log"):
         sim.melt.melt_fO2_log = -9.0
     _fixture_result.temperature_C = float(sim.melt.temperature_C)
-    _fixture_result.pressure_bar = float(sim.melt.p_total_mbar) / 1000.0
+    _fixture_result.pressure_bar = float(sim.melt.p_total_mbar) / MBAR_PER_BAR
     _fixture_result.fO2_log = sim._current_melt_redox_fO2_log()
     with pytest.MonkeyPatch.context() as monkeypatch:
         _configure_recursive_gate_sim(sim, monkeypatch)
@@ -7957,6 +7960,8 @@ def _assert_authorityless_pt1_reads_miss_and_replace(
 def _exercise_equilibrium_replay_consumers(
     store: PT0DeterminismStore,
     sim: Any | None = None,
+    *,
+    allow_typed_batch_failure: bool = False,
 ) -> Any:
     if sim is None:
         sim, _ = _pt0_equilibrium_capture_context(store)
@@ -7967,13 +7972,19 @@ def _exercise_equilibrium_replay_consumers(
         "cached_physics_bucket",
         "cached_interpolated",
     }
-    _exercise_equilibrium_consumers_from_result(sim, result)
+    _exercise_equilibrium_consumers_from_result(
+        sim,
+        result,
+        allow_typed_batch_failure=allow_typed_batch_failure,
+    )
     return sim
 
 
 def _exercise_equilibrium_consumers_from_result(
     sim: Any,
     result: EquilibriumResult,
+    *,
+    allow_typed_batch_failure: bool = False,
 ) -> None:
     resolved = sim._resolve_evaporation_batch_flux_state(
         result,
@@ -7982,6 +7993,8 @@ def _exercise_equilibrium_consumers_from_result(
         ),
     )
     assert isinstance(resolved, tuple) and len(resolved) == 6
+    if not allow_typed_batch_failure:
+        assert resolved[3].get("status") != "unavailable"
     assert isinstance(
         getattr(sim, "_langmuir_flux_closure_context", None), Mapping
     )
@@ -8041,12 +8054,17 @@ def _exercise_cache_payload_replay(
     artifact: str,
     *,
     sim: Any | None = None,
+    allow_typed_batch_failure: bool = False,
 ) -> Any:
     if artifact == "equilibrium_post_record":
         if sim is not None:
             sim.configure_pt0_determinism_store(store)
             sim._freeze_gate_liquid_fraction_cache = None
-        return _exercise_equilibrium_replay_consumers(store, sim)
+        return _exercise_equilibrium_replay_consumers(
+            store,
+            sim,
+            allow_typed_batch_failure=allow_typed_batch_failure,
+        )
     if sim is None:
         sim = _build_pt0_sim(store)
         with pytest.MonkeyPatch.context() as monkeypatch:
@@ -8058,6 +8076,63 @@ def _exercise_cache_payload_replay(
     assert store.last_cache_state == "cached_exact"
     _exercise_gate_replay_consumer(sim, curve)
     return sim
+
+
+_SIO_REPORT_DIAGNOSTIC_FIELDS = (
+    "high_t_melt_activity",
+    "vaporock_full_speciation_Pa",
+)
+
+
+def _exercise_sio_yield_report_diagnostic(sim: Any) -> None:
+    import simulator.runner as runner_module
+
+    session = SimpleNamespace(simulator=sim)
+    completed_result = {
+        "status": "complete",
+        "final_state": {},
+        "per_hour_summary": [{"mass_balance_pct": 0.0}],
+    }
+    with pytest.MonkeyPatch.context() as monkeypatch:
+        monkeypatch.setattr(
+            runner_module.PyrolysisRun,
+            "_start_session",
+            lambda _run: session,
+        )
+        monkeypatch.setattr(
+            runner_module.PyrolysisRun,
+            "_run_session",
+            lambda _run, _session: completed_result,
+        )
+        monkeypatch.setattr(
+            runner_module,
+            "_prepare_sio_campaign_start",
+            lambda *_args, **_kwargs: None,
+        )
+        monkeypatch.setattr(
+            runner_module,
+            "_apply_sio_wall_sweep_controls",
+            lambda *_args, **_kwargs: None,
+        )
+        report, diagnostics = runner_module.build_sio_yield_report(
+            feedstock_id="lunar_mare_low_ti",
+            hours=0,
+            include_diagnostics=True,
+            allow_unmeasured_alpha_fallback=True,
+        )
+
+    assert isinstance(report, Mapping)
+    assert isinstance(diagnostics, Mapping)
+    for field_name in _SIO_REPORT_DIAGNOSTIC_FIELDS:
+        assert isinstance(diagnostics.get(field_name, {}), Mapping)
+
+
+def _is_sio_report_diagnostic_path(path: tuple[Any, ...]) -> bool:
+    return (
+        len(path) >= 2
+        and path[0] == "last_vapor_pressure_diagnostic"
+        and path[1] in _SIO_REPORT_DIAGNOSTIC_FIELDS
+    )
 
 
 def _recursive_capture_for_kind(
@@ -8099,6 +8174,9 @@ def _recursive_capture_for_kind(
             and isinstance(value, Mapping)
             for path, value in _recursive_payload_paths(baseline)
         )
+        replay_diagnostic = baseline["last_vapor_pressure_diagnostic"]
+        for field_name in _SIO_REPORT_DIAGNOSTIC_FIELDS:
+            assert isinstance(replay_diagnostic.get(field_name), Mapping)
     return capture, artifact, key, baseline, db_path, sim
 
 
@@ -8146,6 +8224,8 @@ def test_real_cache_payload_recursive_mutations_miss_or_replay_identically(
         )
     replay_sim.configure_pt0_determinism_store(reader)
     _exercise_cache_payload_replay(reader, artifact, sim=replay_sim)
+    if artifact == "equilibrium_post_record":
+        _exercise_sio_yield_report_diagnostic(replay_sim)
     if payload_kind == "equilibrium" and persistent:
         _assert_authorityless_pt1_reads_miss_and_replace(
             capture,
@@ -8192,6 +8272,8 @@ def test_real_cache_payload_recursive_mutations_miss_or_replay_identically(
                 ("none", None),
             )
         )
+        if len(path) == 2 and _is_sio_report_diagnostic_path(path):
+            mutations.append(("scalar-map", 7))
         for mutation, replacement in mutations:
             cases_expected += 1
             path_name = f"{source_name}: {_recursive_path_label(path)}"
@@ -8290,11 +8372,16 @@ def test_real_cache_payload_recursive_mutations_miss_or_replay_identically(
             else:
                 outcomes[case_name] = "admitted"
                 reset_reader_for_next_row()
+                report_diagnostic_mutation = (
+                    artifact == "equilibrium_post_record"
+                    and _is_sio_report_diagnostic_path(path)
+                )
                 try:
                     replay_sim = _exercise_cache_payload_replay(
                         reader,
                         artifact,
                         sim=replay_sim,
+                        allow_typed_batch_failure=True,
                     )
                 except EvaporationFluxRefusal:
                     outcomes[case_name] = "typed-outcome"
@@ -8308,6 +8395,14 @@ def test_real_cache_payload_recursive_mutations_miss_or_replay_identically(
                             f"{target_hits} {artifact} hits across "
                             f"{reader.hits} total cache hits"
                         )
+                    if report_diagnostic_mutation:
+                        try:
+                            _exercise_sio_yield_report_diagnostic(replay_sim)
+                        except Exception as exc:
+                            failures.append(
+                                f"{path_name} {mutation}: SiO report consumer "
+                                f"raised {type(exc).__name__}: {exc}"
+                            )
                     continue
                 except Exception as exc:
                     failures.append(
@@ -8325,6 +8420,14 @@ def test_real_cache_payload_recursive_mutations_miss_or_replay_identically(
                         f"{target_hits} {artifact} hits across "
                         f"{reader.hits} total cache hits"
                     )
+                if report_diagnostic_mutation:
+                    try:
+                        _exercise_sio_yield_report_diagnostic(replay_sim)
+                    except Exception as exc:
+                        failures.append(
+                            f"{path_name} {mutation}: SiO report consumer "
+                            f"raised {type(exc).__name__}: {exc}"
+                        )
             if reader.hits == 0 and (
                 _accepted_hit_disclosures_for_test(reader) != before_disclosures
             ):
@@ -8349,6 +8452,14 @@ def test_real_cache_payload_recursive_mutations_miss_or_replay_identically(
         outcome in {"admitted", "typed-outcome"}
         for outcome in outcomes.values()
     )
+    if artifact == "equilibrium_post_record":
+        for field_name in _SIO_REPORT_DIAGNOSTIC_FIELDS:
+            root_path = (
+                "encoded-row: root.last_vapor_pressure_diagnostic."
+                f"{field_name}"
+            )
+            for mutation in ("wrong-scalar", "none", "scalar-map"):
+                assert outcomes[f"{root_path} {mutation}"] == "miss"
 
 
 class _MemoryInterpolationCandidates:
@@ -8392,6 +8503,7 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     import simulator.reduced_real_cache_interpolation as interpolation
+    from simulator.evaporation import EvaporationFluxRefusal
 
     db_path = tmp_path / "recursive-interpolation.sqlite"
     capture = PT0DeterminismStore(
@@ -8463,6 +8575,9 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
             f"weight_info={weight_info}"
         )
     baseline = copy.deepcopy(attempt["payload"])
+    baseline_diagnostic = baseline["last_vapor_pressure_diagnostic"]
+    for field_name in _SIO_REPORT_DIAGNOSTIC_FIELDS:
+        assert isinstance(baseline_diagnostic.get(field_name), Mapping)
 
     if not persistent:
         capture.persistent_store = _MemoryInterpolationCandidates(capture)
@@ -8508,6 +8623,7 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
         for keys in interpolation_admission_keys
     )
     _exercise_equilibrium_consumers_from_result(query_sim, baseline_result)
+    _exercise_sio_yield_report_diagnostic(query_sim)
 
     failures: list[str] = []
     cases_expected = 0
@@ -8523,6 +8639,8 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
                 ("none", None),
             )
         )
+        if len(path) == 2 and _is_sio_report_diagnostic_path(path):
+            mutations.append(("scalar-map", 7))
         for mutation, replacement in mutations:
             cases_expected += 1
             path_name = _recursive_path_label(path)
@@ -8595,6 +8713,8 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
                         query_sim,
                         result,
                     )
+                    if _is_sio_report_diagnostic_path(path):
+                        _exercise_sio_yield_report_diagnostic(query_sim)
                 except Exception as exc:
                     failures.append(
                         f"{path_name} {mutation}: restored interpolation replay "
@@ -8623,7 +8743,21 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
                     _exercise_equilibrium_consumers_from_result(
                         query_sim,
                         result,
+                        allow_typed_batch_failure=True,
                     )
+                    if _is_sio_report_diagnostic_path(path):
+                        _exercise_sio_yield_report_diagnostic(query_sim)
+                except EvaporationFluxRefusal:
+                    outcomes[case_name] = "typed-outcome"
+                    if _is_sio_report_diagnostic_path(path):
+                        try:
+                            _exercise_sio_yield_report_diagnostic(query_sim)
+                        except Exception as exc:
+                            failures.append(
+                                f"{path_name} {mutation}: SiO report consumer "
+                                f"raised {type(exc).__name__}: {exc}"
+                            )
+                    continue
                 except Exception as exc:
                     failures.append(
                         f"{path_name} {mutation}: interpolation consumer raised "
@@ -8632,7 +8766,10 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
                     continue
 
     assert len(outcomes) == cases_expected
-    assert all(outcome in {"miss", "admitted"} for outcome in outcomes.values()), (
+    assert all(
+        outcome in {"miss", "admitted", "typed-outcome"}
+        for outcome in outcomes.values()
+    ), (
         "interpolation mutation cases did not each take exactly one admission "
         "branch: "
         + "; ".join(
@@ -8641,4 +8778,8 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
     )
     assert "miss" in outcomes.values()
     assert "admitted" in outcomes.values()
+    for field_name in _SIO_REPORT_DIAGNOSTIC_FIELDS:
+        root_path = f"root.last_vapor_pressure_diagnostic.{field_name}"
+        for mutation in ("wrong-scalar", "none", "scalar-map"):
+            assert outcomes[f"{root_path} {mutation}"] == "miss"
     assert not failures, "\n".join(failures)

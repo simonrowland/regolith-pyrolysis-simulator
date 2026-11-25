@@ -621,6 +621,14 @@ def _decode_payload_for_admission(
                 return False
 
         for diagnostic in provenance_diagnostics:
+            for mapping_field in (
+                "high_t_melt_activity",
+                "vaporock_full_speciation_Pa",
+            ):
+                if mapping_field in diagnostic and not isinstance(
+                    diagnostic[mapping_field], Mapping
+                ):
+                    return None
             backend_pressures = diagnostic.get("backend_vapor_pressures_Pa")
             if "backend_vapor_pressures_Pa" in diagnostic and (
                 not isinstance(backend_pressures, Mapping)
