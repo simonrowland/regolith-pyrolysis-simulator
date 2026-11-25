@@ -669,11 +669,15 @@ def test_exchange_credit_does_not_clear_the_ferric_lock(
         source="test headspace O2 for an exchange credit after exhaustion",
         material_origin="feedstock",
     )
-    drive_pO2 = sim._overhead_exchange_drive_pO2_bar()
-    log_drive_pO2 = max(drive_pO2, sim._oxygen_numerical_floor_bar())
-    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = (
-        math.log10(log_drive_pO2) - 1.0
-    )
+    # Premise: the credit is a melt below the headspace target, and the
+    # target cannot exceed log10(P_total). One mol of O2 in the 1000 kg
+    # headspace (0.08538 m^3) at 1873.15 K is nRT/V = 1.824 bar, log10
+    # 0.261. The old plant, that log minus 1 dex, is -0.739. At 10 mbar
+    # the cap is log10(0.01) = -2, so -0.739 is above the target and the
+    # exchange is not a credit. Half a dex under the cap is -2.5, still
+    # below the capped target, and the 1 mol inventory is what moves.
+    cap_log = sim._melt_redox_fO2_upper_bound_log()
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = cap_log - 0.5
     sim.melt.oxygen_reservoir.reference_T_K = _TEMPERATURE_K
     sim._sync_oxygen_reservoir_mirror()
 
