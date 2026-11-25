@@ -16428,16 +16428,28 @@ def _residue_gas_film_notices(
     raw = film.get("notices")
     if not isinstance(raw, Mapping):
         return ()
-    return tuple(
-        Notice(
-            kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
-            affected_quantities=(reported_quantity,),
-            reason=str(reason),
-            origin=origin,
-            band=None if band is None else str(band),
+    notices = []
+    for reason, band in raw.items():
+        reason_token = str(reason)
+        convention_caveat = reason_token in {
+            "sherwood_shared_scalar_sc",
+            "frozen_bead_diameter_mass_loss_over_20_percent",
+        }
+        notices.append(
+            Notice(
+                kind=(
+                    NoticeKind.ENGINE_MODEL_CAVEAT
+                    if convention_caveat
+                    else NoticeKind.OUT_OF_CERTIFIED_BAND
+                ),
+                affected_quantities=(reported_quantity,),
+                reason=reason_token,
+                origin=origin,
+                band=None if band is None else str(band),
+                authority=Authority.CONVENTION if convention_caveat else None,
+            )
         )
-        for reason, band in raw.items()
-    )
+    return tuple(notices)
 
 
 def _liquid_rows_below_floor_notices(

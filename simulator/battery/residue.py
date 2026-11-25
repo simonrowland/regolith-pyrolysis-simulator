@@ -857,6 +857,11 @@ def _bead_sherwood_at_flow(
     diameter. Viscosity and the self-diffusion coefficient are the
     majority carrier's Chapman–Enskog values, so the small convection
     term does not invent a mixture viscosity. Returns Sh, Re and Sc.
+
+    Correct Sc = nu/D_AB = mu/(rho*D_AB), dimensionless because
+    (kg m^-1 s^-1)/(kg m^-3 * m^2 s^-1) = 1. TODO(t-1993): use
+    species D_AB and species-specific Sh; currently Sc uses carrier
+    self-diffusion and one Sh is shared across species.
     """
 
     from simulator.condensation import (
@@ -3956,6 +3961,7 @@ _SOSSI_GEOMETRIES = (
     "pt_loop_bead_disk_equivalent_volume",
 )
 _SOSSI_PRIMARY_GEOMETRY = _SOSSI_GEOMETRIES[0]
+# Frozen radius: sphere r ∝ m^(1/3), so k_film ∝ 1/r changes by ~⅓ of fractional mass loss (~1.7% for 5%).
 _SOSSI_DENSITY_SOURCE = (
     "labelled 2700 kg/m3 fallback for the Sossi bead geometry sensitivity; "
     "density is not printed by Sossi"
@@ -4082,6 +4088,14 @@ def _sossi_gas_film(
             free_stream_diameter_m=_SOSSI_FREE_STREAM_DIAMETER_M,
             mole_fractions=fraction_map,
         )
+    notices = (("bead_diameter_not_printed", "stated_default"), *flow_notices)
+    if flow_sccm is not None and sherwood > 2.0:
+        notices += (
+            (
+                "sherwood_shared_scalar_sc",
+                "Sc from carrier self-diffusion, Sh shared across species, until t-1993",
+            ),
+        )
     return ResidueGasFilm(
         overhead_pressure_Pa=overhead_pressure_Pa,
         bead_diameter_m=diameter_m,
@@ -4089,7 +4103,7 @@ def _sossi_gas_film(
         carrier_gas=majority,
         carrier_mole_fractions=fractions,
         molecular_diameter_m=_mixture_collision_diameter_m(fraction_map),
-        notices=(("bead_diameter_not_printed", "stated_default"), *flow_notices),
+        notices=notices,
         flow_sccm=flow_sccm,
         free_stream_diameter_m=_SOSSI_FREE_STREAM_DIAMETER_M,
         reynolds=reynolds,
@@ -4877,6 +4891,19 @@ def _predict_sossi_residue_cohort(
         }
         primary_inventory = geometry_inventory_mol[_SOSSI_PRIMARY_GEOMETRY]
         primary_buffer_exchange = geometry_buffer_exchange[_SOSSI_PRIMARY_GEOMETRY]
+        primary_mass_kg, _ = _inventory_bulk_and_element_masses_kg(
+            primary_inventory, primary_buffer_exchange, ()
+        )
+        integrated_mass_loss_fraction = 1.0 - primary_mass_kg / initial_melt_mass_kg
+        gas_film_record = gas_film.as_record()
+        gas_film_notices = dict(gas_film_record["notices"])
+        if integrated_mass_loss_fraction > 0.2:
+            gas_film_notices["frozen_bead_diameter_mass_loss_over_20_percent"] = (
+                f"integrated_mass_loss_fraction={integrated_mass_loss_fraction:.6g}; "
+                "frozen-radius coefficient error exceeds about 7%; "
+                "radius should be updated per step"
+            )
+        gas_film_record["notices"] = gas_film_notices
         printed_composition = sample.get("printed_composition", {})
         prediction_rows.append(
             _SossiResiduePrediction(
@@ -4896,6 +4923,7 @@ def _predict_sossi_residue_cohort(
                     "buffered_fO2_log": buffered_logp,
                     "buffered_boundary": "printed log10 fO2; reservoir oxygen exchange included",
                     "buffer_oxygen_exchange_mol_by_geometry": geometry_buffer_exchange,
+                    "integrated_mass_loss_fraction": integrated_mass_loss_fraction,
                     "host_composition_wt_pct": dict(
                         printed_composition.get("state", {}).get("value", {})
                     ),
@@ -4923,7 +4951,7 @@ def _predict_sossi_residue_cohort(
                     },
                     "density_kg_m3": _HASHIMOTO_DENSITY_KG_M3,
                     "density_source": _SOSSI_DENSITY_SOURCE,
-                    "gas_film": gas_film.as_record(),
+                    "gas_film": gas_film_record,
                     "alpha_arm": "alpha_runtime_catalog",
                     "alpha_by_channel": [
                         {
@@ -4959,7 +4987,7 @@ def _predict_sossi_residue_cohort(
                     "assumption_flags": {
                         "pt_wire_loop_bead_geometry_assumed": True,
                         "density_fallback_2700_kg_m3": True,
-                        **{reason: True for reason, _band in gas_film.notices},
+                        **{reason: True for reason in gas_film_notices},
                     },
                     **_pin_provenance(handoff_bucket),
                 },

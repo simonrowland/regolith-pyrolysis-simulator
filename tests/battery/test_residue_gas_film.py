@@ -123,9 +123,20 @@ def test_outlier_film_uses_bead_diameter_and_printed_flow() -> None:
     assert film.carrier_gas == "CO"
     assert film.overhead_pressure_Pa == 101325.0
     assert ("bead_diameter_not_printed", "stated_default") in film.notices
+    assert dict(film.notices)["sherwood_shared_scalar_sc"] == (
+        "Sc from carrier self-diffusion, Sh shared across species, until t-1993"
+    )
     assert "bc_open_furnace_langmuir_limit_diagnostic" not in {
         reason for reason, _band in film.notices
     }
+    stagnant_film = residue._sossi_gas_film(
+        "sossi-2019-run-2m-15-07-16c",
+        temperature_K=1823.15,
+        overhead_pressure_Pa=101325.0,
+        sample_mass_kg=25.0e-6,
+    )
+    assert stagnant_film.sherwood == 2.0
+    assert "sherwood_shared_scalar_sc" not in dict(stagnant_film.notices)
     _emit(
         "SOSSI_FILM_SHAPE "
         f"Sh={film.sherwood:.6g} "

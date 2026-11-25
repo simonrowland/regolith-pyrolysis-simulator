@@ -163,6 +163,35 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
     assert mno_extension["authority_level"] == expected_mno_activity.evidence_tier
     assert mno_extension["certified_band_K"] is None
     assert mno_extension["activity_provenance"] == expected_mno_activity.provenance()
+    assert prediction.provenance["integrated_mass_loss_fraction"] == 0.0
+    assert "frozen_bead_diameter_mass_loss_over_20_percent" not in (
+        prediction.provenance["gas_film"]["notices"]
+    )
+
+    def lose_three_percent_per_step(inventory, *_args, **_kwargs):
+        return SimpleNamespace(
+            residue_mol={oxide: amount * 0.97 for oxide, amount in inventory.items()},
+            buffer_oxygen_exchange_mol=0.0,
+        )
+
+    monkeypatch.setattr(residue, "_HASHIMOTO_N_CAP", 8)
+    monkeypatch.setattr(
+        residue, "integrate_residue_inventory", lose_three_percent_per_step
+    )
+    large_loss = residue._predict_sossi_residue_cohort(
+        [experiment],
+        catalog,
+        starting_trace_ppm_by_experiment={experiment_id: starting_trace},
+        buffered_fO2_log_by_experiment={experiment_id: -10.0},
+        engine="openimcc",
+    )[0]
+    assert large_loss.provenance["integrated_mass_loss_fraction"] > 0.2
+    assert "frozen_bead_diameter_mass_loss_over_20_percent" in (
+        large_loss.provenance["gas_film"]["notices"]
+    )
+    assert large_loss.provenance["assumption_flags"][
+        "frozen_bead_diameter_mass_loss_over_20_percent"
+    ] is True
 
 
 # engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
@@ -404,6 +433,7 @@ def _assert_sossi_worker_start_failure_recorded(
 
 def test_sossi_scorer_projects_mn_and_types_unsupported_elements(monkeypatch) -> None:
     from simulator.battery.enums import (
+        Authority,
         Engine,
         MetricOperation,
         NoticeKind,
@@ -449,6 +479,12 @@ def test_sossi_scorer_projects_mn_and_types_unsupported_elements(monkeypatch) ->
                     "gas_film": {
                         "notices": {
                             "bead_diameter_not_printed": "stated_default",
+                            "sherwood_shared_scalar_sc": (
+                                "Sc from carrier self-diffusion, Sh shared across species, until t-1993"
+                            ),
+                            "frozen_bead_diameter_mass_loss_over_20_percent": (
+                                "integrated_mass_loss_fraction=0.25; frozen-radius coefficient error exceeds about 7%"
+                            ),
                         },
                     },
                     "melt_activity_extensions": {
@@ -496,6 +532,24 @@ def test_sossi_scorer_projects_mn_and_types_unsupported_elements(monkeypatch) ->
         and "authority_level=UNCERTIFIED" in notice.band
         and "certified_band_K=none" in notice.band
         for notice in prediction.notices
+    )
+    convention_caveats = {
+        notice.reason: notice
+        for notice in prediction.notices
+        if notice.reason
+        in {
+            "sherwood_shared_scalar_sc",
+            "frozen_bead_diameter_mass_loss_over_20_percent",
+        }
+    }
+    assert set(convention_caveats) == {
+        "sherwood_shared_scalar_sc",
+        "frozen_bead_diameter_mass_loss_over_20_percent",
+    }
+    assert all(
+        notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        and notice.authority is Authority.CONVENTION
+        for notice in convention_caveats.values()
     )
     assert metric_operation_for_identity(manganese.identity) is MetricOperation.DEX
     assert refusal.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
