@@ -1242,7 +1242,10 @@ def test_engine_boundary_excludes_unsupported_oxides_and_keeps_supported_ones(
         (("SiO2", Decimal("4")), ("Ag2O", Decimal("1"))),
         Engine.ALPHAMELTS,
     )
-    assert excluded.execution.state is ExecutionState.PRODUCED
+    assert excluded.execution.state is ExecutionState.PRODUCED, (
+        excluded.refusal_reason,
+        excluded.refusal_detail,
+    )
     assert set(calls[-1]["composition_kg"]) == {"SiO2"}
     assert calls[-1]["composition_kg"]["SiO2"] == pytest.approx(0.1)
     exclusion = next(
