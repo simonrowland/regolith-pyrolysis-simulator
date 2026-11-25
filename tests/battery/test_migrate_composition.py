@@ -52,6 +52,13 @@ from simulator.battery.records import (
     State,
     as_decimal,
 )
+from simulator.battery.source_declarations import (
+    EXTERNAL_SAMPLE_ANALYSIS_PROXY_FLAG,
+    ExternalSampleAnalysisRefusal,
+    external_sample_analysis_candidates_from_extracts,
+    external_sample_analysis_source_ids_from_extracts,
+    resolve_external_sample_analysis,
+)
 from tests.battery.factories import migrate_one_extract, tabulation_experiment
 from tests.battery.test_migrate import (
     FIXTURE_EXTRACT,
@@ -2386,7 +2393,12 @@ def test_unflagged_mass_refusal_overwrites_parallel_point_identity(
         )
         assert valid_catalogue is not None
 
-        def return_catalogue(values: object, locator: Locator | None):
+        def return_catalogue(
+            values: object,
+            locator: Locator | None,
+            *,
+            external_sample_analysis_candidates=(),
+        ):
             catalogue_calls.append(values)
             return replace(valid_catalogue, locator=locator)
 
@@ -6510,6 +6522,181 @@ def test_sample_catalogue_composition_is_typed_proxy_not_printed() -> None:
     assert sample.initial_composition.state.value.proxy_flag == (
         "composition_from_sample_catalog"
     )
+
+
+def test_external_sample_analysis_uses_exact_located_bulk_candidate() -> None:
+    source_id = "maxwell-wiik-1971-apollo12-major-composition"
+    observation_id = (
+        "maxwell_wiik_1971_apollo12_sample_12065_84_gsf_bulk_composition_table1"
+    )
+    extract = {
+        "source_id": source_id,
+        "species": {
+            "SiO2": {
+                "observations": [
+                    {
+                        "observation_id": observation_id,
+                        "locator": {
+                            "source_path": "text/maxwell-wiik-1971-apollo12-major-composition/pdftotext-layout.txt",
+                            "table": "1",
+                            "published_page": 286,
+                            "row": "12065,84 GSF",
+                        },
+                        "values": {
+                            "sample": "12065",
+                            "sample_type_as_printed": "rock",
+                            "analysis_role": "initial_charge_bulk",
+                            "major_oxide_measurements_wt_pct": {
+                                "SiO2": 46.87,
+                                "MgO": 7.82,
+                            },
+                        },
+                    }
+                ]
+            }
+        },
+    }
+    candidates = external_sample_analysis_candidates_from_extracts((extract,))
+    values = {
+        EXTERNAL_SAMPLE_ANALYSIS_PROXY_FLAG: True,
+        "sample": "12065",
+        "composition_source_id": source_id,
+        "composition_source_observation_id": observation_id,
+        "composition_heterogeneity_caveat": (
+            "The analysis is a different split of sample 12065."
+        ),
+    }
+
+    decision = resolve_external_sample_analysis(values, candidates)
+
+    assert not isinstance(decision, ExternalSampleAnalysisRefusal)
+    assert decision is not None
+    assert decision.sample_number == "12065"
+    assert source_id in decision.source_reference
+    assert "Table 1" in decision.source_reference
+    assert "row 12065,84 GSF" in decision.source_reference
+    assert decision.oxide_composition_wt_pct == {"SiO2": 46.87, "MgO": 7.82}
+    assert "different split" in decision.heterogeneity_caveat
+
+
+@pytest.mark.parametrize("row_container", ("points", "series"))
+def test_external_sample_analysis_discovers_companion_source_in_run_rows(
+    row_container: str,
+) -> None:
+    extract = {
+        "source_id": "demaria-test",
+        "species": {
+            "Na": {
+                "observations": [
+                    {
+                        "observation_id": "sample-row",
+                        "values": {
+                            row_container: [
+                                {
+                                    EXTERNAL_SAMPLE_ANALYSIS_PROXY_FLAG: True,
+                                    "composition_source_id": (
+                                        "maxwell-wiik-1971-apollo12-major-composition"
+                                    ),
+                                }
+                            ]
+                        },
+                    }
+                ]
+            }
+        },
+    }
+
+    assert external_sample_analysis_source_ids_from_extracts((extract,)) == (
+        "maxwell-wiik-1971-apollo12-major-composition",
+    )
+
+
+def test_external_sample_analysis_refuses_unmatched_sample_and_residue() -> None:
+    source_id = "maxwell-wiik-1971-apollo12-major-composition"
+    observation_id = "bulk-composition"
+    candidate = {
+        "source_id": source_id,
+        "species": {
+            "SiO2": {
+                "observations": [
+                    {
+                        "observation_id": observation_id,
+                        "locator": {
+                            "source_path": "text/maxwell-wiik-1971-apollo12-major-composition/pdftotext-layout.txt",
+                            "table": "1",
+                            "published_page": 286,
+                            "row": "12065,84 GSF",
+                        },
+                        "values": {
+                            "sample": "12065",
+                            "sample_type_as_printed": "rock",
+                            "analysis_role": "initial_charge_bulk",
+                            "major_oxide_measurements_wt_pct": {
+                                "SiO2": 46.87,
+                                "MgO": 7.82,
+                            },
+                        },
+                    }
+                ]
+            }
+        },
+    }
+    candidates = external_sample_analysis_candidates_from_extracts((candidate,))
+    values = {
+        EXTERNAL_SAMPLE_ANALYSIS_PROXY_FLAG: True,
+        "sample": "12022",
+        "composition_source_id": source_id,
+        "composition_source_observation_id": observation_id,
+        "composition_heterogeneity_caveat": "Different split of the same sample.",
+    }
+
+    decision = resolve_external_sample_analysis(values, candidates)
+
+    assert isinstance(decision, ExternalSampleAnalysisRefusal)
+    assert "do not match exactly" in decision.reason
+
+    ambiguous_decision = resolve_external_sample_analysis(
+        {**values, "sample": "12065"}, (*candidates, *candidates)
+    )
+    assert isinstance(ambiguous_decision, ExternalSampleAnalysisRefusal)
+    assert "missing or ambiguous" in ambiguous_decision.reason
+
+    type_conflict_values = {
+        **values,
+        "sample": "12065",
+        "charge_sample_type": "soil",
+    }
+    type_conflict = resolve_external_sample_analysis(
+        type_conflict_values, candidates
+    )
+    assert isinstance(type_conflict, ExternalSampleAnalysisRefusal)
+    assert "material types differ" in type_conflict.reason
+
+    residue_extract = deepcopy(candidate)
+    residue_extract["species"]["SiO2"]["observations"][0]["values"][
+        "analysis_role"
+    ] = "post_heating_residue"
+    residue_candidates = external_sample_analysis_candidates_from_extracts(
+        (residue_extract,)
+    )
+    values["sample"] = "12065"
+    residue_decision = resolve_external_sample_analysis(values, residue_candidates)
+
+    assert isinstance(residue_decision, ExternalSampleAnalysisRefusal)
+    assert "post-heating residue" in residue_decision.reason
+
+    post_heating_extract = deepcopy(candidate)
+    post_heating_extract["species"]["SiO2"]["observations"][0]["values"][
+        "composition_is_post_heating_residue"
+    ] = True
+    post_heating_candidates = external_sample_analysis_candidates_from_extracts(
+        (post_heating_extract,)
+    )
+    post_heating_decision = resolve_external_sample_analysis(
+        values, post_heating_candidates
+    )
+    assert isinstance(post_heating_decision, ExternalSampleAnalysisRefusal)
+    assert "post-heating residue" in post_heating_decision.reason
 
 
 def _located_initial_composition(

@@ -16,6 +16,7 @@ from simulator.battery.enums import (
     Quantity,
     ValueKind,
 )
+from simulator.battery.score import blocking_qualifications
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
 
 
@@ -318,7 +319,7 @@ def test_demaria_in_band_rows_have_thirty_points_and_twelve_context_rows(
         assert len(matching) == expected_counts[fragment], fragment
 
 
-def test_demaria_atomic_oxygen_points_use_smales_catalogue_composition(
+def test_demaria_atomic_oxygen_points_use_external_analysis_for_sample_12065(
     migrated_targets,
 ) -> None:
     oxygen = [
@@ -329,19 +330,15 @@ def test_demaria_atomic_oxygen_points_use_smales_catalogue_composition(
         if "demaria_1971_o_atomic_psat_table5" in observation.observation_id
     ]
     assert len(oxygen) == 13
-    expected_sources = {
-        "12022": "smales_1971_apollo_12022_bulk_composition_tables1_2_3",
-        "12065": "smales_1971_apollo_12065_bulk_composition_tables1_2_3",
-    }
     for observation in oxygen:
         assert observation.value.kind is ValueKind.POINT
         assert observation.identity.quantity.value is Quantity.P_PARTIAL
         assert observation.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
         assert observation.admission.status is AdmissionStatus.ADMITTED
-    _assert_smales_catalogue_composition(oxygen, expected_sources)
+    _assert_demaria_bulk_analysis_composition(oxygen)
 
 
-def test_demaria_table4_points_use_sample_smales_catalogue_composition(
+def test_demaria_table4_points_use_external_analysis_for_sample_12065(
     migrated_targets,
 ) -> None:
     table4 = [
@@ -356,33 +353,50 @@ def test_demaria_table4_points_use_sample_smales_catalogue_composition(
         and observation.value.kind is ValueKind.POINT
     ]
     assert len(table4) == 20
-    expected_sources = {
-        "12022": "smales_1971_apollo_12022_bulk_composition_tables1_2_3",
-        "12065": "smales_1971_apollo_12065_bulk_composition_tables1_2_3",
-    }
     for observation in table4:
         assert observation.identity.quantity.value is Quantity.P_PARTIAL
         assert observation.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
         assert observation.admission.status is AdmissionStatus.ADMITTED
-    _assert_smales_catalogue_composition(table4, expected_sources)
+    _assert_demaria_bulk_analysis_composition(table4)
 
 
-def _assert_smales_catalogue_composition(observations, expected_sources) -> None:
+def _assert_demaria_bulk_analysis_composition(observations) -> None:
     for observation in observations:
         composition = observation.identity.composition
         assert composition is not None and composition.is_value
-        assert composition.value.proxy_flag == "composition_from_sample_catalog"
-        assert "depleted residue" in composition.value.analysis_selection_rule
-        sample = next(
-            sample
-            for sample in expected_sources
-            if f":row={sample}" in observation.observation_id
-        )
-        assert expected_sources[sample] in composition.value.proxy_source
-        assert any(
-            notice.kind is NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG
-            for notice in observation.notices
-        )
+        if ":row=12065" in observation.observation_id:
+            assert composition.value.proxy_flag == "external_sample_analysis"
+            assert "maxwell-wiik-1971-apollo12-major-composition" in (
+                composition.value.proxy_source
+            )
+            assert "Table 1" in composition.value.proxy_source
+            assert "p. 286" in composition.value.proxy_source
+            assert "row 12065,84 GSF" in composition.value.proxy_source
+            notices = [
+                notice
+                for notice in observation.notices
+                if notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+                and notice.reason.startswith("external_sample_analysis:")
+            ]
+            assert notices
+            assert blocking_qualifications(
+                Quantity.P_PARTIAL, tuple(notices)
+            ) == ()
+            assert not any(
+                notice.kind is NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG
+                for notice in observation.notices
+            )
+        else:
+            assert ":row=12022" in observation.observation_id
+            assert composition.value.proxy_flag == "composition_from_sample_catalog"
+            assert "depleted residue" in composition.value.analysis_selection_rule
+            assert "smales_1971_apollo_12022_bulk_composition_tables1_2_3" in (
+                composition.value.proxy_source
+            )
+            assert any(
+                notice.kind is NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG
+                for notice in observation.notices
+            )
 
 
 def test_demaria_context_rows_keep_unmapped_thermochemistry_reasons() -> None:

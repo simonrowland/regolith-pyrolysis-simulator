@@ -1,8 +1,10 @@
 """Source-owned declarations for narrowly scoped reader behaviour."""
 
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 
-from simulator.battery.enums import Phase
+from simulator.battery.enums import NoticeKind, Phase, Quantity
+from simulator.battery.records import Notice
 from simulator.reference_data.robie_hemingway_fisher_1978_usgs_b1452_loader import (
     SOURCE_ID as B1452_SOURCE_ID,
 )
@@ -24,6 +26,54 @@ from simulator.source_ids import (
 class SourceRule:
     value: bool | Phase | str
     reason: str
+
+
+EXTERNAL_SAMPLE_ANALYSIS_PROXY_FLAG = "external_sample_analysis"
+SAMPLE_CATALOG_COMPOSITION_PROXY_FLAG = "composition_from_sample_catalog"
+COMPOSITION_SOURCE_PROXY_FLAGS = frozenset(
+    {
+        SAMPLE_CATALOG_COMPOSITION_PROXY_FLAG,
+        EXTERNAL_SAMPLE_ANALYSIS_PROXY_FLAG,
+    }
+)
+EXTERNAL_SAMPLE_ANALYSIS_LINK_FIELDS = (
+    EXTERNAL_SAMPLE_ANALYSIS_PROXY_FLAG,
+    "sample",
+    "charge_sample_type",
+    "composition_source_id",
+    "composition_source_observation_id",
+    "composition_heterogeneity_caveat",
+)
+
+
+@dataclass(frozen=True)
+class ExternalSampleAnalysisLink:
+    source_reference: str
+    sample_number: str
+    heterogeneity_caveat: str
+    oxide_composition_wt_pct: Mapping[str, object]
+
+
+@dataclass(frozen=True)
+class ExternalSampleAnalysisRefusal:
+    reason: str
+
+
+@dataclass(frozen=True)
+class ExternalSampleAnalysisCandidate:
+    source_id: str
+    observation_id: str
+    sample_number: str | None
+    sample_type: str | None
+    analysis_role: str | None
+    is_post_heating_residue: bool
+    locator: Mapping[str, object] | None
+    oxide_composition_wt_pct: Mapping[str, object] | None
+
+
+ExternalSampleAnalysisDecision = (
+    ExternalSampleAnalysisLink | ExternalSampleAnalysisRefusal
+)
 
 
 DISTIN_SOURCE_ID = "distin-1971-ferrous-silicate-melts"
@@ -180,4 +230,245 @@ def calibration_kinds_for_source(
     return (
         None if kind is None else str(kind.value),
         None if override is None else str(override.value),
+    )
+
+
+def external_sample_analysis_source_ids_from_extracts(
+    extracts: Sequence[object],
+) -> tuple[str, ...]:
+    """Return exact companion source IDs declared by the linked extract rows."""
+
+    source_ids: set[str] = set()
+    for extract in extracts:
+        if not isinstance(extract, Mapping):
+            continue
+        species = extract.get("species")
+        if not isinstance(species, Mapping):
+            continue
+        for block in species.values():
+            if not isinstance(block, Mapping):
+                continue
+            observations = block.get("observations")
+            if not isinstance(observations, Sequence) or isinstance(
+                observations, (str, bytes)
+            ):
+                continue
+            for observation in observations:
+                if not isinstance(observation, Mapping):
+                    continue
+                raw_values = observation.get("values")
+                value_rows = (
+                    [raw_values] if isinstance(raw_values, Mapping) else []
+                )
+                if value_rows:
+                    for row_key in ("points", "series"):
+                        rows = raw_values.get(row_key)
+                        if isinstance(rows, Sequence) and not isinstance(
+                            rows, (str, bytes)
+                        ):
+                            value_rows.extend(
+                                row for row in rows if isinstance(row, Mapping)
+                            )
+                for values in value_rows:
+                    if values.get(EXTERNAL_SAMPLE_ANALYSIS_PROXY_FLAG) is not True:
+                        continue
+                    source_id = values.get("composition_source_id")
+                    if (
+                        isinstance(source_id, str)
+                        and source_id
+                        and source_id == source_id.strip()
+                        and "/" not in source_id
+                        and "\\" not in source_id
+                    ):
+                        source_ids.add(source_id)
+    return tuple(sorted(source_ids))
+
+
+def external_sample_analysis_candidates_from_extracts(
+    extracts: Sequence[object],
+) -> tuple[ExternalSampleAnalysisCandidate, ...]:
+    """Read located alternatives from the explicitly linked v1 extracts."""
+
+    candidates: list[ExternalSampleAnalysisCandidate] = []
+    for extract in extracts:
+        if not isinstance(extract, Mapping):
+            continue
+        source_id = extract.get("source_id")
+        species = extract.get("species")
+        if not isinstance(source_id, str) or not isinstance(species, Mapping):
+            continue
+        for block in species.values():
+            if not isinstance(block, Mapping):
+                continue
+            observations = block.get("observations")
+            if not isinstance(observations, Sequence) or isinstance(
+                observations, (str, bytes)
+            ):
+                continue
+            for observation in observations:
+                if not isinstance(observation, Mapping):
+                    continue
+                observation_id = observation.get("observation_id")
+                values = observation.get("values")
+                if not isinstance(observation_id, str) or not isinstance(
+                    values, Mapping
+                ):
+                    continue
+                sample = values.get("sample")
+                sample_type = values.get("sample_type_as_printed")
+                role = values.get("analysis_role")
+                locator = observation.get("locator")
+                composition = values.get("major_oxide_measurements_wt_pct")
+                candidates.append(
+                    ExternalSampleAnalysisCandidate(
+                        source_id=source_id,
+                        observation_id=observation_id,
+                        sample_number=sample if isinstance(sample, str) else None,
+                        sample_type=(
+                            sample_type if isinstance(sample_type, str) else None
+                        ),
+                        analysis_role=role if isinstance(role, str) else None,
+                        is_post_heating_residue=(
+                            values.get("composition_is_post_heating_residue") is True
+                        ),
+                        locator=locator if isinstance(locator, Mapping) else None,
+                        oxide_composition_wt_pct=(
+                            composition if isinstance(composition, Mapping) else None
+                        ),
+                    )
+                )
+    return tuple(candidates)
+
+
+def resolve_external_sample_analysis(
+    values: object,
+    candidates: Sequence[ExternalSampleAnalysisCandidate] = (),
+) -> ExternalSampleAnalysisDecision | None:
+    """Resolve a located initial bulk analysis by exact printed sample ID.
+
+    Callers pass every located alternative from the row's declared source
+    extracts. This owner requires the exact source observation, sample number,
+    and analysis role; it never falls back to another sample or run residue.
+    """
+
+    if (
+        not isinstance(values, Mapping)
+        or values.get(EXTERNAL_SAMPLE_ANALYSIS_PROXY_FLAG) is not True
+    ):
+        return None
+    sample_number = values.get("sample")
+    if not isinstance(sample_number, str):
+        return ExternalSampleAnalysisRefusal(
+            "external sample analysis refused: printed charge sample number is required"
+        )
+    source_id = values.get("composition_source_id")
+    observation_id = values.get("composition_source_observation_id")
+    if not isinstance(source_id, str) or not isinstance(observation_id, str):
+        return ExternalSampleAnalysisRefusal(
+            "external sample analysis refused: exact source and observation IDs are required"
+        )
+    selected = [
+        candidate
+        for candidate in candidates
+        if candidate.source_id == source_id
+        and candidate.observation_id == observation_id
+    ]
+    if len(selected) != 1:
+        return ExternalSampleAnalysisRefusal(
+            "external sample analysis refused: source observation reference is missing or ambiguous"
+        )
+    candidate = selected[0]
+    if candidate.sample_number is None:
+        return ExternalSampleAnalysisRefusal(
+            "external sample analysis refused: analysis sample number is missing"
+        )
+    if sample_number != candidate.sample_number:
+        return ExternalSampleAnalysisRefusal(
+            "external sample analysis refused: printed sample numbers do not match exactly"
+        )
+    if (
+        candidate.analysis_role != "initial_charge_bulk"
+        or candidate.is_post_heating_residue
+    ):
+        return ExternalSampleAnalysisRefusal(
+            "external sample analysis refused: post-heating residue or non-charge analysis cannot stand for the charge"
+        )
+    if values.get("composition_is_post_heating_residue") is True:
+        return ExternalSampleAnalysisRefusal(
+            "external sample analysis refused: post-heating residue cannot stand for the charge"
+        )
+    locator = candidate.locator
+    if not isinstance(locator, Mapping):
+        return ExternalSampleAnalysisRefusal(
+            "external sample analysis refused: primary source locator is missing"
+        )
+    source_path = locator.get("source_path")
+    table = locator.get("table")
+    page = locator.get("published_page")
+    row = locator.get("row")
+    if (
+        not isinstance(source_path, str)
+        or not source_path.startswith("text/")
+        or table in (None, "")
+        or page in (None, "")
+        or row in (None, "")
+    ):
+        return ExternalSampleAnalysisRefusal(
+            "external sample analysis refused: source text locator needs table, published page, and row"
+        )
+    charge_type = values.get("charge_sample_type")
+    analysis_type = candidate.sample_type
+    if (
+        isinstance(charge_type, str)
+        and charge_type.strip()
+        and isinstance(analysis_type, str)
+        and analysis_type.strip()
+        and charge_type.strip().casefold() != analysis_type.strip().casefold()
+    ):
+        return ExternalSampleAnalysisRefusal(
+            "external sample analysis refused: charge and analysis material types differ"
+        )
+    caveat = values.get("composition_heterogeneity_caveat")
+    if not isinstance(caveat, str) or not caveat.strip():
+        return ExternalSampleAnalysisRefusal(
+            "external sample analysis refused: split heterogeneity caveat is required"
+        )
+    composition = candidate.oxide_composition_wt_pct
+    if not isinstance(composition, Mapping) or len(composition) < 2:
+        return ExternalSampleAnalysisRefusal(
+            "external sample analysis refused: no usable bulk oxide suite"
+        )
+    locator_parts = [f"Table {table}", f"p. {page}"]
+    pdf_page_index = locator.get("pdf_page_index")
+    if pdf_page_index not in (None, ""):
+        locator_parts.append(f"PDF page index {pdf_page_index}")
+    locator_parts.append(f"row {row}")
+    return ExternalSampleAnalysisLink(
+        source_reference=(
+            f"{source_id}::{observation_id}; " + ", ".join(locator_parts)
+        ),
+        sample_number=sample_number,
+        heterogeneity_caveat=caveat.strip(),
+        oxide_composition_wt_pct=composition,
+    )
+
+
+def external_sample_analysis_notice(
+    *,
+    source_reference: str,
+    heterogeneity_caveat: str,
+    quantity: Quantity,
+    origin: str,
+) -> Notice:
+    """Expose external bulk-analysis provenance without blocking scoring."""
+
+    return Notice(
+        kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+        affected_quantities=(quantity,),
+        reason=(
+            f"{EXTERNAL_SAMPLE_ANALYSIS_PROXY_FLAG}: source={source_reference}; "
+            f"{heterogeneity_caveat}"
+        ),
+        origin=origin,
+        source=source_reference,
     )

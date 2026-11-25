@@ -8,10 +8,14 @@ from pathlib import Path
 import pytest
 
 from simulator.diagnostic_helpers.extract_reproduction import (
+    DEFAULT_PO2_BAR,
     MOLAR_MASS,
     AdoptedObservation,
+    _engine_melt_psat_pa,
     _literature_pressure_points,
     _melt_recipe_mol,
+    external_sample_analysis_candidates_from_extracts,
+    external_sample_analysis_source_ids_from_extracts,
     evaluate_observation,
     geometry_assumption_text,
     load_cached_safe_yaml,
@@ -26,10 +30,19 @@ EXTRACT_PATH = (
     / "extracts"
     / "kems-022-demaria-1971.yaml"
 )
+EXTRACTS_DIR = EXTRACT_PATH.parent
 
 
 def _observation(species: str, observation_id: str) -> AdoptedObservation:
     extract = load_cached_safe_yaml(EXTRACT_PATH.read_text(encoding="utf-8"))
+    source_ids = external_sample_analysis_source_ids_from_extracts((extract,))
+    companion_extracts = [
+        load_cached_safe_yaml((EXTRACTS_DIR / f"{source_id}.yaml").read_text(encoding="utf-8"))
+        for source_id in source_ids
+    ]
+    candidates = external_sample_analysis_candidates_from_extracts(
+        companion_extracts
+    )
     row = next(
         row
         for row in extract["species"][species]["observations"]
@@ -53,28 +66,100 @@ def _observation(species: str, observation_id: str) -> AdoptedObservation:
         disagreement_dex=None,
         is_priority_winner=True,
         geometry_assumption=geometry_assumption_text(),
+        external_sample_analysis_candidates=candidates,
     )
 
 
 def test_na_sample_composition_gaps_refuse_the_mare_proxy() -> None:
-    for sample in ("12022", "12065"):
-        obs = _observation(
-            "Na", f"demaria_1971_na_psat_figure1_sample_{sample}_digitized"
-        )
+    obs = _observation(
+        "Na", "demaria_1971_na_psat_figure1_sample_12022_digitized"
+    )
 
-        recipe, source, error = _melt_recipe_mol(obs)
+    recipe, source, error = _melt_recipe_mol(obs)
 
-        assert recipe is None
-        assert source == "extract composition_source_gap"
-        assert error == "missing_condition:melt_composition"
+    assert recipe is None
+    assert source == "extract composition_source_gap"
+    assert error == "missing_condition:melt_composition"
 
-        evaluation = evaluate_observation(
-            obs, vapor_pressure_data=load_vapor_pressure_data()
-        )
-        assert evaluation.skip_reason is not None
-        assert evaluation.skip_reason.startswith("typed-refusal:")
-        assert evaluation.records
-        assert all(record.actual_value is None for record in evaluation.records)
+    evaluation = evaluate_observation(
+        obs, vapor_pressure_data=load_vapor_pressure_data()
+    )
+    assert evaluation.skip_reason is not None
+    assert evaluation.skip_reason.startswith("typed-refusal:")
+    assert evaluation.records
+    assert all(record.actual_value is None for record in evaluation.records)
+
+
+def test_external_sample_analysis_enables_vapor_pressure_prediction() -> None:
+    obs = _observation(
+        "Na", "demaria_1971_na_psat_figure1_sample_12065_digitized"
+    )
+
+    recipe, source, error = _melt_recipe_mol(obs)
+    assert recipe is not None
+    assert error is None
+    assert source.startswith("extract sample_oxide_composition_wt_pct")
+    assert "maxwell_wiik_1971_apollo12_sample_12065_84_gsf_bulk_composition_table1" in source
+
+    same_sample_recipe, same_sample_source, same_sample_error = _melt_recipe_mol(
+        obs, point={"sample": "12065"}
+    )
+    assert same_sample_recipe is not None
+    assert same_sample_error is None
+    assert same_sample_source == source
+
+    unmatched_recipe, unmatched_source, unmatched_error = _melt_recipe_mol(
+        obs, point={"sample": "12022"}
+    )
+    assert unmatched_recipe is None
+    assert unmatched_source == "external_sample_analysis"
+    assert unmatched_error is not None
+    assert "do not match exactly" in unmatched_error
+
+    pressure, refusal, runtime = _engine_melt_psat_pa(
+        "Na",
+        1673.0,
+        DEFAULT_PO2_BAR,
+        load_vapor_pressure_data(),
+        account_mol=recipe,
+    )
+    assert pressure is not None, f"refusal={refusal!r}; runtime={runtime!r}"
+    assert pressure > 0.0
+    assert refusal is None
+    assert runtime["provider_id"] == "builtin-vapor-pressure"
+    assert runtime["provider_status"] == "ok"
+
+    defaulted_values = dict(obs.values)
+    defaulted_values.pop("pO2_bar", None)
+    # This fixture isolates the missing-pO2 model default from the row's
+    # existing figure_only admission marker; the direct engine assertion above
+    # separately exercises the exact linked sample composition.
+    defaulted_values["method_class"] = "measured_direct"
+    defaulted_values["points"] = [
+        {"T_K": 1673.0, "p_Pa": 1.0e-8, "sample": "12065"}
+    ]
+    defaulted_obs = replace(
+        obs,
+        T_range_K=(1673.0, 1673.0),
+        values=defaulted_values,
+    )
+    evaluation = evaluate_observation(
+        defaulted_obs, vapor_pressure_data=load_vapor_pressure_data()
+    )
+    assert evaluation.records
+    predictions = [
+        record for record in evaluation.records if record.actual_value is not None
+    ]
+    assert predictions, (
+        f"skip={evaluation.skip_reason!r}; notes={evaluation.runtime_notes!r}"
+    )
+    prediction = predictions[0]
+    assert prediction.status == "assumed-input"
+    assert any(
+        "psat diagnostic pO2 defaulted to 1e-08 bar (missing_condition:pO2_boundary)"
+        in note
+        for note in evaluation.runtime_notes
+    )
 
 
 def test_admitted_psat_reports_missing_sample_composition() -> None:
@@ -118,7 +203,7 @@ def test_admitted_psat_reports_missing_sample_composition() -> None:
     assert all(record.actual_value is None for record in evaluation.records)
 
 
-def test_pressure_points_use_their_cited_smales_oxide_suites() -> None:
+def test_pressure_points_use_exact_sample_analysis_oxide_suites() -> None:
     obs = _observation("Al2O", "demaria_1971_al2o_psat_table4")
     obs = replace(
         obs,
@@ -151,23 +236,29 @@ def test_pressure_points_use_their_cited_smales_oxide_suites() -> None:
         ),
         (
             "smales_1971_apollo_12065_bulk_composition_tables1_2_3",
-            9.8,
-            3.1,
-            0.24,
-            0.063,
+            10.05,
+            3.34,
+            0.27,
+            0.073,
         ),
     ):
         point = next(
             point
             for point in points
-            if point.get("composition_source_observation_id")
-            == source_observation_id
+            if (
+                point.get("composition_source_observation_id") == source_observation_id
+                or point.get("composition_source_id")
+                == "maxwell-wiik-1971-apollo12-major-composition"
+            )
         )
         recipe, source, error = _melt_recipe_mol(obs, point=point)
 
         assert error is None
         assert source.startswith("extract sample_oxide_composition_wt_pct")
-        assert source_observation_id in source
+        if source_observation_id.startswith("smales") and "12022" in source_observation_id:
+            assert source_observation_id in source
+        else:
+            assert "maxwell_wiik_1971_apollo12_sample_12065_84_gsf_bulk_composition_table1" in source
         # Convert the cited wt% values to oxide moles using each molar mass.
         assert recipe is not None
         assert recipe["Al2O3"] == pytest.approx(

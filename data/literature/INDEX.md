@@ -15,14 +15,14 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 861
-- Extracts (`literature_extract.v1`): 854
+- Sources: 862
+- Extracts (`literature_extract.v1`): 855
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 854
+- Extracts with no PDF: 855
 - Alias groups needing owner/controller resolution: 94
-- Extracts with private/non-public row locators: 88
+- Extracts with private/non-public row locators: 89
 
 ## Sources
 
@@ -467,6 +467,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `matzen-2017-ni-olivine-composition` | Matzen AK, Baker MB, Beckett JR, Wood BJ, Stolper EM (2017). The effect of liquid composition on the partitioning of Ni between olivine and silicate melt. Contributions to Mineralogy and Petrology 172:3. | 10.1007/s00410-016-1319-8 | ABSENT, `` | `raw/matzen-2017-ni-olivine-composition/matzen-2017-ni-olivine-composition.pdf` (present, 3a0b3e83); `text/matzen-2017-ni-olivine-composition/` (60 files, exists); `tables/matzen-2017-ni-olivine-composition/` (0 files, ABSENT) | `data/literature/extracts/matzen-2017-ni-olivine-composition.yaml` (180 rows, draft) | `ledger/matzen-2017-ni-olivine-composition.yaml`: — (—) |
 | `matzen-2022-martian-basalt-redox` | Matzen, A.K., Woodland, A., Beckett, J.R. & Wood, B.J. (2022) Oxidation state of iron and Fe-Mg partitioning between olivine and basaltic Martian melts. American Mineralogist, in press. | 10.2138/am-2021-7682 | ABSENT, `` | `raw/matzen-2022-martian-basalt-redox/matzen-2022-martian-basalt-redox.pdf` (present, 25811172); `text/matzen-2022-martian-basalt-redox/` (1 files, exists); `tables/matzen-2022-martian-basalt-redox/` (0 files, ABSENT) | `data/literature/extracts/matzen-2022-martian-basalt-redox.yaml` (24 rows, draft) | `ledger/matzen-2022-martian-basalt-redox.yaml`: — (—) |
 | `mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas` | Mavrogenes, J. A. and O’Neill, H. St.C. (1999), ‘The relative effects of pressure, temperature and oxygen fugacity on the solubility of sulfide in mafic magmas’, Geochimica et Cosmochimica Acta 63(7/8), 1173–1180. | 10.1016/S0016-7037(98)00289-0 | ABSENT, `` | `raw/mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas/mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas.pdf` (present, 10f73965); `text/mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas/` (34 files, exists); `tables/mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas/` (0 files, ABSENT) | `data/literature/extracts/mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas.yaml` (28 rows, draft) | `ledger/mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas.yaml`: — (—) |
+| `maxwell-wiik-1971-apollo12-major-composition` | Maxwell, J. A. & Wiik, H. B. (1971), "Chemical composition of Apollo 12 lunar samples 12004, 12033, 12051, 12052 and 12065", Earth and Planetary Science Letters, 10, 285–288. |  | ABSENT, `` | `raw/maxwell-wiik-1971-apollo12-major-composition/maxwell-wiik-1971-apollo12-major-composition.pdf` (ABSENT, ); `text/maxwell-wiik-1971-apollo12-major-composition/` (3 files, exists); `tables/maxwell-wiik-1971-apollo12-major-composition/` (0 files, ABSENT) | `data/literature/extracts/maxwell-wiik-1971-apollo12-major-composition.yaml` (1 rows, draft, private_path) | `ledger/maxwell-wiik-1971-apollo12-major-composition.yaml`: — (—) |
 | `mccready-1948-sodium-silicate` | McCready N.W. (1948), The Thermodynamic Properties of Sodium Silicate, Journal of Physical and Colloid Chemistry 52(8), 1277-1283. | 10.1021/j150464a001 | ABSENT, `` | `raw/mccready-1948-sodium-silicate/mccready-1948-sodium-silicate.pdf` (present, 4c199287); `text/mccready-1948-sodium-silicate/` (49 files, exists); `tables/mccready-1948-sodium-silicate/` (0 files, ABSENT) | `data/literature/extracts/mccready-1948-sodium-silicate.yaml` (17 rows, draft) | `ledger/mccready-1948-sodium-silicate.yaml`: — (—) |
 | `mcgill-na-fe-o-critical-assessment` | Moosavi-Khoonsari, E. and Jung, I.-H. (2016), Critical evaluation and optimization of thermodynamic properties and phase diagrams of the Na2O-FeO-Fe2O3 system, Metallurgical and Materials Transactions B, 47, 576-594. | 10.1007/s11663-015-0517-5 | ABSENT, `` | `raw/mcgill-na-fe-o-critical-assessment/mcgill-na-fe-o-critical-assessment.pdf` (present, d6f81b2d); `text/mcgill-na-fe-o-critical-assessment/` (55 files, exists); `tables/mcgill-na-fe-o-critical-assessment/` (0 files, ABSENT) | `data/literature/extracts/mcgill-na-fe-o-critical-assessment.yaml` (7 rows, draft) | `ledger/mcgill-na-fe-o-critical-assessment.yaml`: — (—) |
 | `mendybaev-2013-fun-cai-evaporation` | Mendybaev, R. A. et al. (2013). Experimental evaporation of Mg- and Si-rich melts: Implications for the origin and evolution of FUN CAIs. Geochimica et Cosmochimica Acta 123, 368–384. | 10.1016/j.gca.2013.06.044 | ABSENT, `` | `raw/mendybaev-2013-fun-cai-evaporation/mendybaev-2013-fun-cai-evaporation.pdf` (present, 10505b38); `text/mendybaev-2013-fun-cai-evaporation/` (1 files, exists); `tables/mendybaev-2013-fun-cai-evaporation/` (0 files, ABSENT) | `data/literature/extracts/mendybaev-2013-fun-cai-evaporation.yaml` (2 rows, draft) | `ledger/mendybaev-2013-fun-cai-evaporation.yaml`: — (—) |
@@ -1332,6 +1333,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `matzen-2017-ni-olivine-composition`
 - `matzen-2022-martian-basalt-redox`
 - `mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas`
+- `maxwell-wiik-1971-apollo12-major-composition`
 - `mccready-1948-sodium-silicate`
 - `mcgill-na-fe-o-critical-assessment`
 - `mendybaev-2013-fun-cai-evaporation`
@@ -1811,6 +1813,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `lpi-compendium-15013`
 - `lpi-compendium-65701`
 - `lpi-lunar-soils`
+- `maxwell-wiik-1971-apollo12-major-composition`
 - `mendybaev-2021-cai-low-pressure-h2-evap`
 - `miao-li-yan-2023-fe-v-spinel-gibbs`
 - `nagabayashi-hino-banya-1989-phosphorus`

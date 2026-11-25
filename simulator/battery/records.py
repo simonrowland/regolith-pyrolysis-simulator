@@ -735,6 +735,8 @@ class Reaction:
 
 # Composition.proxy_flag tokens. Absent (None) means a printed analysis of the
 # point. ``composition_from_sample_catalog``: a catalogue proxy.
+# ``external_sample_analysis``: a located bulk analysis of the exact named
+# sample from a companion source; it carries a split-heterogeneity caveat.
 # ``initial_charge_only``: the source prints the starting charge while the
 # datum describes a later (depleted) state; consumers may predict with it but
 # the residual is flagged (b-716).

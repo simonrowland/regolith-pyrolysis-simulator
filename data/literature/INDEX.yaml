@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 861
-  extracts: 854
+  sources: 862
+  extracts: 855
   pdfs_present_in_worktree: 0
-  extracts_with_private_locators: 88
+  extracts_with_private_locators: 89
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 854
+  extracts_without_pdf: 855
   alias_groups_needing_resolution: 94
 gaps:
   pdfs_without_extract: []
@@ -456,6 +456,7 @@ gaps:
   - matzen-2017-ni-olivine-composition
   - matzen-2022-martian-basalt-redox
   - mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas
+  - maxwell-wiik-1971-apollo12-major-composition
   - mccready-1948-sodium-silicate
   - mcgill-na-fe-o-critical-assessment
   - mendybaev-2013-fun-cai-evaporation
@@ -934,6 +935,7 @@ gaps:
   - lpi-compendium-15013
   - lpi-compendium-65701
   - lpi-lunar-soils
+  - maxwell-wiik-1971-apollo12-major-composition
   - mendybaev-2021-cai-low-pressure-h2-evap
   - miao-li-yan-2023-fe-v-spinel-gibbs
   - nagabayashi-hino-banya-1989-phosphorus
@@ -27244,6 +27246,64 @@ sources:
       last_stage: null
       date: null
     commit: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
+- source_id: maxwell-wiik-1971-apollo12-major-composition
+  aliases: []
+  citation: "Maxwell, J. A. & Wiik, H. B. (1971), \"Chemical composition of Apollo 12 lunar samples 12004, 12033, 12051, 12052 and 12065\", Earth and Planetary Science Letters, 10, 285–288."
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/maxwell-wiik-1971-apollo12-major-composition.yaml
+    review_status: draft
+    rows: 1
+    locator_status: private_path
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/maxwell-wiik-1971-apollo12-major-composition/maxwell-wiik-1971-apollo12-major-composition.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/maxwell-wiik-1971-apollo12-major-composition/sidecar.yaml
+      present: false
+    text:
+      path: text/maxwell-wiik-1971-apollo12-major-composition
+      exists: true
+      file_count: 3
+    tables:
+      path: tables/maxwell-wiik-1971-apollo12-major-composition
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/maxwell-wiik-1971-apollo12-major-composition.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/maxwell-wiik-1971-apollo12-major-composition.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: null
 - source_id: mccready-1948-sodium-silicate
   aliases: []
   citation: McCready N.W. (1948), The Thermodynamic Properties of Sodium Silicate, Journal of Physical

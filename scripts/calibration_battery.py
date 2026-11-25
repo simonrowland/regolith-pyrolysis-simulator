@@ -436,17 +436,34 @@ def na_rows():
     for heldout in vapor_pressure_legacy_view(vp)["metals"]["Na"]["reaction"]["heldout_demaria_comparison"]:
         sample, temperature = heldout["sample"], heldout["T_K"]
         obs = sources[sample]
-        composition = n._DEMARIA_12022_WT_PCT if sample == "12022" else obs.values["sample_oxide_composition_wt_pct"]
+        if sample == "12022":
+            composition = n._DEMARIA_12022_WT_PCT
+            account_mol = n._wt_pct_to_mol_account(composition)
+            composition_refusal = None
+            composition_details = {}
+        else:
+            composition = None
+            account_mol, composition_source, composition_refusal = (
+                e._melt_recipe_mol(obs)
+            )
+            composition_details = {
+                "composition_mol": account_mol,
+                "composition_source": composition_source,
+            }
         pO2 = 10 ** (n._demaria_12022_log10_po2_bar(temperature) if sample == "12022" else heldout["log10_pO2_bar"])
-        predicted, refusal, runtime = e._engine_melt_psat_pa("Na", temperature, pO2, vp,
-            account_mol=n._wt_pct_to_mol_account(composition))
+        if account_mol is None:
+            predicted, refusal, runtime = None, composition_refusal, {}
+        else:
+            predicted, refusal, runtime = e._engine_melt_psat_pa("Na", temperature, pO2, vp,
+                account_mol=account_mol)
         rows.append(envelope(dataset_id="na-paired", observation_id=f"{sample}@{temperature}K:Na",
             run_id=f"demaria:{sample}", species="Na", observable="partial_pressure", units="Pa",
             measured=heldout["measured_pNa_Pa"], predicted=predicted,
             status="refused" if refusal else "out-of-domain", authority="extrapolated",
             evidence="derived measurement", split="holdout", selected=False,
             conditions={"temperature_K": temperature, "pO2_bar": pO2, "total_pressure_Pa": pO2 * PA_PER_BAR,
-                        "composition_wt_pct": composition, "partial_melt": True},
+                        "composition_wt_pct": composition, **composition_details,
+                        "partial_melt": True},
             raw={"runtime": runtime, "source_binding": heldout, "source_observation": asdict(obs)},
             uncertainty={"kind": "log10_decades", "value": 0.30, "role": "digitization; correlated cell offset; extrapolated line points have larger unknown uncertainty"},
             source_doi=obs.source_doi,

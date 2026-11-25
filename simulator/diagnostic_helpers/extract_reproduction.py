@@ -71,6 +71,16 @@ from simulator.diagnostic_helpers.reproduction_compare import (
     ComparisonRecord,
     compare_values,
 )
+from simulator.battery.source_declarations import (
+    EXTERNAL_SAMPLE_ANALYSIS_LINK_FIELDS,
+    EXTERNAL_SAMPLE_ANALYSIS_PROXY_FLAG,
+    ExternalSampleAnalysisCandidate,
+    ExternalSampleAnalysisLink,
+    ExternalSampleAnalysisRefusal,
+    external_sample_analysis_candidates_from_extracts,
+    external_sample_analysis_source_ids_from_extracts,
+    resolve_external_sample_analysis,
+)
 from simulator.yaml_cache import load_cached_safe_yaml
 from simulator.source_ids import SOSSI_FEGLEY_SOURCE_ID
 
@@ -147,9 +157,8 @@ DEFAULT_TRANSITION_POINT_UNCERTAINTY: dict[str, Any] = {
     ),
 }
 
-# Engine diagnostic default used only for rate rows that do not state pO2.
-# Coverage/reporting retains that this is defaulted; psat comparisons never
-# relabel a categorical cell-material boundary or total vacuum as numeric pO2.
+# Engine diagnostic default used when a row does not state pO2. Coverage and
+# comparison status retain that this is a default, not a measured boundary.
 DEFAULT_PO2_BAR = 1.0e-8
 
 # Oxide melt wt% composition used when an observation does not state a
@@ -256,6 +265,9 @@ class AdoptedObservation:
     source_doi: str | None = None
     # Preserve source spellings until the extract schema canonicalizes them.
     admission_metadata: Mapping[str, Any] = field(default_factory=dict)
+    external_sample_analysis_candidates: Sequence[
+        ExternalSampleAnalysisCandidate
+    ] = ()
 
     @property
     def case_id(self) -> str:
@@ -586,6 +598,19 @@ def load_adopted_observations(
     directory = extracts_dir or EXTRACTS_DIR
     extracts = em.load_extracts(directory)
     view = em.build_by_species(extracts)
+    external_source_ids = set(
+        external_sample_analysis_source_ids_from_extracts(extracts)
+    )
+    external_sample_analysis_extracts = [
+        extract
+        for extract in extracts
+        if str(extract.get("source_id") or "") in external_source_ids
+    ]
+    external_sample_analysis_candidates = (
+        external_sample_analysis_candidates_from_extracts(
+            external_sample_analysis_extracts
+        )
+    )
     geometry = geometry_assumption_text()
 
     # source_id -> DOI, for provenance-keyed self-agreement exclusion.
@@ -714,6 +739,9 @@ def load_adopted_observations(
                     },
                     condensed_form=condensed_form,
                     source_doi=doi_by_source.get(source_id),
+                    external_sample_analysis_candidates=(
+                        external_sample_analysis_candidates
+                    ),
                 )
             )
     adopted.sort(key=lambda row: (row.species_id, row.source_id, row.observation_id))
@@ -983,8 +1011,8 @@ def _literature_pressure_points(
                         "sample_oxide_composition_wt_pct",
                         "sample_Na2O_wt_pct",
                         "sample_K2O_wt_pct",
-                        "composition_source_observation_id",
                         "composition_source_gap",
+                        *EXTERNAL_SAMPLE_ANALYSIS_LINK_FIELDS,
                     )
                     if key in pt
                 }
@@ -3062,6 +3090,13 @@ def _evaluate_psat(
     assert points is not None
     candidates = _engine_species_candidates(obs)
     standard_state_kind = _pressure_standard_state_kind(obs)
+    pO2_defaulted = pO2 is None and standard_state_kind == "melt"
+    diagnostic_pO2 = (
+        float(pO2)
+        if pO2 is not None
+        else DEFAULT_PO2_BAR if pO2_defaulted else None
+    )
+    pO2_default_used = False
     any_numeric = False
     last_refusal: str | None = None
     temperature_counts = Counter(float(point["T_K"]) for point in points)
@@ -3075,7 +3110,8 @@ def _evaluate_psat(
         actual: float | None = None
         runtime: dict[str, Any] = {
             "temperature_K": T_K,
-            "pO2_bar": pO2,
+            "pO2_bar": diagnostic_pO2,
+            "pO2_defaulted": pO2_defaulted,
             "candidates": candidates,
             "geometry_assumption": obs.geometry_assumption,
             "standard_state_kind": standard_state_kind,
@@ -3107,18 +3143,22 @@ def _evaluate_psat(
                 last_refusal = melt_recipe_error or "missing_condition:melt_composition"
                 runtime["refusal"] = last_refusal
                 continue
-            if pO2 is None:
-                last_refusal = "missing_condition:pO2_boundary"
-                runtime["refusal"] = last_refusal
-                continue
-            else:
-                P_melt, refuse_melt, melt_rt = _engine_melt_psat_pa(
-                    species,
-                    T_K,
-                    pO2,
-                    vp_data,
-                    account_mol=melt_recipe,
-                )
+            if pO2_defaulted:
+                pO2_default_used = True
+                runtime["defaulted_inputs"] = {
+                    "pO2_bar": {
+                        "value": DEFAULT_PO2_BAR,
+                        "reason": "missing_condition:pO2_boundary",
+                    }
+                }
+            assert diagnostic_pO2 is not None
+            P_melt, refuse_melt, melt_rt = _engine_melt_psat_pa(
+                species,
+                T_K,
+                diagnostic_pO2,
+                vp_data,
+                account_mol=melt_recipe,
+            )
             runtime.setdefault("melt_attempts", {})[species] = {
                 "refusal": refuse_melt,
                 **{k: melt_rt.get(k) for k in ("provider_status", "oxide", "warnings")},
@@ -3176,8 +3216,8 @@ def _evaluate_psat(
                     runtime["geometry_note"] = f"orifice present but unused: {exc}"
 
         # Defaulted tolerances still produce match/mismatch against the
-        # documented budget — do NOT route them through assumed-input (that
-        # status is for recipe-side assumed controls, not missing literature σ).
+        # documented budget. A defaulted pO2 boundary is a model input and is
+        # kept in the visibly flagged assumed-input tier.
         record = _compare_point(
             obs=obs,
             observable_id=(
@@ -3197,7 +3237,7 @@ def _evaluate_psat(
             runtime={**runtime, "uncertainty_defaulted": bool(unc.get("defaulted"))},
             unsupported_speciation=unsupported and actual is None,
             out_of_domain=out_of_domain and actual is None,
-            assumed_input=False,
+            assumed_input=pO2_defaulted and actual is not None,
         )
         evaluation.records.append(record)
         if record.status == "mismatch":
@@ -3211,6 +3251,12 @@ def _evaluate_psat(
                 f"residual_dex={residual_dex if residual_dex is not None else 'n/a'} "
                 f"budget={unc}"
             )
+
+    if pO2_default_used:
+        evaluation.runtime_notes.append(
+            "psat diagnostic pO2 defaulted to "
+            f"{DEFAULT_PO2_BAR:g} bar (missing_condition:pO2_boundary)"
+        )
 
     if not any_numeric and evaluation.records:
         # All points refused — surface as skip-with-typed-reason for pytest.
@@ -3629,6 +3675,10 @@ def _melt_recipe_mol(
             "melt_composition_wt_pct",
             "sample_oxide_composition_wt_pct",
         )
+        external_link_keys = EXTERNAL_SAMPLE_ANALYSIS_LINK_FIELDS
+        if any(key in point for key in external_link_keys if key != "sample"):
+            for key in (*point_recipe_keys, *external_link_keys):
+                values.pop(key, None)
         if any(
             isinstance(point.get(key), Mapping) and bool(point.get(key))
             for key in point_recipe_keys
@@ -3638,8 +3688,8 @@ def _melt_recipe_mol(
                 *point_recipe_keys,
                 "sample_Na2O_wt_pct",
                 "sample_K2O_wt_pct",
-                "composition_source_observation_id",
                 "composition_source_gap",
+                *external_link_keys,
             ):
                 values.pop(key, None)
         values.update(
@@ -3649,12 +3699,24 @@ def _melt_recipe_mol(
                     *point_recipe_keys,
                     "sample_Na2O_wt_pct",
                     "sample_K2O_wt_pct",
-                    "composition_source_observation_id",
                     "composition_source_gap",
+                    *external_link_keys,
                 )
                 if key in point
             }
         )
+    external_sample_analysis_used = False
+    if values.get(EXTERNAL_SAMPLE_ANALYSIS_PROXY_FLAG) is True:
+        external_decision = resolve_external_sample_analysis(
+            values, obs.external_sample_analysis_candidates
+        )
+        if isinstance(external_decision, ExternalSampleAnalysisRefusal):
+            return None, "external_sample_analysis", external_decision.reason
+        if isinstance(external_decision, ExternalSampleAnalysisLink):
+            external_sample_analysis_used = True
+            values["sample_oxide_composition_wt_pct"] = (
+                external_decision.oxide_composition_wt_pct
+            )
     for key in ("composition_mol", "melt_composition_mol"):
         raw = values.get(key)
         if isinstance(raw, Mapping) and raw:
@@ -3690,7 +3752,11 @@ def _melt_recipe_mol(
         provenance = "data/feedstocks.yaml::lunar_mare_low_ti (Apollo 12 proxy)"
     # Prefer the printed alkali overlay when an extract gives it alongside a
     # complete melt recipe.
-    if isinstance(raw_wt, Mapping) and values.get("sample_Na2O_wt_pct") is not None:
+    if (
+        isinstance(raw_wt, Mapping)
+        and not external_sample_analysis_used
+        and values.get("sample_Na2O_wt_pct") is not None
+    ):
         try:
             overlaid = dict(raw_wt)
             overlaid["Na2O"] = float(values["sample_Na2O_wt_pct"])

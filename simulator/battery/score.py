@@ -51,9 +51,12 @@ from simulator.supervised_process_pool import (
     supervised_process_map,
 )
 from simulator.battery.source_declarations import (
+    EXTERNAL_SAMPLE_ANALYSIS_PROXY_FLAG,
+    SAMPLE_CATALOG_COMPOSITION_PROXY_FLAG,
     HASHIMOTO_RESIDUE_PREDICTOR,
     SOSSI_RESIDUE_PREDICTOR,
     declared_residue_predictor as _declared_residue_predictor,
+    external_sample_analysis_notice,
     source_rule_enabled as _source_rule_enabled,
 )
 from simulator.source_ids import (
@@ -2018,16 +2021,23 @@ def _catalogue_composition_notice(reference: Observation) -> Notice | None:
     if not identity.composition.is_value or identity.composition.value is None:
         return None
     composition = identity.composition.value
-    if composition.proxy_flag != "composition_from_sample_catalog":
-        return None
     quantity = quantity_token(identity)
     if quantity is None:
+        return None
+    if composition.proxy_flag == EXTERNAL_SAMPLE_ANALYSIS_PROXY_FLAG:
+        return external_sample_analysis_notice(
+            source_reference=composition.proxy_source or "",
+            heterogeneity_caveat=composition.analysis_selection_rule or "",
+            quantity=quantity,
+            origin=reference.observation_id,
+        )
+    if composition.proxy_flag != SAMPLE_CATALOG_COMPOSITION_PROXY_FLAG:
         return None
     return Notice(
         kind=NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG,
         affected_quantities=(quantity,),
         reason=(
-            "composition_from_sample_catalog: "
+            f"{SAMPLE_CATALOG_COMPOSITION_PROXY_FLAG}: "
             f"source={composition.proxy_source}; "
             f"analysis_selection_rule={composition.analysis_selection_rule}"
         ),

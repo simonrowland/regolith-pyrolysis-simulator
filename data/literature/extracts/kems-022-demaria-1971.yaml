@@ -122,23 +122,35 @@ species:
           p_atm: 4.96e-08
           p_Pa: 0.00502572
           sample: '12022'
-        - T_K: 1433.0
+        - <<: &external_12065_analysis
+            external_sample_analysis: true
+            charge_sample_type: rock
+            composition_source_id: maxwell-wiik-1971-apollo12-major-composition
+            composition_source_observation_id: maxwell_wiik_1971_apollo12_sample_12065_84_gsf_bulk_composition_table1
+            composition_heterogeneity_caveat: >-
+              Maxwell & Wiik analyzed split 12065,84; De Maria identifies the charge as sample 12065.
+              Heterogeneity between splits may change the bulk composition.
+          T_K: 1433.0
           p_atm: 3.78e-09
           p_Pa: 0.0003830085
           sample: '12065'
-        - T_K: 1482.0
+        - <<: *external_12065_analysis
+          T_K: 1482.0
           p_atm: 1.22e-08
           p_Pa: 0.001236165
           sample: '12065'
-        - T_K: 1499.0
+        - <<: *external_12065_analysis
+          T_K: 1499.0
           p_atm: 2.11e-08
           p_Pa: 0.0021379575
           sample: '12065'
-        - T_K: 1471.0
+        - <<: *external_12065_analysis
+          T_K: 1471.0
           p_atm: 1.27e-08
           p_Pa: 0.0012868274999999999
           sample: '12065'
-        - T_K: 1459.0
+        - <<: *external_12065_analysis
+          T_K: 1459.0
           p_atm: 8.78e-09
           p_Pa: 0.0008896335
           sample: '12065'
@@ -403,27 +415,32 @@ species:
           p_Pa: 0.401247
           instrument: NAA
           sample: '12022'
-        - T_K: 1747.0
+        - <<: *external_12065_analysis
+          T_K: 1747.0
           p_atm: 1.65e-09
           p_Pa: 0.0001671862
           instrument: NAA
           sample: '12065'
-        - T_K: 1854.0
+        - <<: *external_12065_analysis
+          T_K: 1854.0
           p_atm: 9.4e-09
           p_Pa: 0.000952455
           instrument: NAA
           sample: '12065'
-        - T_K: 1776.0
+        - <<: *external_12065_analysis
+          T_K: 1776.0
           p_atm: 2.4e-09
           p_Pa: 0.00024318
           instrument: NAA
           sample: '12065'
-        - T_K: 1857.0
+        - <<: *external_12065_analysis
+          T_K: 1857.0
           p_atm: 8.85e-08
           p_Pa: 0.0089672625
           instrument: NAA
           sample: '12065'
-        - T_K: 1927.0
+        - <<: *external_12065_analysis
+          T_K: 1927.0
           p_atm: 3.2e-08
           p_Pa: 0.0032424000000000003
           instrument: NAA
@@ -1359,53 +1376,31 @@ species:
           p_Pa: 0.0105378
           instrument: NAA
           sample: '12022'
-        - <<: &smales_12065_catalogue_composition
-            composition_basis: same_sample_catalog_first_complete_whole_sample_bulk_analysis
-            composition_from_sample_catalog: true
-            composition_source_kind: published_same_sample_bulk_analysis
-            composition_source: >-
-              Smales et al. 1971, Tables 1–3, pp. 1254–1255; source observation
-              smales_1971_apollo_12065_bulk_composition_tables1_2_3. Selection rule: use the first
-              reported value for each major oxide in the held Apollo 12 whole-sample bulk analysis;
-              do not average methods. This is the starting bulk composition, not a per-step residue
-              composition. Above about 2000 K DeMaria's stepwise KEMS measures a depleted residue,
-              and no step-specific residue composition is printed.
-            composition_source_observation_id: smales_1971_apollo_12065_bulk_composition_tables1_2_3
-            sample_oxide_composition_wt_pct:
-              SiO2: 47.1
-              Al2O3: 9.8
-              FeO: 20.0
-              MgO: 9.2
-              CaO: 10.1
-              Na2O: 0.24
-              K2O: 0.063
-              TiO2: 3.1
-              MnO: 0.26
-              Cr2O3: 0.50
+        - <<: *external_12065_analysis
           T_K: 2360.0
           p_atm: 6.9e-07
           p_Pa: 0.06991425
           instrument: BC
           sample: '12065'
-        - <<: *smales_12065_catalogue_composition
+        - <<: *external_12065_analysis
           T_K: 2395.0
           p_atm: 9.88e-07
           p_Pa: 0.10010909999999999
           instrument: BC
           sample: '12065'
-        - <<: *smales_12065_catalogue_composition
+        - <<: *external_12065_analysis
           T_K: 2425.0
           p_atm: 1.9e-06
           p_Pa: 0.1925175
           instrument: BC
           sample: '12065'
-        - <<: *smales_12065_catalogue_composition
+        - <<: *external_12065_analysis
           T_K: 2465.0
           p_atm: 3.39e-06
           p_Pa: 0.34349175000000004
           instrument: BC
           sample: '12065'
-        - <<: *smales_12065_catalogue_composition
+        - <<: *external_12065_analysis
           T_K: 2500.0
           p_atm: 4.73e-06
           p_Pa: 0.47926725
@@ -1514,37 +1509,37 @@ species:
         condensed_phase: lunar_basalt_melt
         reliability_note: AlO NAA points mostly final-range — excluded by authors from tables
         points:
-        - <<: *smales_12065_catalogue_composition
+        - <<: *external_12065_analysis
           T_K: 2320.0
           p_atm: 1.05e-06
           p_Pa: 0.10639124999999999
           instrument: BC
           sample: '12065'
-        - <<: *smales_12065_catalogue_composition
+        - <<: *external_12065_analysis
           T_K: 2360.0
           p_atm: 1.3e-06
           p_Pa: 0.1317225
           instrument: BC
           sample: '12065'
-        - <<: *smales_12065_catalogue_composition
+        - <<: *external_12065_analysis
           T_K: 2395.0
           p_atm: 2.22e-06
           p_Pa: 0.2249415
           instrument: BC
           sample: '12065'
-        - <<: *smales_12065_catalogue_composition
+        - <<: *external_12065_analysis
           T_K: 2425.0
           p_atm: 3.79e-06
           p_Pa: 0.38402175
           instrument: BC
           sample: '12065'
-        - <<: *smales_12065_catalogue_composition
+        - <<: *external_12065_analysis
           T_K: 2465.0
           p_atm: 6.84e-06
           p_Pa: 0.693063
           instrument: BC
           sample: '12065'
-        - <<: *smales_12065_catalogue_composition
+        - <<: *external_12065_analysis
           T_K: 2500.0
           p_atm: 8.96e-06
           p_Pa: 0.907872
@@ -1837,37 +1832,37 @@ species:
           p_Pa: 0.20265
           instrument: NAA
           sample: '12022'
-        - <<: *smales_12065_catalogue_composition
+        - <<: *external_12065_analysis
           T_K: 2320.0
           p_atm: 1.63e-06
           p_Pa: 0.16515975
           instrument: BC
           sample: '12065'
-        - <<: *smales_12065_catalogue_composition
+        - <<: *external_12065_analysis
           T_K: 2360.0
           p_atm: 2.91e-06
           p_Pa: 0.29485575
           instrument: BC
           sample: '12065'
-        - <<: *smales_12065_catalogue_composition
+        - <<: *external_12065_analysis
           T_K: 2395.0
           p_atm: 3.8e-06
           p_Pa: 0.385035
           instrument: BC
           sample: '12065'
-        - <<: *smales_12065_catalogue_composition
+        - <<: *external_12065_analysis
           T_K: 2425.0
           p_atm: 7.4e-06
           p_Pa: 0.749805
           instrument: BC
           sample: '12065'
-        - <<: *smales_12065_catalogue_composition
+        - <<: *external_12065_analysis
           T_K: 2465.0
           p_atm: 1.13e-05
           p_Pa: 1.1449725
           instrument: BC
           sample: '12065'
-        - <<: *smales_12065_catalogue_composition
+        - <<: *external_12065_analysis
           T_K: 2500.0
           p_atm: 1.42e-05
           p_Pa: 1.438815
@@ -2224,11 +2219,7 @@ species:
         material: Apollo_12_12065
         condensed_phase: lunar_basalt_melt
         sample: '12065'
-        <<: &composition_12065
-          composition_source_gap: >-
-            DeMaria 1971 does not print a bulk composition for sample 12065. The p. 1375 section reports
-            differences in chemical composition without tabulating the charge oxides; no external
-            composition is imported.
+        <<: *external_12065_analysis
         prior_figure_digitization_present: true
         first_observed_T_K: 1250.0
         selection_context_note: >-
@@ -2817,52 +2808,60 @@ species:
           p_atm: 2.511886e-08
           series: sample_12022_circle_line
         - T_K: 1497.01
-          <<: *composition_12065
+          <<: *external_12065_analysis
           invT_times_1e4_K_inv: 6.68
           log10_p_atm: -8.25
           p_atm: 5.623413e-09
+          sample: '12065'
           series: sample_12065_square_line
         - T_K: 1479.29
-          <<: *composition_12065
+          <<: *external_12065_analysis
           invT_times_1e4_K_inv: 6.76
           log10_p_atm: -8.40
           p_atm: 3.981072e-09
+          sample: '12065'
           series: sample_12065_square_line
         - T_K: 1468.43
-          <<: *composition_12065
+          <<: *external_12065_analysis
           invT_times_1e4_K_inv: 6.81
           log10_p_atm: -8.40
           p_atm: 3.981072e-09
+          sample: '12065'
           series: sample_12065_square_line
         - T_K: 1457.73
-          <<: *composition_12065
+          <<: *external_12065_analysis
           invT_times_1e4_K_inv: 6.86
           log10_p_atm: -8.50
           p_atm: 3.162278e-09
+          sample: '12065'
           series: sample_12065_square_line
         - T_K: 1428.57
-          <<: *composition_12065
+          <<: *external_12065_analysis
           invT_times_1e4_K_inv: 7.00
           log10_p_atm: -8.68
           p_atm: 2.089296e-09
+          sample: '12065'
           series: sample_12065_square_line
         - T_K: 1392.76
-          <<: *composition_12065
+          <<: *external_12065_analysis
           invT_times_1e4_K_inv: 7.18
           log10_p_atm: -8.80
           p_atm: 1.584893e-09
+          sample: '12065'
           series: sample_12065_square_line
         - T_K: 1351.35
-          <<: *composition_12065
+          <<: *external_12065_analysis
           invT_times_1e4_K_inv: 7.40
           log10_p_atm: -8.85
           p_atm: 1.412538e-09
+          sample: '12065'
           series: sample_12065_square_line
         - T_K: 1308.90
-          <<: *composition_12065
+          <<: *external_12065_analysis
           invT_times_1e4_K_inv: 7.64
           log10_p_atm: -9.22
           p_atm: 6.025596e-10
+          sample: '12065'
           series: sample_12065_square_line
   Si:
     observations:

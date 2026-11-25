@@ -52,6 +52,7 @@ from simulator.battery.enums import (
 from simulator.battery.identity import atm_to_pa, identity_equal, quantity_token
 from simulator.battery.score import (
     ScoreContext,
+    blocking_qualifications,
     liquid_model_subsolidus_sample_notice,
     parse_migration_headline,
     predict_with_engine,
@@ -551,6 +552,22 @@ def _migrate_real_extract(
         else src.read_text(encoding="utf-8")
     )
     (extracts / name).write_text(extract_text, encoding="utf-8")
+    from simulator.battery.source_declarations import (
+        external_sample_analysis_source_ids_from_extracts,
+    )
+
+    for linked_source_id in external_sample_analysis_source_ids_from_extracts((doc,)):
+        linked_source = (
+            REPO_ROOT
+            / "data"
+            / "literature"
+            / "extracts"
+            / f"{linked_source_id}.yaml"
+        )
+        assert linked_source.is_file(), linked_source_id
+        (extracts / linked_source.name).write_text(
+            linked_source.read_text(encoding="utf-8"), encoding="utf-8"
+        )
     return migrate(root, write=write)
 
 
@@ -13690,18 +13707,43 @@ def test_demaria_partial_alkalis_do_not_become_a_complete_composition(
         for obs in result.observations.values()
         if obs.source_id == "kems-022-demaria-1971"
     }
-    for prefix in (
-        "demaria_1971_na_psat_figure1_sample_12022_digitized",
-        "demaria_1971_na_psat_figure1_sample_12065_digitized",
-    ):
-        related = [obs for key, obs in rows.items() if key.startswith(prefix)]
-        assert related
-        assert all(obs.identity.composition is not None for obs in related)
-        assert all(obs.identity.composition.is_unknown for obs in related)
-        assert all(
-            obs.identity.composition.reason == "no composition mapped from source"
-            for obs in related
+    sample_12022_rows = [
+        obs
+        for key, obs in rows.items()
+        if key.startswith("demaria_1971_na_psat_figure1_sample_12022_digitized")
+    ]
+    assert sample_12022_rows
+    assert all(obs.identity.composition is not None for obs in sample_12022_rows)
+    assert all(obs.identity.composition.is_unknown for obs in sample_12022_rows)
+    assert all(
+        obs.identity.composition.reason == "no composition mapped from source"
+        for obs in sample_12022_rows
+    )
+
+    sample_12065_rows = [
+        obs
+        for key, obs in rows.items()
+        if key.startswith("demaria_1971_na_psat_figure1_sample_12065_digitized")
+    ]
+    assert sample_12065_rows
+    for obs in sample_12065_rows:
+        composition = obs.identity.composition
+        assert composition is not None and composition.is_value
+        assert composition.value.proxy_flag == "external_sample_analysis"
+        assert "maxwell-wiik-1971-apollo12-major-composition" in (
+            composition.value.proxy_source
         )
+        assert "Table 1" in composition.value.proxy_source
+        assert "p. 286" in composition.value.proxy_source
+        assert "row 12065,84 GSF" in composition.value.proxy_source
+        caveats = [
+            notice
+            for notice in obs.notices
+            if notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+            and notice.reason.startswith("external_sample_analysis:")
+        ]
+        assert caveats
+        assert blocking_qualifications(Quantity.P_PARTIAL, tuple(caveats)) == ()
 
     extract_rows = _extract_observations("kems-022-demaria-1971.yaml")
     sample_12022 = next(
@@ -13725,9 +13767,13 @@ def test_demaria_partial_alkalis_do_not_become_a_complete_composition(
         if row.get("observation_id")
         == "demaria_1971_na_psat_figure1_sample_12065_digitized"
     )
-    assert "does not print a bulk composition" in sample_12065["values"][
-        "composition_source_gap"
-    ]
+    assert sample_12065["values"]["external_sample_analysis"] is True
+    assert sample_12065["values"]["composition_source_id"] == (
+        "maxwell-wiik-1971-apollo12-major-composition"
+    )
+    assert sample_12065["values"]["composition_source_observation_id"] == (
+        "maxwell_wiik_1971_apollo12_sample_12065_84_gsf_bulk_composition_table1"
+    )
 
 
 def test_demaria_undigitized_pressure_figures_are_unavailable_not_points(

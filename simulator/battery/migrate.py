@@ -89,8 +89,18 @@ from simulator.battery import schema_gap as sg
 from simulator.battery.source_declarations import (
     B677_SOURCE_ID,
     B2131_SOURCE_ID as _B2131_SOURCE_ID,
+    COMPOSITION_SOURCE_PROXY_FLAGS,
+    EXTERNAL_SAMPLE_ANALYSIS_PROXY_FLAG,
+    SAMPLE_CATALOG_COMPOSITION_PROXY_FLAG,
+    ExternalSampleAnalysisCandidate,
+    ExternalSampleAnalysisLink,
+    ExternalSampleAnalysisRefusal,
     KEMS_137_SOURCE_ID as _KEMS_137_SOURCE_ID,
     SOURCE_DECLARATIONS,
+    external_sample_analysis_candidates_from_extracts,
+    external_sample_analysis_notice,
+    external_sample_analysis_source_ids_from_extracts,
+    resolve_external_sample_analysis,
 )
 from simulator.source_ids import SOSSI_FEGLEY_SOURCE_ID
 from simulator.battery.oxygen_identity import (
@@ -8233,40 +8243,84 @@ def _composition_axis_is_required(
 def _catalogue_composition_located_from_values(
     values: object,
     locator: Locator | None,
+    *,
+    external_sample_analysis_candidates: Sequence[
+        ExternalSampleAnalysisCandidate
+    ] = (),
 ) -> Located[Composition] | None:
-    """Map an explicitly marked same-sample catalogue composition.
+    """Map an explicitly linked external or same-sample catalogue composition.
 
-    The catalogue map is an engine input proxy, never the paper's printed
-    composition. Keep its source and analysis rule on the typed value so the
-    scorer can carry the flag without creating a second provenance path.
+    External analysis rows are resolved by the owner in source_declarations;
+    this mapper only converts the selected printed oxide cells to engine input.
     """
 
-    if not isinstance(values, Mapping) or values.get("composition_from_sample_catalog") is not True:
+    if not isinstance(values, Mapping):
         return None
+    external_decision = resolve_external_sample_analysis(
+        values, external_sample_analysis_candidates
+    )
+    external_link = (
+        external_decision
+        if isinstance(external_decision, ExternalSampleAnalysisLink)
+        else None
+    )
+    if isinstance(external_decision, ExternalSampleAnalysisRefusal):
+        return Located(State.unknown(external_decision.reason), locator=locator)
+    catalogue_marked = any(
+        values.get(flag) is True for flag in COMPOSITION_SOURCE_PROXY_FLAGS
+    )
+    if not catalogue_marked and external_link is None:
+        return None
+    if external_link is not None:
+        values = {
+            **values,
+            "sample_oxide_composition_wt_pct": (
+                external_link.oxide_composition_wt_pct
+            ),
+        }
     wt = _initial_oxide_map_from_values(
         values,
         declared_map=_declared_wt_composition_point_map(values, None),
     )
     declared_component_map = _named_printed_composition_map(values)
     if not wt or len(wt) < 2:
+        if external_link is not None:
+            return Located(
+                State.unknown(
+                    "external sample analysis refused: no usable bulk oxide suite"
+                ),
+                locator=locator,
+            )
         return None
-    source_raw = values.get("composition_source") or values.get("composition_source_locator")
-    source = str(source_raw).strip() if source_raw not in (None, "") else None
-    rule_raw = values.get("analysis_selection_rule") or values.get(
-        "composition_analysis_selection_rule"
-    )
-    rule = str(rule_raw).strip() if rule_raw not in (None, "") else ""
-    selection_match = (
-        re.search(r"selection rule:\s*(.*)", source, re.IGNORECASE)
-        if source
-        else None
-    )
-    if not rule and selection_match is not None:
-        rule = selection_match.group(1)
-        rule = re.split(r"\s+(?:This composition|Sample \d+ is)\b", rule, maxsplit=1)[0]
-        rule = rule.strip(" .")
-    if not rule:
-        rule = "source-declared catalogue analysis; no separate selection rule stated"
+    if external_link is not None:
+        source = external_link.source_reference
+        rule = external_link.heterogeneity_caveat
+        proxy_flag = EXTERNAL_SAMPLE_ANALYSIS_PROXY_FLAG
+    else:
+        source_raw = values.get("composition_source") or values.get(
+            "composition_source_locator"
+        )
+        source = str(source_raw).strip() if source_raw not in (None, "") else None
+        rule_raw = values.get("analysis_selection_rule") or values.get(
+            "composition_analysis_selection_rule"
+        )
+        rule = str(rule_raw).strip() if rule_raw not in (None, "") else ""
+        selection_match = (
+            re.search(r"selection rule:\s*(.*)", source, re.IGNORECASE)
+            if source
+            else None
+        )
+        if not rule and selection_match is not None:
+            rule = selection_match.group(1)
+            rule = re.split(
+                r"\s+(?:This composition|Sample \d+ is)\b",
+                rule,
+                maxsplit=1,
+            )[0]
+            rule = rule.strip(" .")
+        if not rule:
+            rule = "source-declared catalogue analysis; no separate selection rule stated"
+        proxy_flag = SAMPLE_CATALOG_COMPOSITION_PROXY_FLAG
     closure_result = _wt_percent_conversion_or_refusal(
         wt,
         closure_context=values,
@@ -8283,7 +8337,7 @@ def _catalogue_composition_located_from_values(
     composition = replace(
         converted_state.value,
         basis="sample_catalog_proxy",
-        proxy_flag="composition_from_sample_catalog",
+        proxy_flag=proxy_flag,
         proxy_source=source or "sample catalogue source not named",
         analysis_selection_rule=rule,
     )
@@ -9188,7 +9242,7 @@ def _stamp_promoted_point_composition(
 
     if composition.input_provenance is not None:
         return composition
-    if composition.proxy_flag == "composition_from_sample_catalog":
+    if composition.proxy_flag in COMPOSITION_SOURCE_PROXY_FLAGS:
         return composition
     if composition.basis in {
         ELEMENT_WT_PERCENT_BASIS,
@@ -9236,7 +9290,7 @@ def _finalize_input_provenance(
         condition_locator = getattr(located_composition, "locator", None)
         if isinstance(condition_locator, Locator):
             map_locator = condition_locator
-    if composition.proxy_flag == "composition_from_sample_catalog":
+    if composition.proxy_flag in COMPOSITION_SOURCE_PROXY_FLAGS:
         return
     if composition.basis in {
         ELEMENT_WT_PERCENT_BASIS,
@@ -9422,7 +9476,7 @@ def _apply_equilibrium_starting_bulk(
     if _keeps_existing_composition(ident_kwargs.get("composition")):
         return point_conditions, []
     composition_for_row = composition
-    if composition.proxy_flag != "composition_from_sample_catalog":
+    if composition.proxy_flag not in COMPOSITION_SOURCE_PROXY_FLAGS:
         composition_for_row = composition_with_provenance(
             composition, PRINTED_STARTING_BULK
         )
@@ -20036,7 +20090,7 @@ def _initial_composition_authority(initial: Located[Composition]) -> int:
     # Composition has no typed measured-versus-nominal marker. Owner-selected
     # source values, including initial charges, therefore tie; only the typed
     # catalogue marker and proxy flag can lower or raise their authority.
-    if composition.proxy_flag == "composition_from_sample_catalog":
+    if composition.proxy_flag in COMPOSITION_SOURCE_PROXY_FLAGS:
         return 2
     if composition.proxy_flag not in (None, INITIAL_CHARGE_ONLY_PROXY_FLAG):
         return 1
@@ -20175,6 +20229,9 @@ def sample_from_equipment(
     values: object = None,
     locator: Locator | None = None,
     composition_units: object = None,
+    external_sample_analysis_candidates: Sequence[
+        ExternalSampleAnalysisCandidate
+    ] = (),
 ) -> Sample:
     """Transfer a stated sample payload; never invent mass, form, or units."""
 
@@ -20189,10 +20246,14 @@ def sample_from_equipment(
     hard_form, hard_container = _form_and_container(equipment)
     form_located = _prefer_located(form_located, hard_form)
     container_located = _prefer_located(container_located, hard_container)
-    catalogue = _catalogue_composition_located_from_values(values, locator)
-    catalogue_marked = isinstance(values, Mapping) and values.get(
-        "composition_from_sample_catalog"
-    ) is True
+    catalogue = _catalogue_composition_located_from_values(
+        values,
+        locator,
+        external_sample_analysis_candidates=external_sample_analysis_candidates,
+    )
+    catalogue_marked = isinstance(values, Mapping) and any(
+        values.get(flag) is True for flag in COMPOSITION_SOURCE_PROXY_FLAGS
+    )
     printed = None if catalogue_marked else _printed_composition_from_roots(
         roots, vocab, fallback_locator=locator
     )
@@ -24884,6 +24945,9 @@ class Migrator:
         conditions: dict[str, Located[Decimal]] | None = None,
         observation_id: str | None = None,
         source: str | None = None,
+        external_sample_analysis_candidates: Sequence[
+            ExternalSampleAnalysisCandidate
+        ] = (),
     ) -> Experiment:
         existing = self.result.experiments.get(experiment_id)
         cond = conditions or {
@@ -24910,6 +24974,9 @@ class Migrator:
             values=values,
             locator=locator,
             composition_units=composition_units,
+            external_sample_analysis_candidates=(
+                external_sample_analysis_candidates
+            ),
         )
         if experiment_id in self._initial_composition_conflicts:
             sample = replace(sample, initial_composition=None)
@@ -26221,6 +26288,23 @@ class Migrator:
             enriched.append(experiment)
         return {**doc, "experiments": enriched}
 
+    def _external_sample_analysis_candidates_for_rows(
+        self,
+        extract: Mapping[str, Any],
+    ) -> tuple[ExternalSampleAnalysisCandidate, ...]:
+        """Load every located alternative from the row-declared source files."""
+
+        source_ids = external_sample_analysis_source_ids_from_extracts((extract,))
+        extracts: list[Mapping[str, Any]] = []
+        for source_id in source_ids:
+            candidate_path = self.extracts_dir / f"{source_id}.yaml"
+            if not candidate_path.is_file():
+                continue
+            candidate_doc = load_yaml(candidate_path)
+            if isinstance(candidate_doc, Mapping):
+                extracts.append(candidate_doc)
+        return external_sample_analysis_candidates_from_extracts(extracts)
+
     def _migrate_extract(self, path: Path) -> None:
         rel = path.relative_to(self.root).as_posix() if path.is_relative_to(self.root) else str(path)
         count = self._count(rel)
@@ -26273,6 +26357,9 @@ class Migrator:
             else None
         )
         rows = list(iter_extract_observations(doc))
+        external_sample_analysis_candidates = (
+            self._external_sample_analysis_candidates_for_rows(doc)
+        )
         fusion_transition_rows = self._fusion_transition_rows_by_table_row(rows)
         pressure_identity_context = _pressure_identity_context(doc, rows)
         raw_experiments = doc.get("experiments") or ()
@@ -26335,6 +26422,9 @@ class Migrator:
                     phase_analysis_parent_ids.add(f"{source_id}::{record_id}")
         source_context = dict(pressure_identity_context or {})
         source_context = sg.attach_extract_declarations(source_context, doc)
+        source_context["external_sample_analysis_candidates"] = (
+            external_sample_analysis_candidates
+        )
         source_context["experiment_source_rows"] = experiment_source_rows
         source_context["printed_atmospheres_for_set"] = (
             printed_atmospheres_for_set
@@ -26661,6 +26751,11 @@ class Migrator:
         else:
             values = {}
         context = source_context or {}
+        external_sample_analysis_candidates = context.get(
+            "external_sample_analysis_candidates", ()
+        )
+        if not isinstance(external_sample_analysis_candidates, Sequence):
+            external_sample_analysis_candidates = ()
         closure_components_by_observation = context.get(
             "same_row_composition_closure_components"
         )
@@ -27132,7 +27227,9 @@ class Migrator:
                 observation_id=obs_id,
             )
         catalogue_composition = _catalogue_composition_located_from_values(
-            values, locator
+            values,
+            locator,
+            external_sample_analysis_candidates=external_sample_analysis_candidates,
         )
         malformed_composition_amount: str | None = None
         if composition_axis_required:
@@ -28278,6 +28375,9 @@ class Migrator:
                 else None
             ),
             locator=locator,
+            external_sample_analysis_candidates=(
+                external_sample_analysis_candidates
+            ),
         )
         refused_sample_composition = None
         if (
@@ -28498,6 +28598,9 @@ class Migrator:
                 composition_units=obs.get("units"),
                 observation_id=obs_id,
                 source=source_key,
+                external_sample_analysis_candidates=(
+                    external_sample_analysis_candidates
+                ),
             )
         oxygen_roots: list[object] = []
         if isinstance(values, Mapping):
@@ -29326,6 +29429,9 @@ class Migrator:
                     composition_datum_declared=declares_composition_datum,
                     provenance=observation_provenance,
                     parent_point_conditions=point_conditions,
+                    external_sample_analysis_candidates=(
+                        external_sample_analysis_candidates
+                    ),
                 )
             if (
                 self._count(source_key).observations_out > before
@@ -29460,6 +29566,9 @@ class Migrator:
                         composition_datum_declared=declares_composition_datum,
                         provenance=observation_provenance,
                         parent_point_conditions=point_conditions,
+                        external_sample_analysis_candidates=(
+                            external_sample_analysis_candidates
+                        ),
                         source_point_oxide_map=_mass_loss_oxide_map_from_mapping(
                             raw_item, fields=valid_fields
                         ),
@@ -29599,6 +29708,9 @@ class Migrator:
                     composition_datum_declared=declares_composition_datum,
                     provenance=observation_provenance,
                     parent_point_conditions=point_conditions,
+                    external_sample_analysis_candidates=(
+                        external_sample_analysis_candidates
+                    ),
                 )
                 if not child_carries_value:
                     children_carry_values = False
@@ -29800,6 +29912,9 @@ class Migrator:
                         parent_point_conditions=(
                             point_parent_conditions if non_yield_points else point_conditions
                         ),
+                        external_sample_analysis_candidates=(
+                            external_sample_analysis_candidates
+                        ),
                         content_stable_id=True,
                         use_printed_point_species=non_yield_points,
                     )
@@ -29942,23 +30057,34 @@ class Migrator:
             and identity.composition is not None
             and identity.composition.is_value
             and identity.composition.value is not None
-            and identity.composition.value.proxy_flag
-            == "composition_from_sample_catalog"
+            and identity.composition.value.proxy_flag in COMPOSITION_SOURCE_PROXY_FLAGS
         ):
             composition = identity.composition.value
-            observation_notices.append(
-                Notice(
-                    kind=NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG,
-                    affected_quantities=(q_token,),
-                    reason=(
-                        "composition_from_sample_catalog: "
-                        f"source={composition.proxy_source}; "
-                        f"analysis_selection_rule={composition.analysis_selection_rule}"
-                    ),
-                    origin=obs_id,
-                    source=composition.proxy_source,
+            if composition.proxy_flag == EXTERNAL_SAMPLE_ANALYSIS_PROXY_FLAG:
+                observation_notices.append(
+                    external_sample_analysis_notice(
+                        source_reference=composition.proxy_source or "",
+                        heterogeneity_caveat=(
+                            composition.analysis_selection_rule or ""
+                        ),
+                        quantity=q_token,
+                        origin=obs_id,
+                    )
                 )
-            )
+            else:
+                observation_notices.append(
+                    Notice(
+                        kind=NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG,
+                        affected_quantities=(q_token,),
+                        reason=(
+                            f"{SAMPLE_CATALOG_COMPOSITION_PROXY_FLAG}: "
+                            f"source={composition.proxy_source}; "
+                            f"analysis_selection_rule={composition.analysis_selection_rule}"
+                        ),
+                        origin=obs_id,
+                        source=composition.proxy_source,
+                    )
+                )
         if named_material_lot is not None and isinstance(q_token, Quantity):
             lot_reason, lot_source = named_material_lot
             observation_notices.append(
@@ -30403,6 +30529,9 @@ class Migrator:
         source_point_oxide_map: Mapping[str, Decimal] | None = None,
         source_point_composition_context: Mapping[str, Any] | None = None,
         source_point_residue_fields: Sequence[str] | None = None,
+        external_sample_analysis_candidates: Sequence[
+            ExternalSampleAnalysisCandidate
+        ] = (),
         content_stable_id: bool = False,
         ordinal_point_id: str | None = None,
         use_printed_point_species: bool = False,
@@ -30732,7 +30861,11 @@ class Migrator:
                     )
                 )
             point_catalogue = _catalogue_composition_located_from_values(
-                raw_item, point_locator
+                raw_item,
+                point_locator,
+                external_sample_analysis_candidates=(
+                    external_sample_analysis_candidates
+                ),
             )
             if point_catalogue is not None:
                 point_oxide_map = None
@@ -32271,27 +32404,37 @@ class Migrator:
             and composition_state is not None
             and composition_state.is_value
             and composition_state.value is not None
-            and composition_state.value.proxy_flag
-            == "composition_from_sample_catalog"
-            and not any(
-                notice.kind is NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG
-                for notice in child_notices
-            )
+            and composition_state.value.proxy_flag in COMPOSITION_SOURCE_PROXY_FLAGS
         ):
             composition = composition_state.value
-            child_notices.append(
-                Notice(
-                    kind=NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG,
-                    affected_quantities=(q_token_point,),
-                    reason=(
-                        "composition_from_sample_catalog: "
-                        f"source={composition.proxy_source}; "
-                        f"analysis_selection_rule={composition.analysis_selection_rule}"
+            if composition.proxy_flag == EXTERNAL_SAMPLE_ANALYSIS_PROXY_FLAG:
+                notice = external_sample_analysis_notice(
+                    source_reference=composition.proxy_source or "",
+                    heterogeneity_caveat=(
+                        composition.analysis_selection_rule or ""
                     ),
+                    quantity=q_token_point,
                     origin=point_id,
-                    source=composition.proxy_source,
                 )
-            )
+                if notice not in child_notices:
+                    child_notices.append(notice)
+            elif not any(
+                notice.kind is NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG
+                for notice in child_notices
+            ):
+                child_notices.append(
+                    Notice(
+                        kind=NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG,
+                        affected_quantities=(q_token_point,),
+                        reason=(
+                            f"{SAMPLE_CATALOG_COMPOSITION_PROXY_FLAG}: "
+                            f"source={composition.proxy_source}; "
+                            f"analysis_selection_rule={composition.analysis_selection_rule}"
+                        ),
+                        origin=point_id,
+                        source=composition.proxy_source,
+                    )
+                )
         if printed_phase_kind == "two_phase" and isinstance(q_token_point, Quantity):
             child_notices.append(
                 Notice(

@@ -50,6 +50,18 @@ def test_aggregation_never_averages_authorities(observation):
     assert coverage["refused_fraction"] == 0.25
 
 
+def test_demaria_holdout_uses_external_analysis_resolver_for_sample_12065():
+    from scripts.calibration_battery import na_rows
+
+    row = next(row for row in na_rows() if row["run_id"] == "demaria:12065")
+
+    assert row["conditions"]["composition_wt_pct"] is None
+    assert row["conditions"]["composition_mol"]
+    assert "maxwell_wiik_1971_apollo12_sample_12065_84_gsf_bulk_composition_table1" in (
+        row["conditions"]["composition_source"]
+    )
+
+
 def test_zero_uncertainty_placeholder_is_missing_and_true_zero_is_not_refusal(observation):
     row = envelope(**{**observation, "predicted": 0.0,
         "uncertainty": {"kind": "absolute", "value": 0, "reported_status": "not_reported"}})
