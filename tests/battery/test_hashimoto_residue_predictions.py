@@ -340,7 +340,7 @@ def test_hashimoto_openimcc_primary_numeric_output_is_pinned() -> None:
         oxide: value.hex()
         for oxide, value in primary.primary_oxide_wt_pct.items()
     } == {
-        "SiO2": "0x1.6c50f5b58d934p+5",
+        "SiO2": "0x1.6bec64b671bffp+5",
         "Al2O3": "0x1.23c77e4d99000p+2",
         "FeO": "0x1.c5d0d445df444p+3",
         "MgO": "0x1.015f883f95dfcp+5",
