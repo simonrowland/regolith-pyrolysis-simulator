@@ -469,11 +469,9 @@ def test_richter11_residue_rows_migrate_temperature_and_time_conditions(
         )
 
 
-def test_richter11_residue_series_routes_through_langmuir_owner(
+def test_richter_time_series_residue_routes_to_owner_and_dependencies(
     tmp_path: Path, monkeypatch,
 ) -> None:
-    import pytest
-
     import simulator.battery.migrate as migrate_module
     import simulator.battery.score as score_module
     from simulator.battery.score_run import _residue_adapter_kinds
@@ -507,7 +505,8 @@ def test_richter11_residue_series_routes_through_langmuir_owner(
     # The 325th printed cell is the censored <0.01 Na2O value above; the
     # existing numeric selector keeps that cell typed-refused.
     assert len(residues) == 324
-    routed = []
+    vacuum_rows = []
+    gas_rows = []
     for row in residues:
         experiment = result.experiments[row.experiment_id]
         adapters = _residue_adapter_kinds(
@@ -519,42 +518,130 @@ def test_richter11_residue_series_routes_through_langmuir_owner(
             and experiment.method.value is MethodToken.LANGMUIR_FREE_EVAPORATION
         ):
             assert adapters == (MethodToken.LANGMUIR_FREE_EVAPORATION,)
-            routed.append(row)
+            vacuum_rows.append(row)
         else:
-            # The one-bar flowing-gas records retain their printed unknown
-            # method; they need a source/science ruling before using the
-            # vacuum Langmuir model.
-            assert not adapters
-    assert routed
+            assert not experiment.method.is_value
+            # Selector dispatch is only for the existing typed-refusal path;
+            # the unknown gas method never reaches a Langmuir engine call.
+            assert adapters == (MethodToken.LANGMUIR_FREE_EVAPORATION,)
+            gas_rows.append(row)
+    assert len(vacuum_rows) == 167
+    assert len(gas_rows) == 157
 
     context = score_module.ScoreContext(
         {}, dict(result.experiments), dict(result.observations), root=ROOT
     )
-    owner_prediction = score_module._extent_residue_prediction(
-        context, routed[0], Engine.OPENIMCC
+    for row in vacuum_rows:
+        prediction = score_module._extent_residue_prediction(
+            context, row, Engine.OPENIMCC
+        )
+        assert prediction is not None and prediction.value is None
+        assert prediction.refusal_detail["reason"] == (
+            "awaits_time_forward_langmuir_route"
+        )
+        assert prediction.refusal_detail["upstream_reason"] == (
+            "measured_mass_loss_fraction_missing_or_invalid"
+        )
+    for row in gas_rows:
+        prediction = score_module._extent_residue_prediction(
+            context, row, Engine.OPENIMCC
+        )
+        assert prediction is not None and prediction.value is None
+        assert prediction.refusal_detail["reason"] == "awaits_d475_series_flux"
+        assert prediction.refusal_detail["sample_support_not_printed"] is True
+    langmuir_owner = score_module._langmuir_residue_prediction
+
+    def reject_gas_langmuir_route(*_args, **_kwargs):
+        raise AssertionError("one-bar gas rows must not enter vacuum Langmuir")
+
+    monkeypatch.setattr(
+        score_module, "_langmuir_residue_prediction", reject_gas_langmuir_route
     )
-    assert owner_prediction is not None
-    assert owner_prediction.refusal_detail["reason"] == (
-        "measured_mass_loss_fraction_missing_or_invalid"
+    gas_prediction = score_module._extent_residue_prediction(
+        context, gas_rows[0], Engine.OPENIMCC
+    )
+    assert gas_prediction is not None
+    assert gas_prediction.refusal_detail["reason"] == "awaits_d475_series_flux"
+    monkeypatch.setattr(
+        score_module, "_langmuir_residue_prediction", langmuir_owner
     )
 
-    # Mutation probe: restore the previous source-locked selector and show the
-    # real score-run caller loses this located residue series.
+    richter07_root = tmp_path / "richter07"
+    richter07_root.mkdir()
+    result07 = _migrate_real_extract(richter07_root, RICHTER07_EXTRACT)
+    residues07 = [
+        row for row in result07.observations.values()
+        if row.source_id == RICHTER07_SID
+        and row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    ]
+    assert len(residues07) == 204
+    context07 = score_module.ScoreContext(
+        {}, dict(result07.experiments), dict(result07.observations), root=ROOT
+    )
+    anchor_pairs = []
+    missing_anchor_rows = []
+    for row in residues07:
+        experiment = result07.experiments[row.experiment_id]
+        assert _residue_adapter_kinds(
+            row, Engine.INTERNAL_ANALYTICAL, experiment,
+            Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        ) == (MethodToken.LANGMUIR_FREE_EVAPORATION,)
+        anchors = [
+            candidate for candidate in result07.observations.values()
+            if candidate.source_id == RICHTER07_SID
+            and candidate.experiment_id == row.experiment_id
+            and candidate.identity.quantity.is_value
+            and candidate.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
+            and candidate.locator is not None and row.locator is not None
+            and candidate.locator.table == row.locator.table
+            and candidate.locator.note == row.locator.note
+        ]
+        if anchors:
+            assert len(anchors) == 1
+            anchor_pairs.append((row, experiment))
+        else:
+            missing_anchor_rows.append((row, experiment))
+    assert len(anchor_pairs) == 200
+    assert len(missing_anchor_rows) == 4
+    anchored_row, anchored_experiment = anchor_pairs[0]
+    prediction = score_module._extent_residue_prediction(
+        context07, anchored_row, Engine.INTERNAL_ANALYTICAL
+    )
+    assert prediction is not None
+    assert prediction.value is not None, prediction.refusal_detail
+    missing_row, _missing_experiment = missing_anchor_rows[0]
+    prediction = score_module._extent_residue_prediction(
+        context07, missing_row, Engine.INTERNAL_ANALYTICAL
+    )
+    assert prediction is not None and prediction.value is None
+    assert prediction.refusal_detail["reason"] == (
+        "awaits_time_forward_langmuir_route"
+    )
+
+    # Mutation probe: restore the old source lock and show the real score-run
+    # consumer loses both Richter residue series.
     previous_selector = score_module._extent_residue_method
 
     def old_source_lock(reference, experiment, quantity):
-        if reference.source_id == RICHTER11_SID:
+        if reference.source_id in {RICHTER07_SID, RICHTER11_SID}:
             return None
         return previous_selector(reference, experiment, quantity)
 
     monkeypatch.setattr(score_module, "_extent_residue_method", old_source_lock)
-    row = routed[0]
-    experiment = result.experiments[row.experiment_id]
-    with pytest.raises(AssertionError):
-        assert MethodToken.LANGMUIR_FREE_EVAPORATION in _residue_adapter_kinds(
-            row, Engine.OPENIMCC, experiment,
+    for row, experiment in (
+        (vacuum_rows[0], result.experiments[vacuum_rows[0].experiment_id]),
+        (anchored_row, anchored_experiment),
+    ):
+        assert MethodToken.LANGMUIR_FREE_EVAPORATION not in _residue_adapter_kinds(
+            row, Engine.INTERNAL_ANALYTICAL, experiment,
             Quantity.RESIDUE_COMPONENT_COMPOSITION,
         )
+        assert score_module._extent_residue_prediction(
+            context07 if row.source_id == RICHTER07_SID else context,
+            row,
+            Engine.INTERNAL_ANALYTICAL,
+        ) is None
 
 
 def test_richter02_type_b_melt_phase_is_canonical(tmp_path: Path) -> None:
