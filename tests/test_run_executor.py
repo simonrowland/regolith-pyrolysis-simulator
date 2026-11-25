@@ -495,21 +495,20 @@ def test_campaign_count_includes_partial_campaign_hours():
 
 
 def test_campaign_count_resolves_structured_c3_duration():
-    session = SimSession().start(
-        _run(
-            feedstock_id="lunar_mare_low_ti",
-            campaign="C2A",
-            hours=1,
-            additives_kg={},
-            runtime_campaign_overrides={
-                "C3_NA": {"staged_duration_h": 3.0}
-            },
-        )._session_config()
+    campaign_mgr = SimpleNamespace(
+        _configured_max_hold_hr=lambda _campaign, phase, path: {
+            ("C3_NA", "A_staged"): 3.0,
+        }[(phase, path)],
+        _campaign_overrides=lambda _campaign: {},
     )
-    sim = session.simulator
-    sim.melt.campaign = CampaignPhase.C3_NA
-    sim.record.path = "A_staged"
-    session._step_results = [SimpleNamespace(campaign_summary=None)]
+    session = SimpleNamespace(
+        _step_results=[SimpleNamespace(campaign_summary=None)],
+        simulator=SimpleNamespace(
+            melt=SimpleNamespace(campaign=CampaignPhase.C3_NA),
+            record=SimpleNamespace(path="A_staged"),
+            campaign_mgr=campaign_mgr,
+        ),
+    )
 
     assert _campaigns_elapsed_from_session_history(
         session,
@@ -518,30 +517,29 @@ def test_campaign_count_resolves_structured_c3_duration():
 
 
 def test_campaign_count_resolves_structured_c5_branch_max_hold():
-    """C5 max_hold_hr is selected by branch through the campaign owner."""
-    base_session = SimSession().start(
-        _run(
-            feedstock_id="lunar_mare_low_ti",
-            campaign="C2A",
-            hours=1,
-            additives_kg={},
-        )._session_config()
-    )
-    campaign_mgr = base_session.simulator.campaign_mgr
-    campaign_mgr.campaigns["C5"]["max_hold_hr"] = {
-        "branch_two": 800.0,
-        "branch_one": 400.0,
-    }
+    """C5 max_hold_hr is a per-branch mapping; progress must not float() it.
+
+    Authoritative schema (data/setpoints.yaml campaigns.C5.max_hold_hr):
+      {branch_two: ..., branch_one: ...}
+    Selection rule mirrors campaigns.py C5 endpoint: branch=='two' uses
+    branch_two, otherwise branch_one (including unset branch).
+    """
     calls: list[tuple] = []
-    configured_max_hold_hr = campaign_mgr._configured_max_hold_hr
 
-    def _configured_max_hold_hr(campaign, *path):
+    def _configured_max_hold_hr(_campaign, *path):
         calls.append(path)
-        return configured_max_hold_hr(campaign, *path)
+        table = {
+            ("branch_two",): 800.0,
+            ("branch_one",): 400.0,
+        }
+        return table[path]
 
-    campaign_mgr._configured_max_hold_hr = _configured_max_hold_hr
-    campaign_mgr._max_hold_hr = lambda _campaign: (_ for _ in ()).throw(
-        AssertionError("C5 must not resolve scalar max_hold_hr")
+    campaign_mgr = SimpleNamespace(
+        _configured_max_hold_hr=_configured_max_hold_hr,
+        # If the consumer wrongly calls scalar _max_hold_hr(campaign), surface it.
+        _max_hold_hr=lambda _campaign: (_ for _ in ()).throw(
+            AssertionError("C5 must not resolve scalar max_hold_hr")
+        ),
     )
 
     # Active hour mid-C5 on branch two: 1 completed campaign + 2/800.
