@@ -526,12 +526,78 @@ def test_values_method_is_used_when_extract_regime_is_absent(tmp_path: Path) -> 
     migrated = next(iter(result.observations.values()))
     experiment = result.experiments[migrated.experiment_id]
     assert experiment.method == State.of(MethodToken.UNSPECIFIED)
-    assert any(
-        notice.kind is NoticeKind.METHOD_UNSTATED
-        and "source method text is not mapped: unmapped source regime"
-        in notice.reason
-        for notice in migrated.notices
+    unmapped_rows = [
+        row
+        for row in result.observations.values()
+        if row.observation_id == "fixture-source::na_psat"
+        or row.observation_id.startswith("fixture-source::na_psat::")
+    ]
+    assert unmapped_rows
+    assert all(
+        sum(
+            1
+            for notice in row.notices
+            if notice.kind is NoticeKind.METHOD_UNSTATED
+            and "source method text is not mapped: unmapped source regime"
+            in notice.reason
+        )
+        == 1
+        for row in unmapped_rows
     )
+
+
+def test_unmapped_regime_method_notice_mutation_rejects_duplicate(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    observation = extract["species"]["Na"]["observations"][0]
+    observation["regime"] = "unmapped source regime"
+    observation["values"]["method"] = (
+        "KEMS ion-current intensities converted to partial pressures using "
+        "the thesis calibration (Eq. 2)."
+    )
+    original = Migrator._add_observation
+
+    def readd_method_notice(self, observation, source_key, *args, **kwargs):
+        duplicate = next(
+            (
+                notice
+                for notice in observation.notices
+                if notice.kind is NoticeKind.METHOD_UNSTATED
+                and "source method text is not mapped: unmapped source regime"
+                in notice.reason
+            ),
+            None,
+        )
+        if duplicate is not None:
+            observation = replace(
+                observation, notices=(*observation.notices, duplicate)
+            )
+        return original(self, observation, source_key, *args, **kwargs)
+
+    monkeypatch.setattr(Migrator, "_add_observation", readd_method_notice)
+    result = migrate(
+        _write_min_tree(tmp_path / "duplicate-notice", extract), write=False
+    )
+    rows = [
+        row
+        for row in result.observations.values()
+        if row.observation_id == "fixture-source::na_psat"
+        or row.observation_id.startswith("fixture-source::na_psat::")
+    ]
+    assert rows
+    with pytest.raises(AssertionError):
+        assert all(
+            sum(
+                1
+                for notice in row.notices
+                if notice.kind is NoticeKind.METHOD_UNSTATED
+                and "source method text is not mapped: unmapped source regime"
+                in notice.reason
+            )
+            == 1
+            for row in rows
+        )
 
 
 def _migrate_real_extract(

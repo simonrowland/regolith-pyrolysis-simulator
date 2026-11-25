@@ -29064,9 +29064,6 @@ class Migrator:
             for notice in (phase_flag_notice, method_notice)
             if notice is not None
         )
-        method_resolution_notices = (
-            () if method_notice is None else (method_notice,)
-        )
         effective_method = (
             method
             if method.is_value
@@ -30343,7 +30340,6 @@ class Migrator:
                         *migration_axis_notices,
                         *point_notices,
                         *ambient_pressure_notices,
-                        *method_resolution_notices,
                     ),
                     equipment=obs.get("equipment"),
                     parent_reason=hold_reason,
@@ -30479,7 +30475,6 @@ class Migrator:
                                 else (total_iron_notice,)
                             ),
                             *ambient_pressure_notices,
-                            *method_resolution_notices,
                         ),
                         equipment=obs.get("equipment"),
                         parent_reason=hold_reason,
@@ -30620,7 +30615,6 @@ class Migrator:
                         ),
                         *validity_notices,
                         *ambient_pressure_notices,
-                        *method_resolution_notices,
                     ),
                     equipment=obs.get("equipment"),
                     parent_reason=hold_reason,
@@ -30821,7 +30815,6 @@ class Migrator:
                             ),
                             *validity_notices,
                             *ambient_pressure_notices,
-                            *method_resolution_notices,
                         ),
                         equipment=obs.get("equipment"),
                         parent_reason=hold_reason,
@@ -30950,7 +30943,6 @@ class Migrator:
             observation_notices.append(projection_notice)
         observation_notices.extend(starting_bulk_notices)
         observation_notices.extend(migration_axis_notices)
-        observation_notices.extend(method_resolution_notices)
         observation_notices.extend(validity_notices)
         from simulator.battery.validity import comparison_method_cell_constant_cancels
 

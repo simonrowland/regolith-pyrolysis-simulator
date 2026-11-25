@@ -1900,6 +1900,16 @@ def test_declared_experiment_method_conflicts_split_and_reject_legacy_sharing(
             for experiment_id in experiment_ids
             if experiment_id.endswith(f"::method:{shared_method.value}")
         }
+        assert all(
+            sum(
+                1
+                for notice in row.notices
+                if notice.kind is NoticeKind.METHOD_UNSTATED
+                and notice.reason.startswith("method_unstated:")
+            )
+            == 1
+            for row in row_method_rows
+        )
     else:
         shared_experiment_id = next(iter(staying))
     original = Migrator._experiment_id
@@ -1921,6 +1931,55 @@ def test_declared_experiment_method_conflicts_split_and_reject_legacy_sharing(
     with pytest.raises(AssertionError):
         assert {row.experiment_id for row in legacy_row_method_rows}.isdisjoint(
             row.experiment_id for row in legacy_shared_method_rows
+        )
+
+
+def test_mysen_wet_chemistry_method_notice_mutation_rejects_duplicate(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    filename = "mysen-1985-cmas-redox.yaml"
+    source_id = "mysen-1985-cmas-redox"
+    local_id = "mysen_1985_table1_wet_chemistry_fe3_sumfe"
+    prefix = f"{source_id}::{local_id}"
+    original = Migrator._add_observation
+
+    def readd_method_notice(self, observation, source_key, *args, **kwargs):
+        if observation.observation_id == prefix or observation.observation_id.startswith(
+            prefix + "::"
+        ):
+            duplicate = next(
+                (
+                    notice
+                    for notice in observation.notices
+                    if notice.kind is NoticeKind.METHOD_UNSTATED
+                    and notice.reason.startswith("method_unstated:")
+                ),
+                None,
+            )
+            if duplicate is not None:
+                observation = replace(
+                    observation, notices=(*observation.notices, duplicate)
+                )
+        return original(self, observation, source_key, *args, **kwargs)
+
+    monkeypatch.setattr(Migrator, "_add_observation", readd_method_notice)
+    result = _migrate_real_extract(tmp_path, filename)
+    rows = [
+        row
+        for observation_id, row in result.observations.items()
+        if observation_id == prefix or observation_id.startswith(prefix + "::")
+    ]
+    assert rows
+    with pytest.raises(AssertionError):
+        assert all(
+            sum(
+                1
+                for notice in row.notices
+                if notice.kind is NoticeKind.METHOD_UNSTATED
+                and notice.reason.startswith("method_unstated:")
+            )
+            == 1
+            for row in rows
         )
 
 
