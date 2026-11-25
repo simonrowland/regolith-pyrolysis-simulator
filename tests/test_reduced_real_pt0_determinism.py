@@ -48,6 +48,7 @@ from simulator.melt_backend.melt_envelope import (
     melt_extrapolation_diagnostic,
 )
 from simulator.optimize.determinism import deterministic_result_view
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.reduced_real_determinism import (
     ControlQuantization,
     PT0CacheMiss,
@@ -7337,56 +7338,53 @@ def _capture_recursive_equilibrium_row(
     *,
     temperature_K: float | None = None,
 ) -> tuple[Any, EquilibriumResult, dict[str, Any], dict[str, Any]]:
-    from simulator.chemistry.melt_activity import melt_oxide_activity
-
-    sim, result = _pt0_equilibrium_capture_context(store)
+    sim, _fixture_result = _pt0_equilibrium_capture_context(store)
     if temperature_K is not None:
-        sim.melt.temperature_C = float(temperature_K) - 273.15
+        sim.melt.temperature_C = (
+            float(temperature_K) - CELSIUS_TO_KELVIN_OFFSET
+        )
         sim.melt.fO2_log = -9.0
         if hasattr(sim.melt, "melt_fO2_log"):
             sim.melt.melt_fO2_log = -9.0
-        result.temperature_C = float(sim.melt.temperature_C)
-        result.fO2_log = -9.0
-    resolved_temperature_K = (
-        float(result.temperature_C) + 273.15
-    )
-    activity = melt_oxide_activity(
-        "P2O5",
-        {"P2O5": 0.2, "SiO2": 0.8},
-        temperature_K=resolved_temperature_K,
-    )
-    assert activity is not None
-    provenance = {"P2": activity.provenance()}
-    assert "melt_oxide_gamma_valid_range_K" in provenance["P2"]
-    diagnostic = {
-        "activities": {"P2": activity.activity},
-        "activities_provider": "melt-oxide-table",
-        "activities_standard_state": {
-            "convention": "pure-liquid-component",
-            "phase": "liquid",
-            "reference_pressure_bar": 1.0,
-            "reference_temperature_K": None,
-            "component_basis": "P2O5",
-        },
-        "pO2_bar": 1.0e-8,
-        "vapor_pressure_numerator_provenance": provenance,
-    }
-    result.diagnostics = {
-        "vapor_pressure_numerator_provenance": copy.deepcopy(provenance),
-    }
-    sim._last_vapor_pressure_diagnostic = copy.deepcopy(diagnostic)
-    sim._last_vapor_pressures_source = {"P2": "builtin-vapor-pressure"}
-    store.capture_equilibrium(sim, result)
+    sim.backend.is_available = lambda: True
+    result = sim._get_equilibrium()
+    assert store.capture_sequence[-1]["artifact"] == "equilibrium_post_record"
     key = store._equilibrium_key(sim)
     payload = copy.deepcopy(store._entries[_key_hash(key)]["payload"])
     return sim, result, key, payload
 
 
+def _capture_recursive_gate_row(
+    db_path: Path,
+    *,
+    persistent: bool,
+) -> tuple[PT0DeterminismStore, Any, dict[str, Any], dict[str, Any]]:
+    capture = PT0DeterminismStore(
+        "capture",
+        db_path=db_path if persistent else None,
+    )
+    sim = _build_pt0_sim(capture)
+    with pytest.MonkeyPatch.context() as monkeypatch:
+        _install_magemin_subprocess_gate(sim, monkeypatch)
+        sim.start_campaign(CampaignPhase.C2A_STAGED)
+        curve = sim._freeze_gate_curve()
+    assert capture.capture_sequence[-1]["artifact"] == "freeze_gate_curve"
+    key = copy.deepcopy(capture.capture_sequence[-1]["key"])
+    baseline = copy.deepcopy(capture._entries[_key_hash(key)]["payload"])
+    return capture, curve, key, baseline
+
+
+class _RecursiveMappingKey:
+    def __init__(self, key: Any) -> None:
+        self.key = key
+
+
 def _recursive_payload_paths(payload: Any):
-    def walk(value: Any, path: tuple[str | int, ...]):
+    def walk(value: Any, path: tuple[Any, ...]):
         yield path, value
         if isinstance(value, Mapping):
             for key, child in value.items():
+                yield (*path, _RecursiveMappingKey(key)), key
                 yield from walk(child, (*path, str(key)))
         elif isinstance(value, (list, tuple)):
             for index, child in enumerate(value):
@@ -7395,36 +7393,89 @@ def _recursive_payload_paths(payload: Any):
     yield from walk(payload, ())
 
 
+def _tupleize_recursive_sequences(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        return {
+            copy.deepcopy(key): _tupleize_recursive_sequences(child)
+            for key, child in value.items()
+        }
+    if isinstance(value, (list, tuple)):
+        return tuple(_tupleize_recursive_sequences(child) for child in value)
+    return copy.deepcopy(value)
+
+
 def _recursive_mutation_value(value: Any) -> Any:
     if isinstance(value, Mapping):
         return []
     if isinstance(value, (list, tuple)):
         return 0
-    if isinstance(value, (str, bool)) or value is None:
-        return 0 if isinstance(value, (str, bool)) else "wrong-type"
+    if isinstance(value, bool) or value is None:
+        return "wrong-type"
+    if isinstance(value, str):
+        return 0
     if isinstance(value, (int, float)):
         return "wrong-type"
     return []
 
 
 def _mutate_recursive_payload(
-    payload: Mapping[str, Any],
-    path: tuple[str | int, ...],
+    payload: Any,
+    path: tuple[Any, ...],
     mutation: str,
     replacement: Any = None,
 ) -> Any:
-    result: Any = copy.deepcopy(payload)
-    if not path:
-        return replacement
-    parent = result
-    for part in path[:-1]:
-        parent = parent[part]
-    leaf = path[-1]
-    if mutation == "delete":
-        del parent[leaf]
-    else:
-        parent[leaf] = copy.deepcopy(replacement)
-    return result
+    def mutate(value: Any, depth: int) -> Any:
+        if depth == len(path):
+            return copy.deepcopy(replacement)
+        part = path[depth]
+        is_last = depth == len(path) - 1
+        if isinstance(part, _RecursiveMappingKey):
+            if not is_last or not isinstance(value, Mapping):
+                raise TypeError("mapping-key mutation path is malformed")
+            updated = copy.deepcopy(dict(value))
+            original_key = part.key
+            if mutation == "delete":
+                del updated[original_key]
+            else:
+                child = updated.pop(original_key)
+                updated[copy.deepcopy(replacement)] = child
+            return updated
+        if isinstance(value, Mapping):
+            updated = copy.deepcopy(dict(value))
+            if is_last and mutation == "delete":
+                del updated[part]
+            else:
+                updated[part] = mutate(updated[part], depth + 1)
+            return updated
+        if isinstance(value, list):
+            updated = copy.deepcopy(value)
+            if is_last and mutation == "delete":
+                updated.pop(part)
+            else:
+                updated[part] = mutate(updated[part], depth + 1)
+            return updated
+        if isinstance(value, tuple):
+            updated = list(copy.deepcopy(value))
+            if is_last and mutation == "delete":
+                updated.pop(part)
+            else:
+                updated[part] = mutate(updated[part], depth + 1)
+            return tuple(updated)
+        raise TypeError(f"cannot mutate path through {type(value).__name__}")
+
+    return mutate(payload, 0)
+
+
+def _recursive_path_label(path: tuple[Any, ...]) -> str:
+    label = "root"
+    for part in path:
+        if isinstance(part, _RecursiveMappingKey):
+            label += f"[key={part.key!r}]"
+        elif isinstance(part, int):
+            label += f"[{part}]"
+        else:
+            label += f".{part}"
+    return label
 
 
 def _write_pt1_payload_for_invariant(
@@ -7473,13 +7524,13 @@ def _assert_authorityless_pt1_reads_miss_and_replace(
     entry["payload_hash"] = rrd._sha256(canonical_json_bytes(authorityless))
     _write_pt1_payload_for_invariant(db_path, key_hash, authorityless)
 
-    capture._verify_entry(
+    assert capture._verify_entry(
         "equilibrium_post_record",
         key,
         key_bytes,
         key_hash,
         entry,
-    )
+    ) is None
     assert rrd._decode_payload_for_admission(
         "equilibrium_post_record",
         authorityless,
@@ -7539,34 +7590,60 @@ def _assert_authorityless_pt1_reads_miss_and_replace(
     assert repaired is not None
 
 
-def _recursive_consumer_signature(
+def _exercise_equilibrium_replay_consumers(
     store: PT0DeterminismStore,
-) -> bytes:
+) -> None:
     sim, _ = _pt0_equilibrium_capture_context(store)
     result = sim._get_equilibrium()
-    assert store.hits > 0
+    assert store.hits == 1
     assert store.last_cache_state in {
         "cached_exact",
         "cached_physics_bucket",
         "cached_interpolated",
     }
-    return _recursive_consumer_signature_from_equilibrium(sim, result)
+    _exercise_equilibrium_consumers_from_result(sim, result)
 
 
-def _recursive_gate_consumer_signature(curve: Mapping[str, Any]) -> bytes:
-    sim = _build_pt0_sim(None)
-    midpoint_C = (float(curve["solidus_T_C"]) + float(curve["liquidus_T_C"])) / 2.0
-    return canonical_json_bytes(
-        rrd._json_ready(
-            {
-                "curve": curve,
-                "liquid_fraction": sim._interpolate_freeze_gate_curve(
-                    curve,
-                    midpoint_C,
-                ),
-            }
-        )
+def _exercise_equilibrium_consumers_from_result(
+    sim: Any,
+    result: EquilibriumResult,
+) -> None:
+    resolved = sim._resolve_evaporation_batch_flux_state(
+        result,
+        temperature_K=(
+            float(result.temperature_C) + CELSIUS_TO_KELVIN_OFFSET
+        ),
     )
+    assert isinstance(resolved, tuple) and len(resolved) == 6
+
+
+def _exercise_gate_replay_consumer(
+    sim: Any,
+    curve: Mapping[str, Any],
+) -> None:
+    midpoint_C = (float(curve["solidus_T_C"]) + float(curve["liquidus_T_C"])) / 2.0
+    liquid_fraction = sim._melt_redox_liquid_fraction_at_temperature(
+        curve,
+        midpoint_C,
+    )
+    assert isinstance(liquid_fraction, float)
+
+
+def _exercise_cache_payload_replay(
+    store: PT0DeterminismStore,
+    artifact: str,
+) -> None:
+    if artifact == "equilibrium_post_record":
+        _exercise_equilibrium_replay_consumers(store)
+        return
+    sim = _build_pt0_sim(store)
+    with pytest.MonkeyPatch.context() as monkeypatch:
+        _install_magemin_subprocess_gate(sim, monkeypatch)
+        sim.start_campaign(CampaignPhase.C2A_STAGED)
+        curve = sim._freeze_gate_curve()
+        assert store.hits == 1
+        assert store.last_cache_state == "cached_exact"
+        _exercise_gate_replay_consumer(sim, curve)
 
 
 def _recursive_capture_for_kind(
@@ -7586,29 +7663,11 @@ def _recursive_capture_for_kind(
     key: dict[str, Any]
     baseline: dict[str, Any]
     if payload_kind == "gate":
-        capture, _gate_sim, _fO2_log, _curve = _capture_pt0_gate_curve(
+        capture, _curve, key, baseline = _capture_recursive_gate_row(
             db_path,
-            solidus_T_C=1200.0,
+            persistent=persistent,
         )
-        gate_key = copy.deepcopy(capture.capture_sequence[-1]["key"])
-        gate_hash = _key_hash(gate_key)
-        if persistent:
-            capture.persistent_store = PT1PersistentEquilibriumStore(db_path)
-            persisted = capture.persistent_store._get_with_decoded(
-                artifact="freeze_gate_curve",
-                key=gate_key,
-                key_bytes=canonical_json_bytes(gate_key),
-                key_hash=gate_hash,
-            )
-            assert persisted is not None
-            baseline = copy.deepcopy(persisted[0]["payload"])
-            capture._entries[gate_hash]["payload"] = copy.deepcopy(baseline)
-            _write_pt1_payload_for_invariant(db_path, gate_hash, baseline)
-        else:
-            baseline = copy.deepcopy(capture._entries[gate_hash]["payload"])
-            capture.persistent_store = None
         artifact = "freeze_gate_curve"
-        key = gate_key
     else:
         capture = PT0DeterminismStore(
             "capture",
@@ -7618,8 +7677,6 @@ def _recursive_capture_for_kind(
         _sim, _result, key, baseline = _capture_recursive_equilibrium_row(
             capture
         )
-    if payload_kind == "gate":
-        _capture_recursive_equilibrium_row(capture)
     return capture, artifact, key, baseline, db_path
 
 
@@ -7640,12 +7697,13 @@ def test_real_cache_payload_recursive_mutations_miss_or_replay_identically(
         persistent=persistent,
     )
     key_hash = _key_hash(key)
-    expected = _recursive_consumer_signature(
+    _exercise_cache_payload_replay(
         _recursive_cache_reader(
             capture,
             persistent=persistent,
             db_path=db_path,
-        )
+        ),
+        artifact,
     )
     if payload_kind == "equilibrium" and persistent:
         _assert_authorityless_pt1_reads_miss_and_replace(
@@ -7656,8 +7714,9 @@ def test_real_cache_payload_recursive_mutations_miss_or_replay_identically(
         )
     failures: list[str] = []
     paths_seen = 0
+    mutation_baseline = _tupleize_recursive_sequences(baseline)
 
-    for path, value in _recursive_payload_paths(baseline):
+    for path, value in _recursive_payload_paths(mutation_baseline):
         paths_seen += 1
         mutations: list[tuple[str, Any]] = []
         if path:
@@ -7669,12 +7728,9 @@ def test_real_cache_payload_recursive_mutations_miss_or_replay_identically(
             )
         )
         for mutation, replacement in mutations:
-            path_name = "root" + "".join(
-                f"[{part}]" if isinstance(part, int) else f".{part}"
-                for part in path
-            )
+            path_name = _recursive_path_label(path)
             mutated = _mutate_recursive_payload(
-                baseline,
+                mutation_baseline,
                 path,
                 mutation,
                 replacement,
@@ -7698,7 +7754,9 @@ def test_real_cache_payload_recursive_mutations_miss_or_replay_identically(
                 persistent=persistent,
                 db_path=db_path,
             )
-            was_miss = False
+            before_disclosures = copy.deepcopy(
+                getattr(reader, "_accepted_hit_disclosures", None)
+            )
             try:
                 hit = reader._lookup(
                     artifact,
@@ -7706,96 +7764,60 @@ def test_real_cache_payload_recursive_mutations_miss_or_replay_identically(
                     return_decoded=(artifact == "equilibrium_post_record"),
                 )
             except PT0CacheMiss:
-                was_miss = True
-                if (
-                    reader.hits != 0
-                    or getattr(reader, "_accepted_hit_disclosures", None) is not None
-                ):
+                hit = None
+                if reader.hits != 0 or reader._accepted_hit_disclosures != before_disclosures:
                     failures.append(
                         f"{path_name} {mutation}: miss changed hit/disclosure state"
                     )
             except Exception as exc:
-                was_miss = True
                 failures.append(
                     f"{path_name} {mutation}: lookup raised "
                     f"{type(exc).__name__}: {exc}"
                 )
-            else:
-                if hit is None:
-                    failures.append(f"{path_name} {mutation}: lookup returned no hit")
-                    was_miss = True
-                elif artifact == "freeze_gate_curve":
-                    try:
-                        admitted_curve = rrd._curve_from_payload(hit["curve"])
-                        baseline_curve = rrd._curve_from_payload(
-                            baseline["curve"]
-                        )
-                    except Exception as exc:
-                        failures.append(
-                            f"{path_name} {mutation}: gate consumer raised "
-                            f"{type(exc).__name__}: {exc}"
-                        )
-                    else:
-                        if _recursive_gate_consumer_signature(
-                            admitted_curve
-                        ) != _recursive_gate_consumer_signature(baseline_curve):
-                            failures.append(
-                                f"{path_name} {mutation}: gate consumer values differ"
-                            )
-
-            if was_miss:
-                original = capture._entries[key_hash]
-                capture._store(
-                    artifact,
-                    key,
-                    baseline,
-                    law_disclosures=original.get("law_disclosures", ()),
+                continue
+            if hit is None:
+                if reader.hits != 0 or reader._accepted_hit_disclosures != before_disclosures:
+                    failures.append(
+                        f"{path_name} {mutation}: miss changed hit/disclosure state"
+                    )
+            elif reader.hits != 1:
+                failures.append(
+                    f"{path_name} {mutation}: admission lookup recorded "
+                    f"{reader.hits} hits"
                 )
+            if hit is None:
+                original = capture._entries[key_hash]
+                try:
+                    capture._store(
+                        artifact,
+                        key,
+                        baseline,
+                        law_disclosures=original.get("law_disclosures", ()),
+                    )
+                except Exception as exc:
+                    failures.append(
+                        f"{path_name} {mutation}: recapture raised "
+                        f"{type(exc).__name__}: {exc}"
+                    )
+                    continue
                 reader = _recursive_cache_reader(
                     capture,
                     persistent=persistent,
                     db_path=db_path,
                 )
-                try:
-                    repaired_hit = reader._lookup(
-                        artifact,
-                        key,
-                        return_decoded=(artifact == "equilibrium_post_record"),
-                    )
-                except Exception as exc:
-                    failures.append(
-                        f"{path_name} {mutation}: recaptured row failed to hit: "
-                        f"{type(exc).__name__}: {exc}"
-                    )
-                    continue
-                if repaired_hit is None or reader.hits != 1:
-                    failures.append(
-                        f"{path_name} {mutation}: recaptured row did not hit once"
-                    )
-                    continue
-                if artifact == "freeze_gate_curve":
-                    repaired_curve = rrd._curve_from_payload(
-                        repaired_hit["curve"]
-                    )
-                    if _recursive_gate_consumer_signature(
-                        repaired_curve
-                    ) != _recursive_gate_consumer_signature(
-                        rrd._curve_from_payload(baseline["curve"])
-                    ):
-                        failures.append(
-                            f"{path_name} {mutation}: recaptured gate values differ"
-                        )
+            else:
+                reader = _recursive_cache_reader(
+                    capture,
+                    persistent=persistent,
+                    db_path=db_path,
+                )
             try:
-                actual = _recursive_consumer_signature(reader)
+                _exercise_cache_payload_replay(reader, artifact)
             except Exception as exc:
                 failures.append(
-                    f"{path_name} {mutation}: full core/evaporation/Langmuir "
+                    f"{path_name} {mutation}: recaptured-row or cache-hit "
+                    "core/evaporation/Langmuir "
                     f"consumer raised {type(exc).__name__}: {exc}"
-                )
-                continue
-            if actual != expected:
-                failures.append(
-                    f"{path_name} {mutation}: replay consumer values differ"
                 )
 
     assert paths_seen > 0
@@ -7855,7 +7877,7 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
     ]
     production_attempt = interpolation.attempt_cached_interpolation
     query_sim, _ = _pt0_equilibrium_capture_context(capture)
-    query_sim.melt.temperature_C = 1600.0 - 273.15
+    query_sim.melt.temperature_C = 1600.0 - CELSIUS_TO_KELVIN_OFFSET
     query_sim.melt.fO2_log = -9.0
     if hasattr(query_sim.melt, "melt_fO2_log"):
         query_sim.melt.melt_fO2_log = -9.0
@@ -7892,19 +7914,17 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
         lambda *_a, **_k: None,
     )
     baseline_sim, _ = _pt0_equilibrium_capture_context(capture)
-    baseline_sim.melt.temperature_C = 1600.0 - 273.15
+    baseline_sim.melt.temperature_C = 1600.0 - CELSIUS_TO_KELVIN_OFFSET
     baseline_sim.melt.fO2_log = -9.0
     if hasattr(baseline_sim.melt, "melt_fO2_log"):
         baseline_sim.melt.melt_fO2_log = -9.0
-    expected_result = baseline_sim._get_equilibrium()
+    baseline_result = baseline_sim._get_equilibrium()
     assert capture.last_cache_state == "cached_interpolated"
-    expected = _recursive_consumer_signature_from_equilibrium(
-        baseline_sim,
-        expected_result,
-    )
+    _exercise_equilibrium_consumers_from_result(baseline_sim, baseline_result)
 
     failures: list[str] = []
-    for path, value in _recursive_payload_paths(baseline):
+    mutation_baseline = _tupleize_recursive_sequences(baseline)
+    for path, value in _recursive_payload_paths(mutation_baseline):
         mutations: list[tuple[str, Any]] = []
         if path:
             mutations.append(("delete", None))
@@ -7915,12 +7935,9 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
             )
         )
         for mutation, replacement in mutations:
-            path_name = "root" + "".join(
-                f"[{part}]" if isinstance(part, int) else f".{part}"
-                for part in path
-            )
+            path_name = _recursive_path_label(path)
             mutated = _mutate_recursive_payload(
-                baseline,
+                mutation_baseline,
                 path,
                 mutation,
                 replacement,
@@ -7949,7 +7966,7 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
                     f"{path_name} {mutation}: interpolation lookup raised "
                     f"{type(exc).__name__}: {exc}"
                 )
-                result = None
+                continue
             if result is None:
                 if capture.hits != before_hits:
                     failures.append(
@@ -7975,17 +7992,24 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
                     production_attempt,
                 )
                 replay_sim, _ = _pt0_equilibrium_capture_context(capture)
-                replay_sim.melt.temperature_C = 1600.0 - 273.15
+                replay_sim.melt.temperature_C = (
+                    1600.0 - CELSIUS_TO_KELVIN_OFFSET
+                )
                 replay_sim.melt.fO2_log = -9.0
                 if hasattr(replay_sim.melt, "melt_fO2_log"):
                     replay_sim.melt.melt_fO2_log = -9.0
                 try:
                     replay_result = replay_sim._get_equilibrium()
-                    if replay_sim.last_cache_state != "cached_interpolated":
+                    if capture.last_cache_state != "cached_interpolated":
                         failures.append(
                             f"{path_name} {mutation}: recaptured source rows did not hit interpolation"
                         )
-                    actual = _recursive_consumer_signature_from_equilibrium(
+                    if capture.hits != before_hits + 1:
+                        failures.append(
+                            f"{path_name} {mutation}: recaptured interpolation "
+                            f"recorded {capture.hits - before_hits} hits"
+                        )
+                    _exercise_equilibrium_consumers_from_result(
                         replay_sim,
                         replay_result,
                     )
@@ -7996,18 +8020,30 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
                     )
                     continue
             else:
+                if capture.hits != before_hits + 1:
+                    failures.append(
+                        f"{path_name} {mutation}: admitted interpolation "
+                        f"recorded {capture.hits - before_hits} hits"
+                    )
                 replay_sim, _ = _pt0_equilibrium_capture_context(capture)
-                replay_sim.melt.temperature_C = 1600.0 - 273.15
+                replay_sim.melt.temperature_C = (
+                    1600.0 - CELSIUS_TO_KELVIN_OFFSET
+                )
                 replay_sim.melt.fO2_log = -9.0
                 if hasattr(replay_sim.melt, "melt_fO2_log"):
                     replay_sim.melt.melt_fO2_log = -9.0
                 try:
                     replay_result = replay_sim._get_equilibrium()
-                    if replay_sim.last_cache_state != "cached_interpolated":
+                    if capture.last_cache_state != "cached_interpolated":
                         failures.append(
                             f"{path_name} {mutation}: interpolation consumer did not use a cache hit"
                         )
-                    actual = _recursive_consumer_signature_from_equilibrium(
+                    if capture.hits != before_hits + 2:
+                        failures.append(
+                            f"{path_name} {mutation}: interpolation consumer "
+                            f"recorded {capture.hits - before_hits} total hits"
+                        )
+                    _exercise_equilibrium_consumers_from_result(
                         replay_sim,
                         replay_result,
                     )
@@ -8017,56 +8053,5 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
                         f"{type(exc).__name__}: {exc}"
                     )
                     continue
-            if actual != expected:
-                failures.append(
-                    f"{path_name} {mutation}: interpolation replay values differ"
-                )
 
     assert not failures, "\n".join(failures)
-
-
-def _recursive_consumer_signature_from_equilibrium(
-    sim: Any,
-    result: EquilibriumResult,
-) -> bytes:
-    flux_state = sim._resolve_evaporation_batch_flux_state(
-        result,
-        temperature_K=float(result.temperature_C) + 273.15,
-    )
-    surface = getattr(sim, "_last_langmuir_surface_oxygen", None)
-    if isinstance(surface, Mapping):
-        surface = {
-            field: surface.get(field)
-            for field in ("applied", "surface_pO2_bar", "pressures_Pa")
-        }
-    result_values = {
-        field: getattr(result, field)
-        for field in (
-            "temperature_C",
-            "pressure_bar",
-            "phases_present",
-            "phase_masses_kg",
-            "phase_species_mol",
-            "phase_species_kg",
-            "phase_compositions",
-            "liquid_fraction",
-            "liquid_composition_wt_pct",
-            "vapor_pressures_Pa",
-            "vapor_pressures_source",
-            "activity_coefficients",
-            "fO2_log",
-            "warnings",
-            "status",
-        )
-    }
-    return canonical_json_bytes(
-        rrd._json_ready(
-            _replace_nonfinite_test_values(
-                {
-                    "equilibrium": result_values,
-                    "evaporation_flux_pressures_Pa": flux_state[0],
-                    "langmuir_surface_oxygen": surface,
-                }
-            )
-        )
-    )

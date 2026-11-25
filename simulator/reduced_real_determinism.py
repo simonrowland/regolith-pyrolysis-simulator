@@ -137,6 +137,15 @@ _EQUILIBRIUM_REPLAY_SIDE_FIELDS = (
     "last_vapor_pressures_source",
     "last_vapor_pressure_diagnostic",
 )
+_EQUILIBRIUM_AUTHORITY_FIELDS = (
+    "schema",
+    "evidence_class",
+    "backend_family",
+    "backend",
+    "provider",
+    "vapor_pressure",
+)
+_BACKEND_AUTHORITY_FIELDS = ("backend_name", "backend_class")
 
 
 def _equilibrium_result_payload_fields() -> tuple[dataclasses.Field[Any], ...]:
@@ -219,9 +228,32 @@ def _decode_payload_for_admission(
         return None
     if not isinstance(payload, Mapping):
         return None
+
+    def has_finite_json_numbers(value: Any) -> bool:
+        if isinstance(value, Mapping):
+            return all(
+                isinstance(key, str) and has_finite_json_numbers(item)
+                for key, item in value.items()
+            )
+        if isinstance(value, (list, tuple)):
+            return all(has_finite_json_numbers(item) for item in value)
+        if isinstance(value, bool) or value is None or isinstance(value, str):
+            return True
+        if isinstance(value, (int, float)):
+            try:
+                return math.isfinite(float(value))
+            except (OverflowError, TypeError, ValueError):
+                return False
+        return False
+
+    if not has_finite_json_numbers(payload):
+        return None
     if artifact == "freeze_gate_curve":
         curve_payload = payload.get("curve")
         if not isinstance(curve_payload, Mapping):
+            return None
+        curve_path = curve_payload.get("path")
+        if not isinstance(curve_path, (list, tuple)) or not curve_path:
             return None
         try:
             curve = _curve_from_payload(curve_payload)
@@ -295,20 +327,45 @@ def _decode_payload_for_admission(
             not isinstance(equilibrium_result, Mapping)
             or not required_result_fields.issubset(equilibrium_result)
             or any(field_name not in payload for field_name in _EQUILIBRIUM_REPLAY_SIDE_FIELDS)
-            or (not interpolation_synthesized and "authority" not in payload)
         ):
             return None
+        authority = payload.get("authority")
         if not interpolation_synthesized:
-            if not keys:
-                return None
-            try:
-                validate_reduced_real_equilibrium_record_key(
-                    artifact,
-                    keys[0],
-                    payload,
+            if (
+                not isinstance(authority, Mapping)
+                or any(
+                    field_name not in authority
+                    for field_name in _EQUILIBRIUM_AUTHORITY_FIELDS
                 )
-            except Exception:
+                or any(
+                    not isinstance(authority.get(field_name), str)
+                    for field_name in (
+                        "schema",
+                        "evidence_class",
+                        "backend_family",
+                    )
+                )
+            ):
                 return None
+            backend_identity = authority.get("backend")
+            provider_identity = authority.get("provider")
+            vapor_pressure_identity = authority.get("vapor_pressure")
+            if (
+                not isinstance(backend_identity, Mapping)
+                or any(
+                    field_name not in backend_identity
+                    or not isinstance(backend_identity[field_name], str)
+                    for field_name in _BACKEND_AUTHORITY_FIELDS
+                )
+                or not isinstance(provider_identity, Mapping)
+                or not isinstance(
+                    provider_identity.get("resolved_provider_id"), str
+                )
+                or not isinstance(vapor_pressure_identity, Mapping)
+            ):
+                return None
+        elif "authority" in payload and not isinstance(authority, Mapping):
+            return None
         try:
             decoded = _decode_equilibrium_replay_payload(payload)
         except Exception:
@@ -340,6 +397,49 @@ def _decode_payload_for_admission(
             "melt_oxide_X_single_cation",
         }
         for diagnostic in provenance_diagnostics:
+            activities = diagnostic.get("activities")
+            standard_state = diagnostic.get("activities_standard_state")
+            activity_standard_state_required = (
+                isinstance(activities, Mapping) and bool(activities)
+            )
+            if activity_standard_state_required and not isinstance(
+                standard_state, Mapping
+            ):
+                return None
+            if standard_state is not None:
+                if not isinstance(standard_state, Mapping):
+                    return None
+                if any(
+                    field_name not in standard_state
+                    for field_name in (
+                        "reference_pressure_bar",
+                        "reference_temperature_K",
+                    )
+                ):
+                    return None
+                pressure = standard_state["reference_pressure_bar"]
+                temperature = standard_state["reference_temperature_K"]
+                if (
+                    not isinstance(pressure, (int, float))
+                    or isinstance(pressure, bool)
+                ):
+                    return None
+                try:
+                    if not math.isfinite(float(pressure)):
+                        return None
+                except (OverflowError, TypeError, ValueError):
+                    return None
+                if temperature is not None:
+                    if (
+                        not isinstance(temperature, (int, float))
+                        or isinstance(temperature, bool)
+                    ):
+                        return None
+                    try:
+                        if not math.isfinite(float(temperature)):
+                            return None
+                    except (OverflowError, TypeError, ValueError):
+                        return None
             if "vapor_pressure_numerator_provenance" not in diagnostic:
                 continue
             provenance = diagnostic["vapor_pressure_numerator_provenance"]
@@ -1436,22 +1536,22 @@ class PT0DeterminismStore:
             }
         )
         existing = self._entries.get(key_hash)
-        stale_payload = (
-            existing is not None
-            and _decode_payload_for_admission(
+        existing_decoded = None
+        if existing is not None:
+            existing_decoded = self._verify_entry(
                 artifact,
-                existing.get("payload"),
-                payload_codec_version=existing.get("payload_codec_version"),
-                keys=(key,),
-            ) is None
-        )
+                key,
+                key_bytes,
+                key_hash,
+                existing,
+            )
+        stale_payload = existing is not None and existing_decoded is None
         if existing is not None:
             if not stale_payload and existing["payload_hash"] != payload_hash:
                 raise PT0CacheCollision(
                     f"PT-0 {artifact} key collision with different payload: "
                     f"{key_hash}"
                 )
-            self._verify_entry(artifact, key, key_bytes, key_hash, existing)
             effective_notices_json = monotonic_repair_notices_json(
                 existing.get("repair_notices_json"),
                 repair_notices_json,
@@ -1561,13 +1661,6 @@ class PT0DeterminismStore:
                 continue
             decoded = admission_decoded
             if decoded is None:
-                decoded = _decode_payload_for_admission(
-                    artifact,
-                    entry.get("payload"),
-                    payload_codec_version=entry.get("payload_codec_version"),
-                    keys=(key,),
-                )
-            if decoded is None:
                 continue
             if not _disclosures_known(entry):
                 continue
@@ -1644,15 +1737,6 @@ class PT0DeterminismStore:
                 key_hash,
                 return_decoded=True,
             )
-            if entry is not None and decoded is None:
-                decoded = _decode_payload_for_admission(
-                    artifact,
-                    entry.get("payload"),
-                    payload_codec_version=entry.get("payload_codec_version"),
-                    keys=(candidate_key,),
-                )
-            if entry is not None and decoded is None:
-                entry = None
             cache_state = "cached_exact"
             candidate_physics_bucket_key = (
                 physics_bucket_key
@@ -1792,6 +1876,7 @@ class PT0DeterminismStore:
     ) -> Any | None:
         entry = self._entries.get(key_hash)
         decoded = None
+        checked_by_persistent_store = False
         if entry is None and self.persistent_store is not None:
             fetched = self.persistent_store._get_with_decoded(
                 artifact=artifact,
@@ -1801,10 +1886,13 @@ class PT0DeterminismStore:
             )
             if fetched is not None:
                 entry, decoded = fetched
+                checked_by_persistent_store = True
             if entry is not None:
                 self._entries[key_hash] = copy.deepcopy(entry)
-        if entry is not None:
-            self._verify_entry(artifact, key, key_bytes, key_hash, entry)
+        if entry is not None and not checked_by_persistent_store:
+            decoded = self._verify_entry(artifact, key, key_bytes, key_hash, entry)
+            if decoded is None:
+                entry = None
         return (entry, decoded) if return_decoded else entry
 
     def _entry_for_physics_bucket(
@@ -1825,14 +1913,18 @@ class PT0DeterminismStore:
             and entry.get("physics_bucket_hash") == physics_bucket_hash
         ):
             checked_hashes.add(str(key_hash))
-            decoded = _decode_payload_for_admission(
+            entry_key = entry.get("key")
+            if not isinstance(entry_key, Mapping):
+                raise PT0CacheCollision(
+                    f"PT-0 stored key is not a mapping for {artifact}: {key_hash}"
+                )
+            decoded = self._verify_entry(
                 artifact,
-                entry.get("payload"),
-                payload_codec_version=entry.get("payload_codec_version"),
-                keys=tuple(
-                    key for key in (entry.get("key"), query_key)
-                    if isinstance(key, Mapping)
-                ),
+                entry_key,
+                canonical_json_bytes(entry_key),
+                str(key_hash),
+                entry,
+                admission_keys=(query_key,) if isinstance(query_key, Mapping) else (),
             )
             if decoded is not None:
                 return entry, decoded
@@ -1848,14 +1940,19 @@ class PT0DeterminismStore:
                 if candidate_hash in checked_hashes:
                     continue
                 checked_hashes.add(candidate_hash)
-                decoded = _decode_payload_for_admission(
+                candidate_key = candidate.get("key")
+                if not isinstance(candidate_key, Mapping):
+                    raise PT0CacheCollision(
+                        f"PT-0 stored key is not a mapping for {artifact}: "
+                        f"{candidate_hash}"
+                    )
+                decoded = self._verify_entry(
                     artifact,
-                    candidate.get("payload"),
-                    payload_codec_version=candidate.get("payload_codec_version"),
-                    keys=tuple(
-                        key for key in (candidate.get("key"), query_key)
-                        if isinstance(key, Mapping)
-                    ),
+                    candidate_key,
+                    canonical_json_bytes(candidate_key),
+                    candidate_hash,
+                    candidate,
+                    admission_keys=(query_key,) if isinstance(query_key, Mapping) else (),
                 )
                 if decoded is not None:
                     return candidate, decoded
@@ -2047,14 +2144,27 @@ class PT0DeterminismStore:
         key_bytes: bytes,
         key_hash: str,
         entry: Mapping[str, Any],
-    ) -> None:
-        if _decode_payload_for_admission(
+        *,
+        admission_keys: Sequence[Mapping[str, Any]] = (),
+    ) -> Any | None:
+        try:
+            payload_bytes = canonical_json_bytes(entry["payload"])
+        except PT0NonFinitePayload:
+            raise PT0CacheCollision(
+                f"PT-0 stored payload is non-finite for {artifact}: {key_hash}"
+            )
+        if entry.get("payload_hash") != _sha256(payload_bytes):
+            raise PT0CacheCollision(
+                f"PT-0 stored payload bytes mismatch for {artifact}: {key_hash}"
+            )
+        decoded = _decode_payload_for_admission(
             artifact,
             entry.get("payload"),
             payload_codec_version=entry.get("payload_codec_version"),
-            keys=(key,),
-        ) is None:
-            return
+            keys=(key, *admission_keys),
+        )
+        if decoded is None:
+            return None
         if entry.get("artifact") != artifact:
             raise PT0CacheCollision(
                 f"PT-0 stored artifact mismatch for {artifact}: {key_hash}"
@@ -2072,16 +2182,12 @@ class PT0DeterminismStore:
             raise PT0CacheCollision(
                 f"PT-0 stored key bytes mismatch for {artifact}: {key_hash}"
             )
-        try:
-            payload_bytes = canonical_json_bytes(entry["payload"])
-        except PT0NonFinitePayload:
-            raise PT0CacheCollision(
-                f"PT-0 stored payload is non-finite for {artifact}: {key_hash}"
-            )
-        if entry.get("payload_hash") != _sha256(payload_bytes):
-            raise PT0CacheCollision(
-                f"PT-0 stored payload bytes mismatch for {artifact}: {key_hash}"
-            )
+        validate_reduced_real_equilibrium_record_key(
+            artifact,
+            key,
+            entry.get("payload"),
+        )
+        return decoded
 
     def _drift_fields_for_latest_replay(self) -> list[str]:
         index = len(self.replay_sequence) - 1
@@ -2183,19 +2289,16 @@ class PT1PersistentEquilibriumStore:
             insert_source = None
             effective_notices_json = repair_notices_json
             if existing is not None:
-                entry = self._entry_from_row(
+                entry, existing_decoded = self._entry_from_row(
                     existing,
                     artifact=artifact,
                     key=key,
                     key_bytes=key_bytes,
                     key_hash=key_hash,
+                    return_decoded=True,
+                    admission_keys=(key,),
                 )
-                stale_payload = _decode_payload_for_admission(
-                    artifact,
-                    entry.get("payload"),
-                    payload_codec_version=entry.get("payload_codec_version"),
-                    keys=(entry.get("key", {}), key),
-                ) is None
+                stale_payload = existing_decoded is None
                 if not stale_payload and (
                     entry["payload_hash"] != payload_hash
                     or canonical_json_bytes(entry["payload"]) != payload_bytes
@@ -2442,18 +2545,14 @@ class PT1PersistentEquilibriumStore:
         with self._connect() as conn:
             self._initialize(conn)
             for row in self._fetch_candidates(conn, key_hash):
-                entry = self._entry_from_row(
+                entry, decoded = self._entry_from_row(
                     row,
                     artifact=artifact,
                     key=key,
                     key_bytes=key_bytes,
                     key_hash=key_hash,
-                )
-                decoded = _decode_payload_for_admission(
-                    artifact,
-                    entry.get("payload"),
-                    payload_codec_version=entry.get("payload_codec_version"),
-                    keys=(key,),
+                    return_decoded=True,
+                    admission_keys=(key,),
                 )
                 if decoded is None:
                     continue
@@ -2511,21 +2610,13 @@ class PT1PersistentEquilibriumStore:
             for table in tables:
                 rows = conn.execute(query.format(table=table), params)
                 for row in rows:
-                    entry = self._entry_from_physics_bucket_row(
+                    entry, decoded = self._entry_from_physics_bucket_row(
                         row,
                         artifact=artifact,
                         physics_bucket_key=physics_bucket_key,
                         physics_bucket_bytes=physics_bucket_bytes,
                         physics_bucket_hash=physics_bucket_hash,
-                    )
-                    decoded = _decode_payload_for_admission(
-                        artifact,
-                        entry.get("payload"),
-                        payload_codec_version=entry.get("payload_codec_version"),
-                        keys=tuple(
-                            key for key in (entry.get("key"), query_key)
-                            if isinstance(key, Mapping)
-                        ),
+                        query_key=query_key,
                     )
                     if decoded is not None:
                         return (entry, decoded) if return_decoded else entry
@@ -2579,13 +2670,19 @@ class PT1PersistentEquilibriumStore:
                     seen_hashes.add(row_hash)
                     row_key_bytes = _sqlite_bytes(row["key_bytes"])
                     row_key = json.loads(row_key_bytes.decode("utf-8"))
-                    entry = self._entry_from_row(
+                    entry, decoded = self._entry_from_row(
                         row,
                         artifact=artifact,
                         key=row_key,
                         key_bytes=row_key_bytes,
                         key_hash=row_hash,
+                        return_decoded=True,
+                        admission_keys=(
+                            (query_key,) if isinstance(query_key, Mapping) else ()
+                        ),
                     )
+                    if decoded is None:
+                        continue
                     row_replay_scope = _replay_scope_hash(
                         canonical_physics_bucket_key_from_replay_key(entry["key"])
                     )
@@ -2593,16 +2690,6 @@ class PT1PersistentEquilibriumStore:
                         raise PT1PersistentStoreCorrupt(
                             f"PT-1 row exact key replay scope mismatch: {row_hash}"
                         )
-                    if _decode_payload_for_admission(
-                        artifact,
-                        entry.get("payload"),
-                        payload_codec_version=entry.get("payload_codec_version"),
-                        keys=tuple(
-                            key for key in (entry.get("key"), query_key)
-                            if isinstance(key, Mapping)
-                        ),
-                    ) is None:
-                        continue
                     candidates.append(
                         {
                             "artifact": artifact,
@@ -2678,21 +2765,13 @@ class PT1PersistentEquilibriumStore:
             for table in tables:
                 rows = conn.execute(query.format(table=table), params)
                 for row in rows:
-                    entry = self._entry_from_physics_ladder_bucket_row(
+                    entry, decoded = self._entry_from_physics_ladder_bucket_row(
                         row,
                         artifact=artifact,
                         rung_tag=rung_tag,
                         rung_key=rung_key,
                         rung_hash=rung_hash,
-                    )
-                    decoded = _decode_payload_for_admission(
-                        artifact,
-                        entry.get("payload"),
-                        payload_codec_version=entry.get("payload_codec_version"),
-                        keys=tuple(
-                            key for key in (entry.get("key"), query_key)
-                            if isinstance(key, Mapping)
-                        ),
+                        query_key=query_key,
                     )
                     if decoded is None:
                         continue
@@ -3057,22 +3136,37 @@ class PT1PersistentEquilibriumStore:
         key: Mapping[str, Any],
         key_bytes: bytes,
         key_hash: str,
-    ) -> dict[str, Any]:
+        return_decoded: bool = False,
+        admission_keys: Sequence[Mapping[str, Any]] = (),
+    ) -> Any:
         row_key_bytes = _sqlite_bytes(row["key_bytes"])
         row_payload_bytes = _sqlite_bytes(row["payload_bytes"])
-        row_key = json.loads(row_key_bytes.decode("utf-8"))
-        row_payload = json.loads(row_payload_bytes.decode("utf-8"))
         payload_codec_version = (
             row["payload_codec_version"]
             if "payload_codec_version" in row.keys()
             else None
         )
-        admission = _decode_payload_for_admission(
-            artifact,
-            row_payload,
-            payload_codec_version=payload_codec_version,
-            keys=(row_key,),
-        )
+        if _sha256(row_payload_bytes) != row["payload_sha256"]:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row payload bytes mismatch: {key_hash}"
+            )
+        try:
+            row_key = json.loads(row_key_bytes.decode("utf-8"))
+            row_payload = json.loads(row_payload_bytes.decode("utf-8"))
+        except (json.JSONDecodeError, UnicodeDecodeError) as exc:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row contains invalid JSON bytes: {key_hash}"
+            ) from exc
+        try:
+            canonical_payload_bytes = canonical_json_bytes(row_payload)
+        except PT0NonFinitePayload as exc:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row has non-finite payload values: {key_hash}"
+            ) from exc
+        if canonical_payload_bytes != row_payload_bytes:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row non-canonical payload bytes: {key_hash}"
+            )
         if row["store_schema_version"] not in PT1_SUPPORTED_STORE_SCHEMA_VERSIONS:
             raise PT1PersistentStoreCorrupt(
                 "PT-1 row store schema version drift: "
@@ -3102,27 +3196,24 @@ class PT1PersistentEquilibriumStore:
             raise PT1PersistentStoreCorrupt(
                 f"PT-1 row canonical request mismatch: {key_hash}"
             )
+        admission = _decode_payload_for_admission(
+            artifact,
+            row_payload,
+            payload_codec_version=payload_codec_version,
+            keys=(row_key, *admission_keys),
+        )
         if admission is None:
             admitted_payload = copy.deepcopy(row_payload)
         else:
-            if _sha256(row_payload_bytes) != row["payload_sha256"]:
-                raise PT1PersistentStoreCorrupt(
-                    f"PT-1 row payload bytes mismatch: {key_hash}"
-                )
-            try:
-                canonical_payload_bytes = canonical_json_bytes(row_payload)
-            except PT0NonFinitePayload as exc:
-                raise PT1PersistentStoreCorrupt(
-                    f"PT-1 row has non-finite payload values: {key_hash}"
-                ) from exc
-            if canonical_payload_bytes != row_payload_bytes:
-                raise PT1PersistentStoreCorrupt(
-                    f"PT-1 row non-canonical payload bytes: {key_hash}"
-                )
+            validate_reduced_real_equilibrium_record_key(
+                artifact,
+                row_key,
+                row_payload,
+            )
             admitted_payload = copy.deepcopy(dict(row_payload))
         repair_notices_json = _row_repair_notices(row)
         validate_repair_notices_json(repair_notices_json)
-        return {
+        entry = {
             "artifact": artifact,
             "key": copy.deepcopy(dict(row_key)),
             "key_hash": key_hash,
@@ -3138,6 +3229,7 @@ class PT1PersistentEquilibriumStore:
             ),
             "cache_state": "live_fill",
         }
+        return (entry, admission) if return_decoded else entry
 
     def _entry_from_physics_bucket_row(
         self,
@@ -3147,16 +3239,23 @@ class PT1PersistentEquilibriumStore:
         physics_bucket_key: Mapping[str, Any],
         physics_bucket_bytes: bytes,
         physics_bucket_hash: str,
-    ) -> dict[str, Any]:
+        query_key: Mapping[str, Any] | None = None,
+    ) -> tuple[dict[str, Any], Any]:
         row_key_bytes = _sqlite_bytes(row["key_bytes"])
         row_key = json.loads(row_key_bytes.decode("utf-8"))
-        entry = self._entry_from_row(
+        entry, decoded = self._entry_from_row(
             row,
             artifact=artifact,
             key=row_key,
             key_bytes=row_key_bytes,
             key_hash=str(row["key_hash"]),
+            return_decoded=True,
+            admission_keys=(
+                (query_key,) if isinstance(query_key, Mapping) else ()
+            ),
         )
+        if decoded is None:
+            return entry, None
         row_physics_bytes = _sqlite_bytes(row["physics_key_bytes"])
         if row["physics_bucket_schema_version"] != PHYSICS_BUCKET_SCHEMA_VERSION:
             raise PT1PersistentStoreCorrupt(
@@ -3186,7 +3285,7 @@ class PT1PersistentEquilibriumStore:
                 "PT-1 row exact key does not reproduce physics bucket: "
                 f"{physics_bucket_hash}"
             )
-        return entry
+        return entry, decoded
 
     def _entry_from_physics_ladder_bucket_row(
         self,
@@ -3196,16 +3295,23 @@ class PT1PersistentEquilibriumStore:
         rung_tag: str,
         rung_key: Mapping[str, Any],
         rung_hash: str,
-    ) -> dict[str, Any]:
+        query_key: Mapping[str, Any] | None = None,
+    ) -> tuple[dict[str, Any], Any]:
         row_key_bytes = _sqlite_bytes(row["key_bytes"])
         row_key = json.loads(row_key_bytes.decode("utf-8"))
-        entry = self._entry_from_row(
+        entry, decoded = self._entry_from_row(
             row,
             artifact=artifact,
             key=row_key,
             key_bytes=row_key_bytes,
             key_hash=str(row["key_hash"]),
+            return_decoded=True,
+            admission_keys=(
+                (query_key,) if isinstance(query_key, Mapping) else ()
+            ),
         )
+        if decoded is None:
+            return entry, None
         if row[_physics_ladder_hash_column(rung_tag)] != rung_hash:
             raise PT1PersistentStoreCorrupt(
                 f"PT-1 row {rung_tag} physics bucket hash mismatch: {rung_hash}"
@@ -3235,7 +3341,7 @@ class PT1PersistentEquilibriumStore:
             raise PT1PersistentStoreCorrupt(
                 f"PT-1 row {rung_tag} distance mismatch: {rung_hash}"
             )
-        return entry
+        return entry, decoded
 
 
 def _pt1_row_admission(
@@ -4932,16 +5038,19 @@ def _equilibrium_record_authority(
         "thermoengine": EvidenceClass.MELTS.value,
         "magemin": EvidenceClass.MAGEMIN.value,
     }.get(backend_family, EvidenceClass.INTERNAL_ANALYTICAL.value)
-    return {
-        "schema": "reduced-real-authority-v1",
-        "evidence_class": evidence_class,
-        "backend_family": backend_family,
-        "backend": _typed_backend_identity_for_authority(backend),
-        "provider": _provider_identity(sim, intent),
-        "vapor_pressure": _provider_identity(
-            sim, ChemistryIntent.VAPOR_PRESSURE
-        ),
-    }
+    return dict(
+        zip(
+            _EQUILIBRIUM_AUTHORITY_FIELDS,
+            (
+                "reduced-real-authority-v1",
+                evidence_class,
+                backend_family,
+                _typed_backend_identity_for_authority(backend),
+                _provider_identity(sim, intent),
+                _provider_identity(sim, ChemistryIntent.VAPOR_PRESSURE),
+            ),
+        )
+    )
 
 
 def _cache_payload_diagnostic(
@@ -6228,24 +6337,20 @@ def _typed_backend_identity_for_authority(backend: Any) -> dict[str, str]:
 
     family = _typed_backend_family(backend)
     if family == RealBackendFamily.ALPHAMELTS.value:
-        return {
-            "backend_name": _ALPHAMELTS_BACKEND_NAME,
-            "backend_class": _ALPHAMELTS_BACKEND_CLASS,
-        }
-    if family == RealBackendFamily.THERMOENGINE.value:
-        return {
-            "backend_name": _THERMOENGINE_BACKEND_NAME,
-            "backend_class": _THERMOENGINE_BACKEND_CLASS,
-        }
-    if family == RealBackendFamily.MAGEMIN.value:
-        return {
-            "backend_name": "MAGEMinBackend",
-            "backend_class": "simulator.melt_backend.magemin.MAGEMinBackend",
-        }
-    return {
-        "backend_name": _INTERNAL_ANALYTICAL_BACKEND_SERIALIZED_NAME,
-        "backend_class": _INTERNAL_ANALYTICAL_BACKEND_SERIALIZED_CLASS,
-    }
+        identity = (_ALPHAMELTS_BACKEND_NAME, _ALPHAMELTS_BACKEND_CLASS)
+    elif family == RealBackendFamily.THERMOENGINE.value:
+        identity = (_THERMOENGINE_BACKEND_NAME, _THERMOENGINE_BACKEND_CLASS)
+    elif family == RealBackendFamily.MAGEMIN.value:
+        identity = (
+            "MAGEMinBackend",
+            "simulator.melt_backend.magemin.MAGEMinBackend",
+        )
+    else:
+        identity = (
+            _INTERNAL_ANALYTICAL_BACKEND_SERIALIZED_NAME,
+            _INTERNAL_ANALYTICAL_BACKEND_SERIALIZED_CLASS,
+        )
+    return dict(zip(_BACKEND_AUTHORITY_FIELDS, identity))
 
 
 def _authorized_backend_identity_for_key(
