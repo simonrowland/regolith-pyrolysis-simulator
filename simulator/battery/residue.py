@@ -3117,12 +3117,14 @@ def predict_knudsen_residue_composition(
     ] = {}
     try:
         try:
-            from openimcc import load_gas_datapack
+            from simulator.melt_backend import openimcc_bridge
         except ImportError as exc:
             raise ResidueInventoryRefusal("openimcc_not_importable", str(exc)) from exc
         from simulator.diagnostic_helpers.binary_pot_battery import _openimcc_gas_channels_and_omission_notices
 
-        gas_pack = load_gas_datapack()
+        gas_pack = openimcc_bridge._load_gas_pack(
+            openimcc_bridge.DEFAULT_GAS_PACK_SELECTION
+        )
         raw_gas_channels, source_omissions = _openimcc_gas_channels_and_omission_notices(
             tuple(initial), gas_pack
         )
@@ -3601,14 +3603,16 @@ def predict_mass_loss_fraction(
         for oxide in wt_pct
     }
     try:
-        from openimcc import load_gas_datapack
+        from simulator.melt_backend import openimcc_bridge
     except ImportError as exc:
         raise ResidueInventoryRefusal("openimcc_not_importable", str(exc)) from exc
     from simulator.diagnostic_helpers.binary_pot_battery import (
         _openimcc_gas_channels_and_omission_notices,
     )
 
-    gas_pack = load_gas_datapack()
+    gas_pack = openimcc_bridge._load_gas_pack(
+        openimcc_bridge.DEFAULT_GAS_PACK_SELECTION
+    )
     raw_gas_channels, source_omissions = _openimcc_gas_channels_and_omission_notices(
         tuple(initial_inventory_mol), gas_pack
     )
@@ -4714,7 +4718,6 @@ def _predict_hashimoto_residue_cohort(
         )
     try:
         import openimcc
-        from openimcc import load_gas_datapack
         from openimcc.gas import _default_reactions
     except ImportError as exc:
         raise ResidueInventoryRefusal(
@@ -4726,7 +4729,9 @@ def _predict_hashimoto_residue_cohort(
     from simulator.evaporation import _load_evaporation_alpha_by_species
     from simulator.condensation import alpha_s
 
-    gas_pack = load_gas_datapack()
+    gas_pack = openimcc_bridge._load_gas_pack(
+        openimcc_bridge.DEFAULT_GAS_PACK_SELECTION
+    )
     legacy_catalog = vapor_pressure_legacy_view(runtime_catalog)
     catalog_rows = _residue_catalog_rows(legacy_catalog)
     alpha_specs = _load_evaporation_alpha_by_species(legacy_catalog)
@@ -5534,12 +5539,13 @@ def _predict_sossi_residue_cohort(
     if engine == "openimcc":
         try:
             import openimcc
-            from openimcc import load_gas_datapack
             from openimcc.kernel import ImccNonconvergenceError
             from simulator.melt_backend import openimcc_bridge
         except ImportError as exc:
             raise ResidueInventoryRefusal("openimcc_not_importable", str(exc)) from exc
-        gas_pack = load_gas_datapack()
+        gas_pack = openimcc_bridge._load_gas_pack(
+            openimcc_bridge.DEFAULT_GAS_PACK_SELECTION
+        )
         engine_binding_identity = openimcc_bridge.engine_binding_identity(
             openimcc_bridge._load_pack(
                 openimcc_bridge.DEFAULT_BACKEND_PACK_NAME

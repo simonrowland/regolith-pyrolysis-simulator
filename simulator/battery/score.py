@@ -15167,7 +15167,6 @@ def _catalog_payload_annotations(
     return found
 
 
-@lru_cache(maxsize=1)
 def _catalog_score_rows() -> tuple[tuple[_CatalogScoreRow, ...], str | None]:
     """One compiled catalog and the phase/reaction index the scorer translates."""
 

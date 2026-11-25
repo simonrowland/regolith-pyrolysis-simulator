@@ -1151,6 +1151,19 @@ def _load_pack(pack_name: str) -> Any:
         return package.load_datapack(path)
 
 
+@lru_cache(maxsize=1)
+def _load_gas_pack(selection: str) -> Any:
+    """Resolve the supported gas pack for bridge callers."""
+
+    if selection != DEFAULT_GAS_PACK_SELECTION:
+        raise ValueError(f"unknown OpenIMCC gas pack selection {selection!r}")
+    package = _require_openimcc()
+    loader = getattr(package, "load_gas_datapack", None)
+    if not callable(loader):
+        raise OpenImccUnavailableError("OpenIMCC gas datapack loader unavailable")
+    return loader()
+
+
 def _temperature_domain_K() -> tuple[float, float]:
     try:
         _require_openimcc()

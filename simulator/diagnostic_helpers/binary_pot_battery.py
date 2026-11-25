@@ -3480,9 +3480,7 @@ class _OpenImccBatteryBackend:
 
     def _load_gas(self) -> None:
         try:
-            from openimcc import load_gas_datapack
-
-            self._gas = load_gas_datapack()
+            self._gas = self._bridge._load_gas_pack(self._gas_pack_name)
         except Exception as exc:  # noqa: BLE001 - melt rail remains usable
             self._gas = None
             self._gas_error = f"{type(exc).__name__}: {exc}"

@@ -719,6 +719,48 @@ def test_unexpected_packaged_gas_signature_error_propagates(
         bridge._openimcc_cache_decision({}, gas_pack=gas_pack)
 
 
+def test_old_pack_only_cache_consumer_mutation_is_detected(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import simulator.melt_backend.openimcc_bridge as bridge
+    from simulator import engine_cache
+
+    monkeypatch.setenv(
+        "REGOLITH_ENGINE_CACHE", str(tmp_path / "eligibility-mutation.sqlite")
+    )
+    engine_cache._MEMORY_CACHE.clear()
+    engine_cache.engine_cache_counters(reset=True)
+    request = {
+        "pack": "default",
+        "engine_settings": {"melt_pack": "published-core"},
+    }
+
+    def assert_alternate_pack_bypasses_cache(call) -> None:
+        first = call(request, lambda: {"result": "first"})
+        second = call(request, lambda: {"result": "second"})
+        assert first == {"result": "first"}
+        assert second == {"result": "second"}, (
+            "alternate melt packs must bypass the default-pack cache"
+        )
+
+    assert_alternate_pack_bypasses_cache(bridge._cached_openimcc_call)
+    engine_cache._MEMORY_CACHE.clear()
+
+    def old_pack_only_consumer(request, solve, *, gas_pack=None):
+        if request.get("pack", "default") != "default":
+            return solve()
+        return engine_cache.cached_engine_call("openimcc", request, solve)
+
+    with monkeypatch.context() as mutation:
+        mutation.setattr(bridge, "_cached_openimcc_call", old_pack_only_consumer)
+        with pytest.raises(
+            AssertionError,
+            match="alternate melt packs must bypass the default-pack cache",
+        ):
+            assert_alternate_pack_bypasses_cache(bridge._cached_openimcc_call)
+
+
 def test_pack_digest_preserves_the_published_binding_value() -> None:
     _openimcc_or_skip()
     expected = "ae979b68295f6e653fb1c37d6b381f06cb0be8d4c5b421e673420a6e4596357c"

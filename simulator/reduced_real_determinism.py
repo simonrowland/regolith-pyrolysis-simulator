@@ -3280,6 +3280,11 @@ def canonical_replay_key(
         "redox": redox_key,
         **dependency_vector,
     }
+    if artifact == "equilibrium_post_record":
+        high_t_activity = getattr(sim, "_high_t_melt_activity", "openimcc")
+        key["solver_inputs"] = {
+            "high_t_melt_activity": _json_ready(high_t_activity),
+        }
     if provider_melt_inputs is not None and (
         intent is not ChemistryIntent.GATE_LIQUID_FRACTION
     ):
@@ -3365,6 +3370,10 @@ def canonical_physics_bucket_key_from_replay_key(
         bucket_controls["log_fO2"] = controls.get("log_fO2")
     if _physics_bucket_consumes_pO2_bar(key):
         bucket_controls["pO2_bar"] = controls.get("pO2_bar")
+
+    solver_inputs = key.get("solver_inputs")
+    if isinstance(solver_inputs, Mapping) and solver_inputs:
+        bucket_controls["solver_inputs"] = _json_ready(solver_inputs)
 
     sulfur_input_ppm = _sulfur_input_ppm_from_replay_key(key)
     bucket_sulfur: dict[str, Any] = {"S_input_ppm": sulfur_input_ppm}
