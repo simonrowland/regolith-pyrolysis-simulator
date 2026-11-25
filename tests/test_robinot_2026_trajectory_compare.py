@@ -481,7 +481,19 @@ def test_o2_release_rates_map_to_ppm_and_flag_production_structural_zero(
             for record in records
             if record.observable_id == "robinot_o2_ppm_time_series"
         ]
-        assert len(fig4a) == 121
+        fig4a_integrals = [
+            record
+            for record in records
+            if record.observable_id.endswith(":integral")
+        ]
+        assert len(fig4a) == 120
+        assert len(fig4a_integrals) == 1
+        assert (
+            fig4a_integrals[0].observable_id
+            == "robinot_o2_ppm_time_series:integral"
+        )
+        assert fig4a_integrals[0].actual_value == pytest.approx(0.0)
+        assert fig4a_integrals[0].status == "assumed-input"
         assert all(record.status == "assumed-input" for record in fig4a)
         assert all(record.actual_value == 0.0 for record in fig4a)
 
@@ -513,6 +525,33 @@ def test_o2_release_rates_map_to_ppm_and_flag_production_structural_zero(
             feedstocks=feedstocks,
         )
         assert_production_fig4a_comparison(mutated.records)
+
+
+def test_empty_o2_release_rate_series_refuses_with_trajectory_dependency() -> None:
+    preset = _preset()
+    points = _observation_points(
+        _observable(preset, "robinot_o2_ppm_time_series")
+    )
+    argon_flow = preset["lab_schedule"]["gas_boundary"]["imposed_flow"]["value"]
+
+    with pytest.raises(TimeSeriesComparisonRefusal) as refusal:
+        compare_o2_release_time_series(
+            case_id="robinot_2026",
+            source_id="kems-044-robinot-2026",
+            observable_id="robinot_o2_ppm_time_series",
+            observation_points=points,
+            runtime_rate_samples=[],
+            argon_flow_nl_min=argon_flow,
+            evidence_scope="analyzer_visible_o2_in_argon_carrier",
+            source_locator={"figure": "4a"},
+            recipe={"preset": "robinot_2026"},
+            observation={"points": points},
+            runtime={"rates": []},
+        )
+
+    assert refusal.value.reason_code == "o2_release_rate_series_missing"
+    assert refusal.value.dependency is not None
+    assert "gas_phase_o2_trajectory" in refusal.value.dependency
 
 
 def _series_rows(path: Path) -> dict[str, list[dict[str, float]]]:

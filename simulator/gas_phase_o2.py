@@ -228,7 +228,9 @@ def gas_phase_o2_trajectory(
 
     Callers pass the located step records. This function decides the
     three numbers. A missing step integral stays missing. It is not
-    replaced with zero. An explicit zero is the booked zero.
+    replaced with zero. A non-baseline 0.0 rate gets the typed notice
+    ``melt_offgas_o2_structural_zero``; it does not establish that evaporation
+    released no coproduct oxygen.
 
     The lag is the exact step response of a first-order hold:
     y = y_prev + (1 - exp(-dt / tau)) * (x - y_prev). The paper's
