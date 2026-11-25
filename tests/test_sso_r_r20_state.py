@@ -272,10 +272,13 @@ def test_collapsing_ferric_capacity_routes_evaporative_o2_to_gas(monkeypatch, li
         "Fe", 0.001, 0.001, fe_data,
     )
     # The credit applies the evaporative source before settle. Congruent
-    # Fe loss has none, so the planted sentinel is still 78. Settle then
-    # republishes the ledger (the metal line at q = 0). That publisher
-    # is not the tangent, and it must not spend the coproduct on Fe2O3.
+    # Fe loss has none, so the planted sentinel is still 78. The
+    # overhead rise here is the stoichiometric coproduct, before settle
+    # republishes the ledger.
     assert sim._current_melt_redox_fO2_log() == 78.0
+    assert sim.atom_ledger.mol_by_account("process.overhead_gas").get(
+        "O2", 0.0,
+    ) - overhead_before == pytest.approx(stoich_o2_mol)
     sim._settle_evaporative_redox_after_batch()
     if liquid:
         T_K = float(sim.melt.temperature_C) + 273.15
@@ -296,9 +299,20 @@ def test_collapsing_ferric_capacity_routes_evaporative_o2_to_gas(monkeypatch, li
     )
     assert emitted_o2 == pytest.approx(stoich_o2_mol)
     assert buffer_credit == pytest.approx(0.0)
-    assert sim.atom_ledger.mol_by_account("process.overhead_gas")["O2"] - (
+    overhead_rise = sim.atom_ledger.mol_by_account("process.overhead_gas")["O2"] - (
         overhead_before
-    ) == pytest.approx(stoich_o2_mol)
+    )
+    if liquid:
+        # Studio aa075abc on 1942e4982c. The net overhead rise is
+        # 484.2805878614205 mol. The evaporation credit inside that
+        # net is the stoich mol asserted above (0.008953353030710003).
+        # The rest is the fO2=78 ferric the probe planted: liquid
+        # settle republishes under the effervescence cap, reduces
+        # that ferric, and credits the oxygen to overhead. Fe2O3
+        # did not take the coproduct.
+        assert overhead_rise == pytest.approx(484.2805878614205, abs=1.0e-9)
+    else:
+        assert overhead_rise == pytest.approx(stoich_o2_mol)
     for transition in sim.atom_ledger.transitions[transitions_before:]:
         transition.validate_conservation(sim.species_formula_registry)
         if transition.name == "oxygen_reservoir_exchange":
