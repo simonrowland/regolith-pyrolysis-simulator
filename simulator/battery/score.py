@@ -18009,6 +18009,14 @@ _RICHTER_TIME_FORWARD_SOURCE_IDS = frozenset({
 })
 
 
+def _richter2011_method_is_unreported(experiment) -> bool:
+    if experiment is None:
+        return False
+    if not experiment.method.is_value:
+        return True
+    return experiment.method.value is MethodToken.UNSPECIFIED
+
+
 def _extent_residue_method(reference, experiment, quantity) -> MethodToken | None:
     """Select a method-specific extent adapter without widening cohort locks."""
     if experiment is None or quantity is None:
@@ -18030,13 +18038,13 @@ def _extent_residue_method(reference, experiment, quantity) -> MethodToken | Non
             method is MethodToken.LANGMUIR_FREE_EVAPORATION
             or (
                 reference.source_id == _RICHTER_2011_SOURCE_ID
-                and method is None
+                and _richter2011_method_is_unreported(experiment)
             )
         )
     ):
-        # R11's unknown-method one-bar rows use the existing score-run dispatch
-        # slot only to emit a typed d-475 dependency refusal. The method stays
-        # unknown and no vacuum Langmuir owner is called.
+        # R11's unreported-method one-bar rows use the existing score-run
+        # dispatch slot only to emit a typed d-475 dependency refusal. The
+        # method stays unreported and no vacuum Langmuir owner is called.
         return MethodToken.LANGMUIR_FREE_EVAPORATION
     return None
 
@@ -18061,7 +18069,7 @@ def _extent_residue_prediction(
         if (
             reference.source_id == _RICHTER_2011_SOURCE_ID
             and experiment is not None
-            and not experiment.method.is_value
+            and _richter2011_method_is_unreported(experiment)
         ):
             return EnginePrediction(
                 engine=engine,

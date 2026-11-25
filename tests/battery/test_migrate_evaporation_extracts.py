@@ -520,9 +520,10 @@ def test_richter_time_series_residue_routes_to_owner_and_dependencies(
             assert adapters == (MethodToken.LANGMUIR_FREE_EVAPORATION,)
             vacuum_rows.append(row)
         else:
-            assert not experiment.method.is_value
+            assert experiment.method.is_value
+            assert experiment.method.value is MethodToken.UNSPECIFIED
             # Selector dispatch is only for the existing typed-refusal path;
-            # the unknown gas method never reaches a Langmuir engine call.
+            # the unreported gas method never reaches a Langmuir engine call.
             assert adapters == (MethodToken.LANGMUIR_FREE_EVAPORATION,)
             gas_rows.append(row)
     assert len(vacuum_rows) == 167
@@ -562,6 +563,18 @@ def test_richter_time_series_residue_routes_to_owner_and_dependencies(
     )
     assert gas_prediction is not None
     assert gas_prediction.refusal_detail["reason"] == "awaits_d475_series_flux"
+    # Mutation probe: restore the former absent-state-only check. It misses
+    # migrated UNSPECIFIED gas methods and makes the routed prediction vanish.
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            score_module,
+            "_richter2011_method_is_unreported",
+            lambda experiment: experiment is not None
+            and not experiment.method.is_value,
+        )
+        assert score_module._extent_residue_prediction(
+            context, gas_rows[0], Engine.OPENIMCC
+        ) is None
     monkeypatch.setattr(
         score_module, "_langmuir_residue_prediction", langmuir_owner
     )
