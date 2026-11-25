@@ -205,6 +205,11 @@ def _resolved_value(
                     "DP-004 regime-only resolution cannot include a total"
                 )
             return "P_total(cell) = sum of measured partial pressures"
+        if "value" in context:
+            raise ValueError(
+                "DP-004 requires its owning formula result; direct value overrides "
+                "are not accepted"
+            )
         if "in_cell_total_pressure_pa" not in context:
             raise ValueError(
                 "DP-004 requires the total from its owning partial-pressure sum"
