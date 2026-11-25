@@ -36,7 +36,18 @@ observations:
   notices:
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Ban86 Table 1: equations
+      for partial vapor pressures over
+
+      VO1.022(s) and over V(s)+VO(s) two-phase. Table is figure/image
+
+      in the PDF; numeric A,B coefficients were NOT recovered by OCR.
+
+      Paper reports ΔfH and dissociation energy of VO(g) via second/third
+
+      law (Tables 3, 5).
+
+      '
     origin: banchor-matsui-naito-1986::Ban86_equations
     policy:
       id: DP-106

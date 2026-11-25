@@ -51,6 +51,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: IMCC_model_and_experimental_comparison'
+    origin: 1997jonesthermo::jones_1997_imcc_mgo_activity_comparison
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: 1997jonesthermo
   locator:
     published_page: 24
@@ -151,6 +161,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: equilibrium_vapor_pressure'
+    origin: 1997jonesthermo::jones_1997_mn_vapour_pressure_tabulation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: 1997jonesthermo
   locator:
     published_page: 18

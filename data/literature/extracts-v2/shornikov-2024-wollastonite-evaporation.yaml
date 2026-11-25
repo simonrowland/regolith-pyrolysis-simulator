@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/shornikov-2024-wollastonite-evaporation.yaml
 observations:
 - observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_cao_activity_prose
-  experiment_id: 10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset
+  experiment_id: 10.1007/978-3-031-50349-8_48::shornikov-2024-wollastonite-evaporation::declared:10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset::method:unspecified
   identity:
     quantity:
       tag: value
@@ -94,6 +94,18 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Lewis partial-pressure
+      ratio, Eq. (7)'
+    origin: shornikov-2024-wollastonite-evaporation::shornikov_2024_cao_activity_prose
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -118,7 +130,7 @@ observations:
     output_unit: dimensionless
     references: []
 - observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_crystalline_formation_enthalpy
-  experiment_id: 10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset
+  experiment_id: 10.1007/978-3-031-50349-8_48::shornikov-2024-wollastonite-evaporation::declared:10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -166,6 +178,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Least-squares fit to
+      the temperature dependence using ΔG_T = ΔH_T − TΔS_T, Eq. (10)'
+    origin: shornikov-2024-wollastonite-evaporation::shornikov_2024_crystalline_formation_enthalpy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2024-wollastonite-evaporation
   locator:
     page: 7
@@ -188,7 +211,7 @@ observations:
   provenance:
     printed_phase: crystalline wollastonite
 - observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_crystalline_formation_entropy
-  experiment_id: 10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset
+  experiment_id: 10.1007/978-3-031-50349-8_48::shornikov-2024-wollastonite-evaporation::declared:10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -236,6 +259,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Least-squares fit to
+      the temperature dependence using ΔG_T = ΔH_T − TΔS_T, Eq. (10)'
+    origin: shornikov-2024-wollastonite-evaporation::shornikov_2024_crystalline_formation_entropy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2024-wollastonite-evaporation
   locator:
     page: 7
@@ -951,7 +985,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_liquid_formation_enthalpy
-  experiment_id: 10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset
+  experiment_id: 10.1007/978-3-031-50349-8_48::shornikov-2024-wollastonite-evaporation::declared:10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -999,6 +1033,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Least-squares fit to
+      the temperature dependence using ΔG_T = ΔH_T − TΔS_T, Eq. (10)'
+    origin: shornikov-2024-wollastonite-evaporation::shornikov_2024_liquid_formation_enthalpy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2024-wollastonite-evaporation
   locator:
     page: 7
@@ -1021,7 +1066,7 @@ observations:
   provenance:
     printed_phase: liquid wollastonite
 - observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_liquid_formation_entropy
-  experiment_id: 10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset
+  experiment_id: 10.1007/978-3-031-50349-8_48::shornikov-2024-wollastonite-evaporation::declared:10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1069,6 +1114,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Least-squares fit to
+      the temperature dependence using ΔG_T = ΔH_T − TΔS_T, Eq. (10)'
+    origin: shornikov-2024-wollastonite-evaporation::shornikov_2024_liquid_formation_entropy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2024-wollastonite-evaporation
   locator:
     page: 7
@@ -1091,7 +1147,7 @@ observations:
   provenance:
     printed_phase: liquid wollastonite
 - observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_sio2_activity_prose
-  experiment_id: 10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset
+  experiment_id: 10.1007/978-3-031-50349-8_48::shornikov-2024-wollastonite-evaporation::declared:10.1007/978-3-031-50349-8_48::experiment::shornikov-2024-wollastonite-runset::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1182,6 +1238,18 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Lewis partial-pressure
+      ratio, Eq. (8)'
+    origin: shornikov-2024-wollastonite-evaporation::shornikov_2024_sio2_activity_prose
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -1287,18 +1355,6 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
-    affected_quantities:
-    - transition_temperature
-    reason: 'method_inferred: value=solution_calorimetry; evidence=source text names ''solution calorimetry''; original_reason=source
-      does not state method'
-    origin: shornikov-2024-wollastonite-evaporation::shornikov_2024_table1_adamcovicova_melting_temperature
-    policy:
-      id: DP-107
-      version: 1
-      status: proposed
-      value: solution_calorimetry
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -1313,7 +1369,7 @@ observations:
     note: Table 1 row attributed to reference [38].
   read_from: pdf:shornikov-2024-wollastonite-evaporation
 - observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_table1_barin_melting_temperature
-  experiment_id: 10.1007/978-3-031-50349-8_48::shornikov-2024-wollastonite-evaporation
+  experiment_id: 10.1007/978-3-031-50349-8_48::shornikov-2024-wollastonite-evaporation::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1392,17 +1448,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - transition_temperature
-    reason: 'method_inferred: value=solution_calorimetry; evidence=source text names ''solution calorimetry''; original_reason=source
-      does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Thermochemical calculations;
+      printed source evidence: Thermochemical calculations'
     origin: shornikov-2024-wollastonite-evaporation::shornikov_2024_table1_barin_melting_temperature
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: solution_calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -1499,18 +1555,6 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
-    affected_quantities:
-    - transition_temperature
-    reason: 'method_inferred: value=solution_calorimetry; evidence=source text names ''solution calorimetry''; original_reason=source
-      does not state method'
-    origin: shornikov-2024-wollastonite-evaporation::shornikov_2024_table1_botvinkin_melting_temperature
-    policy:
-      id: DP-107
-      version: 1
-      status: proposed
-      value: solution_calorimetry
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -1525,7 +1569,7 @@ observations:
     note: Table 1 row attributed to reference [36].
   read_from: pdf:shornikov-2024-wollastonite-evaporation
 - observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_table1_current_melting_temperature
-  experiment_id: 10.1007/978-3-031-50349-8_48::shornikov-2024-wollastonite-evaporation
+  experiment_id: 10.1007/978-3-031-50349-8_48::shornikov-2024-wollastonite-evaporation::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1606,17 +1650,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - transition_temperature
-    reason: 'method_inferred: value=solution_calorimetry; evidence=source text names ''solution calorimetry''; original_reason=source
-      does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Differences in liquid
+      and crystalline enthalpy or entropy, Eqs. (11)–(13)'
     origin: shornikov-2024-wollastonite-evaporation::shornikov_2024_table1_current_melting_temperature
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: solution_calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -1647,7 +1691,7 @@ observations:
     output_unit: K
     references: []
 - observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_table1_richet_melting_temperature
-  experiment_id: 10.1007/978-3-031-50349-8_48::shornikov-2024-wollastonite-evaporation
+  experiment_id: 10.1007/978-3-031-50349-8_48::shornikov-2024-wollastonite-evaporation::method:calorimetry
   identity:
     quantity:
       tag: value
@@ -1731,14 +1775,14 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - transition_temperature
-    reason: 'method_inferred: value=solution_calorimetry; evidence=source text names ''solution calorimetry''; original_reason=source
-      does not state method'
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: Ice calorimetry'
     origin: shornikov-2024-wollastonite-evaporation::shornikov_2024_table1_richet_melting_temperature
     policy:
       id: DP-107
       version: 1
       status: proposed
-      value: solution_calorimetry
+      value: calorimetry
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -1754,7 +1798,7 @@ observations:
     note: Table 1 row attributed to reference [40].
   read_from: pdf:shornikov-2024-wollastonite-evaporation
 - observation_id: shornikov-2024-wollastonite-evaporation::shornikov_2024_table1_tarina_melting_temperature
-  experiment_id: 10.1007/978-3-031-50349-8_48::shornikov-2024-wollastonite-evaporation
+  experiment_id: 10.1007/978-3-031-50349-8_48::shornikov-2024-wollastonite-evaporation::method:drop_calorimetry
   identity:
     quantity:
       tag: value
@@ -1835,18 +1879,6 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
-    affected_quantities:
-    - transition_temperature
-    reason: 'method_inferred: value=solution_calorimetry; evidence=source text names ''solution calorimetry''; original_reason=source
-      does not state method'
-    origin: shornikov-2024-wollastonite-evaporation::shornikov_2024_table1_tarina_melting_temperature
-    policy:
-      id: DP-107
-      version: 1
-      status: proposed
-      value: solution_calorimetry
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature

@@ -46,7 +46,17 @@ observations:
         paragraph: sodium vapor pressure comparison
         equation: '6'
         note: printed_cell=Δ log P_Na = 1.44 at 1250°C
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_delta_log_pNa_1250C
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: inoue-suito-1982-na-silicate-sulfur-partitions
   locator:
     page: 3
@@ -160,7 +170,17 @@ observations:
         paragraph: sodium vapor pressure comparison
         equation: '6'
         note: printed_cell=Δ log P_Na = 1.57 at 1350°C
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_delta_log_pNa_1350C
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: inoue-suito-1982-na-silicate-sulfur-partitions
   locator:
     page: 3
@@ -231,7 +251,7 @@ observations:
   provenance:
     printed_phase: g
 - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_eq20_pNa_1300C
-  experiment_id: 10.2355/isijinternational1966.22.514::inoue-suito-1982-na-silicate-sulfur-partitions
+  experiment_id: 10.2355/isijinternational1966.22.514::inoue-suito-1982-na-silicate-sulfur-partitions::method:static_equilibrium
   identity:
     quantity:
       tag: value
@@ -378,7 +398,7 @@ observations:
   provenance:
     printed_phase: g
 - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_eq20_pNa_1400C
-  experiment_id: 10.2355/isijinternational1966.22.514::inoue-suito-1982-na-silicate-sulfur-partitions
+  experiment_id: 10.2355/isijinternational1966.22.514::inoue-suito-1982-na-silicate-sulfur-partitions::method:static_equilibrium
   identity:
     quantity:
       tag: value
@@ -571,7 +591,8 @@ observations:
   notices:
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Printed log fS retained
+      as printed; no linear activity coefficient conversion.'
     origin: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_log_fS_1250C
     policy:
       id: DP-106
@@ -671,7 +692,8 @@ observations:
   notices:
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Printed log fS retained
+      as printed; no linear activity coefficient conversion.'
     origin: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_log_fS_1350C
     policy:
       id: DP-106
@@ -725,7 +747,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_na2o_activity_callow_xsio2_050
-  experiment_id: 10.2355/isijinternational1966.22.514::inoue-suito-1982-na-silicate-sulfur-partitions
+  experiment_id: 10.2355/isijinternational1966.22.514::inoue-suito-1982-na-silicate-sulfur-partitions::method:static_equilibrium
   identity:
     quantity:
       tag: value
@@ -897,7 +919,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_na2o_activity_callow_xsio2_067
-  experiment_id: 10.2355/isijinternational1966.22.514::inoue-suito-1982-na-silicate-sulfur-partitions
+  experiment_id: 10.2355/isijinternational1966.22.514::inoue-suito-1982-na-silicate-sulfur-partitions::method:static_equilibrium
   identity:
     quantity:
       tag: value
@@ -1069,7 +1091,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_na2o_activity_charles_xsio2_050
-  experiment_id: 10.2355/isijinternational1966.22.514::inoue-suito-1982-na-silicate-sulfur-partitions
+  experiment_id: 10.2355/isijinternational1966.22.514::inoue-suito-1982-na-silicate-sulfur-partitions::method:static_equilibrium
   identity:
     quantity:
       tag: value
@@ -1241,7 +1263,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_na2o_activity_charles_xsio2_067
-  experiment_id: 10.2355/isijinternational1966.22.514::inoue-suito-1982-na-silicate-sulfur-partitions
+  experiment_id: 10.2355/isijinternational1966.22.514::inoue-suito-1982-na-silicate-sulfur-partitions::method:static_equilibrium
   identity:
     quantity:
       tag: value
@@ -1413,7 +1435,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_na2o_activity_haller_1250
-  experiment_id: 10.2355/isijinternational1966.22.514::inoue-suito-1982-na-silicate-sulfur-partitions
+  experiment_id: 10.2355/isijinternational1966.22.514::inoue-suito-1982-na-silicate-sulfur-partitions::method:static_equilibrium
   identity:
     quantity:
       tag: value
@@ -1601,7 +1623,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_na2o_activity_haller_1350
-  experiment_id: 10.2355/isijinternational1966.22.514::inoue-suito-1982-na-silicate-sulfur-partitions
+  experiment_id: 10.2355/isijinternational1966.22.514::inoue-suito-1982-na-silicate-sulfur-partitions::method:static_equilibrium
   identity:
     quantity:
       tag: value
@@ -2897,7 +2919,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_sio2_activity_callow_xsio2_050
-  experiment_id: 10.2355/isijinternational1966.22.514::inoue-suito-1982-na-silicate-sulfur-partitions
+  experiment_id: 10.2355/isijinternational1966.22.514::inoue-suito-1982-na-silicate-sulfur-partitions::method:static_equilibrium
   identity:
     quantity:
       tag: value
@@ -3067,7 +3089,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_sio2_activity_callow_xsio2_067
-  experiment_id: 10.2355/isijinternational1966.22.514::inoue-suito-1982-na-silicate-sulfur-partitions
+  experiment_id: 10.2355/isijinternational1966.22.514::inoue-suito-1982-na-silicate-sulfur-partitions::method:static_equilibrium
   identity:
     quantity:
       tag: value
@@ -3237,7 +3259,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_sio2_activity_charles_xsio2_050
-  experiment_id: 10.2355/isijinternational1966.22.514::inoue-suito-1982-na-silicate-sulfur-partitions
+  experiment_id: 10.2355/isijinternational1966.22.514::inoue-suito-1982-na-silicate-sulfur-partitions::method:static_equilibrium
   identity:
     quantity:
       tag: value
@@ -3407,7 +3429,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_sio2_activity_charles_xsio2_067
-  experiment_id: 10.2355/isijinternational1966.22.514::inoue-suito-1982-na-silicate-sulfur-partitions
+  experiment_id: 10.2355/isijinternational1966.22.514::inoue-suito-1982-na-silicate-sulfur-partitions::method:static_equilibrium
   identity:
     quantity:
       tag: value
@@ -59852,7 +59874,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t4_sample_1_3_l_FeO_gamma_feo
-  experiment_id: 10.2355/isijinternational1966.22.514::experiment::table4-ratio-1.3
+  experiment_id: 10.2355/isijinternational1966.22.514::inoue-suito-1982-na-silicate-sulfur-partitions::declared:10.2355/isijinternational1966.22.514::experiment::table4-ratio-1.3::method:static_equilibrium
   identity:
     quantity:
       tag: value
@@ -59999,7 +60021,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t4_sample_1_3_l_FeO_n_feo
-  experiment_id: 10.2355/isijinternational1966.22.514::experiment::table4-ratio-1.3
+  experiment_id: 10.2355/isijinternational1966.22.514::inoue-suito-1982-na-silicate-sulfur-partitions::declared:10.2355/isijinternational1966.22.514::experiment::table4-ratio-1.3::method:static_equilibrium
   identity:
     quantity:
       tag: value
@@ -60232,7 +60254,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t4_sample__3_l_FeO_gamma_feo
-  experiment_id: 10.2355/isijinternational1966.22.514::experiment::table4-ratio-.3
+  experiment_id: 10.2355/isijinternational1966.22.514::inoue-suito-1982-na-silicate-sulfur-partitions::declared:10.2355/isijinternational1966.22.514::experiment::table4-ratio-.3::method:static_equilibrium
   identity:
     quantity:
       tag: value
@@ -60379,7 +60401,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t4_sample__3_l_FeO_n_feo
-  experiment_id: 10.2355/isijinternational1966.22.514::experiment::table4-ratio-.3
+  experiment_id: 10.2355/isijinternational1966.22.514::inoue-suito-1982-na-silicate-sulfur-partitions::declared:10.2355/isijinternational1966.22.514::experiment::table4-ratio-.3::method:static_equilibrium
   identity:
     quantity:
       tag: value
@@ -60612,7 +60634,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t4_sample__6_l_FeO_gamma_feo
-  experiment_id: 10.2355/isijinternational1966.22.514::experiment::table4-ratio-.6
+  experiment_id: 10.2355/isijinternational1966.22.514::inoue-suito-1982-na-silicate-sulfur-partitions::declared:10.2355/isijinternational1966.22.514::experiment::table4-ratio-.6::method:static_equilibrium
   identity:
     quantity:
       tag: value
@@ -60759,7 +60781,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t4_sample__6_l_FeO_n_feo
-  experiment_id: 10.2355/isijinternational1966.22.514::experiment::table4-ratio-.6
+  experiment_id: 10.2355/isijinternational1966.22.514::inoue-suito-1982-na-silicate-sulfur-partitions::declared:10.2355/isijinternational1966.22.514::experiment::table4-ratio-.6::method:static_equilibrium
   identity:
     quantity:
       tag: value
@@ -60992,7 +61014,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t4_sample__9_l_FeO_gamma_feo
-  experiment_id: 10.2355/isijinternational1966.22.514::experiment::table4-ratio-.9
+  experiment_id: 10.2355/isijinternational1966.22.514::inoue-suito-1982-na-silicate-sulfur-partitions::declared:10.2355/isijinternational1966.22.514::experiment::table4-ratio-.9::method:static_equilibrium
   identity:
     quantity:
       tag: value
@@ -61139,7 +61161,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_t4_sample__9_l_FeO_n_feo
-  experiment_id: 10.2355/isijinternational1966.22.514::experiment::table4-ratio-.9
+  experiment_id: 10.2355/isijinternational1966.22.514::inoue-suito-1982-na-silicate-sulfur-partitions::declared:10.2355/isijinternational1966.22.514::experiment::table4-ratio-.9::method:static_equilibrium
   identity:
     quantity:
       tag: value

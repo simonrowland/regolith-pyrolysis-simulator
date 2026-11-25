@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/shilov-2026-sro-la2o3-kems.yaml
 observations:
 - observation_id: shilov-2026-sro-la2o3-kems::shilov_2026_sample1_partial_molar_enthalpy::T=1798:h=06b32c80a991
-  experiment_id: 10.7868/s3034559626090129::shilov-2026-sro-la2o3-kems
+  experiment_id: 10.7868/s3034559626090129::shilov-2026-sro-la2o3-kems::method:unspecified
   identity:
     quantity:
       tag: value
@@ -97,7 +97,18 @@ observations:
         published_page: 1159
         pdf_page_index: 5
         section: Results and discussion
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - partial_molar_enthalpy
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shilov-2026-sro-la2o3-kems::shilov_2026_sample1_partial_molar_enthalpy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shilov-2026-sro-la2o3-kems
   locator:
     page: 6
@@ -155,7 +166,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: shilov-2026-sro-la2o3-kems::shilov_2026_sample2_partial_molar_enthalpy::T=1696:h=2bea7ccf9874
-  experiment_id: 10.7868/s3034559626090129::shilov-2026-sro-la2o3-kems
+  experiment_id: 10.7868/s3034559626090129::shilov-2026-sro-la2o3-kems::method:unspecified
   identity:
     quantity:
       tag: value
@@ -249,7 +260,18 @@ observations:
         published_page: 1159
         pdf_page_index: 5
         section: Results and discussion
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - partial_molar_enthalpy
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shilov-2026-sro-la2o3-kems::shilov_2026_sample2_partial_molar_enthalpy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shilov-2026-sro-la2o3-kems
   locator:
     page: 6
@@ -2829,7 +2851,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1_activity_1900k_estimate::T=1900:h=c9c27b2f5852
-  experiment_id: 10.7868/s3034559626090129::shilov-2026-sro-la2o3-kems
+  experiment_id: 10.7868/s3034559626090129::shilov-2026-sro-la2o3-kems::method:unspecified
   identity:
     quantity:
       tag: value
@@ -2938,7 +2960,18 @@ observations:
         published_page: 1161
         pdf_page_index: 7
         section: Model results
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample1_activity_1900k_estimate
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shilov-2026-sro-la2o3-kems
   locator:
     page: 8
@@ -4102,7 +4135,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2_activity_1900k_estimate::T=1900:h=0d7aa87bcb56
-  experiment_id: 10.7868/s3034559626090129::shilov-2026-sro-la2o3-kems
+  experiment_id: 10.7868/s3034559626090129::shilov-2026-sro-la2o3-kems::method:unspecified
   identity:
     quantity:
       tag: value
@@ -4211,7 +4244,18 @@ observations:
         published_page: 1161
         pdf_page_index: 7
         section: Model results
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_sample2_activity_1900k_estimate
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shilov-2026-sro-la2o3-kems
   locator:
     page: 8
@@ -4273,7 +4317,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_weighted_activity_1750k::T=1750:h=583101e4096f
-  experiment_id: 10.7868/s3034559626090129::shilov-2026-sro-la2o3-kems
+  experiment_id: 10.7868/s3034559626090129::shilov-2026-sro-la2o3-kems::method:unspecified
   identity:
     quantity:
       tag: value
@@ -4383,7 +4427,18 @@ observations:
         pdf_page_index: 6
         table: '2'
         note: Text below Table 2 reports the weighted activity at the 16.8 mol% SrO two-phase boundary.
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shilov-2026-sro-la2o3-kems::shilov_2026_table2_sro_weighted_activity_1750k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shilov-2026-sro-la2o3-kems
   locator:
     page: 7

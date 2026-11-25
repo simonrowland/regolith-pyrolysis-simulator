@@ -48,6 +48,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_lunar_chemical_analysis'
+    origin: lpi-compendium-62231::lpi_2010_62231_table1_chemistry
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: lpi-compendium-62231
   locator:
     pdf_page_index: 3

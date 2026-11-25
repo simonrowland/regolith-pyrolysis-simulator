@@ -4054,6 +4054,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: transpiration_mass_spectrometry'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_fig15_salt_slag_exchange
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
     page: 75
@@ -4127,6 +4137,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: transpiration_mass_spectrometry'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_fig15_salt_slag_exchange_quoted_20260906
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
     page: 42
@@ -4138,7 +4158,7 @@ observations:
   provenance:
     printed_phase: NaCl_on_K1_slag
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized::T=1821.7:h=73d823b8e48e
-  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::method:knudsen_effusion
   identity:
     quantity:
       tag: value
@@ -4335,7 +4355,7 @@ observations:
   provenance:
     printed_phase: g
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized::T=1860.8:h=37b8334fa33d
-  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::method:knudsen_effusion
   identity:
     quantity:
       tag: value
@@ -4532,7 +4552,7 @@ observations:
   provenance:
     printed_phase: g
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized::T=1868.6:h=8ea25bb94003
-  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::method:knudsen_effusion
   identity:
     quantity:
       tag: value
@@ -4729,7 +4749,7 @@ observations:
   provenance:
     printed_phase: g
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized::T=1911.6:h=d9ef607ec5af
-  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::method:knudsen_effusion
   identity:
     quantity:
       tag: value
@@ -4926,7 +4946,7 @@ observations:
   provenance:
     printed_phase: g
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized::T=1914.8:h=96933736e50e
-  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::method:knudsen_effusion
   identity:
     quantity:
       tag: value
@@ -5123,7 +5143,7 @@ observations:
   provenance:
     printed_phase: g
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized::T=1946.8:h=865b11871b18
-  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::method:knudsen_effusion
   identity:
     quantity:
       tag: value
@@ -5320,7 +5340,7 @@ observations:
   provenance:
     printed_phase: g
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized_quoted_20260906
-  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::method:knudsen_effusion
   identity:
     quantity:
       tag: unknown
@@ -5384,7 +5404,7 @@ observations:
   provenance:
     printed_phase: illite_liquid
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_figure_only_blocked
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-measured-soda-lime-glass
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-measured-soda-lime-glass::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -5437,6 +5457,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_figure_only_blocked
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
     page: 51
@@ -5445,7 +5475,7 @@ observations:
   provenance:
     printed_phase: soda_lime_silica_glass
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_figure_only_blocked_quoted_20260906
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-measured-soda-lime-glass
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-measured-soda-lime-glass::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -5498,6 +5528,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_figure_only_blocked_quoted_20260906
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
     page: 57
@@ -6466,7 +6506,7 @@ observations:
   provenance:
     printed_phase: soda_lime_silica_glass
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_this_work_digitized_quoted_20260906
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-measured-soda-lime-glass
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-measured-soda-lime-glass::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -6520,6 +6560,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_this_work_digitized_quoted_20260906
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
     page: 57
@@ -6587,6 +6637,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compilation_derived'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_k2o_liquid_kp_janaf_derived
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
     page: 28
@@ -6642,6 +6702,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_or_fit'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_k2o_liquid_kp_janaf_derived_quoted_20260906
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
     page: 28
@@ -6709,6 +6779,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: literature_quotation'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_kohl1975_na2so4g_foreign_second_law
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
     page: 19
@@ -6781,6 +6861,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_or_fit'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_kohl1975_na2so4g_foreign_second_law_quoted_20260906
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -6852,6 +6942,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: transpiration_and_kems'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_na2so4_second_law_prose
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
     page: 18
@@ -6926,6 +7026,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_or_fit'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_na2so4_second_law_prose_quoted_20260906
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -6997,6 +7107,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: transpiration_and_kems'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_nacl_dimerization_second_law
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
     page: 18
@@ -7071,6 +7191,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_or_fit'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_nacl_dimerization_second_law_quoted_20260906
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -7224,6 +7354,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_or_fit'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_nacl_liquid_logP_prose_quoted_20260906
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
     page: 17
@@ -7282,6 +7422,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_or_fit'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_table2_17k2o_A_as_printed_note_quoted_20260906
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
     page: 29
@@ -7292,7 +7442,7 @@ observations:
   provenance:
     printed_phase: K2O-Al2O3-SiO2_phases_uncertain
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients::rows:h=0ec91612e9c7
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-pt-tms
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-pt-tms::method:knudsen_effusion
   identity:
     quantity:
       tag: unknown
@@ -7511,7 +7661,7 @@ observations:
   provenance:
     printed_phase: K-bearing_oxide_and_slag_mix
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients::rows:h=160b0cf31d4b
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-pt-tms
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-pt-tms::method:knudsen_effusion
   identity:
     quantity:
       tag: unknown
@@ -7571,7 +7721,7 @@ observations:
   provenance:
     printed_phase: K-bearing_oxide_and_slag_mix
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients::rows:h=36fdd20bdc1e
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-pt-tms
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-pt-tms::method:knudsen_effusion
   identity:
     quantity:
       tag: unknown
@@ -7631,7 +7781,7 @@ observations:
   provenance:
     printed_phase: K-bearing_oxide_and_slag_mix
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients::rows:h=5990a63e7c0b
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-pt-tms
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-pt-tms::method:knudsen_effusion
   identity:
     quantity:
       tag: unknown
@@ -7757,7 +7907,7 @@ observations:
   provenance:
     printed_phase: K-bearing_oxide_and_slag_mix
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients::rows:h=65d014284ac8
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-pt-tms
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-pt-tms::method:knudsen_effusion
   identity:
     quantity:
       tag: unknown
@@ -7883,7 +8033,7 @@ observations:
   provenance:
     printed_phase: K-bearing_oxide_and_slag_mix
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients::rows:h=7e1ddafaaee6
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-pt-tms
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-pt-tms::method:knudsen_effusion
   identity:
     quantity:
       tag: unknown
@@ -7943,7 +8093,7 @@ observations:
   provenance:
     printed_phase: K-bearing_oxide_and_slag_mix
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients::rows:h=933ebe29de48
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-pt-tms
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-pt-tms::method:knudsen_effusion
   identity:
     quantity:
       tag: unknown
@@ -8003,7 +8153,7 @@ observations:
   provenance:
     printed_phase: K-bearing_oxide_and_slag_mix
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients::rows:h=a0d035ad29f9
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-pt-tms
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-pt-tms::method:knudsen_effusion
   identity:
     quantity:
       tag: unknown
@@ -8063,7 +8213,7 @@ observations:
   provenance:
     printed_phase: K-bearing_oxide_and_slag_mix
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients::rows:h=af4a50debd88
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-pt-tms
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-pt-tms::method:knudsen_effusion
   identity:
     quantity:
       tag: unknown
@@ -8123,7 +8273,7 @@ observations:
   provenance:
     printed_phase: K-bearing_oxide_and_slag_mix
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients::rows:h=bdd0719b07bd
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-pt-tms
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-pt-tms::method:knudsen_effusion
   identity:
     quantity:
       tag: unknown
@@ -8183,7 +8333,7 @@ observations:
   provenance:
     printed_phase: K-bearing_oxide_and_slag_mix
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients::rows:h=bfd77f1b4c4f
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-pt-tms
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-pt-tms::method:knudsen_effusion
   identity:
     quantity:
       tag: unknown
@@ -8243,7 +8393,7 @@ observations:
   provenance:
     printed_phase: K-bearing_oxide_and_slag_mix
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients::rows:h=c3c57e8f6757
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-pt-tms
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-pt-tms::method:knudsen_effusion
   identity:
     quantity:
       tag: unknown
@@ -8369,7 +8519,7 @@ observations:
   provenance:
     printed_phase: K-bearing_oxide_and_slag_mix
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients::rows:h=c9613b2f065a
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-pt-tms
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-pt-tms::method:knudsen_effusion
   identity:
     quantity:
       tag: unknown
@@ -8429,7 +8579,7 @@ observations:
   provenance:
     printed_phase: K-bearing_oxide_and_slag_mix
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients::rows:h=e3f647c078ee
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-pt-tms
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-pt-tms::method:knudsen_effusion
   identity:
     quantity:
       tag: unknown
@@ -8560,7 +8710,7 @@ observations:
   provenance:
     printed_phase: K-bearing_oxide_and_slag_mix
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients::rows:h=ee99cfbe61d3
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-pt-tms
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-pt-tms::method:knudsen_effusion
   identity:
     quantity:
       tag: unknown
@@ -8620,7 +8770,7 @@ observations:
   provenance:
     printed_phase: K-bearing_oxide_and_slag_mix
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients::rows:h=f3eebf386eda
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-pt-tms
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-pt-tms::method:knudsen_effusion
   identity:
     quantity:
       tag: unknown
@@ -8680,7 +8830,7 @@ observations:
   provenance:
     printed_phase: K-bearing_oxide_and_slag_mix
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients::rows:h=f8d465e76d95
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-pt-tms
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-pt-tms::method:knudsen_effusion
   identity:
     quantity:
       tag: unknown
@@ -8740,7 +8890,7 @@ observations:
   provenance:
     printed_phase: K-bearing_oxide_and_slag_mix
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=032c7e48606c
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-table2-quoted-fits
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-table2-quoted-fits::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -8806,6 +8956,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_or_fit'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
     page: 23
@@ -8815,7 +8975,7 @@ observations:
   provenance:
     printed_phase: K-bearing_oxide_and_slag_mix
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=043cbfd5a16d
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-table2-quoted-fits
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-table2-quoted-fits::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -8881,6 +9041,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_or_fit'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
     page: 24
@@ -8890,7 +9060,7 @@ observations:
   provenance:
     printed_phase: K-bearing_oxide_and_slag_mix
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=208e0732ae07
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-table2-quoted-fits
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-table2-quoted-fits::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -8956,6 +9126,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_or_fit'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
     page: 24
@@ -8965,7 +9145,7 @@ observations:
   provenance:
     printed_phase: K-bearing_oxide_and_slag_mix
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=32ce441e1b70
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-table2-quoted-fits
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-table2-quoted-fits::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -9031,6 +9211,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_or_fit'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
     page: 23
@@ -9040,7 +9230,7 @@ observations:
   provenance:
     printed_phase: K-bearing_oxide_and_slag_mix
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=34540a470ebb
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-table2-quoted-fits
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-table2-quoted-fits::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -9106,6 +9296,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_or_fit'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
     page: 24
@@ -9238,7 +9438,7 @@ observations:
   provenance:
     printed_phase: K-bearing_oxide_and_slag_mix
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=40b6e31ec6e4
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-table2-quoted-fits
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-table2-quoted-fits::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -9304,6 +9504,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_or_fit'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
     page: 24
@@ -9313,7 +9523,7 @@ observations:
   provenance:
     printed_phase: K-bearing_oxide_and_slag_mix
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=4d7fabdcee7f
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-table2-quoted-fits
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-table2-quoted-fits::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -9379,6 +9589,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_or_fit'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
     page: 23
@@ -9388,7 +9608,7 @@ observations:
   provenance:
     printed_phase: K-bearing_oxide_and_slag_mix
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=4ffd59df2376
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-table2-quoted-fits
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-table2-quoted-fits::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -9454,6 +9674,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_or_fit'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
     page: 23
@@ -9463,7 +9693,7 @@ observations:
   provenance:
     printed_phase: K-bearing_oxide_and_slag_mix
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=5b28f8dd1eaf
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-table2-quoted-fits
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-table2-quoted-fits::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -9529,6 +9759,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_or_fit'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
     page: 23
@@ -9538,7 +9778,7 @@ observations:
   provenance:
     printed_phase: K-bearing_oxide_and_slag_mix
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=90847c90136d
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-table2-quoted-fits
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-table2-quoted-fits::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -9604,6 +9844,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_or_fit'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
     page: 23
@@ -9613,7 +9863,7 @@ observations:
   provenance:
     printed_phase: K-bearing_oxide_and_slag_mix
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=940d0e2da80d
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-table2-quoted-fits
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-table2-quoted-fits::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -9679,6 +9929,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_or_fit'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
     page: 23
@@ -9688,7 +9948,7 @@ observations:
   provenance:
     printed_phase: K-bearing_oxide_and_slag_mix
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=b455e61917c0
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-table2-quoted-fits
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-table2-quoted-fits::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -9754,6 +10014,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_or_fit'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
     page: 23
@@ -9763,7 +10033,7 @@ observations:
   provenance:
     printed_phase: K-bearing_oxide_and_slag_mix
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=b79ed16ec8a6
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-table2-quoted-fits
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-table2-quoted-fits::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -9829,6 +10099,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_or_fit'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
     page: 23
@@ -9838,7 +10118,7 @@ observations:
   provenance:
     printed_phase: K-bearing_oxide_and_slag_mix
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=b7beed458db6
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-table2-quoted-fits
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-table2-quoted-fits::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -9904,6 +10184,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_or_fit'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
     page: 23
@@ -9913,7 +10203,7 @@ observations:
   provenance:
     printed_phase: K-bearing_oxide_and_slag_mix
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=de78e686ab1f
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-table2-quoted-fits
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-table2-quoted-fits::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -9979,6 +10269,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_or_fit'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
     page: 24
@@ -9988,7 +10288,7 @@ observations:
   provenance:
     printed_phase: K-bearing_oxide_and_slag_mix
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=dfcd6d43af5e
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-table2-quoted-fits
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-table2-quoted-fits::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -10054,6 +10354,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_or_fit'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
     page: 25
@@ -10063,7 +10373,7 @@ observations:
   provenance:
     printed_phase: K-bearing_oxide_and_slag_mix
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906::rows:h=e8d369daa8f3
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-table2-quoted-fits
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-table2-quoted-fits::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -10129,6 +10439,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_or_fit'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
     page: 23
@@ -10138,7 +10458,7 @@ observations:
   provenance:
     printed_phase: K-bearing_oxide_and_slag_mix
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-solgasmix-model-glass
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-solgasmix-model-glass::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -10198,16 +10518,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''thermochemical_equilibrium_model''
-      is not a closed method token (kems_effusion alone is insufficient)'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
     origin: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -10318,7 +10637,7 @@ observations:
   provenance:
     printed_phase: soda_lime_silica_glass_model
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906::rows:h=0f36488eae22
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-solgasmix-model-glass
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-solgasmix-model-glass::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -10363,16 +10682,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''thermochemical_equilibrium_model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906::rows:h=0f36488eae22
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_or_fit'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -10383,7 +10701,7 @@ observations:
   provenance:
     printed_phase: soda_lime_silica_glass_model
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906::rows:h=22a67a60b1a7
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-solgasmix-model-glass
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-solgasmix-model-glass::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -10428,16 +10746,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''thermochemical_equilibrium_model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906::rows:h=22a67a60b1a7
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_or_fit'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -10448,7 +10765,7 @@ observations:
   provenance:
     printed_phase: soda_lime_silica_glass_model
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906::rows:h=456905b82e81
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-solgasmix-model-glass
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-solgasmix-model-glass::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -10493,16 +10810,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''thermochemical_equilibrium_model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906::rows:h=456905b82e81
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_or_fit'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -10513,7 +10829,7 @@ observations:
   provenance:
     printed_phase: soda_lime_silica_glass_model
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906::rows:h=52e7f26fbe57
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-solgasmix-model-glass
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-solgasmix-model-glass::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -10558,16 +10874,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''thermochemical_equilibrium_model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906::rows:h=52e7f26fbe57
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_or_fit'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -10578,7 +10893,7 @@ observations:
   provenance:
     printed_phase: soda_lime_silica_glass_model
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906::rows:h=698b1a5d8095
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-solgasmix-model-glass
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-solgasmix-model-glass::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -10623,16 +10938,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''thermochemical_equilibrium_model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906::rows:h=698b1a5d8095
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_or_fit'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -10643,7 +10957,7 @@ observations:
   provenance:
     printed_phase: soda_lime_silica_glass_model
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906::rows:h=6999fa3771a0
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-solgasmix-model-glass
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-solgasmix-model-glass::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -10688,16 +11002,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''thermochemical_equilibrium_model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906::rows:h=6999fa3771a0
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_or_fit'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -10708,7 +11021,7 @@ observations:
   provenance:
     printed_phase: soda_lime_silica_glass_model
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906::rows:h=c191a2cc6ce7
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-solgasmix-model-glass
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-solgasmix-model-glass::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -10753,16 +11066,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''thermochemical_equilibrium_model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906::rows:h=c191a2cc6ce7
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_or_fit'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -10773,7 +11085,7 @@ observations:
   provenance:
     printed_phase: soda_lime_silica_glass_model
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906::rows:h=d12bf8167a5d
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-solgasmix-model-glass
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-solgasmix-model-glass::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -10818,16 +11130,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''thermochemical_equilibrium_model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906::rows:h=d12bf8167a5d
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_or_fit'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -10838,7 +11149,7 @@ observations:
   provenance:
     printed_phase: soda_lime_silica_glass_model
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-solgasmix-model-glass
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-solgasmix-model-glass::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -10886,16 +11197,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''thermochemical_equilibrium_model''
-      is not a closed method token (kems_effusion alone is insufficient)'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermochemical_equilibrium_model'
     origin: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -10917,7 +11227,7 @@ observations:
   provenance:
     printed_phase: soda_lime_silica_glass_model
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid_quoted_20260906::rows:h=0f36488eae22
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-solgasmix-model-glass
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-solgasmix-model-glass::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -10962,16 +11272,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''thermochemical_equilibrium_model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid_quoted_20260906::rows:h=0f36488eae22
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_or_fit'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid_quoted_20260906
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -10982,7 +11291,7 @@ observations:
   provenance:
     printed_phase: soda_lime_silica_glass_model
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid_quoted_20260906::rows:h=22a67a60b1a7
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-solgasmix-model-glass
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-solgasmix-model-glass::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -11027,16 +11336,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''thermochemical_equilibrium_model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid_quoted_20260906::rows:h=22a67a60b1a7
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_or_fit'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid_quoted_20260906
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -11047,7 +11355,7 @@ observations:
   provenance:
     printed_phase: soda_lime_silica_glass_model
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid_quoted_20260906::rows:h=456905b82e81
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-solgasmix-model-glass
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-solgasmix-model-glass::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -11092,16 +11400,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''thermochemical_equilibrium_model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid_quoted_20260906::rows:h=456905b82e81
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_or_fit'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid_quoted_20260906
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -11112,7 +11419,7 @@ observations:
   provenance:
     printed_phase: soda_lime_silica_glass_model
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid_quoted_20260906::rows:h=52e7f26fbe57
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-solgasmix-model-glass
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-solgasmix-model-glass::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -11157,16 +11464,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''thermochemical_equilibrium_model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid_quoted_20260906::rows:h=52e7f26fbe57
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_or_fit'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid_quoted_20260906
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -11177,7 +11483,7 @@ observations:
   provenance:
     printed_phase: soda_lime_silica_glass_model
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid_quoted_20260906::rows:h=698b1a5d8095
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-solgasmix-model-glass
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-solgasmix-model-glass::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -11222,16 +11528,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''thermochemical_equilibrium_model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid_quoted_20260906::rows:h=698b1a5d8095
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_or_fit'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid_quoted_20260906
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -11242,7 +11547,7 @@ observations:
   provenance:
     printed_phase: soda_lime_silica_glass_model
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid_quoted_20260906::rows:h=6999fa3771a0
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-solgasmix-model-glass
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-solgasmix-model-glass::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -11287,16 +11592,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''thermochemical_equilibrium_model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid_quoted_20260906::rows:h=6999fa3771a0
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_or_fit'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid_quoted_20260906
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -11307,7 +11611,7 @@ observations:
   provenance:
     printed_phase: soda_lime_silica_glass_model
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid_quoted_20260906::rows:h=c191a2cc6ce7
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-solgasmix-model-glass
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-solgasmix-model-glass::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -11352,16 +11656,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''thermochemical_equilibrium_model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid_quoted_20260906::rows:h=c191a2cc6ce7
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_or_fit'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid_quoted_20260906
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:
@@ -11372,7 +11675,7 @@ observations:
   provenance:
     printed_phase: soda_lime_silica_glass_model
 - observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid_quoted_20260906::rows:h=d12bf8167a5d
-  experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-solgasmix-model-glass
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir::declared:10.6028/nbs.ir.81-2279::experiment::hastie-1981-solgasmix-model-glass::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -11417,16 +11720,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''thermochemical_equilibrium_model''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid_quoted_20260906::rows:h=d12bf8167a5d
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: published_model_or_fit'
+    origin: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid_quoted_20260906
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-020-hastie-1981-nbsir
   locator:

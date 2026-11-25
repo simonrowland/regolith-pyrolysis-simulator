@@ -80,6 +80,18 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_inferred
+    affected_quantities:
+    - activity
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=source method text:
+      KEMS ion-current comparison.'
+    origin: lopatin-2023-na-barium-borate-kems::lopatin_2023_sample13_B2O3_activity
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: comparison_method_cell_constant_cancels
     affected_quantities:
     - activity
@@ -229,6 +241,18 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=source method text:
+      KEMS ion-current comparison.'
+    origin: lopatin-2023-na-barium-borate-kems::lopatin_2023_sample13_B2O3_activity_coefficient
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: comparison_method_cell_constant_cancels
     affected_quantities:
     - activity_coefficient
@@ -369,6 +393,18 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_inferred
+    affected_quantities:
+    - activity
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=source method text:
+      KEMS ion-current comparison.'
+    origin: lopatin-2023-na-barium-borate-kems::lopatin_2023_sample13_NaBO2_activity
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: comparison_method_cell_constant_cancels
     affected_quantities:
     - activity
@@ -518,6 +554,18 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
+  - kind: method_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=source method text:
+      KEMS ion-current comparison.'
+    origin: lopatin-2023-na-barium-borate-kems::lopatin_2023_sample13_NaBO2_activity_coefficient
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: comparison_method_cell_constant_cancels
     affected_quantities:
     - activity_coefficient

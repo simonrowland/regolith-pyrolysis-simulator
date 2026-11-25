@@ -3612,6 +3612,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_binary_s2_quoted
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -3728,6 +3739,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_binary_s3_quoted
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -3844,6 +3866,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_binary_s7_quoted
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -3871,7 +3904,7 @@ observations:
   provenance:
     printed_phase: binary CaO-SiO2 system
 - observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s1_activity
-  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2::method:knudsen_effusion
   identity:
     quantity:
       tag: value
@@ -4028,7 +4061,7 @@ observations:
   provenance:
     printed_phase: CaO-TiO2-SiO2 slag; physical phase not specified
 - observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s1_activity_coefficient
-  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2::method:knudsen_effusion
   identity:
     quantity:
       tag: value
@@ -4193,7 +4226,7 @@ observations:
   provenance:
     printed_phase: CaO-TiO2-SiO2 slag; physical phase not specified
 - observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s2_activity
-  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2::method:knudsen_effusion
   identity:
     quantity:
       tag: value
@@ -4350,7 +4383,7 @@ observations:
   provenance:
     printed_phase: CaO-TiO2-SiO2 slag; physical phase not specified
 - observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s2_activity_coefficient
-  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2::method:knudsen_effusion
   identity:
     quantity:
       tag: value
@@ -4514,7 +4547,7 @@ observations:
   provenance:
     printed_phase: CaO-TiO2-SiO2 slag; physical phase not specified
 - observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s3_activity
-  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2::method:knudsen_effusion
   identity:
     quantity:
       tag: value
@@ -4671,7 +4704,7 @@ observations:
   provenance:
     printed_phase: CaO-TiO2-SiO2 slag; physical phase not specified
 - observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s3_activity_coefficient
-  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2::method:knudsen_effusion
   identity:
     quantity:
       tag: value
@@ -4835,7 +4868,7 @@ observations:
   provenance:
     printed_phase: CaO-TiO2-SiO2 slag; physical phase not specified
 - observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s4_activity
-  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2::method:knudsen_effusion
   identity:
     quantity:
       tag: value
@@ -4992,7 +5025,7 @@ observations:
   provenance:
     printed_phase: CaO-TiO2-SiO2 slag; physical phase not specified
 - observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s4_activity_coefficient
-  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2::method:knudsen_effusion
   identity:
     quantity:
       tag: value
@@ -5156,7 +5189,7 @@ observations:
   provenance:
     printed_phase: CaO-TiO2-SiO2 slag; physical phase not specified
 - observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s5_activity
-  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2::method:knudsen_effusion
   identity:
     quantity:
       tag: value
@@ -5313,7 +5346,7 @@ observations:
   provenance:
     printed_phase: CaO-TiO2-SiO2 slag; physical phase not specified
 - observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s5_activity_coefficient
-  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2::method:knudsen_effusion
   identity:
     quantity:
       tag: value
@@ -5477,7 +5510,7 @@ observations:
   provenance:
     printed_phase: CaO-TiO2-SiO2 slag; physical phase not specified
 - observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s6_activity
-  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2::method:knudsen_effusion
   identity:
     quantity:
       tag: value
@@ -5634,7 +5667,7 @@ observations:
   provenance:
     printed_phase: CaO-TiO2-SiO2 slag; physical phase not specified
 - observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s6_activity_coefficient
-  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2::method:knudsen_effusion
   identity:
     quantity:
       tag: value
@@ -5798,7 +5831,7 @@ observations:
   provenance:
     printed_phase: CaO-TiO2-SiO2 slag; physical phase not specified
 - observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s7_activity
-  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2::method:knudsen_effusion
   identity:
     quantity:
       tag: value
@@ -5955,7 +5988,7 @@ observations:
   provenance:
     printed_phase: CaO-TiO2-SiO2 slag; physical phase not specified
 - observation_id: ostrovski-2000-cao-tio2-sio2::ostrovski_2000_table4_s7_activity_coefficient
-  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2
+  experiment_id: 7c10adb51a549465ebfa2949cf24a4a382cde1ff87db22082a744d7d754fd62c::ostrovski-2000-cao-tio2-sio2::method:knudsen_effusion
   identity:
     quantity:
       tag: value

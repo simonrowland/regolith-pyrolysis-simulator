@@ -32,8 +32,9 @@ experiments:
 - experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-1996-2001-fig-dots
   kind: literature
   method:
-    tag: value
-    value: knudsen_effusion
+    tag: unknown
+    reason: regime 'Knudsen effusion mass spectrometry at 1300 K, cited. The dots are not measurements of this 2008 article.'
+      is not a closed method token (kems_effusion alone is insufficient)
   sample: {}
   conditions:
     temperature_K:
@@ -63,6 +64,74 @@ experiments:
     pdf_page_index: 1
     figure: '1'
 - experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-fig-calculated
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'Lines 4, 5 and 6 are activities and oxide-formation Gibbs energies calculated in the present study. The
+      caption does not print discrete calculated points.' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a
+  locator:
+    page: 2
+    published_page: 150
+    pdf_page_index: 1
+    figure: '1'
+- experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'The table caption says the Gibbs energies were calculated in the present study according to data [1, 6-9].
+      Per-row parents are not printed.' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a
+  locator:
+    page: 1
+    published_page: 149
+    pdf_page_index: 0
+    table: '1'
+- experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::shornikov-2008-zinc-phosphate-melts::declared:a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-1996-2001-fig-dots::method:unspecified
   kind: literature
   method:
     tag: value
@@ -95,7 +164,40 @@ experiments:
     published_page: 150
     pdf_page_index: 1
     figure: '1'
-- experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
+- experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::shornikov-2008-zinc-phosphate-melts::declared:a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-fig-calculated::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a
+  locator:
+    page: 2
+    published_page: 150
+    pdf_page_index: 1
+    figure: '1'
+- experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::shornikov-2008-zinc-phosphate-melts::declared:a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k::method:unspecified
   kind: literature
   method:
     tag: value

@@ -34,6 +34,7 @@ from simulator.battery.enums import (
     ResidualStatus,
     ValueKind,
 )
+from simulator.battery.engine_capability import engine_covers_quantity
 from simulator.battery.identity import Identity, parse_valence_basis
 from simulator.battery.migrate import (
     FERRIC_FRACTION_RELATION,
@@ -119,8 +120,10 @@ def _sossi_aithala_redox_context():
             or (
                 observation.source_id
                 == "aithala-2026-magmatic-iron-redox-to-2100c"
-                and observation.experiment_id.rsplit("::", 1)[-1]
-                in _AITHALA_REDOX_EXPERIMENTS
+                and any(
+                    part in _AITHALA_REDOX_EXPERIMENTS
+                    for part in observation.experiment_id.split("::")
+                )
             )
         )
     }
@@ -373,7 +376,7 @@ def test_openimcc_in_domain_redox_flags_become_prediction_notices(monkeypatch):
 def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
     """Golden pin for extracting the shared inventory and evidence helpers."""
     pytest.importorskip("openimcc")
-    context, _observations = _sossi_aithala_redox_context()
+    context, observations = _sossi_aithala_redox_context()
     residuals, _ = score_store(
         context, engines=(Engine.OPENIMCC,), rail=Rail.REDOX
     )
@@ -441,20 +444,39 @@ def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
         ),
     ):
         assert backlog.get(NoticeKind.SOURCE_DISAGREEMENT.value, 0) == 0
-        assert backlog["engine_model_caveat"] == 178
+        assert backlog["engine_model_caveat"] == 142
         assert backlog["admission_defaulted"] == 18
         assert backlog["total_iron_reported_as_feo"] == 18
-    flagged = [
-        (residual.reference, strata)
+    assert all(
+        score_module.flagged_strata(residual.notices)
+        == (
+            ("iron-oxide-convention",)
+            if observations[residual.reference].source_id
+            == "aithala-2026-magmatic-iron-redox-to-2100c"
+            else (
+                "method_unstated",
+                "iron-oxide-convention",
+                "proposed-policy",
+            )
+        )
         for residual in residuals
-        if (strata := score_module.flagged_strata(residual.notices))
-    ]
-    # Every numeric row reports total iron as FeO, so the production owner
-    # assigns the iron-oxide-convention stratum; no other stratum applies.
-    expected_flag = (score_module.FLAGGED_STRATUM_IRON_OXIDE_CONVENTION,)
-    assert flagged == [
-        (residual.reference, expected_flag) for residual in values
-    ], f"unexpected flagged strata: {flagged!r}"
+    ), {
+        source_id: sorted(
+            {
+                score_module.flagged_strata(residual.notices)
+                for residual in residuals
+                if observations[residual.reference].source_id == source_id
+            }
+        )
+        for source_id in sorted(
+            {observation.source_id for observation in observations.values()}
+        )
+    }
+    assert all(
+        score_module.FLAGGED_STRATUM_IRON_OXIDE_CONVENTION
+        in score_module.flagged_strata(residual.notices)
+        for residual in values
+    )
     assert not any(residual.score_eligible for residual in residuals)
 
 
@@ -928,14 +950,15 @@ def test_internal_analytical_sossi_aithala_redox_payload_pin():
     # fam13 binds the six Aithala Table S-1 Fe rows to the physical SI PDF
     # (page 13, SI-7; SHA-256 ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa).
     # Their printed redox values and decisions are unchanged; the serialized
-    # locator changes from source_path=None to that PDF path. The combined
-    # payload hash therefore moves from 6a3fb7b24e11ad8c838ada5e83177719d6463ebc6683b3faccfec9257b865862
-    # Round-10 pin 0140d9de1cf1d76f49fcf1a1c1889efb3153a95adb25768a39d901cc175ddb50
-    # is refreshed to 3fc087feb0df00013c1632d3a5bf05aea7448739fc17f7e82d18f7bc95dac925.
-    # DP-112's registry flag now admits its canonical-buffer notices, adding
-    # them to the serialized rows and producing the merged payload pin below.
+    # locator changes from source_path=None to that PDF path. The row-level
+    # method split also changes serialized experiment IDs. b274's DP-112
+    # registry flag admits canonical-buffer notices. The combined output hash
+    # below pins both metadata updates while the numeric residuals stay
+    # governed by the separate scorer assertions above.
+    # b274 refreshes its prior 3fc087... payload pin, and the row-specific
+    # experiment IDs produce this merged metadata digest.
     assert hashlib.sha256(encoded).hexdigest() == (
-        "9d1888c0ad721e9eb64c4af53fd256af673e1229fb4e261da300f96b168d0e05"
+        "3032738c8adb3635df9699111f9f7387277ceaff27a1105ee1244e029454b5db"
     )
 
 
@@ -994,7 +1017,7 @@ def test_real_sossi_aithala_bands_propagate_fraction_uncertainty_to_dex():
         observation_id
         for observation_id, observation in observations.items()
         if observation.source_id == "aithala-2026-magmatic-iron-redox-to-2100c"
-        and observation.experiment_id.rsplit("::", 1)[-1] == "aithala-2026-1800-30"
+        and "aithala-2026-1800-30" in observation.experiment_id.split("::")
     )
     assert residual_by_reference[aithala_1800_30].status is ResidualStatus.MATCH
 
@@ -1966,6 +1989,17 @@ def test_aithala_redox_rows_score_when_printed_composition_is_joined():
         benches=result.benches,
     )
     residuals, _ = score_store(context, engines=SCORE_ENGINE_SET, rail=Rail.REDOX)
+    expected_pairs = {
+        (row.observation_id, engine.value)
+        for row in redox_rows
+        for engine in SCORE_ENGINE_SET
+        if engine_covers_quantity(engine, row.identity.quantity.value)
+    }
+    observed_pairs = {
+        (residual.key.split(":T=", 1)[0], residual.key.rsplit("::", 1)[-1])
+        for residual in residuals
+    }
+    assert observed_pairs == expected_pairs
     callable_engines = tuple(
         engine
         for engine in SCORE_ENGINE_SET
@@ -2020,8 +2054,8 @@ def test_aithala_redox_rows_score_when_printed_composition_is_joined():
                     "phase-equilibrium execution"
                 )
         elif engine == "catalog_evaluator":
-            # Gate 9's catalog evaluator answers vapour pressures only.
-            # Fe3+/Fe2+ stays a quantity refusal, not a ferric-split refusal.
+            # Catalog evaluation has no redox row adapter; a direct call still
+            # returns the quantity-level refusal checked above.
             assert residual.numeric is None
             assert residual.refusal is not None
             assert residual.refusal.reason is RefusalReason.UNSUPPORTED

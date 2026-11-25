@@ -39,7 +39,8 @@ observations:
   notices:
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Authors'' thermodynamic
+      assessment from Christensen et al. [27] transition data.'
     origin: mcgill-na-fe-o-critical-assessment::mcgill16_nafeo2_alpha_beta_transition_enthalpy
     policy:
       id: DP-106
@@ -97,7 +98,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: mcgill-na-fe-o-critical-assessment::mcgill16_nafeo2_assessed_delta_fH
-  experiment_id: 10.1007/s11663-015-0517-5::mcgill-na-fe-o-critical-assessment
+  experiment_id: 10.1007/s11663-015-0517-5::mcgill-na-fe-o-critical-assessment::method:calorimetry
   identity:
     quantity:
       tag: value
@@ -174,16 +175,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_unstated
+  - kind: method_inferred
     affected_quantities:
     - delta_fH
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The standard enthalpy was determined from Koehler et al. [28] calorimetry and Gibbs-energy data measured using
+      emf.'
     origin: mcgill-na-fe-o-critical-assessment::mcgill16_nafeo2_assessed_delta_fH
     policy:
-      id: DP-106
+      id: DP-107
       version: 1
       status: proposed
-      value: unspecified
+      value: calorimetry
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -324,7 +327,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - S
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: The standard entropy
+      of formation was fixed according to King [32].'
     origin: mcgill-na-fe-o-critical-assessment::mcgill16_nafeo2_assessed_entropy
     policy:
       id: DP-106
@@ -424,7 +428,8 @@ observations:
   notices:
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Authors'' thermodynamic
+      assessment from Christensen et al. [27] transition data.'
     origin: mcgill-na-fe-o-critical-assessment::mcgill16_nafeo2_beta_gamma_transition_enthalpy
     policy:
       id: DP-106

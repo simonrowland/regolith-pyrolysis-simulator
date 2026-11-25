@@ -90,7 +90,7 @@ observations:
   provenance:
     printed_phase: condensed_liquid
 - observation_id: kems-039-wolf-2023-vaporock::wolf_2023_lunar_basalt_12065_composition_compiled
-  experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::experiment::lunar-basalt-12065
+  experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::kems-039-wolf-2023-vaporock::declared:f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::experiment::lunar-basalt-12065::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -146,7 +146,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compilation_assessed'
+    origin: kems-039-wolf-2023-vaporock::wolf_2023_lunar_basalt_12065_composition_compiled
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-039-wolf-2023-vaporock
   locator:
     published_page: 14
@@ -338,7 +348,7 @@ observations:
   provenance:
     printed_phase: condensed_solid
 - observation_id: kems-039-wolf-2023-vaporock::wolf_2023_lunar_vaporock_activity_fits
-  experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::experiment::lunar-basalt-12065
+  experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::kems-039-wolf-2023-vaporock::declared:f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::experiment::lunar-basalt-12065::method:engine_evaluation
   identity:
     quantity:
       tag: value
@@ -425,7 +435,7 @@ observations:
   provenance:
     printed_phase: condensed_liquid
 - observation_id: kems-039-wolf-2023-vaporock::wolf_2023_table2_model_compositions
-  experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::kems-039-wolf-2023-vaporock
+  experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::kems-039-wolf-2023-vaporock::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -456,7 +466,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compilation_assessed'
+    origin: kems-039-wolf-2023-vaporock::wolf_2023_table2_model_compositions
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-039-wolf-2023-vaporock
   locator:
     published_page: 14

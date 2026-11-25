@@ -94,6 +94,18 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''direct_langmuir_to_knudsen_effusion_comparison''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: chromium_solid_langmuir_knudsen
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -302,6 +314,18 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=regime ''vacuum_langmuir_flux_against_equilibrium_reference''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: potassium_silicate_vacuum
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha

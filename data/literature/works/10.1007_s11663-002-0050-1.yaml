@@ -34,6 +34,156 @@ experiments:
 - experiment_id: 10.1007/s11663-002-0050-1::experiment::forsberg2002_cell2
   kind: literature
   method:
+    tag: unknown
+    reason: regime 'solid_state_emf' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: Emf Cells and Experimental Procedure
+        note: No total pressure is reported.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: Materials Used and Preparations
+        note: The measurement gas is reported as a mixture; no separate sweep gas is stated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1007/s11663-002-0050-1
+  locator:
+    page: 2
+    equation: '2'
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '20000'
+          approximate: false
+      locator:
+        page: 2
+        section: Emf Cells and Experimental Procedure
+        note: Oxygen activity is reported as about 0.2 bars; converted to Pa.
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.2'
+            locator:
+              page: 2
+              section: Emf Cells and Experimental Procedure
+              note: Oxygen activity is reported as about 0.2 bars; converted to Pa.
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              page: 2
+              section: Emf Cells and Experimental Procedure
+              note: Oxygen activity is reported as about 0.2 bars; converted to Pa.
+        output_unit: Pa
+        references: []
+- experiment_id: 10.1007/s11663-002-0050-1::experiment::forsberg2002_cell3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solid_state_emf' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: Emf Cells and Experimental Procedure
+        note: No total pressure is reported.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 2
+        section: Materials Used and Preparations
+        note: The measurement gas is reported as a mixture; no separate sweep gas is stated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1007/s11663-002-0050-1
+  locator:
+    page: 2
+    equation: '3'
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '20000'
+          approximate: false
+      locator:
+        page: 2
+        section: Emf Cells and Experimental Procedure
+        note: Oxygen activity is reported as about 0.2 bars; converted to Pa.
+      inference:
+        relation: bar_to_Pa
+        inputs:
+        - P_Pa = P_bar × 1e5
+        - original_unit=bar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.2'
+            locator:
+              page: 2
+              section: Emf Cells and Experimental Procedure
+              note: Oxygen activity is reported as about 0.2 bars; converted to Pa.
+        - - factor
+          - state:
+              tag: value
+              value: '100000'
+            locator:
+              page: 2
+              section: Emf Cells and Experimental Procedure
+              note: Oxygen activity is reported as about 0.2 bars; converted to Pa.
+        output_unit: Pa
+        references: []
+- experiment_id: 10.1007/s11663-002-0050-1::forsberg-2002-ca-fe-o-incongruent-melting::declared:10.1007/s11663-002-0050-1::experiment::forsberg2002_cell2::method:unspecified
+  kind: literature
+  method:
     tag: value
     value: unspecified
   sample: {}
@@ -106,7 +256,7 @@ experiments:
               note: Oxygen activity is reported as about 0.2 bars; converted to Pa.
         output_unit: Pa
         references: []
-- experiment_id: 10.1007/s11663-002-0050-1::experiment::forsberg2002_cell3
+- experiment_id: 10.1007/s11663-002-0050-1::forsberg-2002-ca-fe-o-incongruent-melting::declared:10.1007/s11663-002-0050-1::experiment::forsberg2002_cell3::method:unspecified
   kind: literature
   method:
     tag: value

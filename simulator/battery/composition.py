@@ -12,7 +12,10 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from decimal import Decimal
 
-from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
+from simulator.accounting.formulas import (
+    ATOMIC_WEIGHTS_G_PER_MOL,
+    atoms_parse_formula_else_janaf,
+)
 from simulator.battery.decimal_tokens import decimal_token
 from simulator.battery.enums import (
     ELEMENT_WT_PERCENT_BASIS,
@@ -22,7 +25,6 @@ from simulator.battery.enums import (
 )
 from simulator.battery.input_provenance import PRINTED_STARTING_BULK
 from simulator.battery.records import Composition
-from simulator.reference_data.janaf import formula_composition
 
 # Spaces, underscores, hyphens, and dashes are not part of the scale token.
 _VOLUME_BASIS_DROPS = str.maketrans("", "", " _-\u2013\u2014")
@@ -37,11 +39,11 @@ _MOLE_FRACTION_CLOSURE = Decimal("0.02")
 
 
 def parse_species_formula(formula: str) -> tuple[tuple[str, float], ...] | None:
-    """Closed element-symbol parse. None means unmatched, never string equality."""
+    """Use the shared accounting parser. None means unmatched."""
 
     if not formula or formula.strip().lower() in {"unknown", "none", "n/a"}:
         return None
-    return formula_composition(formula)
+    return atoms_parse_formula_else_janaf(formula)
 
 
 def canonical_species_key(formula: object) -> str:

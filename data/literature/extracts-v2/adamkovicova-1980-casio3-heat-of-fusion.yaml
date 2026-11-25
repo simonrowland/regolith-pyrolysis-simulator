@@ -86,7 +86,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - heat_of_fusion
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Difference between Hrel
+      for CaSiO3 melt and Hrel for pseudowollastonite at 1817 K, using Eqs. (6) and (7), as described with Fig. 1.'
     origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_heat_of_fusion_at_1817K
     policy:
       id: DP-106
@@ -428,7 +429,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - heat_of_fusion
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Earlier-worker value
+      quoted for comparison; not measured in the present work.'
     origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_27_6_quote
     policy:
       id: DP-106
@@ -556,7 +558,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - heat_of_fusion
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Earlier-worker value
+      quoted for comparison; not measured in the present work.'
     origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_50_1_quote
     policy:
       id: DP-106
@@ -684,7 +687,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - heat_of_fusion
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Prior tabulated value
+      quoted for comparison; not measured in the present work.'
     origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_56_1_quote
     policy:
       id: DP-106
@@ -812,7 +816,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - heat_of_fusion
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Earlier-worker calculated
+      value quoted for comparison; not measured in the present work.'
     origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_59_0_quote
     policy:
       id: DP-106
@@ -939,7 +944,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - heat_of_fusion
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Earlier-worker calculated
+      value quoted for comparison; not measured in the present work.'
     origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_68_2_quote
     policy:
       id: DP-106
@@ -1066,7 +1072,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - heat_of_fusion
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Earlier-worker value
+      quoted for comparison; not measured in the present work.'
     origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_heat_fusion_82_9_quote
     policy:
       id: DP-106
@@ -1182,7 +1189,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - cp
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Alternative earlier-worker
+      melt heat-capacity value quoted in the discussion.'
     origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_melt_heat_capacity_0_14654_quote
     policy:
       id: DP-106
@@ -1288,7 +1296,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - cp
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Earlier-worker melt heat-capacity
+      value quoted in the discussion.'
     origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_prior_melt_heat_capacity_0_15073_quote
     policy:
       id: DP-106
@@ -1561,7 +1570,7 @@ observations:
   provenance:
     printed_phase: crystalline_pseudowollastonite_alpha_wollastonite
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1506:h=18f513d69601
-  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-drop-series
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion::declared:fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-drop-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1640,17 +1649,16 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
-      does not state method'
-    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1506:h=18f513d69601
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: drop_calorimetry
+      value: unspecified
       units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
@@ -1697,7 +1705,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1576:h=b53aea1560f8
-  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-drop-series
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion::declared:fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-drop-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1776,17 +1784,16 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
-      does not state method'
-    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1576:h=b53aea1560f8
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: drop_calorimetry
+      value: unspecified
       units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
@@ -1833,7 +1840,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1630:h=406a82a894f5
-  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-drop-series
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion::declared:fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-drop-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1912,17 +1919,16 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
-      does not state method'
-    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1630:h=406a82a894f5
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: drop_calorimetry
+      value: unspecified
       units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
@@ -1969,7 +1975,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1678:h=3904cda43355
-  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-drop-series
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion::declared:fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-drop-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -2048,17 +2054,16 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
-      does not state method'
-    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1678:h=3904cda43355
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: drop_calorimetry
+      value: unspecified
       units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
@@ -2105,7 +2110,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1730:h=398645529cd2
-  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-drop-series
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion::declared:fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-drop-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -2184,17 +2189,16 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
-      does not state method'
-    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1730:h=398645529cd2
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: drop_calorimetry
+      value: unspecified
       units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
@@ -2241,7 +2245,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1780:h=4ba768d0eaad
-  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-drop-series
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion::declared:fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-drop-series::method:unspecified
   identity:
     quantity:
       tag: value
@@ -2320,17 +2324,16 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
-      does not state method'
-    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured::T=1780:h=4ba768d0eaad
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_cooling_measured
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: drop_calorimetry
+      value: unspecified
       units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
@@ -2429,7 +2432,7 @@ observations:
   - kind: method_unstated
     affected_quantities: []
     reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced::T=1506:h=13c0520666a4
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced
     policy:
       id: DP-106
       version: 1
@@ -2530,7 +2533,7 @@ observations:
   - kind: method_unstated
     affected_quantities: []
     reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced::T=1576:h=70272ed69634
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced
     policy:
       id: DP-106
       version: 1
@@ -2631,7 +2634,7 @@ observations:
   - kind: method_unstated
     affected_quantities: []
     reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced::T=1630:h=1cdd7210e586
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced
     policy:
       id: DP-106
       version: 1
@@ -2732,7 +2735,7 @@ observations:
   - kind: method_unstated
     affected_quantities: []
     reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced::T=1678:h=7f5dd9b90129
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced
     policy:
       id: DP-106
       version: 1
@@ -2833,7 +2836,7 @@ observations:
   - kind: method_unstated
     affected_quantities: []
     reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced::T=1730:h=de2a9db8efd6
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced
     policy:
       id: DP-106
       version: 1
@@ -2934,7 +2937,7 @@ observations:
   - kind: method_unstated
     affected_quantities: []
     reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced::T=1780:h=0f90032e6c86
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table1_solid_relative_enthalpy_measured_reduced
     policy:
       id: DP-106
       version: 1
@@ -2983,7 +2986,7 @@ observations:
   provenance:
     printed_phase: crystalline_pseudowollastonite_alpha_wollastonite
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured
-  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-solution-series
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion::declared:fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-pseudowollastonite-solution-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -3034,16 +3037,15 @@ observations:
       status: canonical
       value: cr
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=solution_calorimetry; evidence=source text names ''solution calorimetry''; original_reason=source
-      does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
     origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table2_solid_solution_heats_measured
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: solution_calorimetry
+      value: unspecified
       units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
@@ -3065,7 +3067,7 @@ observations:
   provenance:
     printed_phase: crystalline_pseudowollastonite_alpha_wollastonite
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1829:h=7fede8d9f322
-  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-drop-series
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion::declared:fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-drop-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -3113,16 +3115,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
-      does not state method'
-    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1829:h=7fede8d9f322
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Printed pp. 194-195:
+      melt ΔHcool depends on the structure of the glass formed on cooling in the drop calorimeter, so the drop is not liquid
+      H(T)-H(298 K).'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: drop_calorimetry
+      value: unspecified
       units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
@@ -3144,7 +3147,7 @@ observations:
   provenance:
     printed_phase: CaSiO3_melt
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1848:h=7c4f837720a4
-  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-drop-series
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion::declared:fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-drop-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -3192,16 +3195,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
-      does not state method'
-    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1848:h=7c4f837720a4
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Printed pp. 194-195:
+      melt ΔHcool depends on the structure of the glass formed on cooling in the drop calorimeter, so the drop is not liquid
+      H(T)-H(298 K).'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: drop_calorimetry
+      value: unspecified
       units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
@@ -3223,7 +3227,7 @@ observations:
   provenance:
     printed_phase: CaSiO3_melt
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1859:h=4d038eb2bc00
-  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-drop-series
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion::declared:fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-drop-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -3271,16 +3275,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
-      does not state method'
-    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1859:h=4d038eb2bc00
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Printed pp. 194-195:
+      melt ΔHcool depends on the structure of the glass formed on cooling in the drop calorimeter, so the drop is not liquid
+      H(T)-H(298 K).'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: drop_calorimetry
+      value: unspecified
       units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
@@ -3302,7 +3307,7 @@ observations:
   provenance:
     printed_phase: CaSiO3_melt
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1915:h=650213d91f74
-  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-drop-series
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion::declared:fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-drop-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -3350,16 +3355,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
-      does not state method'
-    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1915:h=650213d91f74
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Printed pp. 194-195:
+      melt ΔHcool depends on the structure of the glass formed on cooling in the drop calorimeter, so the drop is not liquid
+      H(T)-H(298 K).'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: drop_calorimetry
+      value: unspecified
       units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
@@ -3381,7 +3387,7 @@ observations:
   provenance:
     printed_phase: CaSiO3_melt
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1961:h=7aae6dcb0477
-  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-drop-series
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion::declared:fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-drop-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -3429,16 +3435,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
-      does not state method'
-    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured::T=1961:h=7aae6dcb0477
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Printed pp. 194-195:
+      melt ΔHcool depends on the structure of the glass formed on cooling in the drop calorimeter, so the drop is not liquid
+      H(T)-H(298 K).'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_cooling_measured
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: drop_calorimetry
+      value: unspecified
       units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
@@ -3511,7 +3518,7 @@ observations:
   - kind: method_unstated
     affected_quantities: []
     reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced::T=1829:h=cf370c06c383
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced
     policy:
       id: DP-106
       version: 1
@@ -3616,7 +3623,7 @@ observations:
   - kind: method_unstated
     affected_quantities: []
     reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced::T=1848:h=0841596d01f9
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced
     policy:
       id: DP-106
       version: 1
@@ -3721,7 +3728,7 @@ observations:
   - kind: method_unstated
     affected_quantities: []
     reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced::T=1859:h=ec5d85f803d1
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced
     policy:
       id: DP-106
       version: 1
@@ -3826,7 +3833,7 @@ observations:
   - kind: method_unstated
     affected_quantities: []
     reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced::T=1915:h=3d0ce135d3d3
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced
     policy:
       id: DP-106
       version: 1
@@ -3931,7 +3938,7 @@ observations:
   - kind: method_unstated
     affected_quantities: []
     reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced::T=1961:h=32621aaaf097
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_relative_enthalpy_measured_reduced
     policy:
       id: DP-106
       version: 1
@@ -3985,7 +3992,7 @@ observations:
   provenance:
     printed_phase: CaSiO3_melt
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1829:h=22f3731c16bd
-  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-solution-series
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion::declared:fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-solution-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -4033,16 +4040,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=solution_calorimetry; evidence=source text names ''solution calorimetry''; original_reason=source
-      does not state method'
-    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1829:h=22f3731c16bd
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table III reports the
+      mean heat of solution for each melt sample; the printed text says these are mean values of measurements but does not
+      establish a replicate count.'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: solution_calorimetry
+      value: unspecified
       units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
@@ -4064,7 +4072,7 @@ observations:
   provenance:
     printed_phase: CaSiO3_melt_sample_solution_heat
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1848:h=a662473fe545
-  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-solution-series
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion::declared:fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-solution-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -4112,16 +4120,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=solution_calorimetry; evidence=source text names ''solution calorimetry''; original_reason=source
-      does not state method'
-    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1848:h=a662473fe545
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table III reports the
+      mean heat of solution for each melt sample; the printed text says these are mean values of measurements but does not
+      establish a replicate count.'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: solution_calorimetry
+      value: unspecified
       units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
@@ -4143,7 +4152,7 @@ observations:
   provenance:
     printed_phase: CaSiO3_melt_sample_solution_heat
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1859:h=9d06b38c7c61
-  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-solution-series
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion::declared:fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-solution-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -4191,16 +4200,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=solution_calorimetry; evidence=source text names ''solution calorimetry''; original_reason=source
-      does not state method'
-    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1859:h=9d06b38c7c61
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table III reports the
+      mean heat of solution for each melt sample; the printed text says these are mean values of measurements but does not
+      establish a replicate count.'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: solution_calorimetry
+      value: unspecified
       units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
@@ -4222,7 +4232,7 @@ observations:
   provenance:
     printed_phase: CaSiO3_melt_sample_solution_heat
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1915:h=ecc019604d45
-  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-solution-series
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion::declared:fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-solution-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -4270,16 +4280,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=solution_calorimetry; evidence=source text names ''solution calorimetry''; original_reason=source
-      does not state method'
-    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1915:h=ecc019604d45
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table III reports the
+      mean heat of solution for each melt sample; the printed text says these are mean values of measurements but does not
+      establish a replicate count.'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: solution_calorimetry
+      value: unspecified
       units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:
@@ -4301,7 +4312,7 @@ observations:
   provenance:
     printed_phase: CaSiO3_melt_sample_solution_heat
 - observation_id: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1961:h=9d06b38c7c61
-  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-solution-series
+  experiment_id: fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::adamkovicova-1980-casio3-heat-of-fusion::declared:fd686faff03c7fe63e8cfa72967a94575caa3cbb1988a6af863ed72f43bde3ce::experiment::adamkovicova-melt-solution-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -4349,16 +4360,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=solution_calorimetry; evidence=source text names ''solution calorimetry''; original_reason=source
-      does not state method'
-    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured::T=1961:h=9d06b38c7c61
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table III reports the
+      mean heat of solution for each melt sample; the printed text says these are mean values of measurements but does not
+      establish a replicate count.'
+    origin: adamkovicova-1980-casio3-heat-of-fusion::adamkovicova_1980_table3_melt_solution_means_measured
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: solution_calorimetry
+      value: unspecified
       units: method token
   source_id: adamkovicova-1980-casio3-heat-of-fusion
   locator:

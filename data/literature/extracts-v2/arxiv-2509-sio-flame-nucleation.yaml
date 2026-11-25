@@ -123,7 +123,7 @@ observations:
       units: phase token
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: molecular_kinematic_condensation'
     origin: arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_condensation_growth_model
     policy:
       id: DP-106
@@ -418,6 +418,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: homogeneous_nucleation'
+    origin: arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_nucleation_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: arxiv-2509-sio-flame-nucleation
   locator:
     page: 5
@@ -519,7 +529,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - density
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: authors'' particle-mass
+      and volume model'
     origin: arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_particle_density
     policy:
       id: DP-106
@@ -757,7 +768,7 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - p_sat
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Clausius_Clapeyron_saturation_model'
     origin: arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_saturation_pressure_model
     policy:
       id: DP-106

@@ -40,16 +40,15 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''kems_second_law''
-      is not a closed method token (kems_effusion alone is insufficient)'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_isomolecular'
     origin: kems-050-gorokhov-1977::gorokhov_1977_cro2_isomolecular_cited_t4_absent
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-050-gorokhov-1977
   locator:
@@ -120,16 +119,16 @@ observations:
         source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO.html
         record: '[77ГОР/ГУС]'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''kems_second_law''
-      is not a closed method token (kems_effusion alone is insufficient)'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_second_law; printed
+      source evidence: То же, AlO + Cr = Al + CrO, 2242-2690 K, 12 точек'
     origin: kems-050-gorokhov-1977::gorokhov_1977_t3_cro_alo_exchange_second_law
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-050-gorokhov-1977
   locator:
@@ -197,16 +196,15 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''kems_second_law''
-      is not a closed method token (kems_effusion alone is insufficient)'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: kems_third_law'
     origin: kems-050-gorokhov-1977::gorokhov_1977_t3_cro_alo_exchange_third_law_d0
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: knudsen_effusion
+      value: unspecified
       units: method token
   source_id: kems-050-gorokhov-1977
   locator:

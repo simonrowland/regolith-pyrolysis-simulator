@@ -77,6 +77,2306 @@ experiments:
     printed_composition:
       state:
         tag: value
+        value: 12 MgO, 46 SiO2, 19 Al2O3, 23 CaO wt%
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+    form:
+      state:
+        tag: value
+        value: Approximately 2 mm spherical glass sample
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: Printed 1 atm; unit conversion only
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              note: Printed 1 atm; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              note: Printed 1 atm; unit conversion only
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        note: Mixture is printed but component partial pressures and per-component flows required by this typed field are
+          not
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.5802/crgeos.56
+  locator:
+    published_page: 105
+    pdf_page_index: 5
+    section: 3. Experiments and analyses
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          published_page: 103
+          pdf_page_index: 3
+          note: 1.5 mm nozzle hole delivers levitation gas; no Knudsen orifice
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+  bench_id: 10.5802/crgeos.56::bench::aerodynamic-levitation-laser-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '180'
+          interval_high: '900'
+          approximate: false
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        note: Methods range; abstract instead prints 60-600 s
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Laser shutdown; cooling rate about 850 C/s
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+- experiment_id: 10.5802/crgeos.56::experiment::vp1
+  kind: literature
+  method:
+    tag: unknown
+    reason: not_published
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: would_invent
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        note: Six 15-mg precursor chunks are printed, not individual evaporation-run initial masses
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - MgO
+            - '0.179376771290376'
+          - - SiO2
+            - '0.461253133088141'
+          - - Al2O3
+            - '0.112268146557385'
+          - - CaO
+            - '0.247101949064097'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        note: Derived from the nominal printed starting recipe; it is not a measured post-prefusion composition.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - '{''Printed nominal starting recipe'': ''MgO 12 wt%, SiO2 46 wt%, Al2O3 19 wt%, CaO 23 wt%.''}'
+        - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j).
+        parameters: []
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value: 12 MgO, 46 SiO2, 19 Al2O3, 23 CaO wt%
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+    form:
+      state:
+        tag: value
+        value: Approximately 2 mm spherical glass sample
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: Printed 1 atm; unit conversion only
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              note: Printed 1 atm; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              note: Printed 1 atm; unit conversion only
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        note: Mixture is printed but component partial pressures and per-component flows required by this typed field are
+          not
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.5802/crgeos.56
+  locator:
+    published_page: 105
+    pdf_page_index: 5
+    section: 3. Experiments and analyses
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          published_page: 103
+          pdf_page_index: 3
+          note: 1.5 mm nozzle hole delivers levitation gas; no Knudsen orifice
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+  bench_id: 10.5802/crgeos.56::bench::aerodynamic-levitation-laser-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        note: No duration is assigned to VP1; paper prints conflicting aggregate abstract and Methods ranges
+- experiment_id: 10.5802/crgeos.56::experiment::vp2
+  kind: literature
+  method:
+    tag: unknown
+    reason: not_published
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: would_invent
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        note: Six 15-mg precursor chunks are printed, not individual evaporation-run initial masses
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - MgO
+            - '0.179376771290376'
+          - - SiO2
+            - '0.461253133088141'
+          - - Al2O3
+            - '0.112268146557385'
+          - - CaO
+            - '0.247101949064097'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        note: Derived from the nominal printed starting recipe; it is not a measured post-prefusion composition.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - '{''Printed nominal starting recipe'': ''MgO 12 wt%, SiO2 46 wt%, Al2O3 19 wt%, CaO 23 wt%.''}'
+        - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j).
+        parameters: []
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value: 12 MgO, 46 SiO2, 19 Al2O3, 23 CaO wt%
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+    form:
+      state:
+        tag: value
+        value: Approximately 2 mm spherical glass sample
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: Printed 1 atm; unit conversion only
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              note: Printed 1 atm; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              note: Printed 1 atm; unit conversion only
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        note: Mixture is printed but component partial pressures and per-component flows required by this typed field are
+          not
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.5802/crgeos.56
+  locator:
+    published_page: 105
+    pdf_page_index: 5
+    section: 3. Experiments and analyses
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          published_page: 103
+          pdf_page_index: 3
+          note: 1.5 mm nozzle hole delivers levitation gas; no Knudsen orifice
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+  bench_id: 10.5802/crgeos.56::bench::aerodynamic-levitation-laser-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        note: No duration is assigned to VP1; paper prints conflicting aggregate abstract and Methods ranges
+- experiment_id: 10.5802/crgeos.56::experiment::vp3
+  kind: literature
+  method:
+    tag: unknown
+    reason: not_published
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: would_invent
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        note: Six 15-mg precursor chunks are printed, not individual evaporation-run initial masses
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - MgO
+            - '0.179376771290376'
+          - - SiO2
+            - '0.461253133088141'
+          - - Al2O3
+            - '0.112268146557385'
+          - - CaO
+            - '0.247101949064097'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        note: Derived from the nominal printed starting recipe; it is not a measured post-prefusion composition.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - '{''Printed nominal starting recipe'': ''MgO 12 wt%, SiO2 46 wt%, Al2O3 19 wt%, CaO 23 wt%.''}'
+        - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j).
+        parameters: []
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value: 12 MgO, 46 SiO2, 19 Al2O3, 23 CaO wt%
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+    form:
+      state:
+        tag: value
+        value: Approximately 2 mm spherical glass sample
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: Printed 1 atm; unit conversion only
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              note: Printed 1 atm; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              note: Printed 1 atm; unit conversion only
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        note: Mixture is printed but component partial pressures and per-component flows required by this typed field are
+          not
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.5802/crgeos.56
+  locator:
+    published_page: 105
+    pdf_page_index: 5
+    section: 3. Experiments and analyses
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          published_page: 103
+          pdf_page_index: 3
+          note: 1.5 mm nozzle hole delivers levitation gas; no Knudsen orifice
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+  bench_id: 10.5802/crgeos.56::bench::aerodynamic-levitation-laser-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        note: No duration is assigned to VP1; paper prints conflicting aggregate abstract and Methods ranges
+- experiment_id: 10.5802/crgeos.56::experiment::vp4
+  kind: literature
+  method:
+    tag: unknown
+    reason: not_published
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: would_invent
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        note: Six 15-mg precursor chunks are printed, not individual evaporation-run initial masses
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - MgO
+            - '0.179376771290376'
+          - - SiO2
+            - '0.461253133088141'
+          - - Al2O3
+            - '0.112268146557385'
+          - - CaO
+            - '0.247101949064097'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        note: Derived from the nominal printed starting recipe; it is not a measured post-prefusion composition.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - '{''Printed nominal starting recipe'': ''MgO 12 wt%, SiO2 46 wt%, Al2O3 19 wt%, CaO 23 wt%.''}'
+        - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j).
+        parameters: []
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value: 12 MgO, 46 SiO2, 19 Al2O3, 23 CaO wt%
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+    form:
+      state:
+        tag: value
+        value: Approximately 2 mm spherical glass sample
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: Printed 1 atm; unit conversion only
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              note: Printed 1 atm; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              note: Printed 1 atm; unit conversion only
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        note: Mixture is printed but component partial pressures and per-component flows required by this typed field are
+          not
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.5802/crgeos.56
+  locator:
+    published_page: 105
+    pdf_page_index: 5
+    section: 3. Experiments and analyses
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          published_page: 103
+          pdf_page_index: 3
+          note: 1.5 mm nozzle hole delivers levitation gas; no Knudsen orifice
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+  bench_id: 10.5802/crgeos.56::bench::aerodynamic-levitation-laser-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        note: No duration is assigned to VP1; paper prints conflicting aggregate abstract and Methods ranges
+- experiment_id: 10.5802/crgeos.56::experiment::vp5
+  kind: literature
+  method:
+    tag: unknown
+    reason: not_published
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: would_invent
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        note: Six 15-mg precursor chunks are printed, not individual evaporation-run initial masses
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - MgO
+            - '0.179376771290376'
+          - - SiO2
+            - '0.461253133088141'
+          - - Al2O3
+            - '0.112268146557385'
+          - - CaO
+            - '0.247101949064097'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        note: Derived from the nominal printed starting recipe; it is not a measured post-prefusion composition.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - '{''Printed nominal starting recipe'': ''MgO 12 wt%, SiO2 46 wt%, Al2O3 19 wt%, CaO 23 wt%.''}'
+        - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j).
+        parameters: []
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value: 12 MgO, 46 SiO2, 19 Al2O3, 23 CaO wt%
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+    form:
+      state:
+        tag: value
+        value: Approximately 2 mm spherical glass sample
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: Printed 1 atm; unit conversion only
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              note: Printed 1 atm; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              note: Printed 1 atm; unit conversion only
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        note: Mixture is printed but component partial pressures and per-component flows required by this typed field are
+          not
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.5802/crgeos.56
+  locator:
+    published_page: 105
+    pdf_page_index: 5
+    section: 3. Experiments and analyses
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          published_page: 103
+          pdf_page_index: 3
+          note: 1.5 mm nozzle hole delivers levitation gas; no Knudsen orifice
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+  bench_id: 10.5802/crgeos.56::bench::aerodynamic-levitation-laser-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        note: No duration is assigned to VP1; paper prints conflicting aggregate abstract and Methods ranges
+- experiment_id: 10.5802/crgeos.56::experiment::vp6
+  kind: literature
+  method:
+    tag: unknown
+    reason: not_published
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: would_invent
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        note: Six 15-mg precursor chunks are printed, not individual evaporation-run initial masses
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - MgO
+            - '0.179376771290376'
+          - - SiO2
+            - '0.461253133088141'
+          - - Al2O3
+            - '0.112268146557385'
+          - - CaO
+            - '0.247101949064097'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        note: Derived from the nominal printed starting recipe; it is not a measured post-prefusion composition.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - '{''Printed nominal starting recipe'': ''MgO 12 wt%, SiO2 46 wt%, Al2O3 19 wt%, CaO 23 wt%.''}'
+        - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j).
+        parameters: []
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value: 12 MgO, 46 SiO2, 19 Al2O3, 23 CaO wt%
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+    form:
+      state:
+        tag: value
+        value: Approximately 2 mm spherical glass sample
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: Printed 1 atm; unit conversion only
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              note: Printed 1 atm; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              note: Printed 1 atm; unit conversion only
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        note: Mixture is printed but component partial pressures and per-component flows required by this typed field are
+          not
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.5802/crgeos.56
+  locator:
+    published_page: 105
+    pdf_page_index: 5
+    section: 3. Experiments and analyses
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          published_page: 103
+          pdf_page_index: 3
+          note: 1.5 mm nozzle hole delivers levitation gas; no Knudsen orifice
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+  bench_id: 10.5802/crgeos.56::bench::aerodynamic-levitation-laser-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        note: No duration is assigned to VP1; paper prints conflicting aggregate abstract and Methods ranges
+- experiment_id: 10.5802/crgeos.56::ta-badro-2021::VP1::declared:10.5802/crgeos.56::experiment::vp1::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: would_invent
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        note: Six 15-mg precursor chunks are printed, not individual evaporation-run initial masses
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - MgO
+            - '0.179376771290376'
+          - - SiO2
+            - '0.461253133088141'
+          - - Al2O3
+            - '0.112268146557385'
+          - - CaO
+            - '0.247101949064097'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        note: Derived from the nominal printed starting recipe; it is not a measured post-prefusion composition.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - '{''Printed nominal starting recipe'': ''MgO 12 wt%, SiO2 46 wt%, Al2O3 19 wt%, CaO 23 wt%.''}'
+        - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j).
+        parameters: []
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '19'
+          CaO: '23'
+          MgO: '12'
+          SiO2: '46'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: Starting
+        source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    form:
+      state:
+        tag: value
+        value: Approximately 2 mm spherical glass sample
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: Printed 1 atm; unit conversion only
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              note: Printed 1 atm; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              note: Printed 1 atm; unit conversion only
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        note: Mixture is printed but component partial pressures and per-component flows required by this typed field are
+          not
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.5802/crgeos.56
+  locator:
+    published_page: 105
+    pdf_page_index: 5
+    section: 3. Experiments and analyses
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          published_page: 103
+          pdf_page_index: 3
+          note: 1.5 mm nozzle hole delivers levitation gas; no Knudsen orifice
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
+        references: []
+  bench_id: 10.5802/crgeos.56::bench::aerodynamic-levitation-laser-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        note: No duration is assigned to VP1; paper prints conflicting aggregate abstract and Methods ranges
+- experiment_id: 10.5802/crgeos.56::ta-badro-2021::VP2::declared:10.5802/crgeos.56::experiment::vp2::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: would_invent
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        note: Six 15-mg precursor chunks are printed, not individual evaporation-run initial masses
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - MgO
+            - '0.179376771290376'
+          - - SiO2
+            - '0.461253133088141'
+          - - Al2O3
+            - '0.112268146557385'
+          - - CaO
+            - '0.247101949064097'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        note: Derived from the nominal printed starting recipe; it is not a measured post-prefusion composition.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - '{''Printed nominal starting recipe'': ''MgO 12 wt%, SiO2 46 wt%, Al2O3 19 wt%, CaO 23 wt%.''}'
+        - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j).
+        parameters: []
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '19'
+          CaO: '23'
+          MgO: '12'
+          SiO2: '46'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: Starting
+        source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    form:
+      state:
+        tag: value
+        value: Approximately 2 mm spherical glass sample
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: Printed 1 atm; unit conversion only
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              note: Printed 1 atm; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              note: Printed 1 atm; unit conversion only
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        note: Mixture is printed but component partial pressures and per-component flows required by this typed field are
+          not
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.5802/crgeos.56
+  locator:
+    published_page: 105
+    pdf_page_index: 5
+    section: 3. Experiments and analyses
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          published_page: 103
+          pdf_page_index: 3
+          note: 1.5 mm nozzle hole delivers levitation gas; no Knudsen orifice
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
+        references: []
+  bench_id: 10.5802/crgeos.56::bench::aerodynamic-levitation-laser-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        note: No duration is assigned to VP1; paper prints conflicting aggregate abstract and Methods ranges
+- experiment_id: 10.5802/crgeos.56::ta-badro-2021::VP3::declared:10.5802/crgeos.56::experiment::vp3::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: would_invent
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        note: Six 15-mg precursor chunks are printed, not individual evaporation-run initial masses
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - MgO
+            - '0.179376771290376'
+          - - SiO2
+            - '0.461253133088141'
+          - - Al2O3
+            - '0.112268146557385'
+          - - CaO
+            - '0.247101949064097'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        note: Derived from the nominal printed starting recipe; it is not a measured post-prefusion composition.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - '{''Printed nominal starting recipe'': ''MgO 12 wt%, SiO2 46 wt%, Al2O3 19 wt%, CaO 23 wt%.''}'
+        - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j).
+        parameters: []
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '19'
+          CaO: '23'
+          MgO: '12'
+          SiO2: '46'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: Starting
+        source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    form:
+      state:
+        tag: value
+        value: Approximately 2 mm spherical glass sample
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: Printed 1 atm; unit conversion only
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              note: Printed 1 atm; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              note: Printed 1 atm; unit conversion only
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        note: Mixture is printed but component partial pressures and per-component flows required by this typed field are
+          not
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.5802/crgeos.56
+  locator:
+    published_page: 105
+    pdf_page_index: 5
+    section: 3. Experiments and analyses
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          published_page: 103
+          pdf_page_index: 3
+          note: 1.5 mm nozzle hole delivers levitation gas; no Knudsen orifice
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
+        references: []
+  bench_id: 10.5802/crgeos.56::bench::aerodynamic-levitation-laser-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        note: No duration is assigned to VP1; paper prints conflicting aggregate abstract and Methods ranges
+- experiment_id: 10.5802/crgeos.56::ta-badro-2021::VP4::declared:10.5802/crgeos.56::experiment::vp4::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: would_invent
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        note: Six 15-mg precursor chunks are printed, not individual evaporation-run initial masses
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - MgO
+            - '0.179376771290376'
+          - - SiO2
+            - '0.461253133088141'
+          - - Al2O3
+            - '0.112268146557385'
+          - - CaO
+            - '0.247101949064097'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        note: Derived from the nominal printed starting recipe; it is not a measured post-prefusion composition.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - '{''Printed nominal starting recipe'': ''MgO 12 wt%, SiO2 46 wt%, Al2O3 19 wt%, CaO 23 wt%.''}'
+        - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j).
+        parameters: []
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '19'
+          CaO: '23'
+          MgO: '12'
+          SiO2: '46'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: Starting
+        source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    form:
+      state:
+        tag: value
+        value: Approximately 2 mm spherical glass sample
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: Printed 1 atm; unit conversion only
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              note: Printed 1 atm; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              note: Printed 1 atm; unit conversion only
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        note: Mixture is printed but component partial pressures and per-component flows required by this typed field are
+          not
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.5802/crgeos.56
+  locator:
+    published_page: 105
+    pdf_page_index: 5
+    section: 3. Experiments and analyses
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          published_page: 103
+          pdf_page_index: 3
+          note: 1.5 mm nozzle hole delivers levitation gas; no Knudsen orifice
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
+        references: []
+  bench_id: 10.5802/crgeos.56::bench::aerodynamic-levitation-laser-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        note: No duration is assigned to VP1; paper prints conflicting aggregate abstract and Methods ranges
+- experiment_id: 10.5802/crgeos.56::ta-badro-2021::VP5::declared:10.5802/crgeos.56::experiment::vp5::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: would_invent
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        note: Six 15-mg precursor chunks are printed, not individual evaporation-run initial masses
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - MgO
+            - '0.179376771290376'
+          - - SiO2
+            - '0.461253133088141'
+          - - Al2O3
+            - '0.112268146557385'
+          - - CaO
+            - '0.247101949064097'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        note: Derived from the nominal printed starting recipe; it is not a measured post-prefusion composition.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - '{''Printed nominal starting recipe'': ''MgO 12 wt%, SiO2 46 wt%, Al2O3 19 wt%, CaO 23 wt%.''}'
+        - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j).
+        parameters: []
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '19'
+          CaO: '23'
+          MgO: '12'
+          SiO2: '46'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: Starting
+        source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    form:
+      state:
+        tag: value
+        value: Approximately 2 mm spherical glass sample
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: Printed 1 atm; unit conversion only
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              note: Printed 1 atm; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              note: Printed 1 atm; unit conversion only
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        note: Mixture is printed but component partial pressures and per-component flows required by this typed field are
+          not
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.5802/crgeos.56
+  locator:
+    published_page: 105
+    pdf_page_index: 5
+    section: 3. Experiments and analyses
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          published_page: 103
+          pdf_page_index: 3
+          note: 1.5 mm nozzle hole delivers levitation gas; no Knudsen orifice
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
+        references: []
+  bench_id: 10.5802/crgeos.56::bench::aerodynamic-levitation-laser-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        note: No duration is assigned to VP1; paper prints conflicting aggregate abstract and Methods ranges
+- experiment_id: 10.5802/crgeos.56::ta-badro-2021::VP6::declared:10.5802/crgeos.56::experiment::vp6::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: would_invent
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        note: Six 15-mg precursor chunks are printed, not individual evaporation-run initial masses
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - MgO
+            - '0.179376771290376'
+          - - SiO2
+            - '0.461253133088141'
+          - - Al2O3
+            - '0.112268146557385'
+          - - CaO
+            - '0.247101949064097'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        note: Derived from the nominal printed starting recipe; it is not a measured post-prefusion composition.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - '{''Printed nominal starting recipe'': ''MgO 12 wt%, SiO2 46 wt%, Al2O3 19 wt%, CaO 23 wt%.''}'
+        - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j).
+        parameters: []
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '19'
+          CaO: '23'
+          MgO: '12'
+          SiO2: '46'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        paragraph: Starting
+        source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+    form:
+      state:
+        tag: value
+        value: Approximately 2 mm spherical glass sample
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: Printed 1 atm; unit conversion only
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              note: Printed 1 atm; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              note: Printed 1 atm; unit conversion only
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        note: Mixture is printed but component partial pressures and per-component flows required by this typed field are
+          not
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.5802/crgeos.56
+  locator:
+    published_page: 105
+    pdf_page_index: 5
+    section: 3. Experiments and analyses
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: not_applicable
+          reason: not_applicable
+        locator:
+          published_page: 103
+          pdf_page_index: 3
+          note: 1.5 mm nozzle hole delivers levitation gas; no Knudsen orifice
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00008048530838343782319682917'
+          approximate: false
+      locator:
+        published_page: 101
+        pdf_page_index: 1
+        section: Abstract
+        note: quote=an oxygen partial pressure of 10^-9.1 atm
+        source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=10^-9.1 atm
+        - printed=oxygen_partial_pressure
+        - quote=an oxygen partial pressure of 10^-9.1 atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0000000007943282347242815020659182828'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              published_page: 101
+              pdf_page_index: 1
+              section: Abstract
+              source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
+        output_unit: Pa
+        references: []
+  bench_id: 10.5802/crgeos.56::bench::aerodynamic-levitation-laser-furnace
+  thermal_schedule:
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        note: No duration is assigned to VP1; paper prints conflicting aggregate abstract and Methods ranges
+- experiment_id: 10.5802/crgeos.56::ta-badro-2021::declared:10.5802/crgeos.56::experiment::vp-series::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: would_invent
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        note: Six 15-mg precursor chunks are printed, not individual evaporation-run initial masses
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - MgO
+            - '0.179376771290376'
+          - - SiO2
+            - '0.461253133088141'
+          - - Al2O3
+            - '0.112268146557385'
+          - - CaO
+            - '0.247101949064097'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 105
+        pdf_page_index: 5
+        table: '1'
+        note: Derived from the nominal printed starting recipe; it is not a measured post-prefusion composition.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - '{''Printed nominal starting recipe'': ''MgO 12 wt%, SiO2 46 wt%, Al2O3 19 wt%, CaO 23 wt%.''}'
+        - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j).
+        parameters: []
+        output_unit: mole_fraction
+        references: []
+    printed_composition:
+      state:
+        tag: value
         value:
           Al2O3: '19'
           CaO: '23'
@@ -244,1218 +2544,6 @@ experiments:
       locator:
         published_page: 105
         pdf_page_index: 5
-- experiment_id: 10.5802/crgeos.56::experiment::vp1
-  kind: literature
-  method:
-    tag: unknown
-    reason: not_published
-  sample:
-    mass_kg:
-      state:
-        tag: unknown
-        reason: would_invent
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-        note: Six 15-mg precursor chunks are printed, not individual evaporation-run initial masses
-    initial_composition:
-      state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - MgO
-            - '0.179376771290376'
-          - - SiO2
-            - '0.461253133088141'
-          - - Al2O3
-            - '0.112268146557385'
-          - - CaO
-            - '0.247101949064097'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-        table: '1'
-        note: Derived from the nominal printed starting recipe; it is not a measured post-prefusion composition.
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - '{''Printed nominal starting recipe'': ''MgO 12 wt%, SiO2 46 wt%, Al2O3 19 wt%, CaO 23 wt%.''}'
-        - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j).
-        parameters: []
-        output_unit: mole_fraction
-        references: []
-    printed_composition:
-      state:
-        tag: value
-        value:
-          Al2O3: '19'
-          CaO: '23'
-          MgO: '12'
-          SiO2: '46'
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-        table: '1'
-        paragraph: Starting
-        source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-    form:
-      state:
-        tag: value
-        value: Approximately 2 mm spherical glass sample
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-  conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '1873'
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '101325'
-          approximate: false
-      locator:
-        published_page: 101
-        pdf_page_index: 1
-        section: Abstract
-        note: Printed 1 atm; unit conversion only
-      inference:
-        relation: atm_to_Pa
-        inputs:
-        - P_Pa = P_atm × 101325
-        - original_unit=atm
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '1'
-            locator:
-              published_page: 101
-              pdf_page_index: 1
-              section: Abstract
-              note: Printed 1 atm; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '101325'
-            locator:
-              published_page: 101
-              pdf_page_index: 1
-              section: Abstract
-              note: Printed 1 atm; unit conversion only
-        output_unit: Pa
-        references: []
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-        note: Mixture is printed but component partial pressures and per-component flows required by this typed field are
-          not
-    regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
-  work_id: 10.5802/crgeos.56
-  locator:
-    published_page: 105
-    pdf_page_index: 5
-    section: 3. Experiments and analyses
-  apparatus:
-    geometry:
-      orifice_diameter_m:
-        state:
-          tag: not_applicable
-          reason: not_applicable
-        locator:
-          published_page: 103
-          pdf_page_index: 3
-          note: 1.5 mm nozzle hole delivers levitation gas; no Knudsen orifice
-  fO2_control:
-    channel:
-      tag: value
-      value: gas_mix
-    buffer:
-      state:
-        tag: not_applicable
-        reason: not_applicable
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-    oxygen_partial_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.00008048530838343782319682917'
-          approximate: false
-      locator:
-        published_page: 101
-        pdf_page_index: 1
-        section: Abstract
-        note: quote=an oxygen partial pressure of 10^-9.1 atm
-        source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-      inference:
-        relation: atm_to_Pa
-        inputs:
-        - P_Pa = P_atm × 101325
-        - original_unit=atm
-        - as_published=10^-9.1 atm
-        - printed=oxygen_partial_pressure
-        - quote=an oxygen partial pressure of 10^-9.1 atm
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.0000000007943282347242815020659182828'
-            locator:
-              published_page: 101
-              pdf_page_index: 1
-              section: Abstract
-              source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - factor
-          - state:
-              tag: value
-              value: '101325'
-            locator:
-              published_page: 101
-              pdf_page_index: 1
-              section: Abstract
-              source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        output_unit: Pa
-        references: []
-  bench_id: 10.5802/crgeos.56::bench::aerodynamic-levitation-laser-furnace
-  thermal_schedule:
-    total_duration_s:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-        table: '1'
-        note: No duration is assigned to VP1; paper prints conflicting aggregate abstract and Methods ranges
-- experiment_id: 10.5802/crgeos.56::experiment::vp2
-  kind: literature
-  method:
-    tag: unknown
-    reason: not_published
-  sample:
-    mass_kg:
-      state:
-        tag: unknown
-        reason: would_invent
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-        note: Six 15-mg precursor chunks are printed, not individual evaporation-run initial masses
-    initial_composition:
-      state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - MgO
-            - '0.179376771290376'
-          - - SiO2
-            - '0.461253133088141'
-          - - Al2O3
-            - '0.112268146557385'
-          - - CaO
-            - '0.247101949064097'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-        table: '1'
-        note: Derived from the nominal printed starting recipe; it is not a measured post-prefusion composition.
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - '{''Printed nominal starting recipe'': ''MgO 12 wt%, SiO2 46 wt%, Al2O3 19 wt%, CaO 23 wt%.''}'
-        - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j).
-        parameters: []
-        output_unit: mole_fraction
-        references: []
-    printed_composition:
-      state:
-        tag: value
-        value:
-          Al2O3: '19'
-          CaO: '23'
-          MgO: '12'
-          SiO2: '46'
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-        table: '1'
-        paragraph: Starting
-        source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-    form:
-      state:
-        tag: value
-        value: Approximately 2 mm spherical glass sample
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-  conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '1873'
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '101325'
-          approximate: false
-      locator:
-        published_page: 101
-        pdf_page_index: 1
-        section: Abstract
-        note: Printed 1 atm; unit conversion only
-      inference:
-        relation: atm_to_Pa
-        inputs:
-        - P_Pa = P_atm × 101325
-        - original_unit=atm
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '1'
-            locator:
-              published_page: 101
-              pdf_page_index: 1
-              section: Abstract
-              note: Printed 1 atm; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '101325'
-            locator:
-              published_page: 101
-              pdf_page_index: 1
-              section: Abstract
-              note: Printed 1 atm; unit conversion only
-        output_unit: Pa
-        references: []
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-        note: Mixture is printed but component partial pressures and per-component flows required by this typed field are
-          not
-    regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
-  work_id: 10.5802/crgeos.56
-  locator:
-    published_page: 105
-    pdf_page_index: 5
-    section: 3. Experiments and analyses
-  apparatus:
-    geometry:
-      orifice_diameter_m:
-        state:
-          tag: not_applicable
-          reason: not_applicable
-        locator:
-          published_page: 103
-          pdf_page_index: 3
-          note: 1.5 mm nozzle hole delivers levitation gas; no Knudsen orifice
-  fO2_control:
-    channel:
-      tag: value
-      value: gas_mix
-    buffer:
-      state:
-        tag: not_applicable
-        reason: not_applicable
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-    oxygen_partial_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.00008048530838343782319682917'
-          approximate: false
-      locator:
-        published_page: 101
-        pdf_page_index: 1
-        section: Abstract
-        note: quote=an oxygen partial pressure of 10^-9.1 atm
-        source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-      inference:
-        relation: atm_to_Pa
-        inputs:
-        - P_Pa = P_atm × 101325
-        - original_unit=atm
-        - as_published=10^-9.1 atm
-        - printed=oxygen_partial_pressure
-        - quote=an oxygen partial pressure of 10^-9.1 atm
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.0000000007943282347242815020659182828'
-            locator:
-              published_page: 101
-              pdf_page_index: 1
-              section: Abstract
-              source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - factor
-          - state:
-              tag: value
-              value: '101325'
-            locator:
-              published_page: 101
-              pdf_page_index: 1
-              section: Abstract
-              source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        output_unit: Pa
-        references: []
-  bench_id: 10.5802/crgeos.56::bench::aerodynamic-levitation-laser-furnace
-  thermal_schedule:
-    total_duration_s:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-        table: '1'
-        note: No duration is assigned to VP1; paper prints conflicting aggregate abstract and Methods ranges
-- experiment_id: 10.5802/crgeos.56::experiment::vp3
-  kind: literature
-  method:
-    tag: unknown
-    reason: not_published
-  sample:
-    mass_kg:
-      state:
-        tag: unknown
-        reason: would_invent
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-        note: Six 15-mg precursor chunks are printed, not individual evaporation-run initial masses
-    initial_composition:
-      state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - MgO
-            - '0.179376771290376'
-          - - SiO2
-            - '0.461253133088141'
-          - - Al2O3
-            - '0.112268146557385'
-          - - CaO
-            - '0.247101949064097'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-        table: '1'
-        note: Derived from the nominal printed starting recipe; it is not a measured post-prefusion composition.
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - '{''Printed nominal starting recipe'': ''MgO 12 wt%, SiO2 46 wt%, Al2O3 19 wt%, CaO 23 wt%.''}'
-        - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j).
-        parameters: []
-        output_unit: mole_fraction
-        references: []
-    printed_composition:
-      state:
-        tag: value
-        value:
-          Al2O3: '19'
-          CaO: '23'
-          MgO: '12'
-          SiO2: '46'
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-        table: '1'
-        paragraph: Starting
-        source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-    form:
-      state:
-        tag: value
-        value: Approximately 2 mm spherical glass sample
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-  conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '1873'
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '101325'
-          approximate: false
-      locator:
-        published_page: 101
-        pdf_page_index: 1
-        section: Abstract
-        note: Printed 1 atm; unit conversion only
-      inference:
-        relation: atm_to_Pa
-        inputs:
-        - P_Pa = P_atm × 101325
-        - original_unit=atm
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '1'
-            locator:
-              published_page: 101
-              pdf_page_index: 1
-              section: Abstract
-              note: Printed 1 atm; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '101325'
-            locator:
-              published_page: 101
-              pdf_page_index: 1
-              section: Abstract
-              note: Printed 1 atm; unit conversion only
-        output_unit: Pa
-        references: []
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-        note: Mixture is printed but component partial pressures and per-component flows required by this typed field are
-          not
-    regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
-  work_id: 10.5802/crgeos.56
-  locator:
-    published_page: 105
-    pdf_page_index: 5
-    section: 3. Experiments and analyses
-  apparatus:
-    geometry:
-      orifice_diameter_m:
-        state:
-          tag: not_applicable
-          reason: not_applicable
-        locator:
-          published_page: 103
-          pdf_page_index: 3
-          note: 1.5 mm nozzle hole delivers levitation gas; no Knudsen orifice
-  fO2_control:
-    channel:
-      tag: value
-      value: gas_mix
-    buffer:
-      state:
-        tag: not_applicable
-        reason: not_applicable
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-    oxygen_partial_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.00008048530838343782319682917'
-          approximate: false
-      locator:
-        published_page: 101
-        pdf_page_index: 1
-        section: Abstract
-        note: quote=an oxygen partial pressure of 10^-9.1 atm
-        source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-      inference:
-        relation: atm_to_Pa
-        inputs:
-        - P_Pa = P_atm × 101325
-        - original_unit=atm
-        - as_published=10^-9.1 atm
-        - printed=oxygen_partial_pressure
-        - quote=an oxygen partial pressure of 10^-9.1 atm
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.0000000007943282347242815020659182828'
-            locator:
-              published_page: 101
-              pdf_page_index: 1
-              section: Abstract
-              source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - factor
-          - state:
-              tag: value
-              value: '101325'
-            locator:
-              published_page: 101
-              pdf_page_index: 1
-              section: Abstract
-              source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        output_unit: Pa
-        references: []
-  bench_id: 10.5802/crgeos.56::bench::aerodynamic-levitation-laser-furnace
-  thermal_schedule:
-    total_duration_s:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-        table: '1'
-        note: No duration is assigned to VP1; paper prints conflicting aggregate abstract and Methods ranges
-- experiment_id: 10.5802/crgeos.56::experiment::vp4
-  kind: literature
-  method:
-    tag: unknown
-    reason: not_published
-  sample:
-    mass_kg:
-      state:
-        tag: unknown
-        reason: would_invent
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-        note: Six 15-mg precursor chunks are printed, not individual evaporation-run initial masses
-    initial_composition:
-      state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - MgO
-            - '0.179376771290376'
-          - - SiO2
-            - '0.461253133088141'
-          - - Al2O3
-            - '0.112268146557385'
-          - - CaO
-            - '0.247101949064097'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-        table: '1'
-        note: Derived from the nominal printed starting recipe; it is not a measured post-prefusion composition.
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - '{''Printed nominal starting recipe'': ''MgO 12 wt%, SiO2 46 wt%, Al2O3 19 wt%, CaO 23 wt%.''}'
-        - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j).
-        parameters: []
-        output_unit: mole_fraction
-        references: []
-    printed_composition:
-      state:
-        tag: value
-        value:
-          Al2O3: '19'
-          CaO: '23'
-          MgO: '12'
-          SiO2: '46'
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-        table: '1'
-        paragraph: Starting
-        source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-    form:
-      state:
-        tag: value
-        value: Approximately 2 mm spherical glass sample
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-  conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '1873'
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '101325'
-          approximate: false
-      locator:
-        published_page: 101
-        pdf_page_index: 1
-        section: Abstract
-        note: Printed 1 atm; unit conversion only
-      inference:
-        relation: atm_to_Pa
-        inputs:
-        - P_Pa = P_atm × 101325
-        - original_unit=atm
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '1'
-            locator:
-              published_page: 101
-              pdf_page_index: 1
-              section: Abstract
-              note: Printed 1 atm; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '101325'
-            locator:
-              published_page: 101
-              pdf_page_index: 1
-              section: Abstract
-              note: Printed 1 atm; unit conversion only
-        output_unit: Pa
-        references: []
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-        note: Mixture is printed but component partial pressures and per-component flows required by this typed field are
-          not
-    regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
-  work_id: 10.5802/crgeos.56
-  locator:
-    published_page: 105
-    pdf_page_index: 5
-    section: 3. Experiments and analyses
-  apparatus:
-    geometry:
-      orifice_diameter_m:
-        state:
-          tag: not_applicable
-          reason: not_applicable
-        locator:
-          published_page: 103
-          pdf_page_index: 3
-          note: 1.5 mm nozzle hole delivers levitation gas; no Knudsen orifice
-  fO2_control:
-    channel:
-      tag: value
-      value: gas_mix
-    buffer:
-      state:
-        tag: not_applicable
-        reason: not_applicable
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-    oxygen_partial_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.00008048530838343782319682917'
-          approximate: false
-      locator:
-        published_page: 101
-        pdf_page_index: 1
-        section: Abstract
-        note: quote=an oxygen partial pressure of 10^-9.1 atm
-        source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-      inference:
-        relation: atm_to_Pa
-        inputs:
-        - P_Pa = P_atm × 101325
-        - original_unit=atm
-        - as_published=10^-9.1 atm
-        - printed=oxygen_partial_pressure
-        - quote=an oxygen partial pressure of 10^-9.1 atm
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.0000000007943282347242815020659182828'
-            locator:
-              published_page: 101
-              pdf_page_index: 1
-              section: Abstract
-              source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - factor
-          - state:
-              tag: value
-              value: '101325'
-            locator:
-              published_page: 101
-              pdf_page_index: 1
-              section: Abstract
-              source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        output_unit: Pa
-        references: []
-  bench_id: 10.5802/crgeos.56::bench::aerodynamic-levitation-laser-furnace
-  thermal_schedule:
-    total_duration_s:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-        table: '1'
-        note: No duration is assigned to VP1; paper prints conflicting aggregate abstract and Methods ranges
-- experiment_id: 10.5802/crgeos.56::experiment::vp5
-  kind: literature
-  method:
-    tag: unknown
-    reason: not_published
-  sample:
-    mass_kg:
-      state:
-        tag: unknown
-        reason: would_invent
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-        note: Six 15-mg precursor chunks are printed, not individual evaporation-run initial masses
-    initial_composition:
-      state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - MgO
-            - '0.179376771290376'
-          - - SiO2
-            - '0.461253133088141'
-          - - Al2O3
-            - '0.112268146557385'
-          - - CaO
-            - '0.247101949064097'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-        table: '1'
-        note: Derived from the nominal printed starting recipe; it is not a measured post-prefusion composition.
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - '{''Printed nominal starting recipe'': ''MgO 12 wt%, SiO2 46 wt%, Al2O3 19 wt%, CaO 23 wt%.''}'
-        - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j).
-        parameters: []
-        output_unit: mole_fraction
-        references: []
-    printed_composition:
-      state:
-        tag: value
-        value:
-          Al2O3: '19'
-          CaO: '23'
-          MgO: '12'
-          SiO2: '46'
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-        table: '1'
-        paragraph: Starting
-        source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-    form:
-      state:
-        tag: value
-        value: Approximately 2 mm spherical glass sample
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-  conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '1873'
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '101325'
-          approximate: false
-      locator:
-        published_page: 101
-        pdf_page_index: 1
-        section: Abstract
-        note: Printed 1 atm; unit conversion only
-      inference:
-        relation: atm_to_Pa
-        inputs:
-        - P_Pa = P_atm × 101325
-        - original_unit=atm
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '1'
-            locator:
-              published_page: 101
-              pdf_page_index: 1
-              section: Abstract
-              note: Printed 1 atm; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '101325'
-            locator:
-              published_page: 101
-              pdf_page_index: 1
-              section: Abstract
-              note: Printed 1 atm; unit conversion only
-        output_unit: Pa
-        references: []
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-        note: Mixture is printed but component partial pressures and per-component flows required by this typed field are
-          not
-    regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
-  work_id: 10.5802/crgeos.56
-  locator:
-    published_page: 105
-    pdf_page_index: 5
-    section: 3. Experiments and analyses
-  apparatus:
-    geometry:
-      orifice_diameter_m:
-        state:
-          tag: not_applicable
-          reason: not_applicable
-        locator:
-          published_page: 103
-          pdf_page_index: 3
-          note: 1.5 mm nozzle hole delivers levitation gas; no Knudsen orifice
-  fO2_control:
-    channel:
-      tag: value
-      value: gas_mix
-    buffer:
-      state:
-        tag: not_applicable
-        reason: not_applicable
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-    oxygen_partial_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.00008048530838343782319682917'
-          approximate: false
-      locator:
-        published_page: 101
-        pdf_page_index: 1
-        section: Abstract
-        note: quote=an oxygen partial pressure of 10^-9.1 atm
-        source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-      inference:
-        relation: atm_to_Pa
-        inputs:
-        - P_Pa = P_atm × 101325
-        - original_unit=atm
-        - as_published=10^-9.1 atm
-        - printed=oxygen_partial_pressure
-        - quote=an oxygen partial pressure of 10^-9.1 atm
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.0000000007943282347242815020659182828'
-            locator:
-              published_page: 101
-              pdf_page_index: 1
-              section: Abstract
-              source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - factor
-          - state:
-              tag: value
-              value: '101325'
-            locator:
-              published_page: 101
-              pdf_page_index: 1
-              section: Abstract
-              source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        output_unit: Pa
-        references: []
-  bench_id: 10.5802/crgeos.56::bench::aerodynamic-levitation-laser-furnace
-  thermal_schedule:
-    total_duration_s:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-        table: '1'
-        note: No duration is assigned to VP1; paper prints conflicting aggregate abstract and Methods ranges
-- experiment_id: 10.5802/crgeos.56::experiment::vp6
-  kind: literature
-  method:
-    tag: unknown
-    reason: not_published
-  sample:
-    mass_kg:
-      state:
-        tag: unknown
-        reason: would_invent
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-        note: Six 15-mg precursor chunks are printed, not individual evaporation-run initial masses
-    initial_composition:
-      state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - MgO
-            - '0.179376771290376'
-          - - SiO2
-            - '0.461253133088141'
-          - - Al2O3
-            - '0.112268146557385'
-          - - CaO
-            - '0.247101949064097'
-          amount_basis: mole_fraction
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-        table: '1'
-        note: Derived from the nominal printed starting recipe; it is not a measured post-prefusion composition.
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - '{''Printed nominal starting recipe'': ''MgO 12 wt%, SiO2 46 wt%, Al2O3 19 wt%, CaO 23 wt%.''}'
-        - mole_i = wt_pct_i / M_i; x_i = mole_i / sum(mole_j).
-        parameters: []
-        output_unit: mole_fraction
-        references: []
-    printed_composition:
-      state:
-        tag: value
-        value:
-          Al2O3: '19'
-          CaO: '23'
-          MgO: '12'
-          SiO2: '46'
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-        table: '1'
-        paragraph: Starting
-        source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-    form:
-      state:
-        tag: value
-        value: Approximately 2 mm spherical glass sample
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-  conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '1873'
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '101325'
-          approximate: false
-      locator:
-        published_page: 101
-        pdf_page_index: 1
-        section: Abstract
-        note: Printed 1 atm; unit conversion only
-      inference:
-        relation: atm_to_Pa
-        inputs:
-        - P_Pa = P_atm × 101325
-        - original_unit=atm
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '1'
-            locator:
-              published_page: 101
-              pdf_page_index: 1
-              section: Abstract
-              note: Printed 1 atm; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '101325'
-            locator:
-              published_page: 101
-              pdf_page_index: 1
-              section: Abstract
-              note: Printed 1 atm; unit conversion only
-        output_unit: Pa
-        references: []
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-        note: Mixture is printed but component partial pressures and per-component flows required by this typed field are
-          not
-    regime:
-      regime_class:
-        tag: unknown
-        reason: not_published
-  work_id: 10.5802/crgeos.56
-  locator:
-    published_page: 105
-    pdf_page_index: 5
-    section: 3. Experiments and analyses
-  apparatus:
-    geometry:
-      orifice_diameter_m:
-        state:
-          tag: not_applicable
-          reason: not_applicable
-        locator:
-          published_page: 103
-          pdf_page_index: 3
-          note: 1.5 mm nozzle hole delivers levitation gas; no Knudsen orifice
-  fO2_control:
-    channel:
-      tag: value
-      value: gas_mix
-    buffer:
-      state:
-        tag: not_applicable
-        reason: not_applicable
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-    oxygen_partial_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.00008048530838343782319682917'
-          approximate: false
-      locator:
-        published_page: 101
-        pdf_page_index: 1
-        section: Abstract
-        note: quote=an oxygen partial pressure of 10^-9.1 atm
-        source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-      inference:
-        relation: atm_to_Pa
-        inputs:
-        - P_Pa = P_atm × 101325
-        - original_unit=atm
-        - as_published=10^-9.1 atm
-        - printed=oxygen_partial_pressure
-        - quote=an oxygen partial pressure of 10^-9.1 atm
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.0000000007943282347242815020659182828'
-            locator:
-              published_page: 101
-              pdf_page_index: 1
-              section: Abstract
-              source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        - - factor
-          - state:
-              tag: value
-              value: '101325'
-            locator:
-              published_page: 101
-              pdf_page_index: 1
-              section: Abstract
-              source_path: corpus/raw/ta-badro-2021/ta-badro-2021.pdf
-        output_unit: Pa
-        references: []
-  bench_id: 10.5802/crgeos.56::bench::aerodynamic-levitation-laser-furnace
-  thermal_schedule:
-    total_duration_s:
-      state:
-        tag: unknown
-        reason: not_published
-      locator:
-        published_page: 105
-        pdf_page_index: 5
-        table: '1'
-        note: No duration is assigned to VP1; paper prints conflicting aggregate abstract and Methods ranges
 benches:
 - id: 10.5802/crgeos.56::bench::aerodynamic-levitation-laser-furnace
   work_id: 10.5802/crgeos.56

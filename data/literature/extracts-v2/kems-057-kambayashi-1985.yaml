@@ -8138,7 +8138,7 @@ observations:
         mean t=0.95
     printed_phase: gas
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_p4o10_sat_janaf_extrapolated::T=1643.0:h=fc593b6e815c
-  experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
+  experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985::method:unspecified
   identity:
     quantity:
       tag: value
@@ -8229,6 +8229,17 @@ observations:
       status: canonical
       value: g
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_sat
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: janaf_extrapolation'
+    origin: kems-057-kambayashi-1985::kambayashi_1985_p4o10_sat_janaf_extrapolated
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_sat
@@ -8322,7 +8333,7 @@ observations:
   provenance:
     printed_phase: P4O10_s_saturation_used_as_P2O5_solid_standard
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_p4o10_sat_janaf_extrapolated::T=1653.0:h=4d13eee35236
-  experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
+  experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985::method:unspecified
   identity:
     quantity:
       tag: value
@@ -8413,6 +8424,17 @@ observations:
       status: canonical
       value: g
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_sat
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: janaf_extrapolation'
+    origin: kems-057-kambayashi-1985::kambayashi_1985_p4o10_sat_janaf_extrapolated
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_sat
@@ -8506,7 +8528,7 @@ observations:
   provenance:
     printed_phase: P4O10_s_saturation_used_as_P2O5_solid_standard
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_p4o10_sat_janaf_extrapolated::T=1663.0:h=0628c357b8bf
-  experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
+  experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985::method:unspecified
   identity:
     quantity:
       tag: value
@@ -8597,6 +8619,17 @@ observations:
       status: canonical
       value: g
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_sat
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: janaf_extrapolation'
+    origin: kems-057-kambayashi-1985::kambayashi_1985_p4o10_sat_janaf_extrapolated
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_sat
@@ -15509,7 +15542,7 @@ observations:
   provenance:
     printed_phase: vapor_over_PbO-P2O5_and_FetO-P2O5_melts
 - observation_id: kems-057-kambayashi-1985::kambayashi_1985_table2_appearance_potentials_literature
-  experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
+  experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -15557,6 +15590,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_compilation'
+    origin: kems-057-kambayashi-1985::kambayashi_1985_table2_appearance_potentials_literature
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-057-kambayashi-1985
   locator:
     published_page: 1913

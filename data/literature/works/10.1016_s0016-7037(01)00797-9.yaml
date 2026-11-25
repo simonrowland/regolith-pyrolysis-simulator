@@ -34,6 +34,162 @@ experiments:
 - experiment_id: 10.1016/s0016-7037(01)00797-9::experiment::tachibana_2002_enstatite_h2_2p0e6
   kind: literature
   method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    hydrogen_partial_pressure_bar:
+      state:
+        tag: value
+        value: '0.000002'
+      locator:
+        published_page: 721
+        pdf_page_index: 8
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.2'
+          approximate: false
+      locator:
+        published_page: 721
+        pdf_page_index: 8
+        table: '3'
+        note: Printed p(H2) = 0.0000020 bar; 1 bar = 1e5 Pa
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: H2
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: represented_by_total_pressure_Pa
+      locator:
+        published_page: 715
+        pdf_page_index: 2
+        section: Evaporation Experiments of Enstatite in Vacuum and Hydrogen Gas
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/s0016-7037(01)00797-9
+  locator:
+    published_page: 715
+    pdf_page_index: 2
+    section: Evaporation Experiments of Enstatite in Vacuum and Hydrogen Gas
+- experiment_id: 10.1016/s0016-7037(01)00797-9::experiment::tachibana_2002_enstatite_h2_6p1e6
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    hydrogen_partial_pressure_bar:
+      state:
+        tag: value
+        value: '0.0000061'
+      locator:
+        published_page: 721
+        pdf_page_index: 8
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.61'
+          approximate: false
+      locator:
+        published_page: 721
+        pdf_page_index: 8
+        table: '3'
+        note: Printed p(H2) = 0.0000061 bar; 1 bar = 1e5 Pa
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: H2
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: represented_by_total_pressure_Pa
+      locator:
+        published_page: 715
+        pdf_page_index: 2
+        section: Evaporation Experiments of Enstatite in Vacuum and Hydrogen Gas
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/s0016-7037(01)00797-9
+  locator:
+    published_page: 715
+    pdf_page_index: 2
+    section: Evaporation Experiments of Enstatite in Vacuum and Hydrogen Gas
+- experiment_id: 10.1016/s0016-7037(01)00797-9::experiment::tachibana_2002_enstatite_h2_7p2e7
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    hydrogen_partial_pressure_bar:
+      state:
+        tag: value
+        value: '0.00000072'
+      locator:
+        published_page: 721
+        pdf_page_index: 8
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.072'
+          approximate: false
+      locator:
+        published_page: 721
+        pdf_page_index: 8
+        table: '3'
+        note: Printed p(H2) = 0.00000072 bar; 1 bar = 1e5 Pa
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: H2
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: represented_by_total_pressure_Pa
+      locator:
+        published_page: 715
+        pdf_page_index: 2
+        section: Evaporation Experiments of Enstatite in Vacuum and Hydrogen Gas
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/s0016-7037(01)00797-9
+  locator:
+    published_page: 715
+    pdf_page_index: 2
+    section: Evaporation Experiments of Enstatite in Vacuum and Hydrogen Gas
+- experiment_id: 10.1016/s0016-7037(01)00797-9::tachibana-2002-enstatite-evaporation-kinetics::declared:10.1016/s0016-7037(01)00797-9::experiment::tachibana_2002_enstatite_h2_2p0e6::method:unspecified
+  kind: literature
+  method:
     tag: value
     value: unspecified
   sample: {}
@@ -83,7 +239,7 @@ experiments:
     published_page: 715
     pdf_page_index: 2
     section: Evaporation Experiments of Enstatite in Vacuum and Hydrogen Gas
-- experiment_id: 10.1016/s0016-7037(01)00797-9::experiment::tachibana_2002_enstatite_h2_6p1e6
+- experiment_id: 10.1016/s0016-7037(01)00797-9::tachibana-2002-enstatite-evaporation-kinetics::declared:10.1016/s0016-7037(01)00797-9::experiment::tachibana_2002_enstatite_h2_6p1e6::method:unspecified
   kind: literature
   method:
     tag: value
@@ -135,7 +291,7 @@ experiments:
     published_page: 715
     pdf_page_index: 2
     section: Evaporation Experiments of Enstatite in Vacuum and Hydrogen Gas
-- experiment_id: 10.1016/s0016-7037(01)00797-9::experiment::tachibana_2002_enstatite_h2_7p2e7
+- experiment_id: 10.1016/s0016-7037(01)00797-9::tachibana-2002-enstatite-evaporation-kinetics::declared:10.1016/s0016-7037(01)00797-9::experiment::tachibana_2002_enstatite_h2_7p2e7::method:unspecified
   kind: literature
   method:
     tag: value

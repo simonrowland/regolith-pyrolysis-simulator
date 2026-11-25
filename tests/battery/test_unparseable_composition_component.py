@@ -163,8 +163,8 @@ def _atoms(formula: str) -> dict[str, float]:
 def test_decimal_subscript_is_one_species_and_hydrate_dot_still_splits() -> None:
     """A printed decimal subscript is one species. A hydrate dot still splits.
 
-    Expected decimal atoms come from JANAF formula_composition, the other
-    tokenizer. Hydrate atoms are the water count: CuSO4 plus five H2O is
+    Expected atom counts come from the accounting parser owner. Hydrate atoms
+    are the water count: CuSO4 plus five H2O is
     Cu1 S1 O9 H10. JANAF reads the ASCII dot as decimal oxygen (O 5.5),
     so an O of 9 is the adduct split and an O of 5.5 would mean it was lost.
     """
@@ -199,12 +199,11 @@ def test_decimal_subscript_is_one_species_and_hydrate_dot_still_splits() -> None
     )
     for formula in decimals:
         atoms = _atoms(formula)
-        janaf = formula_composition(formula)
-        assert janaf is not None
-        assert atoms == dict(janaf)
-        assert atoms_parse_formula_else_janaf(formula) == janaf
-        assert score_parse(formula) == janaf
-        assert composition_parse(formula) == janaf
+        expected = atoms_parse_formula_else_janaf(formula)
+        assert expected is not None
+        assert atoms == dict(expected)
+        assert score_parse(formula) == expected
+        assert composition_parse(formula) == expected
     assert _atoms("FeO1.5") == {"Fe": 1.0, "O": 1.5}
     assert _atoms("FeO1.5") != _atoms("Fe2O3")
     assert _atoms("Fe0.947O") == {"Fe": 0.947, "O": 1.0}
@@ -223,6 +222,10 @@ def test_decimal_subscript_is_one_species_and_hydrate_dot_still_splits() -> None
     janaf_dot = dict(formula_composition("CuSO4.5H2O") or ())
     assert janaf_dot.get("O") == 5.5
     assert janaf_dot.get("H") == 2.0
+    expected_hydrate = atoms_parse_formula_else_janaf("CuSO4.5H2O")
+    assert expected_hydrate is not None
+    assert score_parse("CuSO4.5H2O") == expected_hydrate
+    assert composition_parse("CuSO4.5H2O") == expected_hydrate
     assert _atoms("3Al2O3.2SiO2") == {"Al": 6.0, "O": 13.0, "Si": 2.0}
     assert _atoms("Na2O.SiO2") == {"Na": 2.0, "O": 3.0, "Si": 1.0}
     assert _atoms("Na2O.2SiO2") == {"Na": 2.0, "O": 5.0, "Si": 2.0}
@@ -244,12 +247,17 @@ def test_decimal_subscript_is_one_species_and_hydrate_dot_still_splits() -> None
         "O": 8.0,
     }
 
-    for junk in ("foobar", "not-a-formula", "Fe_tO", "Fe(1-x)O", "unknown"):
+    for junk in ("foobar", "not-a-formula", "unknown"):
         with pytest.raises(AccountingError):
             parse_formula(junk)
         assert atoms_parse_formula_else_janaf(junk) is None
         assert composition_parse(junk) is None
         assert score_parse(junk) is None
+
+    # These are scorer-supported iron-bearing shorthand spellings, even
+    # though the accounting formula grammar does not parse them.
+    assert score_parse("Fe_tO") == (("Fe", 1.0), ("O", 1.0))
+    assert score_parse("Fe(1-x)O") == (("Fe", 1.0), ("O", 1.0))
 
     # Printed x is an element token, not a decimal subscript.
     with pytest.raises(AccountingError, match="Ox"):
@@ -276,6 +284,50 @@ def test_decimal_subscript_batch_moles_use_the_mass_owner() -> None:
     denom = x_ko * ko_mass + x_si * _SIO2_G_MOL
     assert ko_mol["KO0.5"] == pytest.approx(1000.0 * x_ko / denom, rel=1e-12)
     assert ko_mol["SiO2"] == pytest.approx(1000.0 * x_si / denom, rel=1e-12)
+
+
+def test_score_decimal_subscripts_use_accounting_parser_owner(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.accounting import formulas as accounting_formulas
+    from simulator.battery import composition as composition_module
+    from simulator.battery import score as score_module
+    from simulator.battery.composition import parse_species_formula as composition_parse
+    from simulator.battery.score import parse_species_formula as score_parse
+    from simulator.battery.score import _battery_hero_nbo_t
+    from simulator.reference_data.janaf import formula_composition
+
+    hydrate = "CuSO4.5H2O"
+    expected_hydrate = atoms_parse_formula_else_janaf(hydrate)
+    assert expected_hydrate is not None
+    assert score_parse(hydrate) == expected_hydrate
+    assert composition_parse(hydrate) == expected_hydrate
+    nbo_composition = {
+        "amount_basis": AmountBasis.MOLE_FRACTION.value,
+        "components": ((hydrate, Decimal(1)),),
+    }
+    expected_nbo_t = _battery_hero_nbo_t(nbo_composition)
+    assert expected_nbo_t is not None
+
+    old_parser_output = formula_composition
+    monkeypatch.setattr(
+        accounting_formulas, "atoms_parse_formula_else_janaf", old_parser_output
+    )
+    monkeypatch.setattr(
+        score_module, "atoms_parse_formula_else_janaf", old_parser_output, raising=False
+    )
+    monkeypatch.setattr(
+        composition_module,
+        "atoms_parse_formula_else_janaf",
+        old_parser_output,
+        raising=False,
+    )
+    with pytest.raises(AssertionError):
+        assert score_parse(hydrate) == expected_hydrate
+    with pytest.raises(AssertionError):
+        assert composition_parse(hydrate) == expected_hydrate
+    with pytest.raises(AssertionError):
+        assert _battery_hero_nbo_t(nbo_composition) == expected_nbo_t
 
 
 def test_oxide_element_inventory_accepts_decimal_subscript() -> None:

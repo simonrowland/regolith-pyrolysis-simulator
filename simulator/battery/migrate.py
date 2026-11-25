@@ -11040,13 +11040,6 @@ def _phase_inference_from_evidence(
     return None
 
 
-def _is_unstated_method_reason(reason: str | None) -> bool:
-    return reason in {
-        "source does not state method",
-        "experiment method not published",
-    }
-
-
 def _phase_needs_default(phase: State[Phase]) -> bool:
     if phase.is_value:
         return phase.value is Phase.UNSPECIFIED
@@ -14005,9 +13998,22 @@ def map_method(regime: object) -> State[MethodToken]:
     return State.of(token)
 
 
+def _method_text_value(candidate: object) -> str | None:
+    if isinstance(candidate, str):
+        return candidate if candidate.strip() else None
+    if isinstance(candidate, Mapping):
+        state = candidate.get("state")
+        if isinstance(state, Mapping) and state.get("tag") == "value":
+            value = state.get("value")
+            if isinstance(value, str) and value.strip():
+                return value
+    return None
+
+
 _METHOD_TEXT_EVIDENCE = (
     ("electron microprobe analysis", MethodToken.ELECTRON_MICROPROBE),
     ("electron microprobe", MethodToken.ELECTRON_MICROPROBE),
+    ("electron probe microanalysis", MethodToken.ELECTRON_MICROPROBE),
     ("knudsen-cell", MethodToken.KNUDSEN_EFFUSION),
     ("knudsen cell", MethodToken.KNUDSEN_EFFUSION),
     ("knudsen effusion", MethodToken.KNUDSEN_EFFUSION),
@@ -14027,9 +14033,10 @@ def _method_inference_from_evidence(
     """Infer a closed method only when one explicit source phrase identifies it."""
 
     for candidate in candidates:
-        if not isinstance(candidate, str) or not candidate.strip():
+        candidate_text = _method_text_value(candidate)
+        if candidate_text is None:
             continue
-        text = " ".join(candidate.casefold().split())
+        text = " ".join(candidate_text.casefold().split())
         # A source-text acronym is evidence; the closed-looking regime token
         # ``kems_effusion`` alone remains insufficient.
         matches = [
@@ -14059,6 +14066,42 @@ def _method_inference_from_evidence(
                 return None
             return token, f"source text names {phrase!r}"
     return None
+
+
+# Figure-series labels b274 leaves on the registered experiment for that
+# technique. They are not a second method and must not conflict-split it.
+_FIGURE_REGIME_INHERITS_DECLARED = {
+    "mixed_kms_tms": MethodToken.KNUDSEN_EFFUSION,
+    "knudsen_mass_spectrometry": MethodToken.KNUDSEN_EFFUSION,
+    "transpiration_mass_spectrometry": MethodToken.TRANSPIRATION,
+}
+
+
+def _row_text_inherits_declared_method(
+    method_raw: str | None,
+    declared: State[MethodToken] | None,
+    *,
+    printed_only: bool,
+) -> bool:
+    """Whether row text keeps the registered experiment method.
+
+    A method_as_printed sentence that did not map or infer is the
+    registered experiment's description (Guo Table 5 quench_equilibration),
+    not a second technique. A regime or method claim still resolves on its
+    own. Hastie figure-series regimes inherit the registered technique:
+    knudsen effusion or transpiration.
+    """
+
+    if (
+        declared is None
+        or not declared.is_value
+        or declared.value is MethodToken.UNSPECIFIED
+        or not method_raw
+    ):
+        return False
+    if _FIGURE_REGIME_INHERITS_DECLARED.get(method_raw) is declared.value:
+        return True
+    return printed_only
 
 
 def _method_inference_notice(
@@ -14967,19 +15010,91 @@ def _pressure_hit_is_model_calculation(
     )
 
 
-def _pressure_hit_is_chamber_condition(
+def _pressure_evidence_is_chamber_background(
+    evidence_text: str,
+    method: State[MethodToken] | None,
+    knudsen_cell: bool,
+) -> bool:
+    has_chamber_context = bool(
+        _PRESSURE_CHAMBER_RE.search(evidence_text)
+    )
+    if not has_chamber_context:
+        return False
+
+    is_closed_knudsen_method = (
+        method is not None
+        and method.is_value
+        and method.value is MethodToken.KNUDSEN_EFFUSION
+    )
+    if knudsen_cell and not is_closed_knudsen_method:
+        # A method-specific split can leave a Knudsen apparatus on an
+        # UNSPECIFIED row. The chamber reading remains background evidence;
+        # only the closed effusion token keeps it on the experiment for KEMS.
+        return True
+    if (
+        re.search(r"\bfurnace\b", evidence_text, re.IGNORECASE)
+        and re.search(r"\bvacuum\b", evidence_text, re.IGNORECASE)
+        and not is_closed_knudsen_method
+    ):
+        # A quoted furnace vacuum is background evidence for a non-Knudsen
+        # sibling, even when a method split copied it from the shared run.
+        return True
+    return False
+
+
+def _experiment_pressure_is_chamber_background(
+    experiment: Experiment,
+    method: State[MethodToken] | None,
+) -> bool:
+    pressure = experiment.pressure_environment.total_pressure_Pa
+    if pressure is None:
+        return False
+    evidence_text = " ".join(
+        (
+            pressure.locator.note or ""
+            if pressure.locator is not None
+            else "",
+            *(
+                pressure.inference.inputs
+                if pressure.inference is not None
+                else ()
+            ),
+        )
+    )
+    apparatus_text = _extract_text(to_plain(experiment.apparatus))
+    knudsen_cell = bool(
+        re.search(r"\bknudsen\b", apparatus_text, re.IGNORECASE)
+        and not re.search(
+            r"\b(?:not|non[- ])\s*knudsen\b",
+            apparatus_text,
+            re.IGNORECASE,
+        )
+    )
+    return _pressure_evidence_is_chamber_background(
+        evidence_text, method, knudsen_cell
+    )
+
+
+def _pressure_hit_is_not_in_cell_total(
     hit: LabHit,
     values: Mapping[str, Any],
     method: State[MethodToken] | None,
     knudsen_cell: bool,
 ) -> bool:
-    if not _PRESSURE_CHAMBER_RE.search(hit.path):
-        return False
-    if knudsen_cell and (method is None or not method.is_value):
-        # With no resolved method, an explicitly identified Knudsen cell means
-        # this chamber value cannot establish the in-cell total.
+    if (
+        hit.path.casefold().startswith("values.")
+        and hit.entry.printed.casefold() == "pressure_pa"
+        and str(values.get("quantity") or "").strip().casefold()
+        in {"partial_pressure", Quantity.P_PARTIAL.value}
+    ):
         return True
+
     mapping = hit.mapping or {}
+    mapping_text = _extract_text(mapping)
+    if _pressure_evidence_is_chamber_background(
+        f"{hit.path} {mapping_text}", method, knudsen_cell
+    ):
+        return True
     if str(mapping.get("kind") or "").casefold() in {
         "about_nominal", "approximate", "pump_ultimate", "ultimate_vacuum", "ultimate-vacuum"
     }:
@@ -20926,7 +21041,7 @@ def pressure_from_equipment(
         hit
         for hit in _hits_for(hits, field)
         if not _pressure_hit_is_model_calculation(hit, payload_values, payload_values)
-        and not _pressure_hit_is_chamber_condition(
+        and not _pressure_hit_is_not_in_cell_total(
             hit, payload_values, method, knudsen_cell
         )
     ]
@@ -25617,6 +25732,8 @@ class Migrator:
         self._inferred_method_evidence_by_experiment: dict[
             str, tuple[MethodToken, str, str]
         ] = {}
+        self._declared_experiment_methods: dict[str, State[MethodToken]] = {}
+        self._unstated_method_original_reason_by_experiment: dict[str, str] = {}
         self._author_derivations: dict[str, Derivation] = {}
         # Parents actually replaced by emitted children. Retarget uses this
         # exact map, never a prefix search.
@@ -25798,6 +25915,89 @@ class Migrator:
             return f"{work_id}::{fallback}::{distinguisher}"
         return f"{work_id}::{fallback}"
 
+    def _publish_experiment(self, experiment: Experiment) -> Experiment:
+        """Register an experiment for the store writer.
+
+        write_outputs emits experiments_by_work and no other experiment list.
+        An id left only in result.experiments is dropped on reload. Every
+        observation that names it then fails referential integrity, and asset
+        lineage fails with it: asset ids are read from the resolved work.
+        """
+
+        experiment_id = experiment.experiment_id
+        work_id = experiment.work_id or ""
+        self.result.experiments[experiment_id] = experiment
+        registered = self.result.experiments_by_work[work_id]
+        if experiment_id not in registered:
+            registered.append(experiment_id)
+        return experiment
+
+    @staticmethod
+    def _tokens_with_published_id(
+        tokens: tuple[str, ...] | None,
+        former_id: str,
+        published_id: str,
+    ) -> tuple[str, ...] | None:
+        if not tokens or former_id == published_id or former_id not in tokens:
+            return tokens
+        return tuple(
+            published_id if token == former_id else token for token in tokens
+        )
+
+    def _derivation_with_published_id(
+        self,
+        derivation: Derivation | None,
+        former_id: str,
+        published_id: str,
+    ) -> Derivation | None:
+        if derivation is None:
+            return None
+        inputs = self._tokens_with_published_id(
+            derivation.inputs, former_id, published_id
+        )
+        if inputs is derivation.inputs:
+            return derivation
+        return replace(derivation, inputs=inputs or ())
+
+    def _rekey_row_references(
+        self,
+        *,
+        former_id: str,
+        experiment_id: str,
+        observation_id: str,
+        derived_from: tuple[str, ...] | None,
+        source_derivation: Derivation | None,
+        value_derivation: Derivation | None,
+    ) -> tuple[tuple[str, ...] | None, Derivation | None, Derivation | None]:
+        """Publish one re-keyed experiment and retarget this row only.
+
+        Sibling rows that stayed on former_id keep that id. A corpus-wide
+        old-to-new rewrite would move them.
+        """
+
+        if experiment_id == former_id:
+            return derived_from, source_derivation, value_derivation
+        experiment = self.result.experiments.get(experiment_id)
+        if experiment is not None:
+            self._publish_experiment(experiment)
+        derived_from = self._tokens_with_published_id(
+            derived_from, former_id, experiment_id
+        )
+        source_derivation = self._derivation_with_published_id(
+            source_derivation, former_id, experiment_id
+        )
+        value_derivation = self._derivation_with_published_id(
+            value_derivation, former_id, experiment_id
+        )
+        registered = self._author_derivations.get(observation_id)
+        if registered is not None:
+            retargeted = self._derivation_with_published_id(
+                registered, former_id, experiment_id
+            )
+            if retargeted is not None and retargeted is not registered:
+                self._author_derivations[observation_id] = retargeted
+        return derived_from, source_derivation, value_derivation
+
     def _ensure_experiment(
         self,
         *,
@@ -25910,8 +26110,7 @@ class Migrator:
                 apparatus,
                 pressure_env,
             )
-            self.result.experiments[experiment_id] = merged
-            return merged
+            return self._publish_experiment(merged)
         if (
             isinstance(equipment, Mapping)
             and isinstance(equipment.get("chamber_pressure"), Mapping)
@@ -25968,9 +26167,7 @@ class Migrator:
             locator=locator or Locator(record=experiment_id),
             apparatus=apparatus,
         )
-        self.result.experiments[experiment_id] = experiment
-        self.result.experiments_by_work[work_id].append(experiment_id)
-        return experiment
+        return self._publish_experiment(experiment)
 
     def _land_experiment_oxygen_pressure(
         self, experiment_id: str, located: Located[Value]
@@ -26371,6 +26568,12 @@ class Migrator:
             # KEMS validity gates — never the pressure a prediction is made at.
             skip_identity_fill = _knudsen_effusion_chamber_background_not_for_identity(
                 effective_method
+            ) or (
+                pressure is not None
+                and pressure_source.startswith("experiment.")
+                and _experiment_pressure_is_chamber_background(
+                    experiment, effective_method
+                )
             )
             if pressure is None and not skip_identity_fill:
                 sweep = experiment.pressure_environment.sweep_gas
@@ -26447,42 +26650,95 @@ class Migrator:
         observation_id: str,
         experiment_id: str,
         method: State[MethodToken],
-        method_raw: object,
+        method_raw_candidates: tuple[object, ...],
+        printed_method_candidates: tuple[object, ...] = (),
+        method_evidence_candidates: tuple[object, ...],
         evidence_candidates: tuple[object, ...],
         quantity: Quantity | None,
-        work_id: str,
-        locator: Locator,
-        source_key: str,
-        queue_if_unresolved: bool,
     ) -> tuple[State[MethodToken], Notice | None]:
         experiment = self.result.experiments.get(experiment_id)
         experiment_method = None if experiment is None else experiment.method
+        declared_experiment_method = self._declared_experiment_methods.get(
+            experiment_id
+        )
+        claim_raw = next(
+            (
+                text
+                for candidate in method_raw_candidates
+                if (text := _method_text_value(candidate)) is not None
+            ),
+            None,
+        )
+        printed_raw = next(
+            (
+                text
+                for candidate in printed_method_candidates
+                if (text := _method_text_value(candidate)) is not None
+            ),
+            None,
+        )
+        # A printed description is the method claim only when the row has no
+        # regime or method of its own. Callers pass both; this owner decides.
+        method_raw = claim_raw if claim_raw is not None else printed_raw
+        printed_only = claim_raw is None and printed_raw is not None
+        method_source_text = next(
+            (
+                text
+                for candidate in (
+                    *method_raw_candidates,
+                    *printed_method_candidates,
+                    *method_evidence_candidates,
+                    *evidence_candidates,
+                )
+                if (text := _method_text_value(candidate)) is not None
+            ),
+            None,
+        )
 
         if (
-            experiment_method is not None
+            declared_experiment_method is not None
             and method.is_unknown
-            and method_raw in (None, "")
-            and experiment_method.is_value
-            and experiment_method.value is not MethodToken.UNSPECIFIED
+            and method_raw is None
+            and declared_experiment_method.is_value
+            and declared_experiment_method.value is not MethodToken.UNSPECIFIED
         ):
-            method = experiment_method
+            method = declared_experiment_method
 
         method_notice: Notice | None = None
+        method_inferred_from_row = False
         method_was_unspecified = (
             method.is_value and method.value is MethodToken.UNSPECIFIED
         )
         if method.is_unknown:
-            method_evidence = _method_inference_from_evidence(
-                method_raw,
-                *evidence_candidates,
-                experiment_method.reason
-                if experiment_method is not None and experiment_method.is_unknown
-                else None,
-            )
+            method_token = map_method(method_raw) if method_raw is not None else None
+            if method_token is not None and method_token.is_value:
+                if method_token.value is MethodToken.UNSPECIFIED:
+                    method = State.unknown(
+                        f"source method text: {method_raw}"
+                    )
+                    method_was_unspecified = True
+                else:
+                    method = method_token
+                method_evidence = None
+            else:
+                inference_candidates = (
+                    (method_raw,)
+                    if method_raw is not None
+                    else (
+                        *method_evidence_candidates,
+                        *evidence_candidates,
+                    )
+                )
+                method_evidence = _method_inference_from_evidence(
+                    *inference_candidates
+                )
             if method_evidence is not None:
                 method_token, evidence = method_evidence
+                method_inferred_from_row = True
                 original_reason = (
-                    method.reason or "source does not state method"
+                    f"source method text: {method_source_text}"
+                    if method_source_text is not None
+                    else method.reason or "source does not state method"
                 )
                 self._inferred_method_evidence_by_experiment[experiment_id] = (
                     method_token,
@@ -26490,19 +26746,53 @@ class Migrator:
                     original_reason,
                 )
                 method = State.of(method_token)
-            elif _is_unstated_method_reason(method.reason):
-                method_was_unspecified = True
-            elif queue_if_unresolved:
-                self.result.add_queue(
-                    work_id,
-                    locator,
-                    ["method"],
-                    method.reason or "unknown method",
-                    source=source_key,
-                    observation_id=observation_id,
+            elif _row_text_inherits_declared_method(
+                method_raw,
+                declared_experiment_method,
+                printed_only=printed_only,
+            ):
+                # Unmapped method_as_printed prose, and Hastie figure-series
+                # regimes b274 keeps on the registered technique, are not a
+                # second method.
+                method = declared_experiment_method
+                method_was_unspecified = False
+            elif method_source_text is not None and method.is_unknown:
+                method = State.unknown(
+                    f"source method text is not mapped: {method_source_text}"
                 )
+                method_was_unspecified = True
+            elif method.is_unknown:
+                # Method absence never prevents an engine call. Preserve the
+                # state's reason in the DP-106 notice instead of queueing it.
+                method_was_unspecified = True
         if method_was_unspecified:
-            original_reason = method.reason or "source does not state method"
+            cached_reason = (
+                self._unstated_method_original_reason_by_experiment.get(
+                    experiment_id
+                )
+                if method_raw is None and method_source_text is None
+                else None
+            )
+            if method.reason:
+                original_reason = method.reason
+            elif cached_reason:
+                original_reason = cached_reason
+            elif (
+                observation_id in self.result.observations
+                and method_raw is None
+                and method_source_text is None
+            ):
+                # The first copy cached the original reason. Losing that cache
+                # must change this copy's payload so the duplicate guard fires.
+                original_reason = (
+                    "source does not state method; original method reason lost"
+                )
+            else:
+                original_reason = "source does not state method"
+            if method.is_unknown:
+                self._unstated_method_original_reason_by_experiment.setdefault(
+                    experiment_id, original_reason
+                )
             printed_method = next(
                 (
                     candidate.strip()
@@ -26527,7 +26817,7 @@ class Migrator:
                 origin=observation_id,
                 policy=NoticePolicy(**policy_resolution.payload["policy"]),
             )
-        elif method.is_value:
+        elif method.is_value and method_inferred_from_row:
             inferred = self._inferred_method_evidence_by_experiment.get(
                 experiment_id
             )
@@ -26639,14 +26929,10 @@ class Migrator:
                 observation_id=observation.observation_id,
                 experiment_id=observation.experiment_id,
                 method=experiment.method,
-                method_raw=None,
+                method_raw_candidates=(),
+                method_evidence_candidates=(),
                 evidence_candidates=(),
                 quantity=quantity if isinstance(quantity, Quantity) else None,
-                work_id=experiment.work_id
-                or observation.experiment_id.split("::", 1)[0],
-                locator=observation.locator,
-                source_key=source_key,
-                queue_if_unresolved=False,
             )
             if method_notice is not None:
                 observation_notices.append(method_notice)
@@ -27054,10 +27340,13 @@ class Migrator:
                 self._amorphous_printed_sample_experiments.add(
                     experiment.experiment_id
                 )
-            self.result.experiments[experiment.experiment_id] = experiment
-            if experiment.experiment_id not in self.result.experiments_by_work[work.work_id]:
-                self.result.experiments_by_work[work.work_id].append(
-                    experiment.experiment_id
+            self._publish_experiment(experiment)
+            if (
+                method_raw is not None
+                and not (isinstance(method_raw, str) and not method_raw.strip())
+            ):
+                self._declared_experiment_methods[experiment.experiment_id] = (
+                    experiment.method
                 )
             experiment_refs[str(local_id)] = experiment.experiment_id
             experiment_refs[experiment.experiment_id] = experiment.experiment_id
@@ -27171,6 +27460,8 @@ class Migrator:
         self,
         experiment_id: str,
         printed: Located[Mapping[str, Any]],
+        *,
+        declared_experiment_id: str | None,
     ) -> bool:
         """True when ``printed`` restates the registry-declared sample map.
 
@@ -27181,9 +27472,15 @@ class Migrator:
         100 wt% non-oxide). A row printing a different map still attaches.
         """
 
-        if experiment_id not in self._registry_printed_composition_experiments:
+        registry_owner_id = (
+            declared_experiment_id
+            if declared_experiment_id
+            in self._registry_printed_composition_experiments
+            else experiment_id
+        )
+        if registry_owner_id not in self._registry_printed_composition_experiments:
             return False
-        experiment = self.result.experiments.get(experiment_id)
+        experiment = self.result.experiments.get(registry_owner_id)
         declared = None if experiment is None else experiment.sample.printed_composition
         if declared is None or not declared.state.is_value:
             return False
@@ -29300,19 +29597,71 @@ class Migrator:
         experiment_id = declared_experiment_id or self._experiment_id(
             work.work_id, locator, source_id, distinguisher=distinguisher
         )
+        experiment_before_method_resolution = self.result.experiments.get(
+            experiment_id
+        )
         rail_raw = obs.get("rail") or values.get("rail")
         if rail_raw:
             canonicalize_rail(str(rail_raw))
-        method_raw = obs.get("regime")
-        if "regime" not in obs:
-            method_raw = values.get("method")
-        method = map_method(method_raw)
+        derivation_method_candidates = tuple(
+            derivation.get("method")
+            for derivation in (obs.get("derivation"), values.get("derivation"))
+            if isinstance(derivation, Mapping)
+        )
+        standard_state_raw = obs.get("standard_state")
+        if not isinstance(standard_state_raw, Mapping):
+            standard_state_raw = values.get("standard_state")
+        standard_state_state = (
+            standard_state_raw.get("state")
+            if isinstance(standard_state_raw, Mapping)
+            else None
+        )
+        standard_state_value = (
+            standard_state_state.get("value")
+            if isinstance(standard_state_state, Mapping)
+            and standard_state_state.get("tag") == "value"
+            else None
+        )
+        iron_saturation_composition = (
+            standard_state_value.get("iron_saturation_composition")
+            if isinstance(standard_state_value, Mapping)
+            else None
+        )
+        standard_state_method = (
+            iron_saturation_composition.get("method")
+            if isinstance(iron_saturation_composition, Mapping)
+            else None
+        )
+        method_raw_candidates = (
+            obs.get("regime"),
+            obs.get("method"),
+            obs.get("measured_by_as_printed"),
+            obs.get("method_text"),
+            obs.get("analytical_method"),
+            obs.get("method_detail_as_printed"),
+            values.get("method"),
+            values.get("measured_by_as_printed"),
+            values.get("method_text"),
+            values.get("analytical_method"),
+            values.get("method_detail_as_printed"),
+        )
+        printed_method_candidates = (
+            obs.get("method_as_printed"),
+            values.get("method_as_printed"),
+        )
+        method_evidence_candidates = (
+            *derivation_method_candidates,
+            standard_state_method,
+        )
+        method = State.unknown("source does not state method")
         quantity_for_notice = q_token if isinstance(q_token, Quantity) else None
         method, method_notice = self._resolve_method_for_observation(
             observation_id=obs_id,
             experiment_id=experiment_id,
             method=method,
-            method_raw=method_raw,
+            method_raw_candidates=method_raw_candidates,
+            printed_method_candidates=printed_method_candidates,
+            method_evidence_candidates=method_evidence_candidates,
             evidence_candidates=(
                 obs.get("method_as_printed"),
                 values.get("method_as_printed"),
@@ -29322,17 +29671,84 @@ class Migrator:
                 values.get("note"),
             ),
             quantity=quantity_for_notice,
-            work_id=work.work_id,
-            locator=locator,
-            source_key=source_key,
-            queue_if_unresolved=True,
+        )
+        declared_experiment_method = self._declared_experiment_methods.get(
+            declared_experiment_id
+        )
+        experiment_method_is_unstated = (
+            declared_experiment_id is not None
+            and (
+                declared_experiment_method is None
+                or not declared_experiment_method.is_value
+            )
+        )
+        experiment_method_conflicts = (
+            experiment_before_method_resolution is not None
+            and experiment_before_method_resolution.method.is_value
+            and method.is_value
+            and experiment_before_method_resolution.method.value is not method.value
+        )
+        former_experiment_id = experiment_id
+        if method.is_value and (
+            experiment_method_is_unstated or experiment_method_conflicts
+        ):
+            # A shared experiment can group rows only while their typed method
+            # decisions agree. An unstated registry method cannot take the
+            # first row's method as its experiment-wide value.
+            self._inferred_method_evidence_by_experiment.pop(experiment_id, None)
+            if experiment_before_method_resolution is not None:
+                self.result.experiments[experiment_id] = (
+                    experiment_before_method_resolution
+                )
+            method_distinguisher = (
+                f"declared:{declared_experiment_id}::method:{method.value.value}"
+                if declared_experiment_id is not None
+                else f"method:{method.value.value}"
+            )
+            distinguisher = (
+                f"{distinguisher}::{method_distinguisher}"
+                if distinguisher
+                else method_distinguisher
+            )
+            experiment_id = self._experiment_id(
+                work.work_id,
+                locator,
+                source_id,
+                distinguisher=distinguisher,
+            )
+            # Keep the declared run context on the method-specific experiment.
+            # Sibling rows share this id, so seed it once and preserve evidence
+            # (such as a printed oxygen pressure) already merged from earlier
+            # rows instead of resetting it from the registry on every row.
+            existing_method_experiment = self.result.experiments.get(experiment_id)
+            if existing_method_experiment is not None:
+                self.result.experiments[experiment_id] = replace(
+                    existing_method_experiment,
+                    method=method,
+                )
+            elif experiment_before_method_resolution is not None:
+                self.result.experiments[experiment_id] = replace(
+                    experiment_before_method_resolution,
+                    experiment_id=experiment_id,
+                    method=method,
+                )
+        (
+            derived_from,
+            source_derivation,
+            value_derivation,
+        ) = self._rekey_row_references(
+            former_id=former_experiment_id,
+            experiment_id=experiment_id,
+            observation_id=obs_id,
+            derived_from=derived_from,
+            source_derivation=source_derivation,
+            value_derivation=value_derivation,
         )
         experiment = self.result.experiments.get(experiment_id)
-        migration_axis_notices = (
-            () if phase_flag_notice is None else (phase_flag_notice,)
-        )
-        method_resolution_notices = (
-            () if method_notice is None else (method_notice,)
+        migration_axis_notices = tuple(
+            notice
+            for notice in (phase_flag_notice, method_notice)
+            if notice is not None
         )
         effective_method = (
             method
@@ -29621,7 +30037,9 @@ class Migrator:
                 locator=locator,
             )
             and not self._repeats_declared_sample_map(
-                experiment_id, row_sample.printed_composition
+                experiment_id,
+                row_sample.printed_composition,
+                declared_experiment_id=declared_experiment_id,
             )
         ):
             # An observation-level printed wt% map is the datum's composition.
@@ -29745,11 +30163,15 @@ class Migrator:
                     "composition": derived,
                     **point_conditions,
                 }
-        if declared_experiment_id is None or (
-            declared_experiment_id in self.result.experiments
-            and (
-                bool(obs.get("equipment"))
-                or row_sample.initial_composition is not None
+        if (
+            declared_experiment_id is None
+            or experiment_id != declared_experiment_id
+            or (
+                declared_experiment_id in self.result.experiments
+                and (
+                    bool(obs.get("equipment"))
+                    or row_sample.initial_composition is not None
+                )
             )
         ):
             self._ensure_experiment(
@@ -30617,7 +31039,6 @@ class Migrator:
                         *migration_axis_notices,
                         *point_notices,
                         *ambient_pressure_notices,
-                        *method_resolution_notices,
                     ),
                     equipment=obs.get("equipment"),
                     parent_reason=hold_reason,
@@ -30753,7 +31174,6 @@ class Migrator:
                                 else (total_iron_notice,)
                             ),
                             *ambient_pressure_notices,
-                            *method_resolution_notices,
                         ),
                         equipment=obs.get("equipment"),
                         parent_reason=hold_reason,
@@ -30894,7 +31314,6 @@ class Migrator:
                         ),
                         *validity_notices,
                         *ambient_pressure_notices,
-                        *method_resolution_notices,
                     ),
                     equipment=obs.get("equipment"),
                     parent_reason=hold_reason,
@@ -31095,7 +31514,6 @@ class Migrator:
                             ),
                             *validity_notices,
                             *ambient_pressure_notices,
-                            *method_resolution_notices,
                         ),
                         equipment=obs.get("equipment"),
                         parent_reason=hold_reason,
@@ -31229,7 +31647,6 @@ class Migrator:
             observation_notices.append(projection_notice)
         observation_notices.extend(starting_bulk_notices)
         observation_notices.extend(migration_axis_notices)
-        observation_notices.extend(method_resolution_notices)
         observation_notices.extend(validity_notices)
         from simulator.battery.validity import comparison_method_cell_constant_cancels
 

@@ -33,6 +33,102 @@ experiments:
 - experiment_id: 10.22323/1.207.0046::experiment::tt2014_forsterite_condensation
   kind: literature
   method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.22323/1.207.0046
+  locator:
+    published_page: 6
+    pdf_page_index: 5
+    section: '4.1'
+- experiment_id: 10.22323/1.207.0046::experiment::tt2014_forsterite_evaporation_review
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.22323/1.207.0046
+  locator:
+    published_page: 5
+    pdf_page_index: 4
+    section: '3'
+- experiment_id: 10.22323/1.207.0046::experiment::tt2014_iron_condensation_review
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.22323/1.207.0046
+  locator:
+    published_page: 2
+    pdf_page_index: 1
+    section: '2'
+- experiment_id: 10.22323/1.207.0046::tachibana-takigawa-2014-forsterite-condensation::declared:10.22323/1.207.0046::experiment::tt2014_forsterite_condensation::method:unspecified
+  kind: literature
+  method:
     tag: value
     value: unspecified
   sample: {}
@@ -62,7 +158,7 @@ experiments:
     published_page: 6
     pdf_page_index: 5
     section: '4.1'
-- experiment_id: 10.22323/1.207.0046::experiment::tt2014_forsterite_evaporation_review
+- experiment_id: 10.22323/1.207.0046::tachibana-takigawa-2014-forsterite-condensation::declared:10.22323/1.207.0046::experiment::tt2014_forsterite_evaporation_review::method:unspecified
   kind: literature
   method:
     tag: value
@@ -94,7 +190,7 @@ experiments:
     published_page: 5
     pdf_page_index: 4
     section: '3'
-- experiment_id: 10.22323/1.207.0046::experiment::tt2014_iron_condensation_review
+- experiment_id: 10.22323/1.207.0046::tachibana-takigawa-2014-forsterite-condensation::declared:10.22323/1.207.0046::experiment::tt2014_iron_condensation_review::method:unspecified
   kind: literature
   method:
     tag: value

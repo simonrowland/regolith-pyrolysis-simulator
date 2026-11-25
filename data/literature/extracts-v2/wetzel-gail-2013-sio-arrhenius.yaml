@@ -41,7 +41,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: solid_SiO_growth_coefficient'
+    origin: wetzel-gail-2013-sio-arrhenius::wetzel_gail_2013_sio_arrhenius
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: wetzel-gail-2013-sio-arrhenius
   locator:
     equation: '8'

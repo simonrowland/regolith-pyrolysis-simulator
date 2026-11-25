@@ -236,9 +236,16 @@ def test_ambient_filled_kinetic_composition_row_carries_absolute_band(
     _migrator, observation = _ambient_pressure_result(tmp_path, quantity=quantity)
 
     assert observation.identity.total_pressure_Pa.value == Decimal("101325")
-    notice, = observation.notices
-    assert notice.kind is NoticeKind.TOTAL_PRESSURE_AMBIENT_OPEN_FURNACE
-    assert notice.band == "-0.10/+0.01 dex"
+    assert {notice.kind for notice in observation.notices} == {
+        NoticeKind.TOTAL_PRESSURE_AMBIENT_OPEN_FURNACE,
+        NoticeKind.METHOD_UNSTATED,
+    }
+    ambient_notice = next(
+        notice
+        for notice in observation.notices
+        if notice.kind is NoticeKind.TOTAL_PRESSURE_AMBIENT_OPEN_FURNACE
+    )
+    assert ambient_notice.band == "-0.10/+0.01 dex"
 
 
 def test_ambient_pressure_co2_co_p_o2_has_no_band() -> None:
@@ -302,10 +309,17 @@ def test_open_furnace_evidence_fills_required_pressure_with_authority_and_notice
         is AmbientPressureEvidenceClass.GAS_FLOW
     )
     assert observation.identity.total_pressure_Pa.value == Decimal("101325")
-    notice, = observation.notices
-    assert notice.kind is NoticeKind.TOTAL_PRESSURE_AMBIENT_OPEN_FURNACE
-    assert notice.authority is Authority.DERIVED_FROM_APPARATUS
-    assert notice.band is None
+    assert {notice.kind for notice in observation.notices} == {
+        NoticeKind.TOTAL_PRESSURE_AMBIENT_OPEN_FURNACE,
+        NoticeKind.METHOD_UNSTATED,
+    }
+    ambient_notice = next(
+        notice
+        for notice in observation.notices
+        if notice.kind is NoticeKind.TOTAL_PRESSURE_AMBIENT_OPEN_FURNACE
+    )
+    assert ambient_notice.authority is Authority.DERIVED_FROM_APPARATUS
+    assert ambient_notice.band is None
     assert observation.derivation is None
     assert not any(
         entry.axes == ["total_pressure_Pa"]
@@ -409,7 +423,9 @@ def test_absent_open_furnace_evidence_keeps_typed_identity_refusal(tmp_path) -> 
         tmp_path, include_evidence=False
     )
     assert observation.identity.total_pressure_Pa.is_unknown
-    assert observation.notices == ()
+    assert {notice.kind for notice in observation.notices} == {
+        NoticeKind.METHOD_UNSTATED
+    }
 
     identity = replace(
         observation.identity,

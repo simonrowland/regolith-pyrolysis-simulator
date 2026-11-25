@@ -29,6 +29,7 @@ from simulator.battery.migrate import (
     _MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN,
     _MASS_PERCENT_MAXIMUM_KEPT_SUM,
     _MASS_PERCENT_RENORMALIZE_ABOVE,
+    _experiment_pressure_is_chamber_background,
     _is_engine_oxide_component,
     _knudsen_effusion_chamber_background_not_for_identity,
     _mass_percent_kept_total,
@@ -1563,7 +1564,14 @@ def pressure_boundary(
     point = _point_condition(experiment, observation, "total_pressure_Pa", "pressure_boundary")
     if point is not None:
         routes.append(point)
-    printed = _value(experiment.pressure_environment.total_pressure_Pa)
+    chamber_background = _experiment_pressure_is_chamber_background(
+        experiment, experiment.method
+    )
+    printed = (
+        None
+        if chamber_background
+        else _value(experiment.pressure_environment.total_pressure_Pa)
+    )
     if printed is not None:
         run_pressure = experiment.pressure_environment.total_pressure_Pa
         routes.append(Waypoint("pressure_boundary", printed, "printed_run_pressure",
@@ -1635,7 +1643,7 @@ def pressure_boundary(
     pressure_inputs = {
         "experiment.pressure_environment.total_pressure_Pa": _value(
             experiment.pressure_environment.total_pressure_Pa
-        ) is not None,
+        ) is not None and not chamber_background,
         "observation.identity.total_pressure_Pa": (
             identity_pressure is not None and identity_pressure.is_value
         ),

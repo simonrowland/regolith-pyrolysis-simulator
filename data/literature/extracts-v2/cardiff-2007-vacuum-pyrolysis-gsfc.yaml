@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/cardiff-2007-vacuum-pyrolysis-gsfc.yaml
 observations:
 - observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_fig4_rga_test12_figure_only
-  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::experiment::fresnel-pyrolysis-series
+  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::cardiff-2007-vacuum-pyrolysis-gsfc::declared:36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::experiment::fresnel-pyrolysis-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -50,6 +50,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: leak_valve_RGA_on_pumped_chamber'
+    origin: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_fig4_rga_test12_figure_only
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -120,6 +130,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: SEM_EDS_residue'
+    origin: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_fig5_ilmenite_EDS_ratios
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: cardiff-2007-vacuum-pyrolysis-gsfc
   locator:
     pdf_page_index: 5
@@ -177,6 +197,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: HSC_gibbs_minimization_model'
+    origin: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_fig6_hsc_1e-1_Torr_figure_only
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -238,6 +268,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: HSC_gibbs_minimization_model'
+    origin: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_fig7_hsc_1e-7_Torr_figure_only
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -298,6 +338,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_measured_points_and_HSC_model_curve'
+    origin: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_fig9_PT_figure_only
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -311,7 +361,7 @@ observations:
   provenance:
     printed_phase: MLS-1A_vaporization_envelope
 - observation_id: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_psu_10g_mls1a_vaporization
-  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::experiment::psu-reduced-pressure-test
+  experiment_id: 36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::cardiff-2007-vacuum-pyrolysis-gsfc::declared:36a2bd0f7fed7a60838c49c676fa2f0e51024220b1e9310c9a25091d618b3fe2::experiment::psu-reduced-pressure-test::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -361,6 +411,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: resistive_high_T_vacuum_furnace'
+    origin: cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_psu_10g_mls1a_vaporization
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: cardiff-2007-vacuum-pyrolysis-gsfc
   locator:
     pdf_page_index: 7

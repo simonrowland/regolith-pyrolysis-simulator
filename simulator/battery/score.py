@@ -44,8 +44,11 @@ from typing import (
 
 import yaml
 
-from simulator.chemistry.formula_text import _strip_formula_markup
-from simulator.chemistry.formula_text import fold_subscript_digits
+from simulator.accounting.formulas import atoms_parse_formula_else_janaf
+from simulator.chemistry.formula_text import (
+    _strip_formula_markup,
+    fold_subscript_digits,
+)
 from simulator.battery.decimal_tokens import decimal_token as _dec_token
 from simulator.policy.default_policy import resolve as resolve_default_policy
 from simulator.battery.oxygen_identity import (
@@ -1176,11 +1179,10 @@ def _species_axis_matches_phase(species: Species | None, phase: Phase) -> bool:
 def parse_species_formula(
     formula: str, *, species: Species | None = None
 ) -> tuple[tuple[str, float], ...] | None:
-    """Parse formula atoms only after validating printed phase and charge axes.
+    """Parse explicit stoichiometry; None means unmatched, never string equality.
 
-    Accounting owns formula notation, dot classification, and atom counts.
-    This scorer boundary validates annotations that JANAF may otherwise strip,
-    plus the explicitly typed iron-oxide reference conventions.
+    Phase, polymorph, and charge annotations must match the typed species axis
+    before the accounting owner parses atom counts and hydrate/adduct segments.
     """
 
     if not formula or formula.strip().lower() in {"unknown", "none", "n/a"}:
@@ -1301,8 +1303,9 @@ def parse_species_formula(
     if text in {"Fe(1-x)O", "Fe_tO"}:
         return (("Fe", 1.0), ("O", 1.0))
 
-    from simulator.accounting.formulas import atoms_parse_formula_else_janaf
-
+    # The accounting parser owns decimal-subscript versus adduct splitting.
+    # Keep only this source spelling normalization, which it does not accept.
+    text = re.sub(r"(?<=[A-Za-z])\.(\d+)$", r"0.\1", text)
     return atoms_parse_formula_else_janaf(text)
 
 
@@ -10188,7 +10191,6 @@ def _oxide_element_inventory(
     """
 
     from simulator.accounting.exceptions import UnparseableCompositionComponent
-    from simulator.accounting.formulas import atoms_parse_formula_else_janaf
     from simulator.accounting.oxide_mass import oxide_molar_mass_g_mol
 
     inventory: dict[str, float] = {}
@@ -24491,7 +24493,7 @@ def _battery_hero_nbo_t(
                 return None
             formula, raw_amount = component
             amount = as_decimal(raw_amount)
-            parsed = formula_composition(str(formula))
+            parsed = atoms_parse_formula_else_janaf(str(formula))
             if (
                 parsed is None
                 or not amount.is_finite()

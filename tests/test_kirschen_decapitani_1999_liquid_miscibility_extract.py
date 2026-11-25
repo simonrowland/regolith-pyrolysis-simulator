@@ -141,7 +141,9 @@ def _migrated_rows():
             assert Decimal(str(observation.value.point)) == Decimal(str(amount["value"]))
             assert amount["sigma"] not in (None, "", "0", "0.0")
             assert Decimal(str(raw["uncertainty"]["sigma"])) == Decimal(str(amount["sigma"]))
-            assert not observation.notices
+            assert {notice.kind.value for notice in observation.notices} == {
+                "phase_inferred"
+            }
     assert point_count == 452
     assert unavailable_count == 108
     assert len(result.experiments) == len(document["experiments"]) == 74

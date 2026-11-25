@@ -80,6 +80,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: coupled_interior_atmosphere_model'
+    origin: jaggi-2021-mercury-atmosphere::jaggi_2021_table1_h2_partial_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -236,6 +247,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: coupled_interior_atmosphere_model'
+    origin: jaggi-2021-mercury-atmosphere::jaggi_2021_table1_h2_partial_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -392,6 +414,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: coupled_interior_atmosphere_model'
+    origin: jaggi-2021-mercury-atmosphere::jaggi_2021_table1_sio_partial_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -548,6 +581,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: coupled_interior_atmosphere_model'
+    origin: jaggi-2021-mercury-atmosphere::jaggi_2021_table1_sio_partial_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -704,6 +748,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: coupled_interior_atmosphere_model'
+    origin: jaggi-2021-mercury-atmosphere::jaggi_2021_table1_sio_partial_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -860,6 +915,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: coupled_interior_atmosphere_model'
+    origin: jaggi-2021-mercury-atmosphere::jaggi_2021_table1_sio_partial_pressure
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -1015,7 +1081,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - liquidus_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: magma_ocean_model_input'
+    origin: jaggi-2021-mercury-atmosphere::jaggi_2021_table2_magma_ocean_composition_input
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jaggi-2021-mercury-atmosphere
   locator:
     published_page: 5

@@ -34,6 +34,7 @@ import pytest
 
 from simulator.battery.consumer_inputs import collect_consumer_inputs
 from simulator.battery.enums import MethodToken, Quantity, ValueKind
+import simulator.battery.migrate as migrate_module
 from simulator.battery.generators.bench import engine_point_requests
 from simulator.battery.records import Value
 from simulator.battery.validity import background_pressure_high
@@ -46,6 +47,7 @@ from tests.battery.test_migrate import _migrate_real_extract
 
 QI = "kems-127-qi-1989.yaml"
 ICHISE = "kems-198-ichise-ueshima-1989.yaml"
+BALABANOVA = "balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems.yaml"
 QI_FURNACE_VACUUM_PA = Decimal("0.00007")
 QI_FURNACE_VACUUM_BAR = float(QI_FURNACE_VACUUM_PA / Decimal(100000))
 KEMS_GATE_QUANTITIES = (
@@ -60,6 +62,17 @@ KEMS_GATE_QUANTITIES = (
 def _only_experiment(result):
     assert len(result.experiments) == 1
     return next(iter(result.experiments.values()))
+
+
+def _qi_knudsen_experiment(result):
+    experiments = [
+        experiment
+        for experiment in result.experiments.values()
+        if experiment.method.is_value
+        and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
+    ]
+    assert len(experiments) == 1
+    return experiments[0]
 
 
 def _bench(result, experiment):
@@ -78,7 +91,7 @@ def qi(tmp_path_factory):
 
 
 def test_qi_1989_furnace_vacuum_is_on_the_experiment_field(qi) -> None:
-    experiment = _only_experiment(qi)
+    experiment = _qi_knudsen_experiment(qi)
     assert experiment.method.is_value
     assert experiment.method.value is MethodToken.KNUDSEN_EFFUSION
     total = experiment.pressure_environment.total_pressure_Pa
@@ -93,7 +106,7 @@ def test_qi_1989_furnace_vacuum_is_on_the_experiment_field(qi) -> None:
 
 
 def test_qi_1989_furnace_vacuum_reaches_the_kems_validity_gates(qi) -> None:
-    experiment = _only_experiment(qi)
+    experiment = _qi_knudsen_experiment(qi)
     for quantity in KEMS_GATE_QUANTITIES:
         outcome = background_pressure_high(experiment, quantity)
         checks = [check for check in outcome.checks if check.name == "background_pressure"]
@@ -111,13 +124,16 @@ def test_qi_1989_furnace_vacuum_reaches_the_kems_validity_gates(qi) -> None:
 
 
 def test_qi_1989_furnace_vacuum_not_identity_nor_prediction_pressure(qi) -> None:
-    experiment = _only_experiment(qi)
-    bench = _bench(qi, experiment)
     assert qi.observations
     for observation in qi.observations.values():
+        experiment = qi.experiments[observation.experiment_id]
+        bench = _bench(qi, experiment)
         identity_pressure = observation.identity.total_pressure_Pa
         assert identity_pressure is None or not identity_pressure.is_value, (
-            f"{observation.observation_id} inherited {identity_pressure!r}"
+            f"{observation.observation_id} inherited {identity_pressure!r}; "
+            f"experiment={experiment.experiment_id!r}; "
+            f"method={experiment.method!r}; "
+            f"experiment pressure={experiment.pressure_environment.total_pressure_Pa!r}"
         )
         assert "total_pressure_Pa" not in (observation.point_conditions or {})
         boundary = pressure_boundary(experiment, bench, observation)
@@ -150,3 +166,76 @@ def test_ichise_ueshima_1989_chamber_vacuum_held_as_note_until_method_ruling(
     for observation in result.observations.values():
         identity_pressure = observation.identity.total_pressure_Pa
         assert identity_pressure is None or not identity_pressure.is_value
+
+
+def _balabanova_partial_rows(result):
+    return [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == "balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems"
+        and observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.P_PARTIAL
+    ]
+
+
+def _assert_balabanova_partial_has_no_total_pressure(result):
+    rows = _balabanova_partial_rows(result)
+    assert len(rows) == 52
+    for observation in rows:
+        pressure = observation.identity.total_pressure_Pa
+        assert pressure is not None and pressure.is_unknown
+        assert pressure.reason == "in_cell_total_pressure_not_derivable"
+        assert "total_pressure_Pa" not in (observation.point_conditions or {})
+
+
+def _qi_ionization_potential_rows(result):
+    return [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == "kems-127-qi-1989"
+        and "qi_1989_table1_ionization_potentials"
+        in observation.observation_id
+    ]
+
+
+def _assert_qi_ionization_potentials_have_no_total_pressure(result):
+    rows = _qi_ionization_potential_rows(result)
+    assert rows
+    for observation in rows:
+        pressure = observation.identity.total_pressure_Pa
+        assert pressure is None or not pressure.is_value, (
+            f"{observation.observation_id} inherited {pressure!r}"
+        )
+        assert "total_pressure_Pa" not in (observation.point_conditions or {})
+
+
+def test_balabanova_partial_pressure_stays_unknown_after_method_split(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(tmp_path, BALABANOVA)
+    _assert_balabanova_partial_has_no_total_pressure(result)
+
+
+def test_pressure_hit_mutation_reintroduces_both_pressure_identity_errors(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            migrate_module,
+            "_pressure_hit_is_not_in_cell_total",
+            lambda *args, **kwargs: False,
+        )
+        balabanova = _migrate_real_extract(tmp_path / "mutated-balabanova", BALABANOVA)
+
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            migrate_module,
+            "_pressure_evidence_is_chamber_background",
+            lambda *args, **kwargs: False,
+        )
+        qi = _migrate_real_extract(tmp_path / "mutated-qi", QI)
+
+    with pytest.raises(AssertionError):
+        _assert_balabanova_partial_has_no_total_pressure(balabanova)
+    with pytest.raises(AssertionError):
+        _assert_qi_ionization_potentials_have_no_total_pressure(qi)

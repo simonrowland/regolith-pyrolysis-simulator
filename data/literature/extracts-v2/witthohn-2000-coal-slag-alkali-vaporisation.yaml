@@ -81,6 +81,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: witthohn-2000-coal-slag-alkali-vaporisation::witthohn_2000_k2o_fig6_model_figure_only
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity
@@ -111,7 +122,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: witthohn-2000-coal-slag-alkali-vaporisation::witthohn_2000_k_g_fig2_figure_only
-  experiment_id: 10ce3421b412a6fc0d5ec1c9e3395b9926d995b1e2012dd68d743cb4d0d6ade8::witthohn-2000-coal-slag-alkali-vaporisation
+  experiment_id: 10ce3421b412a6fc0d5ec1c9e3395b9926d995b1e2012dd68d743cb4d0d6ade8::witthohn-2000-coal-slag-alkali-vaporisation::method:knudsen_effusion
   identity:
     quantity:
       tag: value
@@ -233,7 +244,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: witthohn-2000-coal-slag-alkali-vaporisation::witthohn_2000_k_g_fig3_figure_only
-  experiment_id: 10ce3421b412a6fc0d5ec1c9e3395b9926d995b1e2012dd68d743cb4d0d6ade8::witthohn-2000-coal-slag-alkali-vaporisation
+  experiment_id: 10ce3421b412a6fc0d5ec1c9e3395b9926d995b1e2012dd68d743cb4d0d6ade8::witthohn-2000-coal-slag-alkali-vaporisation::method:knudsen_effusion
   identity:
     quantity:
       tag: value
@@ -601,7 +612,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: witthohn-2000-coal-slag-alkali-vaporisation::witthohn_2000_na_g_fig2_figure_only
-  experiment_id: 10ce3421b412a6fc0d5ec1c9e3395b9926d995b1e2012dd68d743cb4d0d6ade8::witthohn-2000-coal-slag-alkali-vaporisation
+  experiment_id: 10ce3421b412a6fc0d5ec1c9e3395b9926d995b1e2012dd68d743cb4d0d6ade8::witthohn-2000-coal-slag-alkali-vaporisation::method:knudsen_effusion
   identity:
     quantity:
       tag: value
@@ -723,7 +734,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: witthohn-2000-coal-slag-alkali-vaporisation::witthohn_2000_na_g_fig3_figure_only
-  experiment_id: 10ce3421b412a6fc0d5ec1c9e3395b9926d995b1e2012dd68d743cb4d0d6ade8::witthohn-2000-coal-slag-alkali-vaporisation
+  experiment_id: 10ce3421b412a6fc0d5ec1c9e3395b9926d995b1e2012dd68d743cb4d0d6ade8::witthohn-2000-coal-slag-alkali-vaporisation::method:knudsen_effusion
   identity:
     quantity:
       tag: value

@@ -34,8 +34,8 @@ experiments:
 - experiment_id: 10.1007/s00410-016-1319-8::experiment::matzen-2017-run-49
   kind: literature
   method:
-    tag: value
-    value: electron_microprobe
+    tag: unknown
+    reason: experiment method not published
   sample: {}
   conditions:
     temperature_K:
@@ -66,8 +66,8 @@ experiments:
 - experiment_id: 10.1007/s00410-016-1319-8::experiment::matzen-2017-run-50
   kind: literature
   method:
-    tag: value
-    value: electron_microprobe
+    tag: unknown
+    reason: experiment method not published
   sample: {}
   conditions:
     temperature_K:
@@ -98,8 +98,8 @@ experiments:
 - experiment_id: 10.1007/s00410-016-1319-8::experiment::matzen-2017-run-51
   kind: literature
   method:
-    tag: value
-    value: electron_microprobe
+    tag: unknown
+    reason: experiment method not published
   sample: {}
   conditions:
     temperature_K:
@@ -130,8 +130,8 @@ experiments:
 - experiment_id: 10.1007/s00410-016-1319-8::experiment::matzen-2017-run-52
   kind: literature
   method:
-    tag: value
-    value: electron_microprobe
+    tag: unknown
+    reason: experiment method not published
   sample: {}
   conditions:
     temperature_K:
@@ -162,8 +162,8 @@ experiments:
 - experiment_id: 10.1007/s00410-016-1319-8::experiment::matzen-2017-run-53
   kind: literature
   method:
-    tag: value
-    value: electron_microprobe
+    tag: unknown
+    reason: experiment method not published
   sample: {}
   conditions:
     temperature_K:
@@ -194,8 +194,8 @@ experiments:
 - experiment_id: 10.1007/s00410-016-1319-8::experiment::matzen-2017-run-56
   kind: literature
   method:
-    tag: value
-    value: electron_microprobe
+    tag: unknown
+    reason: experiment method not published
   sample: {}
   conditions:
     temperature_K:
@@ -226,8 +226,8 @@ experiments:
 - experiment_id: 10.1007/s00410-016-1319-8::experiment::matzen-2017-run-58
   kind: literature
   method:
-    tag: value
-    value: electron_microprobe
+    tag: unknown
+    reason: experiment method not published
   sample: {}
   conditions:
     temperature_K:
@@ -258,8 +258,8 @@ experiments:
 - experiment_id: 10.1007/s00410-016-1319-8::experiment::matzen-2017-run-59
   kind: literature
   method:
-    tag: value
-    value: electron_microprobe
+    tag: unknown
+    reason: experiment method not published
   sample: {}
   conditions:
     temperature_K:
@@ -290,8 +290,8 @@ experiments:
 - experiment_id: 10.1007/s00410-016-1319-8::experiment::matzen-2017-run-62R
   kind: literature
   method:
-    tag: value
-    value: electron_microprobe
+    tag: unknown
+    reason: experiment method not published
   sample: {}
   conditions:
     temperature_K:
@@ -322,8 +322,8 @@ experiments:
 - experiment_id: 10.1007/s00410-016-1319-8::experiment::matzen-2017-run-63R
   kind: literature
   method:
-    tag: value
-    value: electron_microprobe
+    tag: unknown
+    reason: experiment method not published
   sample: {}
   conditions:
     temperature_K:
@@ -354,8 +354,8 @@ experiments:
 - experiment_id: 10.1007/s00410-016-1319-8::experiment::matzen-2017-run-64R
   kind: literature
   method:
-    tag: value
-    value: electron_microprobe
+    tag: unknown
+    reason: experiment method not published
   sample: {}
   conditions:
     temperature_K:
@@ -386,8 +386,8 @@ experiments:
 - experiment_id: 10.1007/s00410-016-1319-8::experiment::matzen-2017-run-65
   kind: literature
   method:
-    tag: value
-    value: electron_microprobe
+    tag: unknown
+    reason: experiment method not published
   sample: {}
   conditions:
     temperature_K:
@@ -418,8 +418,8 @@ experiments:
 - experiment_id: 10.1007/s00410-016-1319-8::experiment::matzen-2017-run-67R
   kind: literature
   method:
-    tag: value
-    value: electron_microprobe
+    tag: unknown
+    reason: experiment method not published
   sample: {}
   conditions:
     temperature_K:
@@ -448,6 +448,70 @@ experiments:
     pdf_page_index: 46
     table: '1'
 - experiment_id: 10.1007/s00410-016-1319-8::experiment::matzen-2017-run-68
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s00410-016-1319-8
+  locator:
+    page: 47
+    pdf_page_index: 46
+    table: '1'
+- experiment_id: 10.1007/s00410-016-1319-8::experiment::matzen-2017-run-70
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s00410-016-1319-8
+  locator:
+    page: 47
+    pdf_page_index: 46
+    table: '1'
+- experiment_id: 10.1007/s00410-016-1319-8::matzen-2017-ni-olivine-composition::declared:10.1007/s00410-016-1319-8::experiment::matzen-2017-run-49::method:electron_microprobe
   kind: literature
   method:
     tag: value
@@ -479,7 +543,423 @@ experiments:
     page: 47
     pdf_page_index: 46
     table: '1'
-- experiment_id: 10.1007/s00410-016-1319-8::experiment::matzen-2017-run-70
+- experiment_id: 10.1007/s00410-016-1319-8::matzen-2017-ni-olivine-composition::declared:10.1007/s00410-016-1319-8::experiment::matzen-2017-run-50::method:electron_microprobe
+  kind: literature
+  method:
+    tag: value
+    value: electron_microprobe
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s00410-016-1319-8
+  locator:
+    page: 47
+    pdf_page_index: 46
+    table: '1'
+- experiment_id: 10.1007/s00410-016-1319-8::matzen-2017-ni-olivine-composition::declared:10.1007/s00410-016-1319-8::experiment::matzen-2017-run-51::method:electron_microprobe
+  kind: literature
+  method:
+    tag: value
+    value: electron_microprobe
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s00410-016-1319-8
+  locator:
+    page: 47
+    pdf_page_index: 46
+    table: '1'
+- experiment_id: 10.1007/s00410-016-1319-8::matzen-2017-ni-olivine-composition::declared:10.1007/s00410-016-1319-8::experiment::matzen-2017-run-52::method:electron_microprobe
+  kind: literature
+  method:
+    tag: value
+    value: electron_microprobe
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s00410-016-1319-8
+  locator:
+    page: 47
+    pdf_page_index: 46
+    table: '1'
+- experiment_id: 10.1007/s00410-016-1319-8::matzen-2017-ni-olivine-composition::declared:10.1007/s00410-016-1319-8::experiment::matzen-2017-run-53::method:electron_microprobe
+  kind: literature
+  method:
+    tag: value
+    value: electron_microprobe
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s00410-016-1319-8
+  locator:
+    page: 47
+    pdf_page_index: 46
+    table: '1'
+- experiment_id: 10.1007/s00410-016-1319-8::matzen-2017-ni-olivine-composition::declared:10.1007/s00410-016-1319-8::experiment::matzen-2017-run-56::method:electron_microprobe
+  kind: literature
+  method:
+    tag: value
+    value: electron_microprobe
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s00410-016-1319-8
+  locator:
+    page: 47
+    pdf_page_index: 46
+    table: '1'
+- experiment_id: 10.1007/s00410-016-1319-8::matzen-2017-ni-olivine-composition::declared:10.1007/s00410-016-1319-8::experiment::matzen-2017-run-58::method:electron_microprobe
+  kind: literature
+  method:
+    tag: value
+    value: electron_microprobe
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s00410-016-1319-8
+  locator:
+    page: 47
+    pdf_page_index: 46
+    table: '1'
+- experiment_id: 10.1007/s00410-016-1319-8::matzen-2017-ni-olivine-composition::declared:10.1007/s00410-016-1319-8::experiment::matzen-2017-run-59::method:electron_microprobe
+  kind: literature
+  method:
+    tag: value
+    value: electron_microprobe
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s00410-016-1319-8
+  locator:
+    page: 47
+    pdf_page_index: 46
+    table: '1'
+- experiment_id: 10.1007/s00410-016-1319-8::matzen-2017-ni-olivine-composition::declared:10.1007/s00410-016-1319-8::experiment::matzen-2017-run-62R::method:electron_microprobe
+  kind: literature
+  method:
+    tag: value
+    value: electron_microprobe
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s00410-016-1319-8
+  locator:
+    page: 47
+    pdf_page_index: 46
+    table: '1'
+- experiment_id: 10.1007/s00410-016-1319-8::matzen-2017-ni-olivine-composition::declared:10.1007/s00410-016-1319-8::experiment::matzen-2017-run-63R::method:electron_microprobe
+  kind: literature
+  method:
+    tag: value
+    value: electron_microprobe
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s00410-016-1319-8
+  locator:
+    page: 47
+    pdf_page_index: 46
+    table: '1'
+- experiment_id: 10.1007/s00410-016-1319-8::matzen-2017-ni-olivine-composition::declared:10.1007/s00410-016-1319-8::experiment::matzen-2017-run-64R::method:electron_microprobe
+  kind: literature
+  method:
+    tag: value
+    value: electron_microprobe
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s00410-016-1319-8
+  locator:
+    page: 47
+    pdf_page_index: 46
+    table: '1'
+- experiment_id: 10.1007/s00410-016-1319-8::matzen-2017-ni-olivine-composition::declared:10.1007/s00410-016-1319-8::experiment::matzen-2017-run-65::method:electron_microprobe
+  kind: literature
+  method:
+    tag: value
+    value: electron_microprobe
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s00410-016-1319-8
+  locator:
+    page: 47
+    pdf_page_index: 46
+    table: '1'
+- experiment_id: 10.1007/s00410-016-1319-8::matzen-2017-ni-olivine-composition::declared:10.1007/s00410-016-1319-8::experiment::matzen-2017-run-67R::method:electron_microprobe
+  kind: literature
+  method:
+    tag: value
+    value: electron_microprobe
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s00410-016-1319-8
+  locator:
+    page: 47
+    pdf_page_index: 46
+    table: '1'
+- experiment_id: 10.1007/s00410-016-1319-8::matzen-2017-ni-olivine-composition::declared:10.1007/s00410-016-1319-8::experiment::matzen-2017-run-68::method:electron_microprobe
+  kind: literature
+  method:
+    tag: value
+    value: electron_microprobe
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1007/s00410-016-1319-8
+  locator:
+    page: 47
+    pdf_page_index: 46
+    table: '1'
+- experiment_id: 10.1007/s00410-016-1319-8::matzen-2017-ni-olivine-composition::declared:10.1007/s00410-016-1319-8::experiment::matzen-2017-run-70::method:electron_microprobe
   kind: literature
   method:
     tag: value

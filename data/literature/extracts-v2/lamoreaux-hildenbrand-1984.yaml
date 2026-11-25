@@ -36,7 +36,20 @@ observations:
   notices:
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: LH84 Table 2 (OCR-recovered
+      segments for Cs2O(g)):
+
+      298–600 K:  A=40.61, B=-19.222, C=46.327, D=-28.754
+
+      600–1400 K: A=35.68, B=7.100, C=-1.063, D=-0.053
+
+      1400–3000 K: A=35.89, B=7.136, C=-1.427, D=0.142
+
+      VERIFY against NIST PDF before use — OCR of dual-column tables
+
+      is error-prone. Form is the LH84 Table 2 GEF polynomial.
+
+      '
     origin: lamoreaux-hildenbrand-1984::LH84_Cs2O_g_GEF_segments
     policy:
       id: DP-106
@@ -1252,7 +1265,16 @@ observations:
   notices:
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Illustrative oxygen-liberating
+      path. Under Ga-metal saturation the
+
+      relevant path is Ga2O3 + 4 Ga(l) = 3 Ga2O(g) (Frosch & Thurmond
+
+      1962 regime). Do not use the illustrative path as runtime authority
+
+      without specifying a(Ga)/p(O2).
+
+      '
     origin: lamoreaux-hildenbrand-1984::illustrative_dissociation_reaction
     policy:
       id: DP-106

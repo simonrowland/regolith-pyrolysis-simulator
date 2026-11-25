@@ -726,7 +726,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: hashimoto-1990-forsterite-evaporation-kinetics::hashimoto_1990_forsterite_residue_glass_volume_fraction
-  experiment_id: 10.1038/347053a0::hashimoto-1990-forsterite-evaporation-kinetics
+  experiment_id: 10.1038/347053a0::hashimoto-1990-forsterite-evaporation-kinetics::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -766,7 +766,17 @@ observations:
         pdf_page_index: 2
         section: Results and discussion
         note: Approximate glass abundance in the most highly evaporated forsterite residues.
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: hashimoto-1990-forsterite-evaporation-kinetics::hashimoto_1990_forsterite_residue_glass_volume_fraction
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: hashimoto-1990-forsterite-evaporation-kinetics
   locator:
     page: 3
@@ -1368,7 +1378,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: hashimoto-1990-forsterite-evaporation-kinetics::hashimoto_1990_sio2_previous_effusion_alpha
-  experiment_id: 10.1038/347053a0::hashimoto-1990-forsterite-evaporation-kinetics
+  experiment_id: 10.1038/347053a0::hashimoto-1990-forsterite-evaporation-kinetics::method:knudsen_effusion
   identity:
     quantity:
       tag: value

@@ -40,6 +40,581 @@ experiments:
 - experiment_id: 10.1017/s0252921100066513::experiment::run-86a
   kind: literature
   method:
+    tag: unknown
+    reason: experiment method not published
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Etter (L5) chondrite; fine-grained (<10 μm)
+      locator:
+        published_page: 79
+        pdf_page_index: 0
+        section: 2. Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1573.15'
+          approximate: false
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: 1300 °C + 273.15 = 1573.15 K.
+    temperature_as_printed:
+      state:
+        tag: unknown
+        reason: condition temperature_as_printed is not a scalar numeric value
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.102658'
+          approximate: false
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: 0.00077 torr as printed × 133.32236842105263 Pa/torr; He total pressure.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: He
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 80
+        pdf_page_index: 1
+        section: 2. Experimental
+        note: High-purity helium used to adjust total pressure; separate He partial pressure and flow are not stated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 79
+          pdf_page_index: 0
+          section: 2. Experimental
+          note: Apparatus and general procedure are referred to the 1989 paper.
+  work_id: 10.1017/s0252921100066513
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    note: Run conditions are in Table 1; shared 1300 °C hold.; row=86A
+  bench_id: 10.1017/s0252921100066513::bench::prior-described-heating-apparatus
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1573.15'
+            approximate: false
+        locator:
+          published_page: 80
+          pdf_page_index: 1
+          section: 2. Experimental
+          note: 1300 °C + 273.15 K conversion.
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '2400'
+            approximate: false
+        locator:
+          published_page: 80
+          pdf_page_index: 1
+          section: 2. Experimental
+          note: 40 min × 60 s/min = 2400 s.
+    cooling_or_quench:
+      state:
+        tag: value
+        value: quenched at approximately 600 °C/min
+      locator:
+        published_page: 80
+        pdf_page_index: 1
+        section: 2. Experimental
+- experiment_id: 10.1017/s0252921100066513::experiment::run-87a
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Etter (L5) chondrite; fine-grained (<10 μm)
+      locator:
+        published_page: 79
+        pdf_page_index: 0
+        section: 2. Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1573.15'
+          approximate: false
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: 1300 °C + 273.15 = 1573.15 K.
+    temperature_as_printed:
+      state:
+        tag: unknown
+        reason: condition temperature_as_printed is not a scalar numeric value
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0102658'
+          approximate: false
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: 7.7e-05 torr as printed × 133.32236842105263 Pa/torr; He total pressure.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: He
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 80
+        pdf_page_index: 1
+        section: 2. Experimental
+        note: High-purity helium used to adjust total pressure; separate He partial pressure and flow are not stated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 79
+          pdf_page_index: 0
+          section: 2. Experimental
+          note: Apparatus and general procedure are referred to the 1989 paper.
+  work_id: 10.1017/s0252921100066513
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    note: Run conditions are in Table 1; shared 1300 °C hold.; row=87A
+  bench_id: 10.1017/s0252921100066513::bench::prior-described-heating-apparatus
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1573.15'
+            approximate: false
+        locator:
+          published_page: 80
+          pdf_page_index: 1
+          section: 2. Experimental
+          note: 1300 °C + 273.15 K conversion.
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '2400'
+            approximate: false
+        locator:
+          published_page: 80
+          pdf_page_index: 1
+          section: 2. Experimental
+          note: 40 min × 60 s/min = 2400 s.
+    cooling_or_quench:
+      state:
+        tag: value
+        value: quenched at approximately 600 °C/min
+      locator:
+        published_page: 80
+        pdf_page_index: 1
+        section: 2. Experimental
+- experiment_id: 10.1017/s0252921100066513::experiment::run-88a
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Etter (L5) chondrite; fine-grained (<10 μm)
+      locator:
+        published_page: 79
+        pdf_page_index: 0
+        section: 2. Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1573.15'
+          approximate: false
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: 1300 °C + 273.15 = 1573.15 K.
+    temperature_as_printed:
+      state:
+        tag: unknown
+        reason: condition temperature_as_printed is not a scalar numeric value
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1.02658'
+          approximate: false
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: 0.0077 torr as printed × 133.32236842105263 Pa/torr; He total pressure.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: He
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 80
+        pdf_page_index: 1
+        section: 2. Experimental
+        note: High-purity helium used to adjust total pressure; separate He partial pressure and flow are not stated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 79
+          pdf_page_index: 0
+          section: 2. Experimental
+          note: Apparatus and general procedure are referred to the 1989 paper.
+  work_id: 10.1017/s0252921100066513
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    note: Run conditions are in Table 1; shared 1300 °C hold.; row=88A
+  bench_id: 10.1017/s0252921100066513::bench::prior-described-heating-apparatus
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1573.15'
+            approximate: false
+        locator:
+          published_page: 80
+          pdf_page_index: 1
+          section: 2. Experimental
+          note: 1300 °C + 273.15 K conversion.
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '2400'
+            approximate: false
+        locator:
+          published_page: 80
+          pdf_page_index: 1
+          section: 2. Experimental
+          note: 40 min × 60 s/min = 2400 s.
+    cooling_or_quench:
+      state:
+        tag: value
+        value: quenched at approximately 600 °C/min
+      locator:
+        published_page: 80
+        pdf_page_index: 1
+        section: 2. Experimental
+- experiment_id: 10.1017/s0252921100066513::experiment::run-89a
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Etter (L5) chondrite; fine-grained (<10 μm)
+      locator:
+        published_page: 79
+        pdf_page_index: 0
+        section: 2. Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1573.15'
+          approximate: false
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: 1300 °C + 273.15 = 1573.15 K.
+    temperature_as_printed:
+      state:
+        tag: unknown
+        reason: condition temperature_as_printed is not a scalar numeric value
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '10.2658'
+          approximate: false
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: 0.077 torr as printed × 133.32236842105263 Pa/torr; He total pressure.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: He
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 80
+        pdf_page_index: 1
+        section: 2. Experimental
+        note: High-purity helium used to adjust total pressure; separate He partial pressure and flow are not stated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 79
+          pdf_page_index: 0
+          section: 2. Experimental
+          note: Apparatus and general procedure are referred to the 1989 paper.
+  work_id: 10.1017/s0252921100066513
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    note: Run conditions are in Table 1; shared 1300 °C hold.; row=89A
+  bench_id: 10.1017/s0252921100066513::bench::prior-described-heating-apparatus
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1573.15'
+            approximate: false
+        locator:
+          published_page: 80
+          pdf_page_index: 1
+          section: 2. Experimental
+          note: 1300 °C + 273.15 K conversion.
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '2400'
+            approximate: false
+        locator:
+          published_page: 80
+          pdf_page_index: 1
+          section: 2. Experimental
+          note: 40 min × 60 s/min = 2400 s.
+    cooling_or_quench:
+      state:
+        tag: value
+        value: quenched at approximately 600 °C/min
+      locator:
+        published_page: 80
+        pdf_page_index: 1
+        section: 2. Experimental
+- experiment_id: 10.1017/s0252921100066513::experiment::run-90a
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Etter (L5) chondrite; fine-grained (<10 μm)
+      locator:
+        published_page: 79
+        pdf_page_index: 0
+        section: 2. Experimental
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1573.15'
+          approximate: false
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: 1300 °C + 273.15 = 1573.15 K.
+    temperature_as_printed:
+      state:
+        tag: unknown
+        reason: condition temperature_as_printed is not a scalar numeric value
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00102658'
+          approximate: false
+      locator:
+        published_page: 81
+        pdf_page_index: 2
+        table: '1'
+        note: 7.7e-06 torr as printed × 133.32236842105263 Pa/torr; He total pressure.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: He
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        published_page: 80
+        pdf_page_index: 1
+        section: 2. Experimental
+        note: High-purity helium used to adjust total pressure; separate He partial pressure and flow are not stated.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: unknown
+          reason: in_cited_source
+        locator:
+          published_page: 79
+          pdf_page_index: 0
+          section: 2. Experimental
+          note: Apparatus and general procedure are referred to the 1989 paper.
+  work_id: 10.1017/s0252921100066513
+  locator:
+    published_page: 81
+    pdf_page_index: 2
+    table: '1'
+    note: Run conditions are in Table 1; shared 1300 °C hold.; row=90A
+  bench_id: 10.1017/s0252921100066513::bench::prior-described-heating-apparatus
+  thermal_schedule:
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1573.15'
+            approximate: false
+        locator:
+          published_page: 80
+          pdf_page_index: 1
+          section: 2. Experimental
+          note: 1300 °C + 273.15 K conversion.
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '2400'
+            approximate: false
+        locator:
+          published_page: 80
+          pdf_page_index: 1
+          section: 2. Experimental
+          note: 40 min × 60 s/min = 2400 s.
+    cooling_or_quench:
+      state:
+        tag: value
+        value: quenched at approximately 600 °C/min
+      locator:
+        published_page: 80
+        pdf_page_index: 1
+        section: 2. Experimental
+- experiment_id: 10.1017/s0252921100066513::shimaoka-nakamura-1991-iau-colloq126-79::declared:10.1017/s0252921100066513::experiment::run-86a::method:unspecified
+  kind: literature
+  method:
     tag: value
     value: unspecified
   sample:
@@ -152,7 +727,7 @@ experiments:
         published_page: 80
         pdf_page_index: 1
         section: 2. Experimental
-- experiment_id: 10.1017/s0252921100066513::experiment::run-87a
+- experiment_id: 10.1017/s0252921100066513::shimaoka-nakamura-1991-iau-colloq126-79::declared:10.1017/s0252921100066513::experiment::run-87a::method:unspecified
   kind: literature
   method:
     tag: value
@@ -267,7 +842,7 @@ experiments:
         published_page: 80
         pdf_page_index: 1
         section: 2. Experimental
-- experiment_id: 10.1017/s0252921100066513::experiment::run-88a
+- experiment_id: 10.1017/s0252921100066513::shimaoka-nakamura-1991-iau-colloq126-79::declared:10.1017/s0252921100066513::experiment::run-88a::method:unspecified
   kind: literature
   method:
     tag: value
@@ -382,7 +957,7 @@ experiments:
         published_page: 80
         pdf_page_index: 1
         section: 2. Experimental
-- experiment_id: 10.1017/s0252921100066513::experiment::run-89a
+- experiment_id: 10.1017/s0252921100066513::shimaoka-nakamura-1991-iau-colloq126-79::declared:10.1017/s0252921100066513::experiment::run-89a::method:unspecified
   kind: literature
   method:
     tag: value
@@ -497,7 +1072,7 @@ experiments:
         published_page: 80
         pdf_page_index: 1
         section: 2. Experimental
-- experiment_id: 10.1017/s0252921100066513::experiment::run-90a
+- experiment_id: 10.1017/s0252921100066513::shimaoka-nakamura-1991-iau-colloq126-79::declared:10.1017/s0252921100066513::experiment::run-90a::method:unspecified
   kind: literature
   method:
     tag: value

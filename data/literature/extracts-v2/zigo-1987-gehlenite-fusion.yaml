@@ -85,17 +85,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - heat_of_fusion
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''drop_and_solution_calorimetry;
-      cooling_to_298_K'' is not a closed method token (kems_effusion alone is insufficient)'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Difference between extrapolated
+      melt and crystal relative enthalpies at the selected fusion temperature, from Eqs. (5) and (6).'
     origin: zigo-1987-gehlenite-fusion::zigo_1987_fusion_enthalpy_at_1863K
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -214,17 +214,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - entropy_of_fusion
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''drop_and_solution_calorimetry;
-      cooling_to_298_K'' is not a closed method token (kems_effusion alone is insufficient)'
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
     origin: zigo-1987-gehlenite-fusion::zigo_1987_fusion_entropy_at_1863K
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -311,16 +310,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''drop_and_solution_calorimetry;
-      cooling_to_298_K'' is not a closed method token (kems_effusion alone is insufficient)'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: At 1863 K the selected
+      temperature is explicitly called the equilibrium fusion temperature.'
     origin: zigo-1987-gehlenite-fusion::zigo_1987_fusion_temperature_selected
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
@@ -423,17 +422,16 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - heat_of_fusion
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''drop_and_solution_calorimetry;
-      cooling_to_298_K'' is not a closed method token (kems_effusion alone is insufficient)'
-    origin: zigo-1987-gehlenite-fusion::zigo_1987_fusion_temperature_sensitivity::T=1857:h=54bedae60b48
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_fusion_temperature_sensitivity
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
@@ -549,17 +547,16 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - heat_of_fusion
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''drop_and_solution_calorimetry;
-      cooling_to_298_K'' is not a closed method token (kems_effusion alone is insufficient)'
-    origin: zigo-1987-gehlenite-fusion::zigo_1987_fusion_temperature_sensitivity::T=1866:h=a6372be22745
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_fusion_temperature_sensitivity
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
@@ -594,7 +591,7 @@ observations:
   provenance:
     printed_phase: gehlenite_C2AS_crystal_to_composition_matched_melt
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_fit::T=1519:h=1f77549d499a
-  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion::method:calorimetry
   identity:
     quantity:
       tag: value
@@ -689,9 +686,9 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''least_squares_fit_to_drop_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_fit::T=1519:h=1f77549d499a
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: least_squares_fit_to_drop_calorimetry'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_fit
     policy:
       id: DP-107
       version: 1
@@ -754,7 +751,7 @@ observations:
   provenance:
     printed_phase: crystalline_gehlenite_C2AS
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_fit::T=1567:h=310e1ea7d9b7
-  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion::method:calorimetry
   identity:
     quantity:
       tag: value
@@ -849,9 +846,9 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''least_squares_fit_to_drop_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_fit::T=1567:h=310e1ea7d9b7
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: least_squares_fit_to_drop_calorimetry'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_fit
     policy:
       id: DP-107
       version: 1
@@ -914,7 +911,7 @@ observations:
   provenance:
     printed_phase: crystalline_gehlenite_C2AS
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_fit::T=1582:h=ebebb9edb87d
-  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion::method:calorimetry
   identity:
     quantity:
       tag: value
@@ -1009,9 +1006,9 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''least_squares_fit_to_drop_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_fit::T=1582:h=ebebb9edb87d
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: least_squares_fit_to_drop_calorimetry'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_fit
     policy:
       id: DP-107
       version: 1
@@ -1074,7 +1071,7 @@ observations:
   provenance:
     printed_phase: crystalline_gehlenite_C2AS
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_fit::T=1691:h=c5aa36137802
-  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion::method:calorimetry
   identity:
     quantity:
       tag: value
@@ -1169,9 +1166,9 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''least_squares_fit_to_drop_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_fit::T=1691:h=c5aa36137802
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: least_squares_fit_to_drop_calorimetry'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_fit
     policy:
       id: DP-107
       version: 1
@@ -1234,7 +1231,7 @@ observations:
   provenance:
     printed_phase: crystalline_gehlenite_C2AS
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_fit::T=1730:h=ef5d3582a8c1
-  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion::method:calorimetry
   identity:
     quantity:
       tag: value
@@ -1329,9 +1326,9 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''least_squares_fit_to_drop_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_fit::T=1730:h=ef5d3582a8c1
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: least_squares_fit_to_drop_calorimetry'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_fit
     policy:
       id: DP-107
       version: 1
@@ -1394,7 +1391,7 @@ observations:
   provenance:
     printed_phase: crystalline_gehlenite_C2AS
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_fit::T=1799:h=775d6ba75174
-  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion::method:calorimetry
   identity:
     quantity:
       tag: value
@@ -1489,9 +1486,9 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''least_squares_fit_to_drop_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_fit::T=1799:h=775d6ba75174
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: least_squares_fit_to_drop_calorimetry'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_fit
     policy:
       id: DP-107
       version: 1
@@ -1646,6 +1643,17 @@ observations:
       status: canonical
       value: cr
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: cooling_to_298_K_in_drop_calorimeter'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 4
@@ -1783,6 +1791,17 @@ observations:
       status: canonical
       value: cr
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: cooling_to_298_K_in_drop_calorimeter'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 4
@@ -1920,6 +1939,17 @@ observations:
       status: canonical
       value: cr
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: cooling_to_298_K_in_drop_calorimeter'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 4
@@ -2057,6 +2087,17 @@ observations:
       status: canonical
       value: cr
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: cooling_to_298_K_in_drop_calorimeter'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 4
@@ -2194,6 +2235,17 @@ observations:
       status: canonical
       value: cr
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: cooling_to_298_K_in_drop_calorimeter'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 4
@@ -2331,6 +2383,17 @@ observations:
       status: canonical
       value: cr
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - H_minus_H298
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: cooling_to_298_K_in_drop_calorimeter'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_measured
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 4
@@ -2376,7 +2439,7 @@ observations:
   provenance:
     printed_phase: crystalline_gehlenite_C2AS
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t2_crystal_solution_calorimetry
-  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion::method:solution_calorimetry
   identity:
     quantity:
       tag: unknown
@@ -2426,17 +2489,6 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
-    affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''least_squares_fit_to_drop_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: zigo-1987-gehlenite-fusion::zigo_1987_t2_crystal_solution_calorimetry
-    policy:
-      id: DP-107
-      version: 1
-      status: proposed
-      value: calorimetry
-      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 5
@@ -2457,7 +2509,7 @@ observations:
   provenance:
     printed_phase: gehlenite_sample_with_unreacted_admixtures
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t2_crystal_solution_corrected
-  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion::method:solution_calorimetry
   identity:
     quantity:
       tag: unknown
@@ -2505,17 +2557,6 @@ observations:
       status: canonical
       value: cr
       units: phase token
-  - kind: method_inferred
-    affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''least_squares_fit_to_drop_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: zigo-1987-gehlenite-fusion::zigo_1987_t2_crystal_solution_corrected
-    policy:
-      id: DP-107
-      version: 1
-      status: proposed
-      value: calorimetry
-      units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
     page: 6
@@ -2578,16 +2619,15 @@ observations:
       status: canonical
       value: cr
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''least_squares_fit_to_drop_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
     origin: zigo-1987-gehlenite-fusion::zigo_1987_t3_crystal_relative_enthalpy_fit
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
@@ -2647,16 +2687,15 @@ observations:
       status: canonical
       value: cr
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''least_squares_fit_to_drop_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: zigo-1987-gehlenite-fusion::zigo_1987_t3_crystal_relative_enthalpy_measured_derived::T=1519:h=5477a387f8ec
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t3_crystal_relative_enthalpy_measured_derived
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
@@ -2724,16 +2763,15 @@ observations:
       status: canonical
       value: cr
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''least_squares_fit_to_drop_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: zigo-1987-gehlenite-fusion::zigo_1987_t3_crystal_relative_enthalpy_measured_derived::T=1567:h=b0fa1163f10f
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t3_crystal_relative_enthalpy_measured_derived
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
@@ -2801,16 +2839,15 @@ observations:
       status: canonical
       value: cr
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''least_squares_fit_to_drop_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: zigo-1987-gehlenite-fusion::zigo_1987_t3_crystal_relative_enthalpy_measured_derived::T=1582:h=295d9a8075e7
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t3_crystal_relative_enthalpy_measured_derived
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
@@ -2878,16 +2915,15 @@ observations:
       status: canonical
       value: cr
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''least_squares_fit_to_drop_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: zigo-1987-gehlenite-fusion::zigo_1987_t3_crystal_relative_enthalpy_measured_derived::T=1691:h=da3c281d3c2f
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t3_crystal_relative_enthalpy_measured_derived
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
@@ -2955,16 +2991,15 @@ observations:
       status: canonical
       value: cr
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''least_squares_fit_to_drop_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: zigo-1987-gehlenite-fusion::zigo_1987_t3_crystal_relative_enthalpy_measured_derived::T=1730:h=ec0b7f2fb936
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t3_crystal_relative_enthalpy_measured_derived
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
@@ -3032,16 +3067,15 @@ observations:
       status: canonical
       value: cr
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''least_squares_fit_to_drop_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: zigo-1987-gehlenite-fusion::zigo_1987_t3_crystal_relative_enthalpy_measured_derived::T=1799:h=829f71999120
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t3_crystal_relative_enthalpy_measured_derived
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:
@@ -3061,7 +3095,7 @@ observations:
   provenance:
     printed_phase: crystalline_gehlenite_C2AS
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_cooling_enthalpy_measured::T=1873:h=f37185a20f4d
-  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion::method:calorimetry
   identity:
     quantity:
       tag: unknown
@@ -3111,9 +3145,9 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''drop_and_solution_calorimetry;
-      cooling_to_298_K'' is not a closed method token (kems_effusion alone is insufficient)'
-    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_cooling_enthalpy_measured::T=1873:h=f37185a20f4d
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: drop_and_solution_calorimetry; cooling_to_298_K'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_cooling_enthalpy_measured
     policy:
       id: DP-107
       version: 1
@@ -3140,7 +3174,7 @@ observations:
   provenance:
     printed_phase: C2AS_melt_composition_corresponding_to_gehlenite
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_cooling_enthalpy_measured::T=1888:h=1827f9c3f743
-  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion::method:calorimetry
   identity:
     quantity:
       tag: unknown
@@ -3190,9 +3224,9 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''drop_and_solution_calorimetry;
-      cooling_to_298_K'' is not a closed method token (kems_effusion alone is insufficient)'
-    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_cooling_enthalpy_measured::T=1888:h=1827f9c3f743
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: drop_and_solution_calorimetry; cooling_to_298_K'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_cooling_enthalpy_measured
     policy:
       id: DP-107
       version: 1
@@ -3219,7 +3253,7 @@ observations:
   provenance:
     printed_phase: C2AS_melt_composition_corresponding_to_gehlenite
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_cooling_enthalpy_measured::T=1908:h=e237edd0b1f1
-  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion::method:calorimetry
   identity:
     quantity:
       tag: unknown
@@ -3269,9 +3303,9 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''drop_and_solution_calorimetry;
-      cooling_to_298_K'' is not a closed method token (kems_effusion alone is insufficient)'
-    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_cooling_enthalpy_measured::T=1908:h=e237edd0b1f1
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: drop_and_solution_calorimetry; cooling_to_298_K'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_cooling_enthalpy_measured
     policy:
       id: DP-107
       version: 1
@@ -3298,7 +3332,7 @@ observations:
   provenance:
     printed_phase: C2AS_melt_composition_corresponding_to_gehlenite
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_cooling_enthalpy_measured::T=1932:h=0e5a34baee80
-  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion::method:calorimetry
   identity:
     quantity:
       tag: unknown
@@ -3348,9 +3382,9 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''drop_and_solution_calorimetry;
-      cooling_to_298_K'' is not a closed method token (kems_effusion alone is insufficient)'
-    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_cooling_enthalpy_measured::T=1932:h=0e5a34baee80
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: drop_and_solution_calorimetry; cooling_to_298_K'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_cooling_enthalpy_measured
     policy:
       id: DP-107
       version: 1
@@ -3377,7 +3411,7 @@ observations:
   provenance:
     printed_phase: C2AS_melt_composition_corresponding_to_gehlenite
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_cooling_enthalpy_measured::T=1948:h=5c5f9238f18f
-  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion::method:calorimetry
   identity:
     quantity:
       tag: unknown
@@ -3427,9 +3461,9 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''drop_and_solution_calorimetry;
-      cooling_to_298_K'' is not a closed method token (kems_effusion alone is insufficient)'
-    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_cooling_enthalpy_measured::T=1948:h=5c5f9238f18f
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: drop_and_solution_calorimetry; cooling_to_298_K'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_cooling_enthalpy_measured
     policy:
       id: DP-107
       version: 1
@@ -3456,7 +3490,7 @@ observations:
   provenance:
     printed_phase: C2AS_melt_composition_corresponding_to_gehlenite
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_enthalpy_calorimetry::T=1873:h=221016e7caf4
-  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion::method:calorimetry
   identity:
     quantity:
       tag: unknown
@@ -3506,9 +3540,9 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''drop_and_solution_calorimetry;
-      cooling_to_298_K'' is not a closed method token (kems_effusion alone is insufficient)'
-    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_enthalpy_calorimetry::T=1873:h=221016e7caf4
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: drop_and_solution_calorimetry; cooling_to_298_K'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_enthalpy_calorimetry
     policy:
       id: DP-107
       version: 1
@@ -3535,7 +3569,7 @@ observations:
   provenance:
     printed_phase: C2AS_melt_composition_corresponding_to_gehlenite
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_enthalpy_calorimetry::T=1888:h=dc8d6f35ff52
-  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion::method:calorimetry
   identity:
     quantity:
       tag: unknown
@@ -3585,9 +3619,9 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''drop_and_solution_calorimetry;
-      cooling_to_298_K'' is not a closed method token (kems_effusion alone is insufficient)'
-    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_enthalpy_calorimetry::T=1888:h=dc8d6f35ff52
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: drop_and_solution_calorimetry; cooling_to_298_K'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_enthalpy_calorimetry
     policy:
       id: DP-107
       version: 1
@@ -3614,7 +3648,7 @@ observations:
   provenance:
     printed_phase: C2AS_melt_composition_corresponding_to_gehlenite
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_enthalpy_calorimetry::T=1908:h=a46d20c33e7e
-  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion::method:calorimetry
   identity:
     quantity:
       tag: unknown
@@ -3664,9 +3698,9 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''drop_and_solution_calorimetry;
-      cooling_to_298_K'' is not a closed method token (kems_effusion alone is insufficient)'
-    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_enthalpy_calorimetry::T=1908:h=a46d20c33e7e
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: drop_and_solution_calorimetry; cooling_to_298_K'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_enthalpy_calorimetry
     policy:
       id: DP-107
       version: 1
@@ -3693,7 +3727,7 @@ observations:
   provenance:
     printed_phase: C2AS_melt_composition_corresponding_to_gehlenite
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_enthalpy_calorimetry::T=1932:h=7f3e1f7cdeb8
-  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion::method:calorimetry
   identity:
     quantity:
       tag: unknown
@@ -3743,9 +3777,9 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''drop_and_solution_calorimetry;
-      cooling_to_298_K'' is not a closed method token (kems_effusion alone is insufficient)'
-    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_enthalpy_calorimetry::T=1932:h=7f3e1f7cdeb8
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: drop_and_solution_calorimetry; cooling_to_298_K'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_enthalpy_calorimetry
     policy:
       id: DP-107
       version: 1
@@ -3772,7 +3806,7 @@ observations:
   provenance:
     printed_phase: C2AS_melt_composition_corresponding_to_gehlenite
 - observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_enthalpy_calorimetry::T=1948:h=7dec275177e2
-  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion::method:calorimetry
   identity:
     quantity:
       tag: unknown
@@ -3822,9 +3856,9 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''drop_and_solution_calorimetry;
-      cooling_to_298_K'' is not a closed method token (kems_effusion alone is insufficient)'
-    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_enthalpy_calorimetry::T=1948:h=7dec275177e2
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: drop_and_solution_calorimetry; cooling_to_298_K'
+    origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_enthalpy_calorimetry
     policy:
       id: DP-107
       version: 1
@@ -3901,16 +3935,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''drop_and_solution_calorimetry;
-      cooling_to_298_K'' is not a closed method token (kems_effusion alone is insufficient)'
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
     origin: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_relative_enthalpy_fit
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   source_id: zigo-1987-gehlenite-fusion
   locator:

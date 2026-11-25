@@ -35,6 +35,126 @@ experiments:
 - experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k
   kind: literature
   method:
+    tag: unknown
+    reason: regime 'distribution_equilibrium' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523'
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+        note: Table 2 caption.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+        note: Only CO2 and O2 partial pressures are printed.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 5
+        published_page: 418
+        table: '2'
+        note: Only CO2 and O2 partial pressures are printed.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: CO2-CO-Ar gas mixture
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 4
+        published_page: 417
+        section: IV. Activity of SnO2(s) in Na2SnO3(s)-saturated slag
+        note: The distribution-experiment method specifies a CO2-CO-Ar gas mixture.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2320/matertrans1989.35.414
+  locator:
+    page: 5
+    published_page: 418
+    table: '2'
+- experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'distribution_equilibrium' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523'
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+        note: Table 3 caption.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+        note: Only CO2 and O2 partial pressures are printed.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 6
+        published_page: 419
+        table: '3'
+        note: Only CO2 and O2 partial pressures are printed.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: CO2-CO-Ar gas mixture
+          flow_sccm:
+            tag: unknown
+            reason: not_published
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 4
+        published_page: 417
+        section: IV. Activity of SnO2(s) in Na2SnO3(s)-saturated slag
+        note: The distribution-experiment method specifies a CO2-CO-Ar gas mixture.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.2320/matertrans1989.35.414
+  locator:
+    page: 6
+    published_page: 419
+    table: '3'
+- experiment_id: 10.2320/matertrans1989.35.414::fujisawa-1994-na-sn-carbonate-thermodynamics::declared:10.2320/matertrans1989.35.414::experiment::fujisawa94-table2-saturated-slag-1523k::method:unspecified
+  kind: literature
+  method:
     tag: value
     value: unspecified
   sample: {}
@@ -96,7 +216,7 @@ experiments:
     channel:
       tag: unknown
       reason: printed oxygen partial pressure; extract does not classify an fO2 channel
-- experiment_id: 10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k
+- experiment_id: 10.2320/matertrans1989.35.414::fujisawa-1994-na-sn-carbonate-thermodynamics::declared:10.2320/matertrans1989.35.414::experiment::fujisawa94-table3-homogeneous-melt-1523k::method:unspecified
   kind: literature
   method:
     tag: value

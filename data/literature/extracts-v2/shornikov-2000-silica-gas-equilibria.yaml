@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/shornikov-2000-silica-gas-equilibria.yaml
 observations:
 - observation_id: shornikov-2000-silica-gas-equilibria::shornikov_2000_table3_prev_r01_si2o2_sio
-  experiment_id: c026f1d61be88f737132794ecbf56d2767dc2f0ed208e4ef12eae897edc8e0b5::shornikov-2000-silica-gas-equilibria
+  experiment_id: c026f1d61be88f737132794ecbf56d2767dc2f0ed208e4ef12eae897edc8e0b5::shornikov-2000-silica-gas-equilibria::method:unspecified
   identity:
     quantity:
       tag: value
@@ -82,6 +82,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2000-silica-gas-equilibria::shornikov_2000_table3_prev_r01_si2o2_sio
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - ion_intensity_ratio
@@ -109,7 +120,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: shornikov-2000-silica-gas-equilibria::shornikov_2000_table3_prev_r01_sio_sio
-  experiment_id: c026f1d61be88f737132794ecbf56d2767dc2f0ed208e4ef12eae897edc8e0b5::shornikov-2000-silica-gas-equilibria
+  experiment_id: c026f1d61be88f737132794ecbf56d2767dc2f0ed208e4ef12eae897edc8e0b5::shornikov-2000-silica-gas-equilibria::method:unspecified
   identity:
     quantity:
       tag: value
@@ -188,6 +199,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2000-silica-gas-equilibria::shornikov_2000_table3_prev_r01_sio_sio
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - ion_intensity_ratio
@@ -215,7 +237,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: shornikov-2000-silica-gas-equilibria::shornikov_2000_table3_prev_r02_si2o2_sio
-  experiment_id: c026f1d61be88f737132794ecbf56d2767dc2f0ed208e4ef12eae897edc8e0b5::shornikov-2000-silica-gas-equilibria
+  experiment_id: c026f1d61be88f737132794ecbf56d2767dc2f0ed208e4ef12eae897edc8e0b5::shornikov-2000-silica-gas-equilibria::method:unspecified
   identity:
     quantity:
       tag: value
@@ -294,6 +316,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2000-silica-gas-equilibria::shornikov_2000_table3_prev_r02_si2o2_sio
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - ion_intensity_ratio
@@ -321,7 +354,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: shornikov-2000-silica-gas-equilibria::shornikov_2000_table3_prev_r02_sio_sio
-  experiment_id: c026f1d61be88f737132794ecbf56d2767dc2f0ed208e4ef12eae897edc8e0b5::shornikov-2000-silica-gas-equilibria
+  experiment_id: c026f1d61be88f737132794ecbf56d2767dc2f0ed208e4ef12eae897edc8e0b5::shornikov-2000-silica-gas-equilibria::method:unspecified
   identity:
     quantity:
       tag: value
@@ -400,6 +433,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2000-silica-gas-equilibria::shornikov_2000_table3_prev_r02_sio_sio
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - ion_intensity_ratio
@@ -427,7 +471,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: shornikov-2000-silica-gas-equilibria::shornikov_2000_table3_prev_r03_si2o2_sio
-  experiment_id: c026f1d61be88f737132794ecbf56d2767dc2f0ed208e4ef12eae897edc8e0b5::shornikov-2000-silica-gas-equilibria
+  experiment_id: c026f1d61be88f737132794ecbf56d2767dc2f0ed208e4ef12eae897edc8e0b5::shornikov-2000-silica-gas-equilibria::method:unspecified
   identity:
     quantity:
       tag: value
@@ -506,6 +550,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2000-silica-gas-equilibria::shornikov_2000_table3_prev_r03_si2o2_sio
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - ion_intensity_ratio
@@ -533,7 +588,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: shornikov-2000-silica-gas-equilibria::shornikov_2000_table3_prev_r03_sio2_sio
-  experiment_id: c026f1d61be88f737132794ecbf56d2767dc2f0ed208e4ef12eae897edc8e0b5::shornikov-2000-silica-gas-equilibria
+  experiment_id: c026f1d61be88f737132794ecbf56d2767dc2f0ed208e4ef12eae897edc8e0b5::shornikov-2000-silica-gas-equilibria::method:unspecified
   identity:
     quantity:
       tag: value
@@ -612,6 +667,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2000-silica-gas-equilibria::shornikov_2000_table3_prev_r03_sio2_sio
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - ion_intensity_ratio
@@ -639,7 +705,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: shornikov-2000-silica-gas-equilibria::shornikov_2000_table3_prev_r03_sio_sio
-  experiment_id: c026f1d61be88f737132794ecbf56d2767dc2f0ed208e4ef12eae897edc8e0b5::shornikov-2000-silica-gas-equilibria
+  experiment_id: c026f1d61be88f737132794ecbf56d2767dc2f0ed208e4ef12eae897edc8e0b5::shornikov-2000-silica-gas-equilibria::method:unspecified
   identity:
     quantity:
       tag: value
@@ -718,6 +784,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2000-silica-gas-equilibria::shornikov_2000_table3_prev_r03_sio_sio
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - ion_intensity_ratio
@@ -745,7 +822,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: shornikov-2000-silica-gas-equilibria::shornikov_2000_table3_prev_r04_si_sio
-  experiment_id: c026f1d61be88f737132794ecbf56d2767dc2f0ed208e4ef12eae897edc8e0b5::shornikov-2000-silica-gas-equilibria
+  experiment_id: c026f1d61be88f737132794ecbf56d2767dc2f0ed208e4ef12eae897edc8e0b5::shornikov-2000-silica-gas-equilibria::method:unspecified
   identity:
     quantity:
       tag: value
@@ -824,6 +901,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2000-silica-gas-equilibria::shornikov_2000_table3_prev_r04_si_sio
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - ion_intensity_ratio
@@ -851,7 +939,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: shornikov-2000-silica-gas-equilibria::shornikov_2000_table3_prev_r04_sio_sio
-  experiment_id: c026f1d61be88f737132794ecbf56d2767dc2f0ed208e4ef12eae897edc8e0b5::shornikov-2000-silica-gas-equilibria
+  experiment_id: c026f1d61be88f737132794ecbf56d2767dc2f0ed208e4ef12eae897edc8e0b5::shornikov-2000-silica-gas-equilibria::method:unspecified
   identity:
     quantity:
       tag: value
@@ -930,6 +1018,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2000-silica-gas-equilibria::shornikov_2000_table3_prev_r04_sio_sio
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - ion_intensity_ratio
@@ -957,7 +1056,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: shornikov-2000-silica-gas-equilibria::shornikov_2000_table3_prev_r05_si_sio
-  experiment_id: c026f1d61be88f737132794ecbf56d2767dc2f0ed208e4ef12eae897edc8e0b5::shornikov-2000-silica-gas-equilibria
+  experiment_id: c026f1d61be88f737132794ecbf56d2767dc2f0ed208e4ef12eae897edc8e0b5::shornikov-2000-silica-gas-equilibria::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1036,6 +1135,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2000-silica-gas-equilibria::shornikov_2000_table3_prev_r05_si_sio
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - ion_intensity_ratio
@@ -1063,7 +1173,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: shornikov-2000-silica-gas-equilibria::shornikov_2000_table3_prev_r05_sio_sio
-  experiment_id: c026f1d61be88f737132794ecbf56d2767dc2f0ed208e4ef12eae897edc8e0b5::shornikov-2000-silica-gas-equilibria
+  experiment_id: c026f1d61be88f737132794ecbf56d2767dc2f0ed208e4ef12eae897edc8e0b5::shornikov-2000-silica-gas-equilibria::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1142,6 +1252,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2000-silica-gas-equilibria::shornikov_2000_table3_prev_r05_sio_sio
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - ion_intensity_ratio
@@ -1169,7 +1290,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: shornikov-2000-silica-gas-equilibria::shornikov_2000_table3_prev_r06_si_sio
-  experiment_id: c026f1d61be88f737132794ecbf56d2767dc2f0ed208e4ef12eae897edc8e0b5::shornikov-2000-silica-gas-equilibria
+  experiment_id: c026f1d61be88f737132794ecbf56d2767dc2f0ed208e4ef12eae897edc8e0b5::shornikov-2000-silica-gas-equilibria::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1248,6 +1369,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2000-silica-gas-equilibria::shornikov_2000_table3_prev_r06_si_sio
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - ion_intensity_ratio
@@ -1275,7 +1407,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: shornikov-2000-silica-gas-equilibria::shornikov_2000_table3_prev_r06_sio_sio
-  experiment_id: c026f1d61be88f737132794ecbf56d2767dc2f0ed208e4ef12eae897edc8e0b5::shornikov-2000-silica-gas-equilibria
+  experiment_id: c026f1d61be88f737132794ecbf56d2767dc2f0ed208e4ef12eae897edc8e0b5::shornikov-2000-silica-gas-equilibria::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1354,6 +1486,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2000-silica-gas-equilibria::shornikov_2000_table3_prev_r06_sio_sio
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - ion_intensity_ratio
@@ -1381,7 +1524,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: shornikov-2000-silica-gas-equilibria::shornikov_2000_table3_prev_r07_si_sio
-  experiment_id: c026f1d61be88f737132794ecbf56d2767dc2f0ed208e4ef12eae897edc8e0b5::shornikov-2000-silica-gas-equilibria
+  experiment_id: c026f1d61be88f737132794ecbf56d2767dc2f0ed208e4ef12eae897edc8e0b5::shornikov-2000-silica-gas-equilibria::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1460,6 +1603,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2000-silica-gas-equilibria::shornikov_2000_table3_prev_r07_si_sio
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - ion_intensity_ratio
@@ -1487,7 +1641,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: shornikov-2000-silica-gas-equilibria::shornikov_2000_table3_prev_r07_sio_sio
-  experiment_id: c026f1d61be88f737132794ecbf56d2767dc2f0ed208e4ef12eae897edc8e0b5::shornikov-2000-silica-gas-equilibria
+  experiment_id: c026f1d61be88f737132794ecbf56d2767dc2f0ed208e4ef12eae897edc8e0b5::shornikov-2000-silica-gas-equilibria::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1566,6 +1720,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2000-silica-gas-equilibria::shornikov_2000_table3_prev_r07_sio_sio
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - ion_intensity_ratio
@@ -1593,7 +1758,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: shornikov-2000-silica-gas-equilibria::shornikov_2000_table3_prev_r08_sio2_sio
-  experiment_id: c026f1d61be88f737132794ecbf56d2767dc2f0ed208e4ef12eae897edc8e0b5::shornikov-2000-silica-gas-equilibria
+  experiment_id: c026f1d61be88f737132794ecbf56d2767dc2f0ed208e4ef12eae897edc8e0b5::shornikov-2000-silica-gas-equilibria::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1672,6 +1837,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2000-silica-gas-equilibria::shornikov_2000_table3_prev_r08_sio2_sio
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - ion_intensity_ratio
@@ -1699,7 +1875,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: shornikov-2000-silica-gas-equilibria::shornikov_2000_table3_prev_r08_sio_sio
-  experiment_id: c026f1d61be88f737132794ecbf56d2767dc2f0ed208e4ef12eae897edc8e0b5::shornikov-2000-silica-gas-equilibria
+  experiment_id: c026f1d61be88f737132794ecbf56d2767dc2f0ed208e4ef12eae897edc8e0b5::shornikov-2000-silica-gas-equilibria::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1778,6 +1954,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2000-silica-gas-equilibria::shornikov_2000_table3_prev_r08_sio_sio
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - ion_intensity_ratio
@@ -1805,7 +1992,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: shornikov-2000-silica-gas-equilibria::shornikov_2000_table3_prev_r09_sio2_sio
-  experiment_id: c026f1d61be88f737132794ecbf56d2767dc2f0ed208e4ef12eae897edc8e0b5::shornikov-2000-silica-gas-equilibria
+  experiment_id: c026f1d61be88f737132794ecbf56d2767dc2f0ed208e4ef12eae897edc8e0b5::shornikov-2000-silica-gas-equilibria::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1884,6 +2071,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2000-silica-gas-equilibria::shornikov_2000_table3_prev_r09_sio2_sio
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - ion_intensity_ratio
@@ -1911,7 +2109,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: shornikov-2000-silica-gas-equilibria::shornikov_2000_table3_prev_r09_sio_sio
-  experiment_id: c026f1d61be88f737132794ecbf56d2767dc2f0ed208e4ef12eae897edc8e0b5::shornikov-2000-silica-gas-equilibria
+  experiment_id: c026f1d61be88f737132794ecbf56d2767dc2f0ed208e4ef12eae897edc8e0b5::shornikov-2000-silica-gas-equilibria::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1990,6 +2188,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2000-silica-gas-equilibria::shornikov_2000_table3_prev_r09_sio_sio
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - ion_intensity_ratio

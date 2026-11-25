@@ -488,8 +488,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_abs_1900C_argon::T=2173.15:row=abs:h=17860278bfc3
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: 119Sn Mössbauer spectroscopy
+      and optical absorption calibration; printed source evidence: 119Sn Mössbauer spectroscopy and optical absorption calibration'
+    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_abs_1900C_argon
     policy:
       id: DP-106
       version: 1
@@ -697,22 +698,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
-    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_abs_pressure_reduction::T=1773.15:row=abs:h=34bb0eaab6c2
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_abs_pressure_reduction::T=1773.15:row=abs:h=34bb0eaab6c2
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Photoluminescence and
+      optical absorption calibration; printed source evidence: Photoluminescence and optical absorption calibration'
+    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_abs_pressure_reduction
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_abs_pressure_reduction::T=1773.15:row=abs:h=34bb0eaab6c2
   source_id: ehrt-2008-sn-redox-aluminosilicate
   locator:
     page: 5
@@ -935,22 +937,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
-    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_abs_pressure_reduction::T=1923.15:row=abs:h=4f157ebe7479
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_abs_pressure_reduction::T=1923.15:row=abs:h=4f157ebe7479
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Photoluminescence and
+      optical absorption calibration; printed source evidence: Photoluminescence and optical absorption calibration'
+    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_abs_pressure_reduction
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_abs_pressure_reduction::T=1923.15:row=abs:h=4f157ebe7479
   source_id: ehrt-2008-sn-redox-aluminosilicate
   locator:
     page: 5
@@ -1169,22 +1172,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
-    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_air_1600_1700C::T=1873.15:row=as:h=e9395ccaa322
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_air_1600_1700C::T=1873.15:row=as:h=e9395ccaa322
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: 119Sn Mössbauer spectroscopy
+      and optical absorption calibration; printed source evidence: 119Sn Mössbauer spectroscopy and optical absorption calibration'
+    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_air_1600_1700C
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_air_1600_1700C::T=1873.15:row=as:h=e9395ccaa322
   source_id: ehrt-2008-sn-redox-aluminosilicate
   locator:
     page: 4
@@ -1399,22 +1403,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
-    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_air_1600_1700C::T=1973.15:row=as:h=c3177fb0b9ed
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_air_1600_1700C::T=1973.15:row=as:h=c3177fb0b9ed
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: 119Sn Mössbauer spectroscopy
+      and optical absorption calibration; printed source evidence: 119Sn Mössbauer spectroscopy and optical absorption calibration'
+    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_air_1600_1700C
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_air_1600_1700C::T=1973.15:row=as:h=c3177fb0b9ed
   source_id: ehrt-2008-sn-redox-aluminosilicate
   locator:
     page: 4
@@ -1632,8 +1637,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_argon_1600_1800C::T=1873.15:row=as:h=33c658f7d4a2
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: 119Sn Mössbauer spectroscopy
+      and optical absorption calibration; printed source evidence: 119Sn Mössbauer spectroscopy and optical absorption calibration'
+    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_argon_1600_1800C
     policy:
       id: DP-106
       version: 1
@@ -1840,8 +1846,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_argon_1600_1800C::T=2073.15:row=abs:h=4e38776c1fee
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: 119Sn Mössbauer spectroscopy
+      and optical absorption calibration; printed source evidence: 119Sn Mössbauer spectroscopy and optical absorption calibration'
+    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_argon_1600_1800C
     policy:
       id: DP-106
       version: 1
@@ -2052,8 +2059,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_argon_1600_1800C::T=2073.15:row=abs:h=8a64fe0c387e
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: 119Sn Mössbauer spectroscopy
+      and optical absorption calibration; printed source evidence: 119Sn Mössbauer spectroscopy and optical absorption calibration'
+    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_argon_1600_1800C
     policy:
       id: DP-106
       version: 1
@@ -2260,8 +2268,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_as_1000_ppmw_fig6::T=2173.15:row=as:h=34a2a103c376
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: 119Sn Mössbauer spectroscopy
+      and optical absorption calibration; printed source evidence: 119Sn Mössbauer spectroscopy and optical absorption calibration'
+    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_as_1000_ppmw_fig6
     policy:
       id: DP-106
       version: 1
@@ -2464,8 +2473,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_as_1000_ppmw_fig6::T=2273.15:row=as:h=d9138e8560bc
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: 119Sn Mössbauer spectroscopy
+      and optical absorption calibration; printed source evidence: 119Sn Mössbauer spectroscopy and optical absorption calibration'
+    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_as_1000_ppmw_fig6
     policy:
       id: DP-106
       version: 1
@@ -2656,22 +2666,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
-    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_as_5000_ppmw_1600C_air::T=1873.15:row=as:h=1babe8ec3659
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_as_5000_ppmw_1600C_air::T=1873.15:row=as:h=1babe8ec3659
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: 119Sn Mössbauer spectroscopy;
+      printed source evidence: 119Sn Mössbauer spectroscopy'
+    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_as_5000_ppmw_1600C_air
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_as_5000_ppmw_1600C_air::T=1873.15:row=as:h=1babe8ec3659
   source_id: ehrt-2008-sn-redox-aluminosilicate
   locator:
     page: 4

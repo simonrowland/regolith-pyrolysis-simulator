@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/kems-049-kato-1993-ms-review.yaml
 observations:
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_fig3_fe_v_integration_figure_only
-  experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review
+  experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review::method:knudsen_effusion
   identity:
     quantity:
       tag: unknown
@@ -75,7 +75,7 @@ observations:
   provenance:
     printed_phase: Fe-V liquid; Al-added vs without Al
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_fig5_fe_p_p_p2_figure_only
-  experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review
+  experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review::method:knudsen_effusion
   identity:
     quantity:
       tag: unknown
@@ -136,7 +136,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_fig6_fe_mo_ion_intensity_figure_only
-  experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review
+  experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review::method:knudsen_effusion
   identity:
     quantity:
       tag: unknown
@@ -187,7 +187,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_fig7_fe_ge_ion_ratio_figure_only
-  experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review
+  experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review::method:knudsen_effusion
   identity:
     quantity:
       tag: unknown
@@ -249,7 +249,7 @@ observations:
   provenance:
     printed_phase: Fe-Ge; homogeneous liquid and solid plus two-phase
 - observation_id: kems-049-kato-1993-ms-review::kato_1993_fig8_fe_ge_phase_diagram_figure_only
-  experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review
+  experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review::method:knudsen_effusion
   identity:
     quantity:
       tag: unknown
@@ -363,6 +363,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: free_energy_function_assessment'
+    origin: kems-049-kato-1993-ms-review::kato_1993_p300_al2o3_cell_a_al_model_derived
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-049-kato-1993-ms-review
   locator:
     published_page: 300
@@ -473,6 +483,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_sat
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_compilation_ranking'
+    origin: kems-049-kato-1993-ms-review::kato_1993_table1_al_psat_1873k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_sat
@@ -588,6 +609,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_sat
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_compilation_ranking'
+    origin: kems-049-kato-1993-ms-review::kato_1993_table1_au_psat_1873k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_sat
@@ -703,6 +735,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_sat
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_compilation_ranking'
+    origin: kems-049-kato-1993-ms-review::kato_1993_table1_co_psat_1873k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_sat
@@ -818,6 +861,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_sat
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_compilation_ranking'
+    origin: kems-049-kato-1993-ms-review::kato_1993_table1_cr_psat_1873k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_sat
@@ -933,6 +987,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_sat
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_compilation_ranking'
+    origin: kems-049-kato-1993-ms-review::kato_1993_table1_cu_psat_1873k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_sat
@@ -1048,6 +1113,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_sat
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_compilation_ranking'
+    origin: kems-049-kato-1993-ms-review::kato_1993_table1_fe_psat_1873k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_sat
@@ -1163,6 +1239,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_sat
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_compilation_ranking'
+    origin: kems-049-kato-1993-ms-review::kato_1993_table1_ge_psat_1873k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_sat
@@ -1278,6 +1365,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_sat
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_compilation_ranking'
+    origin: kems-049-kato-1993-ms-review::kato_1993_table1_mn_psat_1873k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_sat
@@ -1393,6 +1491,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_sat
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_compilation_ranking'
+    origin: kems-049-kato-1993-ms-review::kato_1993_table1_mo_psat_1873k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_sat
@@ -1508,6 +1617,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_sat
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_compilation_ranking'
+    origin: kems-049-kato-1993-ms-review::kato_1993_table1_nb_psat_1873k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_sat
@@ -1623,6 +1743,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_sat
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_compilation_ranking'
+    origin: kems-049-kato-1993-ms-review::kato_1993_table1_ni_psat_1873k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_sat
@@ -1738,6 +1869,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_sat
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_compilation_ranking'
+    origin: kems-049-kato-1993-ms-review::kato_1993_table1_p_psat_1873k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_sat
@@ -1853,6 +1995,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_sat
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_compilation_ranking'
+    origin: kems-049-kato-1993-ms-review::kato_1993_table1_pd_psat_1873k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_sat
@@ -1968,6 +2121,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_sat
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_compilation_ranking'
+    origin: kems-049-kato-1993-ms-review::kato_1993_table1_s_psat_1873k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_sat
@@ -2083,6 +2247,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_sat
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_compilation_ranking'
+    origin: kems-049-kato-1993-ms-review::kato_1993_table1_si_psat_1873k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_sat
@@ -2198,6 +2373,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_sat
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_compilation_ranking'
+    origin: kems-049-kato-1993-ms-review::kato_1993_table1_sn_psat_1873k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_sat
@@ -2313,6 +2499,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_sat
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_compilation_ranking'
+    origin: kems-049-kato-1993-ms-review::kato_1993_table1_ta_psat_1873k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_sat
@@ -2428,6 +2625,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_sat
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_compilation_ranking'
+    origin: kems-049-kato-1993-ms-review::kato_1993_table1_ti_psat_1873k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_sat
@@ -2543,6 +2751,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_sat
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_compilation_ranking'
+    origin: kems-049-kato-1993-ms-review::kato_1993_table1_v_psat_1873k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_sat
@@ -2658,6 +2877,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_sat
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_compilation_ranking'
+    origin: kems-049-kato-1993-ms-review::kato_1993_table1_w_psat_1873k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_sat

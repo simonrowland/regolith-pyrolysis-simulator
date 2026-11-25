@@ -7,7 +7,15 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import Phase, PhaseRole, Quantity, UncertaintyKind, ValueKind, NoticeKind
+from simulator.battery.enums import (
+    MethodToken,
+    NoticeKind,
+    Phase,
+    PhaseRole,
+    Quantity,
+    UncertaintyKind,
+    ValueKind,
+)
 from simulator.battery.identity import celsius_to_kelvin
 from tests.battery.factories import migrate_one_extract
 from tests.battery.literature_extract_grids import (
@@ -202,17 +210,26 @@ def test_every_typed_liquid_component_migrates_as_a_point_with_identity_and_cond
         else:
             assert observation.uncertainty.kind is UncertaintyKind.NONE
         if row["table"] == "2":
-            # This paper's own runs: the air-pressure gap is the only notice.
-            assert other_notices == []
+            # The paper's own runs have a phase inference and an unstated-method default.
+            assert {notice.kind for notice in other_notices} == {
+                NoticeKind.PHASE_INFERRED,
+                NoticeKind.METHOD_UNSTATED,
+            }
         else:
             # Values the paper quotes from its references may carry admission_status
             # quoted_attributed; the legacy-token mapping admits those with one notice naming
-            # the old token. No other notice kind is allowed on any row.
-            assert all(
-                notice.kind is NoticeKind.ADMISSION_FROM_LEGACY_TOKEN
-                for notice in other_notices
+            # the old token. Table 3 also defaults its unprinted phase and method.
+            expected_other_notice_kinds = (
+                {NoticeKind.ADMISSION_FROM_LEGACY_TOKEN}
+                if row["method_class"] == "quoted_attributed"
+                else set()
             )
-            assert len(other_notices) <= 1
+            expected_other_notice_kinds.add(NoticeKind.PHASE_INFERRED)
+            if row["table"] == "3":
+                expected_other_notice_kinds.add(NoticeKind.METHOD_UNSTATED)
+            assert {
+                notice.kind for notice in other_notices
+            } == expected_other_notice_kinds
 
     assert sum(row["table"] == "2" for row in fixture) == 147
     assert sum(row["table"] == "2" and Decimal(row["component_amount"]) > 0 for row in fixture) == 144

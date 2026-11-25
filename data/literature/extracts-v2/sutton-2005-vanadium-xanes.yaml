@@ -103,8 +103,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber::T=1773.15:row=x102:h=86dc76c85be3
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: titration-derived reference
+      valences used to calibrate XANES'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber
     policy:
       id: DP-106
       version: 1
@@ -368,8 +369,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber::T=1773.15:row=x103:h=062b26b68510
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: titration-derived reference
+      valences used to calibrate XANES'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber
     policy:
       id: DP-106
       version: 1
@@ -630,22 +632,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber::T=1773.15:row=x104:h=260595f84fa2
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber::T=1773.15:row=x104:h=260595f84fa2
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: titration-derived reference
+      valences used to calibrate XANES'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber::T=1773.15:row=x104:h=260595f84fa2
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -900,22 +903,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber::T=1773.15:row=x105:h=122aee61dc17
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber::T=1773.15:row=x105:h=122aee61dc17
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: titration-derived reference
+      valences used to calibrate XANES'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber::T=1773.15:row=x105:h=122aee61dc17
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -1170,22 +1174,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber::T=1773.15:row=x106:h=49ada4b2161b
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber::T=1773.15:row=x106:h=49ada4b2161b
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: titration-derived reference
+      valences used to calibrate XANES'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber::T=1773.15:row=x106:h=49ada4b2161b
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -1440,22 +1445,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber::T=1773.15:row=x108:h=022c6f38975f
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber::T=1773.15:row=x108:h=022c6f38975f
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: titration-derived reference
+      valences used to calibrate XANES'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber::T=1773.15:row=x108:h=022c6f38975f
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -1710,22 +1716,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber::T=1773.15:row=x109:h=1e231add8f0e
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber::T=1773.15:row=x109:h=1e231add8f0e
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: titration-derived reference
+      valences used to calibrate XANES'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber::T=1773.15:row=x109:h=1e231add8f0e
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -1980,22 +1987,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber::T=1773.15:row=x110:h=35fcb9d88e1a
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber::T=1773.15:row=x110:h=35fcb9d88e1a
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: titration-derived reference
+      valences used to calibrate XANES'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber::T=1773.15:row=x110:h=35fcb9d88e1a
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -2250,22 +2258,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber::T=1773.15:row=x111:h=c7a7c2c338e1
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber::T=1773.15:row=x111:h=c7a7c2c338e1
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: titration-derived reference
+      valences used to calibrate XANES'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber::T=1773.15:row=x111:h=c7a7c2c338e1
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -2520,22 +2529,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber::T=1773.15:row=x112:h=9f16169aad4b
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber::T=1773.15:row=x112:h=9f16169aad4b
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: titration-derived reference
+      valences used to calibrate XANES'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber::T=1773.15:row=x112:h=9f16169aad4b
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -2790,22 +2800,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber::T=1773.15:row=x113:h=369ad5c483f1
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber::T=1773.15:row=x113:h=369ad5c483f1
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: titration-derived reference
+      valences used to calibrate XANES'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber::T=1773.15:row=x113:h=369ad5c483f1
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -3063,8 +3074,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber::T=1773.15:row=x114:h=0edd08a1a339
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: titration-derived reference
+      valences used to calibrate XANES'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber
     policy:
       id: DP-106
       version: 1
@@ -3328,8 +3340,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber::T=1773.15:row=x116:h=87072f152dbf
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: titration-derived reference
+      valences used to calibrate XANES'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber
     policy:
       id: DP-106
       version: 1
@@ -3593,8 +3606,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber::T=1773.15:row=x117:h=bb2f9566d610
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: titration-derived reference
+      valences used to calibrate XANES'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_schreiber
     policy:
       id: DP-106
       version: 1
@@ -3860,22 +3874,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1498.15:row=kom45:h=dde1bc37a326
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1498.15:row=kom45:h=dde1bc37a326
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity calibrated against Schreiber FAS/FAD glasses'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1498.15:row=kom45:h=dde1bc37a326
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -4193,22 +4208,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1533.15:row=14a:h=92bccf4ee0cf
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1533.15:row=14a:h=92bccf4ee0cf
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity calibrated against Schreiber FAS/FAD glasses'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1533.15:row=14a:h=92bccf4ee0cf
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -4388,22 +4404,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1533.15:row=18a-(comp.-h):h=ba7776026b5e
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1533.15:row=18a-(comp.-h):h=ba7776026b5e
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity calibrated against Schreiber FAS/FAD glasses'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1533.15:row=18a-(comp.-h):h=ba7776026b5e
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -4694,22 +4711,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1533.15:row=6b-(comp.-l):h=9c8f26f6c47c
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1533.15:row=6b-(comp.-l):h=9c8f26f6c47c
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity calibrated against Schreiber FAS/FAD glasses'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1533.15:row=6b-(comp.-l):h=9c8f26f6c47c
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -4998,22 +5016,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1548.15:row=93-11-1-(1596a):h=3458ef55e8f9
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1548.15:row=93-11-1-(1596a):h=3458ef55e8f9
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity calibrated against Schreiber FAS/FAD glasses'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1548.15:row=93-11-1-(1596a):h=3458ef55e8f9
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -5297,22 +5316,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1548.15:row=kom43:h=d8efa98cfc40
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1548.15:row=kom43:h=d8efa98cfc40
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity calibrated against Schreiber FAS/FAD glasses'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1548.15:row=kom43:h=d8efa98cfc40
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -5647,22 +5667,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1548.15:row=kom44:h=deda48afed0f
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1548.15:row=kom44:h=deda48afed0f
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity calibrated against Schreiber FAS/FAD glasses'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1548.15:row=kom44:h=deda48afed0f
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -5991,22 +6012,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1583.15:row=fad-crv-10-9:h=d34b54701d06
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1583.15:row=fad-crv-10-9:h=d34b54701d06
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity calibrated against Schreiber FAS/FAD glasses'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1583.15:row=fad-crv-10-9:h=d34b54701d06
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -6275,22 +6297,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1583.15:row=fad-crv-fmq:h=a94993899d64
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1583.15:row=fad-crv-fmq:h=a94993899d64
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity calibrated against Schreiber FAS/FAD glasses'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1583.15:row=fad-crv-fmq:h=a94993899d64
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -6559,22 +6582,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1583.15:row=fad-crv-iw:h=798700d66e8e
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1583.15:row=fad-crv-iw:h=798700d66e8e
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity calibrated against Schreiber FAS/FAD glasses'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1583.15:row=fad-crv-iw:h=798700d66e8e
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -6843,22 +6867,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1583.15:row=fad-v-1a:h=16991655cdfe
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1583.15:row=fad-v-1a:h=16991655cdfe
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity calibrated against Schreiber FAS/FAD glasses'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1583.15:row=fad-v-1a:h=16991655cdfe
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -7130,8 +7155,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1583.15:row=fad-v-3:h=a7ca54689652
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity calibrated against Schreiber FAS/FAD glasses'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic
     policy:
       id: DP-106
       version: 1
@@ -7406,22 +7432,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1583.15:row=fad-v4:h=5ff122e478a7
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1583.15:row=fad-v4:h=5ff122e478a7
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity calibrated against Schreiber FAS/FAD glasses'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1583.15:row=fad-v4:h=5ff122e478a7
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -7693,8 +7720,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1583.15:row=fad_v_ss:h=6003e1895b19
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity calibrated against Schreiber FAS/FAD glasses'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic
     policy:
       id: DP-106
       version: 1
@@ -7969,22 +7997,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1583.15:row=nasa-fad-v1:h=9c9c41d69130
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1583.15:row=nasa-fad-v1:h=9c9c41d69130
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity calibrated against Schreiber FAS/FAD glasses'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1583.15:row=nasa-fad-v1:h=9c9c41d69130
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -8253,22 +8282,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1583.15:row=nasa_fadv:h=e3b3a252e2ef
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1583.15:row=nasa_fadv:h=e3b3a252e2ef
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity calibrated against Schreiber FAS/FAD glasses'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1583.15:row=nasa_fadv:h=e3b3a252e2ef
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -8540,8 +8570,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1583.15:row=sh-fad-cr-v2:h=9e7e923876bf
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity calibrated against Schreiber FAS/FAD glasses'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic
     policy:
       id: DP-106
       version: 1
@@ -8816,22 +8847,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1599.15:row=93-12-1-(1596a):h=4215eabef59a
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1599.15:row=93-12-1-(1596a):h=4215eabef59a
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity calibrated against Schreiber FAS/FAD glasses'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1599.15:row=93-12-1-(1596a):h=4215eabef59a
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -9111,22 +9143,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1599.15:row=93-12-15-(1596b):h=6ae5ed65f591
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1599.15:row=93-12-15-(1596b):h=6ae5ed65f591
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity calibrated against Schreiber FAS/FAD glasses'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1599.15:row=93-12-15-(1596b):h=6ae5ed65f591
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -9421,22 +9454,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1623.15:row=kom23:h=d5478e71d42f
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1623.15:row=kom23:h=d5478e71d42f
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity calibrated against Schreiber FAS/FAD glasses'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1623.15:row=kom23:h=d5478e71d42f
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -9771,22 +9805,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1623.15:row=kom24:h=3afe8706c3eb
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1623.15:row=kom24:h=3afe8706c3eb
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity calibrated against Schreiber FAS/FAD glasses'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1623.15:row=kom24:h=3afe8706c3eb
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -10121,22 +10156,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1623.15:row=kom42:h=ff0e796cc8b8
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1623.15:row=kom42:h=ff0e796cc8b8
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity calibrated against Schreiber FAS/FAD glasses'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1623.15:row=kom42:h=ff0e796cc8b8
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -10471,22 +10507,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1623.15:row=kom46:h=990d6e1082c8
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1623.15:row=kom46:h=990d6e1082c8
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity calibrated against Schreiber FAS/FAD glasses'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1623.15:row=kom46:h=990d6e1082c8
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -10815,22 +10852,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1647.15:row=93-14-1-(1596a):h=925bb3b70f0d
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1647.15:row=93-14-1-(1596a):h=925bb3b70f0d
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity calibrated against Schreiber FAS/FAD glasses'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1647.15:row=93-14-1-(1596a):h=925bb3b70f0d
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -11110,22 +11148,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1647.15:row=93-14-15-(1596b):h=9e1ae16a9ead
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1647.15:row=93-14-15-(1596b):h=9e1ae16a9ead
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity calibrated against Schreiber FAS/FAD glasses'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1647.15:row=93-14-15-(1596b):h=9e1ae16a9ead
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -11420,22 +11459,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1698.15:row=kom25:h=58f941321297
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1698.15:row=kom25:h=58f941321297
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity calibrated against Schreiber FAS/FAD glasses'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1698.15:row=kom25:h=58f941321297
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -11770,22 +11810,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1698.15:row=kom27:h=b34391a4a20c
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1698.15:row=kom27:h=b34391a4a20c
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity calibrated against Schreiber FAS/FAD glasses'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1698.15:row=kom27:h=b34391a4a20c
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -12114,22 +12155,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1699.15:row=93-15-1-(1596a):h=5d8486643a6b
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1699.15:row=93-15-1-(1596a):h=5d8486643a6b
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity calibrated against Schreiber FAS/FAD glasses'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1699.15:row=93-15-1-(1596a):h=5d8486643a6b
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -12409,22 +12451,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1699.15:row=93-15-15-(1596b):h=8321383993bd
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1699.15:row=93-15-15-(1596b):h=8321383993bd
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity calibrated against Schreiber FAS/FAD glasses'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1699.15:row=93-15-15-(1596b):h=8321383993bd
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -12725,22 +12768,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1703.15:row=green-iw-+-1:h=d7e175a708b2
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1703.15:row=green-iw-+-1:h=d7e175a708b2
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity calibrated against Schreiber FAS/FAD glasses'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1703.15:row=green-iw-+-1:h=d7e175a708b2
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -13141,22 +13185,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1703.15:row=green-iw---0.7:h=e317c3c1f18b
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1703.15:row=green-iw---0.7:h=e317c3c1f18b
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity calibrated against Schreiber FAS/FAD glasses'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1703.15:row=green-iw---0.7:h=e317c3c1f18b
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -13557,22 +13602,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1703.15:row=green-iw---2:h=0a19c9da9a46
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1703.15:row=green-iw---2:h=0a19c9da9a46
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity calibrated against Schreiber FAS/FAD glasses'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1703.15:row=green-iw---2:h=0a19c9da9a46
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -13973,22 +14019,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1703.15:row=orange-iw-+-1:h=2569b1686847
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1703.15:row=orange-iw-+-1:h=2569b1686847
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity calibrated against Schreiber FAS/FAD glasses'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1703.15:row=orange-iw-+-1:h=2569b1686847
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -14389,22 +14436,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1703.15:row=orange-iw---0.5:h=f338882cfefc
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1703.15:row=orange-iw---0.5:h=f338882cfefc
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity calibrated against Schreiber FAS/FAD glasses'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1703.15:row=orange-iw---0.5:h=f338882cfefc
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -14805,22 +14853,23 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: input_omitted
-    affected_quantities:
-    - valence_ratio
-    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1703.15:row=orange-iw---2:h=99789c745090
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1703.15:row=orange-iw---2:h=99789c745090
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity calibrated against Schreiber FAS/FAD glasses'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic
     policy:
       id: DP-106
       version: 1
       status: proposed
       value: unspecified
       units: method token
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table2_synthetic::T=1703.15:row=orange-iw---2:h=99789c745090
   source_id: sutton-2005-vanadium-xanes
   locator:
     published_page: 2339
@@ -15202,8 +15251,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table3_natural::points:row=cerro-negro-inclusions:h=c1ba2fa2e90e
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table3_natural
     policy:
       id: DP-106
       version: 1
@@ -15376,8 +15426,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table3_natural::points:row=eeta79001-lith-c:h=91f88c549689
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table3_natural
     policy:
       id: DP-106
       version: 1
@@ -15797,8 +15848,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table3_natural::points:row=green-(15318,-15425,-15426):h=ced212bd8b5c
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table3_natural
     policy:
       id: DP-106
       version: 1
@@ -16198,8 +16250,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table3_natural::points:row=kilauea-iki:h=5d95904a2a8d
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table3_natural
     policy:
       id: DP-106
       version: 1
@@ -16597,8 +16650,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table3_natural::points:row=makaopuhi-lava-lake-(22):h=e1a500482238
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table3_natural
     policy:
       id: DP-106
       version: 1
@@ -16980,8 +17034,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table3_natural::points:row=makaopuhi-lava-lake-(22-18):h=20f552a5ba97
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table3_natural
     policy:
       id: DP-106
       version: 1
@@ -17403,8 +17458,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table3_natural::points:row=mid-atlantic-ridge-(ocean-floor):h=f388411656b9
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table3_natural
     policy:
       id: DP-106
       version: 1
@@ -17822,8 +17878,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table3_natural::points:row=orange-(74220):h=42c0fa494725
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table3_natural
     policy:
       id: DP-106
       version: 1
@@ -18203,8 +18260,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table3_natural::points:row=very-low-titanium-(vlt:-79315):h=336fcbaf13c4
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table3_natural
     policy:
       id: DP-106
       version: 1
@@ -18606,8 +18664,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - valence_ratio
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: sutton-2005-vanadium-xanes::sutton_2005_table3_natural::points:row=yellow-(15318,-15425):h=192da5f10bbf
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: V K-edge microXANES pre-edge
+      peak intensity'
+    origin: sutton-2005-vanadium-xanes::sutton_2005_table3_natural
     policy:
       id: DP-106
       version: 1

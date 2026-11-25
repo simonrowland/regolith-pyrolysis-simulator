@@ -117,54 +117,17 @@ experiments:
       regime_class:
         tag: unknown
         reason: not_published
-    pumping:
-      backing_pump:
-        state:
-          tag: value
-          value: Leybold Scrollvac SC 5 D
-        locator:
-          page: 6
-          published_page: 5
-          pdf_page_index: 5
-          figure: 2-4
-          section: '2.2'
-          note: Volatiles extraction system; 350 dpi renders of PDF pages 4-7 and 11
-      high_vacuum_pump:
-        state:
-          tag: value
-          value: Leybold Turbovac SL 80
-        locator:
-          page: 6
-          published_page: 5
-          pdf_page_index: 5
-          figure: 2-4
-          section: '2.2'
-          note: Volatiles extraction system; 350 dpi renders of PDF pages 4-7 and 11
   work_id: 10.1016/j.pss.2019.05.001
   locator:
     published_page: 5
     table: '1'
     note: Table 1 reports a multi-run extraction matrix; individual configurations are not assigned to each plotted observation
-  apparatus:
-    temperature_measurement:
-      thermocouple:
-        state:
-          tag: value
-          value: 0.5 mm diameter Type K mantle thermocouple inserted into the heater to measure the temperature of the sample
-            holder
-        locator:
-          page: 6
-          published_page: 5
-          pdf_page_index: 5
-          figure: 2-4
-          section: '2.2'
-          note: Volatiles extraction system; 350 dpi renders of PDF pages 4-7 and 11
   bench_id: 10.1016/j.pss.2019.05.001::bench::prospa-like-volatiles-extraction
 - experiment_id: 10.1016/j.pss.2019.05.001::reiss-2019-thermal-extraction-nulht2m
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'quoted_composition' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: unspecified
   sample: {}
   conditions:
     temperature_K:
@@ -193,6 +156,180 @@ experiments:
     pdf_page_index: 17
     table: '2'
     note: Table 2 Major mineral phase abundances in NU-LHT-2M according to Rickman and Lowers (2012)
+- experiment_id: 10.1016/j.pss.2019.05.001::reiss-2019-thermal-extraction-nulht2m::declared:10.1016/j.pss.2019.05.001::experiment::nulht2m-extraction-series::method:unspecified
+  kind: literature
+  method:
+    tag: value
+    value: unspecified
+  sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        table: '1'
+        note: Table gives alternative 33-36 mg and 66-72 mg ranges without assigning one to every observation
+    printed_composition:
+      state:
+        tag: value
+        value: Highland-type lunar regolith simulant NU-LHT-2M
+      locator:
+        published_page: 5
+        table: '1'
+    form:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        table: '1'
+        note: Particle-size and loose/compacted alternatives are not assigned to every observation
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 5
+        table: '1'
+        note: Table contains two programmed ramps, not one universal run schedule
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.000001'
+          approximate: true
+      locator:
+        published_page: 2
+        section: '2.2'
+        note: Lower-section operating pressure on the order of 10^-8 mbar; unit conversion only
+      inference:
+        relation: mbar_to_Pa
+        inputs:
+        - P_Pa = P_mbar × 100
+        - original_unit=mbar
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.00000001'
+            locator:
+              published_page: 2
+              section: '2.2'
+              note: Lower-section operating pressure on the order of 10^-8 mbar; unit conversion only
+        - - factor
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              published_page: 2
+              section: '2.2'
+              note: Lower-section operating pressure on the order of 10^-8 mbar; unit conversion only
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 5
+        note: Extraction is under continuous vacuum; dry nitrogen is sample-preparation purge gas
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      backing_pump:
+        state:
+          tag: value
+          value: Leybold Scrollvac SC 5 D
+        locator:
+          page: 6
+          published_page: 5
+          pdf_page_index: 5
+          figure: 2-4
+          section: '2.2'
+          note: Volatiles extraction system; 350 dpi renders of PDF pages 4-7 and 11
+      high_vacuum_pump:
+        state:
+          tag: value
+          value: Leybold Turbovac SL 80
+        locator:
+          page: 6
+          published_page: 5
+          pdf_page_index: 5
+          figure: 2-4
+          section: '2.2'
+          note: Volatiles extraction system; 350 dpi renders of PDF pages 4-7 and 11
+      pumping_speed_m3_s:
+        state:
+          tag: value
+          value: '0.065'
+        locator:
+          page: 18
+          pdf_page_index: 17
+          paragraph: 297-318
+          note: §Volatiles yield; integrals of RGA p(t) with assumed q_pump, not a balance measurement
+        inference:
+          relation: L_s_to_m3_s
+          inputs:
+          - Q_m3_s = Q_L_s / 1000
+          - original_unit=L/s
+          - as_published=65 L/s
+          - printed=q_pump_l_s_assumed_as_printed
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '65'
+              locator:
+                page: 18
+                pdf_page_index: 17
+                paragraph: 297-318
+                note: §Volatiles yield; integrals of RGA p(t) with assumed q_pump, not a balance measurement
+          - - factor
+            - state:
+                tag: value
+                value: '1000'
+              locator:
+                page: 18
+                pdf_page_index: 17
+                paragraph: 297-318
+                note: §Volatiles yield; integrals of RGA p(t) with assumed q_pump, not a balance measurement
+          output_unit: m3/s
+          references: []
+      q_pump_source:
+        state:
+          tag: value
+          value: matching the manufacturer value for N2 (60 l/s for Ar, 55 l/s for He, and 49 l/s for H2) (Leybold GmbH 2009)
+        locator:
+          page: 18
+          pdf_page_index: 17
+          paragraph: 297-318
+          note: §Volatiles yield; integrals of RGA p(t) with assumed q_pump, not a balance measurement
+  work_id: 10.1016/j.pss.2019.05.001
+  locator:
+    published_page: 5
+    table: '1'
+    note: Table 1 reports a multi-run extraction matrix; individual configurations are not assigned to each plotted observation
+  apparatus:
+    temperature_measurement:
+      thermocouple:
+        state:
+          tag: value
+          value: 0.5 mm diameter Type K mantle thermocouple inserted into the heater to measure the temperature of the sample
+            holder
+        locator:
+          page: 6
+          published_page: 5
+          pdf_page_index: 5
+          figure: 2-4
+          section: '2.2'
+          note: Volatiles extraction system; 350 dpi renders of PDF pages 4-7 and 11
+  bench_id: 10.1016/j.pss.2019.05.001::bench::prospa-like-volatiles-extraction
 benches:
 - id: 10.1016/j.pss.2019.05.001::bench::prospa-like-volatiles-extraction
   work_id: 10.1016/j.pss.2019.05.001

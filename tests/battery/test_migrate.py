@@ -537,7 +537,79 @@ def test_values_method_is_used_when_extract_regime_is_absent(tmp_path: Path) -> 
     )
     migrated = next(iter(result.observations.values()))
     experiment = result.experiments[migrated.experiment_id]
-    assert experiment.method.is_unknown
+    assert experiment.method == State.of(MethodToken.UNSPECIFIED)
+    unmapped_rows = [
+        row
+        for row in result.observations.values()
+        if row.observation_id == "fixture-source::na_psat"
+        or row.observation_id.startswith("fixture-source::na_psat::")
+    ]
+    assert unmapped_rows
+    assert all(
+        sum(
+            1
+            for notice in row.notices
+            if notice.kind is NoticeKind.METHOD_UNSTATED
+            and "source method text is not mapped: unmapped source regime"
+            in notice.reason
+        )
+        == 1
+        for row in unmapped_rows
+    )
+
+
+def test_unmapped_regime_method_notice_mutation_rejects_duplicate(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    observation = extract["species"]["Na"]["observations"][0]
+    observation["regime"] = "unmapped source regime"
+    observation["values"]["method"] = (
+        "KEMS ion-current intensities converted to partial pressures using "
+        "the thesis calibration (Eq. 2)."
+    )
+    original = Migrator._add_observation
+
+    def readd_method_notice(self, observation, source_key, *args, **kwargs):
+        duplicate = next(
+            (
+                notice
+                for notice in observation.notices
+                if notice.kind is NoticeKind.METHOD_UNSTATED
+                and "source method text is not mapped: unmapped source regime"
+                in notice.reason
+            ),
+            None,
+        )
+        if duplicate is not None:
+            observation = replace(
+                observation, notices=(*observation.notices, duplicate)
+            )
+        return original(self, observation, source_key, *args, **kwargs)
+
+    monkeypatch.setattr(Migrator, "_add_observation", readd_method_notice)
+    result = migrate(
+        _write_min_tree(tmp_path / "duplicate-notice", extract), write=False
+    )
+    rows = [
+        row
+        for row in result.observations.values()
+        if row.observation_id == "fixture-source::na_psat"
+        or row.observation_id.startswith("fixture-source::na_psat::")
+    ]
+    assert rows
+    with pytest.raises(AssertionError):
+        assert all(
+            sum(
+                1
+                for notice in row.notices
+                if notice.kind is NoticeKind.METHOD_UNSTATED
+                and "source method text is not mapped: unmapped source regime"
+                in notice.reason
+            )
+            == 1
+            for row in rows
+        )
 
 
 def _migrate_real_extract(
@@ -949,8 +1021,10 @@ def test_tachibana_approximate_author_estimate_reaches_residual_stratum(
     )
     assert residual.status is ResidualStatus.REFUSED
     assert flagged_strata(residual.notices) == (
+        NoticeKind.METHOD_UNSTATED.value,
         NoticeKind.PHASE_INFERRED.value,
         FLAGGED_STRATUM_APPROXIMATE_VALUE,
+        "proposed-policy",
     )
 
 
@@ -7564,6 +7638,47 @@ def test_g05_identical_duplicate_keys_are_aliased(tmp_path: Path) -> None:
     assert ledger_count.observations_out == 1
     store_obs = sum(c.observations_out for c in result.source_counts.values())
     assert store_obs == len(result.observations)
+
+
+def test_duplicate_method_reason_mutation_probe_rejects_lost_original_reason(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root = _write_min_tree(tmp_path)
+    point = {
+        "key": "pankratz-dup::T=336.35::delta_fG_kJ_mol",
+        "source_id": "pankratz-1987-usbm-b689",
+        "species": "AgS",
+        "temperature_K": 336.35,
+        "table_kJ_mol": 1.0,
+    }
+    ledger = root / "data" / "literature" / "gibbs_battery_residual_ledger.yaml"
+    ledger.write_text(
+        yaml.safe_dump(
+            {"schema_version": 1, "points": [point, dict(point)]},
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+
+    original = Migrator._resolve_method_for_observation
+
+    def lose_original_method_reason(self, *args, **kwargs):
+        if (
+            kwargs.get("observation_id") == point["key"]
+            and point["key"] in self.result.observations
+        ):
+            self._unstated_method_original_reason_by_experiment.pop(
+                kwargs["experiment_id"], None
+            )
+        return original(self, *args, **kwargs)
+
+    monkeypatch.setattr(
+        Migrator,
+        "_resolve_method_for_observation",
+        lose_original_method_reason,
+    )
+    with pytest.raises(DuplicateObservationIdError):
+        migrate(root, write=True)
 
 
 def test_g05_conflicting_duplicate_key_is_hard_error(tmp_path: Path) -> None:

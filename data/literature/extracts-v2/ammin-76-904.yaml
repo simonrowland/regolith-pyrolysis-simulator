@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/ammin-76-904.yaml
 observations:
 - observation_id: ammin-76-904::ammin_76_904_author_regression_liquid_heat_capacity
-  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::ammin-76-904
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::ammin-76-904::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -46,16 +46,15 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''scanning_calorimetry_constant_cooling''
-      is not a closed method token (kems_effusion alone is insufficient)'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: regression_of_integrated_enthalpy_data'
     origin: ammin-76-904::ammin_76_904_author_regression_liquid_heat_capacity
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   source_id: ammin-76-904
   locator:
@@ -112,8 +111,8 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''scanning_calorimetry_constant_cooling''
-      is not a closed method token (kems_effusion alone is insufficient)'
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: scanning_calorimetry_constant_cooling'
     origin: ammin-76-904::ammin_76_904_crystallization_repeated_runs
     policy:
       id: DP-107
@@ -177,8 +176,8 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: step_scan_calorimetry'
     origin: ammin-76-904::ammin_76_904_fusion_and_melting_transition
     policy:
       id: DP-107
@@ -196,7 +195,7 @@ observations:
   provenance:
     printed_phase: crystalline_diopside_to_liquid_diopside
 - observation_id: ammin-76-904::ammin_76_904_quoted_adamkovicova_wollastonite_fusion
-  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::ammin-76-904
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::ammin-76-904::method:unspecified
   identity:
     quantity:
       tag: value
@@ -285,17 +284,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - heat_of_fusion
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''scanning_calorimetry_constant_cooling''
-      is not a closed method token (kems_effusion alone is insufficient)'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: cited_literature_comparison'
     origin: ammin-76-904::ammin_76_904_quoted_adamkovicova_wollastonite_fusion
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -319,7 +317,7 @@ observations:
   provenance:
     printed_phase: wollastonite
 - observation_id: ammin-76-904::ammin_76_904_quoted_comparator_enthalpy_values
-  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::ammin-76-904
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::ammin-76-904::method:unspecified
   identity:
     quantity:
       tag: value
@@ -408,17 +406,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - heat_of_fusion
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''scanning_calorimetry_constant_cooling''
-      is not a closed method token (kems_effusion alone is insufficient)'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: cited_literature_comparison'
     origin: ammin-76-904::ammin_76_904_quoted_comparator_enthalpy_values
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -442,7 +439,7 @@ observations:
   provenance:
     printed_phase: diopside
 - observation_id: ammin-76-904::ammin_76_904_quoted_ferrier_diopside_fusion
-  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::ammin-76-904
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::ammin-76-904::method:unspecified
   identity:
     quantity:
       tag: value
@@ -531,17 +528,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - heat_of_fusion
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''scanning_calorimetry_constant_cooling''
-      is not a closed method token (kems_effusion alone is insufficient)'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: cited_literature_comparison'
     origin: ammin-76-904::ammin_76_904_quoted_ferrier_diopside_fusion
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -565,7 +561,7 @@ observations:
   provenance:
     printed_phase: diopside
 - observation_id: ammin-76-904::ammin_76_904_quoted_richet_bottinga_diopside_fusion
-  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::ammin-76-904
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::ammin-76-904::method:unspecified
   identity:
     quantity:
       tag: value
@@ -654,17 +650,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - heat_of_fusion
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''scanning_calorimetry_constant_cooling''
-      is not a closed method token (kems_effusion alone is insufficient)'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: cited_literature_comparison'
     origin: ammin-76-904::ammin_76_904_quoted_richet_bottinga_diopside_fusion
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -688,7 +683,7 @@ observations:
   provenance:
     printed_phase: diopside
 - observation_id: ammin-76-904::ammin_76_904_quoted_richet_bottinga_liquid_heat_capacity
-  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::ammin-76-904
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::ammin-76-904::method:unspecified
   identity:
     quantity:
       tag: value
@@ -777,17 +772,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - cp
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''scanning_calorimetry_constant_cooling''
-      is not a closed method token (kems_effusion alone is insufficient)'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: cited_literature_comparison'
     origin: ammin-76-904::ammin_76_904_quoted_richet_bottinga_liquid_heat_capacity
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -804,7 +798,7 @@ observations:
   provenance:
     printed_phase: liquid_diopside
 - observation_id: ammin-76-904::ammin_76_904_quoted_stebbins_1984_liquid_heat_capacity
-  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::ammin-76-904
+  experiment_id: d18b2dc3e6ed7ffed9a9e866e6264edf9a323f55649236a77c3641f3b1dbba91::ammin-76-904::method:unspecified
   identity:
     quantity:
       tag: value
@@ -893,17 +887,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - cp
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''scanning_calorimetry_constant_cooling''
-      is not a closed method token (kems_effusion alone is insufficient)'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: cited_literature_comparison'
     origin: ammin-76-904::ammin_76_904_quoted_stebbins_1984_liquid_heat_capacity
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -969,9 +962,9 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:0
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: step_scan_calorimetry'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
     policy:
       id: DP-107
       version: 1
@@ -1037,9 +1030,9 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:1
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: step_scan_calorimetry'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
     policy:
       id: DP-107
       version: 1
@@ -1105,9 +1098,9 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:10
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: step_scan_calorimetry'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
     policy:
       id: DP-107
       version: 1
@@ -1173,9 +1166,9 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:11
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: step_scan_calorimetry'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
     policy:
       id: DP-107
       version: 1
@@ -1241,9 +1234,9 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:12
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: step_scan_calorimetry'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
     policy:
       id: DP-107
       version: 1
@@ -1309,9 +1302,9 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:13
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: step_scan_calorimetry'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
     policy:
       id: DP-107
       version: 1
@@ -1377,9 +1370,9 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:14
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: step_scan_calorimetry'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
     policy:
       id: DP-107
       version: 1
@@ -1445,9 +1438,9 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:15
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: step_scan_calorimetry'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
     policy:
       id: DP-107
       version: 1
@@ -1513,9 +1506,9 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:16
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: step_scan_calorimetry'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
     policy:
       id: DP-107
       version: 1
@@ -1581,9 +1574,9 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:17
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: step_scan_calorimetry'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
     policy:
       id: DP-107
       version: 1
@@ -1649,9 +1642,9 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:18
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: step_scan_calorimetry'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
     policy:
       id: DP-107
       version: 1
@@ -1717,9 +1710,9 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:19
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: step_scan_calorimetry'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
     policy:
       id: DP-107
       version: 1
@@ -1785,9 +1778,9 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:2
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: step_scan_calorimetry'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
     policy:
       id: DP-107
       version: 1
@@ -1853,9 +1846,9 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:20
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: step_scan_calorimetry'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
     policy:
       id: DP-107
       version: 1
@@ -1921,9 +1914,9 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:21
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: step_scan_calorimetry'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
     policy:
       id: DP-107
       version: 1
@@ -1989,9 +1982,9 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:22
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: step_scan_calorimetry'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
     policy:
       id: DP-107
       version: 1
@@ -2057,9 +2050,9 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:23
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: step_scan_calorimetry'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
     policy:
       id: DP-107
       version: 1
@@ -2125,9 +2118,9 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:24
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: step_scan_calorimetry'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
     policy:
       id: DP-107
       version: 1
@@ -2193,9 +2186,9 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:25
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: step_scan_calorimetry'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
     policy:
       id: DP-107
       version: 1
@@ -2261,9 +2254,9 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:26
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: step_scan_calorimetry'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
     policy:
       id: DP-107
       version: 1
@@ -2329,9 +2322,9 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:27
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: step_scan_calorimetry'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
     policy:
       id: DP-107
       version: 1
@@ -2397,9 +2390,9 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:28
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: step_scan_calorimetry'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
     policy:
       id: DP-107
       version: 1
@@ -2465,9 +2458,9 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:3
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: step_scan_calorimetry'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
     policy:
       id: DP-107
       version: 1
@@ -2533,9 +2526,9 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:4
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: step_scan_calorimetry'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
     policy:
       id: DP-107
       version: 1
@@ -2601,9 +2594,9 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:5
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: step_scan_calorimetry'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
     policy:
       id: DP-107
       version: 1
@@ -2669,9 +2662,9 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:6
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: step_scan_calorimetry'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
     policy:
       id: DP-107
       version: 1
@@ -2737,9 +2730,9 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:7
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: step_scan_calorimetry'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
     policy:
       id: DP-107
       version: 1
@@ -2805,9 +2798,9 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:8
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: step_scan_calorimetry'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
     policy:
       id: DP-107
       version: 1
@@ -2873,9 +2866,9 @@ observations:
       units: phase token
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
-      is not a closed method token (kems_effusion alone is insufficient)'
-    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:9
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: step_scan_calorimetry'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
     policy:
       id: DP-107
       version: 1

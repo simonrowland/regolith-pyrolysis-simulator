@@ -47,6 +47,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: cosmic_ray_exposure_age_calculation'
+    origin: busemann-2024-noble-gases-ryugu-bennu::busemann_2024_preliminary_ryugu_exposure_ages
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: busemann-2024-noble-gases-ryugu-bennu
   locator:
     page: 1
@@ -110,6 +120,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: noble_gas_mass_spectrometry'
+    origin: busemann-2024-noble-gases-ryugu-bennu::busemann_2024_ryugu_bennu_neon_isotope_ranges
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: busemann-2024-noble-gases-ryugu-bennu
   locator:
     page: 1

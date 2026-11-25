@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/fredrickson-chasanov-1973-na2o-enthalpy-1300k.yaml
 observations:
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_bouaziz_dta_transition_1023K_quoted
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -81,17 +81,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - transition_temperature
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
     origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_bouaziz_dta_transition_1023K_quoted
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -108,7 +107,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_bouaziz_dta_transition_1243K_quoted
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -186,17 +185,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - transition_temperature
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
     origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_bouaziz_dta_transition_1243K_quoted
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -213,7 +211,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_no_transition_indicated_by_enthalpy_data
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -292,17 +290,16 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - transition_temperature
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
     origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_no_transition_indicated_by_enthalpy_data
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   source_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k
   locator:
@@ -314,7 +311,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high::T=1007.0:h=ac86f48e0d9f
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -392,17 +389,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high::T=1007.0:h=ac86f48e0d9f
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -524,7 +520,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high::T=1025.5:h=b663b5fec747
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -602,17 +598,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high::T=1025.5:h=b663b5fec747
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -734,7 +729,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high::T=1050.1:h=d75c77c92c99
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -812,17 +807,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high::T=1050.1:h=d75c77c92c99
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -944,7 +938,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high::T=1074.9:h=22c3ed0d0a55
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1022,17 +1016,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high::T=1074.9:h=22c3ed0d0a55
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -1154,7 +1147,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high::T=1099.9:h=784dc04f4590
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1232,17 +1225,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high::T=1099.9:h=784dc04f4590
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -1364,7 +1356,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high::T=1123.4:h=ca9cacecccde
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1442,17 +1434,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high::T=1123.4:h=ca9cacecccde
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -1574,7 +1565,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high::T=1149.3:h=31e80e01c803
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1652,17 +1643,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high::T=1149.3:h=31e80e01c803
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -1784,7 +1774,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high::T=1176.4:h=d6ec086c271b
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1862,17 +1852,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high::T=1176.4:h=d6ec086c271b
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -1994,7 +1983,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high::T=1200.8:h=7055f0069c1c
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -2072,17 +2061,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high::T=1200.8:h=7055f0069c1c
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -2204,7 +2192,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high::T=1216.8:h=c24411aa8629
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -2282,17 +2270,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high::T=1216.8:h=c24411aa8629
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -2414,7 +2401,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high::T=1234.5:h=0a94124f7386
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -2492,17 +2479,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high::T=1234.5:h=0a94124f7386
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -2624,7 +2610,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high::T=1243.5:h=b5cf4a8ea84b
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -2702,17 +2688,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high::T=1243.5:h=b5cf4a8ea84b
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -2834,7 +2819,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high::T=1254.4:h=d10d15373e8a
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -2912,17 +2897,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high::T=1254.4:h=d10d15373e8a
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -3044,7 +3028,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high::T=1266.6:h=3bf49e2e415e
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -3122,17 +3106,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high::T=1266.6:h=3bf49e2e415e
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -3254,7 +3237,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high::T=1285.1:h=ce24051369a7
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -3332,17 +3315,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high::T=1285.1:h=ce24051369a7
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -3464,7 +3446,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high::T=951.3:h=2ca0b675f007
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -3542,17 +3524,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high::T=951.3:h=2ca0b675f007
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -3674,7 +3655,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high::T=951.8:h=8a29ea0c0694
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -3752,17 +3733,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high::T=951.8:h=8a29ea0c0694
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -3884,7 +3864,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high::T=975.4:h=62e539670075
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -3962,17 +3942,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high::T=975.4:h=62e539670075
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -4094,7 +4073,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high::T=991.4:h=bce2a9327cb9
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -4172,17 +4151,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high::T=991.4:h=bce2a9327cb9
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_high
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -4304,7 +4282,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_low::T=511.8:h=3cc76b04bc3d
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -4382,17 +4360,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_low::T=511.8:h=3cc76b04bc3d
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_low
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -4500,7 +4477,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_low::T=520.0:h=8a65f9bedadf
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -4578,17 +4555,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_low::T=520.0:h=8a65f9bedadf
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_low
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -4696,7 +4672,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_low::T=567.5:h=9678a14c11c3
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -4774,17 +4750,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_low::T=567.5:h=9678a14c11c3
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_low
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -4892,7 +4867,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_low::T=568.0:h=49606f0d0f0e
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -4970,17 +4945,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_low::T=568.0:h=49606f0d0f0e
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_low
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -5088,7 +5062,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_low::T=614.1:h=1d08f153fb4d
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -5166,17 +5140,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_low::T=614.1:h=1d08f153fb4d
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_low
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -5284,7 +5257,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_low::T=653.1:h=1cdda34585ac
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -5362,17 +5335,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_low::T=653.1:h=1cdda34585ac
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_low
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -5480,7 +5452,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_low::T=697.1:h=1025e6afd0fc
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -5558,17 +5530,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_low::T=697.1:h=1025e6afd0fc
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_low
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -5676,7 +5647,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_low::T=697.4:h=a0c7a5a10b30
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -5754,17 +5725,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_low::T=697.4:h=a0c7a5a10b30
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_low
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -5872,7 +5842,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_low::T=709.7:h=efade28e881d
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -5950,17 +5920,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_low::T=709.7:h=efade28e881d
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_low
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -6068,7 +6037,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_low::T=729.7:h=c50a2775c21e
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -6146,17 +6115,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_low::T=729.7:h=c50a2775c21e
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_low
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -6264,7 +6232,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_low::T=802.5:h=ae34bf2ae3fc
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -6342,17 +6310,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_low::T=802.5:h=ae34bf2ae3fc
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_low
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -6460,7 +6427,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_low::T=876.4:h=5b2145a05a25
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -6538,17 +6505,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_low::T=876.4:h=5b2145a05a25
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_fit_low
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -6656,7 +6622,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1007.0:h=57e0f78ae223
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:drop_calorimetry
   identity:
     quantity:
       tag: value
@@ -6736,14 +6702,14 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1007.0:h=57e0f78ae223
+    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
+      method text: high-precision drop calorimetry with capsule-heat correction'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high
     policy:
       id: DP-107
       version: 1
       status: proposed
-      value: calorimetry
+      value: drop_calorimetry
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -6832,7 +6798,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1025.5:h=a4f0eb260db2
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:drop_calorimetry
   identity:
     quantity:
       tag: value
@@ -6912,14 +6878,14 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1025.5:h=a4f0eb260db2
+    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
+      method text: high-precision drop calorimetry with capsule-heat correction'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high
     policy:
       id: DP-107
       version: 1
       status: proposed
-      value: calorimetry
+      value: drop_calorimetry
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -7008,7 +6974,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1050.1:h=4499df486be5
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:drop_calorimetry
   identity:
     quantity:
       tag: value
@@ -7088,14 +7054,14 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1050.1:h=4499df486be5
+    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
+      method text: high-precision drop calorimetry with capsule-heat correction'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high
     policy:
       id: DP-107
       version: 1
       status: proposed
-      value: calorimetry
+      value: drop_calorimetry
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -7184,7 +7150,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1074.9:h=7059a49fe4c9
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:drop_calorimetry
   identity:
     quantity:
       tag: value
@@ -7264,14 +7230,14 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1074.9:h=7059a49fe4c9
+    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
+      method text: high-precision drop calorimetry with capsule-heat correction'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high
     policy:
       id: DP-107
       version: 1
       status: proposed
-      value: calorimetry
+      value: drop_calorimetry
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -7360,7 +7326,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1099.9:h=2f43f8dafa28
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:drop_calorimetry
   identity:
     quantity:
       tag: value
@@ -7440,14 +7406,14 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1099.9:h=2f43f8dafa28
+    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
+      method text: high-precision drop calorimetry with capsule-heat correction'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high
     policy:
       id: DP-107
       version: 1
       status: proposed
-      value: calorimetry
+      value: drop_calorimetry
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -7536,7 +7502,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1123.4:h=f858cc1d7dfb
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:drop_calorimetry
   identity:
     quantity:
       tag: value
@@ -7616,14 +7582,14 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1123.4:h=f858cc1d7dfb
+    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
+      method text: high-precision drop calorimetry with capsule-heat correction'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high
     policy:
       id: DP-107
       version: 1
       status: proposed
-      value: calorimetry
+      value: drop_calorimetry
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -7712,7 +7678,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1149.3:h=d51d8071a688
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:drop_calorimetry
   identity:
     quantity:
       tag: value
@@ -7792,14 +7758,14 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1149.3:h=d51d8071a688
+    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
+      method text: high-precision drop calorimetry with capsule-heat correction'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high
     policy:
       id: DP-107
       version: 1
       status: proposed
-      value: calorimetry
+      value: drop_calorimetry
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -7888,7 +7854,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1176.4:h=29f6f3ff443c
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:drop_calorimetry
   identity:
     quantity:
       tag: value
@@ -7968,14 +7934,14 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1176.4:h=29f6f3ff443c
+    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
+      method text: high-precision drop calorimetry with capsule-heat correction'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high
     policy:
       id: DP-107
       version: 1
       status: proposed
-      value: calorimetry
+      value: drop_calorimetry
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -8064,7 +8030,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1200.8:h=e69da485b9af
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:drop_calorimetry
   identity:
     quantity:
       tag: value
@@ -8144,14 +8110,14 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1200.8:h=e69da485b9af
+    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
+      method text: high-precision drop calorimetry with capsule-heat correction'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high
     policy:
       id: DP-107
       version: 1
       status: proposed
-      value: calorimetry
+      value: drop_calorimetry
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -8240,7 +8206,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1216.8:h=6594ffb3febe
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:drop_calorimetry
   identity:
     quantity:
       tag: value
@@ -8320,14 +8286,14 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1216.8:h=6594ffb3febe
+    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
+      method text: high-precision drop calorimetry with capsule-heat correction'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high
     policy:
       id: DP-107
       version: 1
       status: proposed
-      value: calorimetry
+      value: drop_calorimetry
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -8416,7 +8382,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1234.5:h=a5b33509805d
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:drop_calorimetry
   identity:
     quantity:
       tag: value
@@ -8496,14 +8462,14 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1234.5:h=a5b33509805d
+    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
+      method text: high-precision drop calorimetry with capsule-heat correction'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high
     policy:
       id: DP-107
       version: 1
       status: proposed
-      value: calorimetry
+      value: drop_calorimetry
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -8592,7 +8558,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1243.5:h=f48753f45607
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:drop_calorimetry
   identity:
     quantity:
       tag: value
@@ -8672,14 +8638,14 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1243.5:h=f48753f45607
+    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
+      method text: high-precision drop calorimetry with capsule-heat correction'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high
     policy:
       id: DP-107
       version: 1
       status: proposed
-      value: calorimetry
+      value: drop_calorimetry
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -8768,7 +8734,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1254.4:h=c0ee2a48ce97
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:drop_calorimetry
   identity:
     quantity:
       tag: value
@@ -8848,14 +8814,14 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1254.4:h=c0ee2a48ce97
+    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
+      method text: high-precision drop calorimetry with capsule-heat correction'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high
     policy:
       id: DP-107
       version: 1
       status: proposed
-      value: calorimetry
+      value: drop_calorimetry
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -8944,7 +8910,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1266.6:h=45a200f22005
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:drop_calorimetry
   identity:
     quantity:
       tag: value
@@ -9024,14 +8990,14 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1266.6:h=45a200f22005
+    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
+      method text: high-precision drop calorimetry with capsule-heat correction'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high
     policy:
       id: DP-107
       version: 1
       status: proposed
-      value: calorimetry
+      value: drop_calorimetry
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -9120,7 +9086,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1285.1:h=06b9ad907b9f
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:drop_calorimetry
   identity:
     quantity:
       tag: value
@@ -9200,14 +9166,14 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1285.1:h=06b9ad907b9f
+    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
+      method text: high-precision drop calorimetry with capsule-heat correction'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high
     policy:
       id: DP-107
       version: 1
       status: proposed
-      value: calorimetry
+      value: drop_calorimetry
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -9296,7 +9262,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=951.3:h=0dc13daf42bc
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:drop_calorimetry
   identity:
     quantity:
       tag: value
@@ -9376,14 +9342,14 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=951.3:h=0dc13daf42bc
+    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
+      method text: high-precision drop calorimetry with capsule-heat correction'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high
     policy:
       id: DP-107
       version: 1
       status: proposed
-      value: calorimetry
+      value: drop_calorimetry
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -9472,7 +9438,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=951.8:h=b38767bbe4b8
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:drop_calorimetry
   identity:
     quantity:
       tag: value
@@ -9552,14 +9518,14 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=951.8:h=b38767bbe4b8
+    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
+      method text: high-precision drop calorimetry with capsule-heat correction'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high
     policy:
       id: DP-107
       version: 1
       status: proposed
-      value: calorimetry
+      value: drop_calorimetry
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -9648,7 +9614,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=975.4:h=a9a1cb148d90
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:drop_calorimetry
   identity:
     quantity:
       tag: value
@@ -9728,14 +9694,14 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=975.4:h=a9a1cb148d90
+    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
+      method text: high-precision drop calorimetry with capsule-heat correction'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high
     policy:
       id: DP-107
       version: 1
       status: proposed
-      value: calorimetry
+      value: drop_calorimetry
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -9824,7 +9790,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=991.4:h=62b78e66bee2
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:drop_calorimetry
   identity:
     quantity:
       tag: value
@@ -9904,14 +9870,14 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=991.4:h=62b78e66bee2
+    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
+      method text: high-precision drop calorimetry with capsule-heat correction'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high
     policy:
       id: DP-107
       version: 1
       status: proposed
-      value: calorimetry
+      value: drop_calorimetry
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -10000,7 +9966,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=511.8:h=678158ab39f7
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:drop_calorimetry
   identity:
     quantity:
       tag: value
@@ -10080,14 +10046,14 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=511.8:h=678158ab39f7
+    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
+      method text: high-precision drop calorimetry with capsule-heat correction'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low
     policy:
       id: DP-107
       version: 1
       status: proposed
-      value: calorimetry
+      value: drop_calorimetry
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -10176,7 +10142,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=520.0:h=a0c3a5af2ac6
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:drop_calorimetry
   identity:
     quantity:
       tag: value
@@ -10256,14 +10222,14 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=520.0:h=a0c3a5af2ac6
+    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
+      method text: high-precision drop calorimetry with capsule-heat correction'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low
     policy:
       id: DP-107
       version: 1
       status: proposed
-      value: calorimetry
+      value: drop_calorimetry
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -10352,7 +10318,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=567.5:h=542ba48d7744
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:drop_calorimetry
   identity:
     quantity:
       tag: value
@@ -10432,14 +10398,14 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=567.5:h=542ba48d7744
+    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
+      method text: high-precision drop calorimetry with capsule-heat correction'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low
     policy:
       id: DP-107
       version: 1
       status: proposed
-      value: calorimetry
+      value: drop_calorimetry
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -10528,7 +10494,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=568.0:h=93a8362452a8
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:drop_calorimetry
   identity:
     quantity:
       tag: value
@@ -10608,14 +10574,14 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=568.0:h=93a8362452a8
+    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
+      method text: high-precision drop calorimetry with capsule-heat correction'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low
     policy:
       id: DP-107
       version: 1
       status: proposed
-      value: calorimetry
+      value: drop_calorimetry
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -10704,7 +10670,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=614.1:h=584722148603
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:drop_calorimetry
   identity:
     quantity:
       tag: value
@@ -10784,14 +10750,14 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=614.1:h=584722148603
+    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
+      method text: high-precision drop calorimetry with capsule-heat correction'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low
     policy:
       id: DP-107
       version: 1
       status: proposed
-      value: calorimetry
+      value: drop_calorimetry
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -10880,7 +10846,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=653.1:h=409777051aa9
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:drop_calorimetry
   identity:
     quantity:
       tag: value
@@ -10960,14 +10926,14 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=653.1:h=409777051aa9
+    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
+      method text: high-precision drop calorimetry with capsule-heat correction'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low
     policy:
       id: DP-107
       version: 1
       status: proposed
-      value: calorimetry
+      value: drop_calorimetry
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -11056,7 +11022,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=697.1:h=184845c9784a
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:drop_calorimetry
   identity:
     quantity:
       tag: value
@@ -11136,14 +11102,14 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=697.1:h=184845c9784a
+    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
+      method text: high-precision drop calorimetry with capsule-heat correction'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low
     policy:
       id: DP-107
       version: 1
       status: proposed
-      value: calorimetry
+      value: drop_calorimetry
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -11232,7 +11198,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=697.4:h=e6c81cf4f984
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:drop_calorimetry
   identity:
     quantity:
       tag: value
@@ -11312,14 +11278,14 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=697.4:h=e6c81cf4f984
+    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
+      method text: high-precision drop calorimetry with capsule-heat correction'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low
     policy:
       id: DP-107
       version: 1
       status: proposed
-      value: calorimetry
+      value: drop_calorimetry
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -11408,7 +11374,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=709.7:h=743bd9779e27
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:drop_calorimetry
   identity:
     quantity:
       tag: value
@@ -11488,14 +11454,14 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=709.7:h=743bd9779e27
+    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
+      method text: high-precision drop calorimetry with capsule-heat correction'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low
     policy:
       id: DP-107
       version: 1
       status: proposed
-      value: calorimetry
+      value: drop_calorimetry
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -11584,7 +11550,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=729.7:h=5abb534c10ca
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:drop_calorimetry
   identity:
     quantity:
       tag: value
@@ -11664,14 +11630,14 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=729.7:h=5abb534c10ca
+    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
+      method text: high-precision drop calorimetry with capsule-heat correction'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low
     policy:
       id: DP-107
       version: 1
       status: proposed
-      value: calorimetry
+      value: drop_calorimetry
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -11760,7 +11726,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=802.5:h=55c85617a113
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:drop_calorimetry
   identity:
     quantity:
       tag: value
@@ -11840,14 +11806,14 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=802.5:h=55c85617a113
+    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
+      method text: high-precision drop calorimetry with capsule-heat correction'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low
     policy:
       id: DP-107
       version: 1
       status: proposed
-      value: calorimetry
+      value: drop_calorimetry
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -11936,7 +11902,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=876.4:h=bb22df622bdf
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:drop_calorimetry
   identity:
     quantity:
       tag: value
@@ -12016,14 +11982,14 @@ observations:
   - kind: method_inferred
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=876.4:h=bb22df622bdf
+    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
+      method text: high-precision drop calorimetry with capsule-heat correction'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low
     policy:
       id: DP-107
       version: 1
       status: proposed
-      value: calorimetry
+      value: drop_calorimetry
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -12149,9 +12115,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1007.0:h=94a4e7cc0a87
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input
     policy:
       id: DP-107
       version: 1
@@ -12217,9 +12185,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1025.5:h=ef36b7432b9e
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input
     policy:
       id: DP-107
       version: 1
@@ -12285,9 +12255,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1050.1:h=b72e78d93a98
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input
     policy:
       id: DP-107
       version: 1
@@ -12353,9 +12325,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1074.9:h=d291080f6a61
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input
     policy:
       id: DP-107
       version: 1
@@ -12421,9 +12395,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1099.9:h=e6d803e8df3f
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input
     policy:
       id: DP-107
       version: 1
@@ -12489,9 +12465,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1123.4:h=e9b5f40a60b9
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input
     policy:
       id: DP-107
       version: 1
@@ -12557,9 +12535,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1149.3:h=790834f2eabd
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input
     policy:
       id: DP-107
       version: 1
@@ -12625,9 +12605,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1176.4:h=eb8b7b445576
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input
     policy:
       id: DP-107
       version: 1
@@ -12693,9 +12675,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1200.8:h=1ede7def6b06
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input
     policy:
       id: DP-107
       version: 1
@@ -12761,9 +12745,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1216.8:h=4c46a97aad26
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input
     policy:
       id: DP-107
       version: 1
@@ -12829,9 +12815,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1234.5:h=e99c29587f8d
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input
     policy:
       id: DP-107
       version: 1
@@ -12897,9 +12885,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1243.5:h=14077c308d9a
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input
     policy:
       id: DP-107
       version: 1
@@ -12965,9 +12955,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1254.4:h=448af84aff30
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input
     policy:
       id: DP-107
       version: 1
@@ -13033,9 +13025,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1266.6:h=75a95526e88b
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input
     policy:
       id: DP-107
       version: 1
@@ -13101,9 +13095,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1285.1:h=a8e3865111f8
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input
     policy:
       id: DP-107
       version: 1
@@ -13169,9 +13165,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=511.8:h=fd76a8452e72
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input
     policy:
       id: DP-107
       version: 1
@@ -13237,9 +13235,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=520.0:h=c93329e01042
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input
     policy:
       id: DP-107
       version: 1
@@ -13305,9 +13305,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=567.5:h=14a811a586cc
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input
     policy:
       id: DP-107
       version: 1
@@ -13373,9 +13375,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=568.0:h=ed32b0e0fc3f
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input
     policy:
       id: DP-107
       version: 1
@@ -13441,9 +13445,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=614.1:h=98a9aa458775
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input
     policy:
       id: DP-107
       version: 1
@@ -13509,9 +13515,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=653.1:h=dc28181cba27
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input
     policy:
       id: DP-107
       version: 1
@@ -13577,9 +13585,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=697.1:h=685a029117a4
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input
     policy:
       id: DP-107
       version: 1
@@ -13645,9 +13655,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=697.4:h=0043799f8454
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input
     policy:
       id: DP-107
       version: 1
@@ -13713,9 +13725,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=709.7:h=df353b41a622
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input
     policy:
       id: DP-107
       version: 1
@@ -13781,9 +13795,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=729.7:h=ab272baee327
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input
     policy:
       id: DP-107
       version: 1
@@ -13849,9 +13865,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=802.5:h=0eb2f86655c8
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input
     policy:
       id: DP-107
       version: 1
@@ -13917,9 +13935,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=876.4:h=4a0c78ec4073
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input
     policy:
       id: DP-107
       version: 1
@@ -13985,9 +14005,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=951.3:h=d5c15bac8399
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input
     policy:
       id: DP-107
       version: 1
@@ -14053,9 +14075,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=951.8:h=4a5085418604
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input
     policy:
       id: DP-107
       version: 1
@@ -14121,9 +14145,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=975.4:h=52d88477cd62
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input
     policy:
       id: DP-107
       version: 1
@@ -14189,9 +14215,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=991.4:h=caad72995b2f
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input
     policy:
       id: DP-107
       version: 1
@@ -14257,9 +14285,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1007.0:h=de1fddc12080
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input
     policy:
       id: DP-107
       version: 1
@@ -14325,9 +14355,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1025.5:h=bb2b6ae6ceaa
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input
     policy:
       id: DP-107
       version: 1
@@ -14393,9 +14425,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1050.1:h=febb371d3307
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input
     policy:
       id: DP-107
       version: 1
@@ -14461,9 +14495,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1074.9:h=e36153aa036f
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input
     policy:
       id: DP-107
       version: 1
@@ -14529,9 +14565,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1099.9:h=63e20364af76
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input
     policy:
       id: DP-107
       version: 1
@@ -14597,9 +14635,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1123.4:h=fdf1a38b81f7
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input
     policy:
       id: DP-107
       version: 1
@@ -14665,9 +14705,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1149.3:h=86a4b78c7bcd
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input
     policy:
       id: DP-107
       version: 1
@@ -14733,9 +14775,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1176.4:h=2bc53feb90de
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input
     policy:
       id: DP-107
       version: 1
@@ -14801,9 +14845,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1200.8:h=4a0ff6c0f338
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input
     policy:
       id: DP-107
       version: 1
@@ -14869,9 +14915,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1216.8:h=e0de76044847
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input
     policy:
       id: DP-107
       version: 1
@@ -14937,9 +14985,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1234.5:h=a6e3694fc5e9
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input
     policy:
       id: DP-107
       version: 1
@@ -15005,9 +15055,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1243.5:h=c9bde26d7097
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input
     policy:
       id: DP-107
       version: 1
@@ -15073,9 +15125,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1254.4:h=9c95869baf50
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input
     policy:
       id: DP-107
       version: 1
@@ -15141,9 +15195,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1266.6:h=f2c4235dde4a
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input
     policy:
       id: DP-107
       version: 1
@@ -15209,9 +15265,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1285.1:h=250c546236f8
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input
     policy:
       id: DP-107
       version: 1
@@ -15277,9 +15335,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=511.8:h=7f4a0594d5a0
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input
     policy:
       id: DP-107
       version: 1
@@ -15345,9 +15405,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=520.0:h=768424b43537
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input
     policy:
       id: DP-107
       version: 1
@@ -15413,9 +15475,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=567.5:h=65020162659a
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input
     policy:
       id: DP-107
       version: 1
@@ -15481,9 +15545,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=568.0:h=725b8a71737a
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input
     policy:
       id: DP-107
       version: 1
@@ -15549,9 +15615,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=614.1:h=f1260fbc36ff
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input
     policy:
       id: DP-107
       version: 1
@@ -15617,9 +15685,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=653.1:h=fa9b8e1549cf
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input
     policy:
       id: DP-107
       version: 1
@@ -15685,9 +15755,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=697.1:h=d9ef4bd8b072
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input
     policy:
       id: DP-107
       version: 1
@@ -15753,9 +15825,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=697.4:h=b9ab18bd056d
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input
     policy:
       id: DP-107
       version: 1
@@ -15821,9 +15895,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=709.7:h=ba8f9215abad
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input
     policy:
       id: DP-107
       version: 1
@@ -15889,9 +15965,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=729.7:h=0bf4375a6d74
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input
     policy:
       id: DP-107
       version: 1
@@ -15957,9 +16035,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=802.5:h=de451072b9df
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input
     policy:
       id: DP-107
       version: 1
@@ -16025,9 +16105,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=876.4:h=a5b321e6549b
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input
     policy:
       id: DP-107
       version: 1
@@ -16093,9 +16175,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=951.3:h=e59436e26125
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input
     policy:
       id: DP-107
       version: 1
@@ -16161,9 +16245,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=951.8:h=d9def90324ab
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input
     policy:
       id: DP-107
       version: 1
@@ -16229,9 +16315,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=975.4:h=4b4aad1f621a
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input
     policy:
       id: DP-107
       version: 1
@@ -16297,9 +16385,11 @@ observations:
   notices:
   - kind: method_inferred
     affected_quantities: []
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=991.4:h=27227180d77e
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction
+      represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration
+      runs are not printed.'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input
     policy:
       id: DP-107
       version: 1
@@ -16328,7 +16418,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_cp_29815_quoted::T=298.15:h=8f54feb2fd2d
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -16406,17 +16496,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - cp
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_cp_29815_quoted::T=298.15:h=8f54feb2fd2d
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: The value 16.52 cal_th
+      K−1 mol−1 at 298.15 K is used as a constraint in the derived Cp equation; the paper marks the citation with superscript
+      (8).'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_cp_29815_quoted
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -16472,7 +16563,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_cp_300_900_model_derived::T=300:h=8774f9634bd9
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -16550,17 +16641,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - cp
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_cp_300_900_model_derived::T=300:h=8774f9634bd9
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_cp_300_900_model_derived
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -16668,7 +16758,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_cp_300_900_model_derived::T=400:h=a6149dc7eb1a
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -16746,17 +16836,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - cp
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_cp_300_900_model_derived::T=400:h=a6149dc7eb1a
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_cp_300_900_model_derived
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -16864,7 +16953,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_cp_300_900_model_derived::T=500:h=0bf47bd94c34
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -16942,17 +17031,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - cp
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_cp_300_900_model_derived::T=500:h=0bf47bd94c34
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_cp_300_900_model_derived
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -17060,7 +17148,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_cp_300_900_model_derived::T=600:h=d2633c7378b1
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -17138,17 +17226,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - cp
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_cp_300_900_model_derived::T=600:h=d2633c7378b1
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_cp_300_900_model_derived
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -17256,7 +17343,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_cp_300_900_model_derived::T=700:h=192055ca51e9
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -17334,17 +17421,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - cp
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_cp_300_900_model_derived::T=700:h=192055ca51e9
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_cp_300_900_model_derived
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -17452,7 +17538,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_cp_300_900_model_derived::T=800:h=189846dd1808
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -17530,17 +17616,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - cp
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_cp_300_900_model_derived::T=800:h=189846dd1808
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_cp_300_900_model_derived
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -17648,7 +17733,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_cp_300_900_model_derived::T=900:h=a7028d90822b
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -17726,17 +17811,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - cp
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_cp_300_900_model_derived::T=900:h=a7028d90822b
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_cp_300_900_model_derived
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -17844,7 +17928,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_cp_high_measured_reduced::T=1000:h=898472b249df
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -17921,17 +18005,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - cp
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_cp_high_measured_reduced::T=1000:h=898472b249df
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: calculated directly from
+      the measured enthalpies above 900 K; printed source evidence: calculated directly from the measured enthalpies above
+      900 K'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_cp_high_measured_reduced
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -18054,7 +18139,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_cp_high_measured_reduced::T=1100:h=bf77f9d342fc
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -18131,17 +18216,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - cp
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_cp_high_measured_reduced::T=1100:h=bf77f9d342fc
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: calculated directly from
+      the measured enthalpies above 900 K; printed source evidence: calculated directly from the measured enthalpies above
+      900 K'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_cp_high_measured_reduced
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -18264,7 +18350,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_cp_high_measured_reduced::T=1200:h=9f06b1641353
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -18341,17 +18427,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - cp
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_cp_high_measured_reduced::T=1200:h=9f06b1641353
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: calculated directly from
+      the measured enthalpies above 900 K; printed source evidence: calculated directly from the measured enthalpies above
+      900 K'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_cp_high_measured_reduced
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -18474,7 +18561,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_cp_high_measured_reduced::T=1300:h=c031e6e2cd0e
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -18551,17 +18638,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - cp
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_cp_high_measured_reduced::T=1300:h=c031e6e2cd0e
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: calculated directly from
+      the measured enthalpies above 900 K; printed source evidence: calculated directly from the measured enthalpies above
+      900 K'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_cp_high_measured_reduced
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -18684,7 +18772,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_enthalpy_high::T=1000:h=a26f51fa7d62
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -18762,17 +18850,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_enthalpy_high::T=1000:h=a26f51fa7d62
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_enthalpy_high
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -18894,7 +18981,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_enthalpy_high::T=1100:h=4a8082eef661
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -18972,17 +19059,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_enthalpy_high::T=1100:h=4a8082eef661
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_enthalpy_high
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -19104,7 +19190,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_enthalpy_high::T=1200:h=a4c17a975b16
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -19182,17 +19268,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_enthalpy_high::T=1200:h=a4c17a975b16
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_enthalpy_high
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -19314,7 +19399,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_enthalpy_high::T=1300:h=1ec7d2c2186d
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -19392,17 +19477,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_enthalpy_high::T=1300:h=1ec7d2c2186d
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_enthalpy_high
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -19524,7 +19608,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_enthalpy_low::T=298.15:h=7975859bcee3
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -19602,17 +19686,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_enthalpy_low::T=298.15:h=7975859bcee3
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_enthalpy_low
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -19720,7 +19803,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_enthalpy_low::T=300:h=00207297a7a6
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -19798,17 +19881,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_enthalpy_low::T=300:h=00207297a7a6
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_enthalpy_low
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -19916,7 +19998,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_enthalpy_low::T=400:h=b940ac7696d4
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -19994,17 +20076,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_enthalpy_low::T=400:h=b940ac7696d4
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_enthalpy_low
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -20112,7 +20193,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_enthalpy_low::T=500:h=aeb2b04eda95
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -20190,17 +20271,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_enthalpy_low::T=500:h=aeb2b04eda95
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_enthalpy_low
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -20308,7 +20388,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_enthalpy_low::T=600:h=2236151bfdb3
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -20386,17 +20466,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_enthalpy_low::T=600:h=2236151bfdb3
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_enthalpy_low
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -20504,7 +20583,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_enthalpy_low::T=700:h=30c0a373144f
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -20582,17 +20661,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_enthalpy_low::T=700:h=30c0a373144f
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_enthalpy_low
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -20700,7 +20778,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_enthalpy_low::T=800:h=745604219d24
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -20778,17 +20856,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_enthalpy_low::T=800:h=745604219d24
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_enthalpy_low
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -20896,7 +20973,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_enthalpy_low::T=900:h=31948ccdeff8
-  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k::method:unspecified
   identity:
     quantity:
       tag: value
@@ -20974,17 +21051,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - H_minus_H298
-    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source does not
-      state method'
-    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_enthalpy_low::T=900:h=31948ccdeff8
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table2_enthalpy_low
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:

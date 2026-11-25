@@ -107095,7 +107095,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: nasa-cea-thermo::cea_P4O10(L)_gibbs
-  experiment_id: b96a3fbb1cfee93264e9dd1dce793f42245a9be400b1f7f0e3e5241ab0fffd2e::nasa-cea-thermo
+  experiment_id: b96a3fbb1cfee93264e9dd1dce793f42245a9be400b1f7f0e3e5241ab0fffd2e::nasa-cea-thermo::method:unspecified
   identity:
     quantity:
       tag: value
@@ -107173,7 +107173,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: condensed_liquid_standard_state_thermo'
+    origin: nasa-cea-thermo::cea_P4O10(L)_gibbs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: nasa-cea-thermo
   locator:
     note: NASA CEA thermo.inp coefficient record; segments preserved verbatim via tools/vp_cea_ingest.parse_thermo_inp (MC-2

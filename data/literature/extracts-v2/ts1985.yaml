@@ -55,6 +55,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: chemical_equilibration_Na2O-silicate_FeCsat_PbNa'
+    origin: ts1985::ts1985_gamma_Na_in_Pb_table1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ts1985
   locator:
     page: 3
@@ -127,6 +137,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: chemical_equilibration_graphite_CO_PbNa'
+    origin: ts1985::ts1985_na2o_prose_1200C_range
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ts1985
   locator:
     page: 1
@@ -188,7 +208,7 @@ observations:
   provenance:
     printed_phase: Na2O-SiO2_binary_melt
 - observation_id: ts1985::ts1985_na2o_table2_X0p40_T1100C
-  experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p40-t1100
+  experiment_id: 10.2355/tetsutohagane1955.71.7_815::ts1985::declared:10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p40-t1100::method:unspecified
   identity:
     quantity:
       tag: value
@@ -291,6 +311,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: chemical_equilibration_graphite_CO_PbNa'
+    origin: ts1985::ts1985_na2o_table2_X0p40_T1100C
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -362,7 +393,7 @@ observations:
   provenance:
     printed_phase: condensed_liquid
 - observation_id: ts1985::ts1985_na2o_table2_X0p40_T1200C
-  experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p40-t1200
+  experiment_id: 10.2355/tetsutohagane1955.71.7_815::ts1985::declared:10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p40-t1200::method:unspecified
   identity:
     quantity:
       tag: value
@@ -465,6 +496,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: chemical_equilibration_graphite_CO_PbNa'
+    origin: ts1985::ts1985_na2o_table2_X0p40_T1200C
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -536,7 +578,7 @@ observations:
   provenance:
     printed_phase: condensed_liquid
 - observation_id: ts1985::ts1985_na2o_table2_X0p40_T1300C
-  experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p40-t1300
+  experiment_id: 10.2355/tetsutohagane1955.71.7_815::ts1985::declared:10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p40-t1300::method:unspecified
   identity:
     quantity:
       tag: value
@@ -639,6 +681,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: chemical_equilibration_graphite_CO_PbNa'
+    origin: ts1985::ts1985_na2o_table2_X0p40_T1300C
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -710,7 +763,7 @@ observations:
   provenance:
     printed_phase: condensed_liquid
 - observation_id: ts1985::ts1985_na2o_table2_X0p45_T1100C
-  experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p45-t1100
+  experiment_id: 10.2355/tetsutohagane1955.71.7_815::ts1985::declared:10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p45-t1100::method:unspecified
   identity:
     quantity:
       tag: value
@@ -813,6 +866,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: chemical_equilibration_graphite_CO_PbNa'
+    origin: ts1985::ts1985_na2o_table2_X0p45_T1100C
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -884,7 +948,7 @@ observations:
   provenance:
     printed_phase: condensed_liquid
 - observation_id: ts1985::ts1985_na2o_table2_X0p45_T1200C
-  experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p45-t1200
+  experiment_id: 10.2355/tetsutohagane1955.71.7_815::ts1985::declared:10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p45-t1200::method:unspecified
   identity:
     quantity:
       tag: value
@@ -987,6 +1051,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: chemical_equilibration_graphite_CO_PbNa'
+    origin: ts1985::ts1985_na2o_table2_X0p45_T1200C
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -1058,7 +1133,7 @@ observations:
   provenance:
     printed_phase: condensed_liquid
 - observation_id: ts1985::ts1985_na2o_table2_X0p45_T1300C
-  experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p45-t1300
+  experiment_id: 10.2355/tetsutohagane1955.71.7_815::ts1985::declared:10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p45-t1300::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1161,6 +1236,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: chemical_equilibration_graphite_CO_PbNa'
+    origin: ts1985::ts1985_na2o_table2_X0p45_T1300C
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -1232,7 +1318,7 @@ observations:
   provenance:
     printed_phase: condensed_liquid
 - observation_id: ts1985::ts1985_na2o_table2_X0p50_T1100C
-  experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p50-t1100
+  experiment_id: 10.2355/tetsutohagane1955.71.7_815::ts1985::declared:10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p50-t1100::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1335,6 +1421,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: chemical_equilibration_graphite_CO_PbNa'
+    origin: ts1985::ts1985_na2o_table2_X0p50_T1100C
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -1406,7 +1503,7 @@ observations:
   provenance:
     printed_phase: condensed_liquid
 - observation_id: ts1985::ts1985_na2o_table2_X0p50_T1200C
-  experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p50-t1200
+  experiment_id: 10.2355/tetsutohagane1955.71.7_815::ts1985::declared:10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p50-t1200::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1509,6 +1606,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: chemical_equilibration_graphite_CO_PbNa'
+    origin: ts1985::ts1985_na2o_table2_X0p50_T1200C
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -1580,7 +1688,7 @@ observations:
   provenance:
     printed_phase: condensed_liquid
 - observation_id: ts1985::ts1985_na2o_table2_X0p50_T1300C
-  experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p50-t1300
+  experiment_id: 10.2355/tetsutohagane1955.71.7_815::ts1985::declared:10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p50-t1300::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1683,6 +1791,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: chemical_equilibration_graphite_CO_PbNa'
+    origin: ts1985::ts1985_na2o_table2_X0p50_T1300C
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -1754,7 +1873,7 @@ observations:
   provenance:
     printed_phase: condensed_liquid
 - observation_id: ts1985::ts1985_na2o_table2_X0p55_T1100C
-  experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p55-t1100
+  experiment_id: 10.2355/tetsutohagane1955.71.7_815::ts1985::declared:10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p55-t1100::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1857,6 +1976,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: chemical_equilibration_graphite_CO_PbNa'
+    origin: ts1985::ts1985_na2o_table2_X0p55_T1100C
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -1928,7 +2058,7 @@ observations:
   provenance:
     printed_phase: condensed_liquid
 - observation_id: ts1985::ts1985_na2o_table2_X0p55_T1200C
-  experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p55-t1200
+  experiment_id: 10.2355/tetsutohagane1955.71.7_815::ts1985::declared:10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p55-t1200::method:unspecified
   identity:
     quantity:
       tag: value
@@ -2031,6 +2161,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: chemical_equilibration_graphite_CO_PbNa'
+    origin: ts1985::ts1985_na2o_table2_X0p55_T1200C
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -2102,7 +2243,7 @@ observations:
   provenance:
     printed_phase: condensed_liquid
 - observation_id: ts1985::ts1985_na2o_table2_X0p55_T1300C
-  experiment_id: 10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p55-t1300
+  experiment_id: 10.2355/tetsutohagane1955.71.7_815::ts1985::declared:10.2355/tetsutohagane1955.71.7_815::experiment::na2o-sio2-xna2o-0p55-t1300::method:unspecified
   identity:
     quantity:
       tag: value
@@ -2205,6 +2346,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: chemical_equilibration_graphite_CO_PbNa'
+    origin: ts1985::ts1985_na2o_table2_X0p55_T1300C
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -2345,6 +2497,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: chemical_equilibration_graphite_CO_PbNa'
+    origin: ts1985::ts1985_na2o_table2_log10_a_AT_B
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ts1985
   locator:
     page: 7
@@ -2449,6 +2611,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: chemical_equilibration_graphite_CO_PbNa'
+    origin: ts1985::ts1985_na2o_table2_log10_a_AT_B
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ts1985
   locator:
     page: 7
@@ -2553,6 +2725,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: chemical_equilibration_graphite_CO_PbNa'
+    origin: ts1985::ts1985_na2o_table2_log10_a_AT_B
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ts1985
   locator:
     page: 7
@@ -2657,6 +2839,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: chemical_equilibration_graphite_CO_PbNa'
+    origin: ts1985::ts1985_na2o_table2_log10_a_AT_B
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ts1985
   locator:
     page: 7

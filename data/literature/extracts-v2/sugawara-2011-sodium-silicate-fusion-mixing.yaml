@@ -212,7 +212,10 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - heat_of_fusion
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: The results prose says
+      [44] calculated this value using calorimetric heat capacities, glass transition temperature, and enthalpies of vitrification
+      reported in prior studies.; printed source evidence: The results prose says [44] calculated this value using calorimetric
+      heat capacities, glass transition temperature, and enthalpies of vitrification reported in prior studies.'
     origin: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_p2_na2si2o5_prior_calculated_fusion_enthalpy_44
     policy:
       id: DP-106
@@ -346,7 +349,9 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - heat_of_fusion
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: The results prose identifies
+      the cited result as a previous DSC measurement.; printed source evidence: The results prose identifies the cited result
+      as a previous DSC measurement.'
     origin: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_p2_na2si2o5_prior_dsc_fusion_enthalpy_43
     policy:
       id: DP-106
@@ -393,7 +398,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_p2_na2sio3_drop_calorimetry_fusion_enthalpy_37
-  experiment_id: 10.1016/j.jnoncrysol.2010.09.064::sugawara-2011-sodium-silicate-fusion-mixing
+  experiment_id: 10.1016/j.jnoncrysol.2010.09.064::sugawara-2011-sodium-silicate-fusion-mixing::method:drop_calorimetry
   identity:
     quantity:
       tag: value
@@ -481,7 +486,7 @@ observations:
     affected_quantities:
     - heat_of_fusion
     reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
-      does not state method'
+      method text: Drop calorimetry [37].'
     origin: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_p2_na2sio3_drop_calorimetry_fusion_enthalpy_37
     policy:
       id: DP-107
@@ -528,7 +533,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_p2_na2sio3_drop_calorimetry_fusion_enthalpy_38
-  experiment_id: 10.1016/j.jnoncrysol.2010.09.064::sugawara-2011-sodium-silicate-fusion-mixing
+  experiment_id: 10.1016/j.jnoncrysol.2010.09.064::sugawara-2011-sodium-silicate-fusion-mixing::method:drop_calorimetry
   identity:
     quantity:
       tag: value
@@ -616,7 +621,7 @@ observations:
     affected_quantities:
     - heat_of_fusion
     reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
-      does not state method'
+      method text: Drop calorimetry [38].'
     origin: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_p2_na2sio3_drop_calorimetry_fusion_enthalpy_38
     policy:
       id: DP-107
@@ -840,16 +845,17 @@ observations:
         published_page: 1393
         paragraph: Weighted average of liquid mixing enthalpy at NS composition
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
-      does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Weighted average of enthalpy
+      data from the present study, Fan [10], Naylor [37], Richet et al. [38], and Table 2.; printed source evidence: Weighted
+      average of enthalpy data from the present study, Fan [10], Naylor [37], Richet et al. [38], and Table 2.'
     origin: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_p4_ns_weighted_mean_enthalpy_of_mixing
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: drop_calorimetry
+      value: unspecified
       units: method token
   source_id: sugawara-2011-sodium-silicate-fusion-mixing
   locator:
@@ -967,7 +973,9 @@ observations:
   notices:
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Calculated from the DSC
+      fusion enthalpy and the thermodynamic data in Table 2, using equations (2) and (16).; printed source evidence: Calculated
+      from the DSC fusion enthalpy and the thermodynamic data in Table 2, using equations (2) and (16).'
     origin: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t1_na2si2o5_enthalpy_of_mixing
     policy:
       id: DP-106
@@ -1203,16 +1211,17 @@ observations:
         table: '1'
         note: row=1/2 Na2SiO3 (NS); column=H_Mix^L
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
-      does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Calculated from the DSC
+      fusion enthalpy and the thermodynamic data in Table 2, using equations (2) and (16).; printed source evidence: Calculated
+      from the DSC fusion enthalpy and the thermodynamic data in Table 2, using equations (2) and (16).'
     origin: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t1_na2sio3_enthalpy_of_mixing
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: drop_calorimetry
+      value: unspecified
       units: method token
   source_id: sugawara-2011-sodium-silicate-fusion-mixing
   locator:
@@ -1444,7 +1453,9 @@ observations:
   notices:
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Calculated from the DSC
+      fusion enthalpy and the thermodynamic data in Table 2, using equations (2) and (16).; printed source evidence: Calculated
+      from the DSC fusion enthalpy and the thermodynamic data in Table 2, using equations (2) and (16).'
     origin: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t1_na6si8o19_eutectic_enthalpy_of_mixing
     policy:
       id: DP-106
@@ -1702,17 +1713,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - heat_of_fusion
-    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
-      does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: This article attributes
+      the fusion enthalpy to [47] but does not state that source''s method.; printed source evidence: This article attributes
+      the fusion enthalpy to [47] but does not state that source''s method.'
     origin: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2o_fusion_enthalpy
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: drop_calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -1839,17 +1851,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - cp
-    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
-      does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: This article attributes
+      the heat capacity to [47] but does not state that source''s method.; printed source evidence: This article attributes
+      the heat capacity to [47] but does not state that source''s method.'
     origin: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2o_liquid_heat_capacity
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: drop_calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -1953,16 +1966,17 @@ observations:
         table: '2'
         note: row=Na2O; column=H^S_Tm
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
-      does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: This article attributes
+      the value to [47] but does not state that source''s method.; printed source evidence: This article attributes the value
+      to [47] but does not state that source''s method.'
     origin: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2o_solid_enthalpy_at_tm
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: drop_calorimetry
+      value: unspecified
       units: method token
   source_id: sugawara-2011-sodium-silicate-fusion-mixing
   locator:
@@ -2067,7 +2081,10 @@ observations:
   notices:
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Calculated from solid
+      enthalpy at Tm, Na2O and SiO2 endmember enthalpies, and optimized H_Mix^L from equation (8), per Table 2 footnote f.;
+      printed source evidence: Calculated from solid enthalpy at Tm, Na2O and SiO2 endmember enthalpies, and optimized H_Mix^L
+      from equation (8), per Table 2 footnote f.'
     origin: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2si2o5_fusion_enthalpy
     policy:
       id: DP-106
@@ -2294,7 +2311,9 @@ observations:
   notices:
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Calculated using the
+      standard state value of [47] and heat capacity of [40], per Table 2 footnote d.; printed source evidence: Calculated
+      using the standard state value of [47] and heat capacity of [40], per Table 2 footnote d.'
     origin: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2si2o5_solid_enthalpy_at_tm
     policy:
       id: DP-106
@@ -2402,7 +2421,9 @@ observations:
   notices:
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 2 attributes the
+      Cp^G equation to [49] but does not state the measurement method.; printed source evidence: Table 2 attributes the Cp^G
+      equation to [49] but does not state the measurement method.'
     origin: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2si2o5_solid_heat_capacity_equation
     policy:
       id: DP-106
@@ -2510,16 +2531,18 @@ observations:
         table: '2'
         note: row=1/2 Na2SiO3; column=ΔH_Tm^L
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
-      does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Calculated from solid
+      enthalpy at Tm, Na2O and SiO2 endmember enthalpies, and optimized H_Mix^L from equation (8), per Table 2 footnote f.;
+      printed source evidence: Calculated from solid enthalpy at Tm, Na2O and SiO2 endmember enthalpies, and optimized H_Mix^L
+      from equation (8), per Table 2 footnote f.'
     origin: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2sio3_fusion_enthalpy
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: drop_calorimetry
+      value: unspecified
       units: method token
   source_id: sugawara-2011-sodium-silicate-fusion-mixing
   locator:
@@ -2631,16 +2654,15 @@ observations:
         table: '2'
         note: row=1/2 Na2SiO3; column=Cp^L
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
-      does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
     origin: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2sio3_liquid_heat_capacity
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: drop_calorimetry
+      value: unspecified
       units: method token
   source_id: sugawara-2011-sodium-silicate-fusion-mixing
   locator:
@@ -2739,16 +2761,17 @@ observations:
         table: '2'
         note: row=1/2 Na2SiO3; column=H^S_Tm
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
-      does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Calculated using the
+      standard state value of [47] and heat capacity of [40], per Table 2 footnote d.; printed source evidence: Calculated
+      using the standard state value of [47] and heat capacity of [40], per Table 2 footnote d.'
     origin: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2sio3_solid_enthalpy_at_tm
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: drop_calorimetry
+      value: unspecified
       units: method token
   source_id: sugawara-2011-sodium-silicate-fusion-mixing
   locator:
@@ -2848,16 +2871,17 @@ observations:
         table: '2'
         note: row=1/2 Na2SiO3; column=Cp^G
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
-      does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 2 attributes the
+      Cp^G equation to [49] but does not state the measurement method.; printed source evidence: Table 2 attributes the Cp^G
+      equation to [49] but does not state the measurement method.'
     origin: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2sio3_solid_heat_capacity_equation
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: drop_calorimetry
+      value: unspecified
       units: method token
   source_id: sugawara-2011-sodium-silicate-fusion-mixing
   locator:
@@ -2961,7 +2985,10 @@ observations:
   notices:
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Calculated from solid
+      enthalpy at Tm, Na2O and SiO2 endmember enthalpies, and optimized H_Mix^L from equation (8), per Table 2 footnote f.;
+      printed source evidence: Calculated from solid enthalpy at Tm, Na2O and SiO2 endmember enthalpies, and optimized H_Mix^L
+      from equation (8), per Table 2 footnote f.'
     origin: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na6si8o19_fusion_enthalpy
     policy:
       id: DP-106
@@ -3188,7 +3215,9 @@ observations:
   notices:
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Calculated using the
+      standard state value of [47] and heat capacity of [40], per Table 2 footnote d.; printed source evidence: Calculated
+      using the standard state value of [47] and heat capacity of [40], per Table 2 footnote d.'
     origin: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na6si8o19_solid_enthalpy_at_tm
     policy:
       id: DP-106
@@ -3296,7 +3325,9 @@ observations:
   notices:
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 2 attributes the
+      Cp^G equation to [49] but does not state the measurement method.; printed source evidence: Table 2 attributes the Cp^G
+      equation to [49] but does not state the measurement method.'
     origin: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na6si8o19_solid_heat_capacity_equation
     policy:
       id: DP-106
@@ -3424,17 +3455,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - heat_of_fusion
-    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
-      does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: This article attributes
+      the fusion enthalpy to [50] but does not state that source''s method.; printed source evidence: This article attributes
+      the fusion enthalpy to [50] but does not state that source''s method.'
     origin: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_sio2_fusion_enthalpy
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: drop_calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -3561,17 +3593,16 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - cp
-    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
-      does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
     origin: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_sio2_liquid_heat_capacity
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: drop_calorimetry
+      value: unspecified
       units: method token
   - kind: admission_defaulted
     affected_quantities:
@@ -3676,16 +3707,17 @@ observations:
         table: '2'
         note: row=SiO2; column=H^S_Tm
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities: []
-    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
-      does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: This article attributes
+      the value to [47] but does not state that source''s method.; printed source evidence: This article attributes the value
+      to [47] but does not state that source''s method.'
     origin: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_sio2_solid_enthalpy_at_tm
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: drop_calorimetry
+      value: unspecified
       units: method token
   source_id: sugawara-2011-sodium-silicate-fusion-mixing
   locator:
@@ -3809,17 +3841,18 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: method_inferred
+  - kind: method_unstated
     affected_quantities:
     - cp
-    reason: 'method_inferred: value=drop_calorimetry; evidence=source text names ''drop calorimetry''; original_reason=source
-      does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 2 attributes the
+      Cp^G equation to [49] but does not state the measurement method.; printed source evidence: Table 2 attributes the Cp^G
+      equation to [49] but does not state the measurement method.'
     origin: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_sio2_solid_heat_capacity_equation
     policy:
-      id: DP-107
+      id: DP-106
       version: 1
       status: proposed
-      value: drop_calorimetry
+      value: unspecified
       units: method token
   source_id: sugawara-2011-sodium-silicate-fusion-mixing
   locator:

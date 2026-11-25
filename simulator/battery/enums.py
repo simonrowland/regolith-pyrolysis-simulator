@@ -480,6 +480,7 @@ METHOD_TOKEN_ALIASES = MappingProxyType(
     {
         **{token.value: token for token in MethodToken},
         "static_capsule_vapor_pressure": MethodToken.STATIC_EQUILIBRIUM,
+        "static_capsule_equilibrium": MethodToken.STATIC_EQUILIBRIUM,
         "kems_effusion": MethodToken.KNUDSEN_EFFUSION,
         "kems_effusion_compiled_experiment": MethodToken.KNUDSEN_EFFUSION,
         "kems_effusion_method_context": MethodToken.KNUDSEN_EFFUSION,

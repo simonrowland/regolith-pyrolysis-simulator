@@ -38,7 +38,9 @@ observations:
   notices:
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Speciation window only
+      (Eu then EuO over Eu2O3(s), SF18-T1). No numeric γ or activity is printed on this row; sibling sf18_speciation_Eu_metal_and_EuO
+      already carries the same ordering. Locator SF18_Eu2O3_window / SF18-T1 p.403.'
     origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_alias_SF18_Eu2O3_window
     policy:
       id: DP-106
@@ -219,7 +221,9 @@ observations:
       units: phase token
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: SF18 Table 1 dominance
+      order P4O10 >> P4O9, P4O8, P4O7, P4O6 over P4O10(s). No numeric γ or activity is printed. Sibling speciation rows already
+      use bound_not_point_ordering. Locator SF18_T1_P4O10_KEMS_dominance / SF18-T1 p.405.'
     origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_alias_SF18_T1_P4O10_KEMS_dominance
     policy:
       id: DP-106
@@ -332,7 +336,9 @@ observations:
   notices:
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Speciation window only
+      (Yb then YbO over Yb2O3(s), SF18-T1). No numeric γ or activity is printed on this row; sibling sf18_speciation_Yb_metal_and_YbO
+      already carries the same ordering. Locator SF18_Yb2O3_window / SF18-T1 p.407.'
     origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_alias_SF18_Yb2O3_window
     policy:
       id: DP-106
@@ -566,6 +572,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Al__AlO_1_5_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -702,6 +719,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_As__AsO_1_5_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -833,6 +861,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Bi__BiO_1_5_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -979,6 +1018,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Ca_CaO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -1114,6 +1164,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Co_CoO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -1245,6 +1306,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Co_CoO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -1380,6 +1452,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Cr_CrO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -1511,6 +1594,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Cr__CrO_1_5_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -1642,6 +1736,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Cu__CuO_0_5_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -1772,6 +1877,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Cu__CuO_0_5_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -1902,6 +2018,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Fe_FeO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -2035,6 +2162,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Fe_FeO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -2168,6 +2306,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Fe_FeO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -2302,6 +2451,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Fe_FeO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -2438,6 +2598,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_GeO2__GeO_2_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -2569,6 +2740,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Ge_GeO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -2703,6 +2885,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_In__InO_1_5_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -2833,6 +3026,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_K__KO_0_5_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -2979,6 +3183,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Mg_MgO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -3114,6 +3329,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Mn_MnO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -3245,6 +3471,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Mn_MnO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -3380,6 +3617,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_MoO2__MoO_2_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -3511,6 +3759,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_MoO2__MoO_2_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -3648,6 +3907,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_MoO3__MoO_3_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -3781,6 +4051,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_MoO3__MoO_3_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -3911,6 +4192,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Na__NaO_0_5_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -4040,6 +4332,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Na__NaO_0_5_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -4171,6 +4474,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Ni_NiO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -4302,6 +4616,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Ni_NiO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -4434,6 +4759,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Ni_NiO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -4569,6 +4905,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_P__PO_2_5_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -4703,6 +5050,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Pb_PbO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -4833,6 +5191,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_SiO2__SiO_2_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -4969,6 +5338,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Sn_SnO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -5101,6 +5481,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_TiO2__TiO_2_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -5237,6 +5628,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_V__V_2O_3__1900K
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 409
@@ -5370,6 +5772,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_V__V_2O_3__2000K_contested
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 409
@@ -5503,6 +5916,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_V__V_2O_3__2100K
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 409
@@ -5641,6 +6065,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_WO2__WO_2_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 409
@@ -5776,6 +6211,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_WO2__WO_2_
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 409
@@ -5909,6 +6355,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_WO3__WO_3__1923K
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 409
@@ -6043,6 +6500,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_WO3__WO_3__relation_1673K
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 409
@@ -6181,6 +6649,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_WO3__WO_3__relation_1673K
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 409
@@ -6316,6 +6795,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_melt_activity'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table2_gamma_Zn_ZnO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     table: '2'
@@ -6403,7 +6893,7 @@ observations:
       units: phase token
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_qualitative_volatility_order'
     origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table3_order_1
     policy:
       id: DP-106
@@ -6466,7 +6956,7 @@ observations:
       units: phase token
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_qualitative_volatility_order'
     origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table3_order_2
     policy:
       id: DP-106
@@ -6529,7 +7019,7 @@ observations:
       units: phase token
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_qualitative_volatility_order'
     origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table3_order_3
     policy:
       id: DP-106
@@ -6595,7 +7085,7 @@ observations:
       units: phase token
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_model_fugacity'
     origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table4_elemental_fugacities
     policy:
       id: DP-106
@@ -6658,7 +7148,7 @@ observations:
   notices:
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
     origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Ag_speciation
     policy:
       id: DP-106
@@ -6707,7 +7197,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_As_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -6752,7 +7252,7 @@ observations:
   notices:
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
     origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Au_speciation
     policy:
       id: DP-106
@@ -6801,7 +7301,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Bi_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -6846,7 +7356,7 @@ observations:
   notices:
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
     origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Br_speciation
     policy:
       id: DP-106
@@ -6898,7 +7408,7 @@ observations:
   notices:
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
     origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Cd_speciation
     policy:
       id: DP-106
@@ -6950,7 +7460,7 @@ observations:
   notices:
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
     origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Cl_speciation
     policy:
       id: DP-106
@@ -6999,7 +7509,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Cr_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -7044,7 +7564,7 @@ observations:
   notices:
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
     origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Cs_speciation
     policy:
       id: DP-106
@@ -7093,7 +7613,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Cu_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -7138,7 +7668,7 @@ observations:
   notices:
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
     origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_F_speciation
     policy:
       id: DP-106
@@ -7187,7 +7717,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Fe_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -7232,7 +7772,7 @@ observations:
   notices:
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
     origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Ga_speciation
     policy:
       id: DP-106
@@ -7281,7 +7821,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Ge_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -7326,7 +7876,7 @@ observations:
   notices:
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
     origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_H_speciation
     policy:
       id: DP-106
@@ -7378,7 +7928,7 @@ observations:
   notices:
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
     origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_I_speciation
     policy:
       id: DP-106
@@ -7427,7 +7977,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_In_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -7469,7 +8029,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_K_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -7514,7 +8084,7 @@ observations:
   notices:
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
     origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Li_speciation
     policy:
       id: DP-106
@@ -7563,7 +8133,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Mn_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -7608,7 +8188,7 @@ observations:
   notices:
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
     origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Mo_speciation
     policy:
       id: DP-106
@@ -7657,7 +8237,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Na_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -7702,7 +8292,7 @@ observations:
   notices:
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
     origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_O_speciation
     policy:
       id: DP-106
@@ -7751,7 +8341,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_P_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -7793,7 +8393,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Pb_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -7838,7 +8448,7 @@ observations:
   notices:
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
     origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Rb_speciation
     policy:
       id: DP-106
@@ -7890,7 +8500,7 @@ observations:
   notices:
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
     origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_S_speciation
     policy:
       id: DP-106
@@ -7942,7 +8552,7 @@ observations:
   notices:
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
     origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Sb_speciation
     policy:
       id: DP-106
@@ -7994,7 +8604,7 @@ observations:
   notices:
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
     origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Se_speciation
     policy:
       id: DP-106
@@ -8043,7 +8653,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Sn_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39
@@ -8088,7 +8708,7 @@ observations:
   notices:
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
     origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Te_speciation
     policy:
       id: DP-106
@@ -8140,7 +8760,7 @@ observations:
   notices:
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
     origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Tl_speciation
     policy:
       id: DP-106
@@ -8189,7 +8809,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: compiled_speciation_by_environment'
+    origin: kems-041-sossi-fegley-2018::sossi_fegley_2018_table5_Zn_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-041-sossi-fegley-2018
   locator:
     page: 39

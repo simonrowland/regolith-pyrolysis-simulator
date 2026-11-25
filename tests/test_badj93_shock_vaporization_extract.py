@@ -6,7 +6,13 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.enums import IdentityEqualKind, Quantity, StateTag
+from simulator.battery.enums import (
+    IdentityEqualKind,
+    MethodToken,
+    NoticeKind,
+    Quantity,
+    StateTag,
+)
 from simulator.battery.identity import identity_equal
 from simulator.battery.migrate import REPO_ROOT
 from simulator.battery.validity import underdetermined_apparatus
@@ -42,22 +48,27 @@ def test_textual_shock_results_survive_real_migration_and_fidelity_mutation() ->
         assert document["species"][observation_id]["observations"][0]["regime"] == (
             "shock_fusion_vaporization"
         )
-        assert experiment.method.is_unknown
-        assert "shock_fusion_vaporization" in (experiment.method.reason or "")
+        assert experiment.method.is_value
+        assert experiment.method.value is MethodToken.UNSPECIFIED
+        method_notice = next(
+            notice
+            for notice in observation.notices
+            if notice.kind is NoticeKind.METHOD_UNSTATED
+        )
+        assert (
+            "source method text is not mapped: shock_fusion_vaporization"
+            in method_notice.reason
+        )
         method_queue = [
             entry
             for entry in migrator.result.queue
             if entry.observation_id == observation.observation_id
             and entry.axes == ["method"]
         ]
-        assert len(method_queue) == 1
-        assert "shock_fusion_vaporization" in method_queue[0].why
-        assert (
-            underdetermined_apparatus(
-                experiment, observation.identity.quantity.value, observation=observation
-            ).reason.value
-            == "method_unknown"
-        )
+        assert method_queue == []
+        assert underdetermined_apparatus(
+            experiment, observation.identity.quantity.value, observation=observation
+        ).reason is None
         assert observation.identity.quantity.is_value
         assert observation.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
         assert observation.value.point == fraction
@@ -73,7 +84,7 @@ def test_textual_shock_results_survive_real_migration_and_fidelity_mutation() ->
             in {observation.observation_id for observation in observations.values()}
             and entry.axes == ["method"]
         ]
-    ) == 3
+    ) == 0
 
     for observation_id in (
         "Albite",

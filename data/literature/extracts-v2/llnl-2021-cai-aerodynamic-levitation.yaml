@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/llnl-2021-cai-aerodynamic-levitation.yaml
 observations:
 - observation_id: llnl-2021-cai-aerodynamic-levitation::ryerson_2022_CAI_starting_and_evaporated_composition_table1
-  experiment_id: 9b5da9588d7a8a5c096c8f6ded983435c30a2876fdd6b5d84c73bada9f2f8973::experiment::cai-aerodynamic-levitation-series
+  experiment_id: 9b5da9588d7a8a5c096c8f6ded983435c30a2876fdd6b5d84c73bada9f2f8973::llnl-2021-cai-aerodynamic-levitation::declared:9b5da9588d7a8a5c096c8f6ded983435c30a2876fdd6b5d84c73bada9f2f8973::experiment::cai-aerodynamic-levitation-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -52,7 +52,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: aerodynamic_levitation_evaporation'
+    origin: llnl-2021-cai-aerodynamic-levitation::ryerson_2022_CAI_starting_and_evaporated_composition_table1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: llnl-2021-cai-aerodynamic-levitation
   locator:
     pdf_page_index: 5
@@ -170,7 +180,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: llnl-2021-cai-aerodynamic-levitation::ryerson_2022_aerodynamic_transport_conditions
-  experiment_id: 9b5da9588d7a8a5c096c8f6ded983435c30a2876fdd6b5d84c73bada9f2f8973::experiment::cai-aerodynamic-levitation-series
+  experiment_id: 9b5da9588d7a8a5c096c8f6ded983435c30a2876fdd6b5d84c73bada9f2f8973::llnl-2021-cai-aerodynamic-levitation::declared:9b5da9588d7a8a5c096c8f6ded983435c30a2876fdd6b5d84c73bada9f2f8973::experiment::cai-aerodynamic-levitation-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -201,7 +211,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: aerodynamic_levitation'
+    origin: llnl-2021-cai-aerodynamic-levitation::ryerson_2022_aerodynamic_transport_conditions
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: llnl-2021-cai-aerodynamic-levitation
   locator:
     pdf_page_index: 4
@@ -210,7 +230,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: llnl-2021-cai-aerodynamic-levitation::ryerson_2022_fractionation_factors_table2::rows:h=3449c34e85e3
-  experiment_id: 9b5da9588d7a8a5c096c8f6ded983435c30a2876fdd6b5d84c73bada9f2f8973::experiment::cai-aerodynamic-levitation-series
+  experiment_id: 9b5da9588d7a8a5c096c8f6ded983435c30a2876fdd6b5d84c73bada9f2f8973::llnl-2021-cai-aerodynamic-levitation::declared:9b5da9588d7a8a5c096c8f6ded983435c30a2876fdd6b5d84c73bada9f2f8973::experiment::cai-aerodynamic-levitation-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -240,7 +260,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: aerodynamic_levitation_evaporation'
+    origin: llnl-2021-cai-aerodynamic-levitation::ryerson_2022_fractionation_factors_table2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: llnl-2021-cai-aerodynamic-levitation
   locator:
     pdf_page_index: 14
@@ -250,7 +280,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: llnl-2021-cai-aerodynamic-levitation::ryerson_2022_fractionation_factors_table2::rows:h=37c913db6e7b
-  experiment_id: 9b5da9588d7a8a5c096c8f6ded983435c30a2876fdd6b5d84c73bada9f2f8973::experiment::cai-aerodynamic-levitation-series
+  experiment_id: 9b5da9588d7a8a5c096c8f6ded983435c30a2876fdd6b5d84c73bada9f2f8973::llnl-2021-cai-aerodynamic-levitation::declared:9b5da9588d7a8a5c096c8f6ded983435c30a2876fdd6b5d84c73bada9f2f8973::experiment::cai-aerodynamic-levitation-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -280,7 +310,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: aerodynamic_levitation_evaporation'
+    origin: llnl-2021-cai-aerodynamic-levitation::ryerson_2022_fractionation_factors_table2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: llnl-2021-cai-aerodynamic-levitation
   locator:
     pdf_page_index: 14
@@ -290,7 +330,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: llnl-2021-cai-aerodynamic-levitation::ryerson_2022_fractionation_factors_table2::rows:h=93ba22baeed9
-  experiment_id: 9b5da9588d7a8a5c096c8f6ded983435c30a2876fdd6b5d84c73bada9f2f8973::experiment::cai-aerodynamic-levitation-series
+  experiment_id: 9b5da9588d7a8a5c096c8f6ded983435c30a2876fdd6b5d84c73bada9f2f8973::llnl-2021-cai-aerodynamic-levitation::declared:9b5da9588d7a8a5c096c8f6ded983435c30a2876fdd6b5d84c73bada9f2f8973::experiment::cai-aerodynamic-levitation-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -320,7 +360,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: aerodynamic_levitation_evaporation'
+    origin: llnl-2021-cai-aerodynamic-levitation::ryerson_2022_fractionation_factors_table2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: llnl-2021-cai-aerodynamic-levitation
   locator:
     pdf_page_index: 14
@@ -330,7 +380,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: llnl-2021-cai-aerodynamic-levitation::ryerson_2022_fractionation_factors_table2::rows:h=e710ee1b2aba
-  experiment_id: 9b5da9588d7a8a5c096c8f6ded983435c30a2876fdd6b5d84c73bada9f2f8973::experiment::cai-aerodynamic-levitation-series
+  experiment_id: 9b5da9588d7a8a5c096c8f6ded983435c30a2876fdd6b5d84c73bada9f2f8973::llnl-2021-cai-aerodynamic-levitation::declared:9b5da9588d7a8a5c096c8f6ded983435c30a2876fdd6b5d84c73bada9f2f8973::experiment::cai-aerodynamic-levitation-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -360,7 +410,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: aerodynamic_levitation_evaporation'
+    origin: llnl-2021-cai-aerodynamic-levitation::ryerson_2022_fractionation_factors_table2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: llnl-2021-cai-aerodynamic-levitation
   locator:
     pdf_page_index: 14
@@ -370,7 +430,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: llnl-2021-cai-aerodynamic-levitation::ryerson_2022_isotope_ratios_table1
-  experiment_id: 9b5da9588d7a8a5c096c8f6ded983435c30a2876fdd6b5d84c73bada9f2f8973::experiment::cai-aerodynamic-levitation-series
+  experiment_id: 9b5da9588d7a8a5c096c8f6ded983435c30a2876fdd6b5d84c73bada9f2f8973::llnl-2021-cai-aerodynamic-levitation::declared:9b5da9588d7a8a5c096c8f6ded983435c30a2876fdd6b5d84c73bada9f2f8973::experiment::cai-aerodynamic-levitation-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -401,7 +461,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: aerodynamic_levitation_evaporation'
+    origin: llnl-2021-cai-aerodynamic-levitation::ryerson_2022_isotope_ratios_table1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: llnl-2021-cai-aerodynamic-levitation
   locator:
     pdf_page_index: 5
@@ -411,7 +481,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: llnl-2021-cai-aerodynamic-levitation::ryerson_2022_modified_HKL_saturation_factor
-  experiment_id: 9b5da9588d7a8a5c096c8f6ded983435c30a2876fdd6b5d84c73bada9f2f8973::experiment::cai-aerodynamic-levitation-series
+  experiment_id: 9b5da9588d7a8a5c096c8f6ded983435c30a2876fdd6b5d84c73bada9f2f8973::llnl-2021-cai-aerodynamic-levitation::declared:9b5da9588d7a8a5c096c8f6ded983435c30a2876fdd6b5d84c73bada9f2f8973::experiment::cai-aerodynamic-levitation-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -443,7 +513,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: advective_HKL'
+    origin: llnl-2021-cai-aerodynamic-levitation::ryerson_2022_modified_HKL_saturation_factor
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: llnl-2021-cai-aerodynamic-levitation
   locator:
     pdf_page_index: 13

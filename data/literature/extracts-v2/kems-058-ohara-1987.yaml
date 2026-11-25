@@ -425,7 +425,7 @@ observations:
   provenance:
     printed_phase: FetO-P2O5-i_oxide_melt_in_Fe_crucible
 - observation_id: kems-058-ohara-1987::ohara_1987_fig3_Lp_figure_only
-  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-additive-series
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::kems-058-ohara-1987::declared:10.2355/tetsutohagane1955.73.10_1337::experiment::feto-p2o5-additive-series::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -482,6 +482,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: slag_metal_calculation'
+    origin: kems-058-ohara-1987::ohara_1987_fig3_Lp_figure_only
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-058-ohara-1987
   locator:
     published_page: 1341
@@ -727,6 +737,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_compilation'
+    origin: kems-058-ohara-1987::ohara_1987_iwasaki_quoted_Lp
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-058-ohara-1987
   locator:
     published_page: 1341
@@ -6194,6 +6214,17 @@ observations:
       status: canonical
       value: g
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_sat
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: janaf_extrapolation'
+    origin: kems-058-ohara-1987::ohara_1987_p4o10_sat_janaf_1643k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_sat
@@ -22749,6 +22780,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_compilation'
+    origin: kems-058-ohara-1987::ohara_1987_turkdogan_quoted_ln_gamma_eq11
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-058-ohara-1987
   locator:
     published_page: 1340

@@ -614,7 +614,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - delta_fH
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Table 1 column ΔfH°298;
+      formation from elements.'
     origin: shornikov-2002-mullite-thermodynamics::shornikov_2002_t1_hf_neumann
     policy:
       id: DP-106
@@ -2427,7 +2428,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - heat_of_fusion
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Authors describe this
+      value as estimated from their oxide-formation enthalpy and entropy plus earlier melt thermodynamics.'
     origin: shornikov-2002-mullite-thermodynamics::shornikov_2002_t2_fusion_present
     policy:
       id: DP-106

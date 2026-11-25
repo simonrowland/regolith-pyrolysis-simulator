@@ -101,7 +101,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient_temperature_fit
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: CO2-CO chemical equilibration
+      with Pb-Na alloy'
+    origin: tsukihashi-sano-1997-alkali-fluoride-slag-activities::tsukihashi_sano_1997_eq12_na2o_gamma_fit
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tsukihashi-sano-1997-alkali-fluoride-slag-activities
   locator:
     page: 4

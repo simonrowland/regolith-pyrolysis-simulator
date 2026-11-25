@@ -1054,7 +1054,7 @@ observations:
   provenance:
     printed_phase: Fe-V_solid_liquid_equilibrium
 - observation_id: kems-119-furukawa-1975::furukawa_1975_quoted_chipman_dastur_gamma0_v
-  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::kems-119-furukawa-1975
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::kems-119-furukawa-1975::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1102,6 +1102,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_compilation'
+    origin: kems-119-furukawa-1975::furukawa_1975_quoted_chipman_dastur_gamma0_v
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-119-furukawa-1975
   locator:
     published_page: 3051
@@ -1122,7 +1132,7 @@ observations:
   provenance:
     printed_phase: liquid_Fe-V-O
 - observation_id: kems-119-furukawa-1975::furukawa_1975_quoted_fruehan_gamma_v
-  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::kems-119-furukawa-1975
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::kems-119-furukawa-1975::method:unspecified
   identity:
     quantity:
       tag: value
@@ -1213,6 +1223,17 @@ observations:
       status: canonical
       value: l
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_compilation'
+    origin: kems-119-furukawa-1975::furukawa_1975_quoted_fruehan_gamma_v
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-119-furukawa-1975
   locator:
     published_page: 3051
@@ -1233,7 +1254,7 @@ observations:
   provenance:
     printed_phase: liquid_Fe-V-O
 - observation_id: kems-119-furukawa-1975::furukawa_1975_quoted_kay_kontopoulos_gamma0_v
-  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::kems-119-furukawa-1975
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::kems-119-furukawa-1975::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -1281,6 +1302,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: quoted_compilation'
+    origin: kems-119-furukawa-1975::furukawa_1975_quoted_kay_kontopoulos_gamma0_v
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-119-furukawa-1975
   locator:
     published_page: 3051

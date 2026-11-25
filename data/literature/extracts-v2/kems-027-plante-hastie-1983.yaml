@@ -121,6 +121,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_alpha_true_absence
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 44
@@ -653,7 +663,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_csbo2_ideal_model_quoted
-  experiment_id: 10.6028/nbs.ir.83-2731::experiment::plante-1983-model-assay
+  experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983::declared:10.6028/nbs.ir.83-2731::experiment::plante-1983-model-assay::method:unspecified
   identity:
     quantity:
       tag: value
@@ -743,6 +753,17 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_csbo2_ideal_model_quoted
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities:
     - activity
@@ -829,7 +850,8 @@ observations:
   notices:
   - kind: method_unstated
     affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Detection bound, not
+      a measured pressure point. No conversion or fabricated lower temperature bound.'
     origin: kems-027-plante-hastie-1983::plante_hastie_1983_detection_limits_quoted
     policy:
       id: DP-106
@@ -1254,8 +1276,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - p_partial
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls::T=1100.0:h=e93daf08d31a
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls
     policy:
       id: DP-106
       version: 1
@@ -1414,8 +1436,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - p_partial
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls::T=1200.0:h=ad8dcf297945
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls
     policy:
       id: DP-106
       version: 1
@@ -1574,8 +1596,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - p_partial
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls::T=1250.0:h=ae3b69ee8db3
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls
     policy:
       id: DP-106
       version: 1
@@ -1734,8 +1756,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - p_partial
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls::T=1300.0:h=de101914ca94
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls
     policy:
       id: DP-106
       version: 1
@@ -1894,8 +1916,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - p_partial
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls::T=1400.0:h=7f94aad0bd5e
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls
     policy:
       id: DP-106
       version: 1
@@ -2054,8 +2076,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - p_partial
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls::T=1500.0:h=65a15c4273c0
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls
     policy:
       id: DP-106
       version: 1
@@ -2214,8 +2236,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - p_partial
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls::T=1600.0:h=90d7a7af205a
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_csbo2_logP_ls
     policy:
       id: DP-106
       version: 1
@@ -2374,8 +2396,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - p_partial
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1000.0:h=c368d21e3159
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls
     policy:
       id: DP-106
       version: 1
@@ -2531,8 +2553,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - p_partial
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1100.0:h=79ea37904bcc
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls
     policy:
       id: DP-106
       version: 1
@@ -2688,8 +2710,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - p_partial
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1200.0:h=2db4dec5147b
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls
     policy:
       id: DP-106
       version: 1
@@ -2845,8 +2867,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - p_partial
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1250.0:h=297af26062cf
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls
     policy:
       id: DP-106
       version: 1
@@ -3002,8 +3024,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - p_partial
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1300.0:h=47be77b8b03a
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls
     policy:
       id: DP-106
       version: 1
@@ -3159,8 +3181,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - p_partial
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1400.0:h=91eba2cdbb09
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls
     policy:
       id: DP-106
       version: 1
@@ -3316,8 +3338,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - p_partial
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1423.15:h=cc49cab0fda1
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls
     policy:
       id: DP-106
       version: 1
@@ -3473,8 +3495,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - p_partial
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1500.0:h=f4b5fc597850
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls
     policy:
       id: DP-106
       version: 1
@@ -3630,8 +3652,8 @@ observations:
   - kind: method_unstated
     affected_quantities:
     - p_partial
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls::T=1600.0:h=302a07b5bab6
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_libo2_logP_ls
     policy:
       id: DP-106
       version: 1
@@ -3785,6 +3807,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -3936,6 +3969,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -4087,6 +4131,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -4238,6 +4293,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -4389,6 +4455,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -4540,6 +4617,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -4691,6 +4779,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -4842,6 +4941,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -4993,6 +5103,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: mixed_kms_tms'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig19_nabo2_logP_ls
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -5051,7 +5172,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_fig20_21_model_proxy
-  experiment_id: 10.6028/nbs.ir.83-2731::experiment::plante-1983-model-assay
+  experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983::declared:10.6028/nbs.ir.83-2731::experiment::plante-1983-model-assay::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -5106,6 +5227,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: thermodynamic_estimate'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_fig20_21_model_proxy
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 45
@@ -6643,7 +6774,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_offgas_model_quoted
-  experiment_id: 10.6028/nbs.ir.83-2731::experiment::plante-1983-model-assay
+  experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983::declared:10.6028/nbs.ir.83-2731::experiment::plante-1983-model-assay::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -6687,6 +6818,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_offgas_model_quoted
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -6853,7 +6994,7 @@ observations:
   provenance:
     printed_phase: gas
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_table1_snw_glass_composition
-  experiment_id: 10.6028/nbs.ir.83-2731::experiment::plante-1983-model-assay
+  experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983::declared:10.6028/nbs.ir.83-2731::experiment::plante-1983-model-assay::method:knudsen_effusion
   identity:
     quantity:
       tag: unknown
@@ -7451,7 +7592,7 @@ observations:
   provenance:
     printed_phase: SNW_alkali_bearing_glass
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_table4_offgas_cec_model
-  experiment_id: 10.6028/nbs.ir.83-2731::experiment::plante-1983-model-assay
+  experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983::declared:10.6028/nbs.ir.83-2731::experiment::plante-1983-model-assay::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -7509,6 +7650,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: transpiration_mass_spectrometry'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_table4_offgas_cec_model
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-027-plante-hastie-1983
   locator:
     published_page: 33
@@ -7519,7 +7670,7 @@ observations:
   provenance:
     printed_phase: industrial_offgas_model
 - observation_id: kems-027-plante-hastie-1983::plante_hastie_1983_thermodynamic_figures_quoted
-  experiment_id: 10.6028/nbs.ir.83-2731::experiment::plante-1983-model-assay
+  experiment_id: 10.6028/nbs.ir.83-2731::kems-027-plante-hastie-1983::declared:10.6028/nbs.ir.83-2731::experiment::plante-1983-model-assay::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -7564,6 +7715,16 @@ observations:
       status: canonical
       value: unspecified
       units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kems-027-plante-hastie-1983::plante_hastie_1983_thermodynamic_figures_quoted
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement

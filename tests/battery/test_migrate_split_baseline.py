@@ -441,13 +441,12 @@ def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) ->
         },
         "formula": "MLS-1A",
         "phase": {
-          "reason": "phase string 'MLS-1A_HSC_equilibrium' is not in the closed automatic map",
-          "tag": "unknown"
+          "tag": "value",
+          "value": "unspecified"
         },
         "polymorph": {
-          "reason": "phase unknown; polymorph unresolved",
-          "rejection_kind": "omitted",
-          "tag": "unknown"
+          "reason": "not crystal",
+          "tag": "not_applicable"
         }
       },
       "temperature_K": {
@@ -465,7 +464,6 @@ def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) ->
       "queued": true,
       "why": [
         "unsupported quantity 'equilibrium_composition'",
-        "phase string 'MLS-1A_HSC_equilibrium' is not in the closed automatic map",
         "source T_range_K [273.15, 3273.15]; no midpoint invented",
         "regime 'HSC_gibbs_minimization_model' is not a closed method token (kems_effusion alone is insufficient)",
         "derived evidence class with unstated ancestry; queued for page-grounding",
@@ -491,13 +489,12 @@ def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) ->
         },
         "formula": "MLS-1A",
         "phase": {
-          "reason": "phase string 'MLS-1A_HSC_equilibrium' is not in the closed automatic map",
-          "tag": "unknown"
+          "tag": "value",
+          "value": "unspecified"
         },
         "polymorph": {
-          "reason": "phase unknown; polymorph unresolved",
-          "rejection_kind": "omitted",
-          "tag": "unknown"
+          "reason": "not crystal",
+          "tag": "not_applicable"
         }
       },
       "temperature_K": {
@@ -515,7 +512,6 @@ def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) ->
       "queued": true,
       "why": [
         "unsupported quantity 'equilibrium_composition'",
-        "phase string 'MLS-1A_HSC_equilibrium' is not in the closed automatic map",
         "source T_range_K [273.15, 3273.15]; no midpoint invented",
         "regime 'HSC_gibbs_minimization_model' is not a closed method token (kems_effusion alone is insufficient)",
         "derived evidence class with unstated ancestry; queued for page-grounding",
@@ -574,13 +570,12 @@ def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) ->
         },
         "formula": "MgSiO3",
         "phase": {
-          "reason": "phase string 'fresnel_lens_vacuum_pyrolysis_mixed_simulants' is not in the closed automatic map",
-          "tag": "unknown"
+          "tag": "value",
+          "value": "unspecified"
         },
         "polymorph": {
-          "reason": "phase unknown; polymorph unresolved",
-          "rejection_kind": "omitted",
-          "tag": "unknown"
+          "reason": "not crystal",
+          "tag": "not_applicable"
         }
       },
       "standard_pressure_Pa": {
@@ -718,7 +713,6 @@ def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) ->
       "queued": true,
       "why": [
         "unsupported quantity 'vacuum_pyrolysis_experiment_summary'",
-        "phase string 'fresnel_lens_vacuum_pyrolysis_mixed_simulants' is not in the closed automatic map",
         "source T_range_K [821.15, 2140.15]; no midpoint invented"
       ]
     }

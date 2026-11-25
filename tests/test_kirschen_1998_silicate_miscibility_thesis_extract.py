@@ -48,7 +48,9 @@ def _migrated_rows():
         assert observation.identity.species.formula == values.get("formula", formula)
         assert observation.identity.species.phase.value.value == "glass"
         assert observation.identity.subtype.value == "wt_percent"
-        assert not observation.notices
+        assert {notice.kind.value for notice in observation.notices} == {
+            "phase_inferred"
+        }
 
         temperature_key = "T_K" if "T_K" in values else "T_C"
         temperature = values[temperature_key]

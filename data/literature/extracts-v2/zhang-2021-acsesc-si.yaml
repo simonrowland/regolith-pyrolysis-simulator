@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/zhang-2021-acsesc-si.yaml
 observations:
 - observation_id: zhang-2021-acsesc-si::zhang_2021_table1_bas1200c0h1_residue_composition
-  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si
+  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si::method:electron_microprobe
   identity:
     quantity:
       tag: value
@@ -76,16 +76,17 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: method_unstated
+  - kind: method_inferred
     affected_quantities:
     - residue_component_composition
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_inferred: value=electron_microprobe; evidence=source text names ''electron probe microanalysis''; original_reason=source
+      method text: electron probe microanalysis (EPMA)'
     origin: zhang-2021-acsesc-si::zhang_2021_table1_bas1200c0h1_residue_composition
     policy:
-      id: DP-106
+      id: DP-107
       version: 1
       status: proposed
-      value: unspecified
+      value: electron_microprobe
       units: method token
   source_id: zhang-2021-acsesc-si
   locator:
@@ -377,7 +378,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: zhang-2021-acsesc-si::zhang_2021_table1_bas1200c0h2_residue_composition
-  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si
+  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si::method:electron_microprobe
   identity:
     quantity:
       tag: value
@@ -450,16 +451,17 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: method_unstated
+  - kind: method_inferred
     affected_quantities:
     - residue_component_composition
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_inferred: value=electron_microprobe; evidence=source text names ''electron probe microanalysis''; original_reason=source
+      method text: electron probe microanalysis (EPMA)'
     origin: zhang-2021-acsesc-si::zhang_2021_table1_bas1200c0h2_residue_composition
     policy:
-      id: DP-106
+      id: DP-107
       version: 1
       status: proposed
-      value: unspecified
+      value: electron_microprobe
       units: method token
   source_id: zhang-2021-acsesc-si
   locator:
@@ -751,7 +753,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: zhang-2021-acsesc-si::zhang_2021_table1_bas1200c10h_residue_composition
-  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si
+  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si::method:electron_microprobe
   identity:
     quantity:
       tag: value
@@ -824,16 +826,17 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: method_unstated
+  - kind: method_inferred
     affected_quantities:
     - residue_component_composition
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_inferred: value=electron_microprobe; evidence=source text names ''electron probe microanalysis''; original_reason=source
+      method text: electron probe microanalysis (EPMA)'
     origin: zhang-2021-acsesc-si::zhang_2021_table1_bas1200c10h_residue_composition
     policy:
-      id: DP-106
+      id: DP-107
       version: 1
       status: proposed
-      value: unspecified
+      value: electron_microprobe
       units: method token
   source_id: zhang-2021-acsesc-si
   locator:
@@ -1125,7 +1128,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: zhang-2021-acsesc-si::zhang_2021_table1_bas1200c1h_residue_composition
-  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si
+  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si::method:electron_microprobe
   identity:
     quantity:
       tag: value
@@ -1198,16 +1201,17 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: method_unstated
+  - kind: method_inferred
     affected_quantities:
     - residue_component_composition
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_inferred: value=electron_microprobe; evidence=source text names ''electron probe microanalysis''; original_reason=source
+      method text: electron probe microanalysis (EPMA)'
     origin: zhang-2021-acsesc-si::zhang_2021_table1_bas1200c1h_residue_composition
     policy:
-      id: DP-106
+      id: DP-107
       version: 1
       status: proposed
-      value: unspecified
+      value: electron_microprobe
       units: method token
   source_id: zhang-2021-acsesc-si
   locator:
@@ -1499,7 +1503,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: zhang-2021-acsesc-si::zhang_2021_table1_bas1200c40h_residue_composition
-  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si
+  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si::method:electron_microprobe
   identity:
     quantity:
       tag: value
@@ -1572,16 +1576,17 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: method_unstated
+  - kind: method_inferred
     affected_quantities:
     - residue_component_composition
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_inferred: value=electron_microprobe; evidence=source text names ''electron probe microanalysis''; original_reason=source
+      method text: electron probe microanalysis (EPMA)'
     origin: zhang-2021-acsesc-si::zhang_2021_table1_bas1200c40h_residue_composition
     policy:
-      id: DP-106
+      id: DP-107
       version: 1
       status: proposed
-      value: unspecified
+      value: electron_microprobe
       units: method token
   source_id: zhang-2021-acsesc-si
   locator:
@@ -1873,7 +1878,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: zhang-2021-acsesc-si::zhang_2021_table1_bas1200c4h_residue_composition
-  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si
+  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si::method:electron_microprobe
   identity:
     quantity:
       tag: value
@@ -1946,16 +1951,17 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: method_unstated
+  - kind: method_inferred
     affected_quantities:
     - residue_component_composition
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_inferred: value=electron_microprobe; evidence=source text names ''electron probe microanalysis''; original_reason=source
+      method text: electron probe microanalysis (EPMA)'
     origin: zhang-2021-acsesc-si::zhang_2021_table1_bas1200c4h_residue_composition
     policy:
-      id: DP-106
+      id: DP-107
       version: 1
       status: proposed
-      value: unspecified
+      value: electron_microprobe
       units: method token
   source_id: zhang-2021-acsesc-si
   locator:
@@ -2247,7 +2253,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: zhang-2021-acsesc-si::zhang_2021_table1_bas1400c0m1_residue_composition
-  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si
+  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si::method:electron_microprobe
   identity:
     quantity:
       tag: value
@@ -2320,16 +2326,17 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: method_unstated
+  - kind: method_inferred
     affected_quantities:
     - residue_component_composition
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_inferred: value=electron_microprobe; evidence=source text names ''electron probe microanalysis''; original_reason=source
+      method text: electron probe microanalysis (EPMA)'
     origin: zhang-2021-acsesc-si::zhang_2021_table1_bas1400c0m1_residue_composition
     policy:
-      id: DP-106
+      id: DP-107
       version: 1
       status: proposed
-      value: unspecified
+      value: electron_microprobe
       units: method token
   source_id: zhang-2021-acsesc-si
   locator:
@@ -2621,7 +2628,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: zhang-2021-acsesc-si::zhang_2021_table1_bas1400c0m2_residue_composition
-  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si
+  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si::method:electron_microprobe
   identity:
     quantity:
       tag: value
@@ -2694,16 +2701,17 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: method_unstated
+  - kind: method_inferred
     affected_quantities:
     - residue_component_composition
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_inferred: value=electron_microprobe; evidence=source text names ''electron probe microanalysis''; original_reason=source
+      method text: electron probe microanalysis (EPMA)'
     origin: zhang-2021-acsesc-si::zhang_2021_table1_bas1400c0m2_residue_composition
     policy:
-      id: DP-106
+      id: DP-107
       version: 1
       status: proposed
-      value: unspecified
+      value: electron_microprobe
       units: method token
   source_id: zhang-2021-acsesc-si
   locator:
@@ -2995,7 +3003,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: zhang-2021-acsesc-si::zhang_2021_table1_bas1400c15m_residue_composition
-  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si
+  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si::method:electron_microprobe
   identity:
     quantity:
       tag: value
@@ -3068,16 +3076,17 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: method_unstated
+  - kind: method_inferred
     affected_quantities:
     - residue_component_composition
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_inferred: value=electron_microprobe; evidence=source text names ''electron probe microanalysis''; original_reason=source
+      method text: electron probe microanalysis (EPMA)'
     origin: zhang-2021-acsesc-si::zhang_2021_table1_bas1400c15m_residue_composition
     policy:
-      id: DP-106
+      id: DP-107
       version: 1
       status: proposed
-      value: unspecified
+      value: electron_microprobe
       units: method token
   source_id: zhang-2021-acsesc-si
   locator:
@@ -3369,7 +3378,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: zhang-2021-acsesc-si::zhang_2021_table1_bas1400c30m_residue_composition
-  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si
+  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si::method:electron_microprobe
   identity:
     quantity:
       tag: value
@@ -3442,16 +3451,17 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: method_unstated
+  - kind: method_inferred
     affected_quantities:
     - residue_component_composition
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_inferred: value=electron_microprobe; evidence=source text names ''electron probe microanalysis''; original_reason=source
+      method text: electron probe microanalysis (EPMA)'
     origin: zhang-2021-acsesc-si::zhang_2021_table1_bas1400c30m_residue_composition
     policy:
-      id: DP-106
+      id: DP-107
       version: 1
       status: proposed
-      value: unspecified
+      value: electron_microprobe
       units: method token
   source_id: zhang-2021-acsesc-si
   locator:
@@ -3743,7 +3753,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: zhang-2021-acsesc-si::zhang_2021_table1_bas1400c60m_residue_composition
-  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si
+  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si::method:electron_microprobe
   identity:
     quantity:
       tag: value
@@ -3816,16 +3826,17 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: method_unstated
+  - kind: method_inferred
     affected_quantities:
     - residue_component_composition
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_inferred: value=electron_microprobe; evidence=source text names ''electron probe microanalysis''; original_reason=source
+      method text: electron probe microanalysis (EPMA)'
     origin: zhang-2021-acsesc-si::zhang_2021_table1_bas1400c60m_residue_composition
     policy:
-      id: DP-106
+      id: DP-107
       version: 1
       status: proposed
-      value: unspecified
+      value: electron_microprobe
       units: method token
   source_id: zhang-2021-acsesc-si
   locator:
@@ -4117,7 +4128,7 @@ observations:
   provenance:
     printed_phase: glass
 - observation_id: zhang-2021-acsesc-si::zhang_2021_table1_bas1400c90m_residue_composition
-  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si
+  experiment_id: ee4f4c9a8f8c5d5ecd1f3751ebd2fe878ed159ff9b01f277ea69335518a1cd96::zhang-2021-acsesc-si::method:electron_microprobe
   identity:
     quantity:
       tag: value
@@ -4190,16 +4201,17 @@ observations:
     status: pending
     reason: no observation admission_status mapped from source
   notices:
-  - kind: method_unstated
+  - kind: method_inferred
     affected_quantities:
     - residue_component_composition
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    reason: 'method_inferred: value=electron_microprobe; evidence=source text names ''electron probe microanalysis''; original_reason=source
+      method text: electron probe microanalysis (EPMA)'
     origin: zhang-2021-acsesc-si::zhang_2021_table1_bas1400c90m_residue_composition
     policy:
-      id: DP-106
+      id: DP-107
       version: 1
       status: proposed
-      value: unspecified
+      value: electron_microprobe
       units: method token
   source_id: zhang-2021-acsesc-si
   locator:
@@ -4593,17 +4605,6 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_unstated
-    affected_quantities:
-    - mass_loss_fraction
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: zhang-2021-acsesc-si::zhang_si_table_s1_bas1200c0h1_mass_loss
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -4986,17 +4987,6 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_unstated
-    affected_quantities:
-    - mass_loss_fraction
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: zhang-2021-acsesc-si::zhang_si_table_s1_bas1200c0h2_mass_loss
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -5379,17 +5369,6 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_unstated
-    affected_quantities:
-    - mass_loss_fraction
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: zhang-2021-acsesc-si::zhang_si_table_s1_bas1200c10h_mass_loss
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -5772,17 +5751,6 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_unstated
-    affected_quantities:
-    - mass_loss_fraction
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: zhang-2021-acsesc-si::zhang_si_table_s1_bas1200c1h_mass_loss
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -6165,17 +6133,6 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_unstated
-    affected_quantities:
-    - mass_loss_fraction
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: zhang-2021-acsesc-si::zhang_si_table_s1_bas1200c40h_mass_loss
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -6558,17 +6515,6 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_unstated
-    affected_quantities:
-    - mass_loss_fraction
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: zhang-2021-acsesc-si::zhang_si_table_s1_bas1200c4h_mass_loss
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -6951,17 +6897,6 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_unstated
-    affected_quantities:
-    - mass_loss_fraction
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: zhang-2021-acsesc-si::zhang_si_table_s1_bas1400c0m1_mass_loss
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -7344,17 +7279,6 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_unstated
-    affected_quantities:
-    - mass_loss_fraction
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: zhang-2021-acsesc-si::zhang_si_table_s1_bas1400c0m2_mass_loss
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -7737,17 +7661,6 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_unstated
-    affected_quantities:
-    - mass_loss_fraction
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: zhang-2021-acsesc-si::zhang_si_table_s1_bas1400c15m_mass_loss
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -8130,17 +8043,6 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_unstated
-    affected_quantities:
-    - mass_loss_fraction
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: zhang-2021-acsesc-si::zhang_si_table_s1_bas1400c30m_mass_loss
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -8523,17 +8425,6 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_unstated
-    affected_quantities:
-    - mass_loss_fraction
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: zhang-2021-acsesc-si::zhang_si_table_s1_bas1400c60m_mass_loss
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -8916,17 +8807,6 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
-  - kind: method_unstated
-    affected_quantities:
-    - mass_loss_fraction
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: zhang-2021-acsesc-si::zhang_si_table_s1_bas1400c90m_mass_loss
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction
@@ -9238,17 +9118,7 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices:
-  - kind: method_unstated
-    affected_quantities: []
-    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
-    origin: zhang-2021-acsesc-si::zhang_si_table_s1_published_weights
-    policy:
-      id: DP-106
-      version: 1
-      status: proposed
-      value: unspecified
-      units: method token
+  notices: []
   source_id: zhang-2021-acsesc-si
   locator:
     page: 9

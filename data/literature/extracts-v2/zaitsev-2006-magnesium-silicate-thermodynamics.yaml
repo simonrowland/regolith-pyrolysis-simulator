@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/zaitsev-2006-magnesium-silicate-thermodynamics.yaml
 observations:
 - observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq16_mg2sio4_model_function
-  experiment_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245::zaitsev-2006-magnesium-silicate-thermodynamics
+  experiment_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245::zaitsev-2006-magnesium-silicate-thermodynamics::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -39,7 +39,17 @@ observations:
   admission:
     status: pending
     reason: source admission_status=typed_unavailable is not a closed v2.1 token
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq16_mg2sio4_model_function
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: zaitsev-2006-magnesium-silicate-thermodynamics
   locator:
     page: 9
@@ -118,7 +128,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq17_mgsio3_model_function
-  experiment_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245::zaitsev-2006-magnesium-silicate-thermodynamics
+  experiment_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245::zaitsev-2006-magnesium-silicate-thermodynamics::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -154,7 +164,17 @@ observations:
   admission:
     status: pending
     reason: source admission_status=typed_unavailable is not a closed v2.1 token
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_eq17_mgsio3_model_function
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: zaitsev-2006-magnesium-silicate-thermodynamics
   locator:
     page: 9
@@ -2875,7 +2895,7 @@ observations:
   provenance:
     printed_phase: l
 - observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table4_enstatite_calculated_delta_fG
-  experiment_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245::zaitsev-2006-magnesium-silicate-thermodynamics
+  experiment_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245::zaitsev-2006-magnesium-silicate-thermodynamics::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -2922,7 +2942,17 @@ observations:
         pdf_page_index: 6
         table: '4'
         note: table_row_number=13; table_column_number=4; phase=solid; row=Enstatite MgSiO3; ΔfG(298 K); Calculated
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table4_enstatite_calculated_delta_fG
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: zaitsev-2006-magnesium-silicate-thermodynamics
   locator:
     page: 7
@@ -2972,7 +3002,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table4_enstatite_experimental_delta_fG
-  experiment_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245::zaitsev-2006-magnesium-silicate-thermodynamics
+  experiment_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245::zaitsev-2006-magnesium-silicate-thermodynamics::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -3019,7 +3049,17 @@ observations:
         pdf_page_index: 6
         table: '4'
         note: table_row_number=13; table_column_number=3; phase=solid; row=Enstatite MgSiO3; ΔfG(298 K); Experimental
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table4_enstatite_experimental_delta_fG
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: zaitsev-2006-magnesium-silicate-thermodynamics
   locator:
     page: 7
@@ -3060,7 +3100,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table4_protoenstatite_calculated_delta_fG
-  experiment_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245::zaitsev-2006-magnesium-silicate-thermodynamics
+  experiment_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245::zaitsev-2006-magnesium-silicate-thermodynamics::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -3107,7 +3147,17 @@ observations:
         pdf_page_index: 6
         table: '4'
         note: table_row_number=53; table_column_number=4; phase=solid; row=Protoenstatite MgSiO3; ΔfG(298 K); Calculated
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table4_protoenstatite_calculated_delta_fG
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: zaitsev-2006-magnesium-silicate-thermodynamics
   locator:
     page: 7
@@ -3157,7 +3207,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table4_protoenstatite_experimental_delta_fG
-  experiment_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245::zaitsev-2006-magnesium-silicate-thermodynamics
+  experiment_id: 9280a1070ca01da9094b5b24702d2a5da3a34903e94f743afbfdb7cd89e53245::zaitsev-2006-magnesium-silicate-thermodynamics::method:unspecified
   identity:
     quantity:
       tag: unknown
@@ -3204,7 +3254,17 @@ observations:
         pdf_page_index: 6
         table: '4'
         note: table_row_number=53; table_column_number=3; phase=solid; row=Protoenstatite MgSiO3; ΔfG(298 K); Experimental
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: zaitsev-2006-magnesium-silicate-thermodynamics::zaitsev_2006_table4_protoenstatite_experimental_delta_fG
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: zaitsev-2006-magnesium-silicate-thermodynamics
   locator:
     page: 7

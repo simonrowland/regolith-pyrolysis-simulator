@@ -56064,6 +56064,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Calculation based on
+      the phase diagram'
+    origin: shornikov-2026-wollastonite-kems::shornikov_2026_table7_row_01_heat_of_fusion
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -56175,6 +56187,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Calculation based on
+      the phase diagram'
+    origin: shornikov-2026-wollastonite-kems::shornikov_2026_table7_row_01_melting_temperature
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -56202,7 +56226,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table7_row_02_heat_of_fusion
-  experiment_id: 10.1134/s0016702926700035::shornikov-2026-wollastonite-kems
+  experiment_id: 10.1134/s0016702926700035::shornikov-2026-wollastonite-kems::method:solution_calorimetry
   identity:
     quantity:
       tag: value
@@ -56313,7 +56337,7 @@ observations:
   provenance:
     printed_phase: crystal and melt
 - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table7_row_02_melting_temperature
-  experiment_id: 10.1134/s0016702926700035::shornikov-2026-wollastonite-kems
+  experiment_id: 10.1134/s0016702926700035::shornikov-2026-wollastonite-kems::method:solution_calorimetry
   identity:
     quantity:
       tag: value
@@ -56508,6 +56532,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Calculation based on
+      the phase diagram'
+    origin: shornikov-2026-wollastonite-kems::shornikov_2026_table7_row_03_heat_of_fusion
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -56619,6 +56655,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Calculation based on
+      the phase diagram'
+    origin: shornikov-2026-wollastonite-kems::shornikov_2026_table7_row_03_melting_temperature
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -56730,6 +56778,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Thermochemical calculations'
+    origin: shornikov-2026-wollastonite-kems::shornikov_2026_table7_row_04_heat_of_fusion
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -56841,6 +56900,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Thermochemical calculations'
+    origin: shornikov-2026-wollastonite-kems::shornikov_2026_table7_row_04_melting_temperature
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -56952,6 +57022,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Calculation based on
+      the phase diagram'
+    origin: shornikov-2026-wollastonite-kems::shornikov_2026_table7_row_05_heat_of_fusion
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -57063,6 +57145,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Calculation based on
+      the phase diagram'
+    origin: shornikov-2026-wollastonite-kems::shornikov_2026_table7_row_05_melting_temperature
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -57090,7 +57184,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table7_row_06_heat_of_fusion
-  experiment_id: 10.1134/s0016702926700035::shornikov-2026-wollastonite-kems
+  experiment_id: 10.1134/s0016702926700035::shornikov-2026-wollastonite-kems::method:solution_calorimetry
   identity:
     quantity:
       tag: value
@@ -57201,7 +57295,7 @@ observations:
   provenance:
     printed_phase: crystal and melt
 - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table7_row_06_melting_temperature
-  experiment_id: 10.1134/s0016702926700035::shornikov-2026-wollastonite-kems
+  experiment_id: 10.1134/s0016702926700035::shornikov-2026-wollastonite-kems::method:solution_calorimetry
   identity:
     quantity:
       tag: value
@@ -57396,6 +57490,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Calculation based on
+      the phase diagram'
+    origin: shornikov-2026-wollastonite-kems::shornikov_2026_table7_row_07_heat_of_fusion
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -57507,6 +57613,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Calculation based on
+      the phase diagram'
+    origin: shornikov-2026-wollastonite-kems::shornikov_2026_table7_row_07_melting_temperature
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -57534,7 +57652,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table7_row_08_heat_of_fusion
-  experiment_id: 10.1134/s0016702926700035::shornikov-2026-wollastonite-kems
+  experiment_id: 10.1134/s0016702926700035::shornikov-2026-wollastonite-kems::method:solution_calorimetry
   identity:
     quantity:
       tag: value
@@ -57645,7 +57763,7 @@ observations:
   provenance:
     printed_phase: crystal and melt
 - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table7_row_08_melting_temperature
-  experiment_id: 10.1134/s0016702926700035::shornikov-2026-wollastonite-kems
+  experiment_id: 10.1134/s0016702926700035::shornikov-2026-wollastonite-kems::method:solution_calorimetry
   identity:
     quantity:
       tag: value
@@ -57756,7 +57874,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table7_row_09_heat_of_fusion
-  experiment_id: 10.1134/s0016702926700035::shornikov-2026-wollastonite-kems
+  experiment_id: 10.1134/s0016702926700035::shornikov-2026-wollastonite-kems::method:drop_calorimetry
   identity:
     quantity:
       tag: value
@@ -57867,7 +57985,7 @@ observations:
   provenance:
     printed_phase: crystal and melt
 - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table7_row_09_melting_temperature
-  experiment_id: 10.1134/s0016702926700035::shornikov-2026-wollastonite-kems
+  experiment_id: 10.1134/s0016702926700035::shornikov-2026-wollastonite-kems::method:drop_calorimetry
   identity:
     quantity:
       tag: value
@@ -57978,7 +58096,7 @@ observations:
   provenance:
     printed_phase: cr
 - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table7_row_10_heat_of_fusion
-  experiment_id: 10.1134/s0016702926700035::shornikov-2026-wollastonite-kems
+  experiment_id: 10.1134/s0016702926700035::shornikov-2026-wollastonite-kems::method:calorimetry
   identity:
     quantity:
       tag: value
@@ -58062,6 +58180,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_inferred
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: Ice calorimetry'
+    origin: shornikov-2026-wollastonite-kems::shornikov_2026_table7_row_10_heat_of_fusion
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -58089,7 +58219,7 @@ observations:
   provenance:
     printed_phase: crystal and melt
 - observation_id: shornikov-2026-wollastonite-kems::shornikov_2026_table7_row_10_melting_temperature
-  experiment_id: 10.1134/s0016702926700035::shornikov-2026-wollastonite-kems
+  experiment_id: 10.1134/s0016702926700035::shornikov-2026-wollastonite-kems::method:calorimetry
   identity:
     quantity:
       tag: value
@@ -58173,6 +58303,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=source method
+      text: Ice calorimetry'
+    origin: shornikov-2026-wollastonite-kems::shornikov_2026_table7_row_10_melting_temperature
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -58284,6 +58426,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Thermochemical calculations'
+    origin: shornikov-2026-wollastonite-kems::shornikov_2026_table7_row_11_heat_of_fusion
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -58395,6 +58548,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source method text is not mapped: Thermochemical calculations'
+    origin: shornikov-2026-wollastonite-kems::shornikov_2026_table7_row_11_melting_temperature
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature

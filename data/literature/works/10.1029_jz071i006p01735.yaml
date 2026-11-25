@@ -31,7 +31,7 @@ work:
         reason: INDEX does not give an unmatched-layer asset
   doi: 10.1029/jz071i006p01735
 experiments:
-- experiment_id: 10.1029/jz071i006p01735::experiment::centolanzi_1966_fig13b_no_boiling_test
+- experiment_id: 10.1029/jz071i006p01735::centolanzi-1966-tektite-vapour-pressure::declared:10.1029/jz071i006p01735::experiment::centolanzi_1966_fig13b_no_boiling_test::method:unspecified
   kind: literature
   method:
     tag: value
@@ -108,7 +108,7 @@ experiments:
     published_page: 1745
     pdf_page_index: 10
     figure: 13(b)
-- experiment_id: 10.1029/jz071i006p01735::experiment::centolanzi_1966_fig7_furnace_series
+- experiment_id: 10.1029/jz071i006p01735::centolanzi-1966-tektite-vapour-pressure::declared:10.1029/jz071i006p01735::experiment::centolanzi_1966_fig7_furnace_series::method:unspecified
   kind: literature
   method:
     tag: value
@@ -192,7 +192,7 @@ experiments:
     published_page: 1739
     pdf_page_index: 4
     figure: '7'
-- experiment_id: 10.1029/jz071i006p01735::experiment::centolanzi_1966_summary_fit_record
+- experiment_id: 10.1029/jz071i006p01735::centolanzi-1966-tektite-vapour-pressure::declared:10.1029/jz071i006p01735::experiment::centolanzi_1966_summary_fit_record::method:unspecified
   kind: literature
   method:
     tag: value
@@ -237,11 +237,262 @@ experiments:
     published_page: 1735
     pdf_page_index: 0
     section: Abstract
-- experiment_id: 10.1029/jz071i006p01735::experiment::quoted_chapman_larson_1963_relation
+- experiment_id: 10.1029/jz071i006p01735::centolanzi-1966-tektite-vapour-pressure::declared:10.1029/jz071i006p01735::experiment::quoted_chapman_larson_1963_relation::method:unspecified
   kind: literature
   method:
     tag: value
     value: unspecified
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The equation gives a temperature variable, not a single experimental point.
+      locator:
+        page: 14
+        published_page: 1748
+        pdf_page_index: 13
+        section: Summary of Results and Concluding Remarks
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The cited prior fit has no experiment pressure stated in this paper.
+      locator:
+        page: 14
+        published_page: 1748
+        pdf_page_index: 13
+        section: Summary of Results and Concluding Remarks
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: The cited prior fit has no gas composition stated in this paper.
+      locator:
+        page: 14
+        published_page: 1748
+        pdf_page_index: 13
+        section: Summary of Results and Concluding Remarks
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The cited prior fit has no flow-regime statement in this paper.
+  work_id: 10.1029/jz071i006p01735
+  locator:
+    page: 14
+    published_page: 1748
+    pdf_page_index: 13
+    section: Summary of Results and Concluding Remarks
+- experiment_id: 10.1029/jz071i006p01735::experiment::centolanzi_1966_fig13b_no_boiling_test
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2310'
+      locator:
+        page: 11
+        published_page: 1745
+        pdf_page_index: 10
+        figure: 13(b)
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5066.25'
+          approximate: false
+      locator:
+        page: 11
+        published_page: 1745
+        pdf_page_index: 10
+        figure: 13(b)
+        note: printed P_s = 0.05 atm, converted exactly to Pa
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.05'
+            locator:
+              page: 11
+              published_page: 1745
+              pdf_page_index: 10
+              figure: 13(b)
+              note: printed P_s = 0.05 atm, converted exactly to Pa
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 11
+              published_page: 1745
+              pdf_page_index: 10
+              figure: 13(b)
+              note: printed P_s = 0.05 atm, converted exactly to Pa
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: Arc-jet gas composition is not stated.
+      locator:
+        page: 11
+        published_page: 1745
+        pdf_page_index: 10
+        figure: 13(b)
+    regime:
+      regime_class:
+        tag: unknown
+        reason: No typed flow-regime class is stated for this arc-jet test.
+  work_id: 10.1029/jz071i006p01735
+  locator:
+    page: 11
+    published_page: 1745
+    pdf_page_index: 10
+    figure: 13(b)
+- experiment_id: 10.1029/jz071i006p01735::experiment::centolanzi_1966_fig7_furnace_series
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1700'
+      locator:
+        page: 5
+        published_page: 1739
+        pdf_page_index: 4
+        figure: '7'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '10.1325'
+          approximate: false
+      locator:
+        page: 5
+        published_page: 1739
+        pdf_page_index: 4
+        figure: '7'
+        note: printed P = 10^-4 atm, converted exactly to Pa
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0001'
+            locator:
+              page: 5
+              published_page: 1739
+              pdf_page_index: 4
+              figure: '7'
+              note: printed P = 10^-4 atm, converted exactly to Pa
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 5
+              published_page: 1739
+              pdf_page_index: 4
+              figure: '7'
+              note: printed P = 10^-4 atm, converted exactly to Pa
+        output_unit: Pa
+        references: []
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: argon
+          flow_sccm:
+            tag: unknown
+            reason: Furnace gas flow is not stated.
+          partial_pressure_Pa:
+            tag: unknown
+            reason: No argon partial pressure is stated.
+      locator:
+        page: 3
+        published_page: 1737
+        pdf_page_index: 2
+        section: Experimental Procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The printed diffusion-controlled regime has no exact RegimeClass token.
+  work_id: 10.1029/jz071i006p01735
+  locator:
+    page: 5
+    published_page: 1739
+    pdf_page_index: 4
+    figure: '7'
+- experiment_id: 10.1029/jz071i006p01735::experiment::centolanzi_1966_summary_fit_record
+  kind: literature
+  method:
+    tag: unknown
+    reason: Aggregate fit record, not a single experimental run.
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The fit states 1700 to 3000°K, not one point temperature.
+      locator:
+        page: 1
+        published_page: 1735
+        pdf_page_index: 0
+        section: Abstract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The aggregate fit combines several experiments and has no single pressure condition.
+      locator:
+        page: 1
+        published_page: 1735
+        pdf_page_index: 0
+        section: Abstract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: No single carrier gas is assigned to the aggregate fit.
+      locator:
+        page: 1
+        published_page: 1735
+        pdf_page_index: 0
+        section: Abstract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: No single regime is assigned to the aggregate fit.
+  work_id: 10.1029/jz071i006p01735
+  locator:
+    page: 1
+    published_page: 1735
+    pdf_page_index: 0
+    section: Abstract
+- experiment_id: 10.1029/jz071i006p01735::experiment::quoted_chapman_larson_1963_relation
+  kind: literature
+  method:
+    tag: unknown
+    reason: The cited equation is attributed to Chapman and Larson [1963]; its experimental method is not restated.
   sample: {}
   conditions:
     temperature_K:
