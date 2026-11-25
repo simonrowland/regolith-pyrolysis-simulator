@@ -307,14 +307,10 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
     # the upstream SiO2 wall deposit pinned below, not stage-3 capture.
     assert staged_silica == pytest.approx(0.0, abs=1e-15), staged_sio_stage
     assert continuous_silica == pytest.approx(0.0, abs=1.0e-15)
-    assert set(staged_sio_stage) == {"Si", "SiO2", "Fe"}, ", ".join(
-        f"{species}={kg!r}"
-        for species, kg in sorted(staged_sio_stage.items())
-    )
-    assert staged_sio_stage["Fe"] > 0.0
-    assert staged_sio_stage["Si"] + staged_sio_stage["SiO2"] == pytest.approx(
-        staged_silica, rel=1e-12
-    )
+    # Studio 4c2bf77b: stage 3 collected no species. The old
+    # {Si, SiO2, Fe} set was the pre-change pin. Si-bearing mass is
+    # the upstream wall, pinned on the cold-spot test.
+    assert staged_sio_stage == {}
     assert continuous_sio_stage == {}
     assert pins["staged_product_sio_kg"] == pytest.approx(0.0)
 
