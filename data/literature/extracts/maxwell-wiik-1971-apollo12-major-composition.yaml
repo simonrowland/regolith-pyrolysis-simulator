@@ -1,0 +1,64 @@
+schema_version: literature_extract.v1
+source_id: maxwell-wiik-1971-apollo12-major-composition
+source:
+  citation: Maxwell, J. A. & Wiik, H. B. (1971), "Chemical composition of Apollo 12 lunar samples 12004, 12033, 12051, 12052 and 12065", Earth and Planetary Science Letters, 10, 285–288.
+  year: 1971
+extraction:
+  method: Table 1 sample 12065,84 GSF column transcribed from the rendered PDF page and checked against the corpus text artifact. Only the named rock sample is extracted; other Table 1 samples are omitted.
+  date: '2026-11-24'
+  worker: codex-bugs1110-sb7-lunar-242128
+  provenance_path: raw/maxwell-wiik-1971-apollo12-major-composition/maxwell-wiik-1971-apollo12-major-composition.pdf
+review_status: draft
+species:
+  SiO2:
+    observations:
+    - observation_id: maxwell_wiik_1971_apollo12_sample_12065_84_gsf_bulk_composition_table1
+      type: gibbs_table
+      locator:
+        source_path: text/maxwell-wiik-1971-apollo12-major-composition/pdftotext-layout.txt
+        table: '1'
+        published_page: 286
+        pdf_page_index: 2
+        row: '12065,84 GSF'
+      T_range_K: null
+      phase: Apollo_12_lunar_rock_12065
+      standard_state: bulk sample composition as published
+      regime: analytical_composition
+      units: major oxides wt% as published
+      values:
+        quantity: bulk_sample_composition
+        sample: '12065'
+        sample_number_as_printed: '12065,84'
+        sample_type_as_printed: rock
+        analysis_as_printed: GSF
+        major_oxide_measurements_wt_pct:
+          SiO2: 46.87
+          TiO2: 3.34
+          Al2O3: 10.05
+          Cr2O3: 0.50
+          FeO: 19.76
+          MnO: 0.256
+          MgO: 7.82
+          CaO: 10.73
+          Na2O: 0.27
+          K2O: 0.073
+          P2O5: 0.13
+      uncertainty:
+        note: No uncertainty printed for this whole-sample column.
+fidelity_samples:
+- path: species.SiO2.observations[maxwell_wiik_1971_apollo12_sample_12065_84_gsf_bulk_composition_table1].values.major_oxide_measurements_wt_pct.SiO2
+  value: 46.87
+  locator:
+    source_path: text/maxwell-wiik-1971-apollo12-major-composition/pdftotext-layout.txt
+    table: '1'
+    published_page: 286
+    pdf_page_index: 2
+    row: '12065,84 GSF'
+- path: species.SiO2.observations[maxwell_wiik_1971_apollo12_sample_12065_84_gsf_bulk_composition_table1].values.major_oxide_measurements_wt_pct.MgO
+  value: 7.82
+  locator:
+    source_path: text/maxwell-wiik-1971-apollo12-major-composition/pdftotext-layout.txt
+    table: '1'
+    published_page: 286
+    pdf_page_index: 2
+    row: '12065,84 GSF'
