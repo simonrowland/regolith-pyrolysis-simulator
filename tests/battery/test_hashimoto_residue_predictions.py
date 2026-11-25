@@ -328,7 +328,7 @@ def test_hashimoto_openimcc_primary_numeric_output_is_pinned() -> None:
     # engine_flags and an empty pressure_law_diagnostics.
     # Final integration-tip remote output must replace these provisional pins.
     assert _hashimoto_prediction_tuple_digest(predictions) == (
-        "3b1878ecf87665fde693e50342c568cfa276ab166eb936671ab6addc3e634642"
+        "8b0fde172e9f906fd8dec68f7b9d305707e2a6fc67820579bc32e3755475f0ad"
     ), _hashimoto_prediction_tuple_digest(predictions)
     primary = next(
         row for row in predictions if row.alpha_arm == _HASHIMOTO_PRIMARY_ALPHA_ARM
