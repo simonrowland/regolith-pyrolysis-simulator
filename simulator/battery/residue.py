@@ -2103,13 +2103,27 @@ def _time_forward_thermal_segments(
         raise ResidueInventoryRefusal(
             "temperature_path_not_supported", f"Zhang run at {celsius:g} C"
         )
-    # Zhang reports a 40 C/min ramp from 850 C. Its 1200 C runs include a
-    # five-minute hold at the target; 1400 C zero-time specimens are quenched
-    # on reaching 1400 C. A 60 s midpoint partition preserves the printed ramp
-    # rate while bounding the predictor's integration step. Published 1200 C
-    # times are effective dwell minus the common five minutes, so restore that
-    # dwell only on the 1200 C path.
-    ramp_rate_K_s = 40.0 / 60.0
+    # Zhang's located Methods §2.2 values set the ramp start and rate. The
+    # 1200 C runs include a five-minute hold at the target; 1400 C zero-time
+    # specimens are quenched on reaching 1400 C. A 60 s midpoint partition
+    # preserves the printed ramp rate while bounding the integration step.
+    # Published 1200 C times are effective dwell minus the common five minutes,
+    # so restore that dwell only on the 1200 C path.
+    ramp_start_C = _located_point(
+        point_conditions.get("ramp_start_C"), allow_scalar=True
+    )
+    ramp_rate_C_min = _located_point(
+        point_conditions.get("ramp_rate_C_per_min"), allow_scalar=True
+    )
+    if (
+        ramp_start_C is None
+        or ramp_rate_C_min is None
+        or ramp_rate_C_min <= 0.0
+    ):
+        raise ResidueInventoryRefusal(
+            "heating_schedule_not_stated", "located ramp start and rate"
+        )
+    ramp_rate_K_s = ramp_rate_C_min / 60.0
     segments: list[tuple[float, float]] = []
 
     def ramp(start_K: float, end_K: float) -> None:
@@ -2121,7 +2135,7 @@ def _time_forward_thermal_segments(
             midpoint = start_K + (end_K - start_K) * (index + 0.5) / steps
             segments.append((midpoint, duration_s / steps))
 
-    start_K = 850.0 + 273.15
+    start_K = ramp_start_C + 273.15
     at_1200_K = 1200.0 + 273.15
     if math.isclose(celsius, 1200.0, abs_tol=1e-7):
         ramp(start_K, at_1200_K)

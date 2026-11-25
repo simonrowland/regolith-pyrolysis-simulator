@@ -26957,10 +26957,31 @@ class Migrator:
             # extract locators are still available, and pass located facts to
             # each observation without writing derived values into the extract.
             run_inputs: dict[str, dict[str, Any]] = {}
+            heating_schedule: dict[str, Located[Any]] = {}
             for _formula, row in rows:
                 values = row.get("values")
                 if not isinstance(values, Mapping):
                     continue
+                printed_schedule = values.get("heating_schedule")
+                if isinstance(printed_schedule, Mapping):
+                    schedule_locator = locator_from_mapping(
+                        printed_schedule.get("locator")
+                    )
+                    ramp_start = _as_dec_or_none(
+                        printed_schedule.get("ramp_start_C")
+                    )
+                    ramp_rate = _as_dec_or_none(
+                        printed_schedule.get("ramp_rate_C_per_min")
+                    )
+                    if ramp_start is not None and ramp_rate is not None:
+                        heating_schedule = {
+                            "ramp_start_C": located_value(
+                                ramp_start, schedule_locator
+                            ),
+                            "ramp_rate_C_per_min": located_value(
+                                ramp_rate, schedule_locator
+                            ),
+                        }
                 for sample in values.get("runs") or ():
                     if not isinstance(sample, Mapping) or not sample.get("sample"):
                         continue
@@ -27011,6 +27032,7 @@ class Migrator:
                         area_after, area_locator
                     )
             source_context["zhang_sample_run_inputs"] = run_inputs
+            source_context["zhang_heating_schedule"] = heating_schedule
         records = phase_field_records(doc)
         self._phase_field_records[source_id] = records
         for problem in () if records is None else records.problems:
@@ -29494,6 +29516,17 @@ class Migrator:
                 Quantity.RESIDUE_COMPONENT_COMPOSITION,
             }
         ):
+            heating_schedule = (source_context or {}).get(
+                "zhang_heating_schedule", {}
+            )
+            if isinstance(heating_schedule, Mapping):
+                for field_name in ("ramp_start_C", "ramp_rate_C_per_min"):
+                    located = heating_schedule.get(field_name)
+                    if isinstance(located, Located):
+                        point_conditions = {
+                            **(point_conditions or {}),
+                            field_name: located,
+                        }
             sample_name = values.get("sample")
             if not isinstance(sample_name, str) and locator is not None:
                 sample_name = locator.paragraph

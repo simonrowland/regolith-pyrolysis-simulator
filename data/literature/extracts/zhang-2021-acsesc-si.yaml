@@ -75,6 +75,14 @@ species:
       values:
         quantity: untyped_sample_mass_measurements
         method_class: measured_direct
+        heating_schedule:
+          ramp_start_C: 850
+          ramp_rate_C_per_min: 40
+          locator:
+            page: 8
+            section: 2.2 Vacuum evaporation experiments
+            line_range: 208-214
+            note: "Main article Methods §2.2, lines 208–214: programmed heating starts at 850°C with a 40°C/min ramp."
         runs:
         - sample: Bas1400C0m1
           mass_before_mg: 40.4

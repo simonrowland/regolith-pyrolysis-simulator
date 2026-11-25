@@ -21,6 +21,7 @@ from simulator.battery.residue import (
 )
 from simulator.material_densities import resolve_melt_density_kg_m3
 from simulator.battery.score import ScoreContext, score_store
+from simulator.battery.records import State
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -168,6 +169,49 @@ def test_zhang_zero_time_segments_run_through_geometry_integrator() -> None:
         else:
             assert segments[-1][1] > 0.0
             assert segments[-1][0] < 1400.0 + 273.15
+
+
+def test_zhang_ramp_segments_read_located_schedule_values() -> None:
+    source_id = "zhang-2021-acsesc-si"
+    _context, observations, _experiments, _source_observations = _residue_context(
+        source_id
+    )
+    observation = next(
+        row
+        for row in observations.values()
+        if round(float(row.identity.temperature_K.value) - 273.15, 6) == 1400.0
+        and float(row.point_conditions["time_min"].state.value) == 0.0
+    )
+    temperature_K = float(observation.identity.temperature_K.value)
+    original_path = _time_forward_thermal_segments(
+        source_id, observation, temperature_K
+    )
+
+    changed_start_conditions = dict(observation.point_conditions)
+    start = changed_start_conditions["ramp_start_C"]
+    changed_start_conditions["ramp_start_C"] = replace(
+        start, state=State.of(900.0)
+    )
+    changed_start = replace(
+        observation, point_conditions=changed_start_conditions
+    )
+    changed_start_path = _time_forward_thermal_segments(
+        source_id, changed_start, temperature_K
+    )
+    assert changed_start_path[0][0] != original_path[0][0]
+
+    changed_rate_conditions = dict(observation.point_conditions)
+    rate = changed_rate_conditions["ramp_rate_C_per_min"]
+    changed_rate_conditions["ramp_rate_C_per_min"] = replace(
+        rate, state=State.of(20.0)
+    )
+    changed_rate = replace(
+        observation, point_conditions=changed_rate_conditions
+    )
+    changed_rate_path = _time_forward_thermal_segments(
+        source_id, changed_rate, temperature_K
+    )
+    assert len(changed_rate_path) > len(original_path)
 
 
 def test_dp116_notice_uses_the_melt_density_fallback_owner() -> None:
