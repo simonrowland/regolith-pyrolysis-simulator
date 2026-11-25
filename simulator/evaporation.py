@@ -6067,7 +6067,16 @@ class EvaporationMixin:
             return {}
         fe_formula = resolve_species_formula('Fe', self.species_formula_registry)
         fe_molar_mass = fe_formula.molar_mass_kg_per_mol()
-        rate_kg_hr = native_fe_vapor_mol * fe_molar_mass
+        step_kg = native_fe_vapor_mol * fe_molar_mass
+        if source_account == 'process.cleaned_melt':
+            # The shared router books rate * dt, and these moles are
+            # already this step's quantity. Pass a rate so the booked
+            # mass stays the requested moles. A one-hour step divides by 1.
+            rate_kg_hr = step_kg / self.process_dt_hr()
+        else:
+            # The metal-phase branch condenses this call's kilograms
+            # directly. It does not multiply by dt.
+            rate_kg_hr = step_kg
         evap_flux = EvaporationFlux(species_kg_hr={'Fe': rate_kg_hr})
         evap_flux.update_totals()
         self._configure_condensation_operating_conditions(evap_flux)
