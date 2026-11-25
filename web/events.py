@@ -2831,6 +2831,12 @@ def _full_runner_payload(
             )
         else:
             payload.pop('refusal_diagnostic', None)
+        run_metadata = payload.get('run_metadata')
+        if isinstance(run_metadata, dict):
+            _attach_execution_diagnostics(
+                run_metadata,
+                run_flags=_run_flags_for_export(session),
+            )
         recipe_snapshot = _recipe_snapshot_from_projector(projector)
         if recipe_snapshot is not None:
             payload['recipe_snapshot'] = recipe_snapshot

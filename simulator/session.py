@@ -970,8 +970,9 @@ def drive_session(
         if not until_campaign_complete and step_index >= int(hours):
             if step_index > 0 and finite_budget:
                 run_flag = _hour_budget_exhausted_flag(session)
-                if run_flag is not None:
-                    session._run_flags.append(run_flag)
+                run_flags = getattr(session, "_run_flags", None)
+                if run_flag is not None and run_flags is not None:
+                    run_flags.append(run_flag)
             return
         step_index += 1
         if stop_at_stage0_exit and _at_stage0_exit(session):
@@ -1002,11 +1003,13 @@ def drive_session(
             raise ValueError(f"unsupported decision policy {policy!r}")
         result = session.advance()
         if not advanced:
-            session._run_flags[:] = [
-                flag
-                for flag in session._run_flags
-                if flag.get("code") != _RUN_HOUR_BUDGET_FLAG_CODE
-            ]
+            run_flags = getattr(session, "_run_flags", None)
+            if run_flags is not None:
+                run_flags[:] = [
+                    flag
+                    for flag in run_flags
+                    if flag.get("code") != _RUN_HOUR_BUDGET_FLAG_CODE
+                ]
             advanced = True
         yield result
         if stop_at_stage0_exit and _at_stage0_exit(session):

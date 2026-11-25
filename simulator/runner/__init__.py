@@ -5894,6 +5894,8 @@ def _attach_execution_diagnostics(
     run_flags = list(run_flags or ())
     if run_flags:
         run_metadata["run_flags"] = _json_safe(run_flags)
+    else:
+        run_metadata.pop("run_flags", None)
     campaign_stops = list(campaign_stops or ())
     if any(
         isinstance(stop, Mapping) and stop.get("flags")

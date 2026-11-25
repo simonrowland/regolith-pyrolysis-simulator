@@ -4388,6 +4388,47 @@ def test_web_artifact_projection_preserves_existing_run_and_campaign_flags():
     assert fallback_metadata["campaign_stops"] == metadata["campaign_stops"]
 
 
+def test_recorded_web_projection_drops_budget_flag_after_c6_no():
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C2A",
+        hours=1,
+    )
+    session = run._start_session()
+    sim = session.simulator
+    sim.record.path = "A_post_mg_boiloff"
+    sim.record.branch = "two"
+    sim.campaign_mgr.campaigns["C2A_continuous"]["max_hold_hr"] = 1
+
+    pending_execution = runner_module.RunExecutor().execute_session(
+        session,
+        hours=1,
+    )
+    recorded_payload = run._build_output(pending_execution)
+    session._set_result_document(recorded_payload)
+
+    assert sim.pending_decision is not None
+    assert sim.pending_decision.decision_type is DecisionType.C6_PROCEED
+    assert any(
+        flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+        for flag in recorded_payload["run_metadata"]["run_flags"]
+    )
+
+    session.decide("no")
+    assert session.is_complete()
+
+    projected_payload = web_events._full_runner_payload(
+        session,
+        projector=run,
+        status="ok",
+    )
+
+    assert not any(
+        flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+        for flag in projected_payload["run_metadata"].get("run_flags", ())
+    )
+
+
 def test_real_web_session_failure_persists_non_sparse_terminal(tmp_path, monkeypatch):
     captured_tasks = _force_socketio_internal_analytical(monkeypatch)
     app = app_module.create_app()
