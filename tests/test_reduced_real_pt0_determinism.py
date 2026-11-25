@@ -2836,6 +2836,10 @@ def test_pt0_equilibrium_replay_misses_after_activity_setpoint_change() -> None:
     source_key = capture.capture_sequence[-1]["key"]
 
     sim.setpoints["high_t_melt_activity"] = "constant_gamma"
+    configured_key = capture._equilibrium_key(sim)
+    assert configured_key["solver_inputs"]["high_t_melt_activity"] == "openimcc"
+    assert configured_key == source_key
+
     sim._high_t_melt_activity = "constant_gamma"
     query_key = capture._equilibrium_key(sim)
 

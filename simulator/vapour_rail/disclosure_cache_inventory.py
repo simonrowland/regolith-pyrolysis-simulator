@@ -643,9 +643,17 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/melt_backend/openimcc_bridge.py:_load_pack': {
         "path": 'simulator/melt_backend/openimcc_bridge.py',
-        "line": 1018,
+        "line": 1095,
         "kind": 'lru',
         "name": '_load_pack',
+        "carries_disclosure": False,
+        "how": 'Pure loader or identity digest. It never evaluates a vapour law, so a cached value cannot carry a disclosure.',
+    },
+    'lru:simulator/melt_backend/openimcc_bridge.py:_load_gas_pack': {
+        "path": 'simulator/melt_backend/openimcc_bridge.py',
+        "line": 1118,
+        "kind": 'lru',
+        "name": '_load_gas_pack',
         "carries_disclosure": False,
         "how": 'Pure loader or identity digest. It never evaluates a vapour law, so a cached value cannot carry a disclosure.',
     },
@@ -715,7 +723,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/reduced_real_determinism.py:_source_module_digest': {
         "path": 'simulator/reduced_real_determinism.py',
-        "line": 4743,
+        "line": 4738,
         "kind": 'lru',
         "name": '_source_module_digest',
         "carries_disclosure": False,
@@ -851,7 +859,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/residue.py:pressure_cache': {
         "path": 'simulator/battery/residue.py',
-        "line": 3895,
+        "line": 3900,
         "kind": 'store',
         "name": 'pressure_cache',
         "carries_disclosure": True,
@@ -859,7 +867,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/residue.py:pressure_state_cache': {
         "path": 'simulator/battery/residue.py',
-        "line": 1452,
+        "line": 1451,
         "kind": 'store',
         "name": 'pressure_state_cache',
         "carries_disclosure": True,

@@ -3249,12 +3249,7 @@ def canonical_replay_key(
         **dependency_vector,
     }
     if artifact == "equilibrium_post_record":
-        setpoints = getattr(sim, "setpoints", {})
-        high_t_activity = (
-            setpoints.get("high_t_melt_activity", "openimcc")
-            if isinstance(setpoints, Mapping)
-            else "openimcc"
-        )
+        high_t_activity = getattr(sim, "_high_t_melt_activity", "openimcc")
         key["solver_inputs"] = {
             "high_t_melt_activity": _json_ready(high_t_activity),
         }
