@@ -20328,11 +20328,15 @@ def test_score_store_attempts_all_owned_handle_closes(
         )
 
     monkeypatch.setattr(battery, "open_battery_engine", open_probe_engine)
-    experiment = F.tabulation_experiment()
+    identity = F.activity_identity()
+    experiment = F.tabulation_experiment(
+        T_K=identity.temperature_K.value,
+        total_P=identity.total_pressure_Pa.value,
+    )
     reference = F.observation(
         "fd-close-reference",
         experiment.experiment_id,
-        F.activity_identity(),
+        identity,
         Decimal("0.1"),
         evidence=EvidenceClass.MEASURED_DIRECT,
         source_id="work-1",
