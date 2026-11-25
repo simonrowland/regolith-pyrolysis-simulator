@@ -6,6 +6,7 @@ from pathlib import Path
 
 import yaml
 
+from simulator.battery.enums import NoticeKind
 from simulator.battery.migrate import Migrator
 from tools.validate_literature_extracts import validate_extract_document
 
@@ -72,7 +73,9 @@ def test_printed_solid_formation_constants_validate_and_migrate_as_points() -> N
         row = actual[obs_id]
         assert row.value.kind.value == "point"
         assert row.value.point == value
-        assert row.notices == ()
+        assert tuple(notice.kind for notice in row.notices) == (
+            NoticeKind.METHOD_UNSTATED,
+        )
         assert row.identity.species.formula == formula
         assert row.identity.temperature_K.is_value
         assert row.identity.temperature_K.value == Decimal("1873")

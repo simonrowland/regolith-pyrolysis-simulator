@@ -31,6 +31,7 @@ from simulator.fe_redox import (
     KRESS91_INV_T_COEFFICIENT_K,
     KRESS91_LN_FO2_COEFFICIENT,
 )
+from simulator.physical_constants import MELT_DISSOCIATION_PO2_MIN_BAR
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.metal_saturation_floor import (
     melt_metal_saturation_floor_log10_fO2_bar,
@@ -2631,11 +2632,18 @@ def test_exchange_target_cannot_exceed_controlled_total_pressure() -> None:
 @pytest.mark.parametrize(
     ("buffer_o2_mol", "expected_unbacked_o2_mol", "expected_fO2_log"),
     [
-        (0.0, 0.0015952259282159419, -1.0),
+        # Both remainders are the production resolver on the capped tree.
+        # 636308c53e drives the exchange from the overhead ledger partial,
+        # not from the 1.5 mbar CONTROLLED_O2 setpoint. This plant drains
+        # the headspace first, so that partial is 0 and the logarithm
+        # uses the numerical floor. The buffer clamp is unchanged, and
+        # the effervescence cap does not bind below log10(0.0015).
+        (0.0, 0.006996955022607205, -1.0),
         # 1e-6 mol is a reducing exchange. Lunar mare loads no Fe2O3, so
-        # the tangent holds fO2. The old receipt (-1.0000000153832351) was
-        # the uncapped Euler step.
-        (1.0e-6, 0.001594225928215942, -1.0),
+        # the tangent holds fO2. The old fO2 receipt
+        # (-1.0000000153832351) was the uncapped Euler step. The mol
+        # remainder is the same ledger-drive step minus this buffer.
+        (1.0e-6, 0.006995955022607205, -1.0),
     ],
 )
 def test_melt_to_headspace_exchange_reports_unbacked_buffer_oxygen(
@@ -3437,27 +3445,93 @@ def test_native_fe_precipitation_hour_conserves_oxygen() -> None:
     booked = float(
         sim._redox_source_terms_this_hr["redox_source:native_fe_saturation_split"]
     )
-    capacity = float(
-        sim.melt.oxygen_reservoir.melt_redox_capacity_mol_per_ln_fO2
-    )
-    assert capacity > OXYGEN_RESERVOIR_NOOP_MOL
     assert 0.0 < booked <= o2_released * (1.0 + 1.0e-12)
-    tangent = base_fO2 + booked / (capacity * math.log(10.0))
-    published_floor, _published_metal = melt_metal_saturation_floor_log10_fO2_bar(
-        temperature_K,
-        sim._melt_metal_saturation_activities(temperature_K),
+    published = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+    line = sim._fe_metal_line_log10_fO2(temperature_K)
+    assert line is not None
+    # The extent is the Fe that reaches the line, not a fixed-fO2 lever
+    # that keeps climbing. Landing above the line is the oxidizing cross.
+    assert published == pytest.approx(float(line), abs=1.0e-6)
+    assert published <= float(line) + 1.0e-6
+    assert published < sim._melt_redox_fO2_upper_bound_log() - 1.0
+
+
+def test_native_fe_precipitation_from_far_below_lands_on_the_fe_line() -> None:
+    """Dust ferric iron does not publish a sub-guard fO2 or cross the Fe line.
+
+    q near 0 sends the Kress inverse below log10(1e-30 bar). That log is
+    not stored. One precipitation step stops on the Fe line of the melt
+    after the debit, conserves oxygen, and stays below the effervescence
+    ceiling. Crossing the line toward the ceiling is the forbidden move.
+    """
+
+    sim = _make_sim()
+    sim.melt.temperature_C = 1750.0
+    sim.melt.p_total_mbar = 10.0
+    temperature_K = 1750.0 + 273.15
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
+    sim.melt.oxygen_reservoir.reference_T_K = temperature_K
+    sim._sync_oxygen_reservoir_mirror()
+    melt = sim.atom_ledger.project_account_mol("process.cleaned_melt")
+    feo = float(melt.get("FeO", 0.0) or 0.0)
+    sim.atom_ledger.load_external_mol(
+        "process.cleaned_melt",
+        {"Fe2O3": feo * 1.0e-12},
+        source="test dust ferric below the float guard",
+        material_origin="feedstock",
     )
-    assert published_floor is not None
-    expected = min(
-        max(tangent, float(published_floor)),
-        sim._melt_redox_fO2_upper_bound_log(),
+    sim._project_cleaned_melt_from_atom_ledger()
+    unfloored, _floor, mode = sim._ledger_consistent_melt_fO2_and_floor(
+        temperature_K,
+    )
+    guard = math.log10(MELT_DISSOCIATION_PO2_MIN_BAR)
+    assert mode == "below_float_guard"
+    assert math.isfinite(unfloored)
+    assert unfloored >= guard
+
+    def _oxygen_snapshot() -> tuple[dict[str, float], dict[str, float]]:
+        balances = sim.atom_ledger.mol_by_account()
+        o2_mol = {
+            account: float(species.get("O2", 0.0) or 0.0)
+            for account, species in balances.items()
+        }
+        oxygen_atoms = {
+            account: float(
+                sim.atom_ledger.atom_moles_by_account(account).get("O", 0.0)
+            )
+            for account in balances
+        }
+        return o2_mol, oxygen_atoms
+
+    o2_before, oxygen_before = _oxygen_snapshot()
+    split = sim._apply_native_fe_saturation_split()
+    o2_after, oxygen_after = _oxygen_snapshot()
+    o2_accounts = set(o2_before) | set(o2_after)
+    oxygen_accounts = set(oxygen_before) | set(oxygen_after)
+    o2_released = math.fsum(
+        o2_after.get(account, 0.0) - o2_before.get(account, 0.0)
+        for account in o2_accounts
+    )
+    melt_o_drop = oxygen_before.get("process.cleaned_melt", 0.0) - oxygen_after.get(
+        "process.cleaned_melt", 0.0
+    )
+    total_o_before = math.fsum(oxygen_before.values())
+    total_o_after = math.fsum(
+        oxygen_after.get(account, 0.0) for account in oxygen_accounts
     )
     published = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
-    assert published == pytest.approx(expected, abs=1.0e-8)
-    assert published >= float(published_floor) - 1.0e-6
-    assert published <= float(published_floor) + 0.25 * (
-        float(published_floor) - base_fO2
-    )
+    line = sim._fe_metal_line_log10_fO2(temperature_K)
+    ceiling = sim._melt_redox_fO2_upper_bound_log()
+
+    assert split["native_fe_event"] == "native_fe_partitioned_saturation"
+    assert line is not None
+    assert published == pytest.approx(float(line), abs=1.0e-6)
+    assert published <= float(line) + 1.0e-6
+    assert published > guard
+    assert published < ceiling - 1.0
+    assert o2_released > 0.0
+    assert total_o_after == pytest.approx(total_o_before, rel=1.0e-12, abs=0.0)
+    assert melt_o_drop == pytest.approx(2.0 * o2_released, rel=1.0e-12, abs=0.0)
 
 
 def test_native_fe_partition_vacuum_exceeds_pn2_and_small_pool_vaporizes() -> None:
@@ -3509,10 +3583,10 @@ def test_pn2_native_fe_partition_e2e_drains_tap_and_reports_stage3_fe_wt() -> No
     assert snapshot.overhead.composition["N2"] == pytest.approx(10.0)
     assert partition["native_fe_pool_mol"] > 0.0
     assert partition["native_fe_tap_mol"] > partition["native_fe_vapor_mol"]
-    # The Holzheid extrapolation reduces the native Fe pool from 1842.724 to
-    # 1816.228 mol, shifting this escape fraction at 1700 °C.
+    # fraction = vapor/pool. The pool is the Fe that reaches the metal
+    # line, so a pasted lever-pool receipt is not the fraction.
     assert partition["native_fe_vapor_escape_fraction_of_pool"] == pytest.approx(
-        0.0020039128629401287,
+        partition["native_fe_vapor_mol"] / partition["native_fe_pool_mol"],
         rel=0.0,
         abs=1.0e-15,
     )

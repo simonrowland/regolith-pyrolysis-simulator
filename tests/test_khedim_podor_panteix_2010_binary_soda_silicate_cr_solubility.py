@@ -8,7 +8,7 @@ import subprocess
 import pytest
 import yaml
 
-from simulator.battery.enums import EvidenceClass, Phase, PhaseRole, Quantity
+from simulator.battery.enums import EvidenceClass, NoticeKind, Phase, PhaseRole, Quantity
 from simulator.battery.identity import celsius_to_kelvin
 from simulator.battery.migrate import REPO_ROOT, migrate
 from tests.battery.test_migrate import _write_min_tree
@@ -230,7 +230,9 @@ def test_isolated_migration_keeps_all_table2_points_and_conditions(tmp_path: Pat
         assert observation.identity.temperature_K.value == celsius_to_kelvin(Decimal(row["T_C"]))
         assert observation.identity.fO2_Pa.is_value
         assert observation.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
-        assert observation.notices == ()
+        assert tuple(notice.kind for notice in observation.notices) == (
+            NoticeKind.PHASE_INFERRED,
+        )
         assert observation.uncertainty.kind.value == "printed"
         assert observation.uncertainty.verbatim["confidence_level"] == "one_sigma"
         assert Decimal(str(observation.uncertainty.verbatim["sigma"])) == row["sigma"]

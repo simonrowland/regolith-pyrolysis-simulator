@@ -146,11 +146,20 @@ def test_ehrt_redox_values_migrate_as_points_with_printed_conditions():
             assert oxygen_log.locator == atmosphere.locator
             assert oxygen_log.state.is_value
             assert oxygen_log.state.value.kind is ValueKind.INTERVAL
-            assert len(observation.notices) == 1
-            assert observation.notices[0].kind is NoticeKind.INPUT_OMITTED
-            assert "interval condition not yet scorable" in observation.notices[0].reason
+            assert {notice.kind for notice in observation.notices} == {
+                NoticeKind.INPUT_OMITTED,
+                NoticeKind.METHOD_UNSTATED,
+            }
+            assert len(observation.notices) == 2
+            input_notice = next(
+                notice for notice in observation.notices
+                if notice.kind is NoticeKind.INPUT_OMITTED
+            )
+            assert "interval condition not yet scorable" in input_notice.reason
         else:
-            assert not observation.notices
+            assert tuple(notice.kind for notice in observation.notices) == (
+                NoticeKind.METHOD_UNSTATED,
+            )
     fig6_as = [
         observation
         for observation in redox_observations
