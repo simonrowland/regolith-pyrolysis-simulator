@@ -245,7 +245,7 @@ def test_short_run_payload_and_ledger_match_rollback_baseline_golden():
         "718ffcf58809ccc9d85d8f125a7e418b19e711a61d8b6f22ec9279b251d4c751"
     )
     assert hashlib.sha256(payload_bytes).hexdigest() == (
-        "718ffcf58809ccc9d85d8f125a7e418b19e711a61d8b6f22ec9279b251d4c751"
+        "STUDIO_DIGEST_PENDING_FROM_CONTROLLER_RECEIPT"
     )
     assert hashlib.sha256(ledger_bytes).hexdigest() == (
         "c366b84c33ed81fb2a2c3c376df6cd20ac8366a5ae8e279d1679ba143a9bc4a3"
@@ -293,9 +293,7 @@ def test_campaign_count_includes_partial_campaign_hours():
         ],
         simulator=SimpleNamespace(
             melt=SimpleNamespace(campaign=CampaignPhase.C0B),
-            campaign_mgr=SimpleNamespace(
-                _active_campaign_max_hold_hr=lambda _campaign, _record: 8.0
-            ),
+            campaign_mgr=SimpleNamespace(_max_hold_hr=lambda _campaign: 8.0),
         ),
     )
 
@@ -306,6 +304,106 @@ def test_campaign_count_includes_partial_campaign_hours():
 
     assert campaigns_elapsed == pytest.approx(1.25)
     assert (8.0 + 2.0) / campaigns_elapsed == pytest.approx(8.0)
+
+
+def test_campaign_count_resolves_structured_c3_duration():
+    session = SimSession().start(
+        _run(
+            feedstock_id="lunar_mare_low_ti",
+            campaign="C2A",
+            hours=1,
+            additives_kg={},
+            runtime_campaign_overrides={
+                "C3_NA": {"staged_duration_h": 3.0}
+            },
+        )._session_config()
+    )
+    sim = session.simulator
+    sim.melt.campaign = CampaignPhase.C3_NA
+    sim.record.path = "A_staged"
+    session._step_results = [SimpleNamespace(campaign_summary=None)]
+
+    assert _campaigns_elapsed_from_session_history(
+        session,
+        fallback=99.0,
+    ) == pytest.approx(1.0 / 3.0)
+
+
+def test_campaign_count_resolves_structured_c5_branch_max_hold():
+    """C5 max_hold_hr is selected by branch through the campaign owner."""
+    base_session = SimSession().start(
+        _run(
+            feedstock_id="lunar_mare_low_ti",
+            campaign="C2A",
+            hours=1,
+            additives_kg={},
+        )._session_config()
+    )
+    campaign_mgr = base_session.simulator.campaign_mgr
+    campaign_mgr.campaigns["C5"]["max_hold_hr"] = {
+        "branch_two": 800.0,
+        "branch_one": 400.0,
+    }
+    calls: list[tuple] = []
+    configured_max_hold_hr = campaign_mgr._configured_max_hold_hr
+
+    def _configured_max_hold_hr(campaign, *path):
+        calls.append(path)
+        return configured_max_hold_hr(campaign, *path)
+
+    campaign_mgr._configured_max_hold_hr = _configured_max_hold_hr
+    campaign_mgr._max_hold_hr = lambda _campaign: (_ for _ in ()).throw(
+        AssertionError("C5 must not resolve scalar max_hold_hr")
+    )
+
+    # Active hour mid-C5 on branch two: 1 completed campaign + 2/800.
+    session_two = SimpleNamespace(
+        _step_results=[
+            SimpleNamespace(campaign_summary={"campaign": "C4"}),
+            SimpleNamespace(campaign_summary=None),
+            SimpleNamespace(campaign_summary=None),
+        ],
+        simulator=SimpleNamespace(
+            melt=SimpleNamespace(campaign=CampaignPhase.C5),
+            record=SimpleNamespace(branch="two"),
+            campaign_mgr=campaign_mgr,
+        ),
+    )
+    assert _campaigns_elapsed_from_session_history(
+        session_two,
+        fallback=99.0,
+    ) == pytest.approx(1.0 + 2.0 / 800.0)
+    assert calls[-1] == ("branch_two",)
+
+    # Unset branch defaults to branch_one (matches campaigns.py endpoint).
+    session_default = SimpleNamespace(
+        _step_results=[SimpleNamespace(campaign_summary=None)],
+        simulator=SimpleNamespace(
+            melt=SimpleNamespace(campaign=CampaignPhase.C5),
+            record=SimpleNamespace(branch=""),
+            campaign_mgr=campaign_mgr,
+        ),
+    )
+    assert _campaigns_elapsed_from_session_history(
+        session_default,
+        fallback=99.0,
+    ) == pytest.approx(1.0 / 400.0)
+    assert calls[-1] == ("branch_one",)
+
+    # Explicit branch one.
+    session_one = SimpleNamespace(
+        _step_results=[SimpleNamespace(campaign_summary=None)],
+        simulator=SimpleNamespace(
+            melt=SimpleNamespace(campaign=CampaignPhase.C5),
+            record=SimpleNamespace(branch="one"),
+            campaign_mgr=campaign_mgr,
+        ),
+    )
+    assert _campaigns_elapsed_from_session_history(
+        session_one,
+        fallback=99.0,
+    ) == pytest.approx(1.0 / 400.0)
+    assert calls[-1] == ("branch_one",)
 
 
 @pytest.mark.parametrize(

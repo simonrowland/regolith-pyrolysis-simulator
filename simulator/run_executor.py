@@ -194,13 +194,17 @@ def _campaigns_elapsed_from_session_history(
         campaign = getattr(getattr(sim, "melt", None), "campaign", None)
         campaign_duration_h: float | None = None
         if campaign_mgr is not None and campaign is not None:
-            duration = getattr(
-                campaign_mgr, "_active_campaign_max_hold_hr", None
-            )
-            if callable(duration):
-                campaign_duration_h = float(
-                    duration(campaign, getattr(sim, "record", None))
+            record = getattr(sim, "record", None)
+            if record is None:
+                duration = getattr(campaign_mgr, "_max_hold_hr", None)
+                if callable(duration):
+                    campaign_duration_h = float(duration(campaign))
+            else:
+                duration = getattr(
+                    campaign_mgr, "_active_campaign_max_hold_hr", None
                 )
+                if callable(duration):
+                    campaign_duration_h = float(duration(campaign, record))
         if campaign_duration_h is not None:
             if math.isfinite(campaign_duration_h) and campaign_duration_h > 0.0:
                 # The cumulative wall load includes every executed hour, so
