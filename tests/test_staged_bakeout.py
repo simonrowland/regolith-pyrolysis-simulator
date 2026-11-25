@@ -245,7 +245,7 @@ def test_c2a_staged_k_shuttle_and_conservation_remain_visible(
 # physics rather than resurrecting the old ceiling; do not retune.
 
 
-def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
+def test_c2a_staged_is_deterministic_and_leaves_stage3_empty():
     first = _run_staged()
     second = _run_staged()
     continuous = _run_continuous()
@@ -290,12 +290,6 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
     # The repaired 510 -> 860 C continuous trajectory no longer dwells in the
     # staged high-temperature Na recovery window.
     assert staged_products.get("Na", 0.0) > continuous_products.get("Na", 0.0) > 0.0
-    # 2026-07-21 B1 wall-gate fix: "Stage 3 remains Fe-only / Si goes to the
-    # wall" was the unguarded hot-wall backstop artifact. With hot walls
-    # honest (zero deposit above T_cond), the staged probe's Si-bearing
-    # material reaches the DESIGNATED Stage 3 trap as disproportionation
-    # products; the continuous probe still never reaches the hot capture
-    # window. Values pinned from the executable under the quiesced gate.
     # The 2026-08-02 pins persisted through an f7bcbf79c..b24e17095
     # transport excursion (fabricated 100 Pa -> refusal -> flagged
     # extrapolation; net +0.0097%), then 82599cf81 (-0.17%), 03616bb20
@@ -415,9 +409,10 @@ def test_c2a_staged_pipework_flags_upstream_cold_spots():
     # 2026-06-30 cold-wall SiO uses the grounded Pound 1972 unity condensation
     # gate below the Wetzel/Gail evaporation-Arrhenius validity floor.
     # 2026-07-01 C4b stores the wall deposit as Si/SiO2/FeSi products, not SiO.
-    # Studio 4c2bf77b: SiO2 is the whole mass and dominates on
-    # stage_0_to_stage_1 at 1500 C. That segment is upstream of the
-    # stage-3 SiO condenser, a hot-wall violation.
+    # Studio 4c2bf77b: SiO2 is the whole mass. t-1994: the dominant
+    # deposit on stage_0_to_stage_1 at 1500 C is a hot-wall violation
+    # being recorded, not accepted behaviour. Species totals stay green
+    # if that mass moves to another segment, so the segment is asserted.
     assert by_species == pytest.approx(
         STAGED_WALL_DEPOSIT_KG_BY_SPECIES,
         abs=1e-15,
@@ -426,4 +421,8 @@ def test_c2a_staged_pipework_flags_upstream_cold_spots():
         STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG,
         abs=1e-15,
     ), {"by_species_kg": by_species, "by_segment_kg": by_segment, "dominant": dominant}
+    assert dominant["segment"] == "stage_0_to_stage_1"
+    assert dominant["species"] == "SiO2"
+    assert dominant["kg"] == pytest.approx(0.0748163532630087, abs=1e-15)
+    assert dominant["wall_temperature_C"] == pytest.approx(1500.0)
     assert _max_mass_balance_pct(sim) < MASS_BALANCE_MAX_PCT

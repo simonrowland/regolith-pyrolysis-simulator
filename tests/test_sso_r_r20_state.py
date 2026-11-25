@@ -279,7 +279,13 @@ def test_collapsing_ferric_capacity_routes_evaporative_o2_to_gas(monkeypatch, li
     assert sim.atom_ledger.mol_by_account("process.overhead_gas").get(
         "O2", 0.0,
     ) - overhead_before == pytest.approx(stoich_o2_mol)
+    fe2o3_at_settle = sim.atom_ledger.mol_by_account(
+        "process.cleaned_melt"
+    ).get("Fe2O3", 0.0)
     sim._settle_evaporative_redox_after_batch()
+    fe2o3_after = sim.atom_ledger.mol_by_account(
+        "process.cleaned_melt"
+    ).get("Fe2O3", 0.0)
     if liquid:
         T_K = float(sim.melt.temperature_C) + 273.15
         assert sim._current_melt_redox_fO2_log() == pytest.approx(
@@ -287,9 +293,7 @@ def test_collapsing_ferric_capacity_routes_evaporative_o2_to_gas(monkeypatch, li
         )
     else:
         assert sim._current_melt_redox_fO2_log() == 78.0
-    assert sim.atom_ledger.mol_by_account("process.cleaned_melt").get(
-        "Fe2O3", 0.0,
-    ) <= fe2o3_before + 1.0e-12
+    assert fe2o3_after <= fe2o3_before + 1.0e-12
     evaporation = sim.atom_ledger.transitions[transitions_before]
     emitted_o2 = _transition_account_species_mol(
         sim, evaporation, side="credits", account="process.overhead_gas", species="O2",
@@ -302,16 +306,21 @@ def test_collapsing_ferric_capacity_routes_evaporative_o2_to_gas(monkeypatch, li
     overhead_rise = sim.atom_ledger.mol_by_account("process.overhead_gas")["O2"] - (
         overhead_before
     )
+    # When settle decreases Fe2O3, that oxygen leaves as O2.
+    # 2 FeO + 1/2 O2 = Fe2O3, so n_O2 = delta n_Fe2O3 / 2.
+    # Unit: mol. A settle that does not decrease Fe2O3 releases
+    # nothing, and the overhead rise is the evaporation stoich credit.
+    released_o2_mol = (fe2o3_at_settle - fe2o3_after) / 2.0
     if liquid:
-        # Studio aa075abc on 1942e4982c. The net overhead rise is
-        # 484.2805878614205 mol. The evaporation credit inside that
-        # net is the stoich mol asserted above (0.008953353030710003).
-        # The rest is the fO2=78 ferric the probe planted: liquid
-        # settle republishes under the effervescence cap, reduces
-        # that ferric, and credits the oxygen to overhead. Fe2O3
-        # did not take the coproduct.
-        assert overhead_rise == pytest.approx(484.2805878614205, abs=1.0e-9)
+        # released_o2_mol > 1 keeps a settle that stops releasing from
+        # passing on the stoich credit alone.
+        assert released_o2_mol > 1.0
+        assert overhead_rise == pytest.approx(
+            stoich_o2_mol + released_o2_mol,
+            abs=1.0e-9,
+        )
     else:
+        assert released_o2_mol == 0.0
         assert overhead_rise == pytest.approx(stoich_o2_mol)
     for transition in sim.atom_ledger.transitions[transitions_before:]:
         transition.validate_conservation(sim.species_formula_registry)
