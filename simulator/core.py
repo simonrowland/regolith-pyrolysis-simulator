@@ -16657,7 +16657,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self.melt.campaign_hour += 1
         else:
             self.melt.campaign_hour = (
-                float(self.melt.hour) * self.process_timestep.dt_h
+                float(self.melt.hour - self._campaign_start_hour)
+                * self.process_timestep.dt_h
             )
         self._stamp_redox_source_context_for_current_state(force=True)
         snapshot = self._make_snapshot()

@@ -37,6 +37,7 @@ from simulator.runner import _load_vacuum_preset_run_spec
 from simulator.accounting.run_artifact import (
     CONFIDENCE_MAX_MASS_BALANCE_RESIDUAL_PCT,
 )
+from simulator.core import PyrolysisSimulator
 from simulator.state import CampaignPhase, EvaporationFlux, MeltState, OverheadGas
 from tests.chemistry.conftest import _build_sim, _load_yaml
 
@@ -55,6 +56,16 @@ def _loaded_sim():
         _load_yaml("feedstocks.yaml"),
         _load_yaml("setpoints.yaml"),
     )
+
+
+def _run_two_campaign_steps(dt_s: float):
+    sim = _loaded_sim()
+    sim.process_timestep = resolve_process_timestep(dt_s)
+    sim.start_campaign(CampaignPhase.C0)
+    sim.step()
+    sim.start_campaign(CampaignPhase.C0B)
+    sim.step()
+    return sim
 
 
 def _species_data(sim, species: str) -> dict:
@@ -519,3 +530,43 @@ def test_quarter_hour_preset_runs_and_samples_inside_the_window(tmp_path: Path):
     enforcement = session.simulator.campaign_mgr.last_pO2_enforcement
     assert enforcement is not None
     assert enforcement["schedule_time_h"] == 0.25
+
+
+def test_campaign_clock_restarts_at_each_subhour_campaign():
+    sim = _run_two_campaign_steps(900.0)
+
+    assert sim._campaign_start_hour == 1
+    assert sim.melt.hour == 2
+    assert sim.melt.campaign_hour.hex() == sim.process_timestep.dt_h.hex()
+
+
+def test_campaign_clock_keeps_hourly_integer_increment_bit_identical():
+    sim = _run_two_campaign_steps(3600.0)
+
+    assert sim.process_timestep.is_one_hour
+    assert sim._campaign_start_hour == 1
+    assert sim.melt.hour == 2
+    assert isinstance(sim.melt.campaign_hour, int)
+    assert float(sim.melt.campaign_hour).hex() == float(1.0).hex()
+
+
+def test_campaign_clock_regression_probe_detects_global_hour_mutation(monkeypatch):
+    original_step = PyrolysisSimulator._step_one_hour
+
+    def old_global_elapsed_formula(self):
+        snapshot = original_step(self)
+        if not self.process_timestep.is_one_hour:
+            self.melt.campaign_hour = (
+                float(self.melt.hour) * self.process_timestep.dt_h
+            )
+        return snapshot
+
+    monkeypatch.setattr(
+        PyrolysisSimulator,
+        "_step_one_hour",
+        old_global_elapsed_formula,
+    )
+    sim = _run_two_campaign_steps(900.0)
+
+    with pytest.raises(AssertionError):
+        assert sim.melt.campaign_hour.hex() == sim.process_timestep.dt_h.hex()

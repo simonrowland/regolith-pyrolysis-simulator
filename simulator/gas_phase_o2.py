@@ -330,9 +330,20 @@ def gas_phase_o2_trajectory(
             ppm_analyzer = lagged
         elif ppm_instant is not None and step.get("anchor") == "pre_step_baseline":
             lagged = ppm_instant
+        step_chamber_pa = chamber_pa
+        if "chamber_pressure_mbar" in step:
+            step_chamber_mbar = _optional_float(
+                step.get("chamber_pressure_mbar"),
+                "chamber_pressure_not_finite",
+            )
+            step_chamber_pa = (
+                None
+                if step_chamber_mbar is None
+                else step_chamber_mbar * PA_PER_MBAR
+            )
         flow_pa = None
-        if mole_fraction is not None and chamber_pa is not None:
-            flow_pa = mole_fraction * chamber_pa
+        if mole_fraction is not None and step_chamber_pa is not None:
+            flow_pa = mole_fraction * step_chamber_pa
         partial_mbar = _optional_float(
             step.get("overhead_o2_partial_mbar"),
             "overhead_o2_partial_not_finite",

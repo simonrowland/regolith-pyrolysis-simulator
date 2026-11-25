@@ -36,10 +36,8 @@ The provider:
     standard state,
   * ``melt_fO2_log`` -- diagnostic melt oxygen fugacity used only for the
     inert Kress91 Fe-redox split reported in ``diagnostic``,
-  * ``dt_hr`` -- tick duration in hours (always 1.0 in the current
-    simulator, passed through explicitly so the provider stays unit-
-    correct if the simulator's tick ever changes -- the t_s = 3600 s
-    Faraday integration scales with this).
+  * ``dt_hr`` -- tick duration in hours. The Faraday integration uses
+    ``3600 * dt_hr`` seconds, so sub-hour steps reduce it accordingly.
 
 The MRE Nernst activity uses the shared gamma-X single-cation oxide
 activity on the live mol composition. The wt% projection is still computed

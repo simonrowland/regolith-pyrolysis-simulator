@@ -15,6 +15,7 @@ from pathlib import Path
 
 import pytest
 import yaml
+import simulator.runner as runner_module
 
 from simulator.account_ids import (
     OXYGEN_MELT_OFFGAS_ACCOUNT,
@@ -39,6 +40,7 @@ from simulator.gas_phase_o2 import (
 )
 from simulator.physical_constants import PA_PER_MBAR
 from simulator.process_timestep import exponential_approach_fraction
+from simulator.lab_schedule import interpolate_schedule_points
 from simulator.runner import (
     _gas_phase_o2_trajectory_for_run,
     _load_preset_run_spec,
@@ -674,7 +676,10 @@ def test_runner_inserts_the_pre_step_baseline() -> None:
 
     schedule = {
         "gas_boundary": {"imposed_flow": {"value": 0.3}},
-        "chamber_pressure_mbar": ({"value": 13.0},),
+        "chamber_pressure_mbar": (
+            {"t_h": 0.0, "value": 13.0},
+            {"t_h": 1.0, "value": 13.0},
+        ),
         "analyzer_response": {
             "tau_s": 30,
             "notice": {
@@ -693,3 +698,85 @@ def test_runner_inserts_the_pre_step_baseline() -> None:
         0.002
     )
     assert trajectory["points"][1]["ppm_analyzer"] == 0.0
+
+
+def _varying_pressure_run_inputs():
+    class Snap:
+        def __init__(self, t_s: float):
+            self.t_s = t_s
+            self.duration_h = 0.1
+            self.hour = int(t_s / 360.0)
+            self.melt_offgas_O2_mol_hr = 1.0
+            self.condensation_totals = {"O2": 0.0}
+
+    schedule = {
+        "gas_boundary": {"imposed_flow": {"value": 0.3}},
+        "chamber_pressure_mbar": (
+            {"t_h": 0.0, "value": 10.0},
+            {"t_h": 1.0, "value": 30.0},
+        ),
+        "analyzer_response": {"tau_s": 30},
+    }
+    snapshots = (Snap(360.0), Snap(720.0))
+    return schedule, snapshots
+
+
+def _assert_pressure_trajectory_uses_each_schedule_sample(
+    trajectory: dict,
+    schedule: dict,
+    snapshots: tuple,
+) -> None:
+    for snapshot, point in zip(snapshots, trajectory["points"][1:]):
+        pressure_mbar = interpolate_schedule_points(
+            schedule["chamber_pressure_mbar"],
+            snapshot.t_s / 3600.0,
+        )
+        assert point["p_O2_flow_Pa"] == pytest.approx(
+            point["mole_fraction"] * pressure_mbar * PA_PER_MBAR
+        )
+
+
+def test_runner_samples_chamber_pressure_at_each_trajectory_step() -> None:
+    schedule, snapshots = _varying_pressure_run_inputs()
+    trajectory = _gas_phase_o2_trajectory_for_run(schedule, snapshots)
+
+    _assert_pressure_trajectory_uses_each_schedule_sample(
+        trajectory,
+        schedule,
+        snapshots,
+    )
+    assert trajectory["points"][1]["p_O2_flow_Pa"] < (
+        trajectory["points"][2]["p_O2_flow_Pa"]
+    )
+
+
+def test_pressure_trajectory_regression_probe_detects_last_sample_mutation(
+    monkeypatch,
+) -> None:
+    schedule, snapshots = _varying_pressure_run_inputs()
+    production_trajectory = runner_module.gas_phase_o2_trajectory
+
+    def old_last_sample_for_every_step(steps, **kwargs):
+        old_steps = [
+            {
+                key: value
+                for key, value in step.items()
+                if key != "chamber_pressure_mbar"
+            }
+            for step in steps
+        ]
+        return production_trajectory(old_steps, **kwargs)
+
+    monkeypatch.setattr(
+        runner_module,
+        "gas_phase_o2_trajectory",
+        old_last_sample_for_every_step,
+    )
+    trajectory = _gas_phase_o2_trajectory_for_run(schedule, snapshots)
+
+    with pytest.raises(AssertionError):
+        _assert_pressure_trajectory_uses_each_schedule_sample(
+            trajectory,
+            schedule,
+            snapshots,
+        )

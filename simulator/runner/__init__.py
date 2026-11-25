@@ -146,6 +146,7 @@ from simulator.lab_geometry import LabGeometryError, parse_lab_geometry
 from simulator.lab_schedule import (
     LAB_SCHEDULE_OVERRIDE_KEY,
     LabScheduleValidationError,
+    interpolate_schedule_points,
     normalize_lab_schedule,
 )
 from simulator.gas_phase_o2 import (
@@ -401,6 +402,16 @@ def _gas_phase_o2_trajectory_for_run(
                 "anchor": "pre_step_baseline",
             },
         )
+    if (
+        isinstance(pressures, Sequence)
+        and not isinstance(pressures, (str, bytes))
+        and len(pressures) > 0
+    ):
+        for record in records:
+            record["chamber_pressure_mbar"] = interpolate_schedule_points(
+                pressures,
+                float(record["time_s"]) / float(PROCESS_HOUR_S),
+            )
     return gas_phase_o2_trajectory(
         records,
         carrier_flow_nl_min=carrier,
