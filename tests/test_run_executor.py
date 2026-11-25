@@ -29,6 +29,7 @@ from simulator.session import (
     SimSessionConfig,
     StepResult,
     _hour_budget_exhausted_flag,
+    drive_auto_apply,
     drive_session,
 )
 from simulator.state import CampaignPhase, DecisionType
@@ -692,6 +693,87 @@ def test_resumed_terminal_execution_does_not_export_prior_budget_flag():
     assert not any(
         flag["code"] == "run_hour_budget_exhausted_mid_campaign"
         for flag in artifact["terminal"]["run_metadata"].get("run_flags", ())
+    )
+
+
+def test_zero_hour_campaign_completion_exports_only_new_run_flags():
+    run = _run(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C7_CA_ALUMINOTHERMIC",
+        hours=1,
+        additives_kg={},
+        runtime_campaign_overrides={"C7": {"max_hours": 2}},
+        until_campaign_complete=True,
+    )
+    session = _started_internal_session(run)
+
+    list(drive_auto_apply(session, 1))
+    assert not session.is_complete()
+    assert any(
+        flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+        for flag in session._run_flags
+    )
+
+    completed_execution = RunExecutor().execute_session(session, hours=0)
+
+    assert session.is_complete()
+    assert not any(
+        flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+        for flag in completed_execution.run_flags
+    )
+    artifact = build_run_artifact(
+        run._build_output(completed_execution),
+        run_id="zero-hour-campaign-completion",
+    )
+    assert not any(
+        flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+        for flag in artifact["terminal"]["run_metadata"].get("run_flags", ())
+    )
+
+
+def test_budget_flag_contains_json_safe_unresolved_cyclic_limit():
+    session = _started_internal_session(_run(campaign="C2A", hours=1))
+    cyclic_limit = []
+    cyclic_limit.append(cyclic_limit)
+    session.simulator.campaign_mgr._campaign_config(
+        session.simulator.melt.campaign
+    )["max_hold_hr"] = cyclic_limit
+
+    flag = _hour_budget_exhausted_flag(session)
+
+    assert flag["detail"] == {
+        "unresolved": True,
+        "error_type": "RecursionError",
+    }
+    from simulator.runner import _attach_execution_diagnostics
+
+    metadata = {}
+    _attach_execution_diagnostics(metadata, run_flags=[flag])
+    assert metadata["run_flags"][0]["detail"] == flag["detail"]
+
+
+def test_resumed_execution_campaign_stops_include_only_new_stops():
+    run = _run(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C4",
+        hours=1,
+        additives_kg={},
+    )
+    session = _started_internal_session(run)
+    session.simulator.record.branch = "two"
+    session.simulator.campaign_mgr.campaigns[
+        "C4"
+    ]["max_target_acquisition_hr"] = 1.0
+
+    first_execution = RunExecutor().execute_session(session, hours=1)
+    assert any(
+        stop["campaign"] == "C4" for stop in first_execution.campaign_stops
+    )
+
+    resumed_execution = RunExecutor().execute_session(session, hours=1)
+
+    assert not any(
+        stop["campaign"] == "C4" for stop in resumed_execution.campaign_stops
     )
 
 

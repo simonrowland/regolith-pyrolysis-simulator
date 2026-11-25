@@ -25,6 +25,7 @@ from simulator.backends import (
 )
 from simulator.core import CampaignPhase, PyrolysisSimulator
 from simulator.feedstock_guard import BlockedFeedstockError, assert_feedstock_loadable
+from simulator.json_safety import _json_safe
 from simulator.lab_schedule import LAB_SCHEDULE_OVERRIDE_KEY, normalize_lab_schedule
 from simulator.scalar_boundary import is_declared_real_scalar, require_finite_float as _finite_float
 from simulator.campaigns import parse_campaign_override_value
@@ -1128,6 +1129,7 @@ def _hour_budget_exhausted_flag(session: SimSession) -> dict[str, Any] | None:
             configured_limits["max_hours_override"] = copy.deepcopy(
                 campaign_overrides["max_hours"]
             )
+        configured_limits = _json_safe(configured_limits)
 
         detail.update({
             "campaign": campaign_name,

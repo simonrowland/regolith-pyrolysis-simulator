@@ -347,10 +347,15 @@ class RunExecutor:
         failure_exc: Exception | None = None
         hours = _coerce_nonnegative_hours(hours)
         run_flags_start = len(tuple(getattr(session, "_run_flags", ()) or ()))
+        execution_advanced = False
 
         def execution_run_flags() -> tuple[dict[str, Any], ...]:
             run_flags = tuple(getattr(session, "_run_flags", ()) or ())
-            return run_flags if hours == 0 else run_flags[run_flags_start:]
+            return (
+                run_flags
+                if not execution_advanced
+                else run_flags[run_flags_start:]
+            )
 
         snapshot_start = len(
             tuple(getattr(getattr(sim, "record", None), "snapshots", ()))
@@ -367,7 +372,7 @@ class RunExecutor:
         until_campaign_complete = bool(
             getattr(config, "until_campaign_complete", False)
         )
-        campaign_stops = list(_campaign_stops_for_trace(session))
+        campaign_stops: list[dict[str, Any]] = []
 
         try:
             if initial_refusal is not None:
@@ -398,6 +403,7 @@ class RunExecutor:
                     sim.melt = melt_before_hour
                     sim._chem_kernel = sim._build_chemistry_kernel()
                     raise
+                execution_advanced = True
                 per_hour_summary = dict(result.per_hour_summary)
                 cache_state = getattr(sim, "_last_reduced_real_cache_state", None)
                 if cache_state is not None:
