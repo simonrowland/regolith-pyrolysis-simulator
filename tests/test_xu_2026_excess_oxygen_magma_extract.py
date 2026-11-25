@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+import simulator.battery.migrate as migrate_module
 from simulator.battery.enums import (
     AmountBasis,
     Phase,
@@ -124,7 +125,9 @@ def test_independent_render_and_workbook_grids_reject_both_mutations() -> None:
         _assert_grid(changed_extract, ("xu_2026_table1_",), table1)
 
 
-def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points() -> None:
+def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     table1 = _fixture(TABLE1_GRID)
     s2 = _fixture(S2_GRID)
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
@@ -212,11 +215,16 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
         assert "composition" not in (
             raw_observations[row["observation_id"]].get("point_conditions") or {}
         )
-        assert observation.identity.composition.is_value
-        composition = observation.identity.composition.value
+        assert observation.identity.composition.is_unknown
+        assert (
+            observation.identity.composition.reason
+            == "input_composition_is_scored_phase_analysis"
+        )
+        located_composition = observation.point_conditions["composition"]
+        assert located_composition.state.is_value
+        composition = located_composition.state.value
         assert composition.basis == "stoichiometric_oxide_projection"
         assert composition.amount_basis is AmountBasis.MOLE_FRACTION
-        located_composition = observation.point_conditions["composition"]
         assert located_composition.inference is not None
         assert (
             located_composition.inference.relation
@@ -368,7 +376,14 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
         "all experimental Fe is trivalent" in value
         for value in projection_derivation.inputs
     )
-    assert dict(lvp1_composition.identity.composition.value.components) == {
+    assert projection_parameters[
+        "original_analytical_total_wt_pct"
+    ].state.value == sum(
+        (Decimal(amount) for amount in elemental_wt_percent.values()), Decimal("0")
+    )
+    assert dict(
+        lvp1_composition.point_conditions["composition"].state.value.components
+    ) == {
         "SiO2": Decimal("0.5531183156263053760382113461"),
         "TiO2": Decimal("0.008043932072763917401742288490"),
         "Al2O3": Decimal("0.09288099447174100359886515809"),
@@ -399,9 +414,9 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
         valence_by_element=valences,
         retained_components=retained_components,
     )
-    assert dict(lvp1_composition.identity.composition.value.components) == dict(
-        projected.components
-    )
+    assert dict(
+        lvp1_composition.point_conditions["composition"].state.value.components
+    ) == dict(projected.components)
     assert dict(projected.components)["Cl"] > 0
     assert projection_parameters[
         "oxygen_balance_residual_wt_percent"
@@ -416,6 +431,21 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
     assert s2_row_100_residual.locator == observations[
         "xu_2026_s2_row_100_o"
     ].locator
+    s2_row_100_parameters = dict(
+        observations["xu_2026_s2_row_100_si"]
+        .point_conditions["composition"]
+        .inference.parameters
+    )
+    assert s2_row_100_parameters[
+        "original_analytical_total_wt_pct"
+    ].state.value == sum(
+        (
+            Decimal(row["component_amount_as_published"])
+            for row in s2
+            if row["source_cell"].endswith("100")
+        ),
+        Decimal("0"),
+    )
     oxygen_changed = dict(elemental_wt_percent)
     oxygen_changed["O"] = str(Decimal(oxygen_changed["O"]) + 1)
     oxygen_check_only = _element_wt_percent_stoichiometric_oxide_projection(
@@ -441,6 +471,21 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
     assert all(
         "fO2_log" not in (row.point_conditions or {}) for row in all_observations
     )
+
+    monkeypatch.setattr(
+        migrate_module,
+        "input_composition_echo_detail",
+        lambda _identity: None,
+    )
+    unguarded_migrator = migrate_one_extract(ROOT, EXTRACT, index={}, aliases={})
+    unguarded_migrator.finalize()
+    unguarded_lvp1 = next(
+        observation
+        for observation in unguarded_migrator.result.observations.values()
+        if observation.observation_id.endswith("::xu_2026_table1_lvp_1_si")
+    )
+    with pytest.raises(AssertionError):
+        assert unguarded_lvp1.identity.composition.is_unknown
 
     figures = [
         record

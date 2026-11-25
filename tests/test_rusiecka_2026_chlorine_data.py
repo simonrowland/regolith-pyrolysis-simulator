@@ -89,12 +89,14 @@ def _assert_projected_compositions_without_workbook(doc: dict, result, tmp_path:
         == "equilibrium_phase_composition"
     ]
     assert len(phase_rows) == 1785
-    refused_ids = [
+    unusable_projection_ids = [
         source["observation_id"]
         for _formula, source in phase_rows
-        if not migrated[source["observation_id"]].identity.composition.is_value
+        if not migrated[source["observation_id"]]
+        .point_conditions["composition"]
+        .state.is_value
     ]
-    assert len(refused_ids) == 34, refused_ids
+    assert len(unusable_projection_ids) == 34, unusable_projection_ids
 
     for row_number, source, row in mapped:
         source_components = source["values"]["composition_wt_pct"]
@@ -127,8 +129,13 @@ def _assert_projected_compositions_without_workbook(doc: dict, result, tmp_path:
             assert "no mole-fraction normalization was applied" in notices[0].reason
             continue
 
-        assert row.identity.composition.is_value, row.observation_id
-        composition = row.identity.composition.value
+        assert row.identity.composition.is_unknown, row.observation_id
+        assert (
+            row.identity.composition.reason
+            == "input_composition_is_scored_phase_analysis"
+        )
+        assert point_composition.state.is_value
+        composition = point_composition.state.value
         assert composition.basis == "printed_oxides"
         assert composition.amount_basis is AmountBasis.MOLE_FRACTION
         projected = dict(composition.components)
@@ -186,14 +193,18 @@ def _assert_projected_compositions_without_workbook(doc: dict, result, tmp_path:
         tmp_path / "chloride-mutated", EXTRACT_NAME, extract_doc=mutated_doc
     )
     base_projection = dict(
-        migrated["rusiecka_2026_data_row6_sio2"].identity.composition.value.components
+        migrated["rusiecka_2026_data_row6_sio2"]
+        .point_conditions["composition"]
+        .state.value.components
     )
     changed = next(
         row
         for row in mutated_result.observations.values()
         if row.observation_id.endswith("::rusiecka_2026_data_row6_sio2")
     )
-    changed_projection = dict(changed.identity.composition.value.components)
+    changed_projection = dict(
+        changed.point_conditions["composition"].state.value.components
+    )
     assert changed_projection["Cl"] > base_projection["Cl"]
     assert changed_projection["SiO2"] < base_projection["SiO2"]
 
@@ -227,7 +238,7 @@ def test_row6_projection_components_match_current_mass_percent_resolver(
         closure_context=values,
         declared_component_map=printed,
     )
-    assert dict(row.identity.composition.value.components) == dict(
+    assert dict(row.point_conditions["composition"].state.value.components) == dict(
         expected.state.value.components
     )
 
@@ -260,12 +271,17 @@ def test_row97_links_located_component_rows_and_flags_cl_without_filling_s_or_f(
         for observation in result.observations.values()
         if observation.observation_id.endswith("::rusiecka_2026_data_row97_sio2")
     )
-    assert row.identity.composition.is_value
-    projected = dict(row.identity.composition.value.components)
+    assert row.identity.composition.is_unknown
+    assert (
+        row.identity.composition.reason
+        == "input_composition_is_scored_phase_analysis"
+    )
+    projected_composition = row.point_conditions["composition"].state.value
+    projected = dict(projected_composition.components)
     assert projected["Cl"] > 0
     assert "S" not in projected
     assert "F" not in projected
-    wt_percent = composition_wt_pct(row.identity.composition.value)
+    wt_percent = composition_wt_pct(projected_composition)
     assert wt_percent is not None
     kept, excluded = partition_engine_components(
         wt_percent,
@@ -497,8 +513,12 @@ def test_corrected_rows_migrate_and_pin_workbook_cells(tmp_path: Path) -> None:
                 row.identity.composition.reason or ""
             )
             continue
-        assert row.identity.composition.is_value
-        composition = row.identity.composition.value
+        assert row.identity.composition.is_unknown
+        assert (
+            row.identity.composition.reason
+            == "input_composition_is_scored_phase_analysis"
+        )
+        composition = row.point_conditions["composition"].state.value
         assert composition.basis == "printed_oxides"
         assert composition.amount_basis is AmountBasis.MOLE_FRACTION
         projected = dict(composition.components)
@@ -577,13 +597,19 @@ def test_corrected_rows_migrate_and_pin_workbook_cells(tmp_path: Path) -> None:
     mutated_result = _migrate_real_extract(
         tmp_path / "chloride-mutated", EXTRACT_NAME, extract_doc=mutated_doc
     )
-    base_projection = dict(migrated["rusiecka_2026_data_row6_sio2"].identity.composition.value.components)
+    base_projection = dict(
+        migrated["rusiecka_2026_data_row6_sio2"]
+        .point_conditions["composition"]
+        .state.value.components
+    )
     mutated_row = next(
         row
         for row in mutated_result.observations.values()
         if row.observation_id.endswith("::rusiecka_2026_data_row6_sio2")
     )
-    changed_projection = dict(mutated_row.identity.composition.value.components)
+    changed_projection = dict(
+        mutated_row.point_conditions["composition"].state.value.components
+    )
     assert changed_projection["Cl"] > base_projection["Cl"]
     assert changed_projection["SiO2"] < base_projection["SiO2"]
 
