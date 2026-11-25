@@ -201,7 +201,9 @@ def test_campaign_count_includes_partial_campaign_hours():
         ],
         simulator=SimpleNamespace(
             melt=SimpleNamespace(campaign=CampaignPhase.C0B),
-            campaign_mgr=SimpleNamespace(_max_hold_hr=lambda _campaign: 8.0),
+            campaign_mgr=SimpleNamespace(
+                _active_campaign_max_hold_hr=lambda _campaign, _record: 8.0
+            ),
         ),
     )
 
@@ -214,118 +216,27 @@ def test_campaign_count_includes_partial_campaign_hours():
     assert (8.0 + 2.0) / campaigns_elapsed == pytest.approx(8.0)
 
 
-def test_campaign_count_resolves_structured_c3_duration():
-    campaign_mgr = SimpleNamespace(
-        _configured_max_hold_hr=lambda _campaign, phase, path: {
-            ("C3_NA", "A_staged"): 3.0,
-        }[(phase, path)],
-        _campaign_overrides=lambda _campaign: {},
-    )
-    session = SimpleNamespace(
-        _step_results=[SimpleNamespace(campaign_summary=None)],
-        simulator=SimpleNamespace(
-            melt=SimpleNamespace(campaign=CampaignPhase.C3_NA),
-            record=SimpleNamespace(path="A_staged"),
-            campaign_mgr=campaign_mgr,
-        ),
-    )
-
-    assert _campaigns_elapsed_from_session_history(
-        session,
-        fallback=99.0,
-    ) == pytest.approx(1.0 / 3.0)
-
-
-def test_campaign_count_resolves_structured_c5_branch_max_hold():
-    """C5 max_hold_hr is a per-branch mapping; progress must not float() it.
-
-    Authoritative schema (data/setpoints.yaml campaigns.C5.max_hold_hr):
-      {branch_two: ..., branch_one: ...}
-    Selection rule mirrors campaigns.py C5 endpoint: branch=='two' uses
-    branch_two, otherwise branch_one (including unset branch).
-    """
-    calls: list[tuple] = []
-
-    def _configured_max_hold_hr(_campaign, *path):
-        calls.append(path)
-        table = {
-            ("branch_two",): 800.0,
-            ("branch_one",): 400.0,
-        }
-        return table[path]
-
-    campaign_mgr = SimpleNamespace(
-        _configured_max_hold_hr=_configured_max_hold_hr,
-        # If the consumer wrongly calls scalar _max_hold_hr(campaign), surface it.
-        _max_hold_hr=lambda _campaign: (_ for _ in ()).throw(
-            AssertionError("C5 must not resolve scalar max_hold_hr")
-        ),
-    )
-
-    # Active hour mid-C5 on branch two: 1 completed campaign + 2/800.
-    session_two = SimpleNamespace(
-        _step_results=[
-            SimpleNamespace(campaign_summary={"campaign": "C4"}),
-            SimpleNamespace(campaign_summary=None),
-            SimpleNamespace(campaign_summary=None),
-        ],
-        simulator=SimpleNamespace(
-            melt=SimpleNamespace(campaign=CampaignPhase.C5),
-            record=SimpleNamespace(branch="two"),
-            campaign_mgr=campaign_mgr,
-        ),
-    )
-    assert _campaigns_elapsed_from_session_history(
-        session_two,
-        fallback=99.0,
-    ) == pytest.approx(1.0 + 2.0 / 800.0)
-    assert calls[-1] == ("branch_two",)
-
-    # Unset branch defaults to branch_one (matches campaigns.py endpoint).
-    session_default = SimpleNamespace(
-        _step_results=[SimpleNamespace(campaign_summary=None)],
-        simulator=SimpleNamespace(
-            melt=SimpleNamespace(campaign=CampaignPhase.C5),
-            record=SimpleNamespace(branch=""),
-            campaign_mgr=campaign_mgr,
-        ),
-    )
-    assert _campaigns_elapsed_from_session_history(
-        session_default,
-        fallback=99.0,
-    ) == pytest.approx(1.0 / 400.0)
-    assert calls[-1] == ("branch_one",)
-
-    # Explicit branch one.
-    session_one = SimpleNamespace(
-        _step_results=[SimpleNamespace(campaign_summary=None)],
-        simulator=SimpleNamespace(
-            melt=SimpleNamespace(campaign=CampaignPhase.C5),
-            record=SimpleNamespace(branch="one"),
-            campaign_mgr=campaign_mgr,
-        ),
-    )
-    assert _campaigns_elapsed_from_session_history(
-        session_one,
-        fallback=99.0,
-    ) == pytest.approx(1.0 / 400.0)
-    assert calls[-1] == ("branch_one",)
-
-
 @pytest.mark.parametrize(
-    ("campaign", "phase", "path", "branch", "cap_path"),
+    ("phase", "path", "branch", "cap_path"),
     [
-        ("C3_NA", CampaignPhase.C3_NA, "A_staged", "", ("C3_NA", "A_staged")),
-        ("C5", CampaignPhase.C5, "", "two", ("branch_two",)),
+        (CampaignPhase.C3_K, "A_staged", "", ("C3_K", "A_staged")),
+        (CampaignPhase.C3_K, "A", "", ("C3_K", "A")),
+        (CampaignPhase.C3_K, "B", "", ("C3_K", "default")),
+        (CampaignPhase.C3_NA, "A_staged", "", ("C3_NA", "A_staged")),
+        (CampaignPhase.C3_NA, "A", "", ("C3_NA", "A")),
+        (CampaignPhase.C3_NA, "B", "", ("C3_NA", "default")),
+        (CampaignPhase.C5, "", "two", ("branch_two",)),
+        (CampaignPhase.C5, "", "one", ("branch_one",)),
+        (CampaignPhase.C5, "", "", ("branch_one",)),
     ],
 )
 def test_campaign_count_uses_real_manager_structured_campaign_caps(
-    campaign, phase, path, branch, cap_path
+    phase, path, branch, cap_path
 ):
     session = SimSession().start(
         _run(
             feedstock_id="lunar_mare_low_ti",
-            campaign=campaign,
+            campaign="C2A",
             hours=1,
             additives_kg={},
         )._session_config()
@@ -337,6 +248,34 @@ def test_campaign_count_uses_real_manager_structured_campaign_caps(
     session._step_results = [SimpleNamespace(campaign_summary=None)]
 
     campaign_cap = sim.campaign_mgr._configured_max_hold_hr(phase, *cap_path)
+    campaigns_elapsed = _campaigns_elapsed_from_session_history(
+        session,
+        fallback=99.0,
+    )
+
+    assert campaigns_elapsed == pytest.approx(1.0 / campaign_cap)
+
+
+def test_campaign_count_uses_real_c3_staged_duration_override():
+    session = SimSession().start(
+        _run(
+            feedstock_id="lunar_mare_low_ti",
+            campaign="C2A",
+            hours=1,
+            additives_kg={},
+            runtime_campaign_overrides={
+                "C3_NA": {"staged_duration_h": 2}
+            },
+        )._session_config()
+    )
+    sim = session.simulator
+    sim.melt.campaign = CampaignPhase.C3_NA
+    sim.record.path = "A_staged"
+    session._step_results = [SimpleNamespace(campaign_summary=None)]
+
+    campaign_cap = sim.campaign_mgr._campaign_overrides(
+        CampaignPhase.C3_NA
+    )["staged_duration_h"]
     campaigns_elapsed = _campaigns_elapsed_from_session_history(
         session,
         fallback=99.0,

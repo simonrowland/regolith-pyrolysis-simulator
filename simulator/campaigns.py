@@ -1368,6 +1368,49 @@ class CampaignManager:
                 return self._float(ovr.get('duration_h'), 0.0)
         return self._configured_max_hold_hr(campaign, *path)
 
+    def _active_campaign_hold_path(
+        self,
+        campaign: CampaignPhase,
+        record: BatchRecord,
+        *,
+        endpoint_fallback: bool = False,
+    ) -> tuple[str, ...]:
+        if campaign in (CampaignPhase.C3_K, CampaignPhase.C3_NA):
+            record_path = str(getattr(record, 'path', '') or '')
+            duration_path = (
+                'A_staged'
+                if record_path == 'A_staged' and not endpoint_fallback
+                else 'A' if record_path == 'A' else 'default'
+            )
+            return campaign.name, duration_path
+        if campaign == CampaignPhase.C5:
+            record_branch = str(getattr(record, 'branch', '') or '')
+            return ('branch_two' if record_branch == 'two' else 'branch_one',)
+        return ()
+
+    def _active_campaign_max_hold_hr(
+        self,
+        campaign: CampaignPhase,
+        record: BatchRecord,
+    ) -> float:
+        """Resolve the active campaign's configured hold ceiling."""
+        if campaign == CampaignPhase.C2A_STAGED:
+            return self._configured_staged_max_hold_hr(campaign)
+        if campaign in (CampaignPhase.C3_K, CampaignPhase.C3_NA):
+            path = self._active_campaign_hold_path(campaign, record)
+            if path[-1] == 'A_staged':
+                staged_duration = self._campaign_overrides(campaign).get(
+                    'staged_duration_h'
+                )
+                if staged_duration is not None:
+                    return float(staged_duration)
+            return self._configured_max_hold_hr(campaign, *path)
+        if campaign == CampaignPhase.C5:
+            return self._configured_max_hold_hr(
+                campaign, *self._active_campaign_hold_path(campaign, record)
+            )
+        return self._max_hold_hr(campaign)
+
     def _c6_target_acquisition_limit(self) -> tuple[float, str]:
         ovr = self._campaign_overrides(CampaignPhase.C6)
         if 'max_hours' in ovr:
@@ -3232,13 +3275,19 @@ class CampaignManager:
             if record.path == 'A_staged':
                 staged_hours = int(self._float(
                     self._campaign_overrides(campaign).get('staged_duration_h'),
-                    self._configured_max_hold_hr(campaign, 'C3_K', 'A_staged'),
+                    self._configured_max_hold_hr(
+                        campaign,
+                        *self._active_campaign_hold_path(campaign, record),
+                    ),
                 ))
                 if completed_campaign_hour >= max(1, staged_hours):
                     return self._end_at("endpoint_met", detail="staged_duration")
-            path_key = 'A' if record.path == 'A' else 'default'
             max_hold_hr = self._configured_max_hold_hr(
-                campaign, 'C3_K', path_key)
+                campaign,
+                *self._active_campaign_hold_path(
+                    campaign, record, endpoint_fallback=True
+                ),
+            )
             if completed_campaign_hour >= max_hold_hr:
                 return self._end_at("endpoint_met", detail="max_hold")
             return False
@@ -3259,13 +3308,19 @@ class CampaignManager:
             if record.path == 'A_staged':
                 staged_hours = int(self._float(
                     self._campaign_overrides(campaign).get('staged_duration_h'),
-                    self._configured_max_hold_hr(campaign, 'C3_NA', 'A_staged'),
+                    self._configured_max_hold_hr(
+                        campaign,
+                        *self._active_campaign_hold_path(campaign, record),
+                    ),
                 ))
                 if completed_campaign_hour >= max(1, staged_hours):
                     return self._end_at("endpoint_met", detail="staged_duration")
-            path_key = 'A' if record.path == 'A' else 'default'
             max_hold_hr = self._configured_max_hold_hr(
-                campaign, 'C3_NA', path_key)
+                campaign,
+                *self._active_campaign_hold_path(
+                    campaign, record, endpoint_fallback=True
+                ),
+            )
             if completed_campaign_hour >= max_hold_hr:
                 return self._end_at("endpoint_met", detail="max_hold")
             return False
@@ -3611,16 +3666,18 @@ class CampaignManager:
 
         elif campaign == CampaignPhase.C5:
             endpoint = self._configured_endpoint(campaign, 'endpoint')
-            if record.branch == 'two':
-                branch_cfg = self._campaign_config(campaign).get('branch_two', {})
+            hold_path = self._active_campaign_hold_path(campaign, record)
+            if hold_path[0] == 'branch_two':
+                branch_cfg = self._campaign_config(campaign).get(
+                    hold_path[0], {}
+                )
                 default_cap_V = self._float(branch_cfg.get('max_voltage_V'), 1.6)
-                max_hold_hr = self._configured_max_hold_hr(
-                    campaign, 'branch_two')
             else:
-                branch_cfg = self._campaign_config(campaign).get('branch_one', {})
+                branch_cfg = self._campaign_config(campaign).get(
+                    hold_path[0], {}
+                )
                 default_cap_V = self._float(branch_cfg.get('max_voltage_V'), 2.5)
-                max_hold_hr = self._configured_max_hold_hr(
-                    campaign, 'branch_one')
+            max_hold_hr = self._configured_max_hold_hr(campaign, *hold_path)
             configured_cap_V = (
                 mre_ladder.coerce_mre_decomposition_voltage(
                     getattr(melt, 'mre_max_voltage_V', 0.0)
