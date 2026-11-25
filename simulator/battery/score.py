@@ -17922,6 +17922,7 @@ def _langmuir_residue_prediction(
     from simulator.battery.residue import (
         ResidueEngineNonconvergence,
         ResidueInventoryRefusal,
+        _is_wang_imp_residue_series,
         _langmuir_residue_row_id,
         predict_langmuir_residue_composition,
     )
@@ -17937,10 +17938,12 @@ def _langmuir_residue_prediction(
     if reference.source_id == _WANG_2001_SOURCE_ID:
         run_row = _langmuir_residue_row_id(reference.locator)
         if run_row is not None:
-            # The shared residue owner reads one temperature, pressure, starting
-            # inventory and Table 2 extent per Wang run row; analyte-series
-            # locators for that row therefore share one computed composition.
+            # Composition inputs are shared by run row; IMP notices are not.
             cache_locator = f"run-row:{run_row}"
+            if _is_wang_imp_residue_series(reference):
+                # IMP carries a series-specific closure notice; do not reuse
+                # the EMP/REE cached notice tuple for its residuals.
+                cache_locator += ":wang-imp"
     cache_source_id = (
         f"langmuir:{reference.source_id}:{reference.experiment_id}:{cache_locator}"
     )

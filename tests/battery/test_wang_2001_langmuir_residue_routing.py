@@ -305,7 +305,9 @@ def test_wang_residue_cells_emit_one_production_score_event_each(monkeypatch):
     by_reference = {residual.reference: residual for residual in residuals}
     assert set(by_reference) == set(references)
     assert len(residuals) == 416
-    assert predictions_by_run_row == Counter({row_id: 1 for row_id in by_run_row})
+    # One shared result serves EMP/REE rows and a second carries IMP's
+    # series-specific closure notice for the same run row.
+    assert predictions_by_run_row == Counter({row_id: 2 for row_id in by_run_row})
 
     # Mutate the source selector back to its previous Mendybaev-only rule.
     # Keep this independent of numeric model success: the source-routing
