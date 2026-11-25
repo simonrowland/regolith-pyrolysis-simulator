@@ -2147,12 +2147,7 @@ class PT0DeterminismStore:
         *,
         admission_keys: Sequence[Mapping[str, Any]] = (),
     ) -> Any | None:
-        try:
-            payload_bytes = canonical_json_bytes(entry["payload"])
-        except PT0NonFinitePayload:
-            raise PT0CacheCollision(
-                f"PT-0 stored payload is non-finite for {artifact}: {key_hash}"
-            )
+        payload_bytes = _payload_integrity_bytes(entry["payload"])
         if entry.get("payload_hash") != _sha256(payload_bytes):
             raise PT0CacheCollision(
                 f"PT-0 stored payload bytes mismatch for {artifact}: {key_hash}"
@@ -3157,12 +3152,7 @@ class PT1PersistentEquilibriumStore:
             raise PT1PersistentStoreCorrupt(
                 f"PT-1 row contains invalid JSON bytes: {key_hash}"
             ) from exc
-        try:
-            canonical_payload_bytes = canonical_json_bytes(row_payload)
-        except PT0NonFinitePayload as exc:
-            raise PT1PersistentStoreCorrupt(
-                f"PT-1 row has non-finite payload values: {key_hash}"
-            ) from exc
+        canonical_payload_bytes = _payload_integrity_bytes(row_payload)
         if canonical_payload_bytes != row_payload_bytes:
             raise PT1PersistentStoreCorrupt(
                 f"PT-1 row non-canonical payload bytes: {key_hash}"
@@ -5309,11 +5299,20 @@ def _is_cacheable_gate_curve(curve: Mapping[str, Any]) -> bool:
 
 
 def canonical_json_bytes(value: Any) -> bytes:
+    return _canonical_json_bytes(value, allow_nonfinite=False)
+
+
+def _payload_integrity_bytes(value: Any) -> bytes:
+    """Canonicalize stored bytes for verification before shape admission."""
+    return _canonical_json_bytes(value, allow_nonfinite=True)
+
+
+def _canonical_json_bytes(value: Any, *, allow_nonfinite: bool) -> bytes:
     return json.dumps(
-        _json_ready(value),
+        _json_ready(value, allow_nonfinite=allow_nonfinite),
         sort_keys=True,
         separators=(",", ":"),
-        allow_nan=False,
+        allow_nan=allow_nonfinite,
     ).encode("utf-8")
 
 
@@ -6560,24 +6559,41 @@ def cache_row_needs_rekey(
     )
 
 
-def _json_ready(value: Any, path: str = "$") -> Any:
+def _json_ready(
+    value: Any,
+    path: str = "$",
+    *,
+    allow_nonfinite: bool = False,
+) -> Any:
     if dataclasses.is_dataclass(value) and not isinstance(value, type):
         return {
             field.name: _json_ready(
                 getattr(value, field.name),
                 f"{path}.{field.name}",
+                allow_nonfinite=allow_nonfinite,
             )
             for field in dataclasses.fields(value)
         }
     if isinstance(value, Mapping):
         return {
-            str(key): _json_ready(item, f"{path}.{str(key)}")
+            str(key): _json_ready(
+                item,
+                f"{path}.{str(key)}",
+                allow_nonfinite=allow_nonfinite,
+            )
             for key, item in value.items()
         }
     if isinstance(value, (list, tuple)):
-        return [_json_ready(item, f"{path}[{index}]") for index, item in enumerate(value)]
+        return [
+            _json_ready(
+                item,
+                f"{path}[{index}]",
+                allow_nonfinite=allow_nonfinite,
+            )
+            for index, item in enumerate(value)
+        ]
     if isinstance(value, float):
-        if not math.isfinite(value):
+        if not math.isfinite(value) and not allow_nonfinite:
             raise PT0NonFinitePayload(
                 f"non-finite value in PT-0 payload at {path}: {value!r}"
             )

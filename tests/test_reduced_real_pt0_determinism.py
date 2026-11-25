@@ -785,6 +785,11 @@ def _pt0_equilibrium_capture_context(
     class AlphaMELTSBackend(RealBackendAuthority):
         real_backend_family = RealBackendFamily.ALPHAMELTS
 
+        def equilibrate(self, *, composition_mol_by_account=None):
+            raise AssertionError(
+                "the registered equilibrium fixture provider must handle the solve"
+            )
+
         def get_engine_version(self) -> str:
             return "non-stub-test"
 
@@ -5090,15 +5095,7 @@ def _store_raw_replay_payload(
     law_disclosures=(),
 ) -> None:
     key_bytes = rrd.canonical_json_bytes(key)
-    try:
-        payload_bytes = rrd.canonical_json_bytes(payload)
-    except rrd.PT0NonFinitePayload:
-        payload_bytes = json.dumps(
-            payload,
-            sort_keys=True,
-            separators=(",", ":"),
-            allow_nan=True,
-        ).encode("utf-8")
+    payload_bytes = rrd._payload_integrity_bytes(payload)
     store.persistent_store.put(
         artifact=artifact,
         key=key,
@@ -5136,6 +5133,9 @@ def _store_unadmitted_test_payload(
                 law_disclosures=law_disclosures,
             )
             store._entries[_key_hash(key)]["payload"] = copy.deepcopy(payload)
+            store._entries[_key_hash(key)]["payload_hash"] = rrd._sha256(
+                rrd._payload_integrity_bytes(payload)
+            )
     else:
         _store_raw_replay_payload(
             store,
@@ -7363,7 +7363,7 @@ def _capture_recursive_gate_row(
         "capture",
         db_path=db_path if persistent else None,
     )
-    sim = _build_pt0_sim(capture)
+    sim, _ = _pt0_equilibrium_capture_context(capture)
     with pytest.MonkeyPatch.context() as monkeypatch:
         _install_magemin_subprocess_gate(sim, monkeypatch)
         sim.start_campaign(CampaignPhase.C2A_STAGED)
@@ -7636,7 +7636,7 @@ def _exercise_cache_payload_replay(
     if artifact == "equilibrium_post_record":
         _exercise_equilibrium_replay_consumers(store)
         return
-    sim = _build_pt0_sim(store)
+    sim, _ = _pt0_equilibrium_capture_context(store)
     with pytest.MonkeyPatch.context() as monkeypatch:
         _install_magemin_subprocess_gate(sim, monkeypatch)
         sim.start_campaign(CampaignPhase.C2A_STAGED)

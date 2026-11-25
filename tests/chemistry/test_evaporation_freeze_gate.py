@@ -1125,7 +1125,11 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
     )
     # r10's lunar run had one real provider dispatch for each of its seven
     # committed curve records. The hourly verdict check must stay replay-neutral.
-    assert freeze_gate_dispatch_counts['lunar_mare_low_ti_C0_24h'] == 7
+    assert freeze_gate_dispatch_counts['lunar_mare_low_ti_C0_24h'] == 7, {
+        'dispatches': freeze_gate_dispatch_counts,
+        'curve_rows': observed.get('lunar_mare_low_ti_C0_24h'),
+        'rebuilds': rebuild_counts.get('lunar_mare_low_ti_C0_24h'),
+    }
     assert observed == expected
 
 
