@@ -487,7 +487,7 @@ def test_structural_zero_bleed_flags_every_fig4a_point() -> None:
     )
     assert any(
         item["kind"] == "typed_unknown"
-        and item["field"] == "melt_offgas_O2_mol_hr"
+        and item.get("field") == "melt_offgas_O2_mol_hr"
         and item["reason"] == "melt_offgas_o2_structural_zero"
         for item in trajectory["notices"]
     )
