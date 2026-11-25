@@ -1992,10 +1992,13 @@ def test_kress_table1_redox_rows_score_at_ambient_furnace_pressure():
         assert row.identity.temperature_K.is_value
         assert row.identity.composition is not None
         assert row.identity.composition.is_value
+        assert row.locator is not None
         row_composition = (row.point_conditions or {}).get("composition")
         assert row_composition is not None and row_composition.state.is_value
+        assert row_composition.locator is not None
         row_fugacity = (row.point_conditions or {}).get("fO2_log")
         assert row_fugacity is not None and row_fugacity.state.is_value
+        assert row_fugacity.locator is not None
         ambient = [
             notice
             for notice in row.notices
