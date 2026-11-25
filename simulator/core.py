@@ -38,7 +38,7 @@ Units:
     Temperature     °C
     Amount          mol in AtomLedger; kg only at external projections
     Pressure        mbar (overhead), bar (O₂ accumulator)
-    Time            hours (simulation timestep = 1 h)
+    Time            process timestep, default 1 h (dt = 3600 s)
     Energy          kWh (electrical only; solar-thermal assumed)
     Evaporation     kg/hr (Hertz-Knudsen flux × surface area)
     Vapor pressure  Pa (Antoine → converted as needed)
@@ -66,6 +66,12 @@ from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     C0_FORECAST_ENGINE_NAMES,
     canonical_backend_name,
+)
+from simulator.process_timestep import (
+    ONE_HOUR,
+    exponential_approach_fraction,
+    step_end_sample_h,
+    timeseries_t_s,
 )
 
 class RefusalStateSnapshotError(TypeError):
@@ -1643,6 +1649,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         from simulator.campaigns import CampaignManager
         self.campaign_mgr = CampaignManager(setpoints)
         self.campaign_mgr.apply_collection_route(self.melt, self.train)
+        # Default step is one hour. session.start replaces this before load
+        # when a run configures a shorter process dt.
+        self.process_timestep = ONE_HOUR
+        self.campaign_mgr._process_dt_h = 1.0
 
         # --- Subsystem models (lazy imports to avoid circular deps) ---
         self._condensation_model = None
@@ -4534,13 +4544,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         self._headspace_downstream_pressure_bar(),
                     )
                 )
-                bleed_kg = (
-                    self._headspace_bleed_conductance_kg_s(
-                        species_kg_for_M_avg=holdup_kg,
-                    )
-                    * pressure_capacity_fraction
-                    * 3600.0
+                bleed_conductance_kg_s = self._headspace_bleed_conductance_kg_s(
+                    species_kg_for_M_avg=holdup_kg,
                 )
+                if self.process_timestep.is_one_hour:
+                    bleed_kg = (
+                        bleed_conductance_kg_s
+                        * pressure_capacity_fraction
+                        * 3600.0
+                    )
+                else:
+                    bleed_kg = (
+                        bleed_conductance_kg_s
+                        * pressure_capacity_fraction
+                        * self.process_timestep.dt_s
+                    )
                 if bleed_kg > 0.0:
                     avg_molar_mass = total_kg / total_mol
                     bleed_total_mol = min(total_mol, bleed_kg / avg_molar_mass)
@@ -7129,7 +7147,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         k_O, k_source = self._oxygen_exchange_k_m_s(T_K)
         h_eff_m = self._oxygen_exchange_effective_melt_depth_m()
         tau_s = h_eff_m / k_O
-        alpha = 1.0 - math.exp(-3600.0 / tau_s)
+        if self.process_timestep.is_one_hour:
+            alpha = 1.0 - math.exp(-3600.0 / tau_s)
+        else:
+            alpha = exponential_approach_fraction(
+                tau_s,
+                self.process_timestep.dt_s,
+            )
         C_m = self._melt_redox_source_capacity_mol_per_ln_fO2(
             fO2_log=base_fO2_log,
             T_K=T_K,
@@ -7359,7 +7383,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     effective_transport_capacity
                 )
             ),
-            'dt_hr': 1.0,
+            'dt_hr': self.process_dt_hr(),
             'force_drain_all': bool(force_drain_all),
             'external_o2_in_overhead_mol': getattr(
                 self,
@@ -7478,10 +7502,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'o2_accumulated_mol', 'o2_relieved_mol', 'o2_held_mol'
                 )
             )
-            # dt_hr is pinned to 1.0 in _dispatch_overhead_bleed's controls.
-            capacity_mol = (
-                capacity.value_kg_hr * 1.0 / OXYGEN_MOLAR_MASS_KG_PER_MOL
-            )
+            # One hour keeps the literal 1.0 h. A shorter step uses process dt.
+            if self.process_timestep.is_one_hour:
+                capacity_mol = (
+                    capacity.value_kg_hr * 1.0 / OXYGEN_MOLAR_MASS_KG_PER_MOL
+                )
+            else:
+                capacity_mol = (
+                    capacity.value_kg_hr
+                    * self.process_dt_hr()
+                    / OXYGEN_MOLAR_MASS_KG_PER_MOL
+                )
             self.overhead.turbine_utilization_pct = (
                 demand_mol / capacity_mol * 100.0
             )
@@ -7667,7 +7698,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
             rates = self._analytic_evaporation_depletion_rates(
                 rates,
-                dt_hr=1.0,
+                dt_hr=self.process_dt_hr(),
                 phase_scalar=1.0,
                 cleaned_melt_kg=frozen_cleaned_melt_kg,
                 available_o2_kg=frozen_overhead_o2_kg,
@@ -7697,7 +7728,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 ),
                 temperature_K=self._headspace_temperature_K(),
                 volume_m3=self._headspace_volume_m3(),
-                dt_hr=1.0,
+                dt_hr=self.process_dt_hr(),
                 bleed_conductance_kg_s=self._headspace_bleed_conductance_kg_s(
                     species_kg_for_M_avg=self._overhead_holdup_species_kg(
                         pre_holdup
@@ -8417,7 +8448,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             * 3600.0,
         )
         capacity_mol_hr = capacity_kg_hr / molar_mass_kg_mol
-        vapor_mol = min(native_fe_available_mol, capacity_mol_hr)
+        if self.process_timestep.is_one_hour:
+            vapor_mol = min(native_fe_available_mol, capacity_mol_hr)
+        else:
+            vapor_mol = min(
+                native_fe_available_mol,
+                capacity_mol_hr * self.process_dt_hr(),
+            )
         tap_mol = native_fe_available_mol - vapor_mol
         pool = native_fe_available_mol
         series_diag = series_flux.as_diagnostic()
@@ -8679,11 +8716,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             vapor_route.get('native_fe_vapor_mol', 0.0) or 0.0
         )
         committed_pool_mol = committed_vapor_mol + committed_tap_mol
-        residual_capacity_mol = max(
-            0.0,
-            float(partition.get('native_fe_vapor_capacity_mol_hr', 0.0) or 0.0)
-            - committed_vapor_mol,
-        )
+        if self.process_timestep.is_one_hour:
+            residual_capacity_mol = max(
+                0.0,
+                float(partition.get(
+                    'native_fe_vapor_capacity_mol_hr', 0.0,
+                ) or 0.0)
+                - committed_vapor_mol,
+            )
+        else:
+            residual_capacity_mol = max(
+                0.0,
+                float(partition.get(
+                    'native_fe_vapor_capacity_mol_hr', 0.0,
+                ) or 0.0) * self.process_dt_hr()
+                - committed_vapor_mol,
+            )
         self._native_fe_vapor_residual_capacity_mol_this_hr = residual_capacity_mol
         partition.update({
             'native_fe_split_commit_status': split_commit_status,
@@ -14441,7 +14489,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 "molar_mass_kg_mol": molar_mass_kg_mol,
                 "reactions": provider_reactions,
                 "max_throughput_kg_hr": float(throughput),
-                "dt_hr": SUBSOLIDUS_STEP_DURATION_HR,
+                "dt_hr": (
+                    SUBSOLIDUS_STEP_DURATION_HR
+                    if self.process_timestep.is_one_hour
+                    else self.process_dt_hr()
+                ),
                 "admitted_gas_kg_hr": dict(admitted_gas_kg_hr or {}),
             }
             if solid_host_area_m2 is not None:
@@ -15511,7 +15563,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             else {}
         )
         self.record.cost_rollup = self.cost_ledger.summary()
-        self.record.total_hours = self.melt.hour
+        if self.process_timestep.is_one_hour:
+            self.record.total_hours = self.melt.hour
+        else:
+            self.record.total_hours = float(self.melt.hour) * self.process_dt_hr()
         self.record.completed = True
 
     def _ledger_o2_kg(self, account: str) -> float:
@@ -15613,7 +15668,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     def _capture_campaign_summary(self, campaign_name: str) -> dict:
         """Capture a summary of what happened during the just-completed campaign."""
-        duration_h = self.melt.hour - self._campaign_start_hour + 1
+        if self.process_timestep.is_one_hour:
+            duration_h = self.melt.hour - self._campaign_start_hour + 1
+        else:
+            steps_including_current = (
+                self.melt.hour - self._campaign_start_hour + 1
+            )
+            duration_h = float(steps_including_current) * self.process_dt_hr()
         end_mass = self.melt.total_mass_kg
         mass_lost = self._campaign_start_mass - end_mass
 
@@ -15957,8 +16018,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self.cost_ledger.__dict__.update(cost_state)
         self._chem_kernel = self._build_chemistry_kernel()
 
+    def process_dt_hr(self) -> float:
+        """Hours in the current process step. The one-hour path returns 1.0."""
+
+        timestep = getattr(self, "process_timestep", None)
+        if timestep is None or timestep.is_one_hour:
+            return 1.0
+        return float(timestep.dt_h)
+
     def step(self) -> HourSnapshot:
-        """Advance one hour, refusing replay after a partial commit."""
+        """Advance one process step, refusing replay after a partial commit."""
         poisoned = self._poisoned_hour
         if poisoned is not None:
             raise PoisonedHourError(poisoned)
@@ -16075,6 +16144,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         """
         # A paused poll is observational: preserve the last committed hour's
         # diagnostics and return a detached snapshot without clearing evidence.
+        self.campaign_mgr._process_dt_h = self.process_dt_hr()
         if self.paused_for_decision:
             return self._make_snapshot()
         self._last_imcc_activity_shadow = {}
@@ -16107,7 +16177,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._restore_metal_phase_staging()
         self._mre_anode_O2_kg_this_hr = 0.0
 
-        sample_time_h = float(self.melt.campaign_hour) + 1.0
+        if self.process_timestep.is_one_hour:
+            sample_time_h = float(self.melt.campaign_hour) + 1.0
+        else:
+            schedule = self.campaign_mgr._lab_schedule(self.melt.campaign)
+            schedule_duration_h = (
+                None if schedule is None else float(schedule["duration_h"])
+            )
+            sample_time_h = step_end_sample_h(
+                self.melt.campaign_hour,
+                self.process_dt_hr(),
+                schedule_duration_h,
+            )
         self.campaign_mgr.apply_lab_schedule_controls(
             self.melt,
             self.melt.campaign,
@@ -16234,7 +16315,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     ),
                 )
                 live_effective_flux = (
-                    self._apply_analytic_evaporation_depletion(live_raw_flux)
+                    self._apply_analytic_evaporation_depletion(
+                        live_raw_flux,
+                        dt_hr=self.process_dt_hr(),
+                    )
                 )
                 solved_rates = {
                     species: float(rate)
@@ -16279,7 +16363,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             else:
                 evap_flux = self._calculate_evaporation(equilibrium)
                 evap_flux = self._apply_analytic_evaporation_depletion(
-                    evap_flux
+                    evap_flux,
+                    dt_hr=self.process_dt_hr(),
                 )
         # Hertz-Knudsen reads the headspace persisted last step. A same-step
         # ordinary-only provisional would replace that combined basis.
@@ -16312,7 +16397,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         inlet_flux = self._subsolidus_transport_inlet_flux(evap_flux)
         self._commit_pending_subsolidus_release()
         effective_transport_capacity = (
-            self._controlled_o2_transport_capacity(inlet_flux)
+            self._controlled_o2_transport_capacity(
+                inlet_flux,
+                dt_hr=self.process_dt_hr(),
+            )
         )
         self._effective_transport_capacity_this_tick = (
             effective_transport_capacity
@@ -16327,12 +16415,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             or bool(evap_flux.carrier_authority_by_species)
         ):
             self._configure_condensation_operating_conditions(evap_flux)
-            self._apply_lab_surface_temperatures(sample_time_h=float(self.melt.hour) + 1.0)
+            if self.process_timestep.is_one_hour:
+                surface_sample_h = float(self.melt.hour) + 1.0
+            else:
+                surface_sample_h = sample_time_h
+            self._apply_lab_surface_temperatures(
+                sample_time_h=surface_sample_h,
+            )
             overhead_flux = self._route_to_condensation(evap_flux)
             evap_flux = self._ledger_committed_evap_flux_this_tick
             inlet_flux = self._subsolidus_transport_inlet_flux(evap_flux)
             effective_transport_capacity = (
-                self._controlled_o2_transport_capacity(inlet_flux)
+                self._controlled_o2_transport_capacity(
+                    inlet_flux,
+                    dt_hr=self.process_dt_hr(),
+                )
             )
             self._effective_transport_capacity_this_tick = (
                 effective_transport_capacity
@@ -16469,6 +16566,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self.melt, self.overhead, evap_flux,
             mre_kWh=mre_energy_kWh,  # Actual MRE energy this hour
             vapor_pressures=self.vapor_pressures,
+            dt_h=self.process_dt_hr(),
         )
         self.energy_electrical_plus_evaporation_cumulative_kWh += (
             energy.electrical_plus_evaporation_kWh
@@ -16555,9 +16653,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # --- 10. Record snapshot ---
         completed_hour = int(self.melt.hour)
         self.melt.hour += 1
-        self.melt.campaign_hour += 1
+        if self.process_timestep.is_one_hour:
+            self.melt.campaign_hour += 1
+        else:
+            self.melt.campaign_hour = (
+                float(self.melt.hour) * self.process_timestep.dt_h
+            )
         self._stamp_redox_source_context_for_current_state(force=True)
         snapshot = self._make_snapshot()
+        t_s = timeseries_t_s(self.melt.hour, self.process_timestep)
+        if t_s is not None:
+            snapshot.t_s = t_s
         if getattr(self, "_imcc_activity_shadow_enabled", False):
             snapshot.imcc_activity_shadow = self._imcc_activity_shadow_for_hour(
                 snapshot
@@ -16825,7 +16931,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if abs(delta) < 0.1:
             self.melt.temperature_C = target_T
         elif actual_ramp > 0:
-            step = min(abs(delta), actual_ramp)
+            # One hour applies the °C/hr cap directly. A lab schedule's cap is
+            # the gap to the printed end-of-step temperature, so a shorter
+            # step still reaches that sample. A configured rate scales by dt.
+            ramp_cap = actual_ramp
+            if not self.process_timestep.is_one_hour:
+                if self.campaign_mgr._lab_schedule(self.melt.campaign) is None:
+                    ramp_cap = actual_ramp * self.process_dt_hr()
+            step = min(abs(delta), ramp_cap)
             self.melt.temperature_C += math.copysign(step, delta)
 
     def _get_turbine_spec(self):
@@ -17191,7 +17304,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         snapshot = HourSnapshot(
             liquid_fraction_gate=liquid_fraction_gate,
             hour=self.melt.hour,
-            duration_h=1.0,
+            duration_h=(
+                1.0
+                if self.process_timestep.is_one_hour
+                else self.process_timestep.dt_h
+            ),
             campaign=self.melt.campaign,
             temperature_C=self.melt.temperature_C,
             melt_mass_kg=self.melt.total_mass_kg,

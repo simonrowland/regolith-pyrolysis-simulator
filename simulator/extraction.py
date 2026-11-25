@@ -35,6 +35,7 @@ from simulator.condensation_routing import (
 from simulator.config_flags import bool_feature_flag
 from simulator.melt_regime import MeltRegime, melt_regime
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+from simulator.process_timestep import advance_hour_counter
 from simulator.state import (
     FARADAY,
     GAS_CONSTANT,
@@ -834,7 +835,7 @@ class ExtractionMixin:
         controls = {
             'mode': 'stratify',
             'k_mix_per_hr': k_mix_per_hr,
-            'dt_hr': 1.0,
+            'dt_hr': self.process_dt_hr(),
             'temperature_K': temperature_K,
             'melt_density_kg_m3': melt_density,
             'prior_pool_mol': dict(
@@ -1539,7 +1540,10 @@ class ExtractionMixin:
                 step_info = seq[idx]
                 voltage_V = step_info['voltage']
 
-                self._mre_hold_hours += 1
+                self._mre_hold_hours = advance_hour_counter(
+                    self._mre_hold_hours,
+                    self.process_dt_hr(),
+                )
 
                 # Advance only after affirmative effective current (or
                 # explicit species-absent evidence). Continuous near-zero
@@ -1645,7 +1649,10 @@ class ExtractionMixin:
                 if allowed_oxides is not None:
                     rung_allowed_oxides &= set(allowed_oxides)
 
-                self._mre_hold_hours += 1
+                self._mre_hold_hours = advance_hour_counter(
+                    self._mre_hold_hours,
+                    self.process_dt_hr(),
+                )
                 if self._mre_hold_hours >= step_info.get('min_hold_hours', 3):
                     c5_current_A = mre_ladder.C5_LIMITED_MRE_CURRENT_A
                     target_current_low = (
@@ -1724,7 +1731,7 @@ class ExtractionMixin:
             c5_allowed_oxides = sorted(rung_allowed_oxides)
 
         return PlantMREIntervalControl(
-            dt_h=1.0,
+            dt_h=self.process_dt_hr(),
             applied_current_A=float(current_A),
             applied_voltage_V=float(voltage_V),
             temperature_C=float(self.melt.temperature_C),
@@ -2635,6 +2642,7 @@ class ExtractionMixin:
                     ),
                     'true_available_mol_by_species': true_feo_mol,
                     'liquid_fraction': liquid_fraction,
+                    # One-hour feasibility probe, not the process step.
                     'dt_hr': 1.0,
                 },
                 temperature_C_override=temperature_C,
@@ -2891,7 +2899,7 @@ class ExtractionMixin:
                 'true_available_mol_by_species':
                     self._cleaned_melt_available_mol_by_species(('FeO',)),
                 'liquid_fraction': liquid_fraction,
-                'dt_hr': 1.0,
+                'dt_hr': self.process_dt_hr(),
             },
         )
         diagnostic = dict(kernel_result.diagnostic or {})
@@ -2921,7 +2929,7 @@ class ExtractionMixin:
             diagnostic=diagnostic,
             control_inputs={
                 'reaction_family': REACTION_FAMILY_C3_K,
-                'dt_hr': 1.0,
+                'dt_hr': self.process_dt_hr(),
             },
         )
         # The stirred melt makes feedstock and reagent K one well-mixed pool.
@@ -3013,7 +3021,7 @@ class ExtractionMixin:
                         ('FeO', 'Cr2O3', 'TiO2'),
                     ),
                 'liquid_fraction': liquid_fraction,
-                'dt_hr': 1.0,
+                'dt_hr': self.process_dt_hr(),
             },
         )
         diagnostic = dict(kernel_result.diagnostic or {})
@@ -3043,7 +3051,7 @@ class ExtractionMixin:
             diagnostic=diagnostic,
             control_inputs={
                 'reaction_family': REACTION_FAMILY_C3_NA,
-                'dt_hr': 1.0,
+                'dt_hr': self.process_dt_hr(),
             },
         )
         # As for K and Mg, dissolved feedstock/reagent Na is well mixed;
@@ -3284,7 +3292,7 @@ class ExtractionMixin:
                     c6_cfg.get('kinetic_driven_above_crossover')
                 ),
                 'kinetic_note': str(c6_cfg.get('kinetic_note') or ''),
-                'dt_hr': 1.0,
+                'dt_hr': self.process_dt_hr(),
             },
         )
         primary_diag = dict(primary_result.diagnostic or {})
@@ -3302,7 +3310,7 @@ class ExtractionMixin:
             diagnostic=primary_diag,
             control_inputs={
                 'reaction_family': REACTION_FAMILY_C6_MG,
-                'dt_hr': 1.0,
+                'dt_hr': self.process_dt_hr(),
             },
         )
         # The stirred melt makes feedstock and reagent Mg one well-mixed pool.
@@ -3347,7 +3355,7 @@ class ExtractionMixin:
                     c6_cfg.get('kinetic_driven_above_crossover')
                 ),
                 'kinetic_note': str(c6_cfg.get('kinetic_note') or ''),
-                'dt_hr': 1.0,
+                'dt_hr': self.process_dt_hr(),
             },
         )
         back_diag = dict(back_result.diagnostic or {})
@@ -3362,7 +3370,7 @@ class ExtractionMixin:
                 control_inputs={
                     'reaction_family': REACTION_FAMILY_C6_MG,
                     'back_reduction': True,
-                    'dt_hr': 1.0,
+                    'dt_hr': self.process_dt_hr(),
                 },
             )
             self._apply_c6_back_reduction_redox_source_terms(
@@ -3418,7 +3426,7 @@ class ExtractionMixin:
                 'reaction_family': REACTION_FAMILY_C6_MG,
                 'product_routing': True,
                 'mol_Al_product': mol_Al_product,
-                'dt_hr': 1.0,
+                'dt_hr': self.process_dt_hr(),
             },
         )
         product_proposal = product_result.transition
@@ -3430,7 +3438,7 @@ class ExtractionMixin:
                 control_inputs={
                     'reaction_family': REACTION_FAMILY_C6_MG,
                     'product_routing': True,
-                    'dt_hr': 1.0,
+                    'dt_hr': self.process_dt_hr(),
                 },
             )
             self._project_drain_tap_from_atom_ledger()
@@ -3673,7 +3681,13 @@ class ExtractionMixin:
                 getattr(self.melt, 'melt_surface_area_m2', 0.2),
             ),
         )
-        hold_time_h = max(0.0, self._c7_float(cfg.get('hold_time_h'), 1.0))
+        configured_hold_h = max(
+            0.0, self._c7_float(cfg.get('hold_time_h'), 1.0),
+        )
+        if self.process_timestep.is_one_hour:
+            hold_time_h = configured_hold_h
+        else:
+            hold_time_h = self.process_dt_hr()
         ca_entry = dict(
             (getattr(self, 'vapor_pressures', {}) or {})
             .get('metals', {})

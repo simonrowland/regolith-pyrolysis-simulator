@@ -6258,7 +6258,7 @@ class EvaporationMixin:
                         {},
                     )
                 ),
-                'dt_hr': 1.0,
+                'dt_hr': self.process_dt_hr(),
             },
         )
         if kernel_result.transition is None:
@@ -6453,7 +6453,8 @@ class EvaporationMixin:
             return (0.0, None) if return_transition else 0.0
 
         parent_oxide = stoich['parent_oxide']
-        rate_kg_per_tick = rate_kg_hr * 1.0  # 1-hour tick (see core.py)
+        dt_hr = self.process_dt_hr()
+        rate_kg_per_tick = rate_kg_hr * dt_hr
         oxide_removed = rate_kg_per_tick * stoich['oxide_per_product_kg']
         product_kg = rate_kg_per_tick
 
@@ -6474,7 +6475,7 @@ class EvaporationMixin:
                 f"condensation route for {species!r} returned "
                 "unphysical remaining vapor mass"
             )
-        remaining_kg = max(0.0, remaining_kg_hr) * 1.0
+        remaining_kg = max(0.0, remaining_kg_hr) * dt_hr
         if remaining_kg > product_kg + 1e-12:
             raise AccountingError(
                 f"condensation route for {species!r} exceeds credited vapor"
@@ -6490,7 +6491,7 @@ class EvaporationMixin:
                 'sp_data': dict(sp_data or {}),
                 'rate_kg_hr': float(rate_kg_hr),
                 'remaining_kg_hr': float(remaining_kg_hr),
-                'dt_hr': 1.0,
+                'dt_hr': dt_hr,
                 'available_kg': float(available_kg),
             },
         )
@@ -6506,7 +6507,7 @@ class EvaporationMixin:
             'sp_data': dict(sp_data or {}),
             'rate_kg_hr': float(rate_kg_hr),
             'remaining_kg_hr': float(remaining_kg_hr),
-            'dt_hr': 1.0,
+            'dt_hr': dt_hr,
             'available_kg': float(available_kg),
         }
         transition = self._commit_proposal(
