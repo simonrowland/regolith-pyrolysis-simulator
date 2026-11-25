@@ -37,7 +37,8 @@ PINNED_NATIVE_FE_MIGRATION_GOLDENS = {
         # 2026-08-05 MC-1 trace wiring d1b4f5d: Co/Ni/S/Cl passengers shift
         # the lunar cleaned-melt basis; migration routing assertions below stay.
         "native_fe_mol": 1607.3611432553353,
-        "native_vapor_Fe_kg": 0.1682078458614615,
+        # d-383 lowers pure-Fe P_sat from JANAF Fe-008, reducing the vapor pool.
+        "native_vapor_Fe_kg": 0.08771486886306674,
     },
     "mars_basalt": {
         # Recomputed after 9de6ffb8: counterfactual tracing attributes the

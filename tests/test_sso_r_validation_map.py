@@ -762,11 +762,12 @@ def test_grind_ready_target_window_opens_with_live_parity(smoke_payload):
     # grind_ready_target_window = (first_passing_T is not None) AND
     # certification_pass(owner and live-parity). Live parity is green, but the
     # corrected loaded-melt geometry leaves the owner row above its native-Fe
-    # escape limit, so the certification window remains closed.
+    # escape limit, so the certification window remains closed. d-383 lowers
+    # Fe P_sat and moves the first internal pass to 1600 C without certification.
     assert smoke_payload["live_owner_probe"]["native_split_observed"] is True
     assert parity["passed"] is True
     assert window["passed"] is False
-    assert "first_passing_T_C=None" in window["detail"]
+    assert "first_passing_T_C=1600.0" in window["detail"]
     assert "window under PN2 sweep transport semantics" in window["detail"]
     assert "live parity=confirmed" in window["detail"]
 

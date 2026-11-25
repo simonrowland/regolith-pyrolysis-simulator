@@ -418,14 +418,14 @@ def test_successful_openimcc_physics_is_bit_identical() -> None:
         result,
         exclude_b813_temperature_notices=True,
     )
-    # Numeric-only hash captured from the green 4b95c7176 engine on studio-2.
+    # d-383 lowers Fe P_sat and routes the FeO association base through Fe-008.
     assert hashlib.sha256(
         json.dumps(numeric_payload, sort_keys=True).encode()
-    ).hexdigest() == "3d1181198c3ed5425d44a1d1c4fb3f96d1d4a36f3ceff918eb7d7a0d7ecdc8e5"
-    # Projected metadata digest captured from merged green cb20fb3d4 on studio-2.
+    ).hexdigest() == "426741f4db8896e95f73c1121e7caeb75294843028e1b3ed7afbcd3c8b7cfa4f"
+    # d-383's Fe-008 pure-Fe marker also changes the projected association metadata.
     assert hashlib.sha256(
         json.dumps((*numeric_payload, *metadata_payload), sort_keys=True).encode()
-    ).hexdigest() == "1064588935496b5f0ff99e1ff6e2908bc62f20e1845520ebe8aa321a91c76582"
+    ).hexdigest() == "2c58dc17da01c2c424a0b7ce81ccf30e1797fd4beabb1cf490524ab215422800"
 
 
 def test_1800_k_pre_switch_physics_pin() -> None:
@@ -437,14 +437,14 @@ def test_1800_k_pre_switch_physics_pin() -> None:
         result,
         exclude_b813_temperature_notices=True,
     )
-    # Numeric-only hash captured from the green 4b95c7176 engine on studio-2.
+    # d-383 lowers Fe P_sat and routes the FeO association base through Fe-008.
     assert hashlib.sha256(
         json.dumps(numeric_payload, sort_keys=True).encode()
-    ).hexdigest() == "f82b65f10ddba00cbfdeaee41ac19406e2d81fc91a2e55518a2b5388a2137d01"
-    # Projected metadata digest captured from merged green cb20fb3d4 on studio-2.
+    ).hexdigest() == "afb15e878fa97bcc9e60a9b79ae46e4ce981f30e4e373ca80684f42bb5e355d0"
+    # d-383's Fe-008 pure-Fe marker also changes the projected association metadata.
     assert hashlib.sha256(
         json.dumps((*numeric_payload, *metadata_payload), sort_keys=True).encode()
-    ).hexdigest() == "4557c916600edd636d29d482a0772385440fa4daf68a9d5a6d54139c5b344fdd"
+    ).hexdigest() == "a0c5c265d8ca57c738d4354aa2c21a5bd22ffe0b706068eaed937afbabd0ce21"
 
 
 @pytest.mark.parametrize("temperature_K, expected", [(1650.0, False), (1800.0, True)])

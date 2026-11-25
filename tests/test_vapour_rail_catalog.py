@@ -974,15 +974,16 @@ def test_t609_feo_nio_exponents_are_stoichiometry_derived() -> None:
 
 
 def test_t609_feo_association_tracks_pure_fe_and_janaf_k() -> None:
-    """FeO(g) at fixed pO2 falls as T falls, on the pure-Fe saturation base.
+    """FeO(g) at fixed pO2 tracks the pure Fe-008 saturation base.
 
     The association constant is JANAF Fe-021 minus Fe-008. The pressure
-    base is metals.Fe.pure_component_antoine (a_Fe = 1, C = 0), not the
-    catalog Fe evaluator, which is still the C = 1000 effective fit.
+    base is metals.Fe.pure_component_antoine (a_Fe = 1), evaluated by the
+    d-383 Fe-008 marker rather than its retained Antoine cross-check.
     """
-    from engines.antoine import _antoine_log10_pressure
     from engines.builtin.vapor_pressure import (
         COEFF_BLOCK_PURE_COMPONENT,
+        coefficient_block_is_fe008_saturation,
+        fe008_saturation,
         vapor_pressure_antoine_coefficients,
     )
 
@@ -999,20 +1000,17 @@ def test_t609_feo_association_tracks_pure_fe_and_janaf_k() -> None:
         "base_reference_pressure_model"
     ]["coefficients"]
     pure = fe_row["pure_component_antoine"]
+    assert coefficient_block_is_fe008_saturation(base)
     assert base["A"] == pytest.approx(pure["A"])
     assert base["B"] == pytest.approx(pure["B"])
     assert base["C"] == pytest.approx(pure["C"])
-    assert float(base["C"]) == pytest.approx(0.0, abs=1.0e-12)
     assert float(base["A"]) != pytest.approx(9.408547)
 
-    antoine, block = vapor_pressure_antoine_coefficients(fe_row, 1800.0)
+    _antoine, block = vapor_pressure_antoine_coefficients(fe_row, 1800.0)
     assert block == COEFF_BLOCK_PURE_COMPONENT
-    p_pure = 10.0 ** _antoine_log10_pressure(
-        float(antoine["A"]),
-        float(antoine["B"]),
-        float(antoine["C"]),
-        1800.0,
-    )
+    # d-383 lowers pure-Fe P_sat through Fe-008, so association is checked
+    # against that direct pressure rather than the sidecar fit value.
+    p_pure = fe008_saturation(1800.0).pressure_pa
     p_feo_1bar = feo.evaluate(1800.0, pO2_bar=1.0).pressure_pa
     p_feo_001bar = feo.evaluate(1800.0, pO2_bar=0.01).pressure_pa
     # NIST-JANAF 4th, 1800 K, delta-f G as published: Fe-021 75.293 kJ/mol,
@@ -1027,9 +1025,8 @@ def test_t609_feo_association_tracks_pure_fe_and_janaf_k() -> None:
 
     # 1500 K, pO2 = 1.5e-3 bar. Fe-021 log10 Kf = -3.492 and Fe-007
     # log10 Kf = 0, so p_FeO = P° * Kf * (pO2/P°)^0.5 = 1.248 Pa.
-    # The liquid Antoine construction support starts at 1809 K, so this
-    # point lies above that solid-Fe value and below the activity-folded
-    # effective-curve answer (~99 Pa).
+    # Fe-008 supplies the pure-Fe base below its 1809 K liquid-fit range;
+    # this association remains below the activity-folded effective curve.
     p_janaf = 1.0e5 * (10.0 ** -3.492) * math.sqrt(1.5e-3)
     p_model = feo.evaluate(1500.0, pO2_bar=1.5e-3).pressure_pa
     assert p_janaf < p_model < 10.0 * p_janaf

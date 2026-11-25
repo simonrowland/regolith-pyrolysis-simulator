@@ -830,11 +830,10 @@ def test_per_hour_alkali_series_separate_cumulative_condensate_from_live_product
 
     assert rows[8]["product_ledger_kg_at_hour"] == rows[8]["metal_yields_kg"]
     # d-137 splits the old 350 C Stage 4 into a 250 C Na/Mg collector and a
-    # 40 C K trap. Preserve a06a92246's absolute live-product pin across
-    # the replay; the per-row identities independently verify separation
-    # of cumulative condensate, reagent transfers, and live product.
+    # 40 C K trap. d-383 lowers Fe P_sat, shifting this coupled live alkali
+    # product while the per-row identities still separate cumulative mass.
     assert alkali_total(rows[7], "product_ledger_kg_at_hour") == pytest.approx(
-        7.693708697396846e-4, rel=1e-12, abs=1e-15
+        7.947566965431965e-4, rel=1e-12, abs=1e-15
     )
     assert alkali_total(rows[8], "product_ledger_kg_at_hour") == 0.0
     for key in (

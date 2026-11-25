@@ -1952,7 +1952,7 @@ def _evaluate_transition_point(
 ) -> ObservationEvaluation:
     """Compare a store transition_point to the engine, or refuse by kind.
 
-    Normal boiling points invert the pure-component Antoine sidecar at the
+    Normal boiling points invert the pure-component saturation law at the
     observation's pressure basis (1 atm unless the extract names 1 bar).
     Melting / triple / solid-solid points have no engine comparator — the
     vapor-pressure catalog is not a melting-point model, and reading
@@ -2055,27 +2055,62 @@ def _evaluate_transition_point(
             return _refuse("no_pure_component_saturation_curve")
 
         runtime["catalog_family"] = family
-        runtime["antoine_source"] = coeff.get("source")
-        runtime["antoine_source_certification"] = coeff.get("source_certification")
-        runtime["antoine_provenance_class"] = coeff.get("provenance_class")
-        valid_range = coeff.get("valid_range_K")
-        if (
-            isinstance(valid_range, (list, tuple))
-            and len(valid_range) == 2
-        ):
-            try:
-                runtime["antoine_valid_range_K"] = [
-                    float(valid_range[0]),
-                    float(valid_range[1]),
-                ]
-            except (TypeError, ValueError):
-                runtime["antoine_valid_range_K"] = list(valid_range)
+        from engines.builtin.vapor_pressure import (
+            coefficient_block_is_fe008_saturation,
+            fe008_saturation,
+            fe008_saturation_band_K,
+        )
 
-        actual_T, invert_reason = _invert_antoine_temperature_K(coeff, target_pa)
+        if coefficient_block_is_fe008_saturation(coeff):
+            # d-383 makes Fe-008 the pure-Fe law: its lower pressure moves the
+            # 1-atm inverse root above the Antoine cross-check's root.
+            runtime["engine_path"] = "pure_component_fe008_nbp_inversion"
+            runtime["saturation_source"] = coeff.get("source")
+            low, high = fe008_saturation_band_K()
+            runtime["saturation_valid_range_K"] = [low, high]
+            if fe008_saturation(low).pressure_pa >= target_pa:
+                return _refuse("fe008_nbp_pressure_below_certified_floor")
+            while fe008_saturation(high).pressure_pa < target_pa:
+                low, high = high, high * 1.05
+                if high > 1.0e6:
+                    return _refuse("fe008_nbp_pressure_not_bracketed")
+            for _ in range(80):
+                midpoint = (low + high) / 2.0
+                if fe008_saturation(midpoint).pressure_pa < target_pa:
+                    low = midpoint
+                else:
+                    high = midpoint
+            actual_T = (low + high) / 2.0
+            invert_reason = None
+        else:
+            runtime["antoine_source"] = coeff.get("source")
+            runtime["antoine_source_certification"] = coeff.get(
+                "source_certification"
+            )
+            runtime["antoine_provenance_class"] = coeff.get(
+                "provenance_class"
+            )
+            valid_range = coeff.get("valid_range_K")
+            if (
+                isinstance(valid_range, (list, tuple))
+                and len(valid_range) == 2
+            ):
+                try:
+                    runtime["antoine_valid_range_K"] = [
+                        float(valid_range[0]),
+                        float(valid_range[1]),
+                    ]
+                except (TypeError, ValueError):
+                    runtime["antoine_valid_range_K"] = list(valid_range)
+            actual_T, invert_reason = _invert_antoine_temperature_K(
+                coeff, target_pa
+            )
     if actual_T is None:
         return _refuse(invert_reason or "antoine_inversion_failed")
 
-    range_pair = runtime.get("antoine_valid_range_K")
+    range_pair = runtime.get("saturation_valid_range_K") or runtime.get(
+        "antoine_valid_range_K"
+    )
     extrapolated = False
     if isinstance(range_pair, list) and len(range_pair) == 2:
         low, high = float(range_pair[0]), float(range_pair[1])

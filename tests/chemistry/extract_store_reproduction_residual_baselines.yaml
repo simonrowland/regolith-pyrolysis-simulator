@@ -200,13 +200,13 @@ points:
   observation_type: transition_point
   species: Fe
   residual_unit: K
-  residual_K: 1.149888431852105
+  residual_K: 2.285510061759851
   band_K: 0.05
   status: mismatch
-  note: Pure-component Antoine inversion residual (T_engine - T_obs) in Kelvin, not dex. Regression band
-    ±0.05 K is numerical noise, not an accuracy tolerance.
+  note: d-383 lowers pure-Fe P_sat via Fe-008, moving the direct 1-atm inverse root to 3136.285510 K. Regression
+    band ±0.05 K is numerical noise, not an accuracy tolerance.
   temperature_K: 3134.0
-  residual: 1.149888431852105
+  residual: 2.285510061759851
 - key: HF_normal_boiling_point:Psat=1atm
   case_id: nist-webbook::HF_normal_boiling_point
   source_id: nist-webbook

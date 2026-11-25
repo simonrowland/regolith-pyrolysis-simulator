@@ -15161,8 +15161,8 @@ families:
           flux_dormant: true
           reaction:
             formula: Fe(g) + 0.5 O2(g) -> FeO(g)
-            basis: Pure-Fe saturation pressure (metals.Fe.pure_component_antoine, a_Fe = 1) composed
-              with landed NASA CEA Fe, FeO, and O2 gas Gibbs rows.
+            basis: Pure-Fe saturation pressure from JANAF Fe-008 (metals.Fe.pure_component_antoine,
+              a_Fe = 1) composed with landed NASA CEA Fe, FeO, and O2 gas Gibbs rows.
             derivation: Association at metal saturation. The base is not the VapoRock activity-folded
               effective curve, so melt activity is not inside p_Fe and is not applied again. pO2 enters
               only as the association's +1/2 power.
@@ -15212,23 +15212,15 @@ families:
             oxygen_fugacity_channel: intrinsic_melt
             base_reference_pressure_model:
               evaluator_family: antoine
-              # Premise: p_Fe is pure-Fe saturation at a_Fe = 1 (metals.Fe.pure_component_antoine,
-              # REF-012 CRC/NIST, C = 0), not the VapoRock effective fit. At fixed pO2,
-              # d ln p_FeO / d(1/T) = -(dH_vap,Fe + dH_assoc)/R = -dHf(FeO,g)/R.
-              # JANAF Fe-021 dHf_deg(298.15 K) = +251.040 kJ/mol, so p_FeO falls as T falls.
-              # Algebra: log10(p_Fe/Pa) = A - B/(T+C). With C = 0, d log10 p / d(1/T) = -B
-              # = -dH_vap/(R ln 10). The activity-folded fit A=9.408547, B=23312.312336, C=1000 has
-              # d log10 p / d(1/T) = -B T^2/(T+C)^2, only 152 kJ/mol at 1400 K and flatter
-              # below the band, so |dH_assoc| won and p_FeO rose as T fell.
-              # Units: A dimensionless in log10(Pa), B in K, C in K. Sanity: at 1500 K,
-              # JANAF Fe-008/Fe-007/Fe-021 give p_FeO = 1.248 Pa at pO2 = 1.5e-3 bar
-              # (a_Fe = 1). This liquid Antoine's construction support starts at 1809 K,
-              # so the composite is flagged out_of_range below 1809 K; 1500 K sits
-              # above the solid-Fe JANAF value. K itself matches JANAF (2.110e3).
+              # d-383 uses the marked Fe-008 formation-Gibbs law for this pure-Fe
+              # saturation base; the Antoine coefficients remain its cross-check only.
+              # At fixed pO2, JANAF Fe-021 minus Fe-008 supplies the FeO association K.
               coefficients:
-                A: 10.670336
-                B: 17759.430841
-                C: 0.0
+                A: 10.580010801
+                B: 16600.8522745789
+                C: -157.2155777135
+                evaluation: janaf_fe008_formation_gibbs
+                janaf_table_id: Fe-008
             base_vapor_formula: Fe
             gas_exchange_reaction:
               reactants:

@@ -96,13 +96,14 @@ def _fe_sio_segments(wall_temperature_C: float) -> list[PipeSegment]:
 
 
 def test_millibar_fe_sio_at_1400_c_is_hot_wall_violation():
-    """Keep the parent value pin and verify the local Fe partial is judged."""
+    """Fe-008 P_sat and the local millibar Fe hot-wall violation stay pinned."""
 
     assert CONDENSATION_TEMPS_C["Fe"] == 1250
     assert CONDENSATION_TEMPS_C["SiO"] == 1050
     fe_psat, refused = _try_antoine_psat_pa("Fe", WALL_1400_K)
     assert refused is False
-    assert fe_psat == pytest.approx(1.1375418658, rel=1e-9, abs=0.0)
+    # d-383 lowers Fe P_sat at 1400 C; the millibar partial still exceeds it.
+    assert fe_psat == pytest.approx(0.4093959156295122, rel=1e-9, abs=0.0)
     assert MILLIBAR_BAKEOFF_PA > fe_psat
 
     segments = _fe_sio_segments(1400.0)
@@ -122,8 +123,8 @@ def test_millibar_fe_sio_at_1400_c_is_hot_wall_violation():
     )
 
 
-def test_dilute_or_hot_fe_at_valid_wall_stays_clear():
-    """Retain the parent's diluted and hot Fe successful-value controls."""
+def test_dilute_fe_stays_clear_but_hot_fe_exceeds_new_saturation():
+    """The dilute control stays clear; the 1800 C, 100 Pa case now violates."""
 
     dilute_segments = _fe_sio_segments(1400.0)
     dilute = cold_spot_diagnostic(
@@ -144,7 +145,13 @@ def test_dilute_or_hot_fe_at_valid_wall_stays_clear():
 
     assert dilute["has_upstream_hot_wall_violation"] is False
     assert dilute["has_cold_spot"] is False
-    assert hot["has_upstream_hot_wall_violation"] is False
+    # d-383 lowers Fe P_sat below 100 Pa at 1800 C, so the hot-wall verdict
+    # correctly changes while the dilute control remains clear.
+    assert hot["has_upstream_hot_wall_violation"] is True
+    assert any(
+        finding["species"] == "Fe"
+        for finding in hot["upstream_hot_wall_findings"]
+    )
     assert hot["has_cold_spot"] is False
 
 

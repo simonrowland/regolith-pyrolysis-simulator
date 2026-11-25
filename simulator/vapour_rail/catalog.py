@@ -929,6 +929,17 @@ class _ReferencePressureModel:
 
     def log10_pressure(self, temperature_K: float) -> float:
         if self.evaluator_family == "antoine":
+            if (
+                self.coefficients.get("evaluation")
+                == "janaf_fe008_formation_gibbs"
+            ):
+                from engines.builtin.vapor_pressure import (
+                    coefficient_block_is_fe008_saturation,
+                    fe008_saturation,
+                )
+
+                if coefficient_block_is_fe008_saturation(self.coefficients):
+                    return fe008_saturation(temperature_K).log10_pressure_pa
             try:
                 A = float(self.coefficients["A"])
                 B = float(self.coefficients["B"])

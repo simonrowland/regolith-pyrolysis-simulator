@@ -3202,8 +3202,10 @@ def test_native_fe_partition_vacuum_exceeds_pn2_and_small_pool_vaporizes() -> No
 
     vacuum_small = sim._native_fe_partition_diagnostic(0.5)
     vacuum_pool = sim._native_fe_partition_diagnostic(100.0)
+    # d-383 lowers the pure-Fe reference pressure from Fe-008 at 1973.15 K;
+    # the vacuum-over-pN2 escape ordering below remains intact.
     assert vacuum_small["P_reference_Antoine_Pa"].hex() == (
-        "0x1.76017513f6704p+5"
+        "0x1.b61e3f0c3dfd2p+4"
     )
 
     sim.melt.p_total_mbar = 10.0
@@ -3242,11 +3244,10 @@ def test_pn2_native_fe_partition_e2e_drains_tap_and_reports_stage3_fe_wt() -> No
     assert snapshot.overhead.composition["N2"] == pytest.approx(10.0)
     assert partition["native_fe_pool_mol"] > 0.0
     assert partition["native_fe_tap_mol"] > partition["native_fe_vapor_mol"]
-    # 2026-09-22 03616bb20 corrected Chapman-Enskog's pressure prefactor
-    # from the bar form used with P[atm] to 0.0018583*sqrt(2). The resulting
-    # finite-series-resistance escape fraction moved with D_AB.
+    # d-383 lowers Fe-008 P_sat and the resulting vapor escape fraction; the
+    # finite-series-resistance relation still uses the 2026-09-22 D_AB fix.
     assert partition["native_fe_vapor_escape_fraction_of_pool"] == pytest.approx(
-        0.0019750990648993625,
+        0.0011568363320486668,
         rel=0.0,
         abs=1.0e-15,
     )

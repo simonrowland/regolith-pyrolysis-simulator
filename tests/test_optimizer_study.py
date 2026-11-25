@@ -3818,12 +3818,11 @@ def test_parallel_composition_target_stub_study_completes(
     payload = json.loads(pareto_path.read_text())
     # d-384 (2026-11-10) lowered the hot-wall search floor from 1400 C to the
     # 20 C collector band. The Morris base (seed 0, level 1/3) now places the
-    # upstream walls at 746.67 C. The cold candidates commit a small measured
-    # Fe deposit on stage_0_to_stage_1; the d-401 booking path only replaces
-    # species named by wall saturation-pressure refusals. Their reported
-    # per-campaign load is higher than the run cumulative load because this
-    # 24-hour run represents 24/35 of a campaign. The thermal remobilization
-    # flag is diagnostic and does not subtract mass from the committed ledger.
+    # upstream walls at 746.67 C. d-383 lowers Fe P_sat enough that the prior
+    # trace Fe deposit is no longer present in the reported wall-deposit maps.
+    # Their per-campaign load is higher than the run cumulative load because
+    # this 24-hour run represents 24/35 of a campaign. Thermal remobilization
+    # remains diagnostic and does not subtract mass from the committed ledger.
     # The thermo step s003 still sits on the 2200 C ceiling. At 1773.15 K the
     # d-402 pO2-free SiO route resolves wall saturation; d-401 then classifies
     # its run-total supply below ledger resolution as an authorized zero. The
@@ -3853,29 +3852,15 @@ def test_parallel_composition_target_stub_study_completes(
                 "resinter_threshold_ungrounded"
             )
             assert summary["has_positive_qualified_fouling"] is True
-            assert summary["wall_deposit_kg_by_species"]["Fe"] == pytest.approx(
-                6.181281691758682e-12,
-                rel=1e-9,
-            )
-            assert summary["wall_deposit_cumulative_kg_by_species"]["Fe"] == (
-                pytest.approx(4.238593160063097e-12, rel=1e-9)
-            )
-            # Derivation (kg/run): the direct congruent JANAF pressure for
-            # FeO(cr)=FeO(g) enters the 24-hour activity-1 Hertz-Knudsen
-            # supply integral, sum(alpha * P_eq * sqrt(M/(2*pi*R*T)) *
-            # area * 3600 * duration), giving FeO_association_gas
-            # 4.4945768446829577e-5 kg. The same integral books K
-            # (2.0788664676353697e-6), MnO_gas (6.645065401993441e-9),
-            # Na (3.616923154680258e-5), and SiO2_gas
-            # (6.489072371783856e-11) kg. They have no located refusal
-            # segments, so their sum U=8.320057641739323e-5 kg is the
-            # unlocated bound. Adding the committed Fe deposit
-            # (4.207683789812068e-12 kg) makes stage_0_to_stage_1 in the
-            # Hottest zone the governing segment. The 24-hour C3 run spans
-            # 24/35 of a campaign, so (U + Fe) / (24/35) = 0.000121334180078237
-            # kg/campaign, rendered to 12 significant digits below.
+            assert summary["wall_deposit_kg_by_species"].get("Fe", 0.0) == 0.0
+            assert summary["wall_deposit_cumulative_kg_by_species"].get(
+                "Fe", 0.0
+            ) == 0.0
+            # Wall load derives from the 24-hour activity-1 Hertz-Knudsen
+            # supply integral. d-383 lowers pure-Fe P_sat and the JANAF FeO
+            # association base, moving the remaining campaign-load projection.
             ungrounded_lifetime = (
-                "resinter_threshold_kg / 0.000121334180078"
+                "resinter_threshold_kg / 0.000121334173942"
             )
             assert summary["campaigns_to_resinter"] == ungrounded_lifetime
             assert summary["campaigns_to_resinter_worst_segment"] == (

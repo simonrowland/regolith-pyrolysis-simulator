@@ -59,8 +59,10 @@ def _score_context():
 # value, solved pO2 bar. Costa's internal-analytical species pressure uses the
 # offer 20 r8 vapour route at the same solved pO2.
 _PIN = {
+    # d-383 lowers pure-Fe P_sat, reducing the Fe contribution to the shared
+    # effusion/oxygen-closure prediction at this Costa condition.
     (_COSTA, Engine.INTERNAL_ANALYTICAL): (
-        Decimal("0.13890413464807302"),
+        Decimal("0.053286422115422685"),
         2.74738410411159e-10,
     ),
     (_COSTA, Engine.OPENIMCC): (

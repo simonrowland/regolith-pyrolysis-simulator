@@ -1206,7 +1206,8 @@ def test_finite_capacity_in_domain_rates_match_parent_nonbinding_baseline(
         "CaO_gas": 2.067737447801073e-11,
         "Cr": 4.3552191736308734e-05,
         "CrO": 9.129280757927083e-06,
-        "CrO2": 3.170453002929102e-06,
+        # d-383 lowers Fe P_sat and shifts the coupled nonbinding rate vector.
+        "CrO2": 3.1704530196319767e-06,
         "CrO3": 9.294384109563237e-10,
         "K": 1.8395070246088384e-04,
         "K2": 1.6813544178336032e-11,
@@ -1217,7 +1218,7 @@ def test_finite_capacity_in_domain_rates_match_parent_nonbinding_baseline(
         "Na2": 3.013634463408095e-08,
         "Na2O_gas": 3.0031933641137976e-11,
         "Si": 1.2046947950628297e-10,
-        "SiO": 7.769179203709372e-09,
+        "SiO": 7.748311601087479e-09,
         "SiO2_gas": 4.598894711291365e-06,
         "TiO": 2.8635316467141483e-09,
         "TiO2_gas": 4.788176871001818e-08,

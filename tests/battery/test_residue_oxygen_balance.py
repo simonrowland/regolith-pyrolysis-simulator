@@ -495,11 +495,13 @@ def test_hashimoto_vacuum_oxygen_balance_is_engine_specific_and_alpha_weighted()
     assert solved["openimcc"][0.25].pO2_bar * PA_PER_BAR == pytest.approx(
         0.3003449996328013, rel=2.0e-5
     )
+    # d-383 lowers Fe P_sat in the oxygen-bearing channel set, shifting this
+    # engine-specific vacuum oxygen-balance root.
     assert solved["internal-analytical"][1.0].pO2_bar * PA_PER_BAR == pytest.approx(
-        1.025329, rel=2.0e-5
+        0.7851631480632897, rel=2.0e-5
     )
     assert solved["internal-analytical"][0.25].pO2_bar * PA_PER_BAR == pytest.approx(
-        0.374487, rel=2.0e-5
+        0.28402379787689996, rel=2.0e-5
     )
 
     # Replacing either engine's root by the other's does not close that engine's

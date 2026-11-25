@@ -626,17 +626,17 @@ def test_sio_yield_restored_capture_keeps_provenance_and_closure(feedstock):
     # routed SiO capture. d-402's Stage-3 pO2-free bound removes the former
     # 4.89580870473e-9 kg Mars capture that the reactive Psat=0 backstop
     # admitted; atom-ledger closure remains independently bounded at 5e-12%.
-    # The lunar cancellation residual is 1.54541037e-14 percentage points
-    # below its prior studio pin, a change in the near-equal subtraction path.
+    # d-383 lowers Fe P_sat and changes the Fe-vapor/FeO association redox
+    # subtraction; the atom-ledger closure remains separately bounded.
     expected_closure_error_pct = {
-        "lunar_mare_low_ti": 1.664998945735705e-6,
+        "lunar_mare_low_ti": 1.1997431500484354e-6,
         # r3's melt-to-headspace clamp advances fO2 only for oxygen committed
         # from reservoir.fo2_buffer; the unbacked remainder is held and the
         # resulting subtraction residual is reported by the production resolver.
         # The piecewise segment solve changes the cancellation residual by
         # 1.134167275e-14 percentage points from the single-exponential pin;
         # canonical atom-ledger balance remains within 5e-12 percent.
-        "mars_basalt": 4.4306091172096064e-7,
+        "mars_basalt": 8.005961021169913e-8,
     }
     assert diagnostics["closure_error_pct"] == pytest.approx(
         expected_closure_error_pct[feedstock], rel=1.0e-9, abs=1.0e-15
