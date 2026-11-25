@@ -151,6 +151,7 @@ from simulator.lab_schedule import (
 from simulator.thermal_budget import (
     FURNACE_POWER_DRIVER_KEY,
     PowerTemperatureRefusal,
+    declared_benchtop_lengths_m,
     furnace_power_driver_payload,
     measured_furnace_power_trace,
 )
@@ -657,10 +658,22 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
             if exc.code != "exposed_melt_area_not_printed":
                 raise
             exposed_area_m2 = None
+        sample = geometry.get("sample") if isinstance(geometry, Mapping) else None
+        try:
+            lengths = declared_benchtop_lengths_m(sample)
+        except PowerTemperatureRefusal as exc:
+            raise PresetRunnerError(
+                f"malformed_preset: {exc.reason}: {exc}",
+                provenance=provenance,
+            ) from exc
         schedule[FURNACE_POWER_DRIVER_KEY] = furnace_power_driver_payload(
             power_trace,
             mass_kg=mass_kg,
             exposed_area_m2=exposed_area_m2,
+            pellet_diameter_m=lengths.get("pellet_diameter_m"),
+            pellet_height_m=lengths.get("pellet_height_m"),
+            focal_spot_diameter_m=lengths.get("focal_spot_diameter_m"),
+            radiating_face_set=lengths.get("radiating_face_set"),
         )
     return PresetRunSpec(
         feedstock_id=feedstock_id,
