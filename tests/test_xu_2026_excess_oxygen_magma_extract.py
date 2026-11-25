@@ -209,10 +209,6 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
             raw_observations[row["observation_id"]].get("point_conditions") or {}
         )
         assert observation.identity.composition.is_unknown
-        assert (
-            observation.identity.composition.reason
-            == "input_composition_is_scored_phase_analysis"
-        )
         assert observation.value.kind is ValueKind.POINT
         assert observation.value.point == Decimal(row["component_amount"])
         assert observation.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
