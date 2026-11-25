@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import hashlib
 import json
 from copy import deepcopy
@@ -62,6 +63,46 @@ def test_run_executor_returns_structured_execution():
     assert isinstance(execution.trace, PhysicsTrace)
     assert execution.trace.snapshots == execution.snapshots
     assert isinstance(execution.operator_decisions, tuple)
+
+
+def test_hour_budget_mid_campaign_records_typed_run_truncation_flag():
+    run = _run(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C2A",
+        hours=1,
+        additives_kg={},
+        runtime_campaign_overrides={"C2A": {"max_hours": 3}},
+    )
+
+    execution = RunExecutor().execute(run._session_config())
+
+    assert execution.status == "ok"
+    assert execution.simulator.melt.campaign is CampaignPhase.C2A
+    assert execution.simulator.melt.campaign_hour == 1
+    assert execution.campaign_stops == ()
+    assert len(execution.run_flags) == 1
+    flag = execution.run_flags[0]
+    assert flag["kind"] == "run_truncation"
+    assert flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+    detail = flag["detail"]
+    assert detail["active_campaign"] == "C2A"
+    assert detail["hours_run_in_campaign"] == 1
+    assert detail["campaign_cap_hours"] == (
+        execution.simulator.campaign_mgr._max_hold_hr(CampaignPhase.C2A)
+    )
+    expected_sequence = copy.copy(
+        execution.simulator.campaign_mgr
+    ).auto_apply_sequence(
+        CampaignPhase.C2A,
+        copy.deepcopy(execution.simulator.record),
+    )
+    assert detail["successors_not_reached"] == [
+        phase.name for phase in expected_sequence[1:]
+    ]
+    assert detail["ruling"] == "d-473"
+
+    run_record = run._build_output(execution)
+    assert run_record["run_metadata"]["run_flags"] == [dict(flag)]
 
 
 def test_short_run_payload_and_ledger_match_rollback_baseline_golden():
@@ -271,6 +312,39 @@ def test_campaign_count_resolves_structured_c5_branch_max_hold():
     assert calls[-1] == ("branch_one",)
 
 
+@pytest.mark.parametrize(
+    ("campaign", "phase", "path", "branch", "cap_path"),
+    [
+        ("C3_NA", CampaignPhase.C3_NA, "A_staged", "", ("C3_NA", "A_staged")),
+        ("C5", CampaignPhase.C5, "", "two", ("branch_two",)),
+    ],
+)
+def test_campaign_count_uses_real_manager_structured_campaign_caps(
+    campaign, phase, path, branch, cap_path
+):
+    session = SimSession().start(
+        _run(
+            feedstock_id="lunar_mare_low_ti",
+            campaign=campaign,
+            hours=1,
+            additives_kg={},
+        )._session_config()
+    )
+    sim = session.simulator
+    sim.melt.campaign = phase
+    sim.record.path = path
+    sim.record.branch = branch
+    session._step_results = [SimpleNamespace(campaign_summary=None)]
+
+    campaign_cap = sim.campaign_mgr._configured_max_hold_hr(phase, *cap_path)
+    campaigns_elapsed = _campaigns_elapsed_from_session_history(
+        session,
+        fallback=99.0,
+    )
+
+    assert campaigns_elapsed == pytest.approx(1.0 / campaign_cap)
+
+
 def test_run_metadata_projects_execution_campaign_count_over_override():
     run = _run(
         run_metadata_overrides={
@@ -463,6 +537,7 @@ def test_auto_apply_c4_time_cap_runs_c2a_and_c6_then_flags_terminal_cap():
     execution = RunExecutor().execute_session(session, hours=1)
 
     assert execution.status == "ok"
+    assert execution.run_flags == ()
     stop_by_campaign = {
         stop["campaign"]: stop for stop in execution.campaign_stops
     }
@@ -503,6 +578,7 @@ def test_c4_refusal_is_non_resumable_under_auto_apply_and_decide() -> None:
 
     execution = RunExecutor().execute_session(session, hours=1)
     assert execution.status == "refused"
+    assert execution.run_flags == ()
     assert execution.reason == "c4_outdoor_alkali_limit_missing"
     sim = session.simulator
     assert sim._last_c4_refusal_diagnostic["diagnostic"]["reason_refused"] == (
