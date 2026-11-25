@@ -28955,9 +28955,17 @@ class Migrator:
                 source_id,
                 distinguisher=distinguisher,
             )
-            # The method-specific row keeps the declared run context; only
-            # its typed technique differs from the shared experiment.
-            if experiment_before_method_resolution is not None:
+            # Keep the declared run context on the method-specific experiment.
+            # Sibling rows share this id, so seed it once and preserve evidence
+            # (such as a printed oxygen pressure) already merged from earlier
+            # rows instead of resetting it from the registry on every row.
+            existing_method_experiment = self.result.experiments.get(experiment_id)
+            if existing_method_experiment is not None:
+                self.result.experiments[experiment_id] = replace(
+                    existing_method_experiment,
+                    method=method,
+                )
+            elif experiment_before_method_resolution is not None:
                 self.result.experiments[experiment_id] = replace(
                     experiment_before_method_resolution,
                     experiment_id=experiment_id,

@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 import pytest
 import yaml
 
@@ -213,6 +215,47 @@ def test_missing_row_method_inherits_only_a_declared_experiment_method(tmp_path)
     assert all(
         not any(notice.kind is NoticeKind.METHOD_UNSTATED for notice in row.notices)
         for row in observations
+    )
+
+
+def test_method_split_preserves_printed_oxygen_from_earlier_sibling_row(tmp_path):
+    filename = "darken-gurry-1946-iron-oxygen-ii.yaml"
+    source_id = "darken-gurry-1946-iron-oxygen-ii"
+    extract = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts" / filename).read_text(
+            encoding="utf-8"
+        )
+    )
+    selected_ids = {
+        "dg46_t1_l_1589_fe2o3",
+        "dg46_t1_l_1636_fe2o3",
+    }
+    for species in extract["species"].values():
+        species["observations"] = [
+            row
+            for row in species["observations"]
+            if row.get("observation_id") in selected_ids
+        ]
+
+    result = _migrate_real_extract(
+        tmp_path, filename, extract_doc=extract
+    )
+    rows = [
+        row
+        for local_id in selected_ids
+        for row in _rows_for_local_id(result, source_id, local_id)
+    ]
+    assert len(rows) == 2
+    assert len({row.experiment_id for row in rows}) == 1
+    experiment = result.experiments[rows[0].experiment_id]
+    assert experiment.method.is_value
+    assert experiment.method.value is MethodToken.UNSPECIFIED
+    control = experiment.fO2_control
+    assert control is not None
+    assert control.oxygen_partial_pressure_Pa is not None
+    assert (
+        control.oxygen_partial_pressure_Pa.state.value.point
+        == Decimal("101325")
     )
 
 
