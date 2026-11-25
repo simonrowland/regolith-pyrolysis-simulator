@@ -641,8 +641,8 @@ ENGINE_CHEMISTRY_VERSION_IDENTITY_AT = {
         "date": "2026-11-08",
     },
     "internal-analytical": {
-        "identity": "source-sha256:ac03c54243b61890960158318fb40a52972f301e9ac1dc9c381fa3a495818740",
-        "date": "2026-11-18",
+        "identity": "source-sha256:b2262bd49c915e2c1b9ae527926d43cdafa08ec796088c4acba29a06e335c589",
+        "date": "2026-11-25",
     },
     "vaporock": {
         "identity": "version:1.0.0;record-sha256:89e860e3d6995f542337748019c4f6198f76c127ce3ca90fbbc2063bd401fc5a",
@@ -654,11 +654,11 @@ ENGINE_CHEMISTRY_VERSION_IDENTITY_AT = {
     },
     "alphamelts": {
         "identity": "sha256:d91bd8baee106dee03136e7bf16a9e2c6c17d0dda6c978ff1bfd698c0b073a85",
-        "date": "2026-11-18",
+        "date": "2026-11-25",
     },
     "thermoengine": {
         "identity": "version:1.2.0;record-sha256:462a81b3fda92acf74a1e9e38f260dac65232d855340f72307e05a65219c1b27",
-        "date": "2026-11-18",
+        "date": "2026-11-25",
     },
 }
 

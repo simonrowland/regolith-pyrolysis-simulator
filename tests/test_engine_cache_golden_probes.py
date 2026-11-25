@@ -34,13 +34,13 @@ pytestmark = pytest.mark.engine_cache_off
 # Update each digest pair together after a reviewed numeric engine change.
 ENGINE_GOLDEN_PROBES = {
     "openimcc": (1, "0656d169b9fb045ebfc2455b7c725cf716817bfac00247d8406f2d24692ecf5d"),
-    # VERIFICATION PENDING (d-383): the controller will replace this pre-port
-    # digest with the post-port Studio measurement after the remote hold lifts.
-    "internal-analytical": (4, "49a558bf28a3703a997732209d5e1b65c14b51671ec0e9add51657932656d932"),
+    # d-383 (Fe-008 pure-Fe P_sat): digests below measured live on
+    # Mac-Studio-256-1 at 20380f32e2, 2026-11-25; all three passed at green 0ef47e3c09.
+    "internal-analytical": (4, "2f7879f2be07aaf597cb365ac563ae0cee6fee5570a6f9e810099206117c8d3f"),
     "vaporock": (1, "673a8c5ac16725e21c985b585a5320f08bc2bf31f785d9f68e7c1cd3f9753f3b"),
     "magemin": (4, "59eb4ffd0c28195b79b5fdfb1f212fe0f13ed1c1112afa1ae724ce60797cbac8"),
-    "alphamelts": (5, "3d6e809e84c119afc0341d5bcec193fd0c0886e027c16d0fcf247035f3547af4"),
-    "thermoengine": (5, "3db7ad76c46e3130880e2782b235e739a7de72b825180c84fa94e46ec68bfb53"),
+    "alphamelts": (5, "3373c24583ddaae3fb1f507992abb8194bc6047aadd6f6e40288821b7b6b7485"),
+    "thermoengine": (5, "21c5153d71a45d2c594ba12235ab11d48199fa126182025570f19f4829bb548d"),
 }
 
 _EXPECTED_NUMERIC_TRACE_PATHS = {
