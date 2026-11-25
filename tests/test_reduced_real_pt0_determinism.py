@@ -7935,6 +7935,9 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
                 ),
             )
             before_hits = capture.hits
+            before_disclosures = copy.deepcopy(
+                capture._accepted_hit_disclosures
+            )
             try:
                 result = capture._lookup_interpolated(
                     "equilibrium_post_record",
@@ -7952,7 +7955,7 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
                     failures.append(
                         f"{path_name} {mutation}: interpolation miss changed hits"
                     )
-                if capture._accepted_hit_disclosures is not None:
+                if capture._accepted_hit_disclosures != before_disclosures:
                     failures.append(
                         f"{path_name} {mutation}: interpolation miss changed disclosure state"
                     )
