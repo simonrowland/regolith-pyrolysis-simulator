@@ -217,6 +217,14 @@ def scan_cache_sites(root: Path | None = None) -> dict[str, dict[str, Any]]:
     return found
 
 CACHE_SITES: dict[str, dict[str, Any]] = {
+    'lru:engines/builtin/vapor_pressure.py:_fe008_saturation_nodes': {
+        "path": 'engines/builtin/vapor_pressure.py',
+        "line": 2407,
+        "kind": 'lru',
+        "name": '_fe008_saturation_nodes',
+        "carries_disclosure": False,
+        "how": 'Caches the printed JANAF Fe-008 nodes used to derive P_sat; the nodes are input data, not an evaluated vapour-law result.',
+    },
     'lru:simulator/engine_cache.py:_string_bytes': {
         "path": 'simulator/engine_cache.py',
         "line": 112,
@@ -235,7 +243,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/engine_cache.py:runtime_identity': {
         "path": 'simulator/engine_cache.py',
-        "line": 1574,
+        "line": 1575,
         "kind": 'lru',
         "name": 'runtime_identity',
         "carries_disclosure": False,
@@ -251,7 +259,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/score.py:residue_prediction_cache': {
         "path": 'simulator/battery/score.py',
-        "line": 16473,
+        "line": 16478,
         "kind": 'store',
         "name": 'residue_prediction_cache',
         "carries_disclosure": True,
@@ -259,7 +267,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/engine_cache.py:_MEMORY_CACHE': {
         "path": 'simulator/engine_cache.py',
-        "line": 741,
+        "line": 742,
         "kind": 'store',
         "name": '_MEMORY_CACHE',
         "carries_disclosure": True,
@@ -267,7 +275,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'sqlite:simulator/engine_cache.py:engine_outputs': {
         "path": 'simulator/engine_cache.py',
-        "line": 1771,
+        "line": 1772,
         "kind": 'sqlite',
         "name": 'engine_outputs',
         "carries_disclosure": True,
@@ -475,7 +483,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/score.py:_e15_binding_log10_k': {
         "path": 'simulator/battery/score.py',
-        "line": 20600,
+        "line": 20605,
         "kind": 'lru',
         "name": '_e15_binding_log10_k',
         "carries_disclosure": False,
@@ -523,7 +531,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/chemistry/langmuir_knudsen.py:_vapor_pressure_data': {
         "path": 'simulator/chemistry/langmuir_knudsen.py',
-        "line": 317,
+        "line": 319,
         "kind": 'lru',
         "name": '_vapor_pressure_data',
         "carries_disclosure": False,
@@ -875,7 +883,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/score.py:_row_metadata_cache': {
         "path": 'simulator/battery/score.py',
-        "line": 24943,
+        "line": 24948,
         "kind": 'store',
         "name": '_row_metadata_cache',
         "carries_disclosure": False,
@@ -899,7 +907,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/core.py:_freeze_gate_held_curve_record': {
         "path": 'simulator/core.py',
-        "line": 1450,
+        "line": 1445,
         "kind": 'store',
         "name": '_freeze_gate_held_curve_record',
         "carries_disclosure": True,
@@ -907,7 +915,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/core.py:_freeze_gate_liquid_fraction_cache': {
         "path": 'simulator/core.py',
-        "line": 1448,
+        "line": 1443,
         "kind": 'store',
         "name": '_freeze_gate_liquid_fraction_cache',
         "carries_disclosure": True,
@@ -915,7 +923,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/core.py:_freeze_gate_liquid_fraction_curve_memo': {
         "path": 'simulator/core.py',
-        "line": 1451,
+        "line": 1446,
         "kind": 'store',
         "name": '_freeze_gate_liquid_fraction_curve_memo',
         "carries_disclosure": True,
@@ -923,7 +931,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/core.py:_memo': {
         "path": 'simulator/core.py',
-        "line": 151,
+        "line": 146,
         "kind": 'store',
         "name": '_memo',
         "carries_disclosure": False,
@@ -931,7 +939,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/core.py:rates_cache': {
         "path": 'simulator/core.py',
-        "line": 7596,
+        "line": 7591,
         "kind": 'store',
         "name": 'rates_cache',
         "carries_disclosure": False,

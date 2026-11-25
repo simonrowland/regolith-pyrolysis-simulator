@@ -974,11 +974,13 @@ def test_t609_feo_nio_exponents_are_stoichiometry_derived() -> None:
 
 
 def test_t609_feo_association_tracks_pure_fe_and_janaf_k() -> None:
-    """FeO(g) at fixed pO2 tracks the pure Fe-008 saturation base.
+    """FeO(g) follows JANAF Fe-021 over the pure Fe-008 saturation base.
 
     The association constant is JANAF Fe-021 minus Fe-008. The pressure
-    base is metals.Fe.pure_component_antoine (a_Fe = 1), evaluated by the
-    d-383 Fe-008 marker rather than its retained Antoine cross-check.
+    base is metals.Fe.pure_component_antoine (a_Fe = 1). Green used the CRC
+    block as the live law, and d444522e43 left this association base on that
+    block; d-383 completes the port by evaluating it through Fe-008 while
+    retaining Antoine only as a cross-check.
     """
     from engines.builtin.vapor_pressure import (
         COEFF_BLOCK_PURE_COMPONENT,
@@ -1025,11 +1027,12 @@ def test_t609_feo_association_tracks_pure_fe_and_janaf_k() -> None:
 
     # 1500 K, pO2 = 1.5e-3 bar. Fe-021 log10 Kf = -3.492 and Fe-007
     # log10 Kf = 0, so p_FeO = P° * Kf * (pO2/P°)^0.5 = 1.248 Pa.
-    # Fe-008 supplies the pure-Fe base below its 1809 K liquid-fit range;
-    # this association remains below the activity-folded effective curve.
+    # Since the association is Fe-021 minus Fe-008, multiplying by the
+    # Fe-008 base recovers the JANAF Fe-021 formation pressure. Their printed
+    # values differ by less than 0.1% here, including the Fe-008 extrapolation.
     p_janaf = 1.0e5 * (10.0 ** -3.492) * math.sqrt(1.5e-3)
     p_model = feo.evaluate(1500.0, pO2_bar=1.5e-3).pressure_pa
-    assert p_janaf < p_model < 10.0 * p_janaf
+    assert p_model == pytest.approx(p_janaf, rel=1.0e-3)
 
     temperatures = (
         348.15,
