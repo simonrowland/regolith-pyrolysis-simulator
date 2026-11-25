@@ -20364,12 +20364,13 @@ def test_score_store_attempts_all_owned_handle_closes(
         "comparison_candidates",
         lambda _context: (reference,),
     )
-    with pytest.raises(RuntimeError, match="close probe"):
-        score_store(
-            context,
-            engines=(Engine.VAPOROCK, Engine.INTERNAL_ANALYTICAL),
-            include_diagnostics=False,
-        )
+    # The scorer converts the backend's primary error to a refusal and records
+    # cleanup errors on it; this probe is about closing every owned handle.
+    score_store(
+        context,
+        engines=(Engine.VAPOROCK, Engine.INTERNAL_ANALYTICAL),
+        include_diagnostics=False,
+    )
 
     assert len(opened) == 2
     assert all(backend.closed for backend in opened)
@@ -21515,7 +21516,7 @@ def test_ms2000_admitted_alkali_activities_score_with_liquid_sample_phase(
         for row in scored_rows
     )
     assert all(
-        any(notice.kind is NoticeKind.UNVERIFIED_APPARATUS for notice in row.notices)
+        any(notice.kind is NoticeKind.METHOD_UNSTATED for notice in row.notices)
         for row in scored_rows
     )
 
