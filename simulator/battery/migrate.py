@@ -13763,14 +13763,13 @@ def _method_inference_from_evidence(
     return None
 
 
-# Figure-series labels b274 leaves on a registered knudsen-effusion experiment.
-# They are not a second technique and must not conflict-split that experiment.
-_HASTIE_KNUDSEN_FIGURE_REGIMES = frozenset(
-    {
-        "mixed_kms_tms",
-        "knudsen_mass_spectrometry",
-    }
-)
+# Figure-series labels b274 leaves on the registered experiment for that
+# technique. They are not a second method and must not conflict-split it.
+_FIGURE_REGIME_INHERITS_DECLARED = {
+    "mixed_kms_tms": MethodToken.KNUDSEN_EFFUSION,
+    "knudsen_mass_spectrometry": MethodToken.KNUDSEN_EFFUSION,
+    "transpiration_mass_spectrometry": MethodToken.TRANSPIRATION,
+}
 
 
 def _row_text_inherits_declared_method(
@@ -13784,8 +13783,8 @@ def _row_text_inherits_declared_method(
     A method_as_printed sentence that did not map or infer is the
     registered experiment's description (Guo Table 5 quench_equilibration),
     not a second technique. A regime or method claim still resolves on its
-    own. The Hastie figure-series regimes inherit knudsen_effusion when the
-    experiment already registers it.
+    own. Hastie figure-series regimes inherit the registered technique:
+    knudsen effusion or transpiration.
     """
 
     if (
@@ -13795,10 +13794,7 @@ def _row_text_inherits_declared_method(
         or not method_raw
     ):
         return False
-    if (
-        method_raw in _HASTIE_KNUDSEN_FIGURE_REGIMES
-        and declared.value is MethodToken.KNUDSEN_EFFUSION
-    ):
+    if _FIGURE_REGIME_INHERITS_DECLARED.get(method_raw) is declared.value:
         return True
     return printed_only
 
@@ -26095,8 +26091,9 @@ class Migrator:
                 declared_experiment_method,
                 printed_only=printed_only,
             ):
-                # Unmapped method_as_printed prose, and the Hastie figure-series
-                # regimes b274 keeps on knudsen effusion, are not a second technique.
+                # Unmapped method_as_printed prose, and Hastie figure-series
+                # regimes b274 keeps on the registered technique, are not a
+                # second method.
                 method = declared_experiment_method
                 method_was_unspecified = False
             elif method_source_text is not None and method.is_unknown:
