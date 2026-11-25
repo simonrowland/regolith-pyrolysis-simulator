@@ -768,7 +768,10 @@ from simulator.chemistry.kernel import (
     normalize_chemistry_kernel_config,
     normalize_oxygen_sink_channel_mode,
 )
-from simulator.physical_constants import PA_PER_BAR
+from simulator.physical_constants import (
+    MELT_DISSOCIATION_PO2_MIN_BAR,
+    PA_PER_BAR,
+)
 from simulator.chemistry.melt_activity import normalize_high_t_melt_activity
 from simulator.high_t_melt_activity import (
     aggregate_high_t_melt_activity_run_notice,
@@ -6219,6 +6222,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self,
         T_K: float,
         fO2_log: float,
+        comp_wt: Mapping[str, float] | None = None,
     ) -> float:
         """Stoichiometric a_FeO shared by the floor and the native onset.
 
@@ -6227,6 +6231,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         ``_native_fe_saturation_state`` reads. Pressure is the
         vacuum-floored melt total the Kress inverse already uses.
         No FeOt returns 0. This does not substitute 1.
+        ``comp_wt`` defaults to the live melt. A trial composition
+        (the precipitation root) passes its own wt% into this same
+        fixed point; it does not grow a second activity loop.
         """
 
         pressure_bar = floor_vacuum_pressure_bar(
@@ -6237,15 +6244,24 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         liquid_domain = (
             domain_at(float(T_K)) if callable(domain_at) else None
         )
+        oxides = (
+            self._melt_oxide_wt_pct()
+            if comp_wt is None
+            else dict(comp_wt)
+        )
         return kress91_ferrous_feo_activity(
-            comp_wt=self._melt_oxide_wt_pct(),
+            comp_wt=oxides,
             fO2_log=float(fO2_log),
             T_K=float(T_K),
             pressure_bar=pressure_bar,
             liquid_domain=liquid_domain,
         )
 
-    def _consistent_stoich_feo_activity(self, T_K: float) -> float | None:
+    def _consistent_stoich_feo_activity(
+        self,
+        T_K: float,
+        comp_wt: Mapping[str, float] | None = None,
+    ) -> float | None:
         """Stoichiometric a_FeO on the Fe-metal line, or None if no FeO.
 
         d-463: a_FeO depends on fO2 through the Kress split, so the Fe
@@ -6271,6 +6287,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             activity = self._authoritative_melt_feo_activity(
                 float(T_K),
                 fO2_log,
+                comp_wt=comp_wt,
             )
             if not math.isfinite(activity) or activity <= 0.0:
                 return None
@@ -6282,6 +6299,35 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 return activity
             fO2_log = nxt
         return activity
+
+    def _fe_metal_line_log10_fO2(
+        self,
+        T_K: float,
+        comp_wt: Mapping[str, float] | None = None,
+    ) -> float | None:
+        """Fe-metal line at this composition, log10(fO2/bar).
+
+        The published floor may name a more oxidizing couple. Native-Fe
+        precipitation stops on the Fe line itself:
+        ``fe_metal_saturation_log10_fO2_bar`` at the fixed-point
+        stoichiometric a_FeO. No positive a_FeO means the couple is
+        absent.
+        """
+
+        activity = self._consistent_stoich_feo_activity(
+            float(T_K),
+            comp_wt=comp_wt,
+        )
+        if (
+            activity is None
+            or not math.isfinite(activity)
+            or activity <= 0.0
+        ):
+            return None
+        return float(fe_metal_saturation_log10_fO2_bar(
+            float(T_K),
+            a_feo_stoich=activity,
+        ))
 
     def _melt_metal_saturation_activities(self, T_K: float) -> dict[str, float]:
         """Fe fixed-point activity plus formula activities of the named oxides."""
@@ -6424,13 +6470,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     ) -> tuple[float, float | None, str]:
         """Unfloored ledger fO2, the metal floor, and the path that chose them.
 
-        ``mode`` is ``no_iron``, ``passthrough``, ``snap``, or ``inverse``.
-        Does not write the reservoir and does not emit the floor notice.
-        ``_ledger_consistent_melt_fO2_log`` is the publisher. The native-Fe
-        extent reads this pair so a deficit the floor would hide stays
-        visible. ``no_iron`` and ``snap`` have no finite Kress inverse;
-        their unfloored value is the current reservoir log. ``inverse``
-        is the Kress inverse of q before the floor.
+        ``mode`` is ``no_iron``, ``passthrough``, ``snap``, ``inverse``,
+        or ``below_float_guard``. Does not write the reservoir and does
+        not emit the floor notice. ``_ledger_consistent_melt_fO2_log``
+        is the publisher. The native-Fe extent reads this pair so a
+        deficit the floor would hide stays visible. ``no_iron`` and
+        ``snap`` have no finite Kress inverse; their unfloored value is
+        the current reservoir log. ``inverse`` is the Kress inverse of
+        q before the floor. ``below_float_guard`` is an inverse that is
+        non-finite or below ``log10(MELT_DISSOCIATION_PO2_MIN_BAR)``
+        (1e-30 bar). That number is not returned and must not be stored.
+        The inventory is far below the metal line; publication is the
+        floor, and precipitation sizes only up to the line.
         """
 
         melt_mol = self.atom_ledger.project_account_mol('process.cleaned_melt')
@@ -6464,6 +6515,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         except Kress91InvalidControls:
             return current, float(floor), 'snap'
+        guard_log = math.log10(MELT_DISSOCIATION_PO2_MIN_BAR)
+        if not math.isfinite(inverse) or float(inverse) < guard_log:
+            # q near 0 sends the Kress inverse to -inf. 1e-30 bar is the
+            # float guard, not a melt state and not the metal line.
+            # Handing that log back is how a sizing step starts tens of
+            # dex below the line. Callers treat the mode as far below
+            # and do not store the inverse.
+            return current, float(floor), 'below_float_guard'
         return float(inverse), float(floor), 'inverse'
 
     def _ledger_consistent_melt_fO2_log(self, T_K: float) -> float:
@@ -6525,11 +6584,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if mode == 'passthrough' or floor is None:
             return unfloored
         ceiling = self._melt_redox_fO2_upper_bound_log()
-        if mode == 'snap':
-            # q is undefined. An Fe-bearing melt still publishes the
-            # floor (d-463), which may be below the current fO2. The
-            # notice is only the lower-bound bind, when current is
-            # below that floor.
+        if mode in ('snap', 'below_float_guard'):
+            # q is undefined, or its inverse is below the float guard.
+            # An Fe-bearing melt still publishes the floor (d-463),
+            # which may be below the current fO2. The notice is only
+            # the lower-bound bind, when current is below that floor.
+            # The sub-guard inverse is not published.
             _raised, notice = apply_melt_metal_saturation_floor(
                 unfloored,
                 float(T_K),
@@ -7071,6 +7131,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             T_K=T_K,
             base_fO2_log=base_fO2_log,
         )
+        if not skip_reason:
+            # Republish replaces a tangent landing with the ledger fO2
+            # and does not undo the predictor's delta. The hour sum is
+            # the change that remains. A discarded ceiling predictor
+            # must not stay in that sum.
+            applied_delta_ln = (
+                float(reservoir.melt_intrinsic_fO2_log) - float(base_fO2_log)
+            ) * math.log(10.0)
         if skip_reason:
             # The tangent path floors its own landing. A skip never
             # reaches that line, and re-reference no longer floors, so
@@ -9606,6 +9674,154 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         return diagnostic
 
+    def _native_fe_precipitation_mol_to_metal_line(
+        self,
+        T_K: float,
+    ) -> tuple[float, float | None]:
+        """Fe mol that puts the melt on the Fe line, and that line.
+
+        Premise. FeO(l) = Fe(metal) + 1/2 O2. While the melt is below
+        the line, that oxygen is the ferric buffer, not free gas:
+        2 FeO + 1/2 O2 = Fe2O3. One mol of Fe precipitated therefore
+        removes 3 mol FeO and adds 1 mol Fe2O3. Oxide oxygen is
+        unchanged: 3 O leave FeO and 3 O enter Fe2O3. The metal takes
+        none. The provider still debits only the precipitated FeO and
+        parks 1/2 mol O2 per mol Fe; the root is the n whose parked
+        oxygen, once the couple absorbs it, is the line and not the
+        effervescence ceiling.
+
+        Algebra. n is mol Fe, bounded by the FeO inventory,
+        0 <= n <= n_FeO / 3.
+            n_FeO' = n_FeO - 3 n
+            n_Fe2O3' = n_Fe2O3 + n
+            ΣFe' = n_FeO + 2 n_Fe2O3 - n
+            q(n) = 2 (n_Fe2O3 + n) / ΣFe'
+        The landing is the Kress inverse of q(n) at the trial wt%.
+        The line is ``_fe_metal_line_log10_fO2`` at that same wt%,
+        the fixed-point a_FeO, not a second loop. Residual
+        r(n) = inverse(q(n)) - line(n), both log10(fO2/bar). q rises
+        with n, so the inverse moves oxidizing. a_FeO falls, so the
+        line moves reducing or stays. Both raise r, and one bisection
+        is the root.
+
+        A non-finite inverse, or one below
+        log10(MELT_DISSOCIATION_PO2_MIN_BAR) = -30, is not a melt fO2
+        and is not returned. r stays negative: the inventory is far
+        below the line, and n still stops at the line.
+
+        Units. n_FeO and n are mol. q is dimensionless. The inverse
+        and the line are log10(bar).
+
+        Limits. r(0) >= -1e-9 dex means the inventory is already on
+        or above the line, so n = 0. If n = n_FeO/3 is still below
+        the line, the inventory bound is the whole extent.
+        """
+
+        from engines.builtin._common import (
+            composition_wt_pct_from_account_view,
+        )
+        from simulator.chemistry.kernel.dto import ProviderAccountView
+
+        melt = dict(self.atom_ledger.project_account_mol(
+            'process.cleaned_melt',
+        ))
+        feo_mol = max(0.0, float(melt.get('FeO', 0.0) or 0.0))
+        fe2o3_mol = max(0.0, float(melt.get('Fe2O3', 0.0) or 0.0))
+        if feo_mol <= 1.0e-15:
+            return 0.0, self._fe_metal_line_log10_fO2(float(T_K))
+        n_max = feo_mol / 3.0
+        guard_log = math.log10(MELT_DISSOCIATION_PO2_MIN_BAR)
+        pressure_bar = floor_vacuum_pressure_bar(
+            float(self.melt.p_total_mbar) / 1000.0,
+            floor_bar=self._vacuum_floor_bar(),
+        )
+
+        def residual(n_mol: float) -> tuple[float, float | None]:
+            feo_trial = feo_mol - 3.0 * n_mol
+            fe2_trial = fe2o3_mol + n_mol
+            if feo_trial < -1.0e-12:
+                return math.inf, None
+            total_fe = feo_trial + 2.0 * fe2_trial
+            if total_fe <= 1.0e-18:
+                return math.inf, None
+            q_trial = (2.0 * fe2_trial) / total_fe
+            if q_trial <= 0.0:
+                return -math.inf, None
+            if q_trial >= 1.0:
+                return math.inf, None
+            trial = dict(melt)
+            trial['FeO'] = max(0.0, feo_trial)
+            trial['Fe2O3'] = fe2_trial
+            view = ProviderAccountView(
+                accounts={'process.cleaned_melt': trial},
+                species_formula_registry=self.species_formula_registry,
+            )
+            comp_wt = composition_wt_pct_from_account_view(
+                view,
+                'process.cleaned_melt',
+            )
+            fractions = melt_mol_fractions_for_kress91(comp_wt)
+            if not fractions:
+                return math.inf, None
+            try:
+                inverse = kress91_log10_fO2_from_fe3_over_sigma_fe(
+                    fe3_over_sigma_fe=q_trial,
+                    mol_fractions=fractions,
+                    T_K=float(T_K),
+                    pressure_bar=pressure_bar,
+                )
+            except Kress91InvalidControls:
+                return (
+                    (-math.inf if q_trial < 0.5 else math.inf),
+                    None,
+                )
+            if (
+                not math.isfinite(inverse)
+                or float(inverse) < guard_log
+            ):
+                return -math.inf, None
+            line_log = self._fe_metal_line_log10_fO2(
+                float(T_K),
+                comp_wt=comp_wt,
+            )
+            if line_log is None or not math.isfinite(line_log):
+                return math.inf, None
+            return float(inverse) - float(line_log), float(line_log)
+
+        r_lo, line_lo = residual(0.0)
+        if math.isfinite(r_lo) and r_lo >= -1.0e-9:
+            return 0.0, line_lo
+        r_hi, line_hi = residual(n_max)
+        if not math.isfinite(r_hi) and r_hi < 0.0:
+            return n_max, line_hi
+        lo = 0.0
+        hi = n_max
+        # A finite residual is the only landing. n_max is not a
+        # fallback when the high side is already above the line or
+        # the activity is missing: that would precipitate the inventory
+        # bound and park the oxygen at the ceiling.
+        best_n = 0.0
+        best_line = line_lo
+        best_abs = math.inf
+        for _ in range(60):
+            mid = 0.5 * (lo + hi)
+            r_mid, line_mid = residual(mid)
+            if (
+                math.isfinite(r_mid)
+                and line_mid is not None
+                and abs(r_mid) < best_abs
+            ):
+                best_abs = abs(r_mid)
+                best_n = mid
+                best_line = line_mid
+            if math.isfinite(r_mid) and abs(r_mid) <= 1.0e-6:
+                return mid, line_mid
+            if r_mid < 0.0:
+                lo = mid
+            else:
+                hi = mid
+        return best_n, best_line
+
     def _apply_native_fe_saturation_split(
         self,
         *,
@@ -9648,21 +9864,61 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         unfloored, floor_log, mode = (
             self._ledger_consistent_melt_fO2_and_floor(T_K)
         )
-        if (
+        guard_log = math.log10(MELT_DISSOCIATION_PO2_MIN_BAR)
+        melt_mol = self.atom_ledger.project_account_mol('process.cleaned_melt')
+        _feo_now, fe2_now = iron_oxide_values(melt_mol)
+        total_fe_now = feot_equivalent_moles(melt_mol)
+        ferric_fraction = (
+            (2.0 * fe2_now) / total_fe_now if total_fe_now > 0.0 else 0.0
+        )
+        inventory_below = mode == 'below_float_guard' or (
             mode == 'inverse'
             and floor_log is not None
             and unfloored + _FLOOR_BIND_TOLERANCE_DEX < floor_log
-        ):
-            extent_fO2 = unfloored
-            reference_T_K = T_K
-        else:
-            extent_fO2 = temp_fO2
-        reservoir = self.melt.oxygen_reservoir
-        reservoir.melt_intrinsic_fO2_log = self._finite_oxygen_reservoir_fO2_log(
-            extent_fO2,
-            context='native_fe_saturation_extent',
-            candidate_fO2_log=extent_fO2,
         )
+        reservoir_below = False
+        if not inventory_below and ferric_fraction <= 0.0:
+            # q = 0 has no Kress inverse. The reservoir is the state.
+            # A reservoir already on or above the Fe line does not
+            # precipitate. One below the line, or below the float
+            # guard, is far below and the root stops at the line.
+            live_line = self._fe_metal_line_log10_fO2(T_K)
+            reservoir_below = live_line is not None and (
+                not math.isfinite(float(temp_fO2))
+                or float(temp_fO2) < guard_log
+                or float(temp_fO2) + _FLOOR_BIND_TOLERANCE_DEX < live_line
+            )
+        use_root = ferric_fraction < 1.0 and (
+            inventory_below or reservoir_below
+        )
+        metal_line_log: float | None = None
+        if (
+            mode == 'inverse'
+            and floor_log is not None
+            and math.isfinite(unfloored)
+            and unfloored >= guard_log
+            and unfloored + _FLOOR_BIND_TOLERANCE_DEX < floor_log
+        ):
+            extent_fO2: float | None = float(unfloored)
+            reference_T_K = T_K
+        elif (
+            mode != 'below_float_guard'
+            and math.isfinite(float(temp_fO2))
+            and float(temp_fO2) >= guard_log
+        ):
+            extent_fO2 = float(temp_fO2)
+        else:
+            # Do not store a non-finite or sub-guard ledger fO2.
+            extent_fO2 = None
+        reservoir = self.melt.oxygen_reservoir
+        if extent_fO2 is not None:
+            reservoir.melt_intrinsic_fO2_log = (
+                self._finite_oxygen_reservoir_fO2_log(
+                    extent_fO2,
+                    context='native_fe_saturation_extent',
+                    candidate_fO2_log=extent_fO2,
+                )
+            )
         reservoir.reference_T_K = reference_T_K
         self._sync_oxygen_reservoir_mirror()
         native_extent = self._compute_native_fe_saturation_extent()
@@ -9673,10 +9929,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         native_fe_source_account = 'process.cleaned_melt'
         native_fe_intent = ChemistryIntent.NATIVE_FE_SATURATION
-        native_fe_mol = max(
-            0.0,
-            float(native_extent.get('native_fe_mol', 0.0) or 0.0),
-        )
+        if use_root:
+            precip_mol, metal_line_log = (
+                self._native_fe_precipitation_mol_to_metal_line(T_K)
+            )
+            feo_available = max(
+                0.0,
+                float(native_extent.get('feo_available_mol', 0.0) or 0.0),
+            )
+            native_fe_mol = min(feo_available, max(0.0, float(precip_mol)))
+        else:
+            native_fe_mol = max(
+                0.0,
+                float(native_extent.get('native_fe_mol', 0.0) or 0.0),
+            )
         if (
             native_fe_mol <= 1.0e-12
             and self.melt.campaign == CampaignPhase.C2A_STAGED
@@ -9861,7 +10127,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         })
         self._last_native_fe_partition_diagnostic = dict(partition)
         base_fO2_log = self._current_melt_redox_fO2_log()
-        target_fO2_log = self._native_fe_saturation_target_fO2_log(base_fO2_log)
+        if use_root and metal_line_log is not None:
+            # The closed-form lever at fixed fO2 precipitates the
+            # equilibrium fraction as if fO2 did not rise. The root's
+            # line is the landing, so the tangent is not asked to climb
+            # past it. The 0.25 dex bracket search is that overshoot.
+            target_fO2_log = float(metal_line_log)
+        else:
+            target_fO2_log = self._native_fe_saturation_target_fO2_log(
+                base_fO2_log,
+            )
         # Native-Fe saturation is not a reducing step. The lock must
         # not collapse this sizing to the noop. The source below is
         # positive, so it does not clear the lock; the republish there
@@ -9913,6 +10188,39 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             exchange_direction='redox_source:native_fe_saturation_split',
             gate_authority=gate_authority,
         )
+        if (
+            use_root
+            and native_fe_source_account == 'process.cleaned_melt'
+            and native_fe_mol > 1.0e-12
+        ):
+            # Publication is the Fe line of the melt after the debit.
+            # A tangent that reached the effervescence ceiling, or a
+            # lock that put the old ledger back, is not the extent.
+            live_line = self._fe_metal_line_log10_fO2(T_K)
+            current_fO2 = self._current_melt_redox_fO2_log()
+            if (
+                live_line is not None
+                and abs(current_fO2 - live_line) > 1.0e-6
+            ):
+                self._redox_source_delta_ln_this_hr = float(
+                    getattr(self, '_redox_source_delta_ln_this_hr', 0.0)
+                    or 0.0
+                ) + (live_line - current_fO2) * math.log(10.0)
+                self.melt.oxygen_reservoir.melt_intrinsic_fO2_log = (
+                    self._finite_oxygen_reservoir_fO2_log(
+                        live_line,
+                        context='native_fe_metal_line',
+                        candidate_fO2_log=live_line,
+                    )
+                )
+                self._sync_oxygen_reservoir_mirror()
+                booked_ln = float(self._redox_source_delta_ln_this_hr)
+                self.melt.oxygen_reservoir.redox_source_delta_ln_fO2 = (
+                    booked_ln
+                )
+                self.melt.oxygen_reservoir.redox_source_delta_log10_fO2 = (
+                    booked_ln / math.log(10.0)
+                )
         if transition is None and committed_vapor_mol > 1.0e-12:
             event = {
                 'native_fe_event': 'native_fe_partitioned_saturation',

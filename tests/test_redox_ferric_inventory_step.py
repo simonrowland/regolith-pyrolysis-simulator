@@ -149,6 +149,42 @@ def test_in_inventory_reducing_source_step_is_demand_over_capacity(
     assert _oxygen_atoms(sim) == pytest.approx(before_atoms, abs=1.0e-9)
 
 
+def test_locked_oxidizing_tangent_books_the_ledger_not_the_ceiling(
+    sim: PyrolysisSimulator,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A discarded ceiling predictor must not stay in the hour's fO2 sum.
+
+    The ferric lock republishes the ledger after the tangent. The delta
+    is that remaining change. Booking the ceiling landing is how a melt
+    on the metal line reports a tens-of-dex oxidizing jump.
+    """
+
+    planted = -12.0
+    _pin_tangent(sim, monkeypatch, fe2o3_mol=0.0, base_log=planted)
+    sim._ferric_tangent_exhausted = True
+    ceiling = sim._melt_redox_fO2_upper_bound_log()
+    past_ceiling_mol = (
+        (ceiling - planted) * _CAPACITY_MOL_PER_LN * math.log(10.0)
+    ) + 1.0e-3
+
+    reservoir = sim._apply_oxygen_reservoir_redox_source_terms(
+        {"redox_source:test_oxidizing_locked": past_ceiling_mol},
+        temperature_K=_TEMPERATURE_K,
+    )
+
+    published = reservoir.melt_intrinsic_fO2_log
+    ceiling_delta_ln = (ceiling - planted) * math.log(10.0)
+    assert published < ceiling - 1.0
+    assert published == pytest.approx(
+        sim._ledger_consistent_melt_fO2_log(_TEMPERATURE_K),
+    )
+    assert reservoir.redox_source_delta_ln_fO2 == pytest.approx(
+        (published - planted) * math.log(10.0),
+    )
+    assert reservoir.redox_source_delta_ln_fO2 != pytest.approx(ceiling_delta_ln)
+
+
 def test_oxidizing_source_step_is_demand_over_capacity(
     sim: PyrolysisSimulator,
     monkeypatch: pytest.MonkeyPatch,
