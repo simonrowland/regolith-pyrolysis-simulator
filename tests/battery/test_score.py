@@ -20342,15 +20342,11 @@ def test_score_store_attempts_all_owned_handle_closes(
         )
 
     monkeypatch.setattr(battery, "open_battery_engine", open_probe_engine)
-    identity = F.activity_identity()
-    experiment = F.tabulation_experiment(
-        T_K=identity.temperature_K.value,
-        total_P=identity.total_pressure_Pa.value,
-    )
+    experiment = F.tabulation_experiment()
     reference = F.observation(
         "fd-close-reference",
         experiment.experiment_id,
-        identity,
+        F.psat_identity("Na"),
         Decimal("0.1"),
         evidence=EvidenceClass.MEASURED_DIRECT,
         source_id="work-1",
@@ -20368,7 +20364,7 @@ def test_score_store_attempts_all_owned_handle_closes(
     # cleanup errors on it; this probe is about closing every owned handle.
     score_store(
         context,
-        engines=(Engine.VAPOROCK, Engine.INTERNAL_ANALYTICAL),
+        engines=(Engine.VAPOROCK, Engine.THERMOENGINE),
         include_diagnostics=False,
     )
 
