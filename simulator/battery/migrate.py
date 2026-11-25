@@ -12669,6 +12669,47 @@ def _yield_table_items(
     return None, None
 
 
+def _expand_printed_residue_vector(
+    values: dict[str, Any],
+    locator: Mapping[str, Any] | None,
+    point_conditions: Mapping[str, Any] | None,
+) -> None:
+    """Expose a printed residue vector through the existing oxide-cell reader."""
+    printed = values.get("printed_residue_oxide_wt_pct")
+    composition = (
+        printed.get("composition_wt_pct")
+        if isinstance(printed, Mapping)
+        else None
+    )
+    if (
+        not isinstance(composition, Mapping)
+        or isinstance(values.get("series"), list)
+        or not composition
+    ):
+        return
+
+    point = {
+        f"{formula}_wt_pct": amount
+        for formula, amount in composition.items()
+        if isinstance(formula, str)
+    }
+    for key in ("T_C", "T_K", "temperature_C", "temperature_K", "sample"):
+        if key in values:
+            point[key] = values[key]
+    if isinstance(point_conditions, Mapping):
+        point["point_conditions"] = point_conditions
+    duration_min = _as_dec_or_none(values.get("duration_min_as_published"))
+    if duration_min is not None:
+        point["t_min"] = duration_min
+    point_locator = printed.get("locator") if isinstance(printed, Mapping) else None
+    if point_locator is None:
+        point_locator = locator
+    if isinstance(point_locator, Mapping):
+        point["locator"] = point_locator
+    values["series"] = [point]
+    values.pop("printed_residue_oxide_wt_pct", None)
+
+
 _VACUUM_PYROLYSIS_SIDECAR_QUANTITY = {
     "pomeroy_non_condensed_mass_loss_fraction": Quantity.MASS_LOSS_FRACTION,
     "non_condensed_mass_loss_fraction": Quantity.MASS_LOSS_FRACTION,
@@ -27277,6 +27318,12 @@ class Migrator:
         obs_type = obs.get("type") if isinstance(obs.get("type"), str) else None
         quantity, q_reason, declared_schema_gap = sg.map_quantity(map_quantity, source_id, raw_obs_id, values, context, obs)
         q_token = quantity.value if quantity.is_value else None
+        if q_token is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+            _expand_printed_residue_vector(
+                values,
+                obs.get("locator"),
+                obs.get("point_conditions"),
+            )
         identity_profile_uses_composition = _composition_axis_is_required(
             q_token,
             values.get("basis")
