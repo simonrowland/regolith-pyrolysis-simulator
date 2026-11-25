@@ -753,6 +753,7 @@ def _hook(calls: list[dict]):
         pressure_bar,
         handles=None,
         redox_mode=None,
+        measured_ferric_fraction=False,
     ):
         _record_call(
             calls,
@@ -783,6 +784,7 @@ def _echo(calls: list[dict]):
         pressure_bar,
         handles=None,
         redox_mode=None,
+        measured_ferric_fraction=False,
     ):
         _record_call(
             calls,
