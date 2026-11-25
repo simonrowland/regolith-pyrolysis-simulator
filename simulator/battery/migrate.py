@@ -25335,6 +25335,89 @@ class Migrator:
             return f"{work_id}::{fallback}::{distinguisher}"
         return f"{work_id}::{fallback}"
 
+    def _publish_experiment(self, experiment: Experiment) -> Experiment:
+        """Register an experiment for the store writer.
+
+        write_outputs emits experiments_by_work and no other experiment list.
+        An id left only in result.experiments is dropped on reload. Every
+        observation that names it then fails referential integrity, and asset
+        lineage fails with it: asset ids are read from the resolved work.
+        """
+
+        experiment_id = experiment.experiment_id
+        work_id = experiment.work_id or ""
+        self.result.experiments[experiment_id] = experiment
+        registered = self.result.experiments_by_work[work_id]
+        if experiment_id not in registered:
+            registered.append(experiment_id)
+        return experiment
+
+    @staticmethod
+    def _tokens_with_published_id(
+        tokens: tuple[str, ...] | None,
+        former_id: str,
+        published_id: str,
+    ) -> tuple[str, ...] | None:
+        if not tokens or former_id == published_id or former_id not in tokens:
+            return tokens
+        return tuple(
+            published_id if token == former_id else token for token in tokens
+        )
+
+    def _derivation_with_published_id(
+        self,
+        derivation: Derivation | None,
+        former_id: str,
+        published_id: str,
+    ) -> Derivation | None:
+        if derivation is None:
+            return None
+        inputs = self._tokens_with_published_id(
+            derivation.inputs, former_id, published_id
+        )
+        if inputs is derivation.inputs:
+            return derivation
+        return replace(derivation, inputs=inputs or ())
+
+    def _rekey_row_references(
+        self,
+        *,
+        former_id: str,
+        experiment_id: str,
+        observation_id: str,
+        derived_from: tuple[str, ...] | None,
+        source_derivation: Derivation | None,
+        value_derivation: Derivation | None,
+    ) -> tuple[tuple[str, ...] | None, Derivation | None, Derivation | None]:
+        """Publish one re-keyed experiment and retarget this row only.
+
+        Sibling rows that stayed on former_id keep that id. A corpus-wide
+        old-to-new rewrite would move them.
+        """
+
+        if experiment_id == former_id:
+            return derived_from, source_derivation, value_derivation
+        experiment = self.result.experiments.get(experiment_id)
+        if experiment is not None:
+            self._publish_experiment(experiment)
+        derived_from = self._tokens_with_published_id(
+            derived_from, former_id, experiment_id
+        )
+        source_derivation = self._derivation_with_published_id(
+            source_derivation, former_id, experiment_id
+        )
+        value_derivation = self._derivation_with_published_id(
+            value_derivation, former_id, experiment_id
+        )
+        registered = self._author_derivations.get(observation_id)
+        if registered is not None:
+            retargeted = self._derivation_with_published_id(
+                registered, former_id, experiment_id
+            )
+            if retargeted is not None and retargeted is not registered:
+                self._author_derivations[observation_id] = retargeted
+        return derived_from, source_derivation, value_derivation
+
     def _ensure_experiment(
         self,
         *,
@@ -25447,8 +25530,7 @@ class Migrator:
                 apparatus,
                 pressure_env,
             )
-            self.result.experiments[experiment_id] = merged
-            return merged
+            return self._publish_experiment(merged)
         if (
             isinstance(equipment, Mapping)
             and isinstance(equipment.get("chamber_pressure"), Mapping)
@@ -25505,9 +25587,7 @@ class Migrator:
             locator=locator or Locator(record=experiment_id),
             apparatus=apparatus,
         )
-        self.result.experiments[experiment_id] = experiment
-        self.result.experiments_by_work[work_id].append(experiment_id)
-        return experiment
+        return self._publish_experiment(experiment)
 
     def _land_experiment_oxygen_pressure(
         self, experiment_id: str, located: Located[Value]
@@ -26666,17 +26746,13 @@ class Migrator:
                 self._amorphous_printed_sample_experiments.add(
                     experiment.experiment_id
                 )
-            self.result.experiments[experiment.experiment_id] = experiment
+            self._publish_experiment(experiment)
             if (
                 method_raw is not None
                 and not (isinstance(method_raw, str) and not method_raw.strip())
             ):
                 self._declared_experiment_methods[experiment.experiment_id] = (
                     experiment.method
-                )
-            if experiment.experiment_id not in self.result.experiments_by_work[work.work_id]:
-                self.result.experiments_by_work[work.work_id].append(
-                    experiment.experiment_id
                 )
             experiment_refs[str(local_id)] = experiment.experiment_id
             experiment_refs[experiment.experiment_id] = experiment.experiment_id
@@ -29015,6 +29091,7 @@ class Migrator:
             and method.is_value
             and experiment_before_method_resolution.method.value is not method.value
         )
+        former_experiment_id = experiment_id
         if method.is_value and (
             experiment_method_is_unstated or experiment_method_conflicts
         ):
@@ -29058,6 +29135,18 @@ class Migrator:
                     experiment_id=experiment_id,
                     method=method,
                 )
+        (
+            derived_from,
+            source_derivation,
+            value_derivation,
+        ) = self._rekey_row_references(
+            former_id=former_experiment_id,
+            experiment_id=experiment_id,
+            observation_id=obs_id,
+            derived_from=derived_from,
+            source_derivation=source_derivation,
+            value_derivation=value_derivation,
+        )
         experiment = self.result.experiments.get(experiment_id)
         migration_axis_notices = tuple(
             notice
