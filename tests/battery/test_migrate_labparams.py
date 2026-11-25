@@ -9,6 +9,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+import simulator.battery.migrate as migration_module
 from simulator.battery.enums import Engine, MethodToken, NoticeKind, Phase
 from simulator.battery.migrate import (
     REPO_ROOT,
@@ -143,6 +144,7 @@ def test_equal_pressure_duplicates_keep_printed_approximation() -> None:
     ("printed_method", "expected"),
     [
         ("static_capsule_vapor_pressure", MethodToken.STATIC_EQUILIBRIUM),
+        ("static_capsule_equilibrium", MethodToken.STATIC_EQUILIBRIUM),
         ("solar_furnace", MethodToken.SOLAR_FURNACE_PYROLYSIS),
         ("melt_equilibration_quench", MethodToken.QUENCH_EQUILIBRATION),
         ("kems_effusion", MethodToken.KNUDSEN_EFFUSION),
@@ -239,6 +241,28 @@ def test_ntrs_static_capsule_rows_migrate_with_source_validity_flags() -> None:
     )
 
 
+def test_ntrs_reservoir_alias_mutation_probe_rejects_unmapped_regime(
+    monkeypatch,
+) -> None:
+    aliases = dict(migration_module.METHOD_TOKEN_ALIASES)
+    aliases.pop("static_capsule_equilibrium")
+    monkeypatch.setattr(migration_module, "METHOD_TOKEN_ALIASES", aliases)
+
+    extract = REPO_ROOT / "data/literature/extracts/ntrs-19650014783.yaml"
+    migrator = migrate_one_extract(REPO_ROOT, extract)
+    rows = [
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.source_id == "ntrs-19650014783"
+        and observation.observation_id.startswith(
+            "ntrs-19650014783::bowles_rosenblum_1965_na_table1_static_capsule::"
+        )
+    ]
+    assert rows
+    with pytest.raises(AssertionError):
+        assert all(row.identity.reservoir.is_value for row in rows)
+
+
 # Printed 「3. 起電力測定」 under 「II. 実験方法」. The heading is on published
 # page 737; the temperature-stabilization paragraph continues on page 738
 # above 「III. 実験結果および考察」. Roman III on that page is results.
@@ -272,7 +296,17 @@ def test_wetzel_sio_film_source_is_not_mapped_to_kems(tmp_path: Path) -> None:
         for item in migrator.result.experiments.values()
         if item.experiment_id.endswith("::experiment::sio-film-measurement-series")
     )
-    assert experiment.method.is_unknown
+    assert experiment.method == State.of(MethodToken.UNSPECIFIED)
+    method_notice = next(
+        notice
+        for observation in migrator.result.observations.values()
+        if observation.experiment_id == experiment.experiment_id
+        for notice in observation.notices
+        if notice.kind is NoticeKind.METHOD_UNSTATED
+    )
+    assert "source method text is not mapped: solid_SiO_growth_coefficient" in (
+        method_notice.reason
+    )
 
 
 def test_yam1983_emf_procedure_is_section_ii_subsection_3(tmp_path: Path) -> None:

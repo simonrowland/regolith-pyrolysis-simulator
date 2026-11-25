@@ -155,7 +155,12 @@ def test_rein_chipman_quote_keeps_unknown_method_refusal(tmp_path: Path) -> None
         if row.observation_id.endswith("::kume_2000_table4_sample_301_sio2_activity")
     )
     experiment = migrated.experiments[observation.experiment_id]
-    assert not experiment.method.is_value
+    assert experiment.method.is_value
+    assert experiment.method.value is MethodToken.UNSPECIFIED
+    assert {notice.kind.value for notice in observation.notices} == {
+        "admission_defaulted",
+        "method_unstated",
+    }
 
     context = ScoreContext(
         works=migrated.works,
@@ -169,10 +174,10 @@ def test_rein_chipman_quote_keeps_unknown_method_refusal(tmp_path: Path) -> None
     residual = next(row for row in residuals if row.reference == observation.observation_id)
     assert residual.status is ResidualStatus.REFUSED
     assert residual.refusal is not None
-    # The quoted source method is still unknown, so validity refuses before
-    # a number. d-338 has already inferred the polymorph; that inference is
-    # not re-attached as a secondary identity refusal.
-    assert residual.refusal.reason is RefusalReason.METHOD_UNKNOWN
+    # d-460 predicts with a flagged method default. d-338 still infers the
+    # polymorph, and that inference is not re-attached as a secondary refusal.
+    assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert residual.refusal.detail["reason"] == "fusion_source_reference_phase_unprinted"
     assert "fusion_source_reference_phase_unprinted" not in (
         residual.refusal.detail.get("secondary_reasons") or ()
     )

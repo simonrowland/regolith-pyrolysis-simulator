@@ -17,6 +17,7 @@ from simulator.battery.enums import (
     Phase,
     Quantity,
 )
+from simulator.battery import fo2_ladder
 from simulator.battery.fo2_ladder import fo2_tier_notice, resolve_row_fo2
 from simulator.battery.identity import Identity
 from simulator.battery.records import (
@@ -29,11 +30,12 @@ from simulator.battery.records import (
     Value,
 )
 from simulator.physical_constants import PA_PER_BAR
+from simulator.source_ids import REGO_SOURCE_ID, RYS_SOURCE_ID
 from tests.battery import factories as F
 
 ROOT = Path(__file__).resolve().parents[2]
-REGO_SOURCE = "rego-1985-na2o-sio2-transpiration"
-RYS_SOURCE = "rys-2007-alkali-oxide-thermodynamics"
+REGO_SOURCE = REGO_SOURCE_ID
+RYS_SOURCE = RYS_SOURCE_ID
 
 
 def _na_partial_row(
@@ -622,3 +624,37 @@ def test_every_rys_na_source_row_has_target_independent_oxygen_input() -> None:
     assert len(targets) == 330
     assert measured_link_count == 0
     assert closure_count == 330
+
+
+def test_rego_and_rys_oxygen_routes_obey_source_declarations(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    experiment = F.tabulation_experiment(
+        "rego-policy-run",
+        T_K=Decimal("1573.15"),
+        total_P=Decimal("102844.875"),
+    )
+    row = _na_partial_row(
+        source_id=REGO_SOURCE,
+        observation_id="rego-policy-run-pNa",
+        experiment_id=experiment.experiment_id,
+        temperature_K="1573.15",
+        pressure_Pa="226.968",
+        total_pressure_Pa="102844.875",
+    )
+    rego_route = resolve_row_fo2(
+        experiment, None, row, quantity=Quantity.P_PARTIAL
+    )
+    assert rego_route is not None
+    assert rego_route.route == "rego_c_co_two_species_approximation"
+
+    rys_row = replace(row, source_id=RYS_SOURCE)
+    assert fo2_ladder._rys_oxygen_measurement_status(
+        rys_row, Quantity.P_PARTIAL
+    ) == "unknown"
+
+    monkeypatch.setattr(fo2_ladder, "source_rule_enabled", lambda *_args: False)
+    assert resolve_row_fo2(experiment, None, row, quantity=Quantity.P_PARTIAL) is None
+    assert fo2_ladder._rys_oxygen_measurement_status(
+        rys_row, Quantity.P_PARTIAL
+    ) is None

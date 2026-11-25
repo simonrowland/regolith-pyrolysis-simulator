@@ -7,7 +7,7 @@ import pytest
 import yaml
 
 from simulator.battery.enums import MethodToken, PhaseRole, Quantity, ValueKind
-from simulator.battery.migrate import REPO_ROOT
+from simulator.battery.migrate import REPO_ROOT, _phase_needs_default, map_phase
 from tests.battery.factories import migrate_one_extract
 
 
@@ -338,13 +338,36 @@ def test_all_scored_rows_migrate_as_points_with_printed_conditions() -> None:
     migrated = migrator.result.observations
     assert len(migrated) == len(source_rows)
     assert not migrator.result.registry_issues
+    experiment_methods = {
+        experiment["experiment_id"]: experiment.get("method") or {}
+        for experiment in document["experiments"]
+    }
 
     for container, raw in source_rows:
         values = raw["values"]
         observation = migrated[f"{SOURCE_ID}::{raw['observation_id']}"]
         quantity = values["quantity"]
         assert observation.value.kind is ValueKind.POINT, raw["observation_id"]
-        assert not observation.notices, raw["observation_id"]
+        method = experiment_methods[raw["experiment"]]
+        method_is_declared = (
+            isinstance(method, str) and bool(method.strip())
+        ) or (isinstance(method, dict) and method.get("tag") == "value")
+        expected_notice_kinds = set() if method_is_declared else {"method_unstated"}
+        phase_raw = raw.get("phase") or values.get("phase")
+        phase_state, _unmapped_phase = map_phase(phase_raw)
+        if _phase_needs_default(phase_state):
+            expected_notice_kinds.add("phase_inferred")
+        actual_notice_kinds = {
+            notice.kind.value for notice in observation.notices
+        }
+        assert actual_notice_kinds == expected_notice_kinds, (
+            raw["observation_id"],
+            sorted(expected_notice_kinds),
+            [
+                (notice.kind.value, notice.reason)
+                for notice in observation.notices
+            ],
+        )
         raw_conditions = values.get("point_conditions", raw.get("point_conditions", {}))
         if quantity == "equilibrium_phase_composition":
             expected_value = Decimal(str(values["component_amount"]))

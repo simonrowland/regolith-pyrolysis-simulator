@@ -74,4 +74,6 @@ def test_printed_poster_values_migrate_as_points_with_identity_and_temperature()
         assert temperature.locator.pdf_page_index == 0
         assert observation.uncertainty.verbatim["sigma"] == float(sigma)
         assert observation.uncertainty.verbatim["units"] == "kJ/mol"
-        assert observation.notices == ()
+        assert {notice.kind.value for notice in observation.notices} == {
+            "method_unstated"
+        }

@@ -478,7 +478,18 @@ def test_this_study_experiments_migrate_with_reported_method(tmp_path: Path) -> 
         for experiment_id, item in mutated_result.experiments.items()
         if experiment_id.endswith("::experiment::worksheet-row-81")
     )
-    assert mutated.method.is_unknown
+    assert mutated.method.is_value
+    assert mutated.method.value is MethodToken.UNSPECIFIED
+    mutated_rows = [
+        observation
+        for observation in mutated_result.observations.values()
+        if observation.experiment_id == mutated.experiment_id
+    ]
+    assert mutated_rows
+    assert all(
+        any(notice.kind is NoticeKind.METHOD_UNSTATED for notice in row.notices)
+        for row in mutated_rows
+    )
 
 
 def test_companion_table2_locator_and_sample_list_disagreement() -> None:

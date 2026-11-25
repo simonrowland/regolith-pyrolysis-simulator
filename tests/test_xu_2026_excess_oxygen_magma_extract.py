@@ -273,7 +273,10 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
             buffer_text = buffer_state["value"]
             assert "No PtO2 powder" in buffer_text
         assert observation.identity.fO2_Pa.is_unknown
-        assert not observation.notices
+        assert {notice.kind.value for notice in observation.notices} == {
+            "phase_inferred",
+            "method_unstated",
+        }
 
         if row["sigma"]:
             assert observation.uncertainty.kind is UncertaintyKind.PRINTED
@@ -314,7 +317,7 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
     assert fe.derivation.raw_inputs.locator.page == 3
     assert fe.derivation.raw_inputs.locator.section == "Mössbauer spectroscopic analysis"
     assert not fe.derived_from
-    assert not fe.notices
+    assert {notice.kind.value for notice in fe.notices} == {"method_unstated"}
 
     table1_lvp1 = [
         raw_observations[row["observation_id"]]

@@ -460,7 +460,11 @@ def test_rendered_tables_bind_every_cell_and_migrate_conditions() -> None:
         row for row in rows if row.identity.quantity.value is Quantity.VALENCE_RATIO
     ]
     assert len(migrated_titanium_redox) == 45
-    assert all(row.identity.species.phase.is_unknown for row in migrated_titanium_redox)
+    assert all(
+        row.identity.species.phase.value.value == "unspecified"
+        and {notice.kind.value for notice in row.notices} == {"phase_inferred"}
+        for row in migrated_titanium_redox
+    )
     titanium_redox_points = [
         point
         for observation in document["species"]["Ti"]["observations"]

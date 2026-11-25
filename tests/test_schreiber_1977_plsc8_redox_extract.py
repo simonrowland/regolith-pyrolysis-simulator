@@ -137,7 +137,9 @@ def test_isolated_migration_preserves_each_quoted_value_and_species() -> None:
         assert row.point_conditions["temperature_K"].state.is_unknown
         assert row.point_conditions["fO2_log"].state.is_unknown
         assert row.identity.fO2_Pa.is_unknown
-        assert row.notices == ()
+        assert {notice.kind.value for notice in row.notices} == {
+            "method_unstated"
+        }
         if kind == "interval":
             assert str(row.value.interval_low) == expected[0]
             assert str(row.value.interval_high) == expected[1]

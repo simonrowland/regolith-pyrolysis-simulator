@@ -10,7 +10,7 @@ import pytest
 import yaml
 
 from simulator.battery.migrate import Migrator, REPO_ROOT
-from simulator.battery.enums import MethodToken, ValueKind
+from simulator.battery.enums import MethodToken, NoticeKind, ValueKind
 from simulator.battery.records import ApproxPressure, BandBasis
 
 
@@ -356,8 +356,22 @@ def test_isolated_migration_binds_conditions_and_exact_schema_gaps() -> None:
         assert method.value is MethodToken.LANGMUIR_FREE_EVAPORATION
     for row in flowing_experiments:
         method = migrated_method_experiments[row["experiment_id"]].method
-        assert method.is_unknown
-        assert "does not infer vapour pressure from carrier-gas saturation" in method.reason
+        assert method.is_value
+        assert method.value is MethodToken.UNSPECIFIED
+    flowing_ids = {
+        migrated_method_experiments[row["experiment_id"]].experiment_id
+        for row in flowing_experiments
+    }
+    flowing_rows = [
+        observation
+        for observation in result.observations.values()
+        if observation.experiment_id in flowing_ids
+    ]
+    assert flowing_rows
+    assert all(
+        any(notice.kind is NoticeKind.METHOD_UNSTATED for notice in row.notices)
+        for row in flowing_rows
+    )
     assert len(source_observations) == 388
     assert len(result.observations) == 387
     assert sum(
