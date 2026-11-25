@@ -1153,7 +1153,7 @@ def test_richter_area_route_mutation_restoring_old_gate_refuses(mass_loss_rows, 
     assert prediction.refusal_detail["reason"] == "sample_geometry_not_stated"
 
 
-def test_non_richter_row_without_experiment_area_keeps_prior_refusal(
+def test_non_richter_row_without_experiment_area_preserves_prior_refusal_order(
     mass_loss_rows,
 ) -> None:
     (
@@ -1175,7 +1175,7 @@ def test_non_richter_row_without_experiment_area_keeps_prior_refusal(
     )
 
     assert prediction.value is None
-    assert prediction.refusal_detail["reason"] == "sample_geometry_not_stated"
+    assert prediction.refusal_detail["reason"] == "duration_not_stated"
 
 
 def test_engine_without_residue_capability_refuses_with_engine_name(mass_loss_rows) -> None:
