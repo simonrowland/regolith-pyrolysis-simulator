@@ -3606,7 +3606,7 @@ def test_redox_temperature_correction_keeps_the_experiment_run(field, temperatur
                          total_pressure_Pa=State.of(BAR_PA_DECIMAL)),
         derivation=Derivation("temperature correction", (), (("original_temperature_C", original),), "1"),
     )
-    experiment = replace(F.tabulation_experiment(), conditions={
+    experiment = replace(F.tabulation_experiment(experiment_id=row.experiment_id), conditions={
         field: Located(State.of(Decimal(temperature)), Locator(page=4, record="run")),
     })
 
@@ -3650,14 +3650,14 @@ def test_redox_pressure_correction_keeps_the_run_identity(run_source):
     run_pressure = Decimal("100000000")
     experiment = None
     if run_source == "experiment":
-        experiment = F.tabulation_experiment()
+        experiment = F.tabulation_experiment(experiment_id=row.experiment_id)
         experiment = replace(experiment, pressure_environment=replace(
             experiment.pressure_environment,
             total_pressure_Pa=Located(State.of(Value.point_of(run_pressure)),
                                       Locator(page=4, record="run pressure")),
         ))
     elif run_source == "experiment-alias":
-        experiment = F.tabulation_experiment()
+        experiment = F.tabulation_experiment(experiment_id=row.experiment_id)
         experiment = replace(
             experiment,
             conditions={"P_total_bar": Located(State.of(Decimal("1000")), Locator(page=4, record="run pressure"))},
@@ -3695,7 +3695,7 @@ def test_redox_pressure_correction_keeps_the_printed_run_band(field):
     scale = Decimal(1) if field == "total_pressure_Pa" else BAR_PA_DECIMAL
     band = Value(ValueKind.INTERVAL, interval_low=low / scale, interval_high=high / scale)
     recorded = Located(State.of(band), Locator(page=4, record="run pressure"))
-    experiment = F.tabulation_experiment()
+    experiment = F.tabulation_experiment(experiment_id=row.experiment_id)
     experiment = replace(
         experiment, conditions={field: recorded} if field == "P_total_bar" else experiment.conditions,
         pressure_environment=replace(experiment.pressure_environment, total_pressure_Pa=(
@@ -3794,7 +3794,7 @@ def test_generic_temperature_correction_uses_its_printed_unit_and_run_temperatur
         ),
     )
     experiment = replace(
-        F.tabulation_experiment(),
+        F.tabulation_experiment(experiment_id=target.experiment_id),
         conditions={
             "T": Located(State.of(Decimal("1300")), Locator(page=4, record="run T")),
             "T_units": Located(State.of("C"), Locator(page=4, record="run T unit")),
@@ -4674,7 +4674,7 @@ def test_redox_routes_share_printed_cell_identity(borisov_redox_row, route, colu
                      derivation=replace(real.derivation, parameters=(("original", replace(
                          original, locator=address,
                      )),)) if reduced else None)
-    experiment = F.tabulation_experiment()
+    experiment = F.tabulation_experiment(experiment_id=real.experiment_id)
     quantity = Quantity.FE3_FE2_RATIO
     if route == "borisov-real-oxygen":
         target = real

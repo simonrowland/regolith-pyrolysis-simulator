@@ -301,6 +301,15 @@ def fo2_tier_notice(
     return notice
 
 
+def _with_policy_notice(quantity: Quantity, resolved: ResolvedFo2) -> ResolvedFo2:
+    """Keep a typed policy decision attached to its selected oxygen value."""
+
+    if resolved.policy is None:
+        raise ValueError("policy fO2 resolution is missing its policy")
+    notice = fo2_tier_notice(quantity, resolved)
+    return replace(resolved, notices=(*resolved.notices, notice))
+
+
 def fo2_refusal_notice(quantity: Quantity) -> Notice:
     return Notice(
         kind=NoticeKind.INPUT_OMITTED,
@@ -611,14 +620,17 @@ def resolve_row_fo2(
             if vacuum_pressure_pa.is_finite() and vacuum_pressure_pa > 0:
                 vacuum_bar = vacuum_pressure_pa / BAR_PA_DECIMAL
                 vacuum_log = math.log10(float(vacuum_bar))
-                return ResolvedFo2(
-                    vacuum_log,
-                    3,
-                    "dp019_vacuum_boundary",
-                    False,
-                    po2_bar=float(vacuum_bar),
-                    pressure_pa=vacuum_pressure_pa,
-                    policy=NoticePolicy(**vacuum.payload["policy"]),
+                return _with_policy_notice(
+                    resolved_quantity,
+                    ResolvedFo2(
+                        vacuum_log,
+                        3,
+                        "dp019_vacuum_boundary",
+                        False,
+                        po2_bar=float(vacuum_bar),
+                        pressure_pa=vacuum_pressure_pa,
+                        policy=NoticePolicy(**vacuum.payload["policy"]),
+                    ),
                 )
     if resolved_quantity is None:
         return None
@@ -643,15 +655,18 @@ def resolve_row_fo2(
         )
         if frame_reason is not None:
             original_reason = f"{original_reason}; {frame_reason}"
-    return ResolvedFo2(
-        log_fo2_bar,
-        4,
-        "dp010_ambient_air_unprinted_atmosphere",
-        False,
-        po2_bar=float(oxygen_bar),
-        pressure_pa=oxygen_pa,
-        policy=NoticePolicy(**policy_result.payload["policy"]),
-        original_reason=original_reason,
+    return _with_policy_notice(
+        resolved_quantity,
+        ResolvedFo2(
+            log_fo2_bar,
+            4,
+            "dp010_ambient_air_unprinted_atmosphere",
+            False,
+            po2_bar=float(oxygen_bar),
+            pressure_pa=oxygen_pa,
+            policy=NoticePolicy(**policy_result.payload["policy"]),
+            original_reason=original_reason,
+        ),
     )
 
 
