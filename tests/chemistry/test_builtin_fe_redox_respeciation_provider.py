@@ -4,7 +4,10 @@ import pytest
 
 from engines.builtin.fe_redox_respeciation import (
     BuiltinFeRedoxRespeciationProvider,
+    fe2o3_mol_for_ferric_o2,
 )
+from simulator.condensation import CondensationRouteResult
+from simulator.core import FE_REDOX_OXYGEN_SOURCE_OVERHEAD
 from simulator.chemistry.kernel import (
     ChemistryIntent,
     IntentRequest,
@@ -390,3 +393,281 @@ def test_oxidizing_respeciation_refuses_managed_scalar_without_ledger_o2(
     assert result.diagnostic["reason"] == "fe_redox_respeciation_o2_unavailable"
     assert result.diagnostic["required_o2_mol"] > 0.0
     assert result.diagnostic["available_o2_mol"] == pytest.approx(0.0)
+
+
+def test_overhead_oxidation_spends_a_tap_short_of_the_kress_delta(
+    formula_registry,
+):
+    """2 FeO + 1/2 O2 = Fe2O3. A positive tap short of the delta is
+    spent. Zero available leaves the couple unchanged. Available O2 at
+    or above the delta's O2 applies the full delta."""
+
+    melt = {"FeO": 10.0, "SiO2": 20.0}
+    funded = BuiltinFeRedoxRespeciationProvider().dispatch(
+        _request(
+            formula_registry,
+            {
+                "process.cleaned_melt": dict(melt),
+                "process.overhead_gas": {"O2": 10.0},
+            },
+            fO2_log=-3.0,
+        )
+    )
+    required_o2_mol = float(funded.diagnostic["required_o2_mol"])
+    assert funded.status == "ok"
+    assert required_o2_mol > 1.0e-6
+    assert required_o2_mol <= 10.0
+    assert funded.transition.credits["process.cleaned_melt"]["Fe2O3"] == (
+        pytest.approx(fe2o3_mol_for_ferric_o2(required_o2_mol))
+    )
+
+    none = BuiltinFeRedoxRespeciationProvider().dispatch(
+        _request(
+            formula_registry,
+            {
+                "process.cleaned_melt": dict(melt),
+                "process.overhead_gas": {},
+            },
+            fO2_log=-3.0,
+        )
+    )
+    assert none.status == "refused"
+    assert none.transition is None
+    assert none.diagnostic["available_o2_mol"] == pytest.approx(0.0)
+
+    tap_o2_mol = 0.5 * required_o2_mol
+    partial = BuiltinFeRedoxRespeciationProvider().dispatch(
+        _request(
+            formula_registry,
+            {
+                "process.cleaned_melt": dict(melt),
+                "process.overhead_gas": {"O2": tap_o2_mol},
+            },
+            fO2_log=-3.0,
+        )
+    )
+    assert partial.status == "ok"
+    assert partial.transition is not None
+    assert partial.diagnostic["respeciation_status"] == "partial"
+    assert partial.diagnostic["applied_o2_mol"] == pytest.approx(tap_o2_mol)
+    assert partial.diagnostic["unfunded_o2_mol"] == pytest.approx(
+        required_o2_mol - tap_o2_mol,
+    )
+    assert partial.transition.debits["process.overhead_gas"]["O2"] == (
+        pytest.approx(tap_o2_mol)
+    )
+    assert partial.transition.credits["process.cleaned_melt"]["Fe2O3"] == (
+        pytest.approx(fe2o3_mol_for_ferric_o2(tap_o2_mol))
+    )
+    validate_atom_balance(partial.transition, formula_registry)
+
+    coproduct_o2_mol = 5.0
+    mixed = BuiltinFeRedoxRespeciationProvider().dispatch(
+        _request(
+            formula_registry,
+            {
+                "process.cleaned_melt": dict(melt),
+                "process.overhead_gas": {"O2": tap_o2_mol + coproduct_o2_mol},
+            },
+            fO2_log=-3.0,
+            control_inputs={"evaporation_coproduct_o2_mol": coproduct_o2_mol},
+        )
+    )
+    assert mixed.status == "ok"
+    assert mixed.diagnostic["available_o2_mol"] == pytest.approx(tap_o2_mol)
+    assert mixed.diagnostic["applied_o2_mol"] == pytest.approx(tap_o2_mol)
+    assert mixed.transition.debits["process.overhead_gas"]["O2"] == (
+        pytest.approx(tap_o2_mol)
+    )
+
+
+# Mixed pool: preexisting overhead, tap, and evaporation coproduct.
+# The debit is larger than the legitimate oxidant and smaller than the
+# coproduct, so a gross counter treats the debit as if it ate the tap.
+_PREEXISTING_O2_MOL = 0.4
+_TAP_O2_MOL = 0.6
+_COPRODUCT_O2_MOL = 3.0
+_DEBIT_O2_MOL = 1.5
+_LEGITIMATE_O2_MOL = _PREEXISTING_O2_MOL + _TAP_O2_MOL
+
+
+def _o2_mol(sim, account: str) -> float:
+    return float(
+        sim.atom_ledger.mol_by_account(account).get("O2", 0.0) or 0.0
+    )
+
+
+def _product_rate_kg_hr(sim, species: str, sp_data: dict, o2_mol: float) -> float:
+    stoich = sim._evaporation_stoich(species, sp_data)
+    per_kg = abs(float(stoich["O2_per_product_kg"]))
+    molar = sim.species_formula_registry["O2"].molar_mass_kg_per_mol()
+    return o2_mol * molar / (sim.process_dt_hr() * per_kg)
+
+
+def _plant_mixed_overhead(sim) -> None:
+    sim.melt.temperature_C = 1600.0
+    sim.melt.p_total_mbar = 10.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -2.0
+    sim.melt.oxygen_reservoir.reference_T_K = (
+        float(sim.melt.temperature_C) + 273.15
+    )
+    sim._sync_oxygen_reservoir_mirror()
+    sim._evaporation_coproduct_o2_mol_this_hr = 0.0
+    assert _o2_mol(sim, "process.overhead_gas") == pytest.approx(0.0, abs=1.0e-12)
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"O2": _LEGITIMATE_O2_MOL},
+        source="test preexisting overhead plus tap",
+        material_origin="feedstock",
+    )
+    fe_data = sim.vapor_pressures["metals"]["Fe"]
+    rate = _product_rate_kg_hr(sim, "Fe", fe_data, _COPRODUCT_O2_MOL)
+    sim._credit_evaporation_transition(
+        "Fe",
+        rate,
+        rate,
+        fe_data,
+        apply_evaporative_redox_source_terms=False,
+    )
+    assert sim._evaporation_coproduct_o2_mol_this_hr == pytest.approx(
+        _COPRODUCT_O2_MOL,
+        abs=1.0e-9,
+    )
+    assert _o2_mol(sim, "process.overhead_gas") == pytest.approx(
+        _LEGITIMATE_O2_MOL + _COPRODUCT_O2_MOL,
+        abs=1.0e-9,
+    )
+
+
+def _ensure_parent_oxide_kg(sim, oxide: str, need_kg: float) -> None:
+    have_kg = float(
+        sim.atom_ledger.kg_by_account("process.cleaned_melt").get(oxide, 0.0)
+        or 0.0
+    )
+    if have_kg + 1.0e-9 >= need_kg:
+        return
+    molar = sim.species_formula_registry[oxide].molar_mass_kg_per_mol()
+    sim.atom_ledger.load_external_mol(
+        "process.cleaned_melt",
+        {oxide: (need_kg - have_kg) / molar + 1.0},
+        source="test parent oxide for the overhead debit",
+        material_origin="feedstock",
+    )
+
+
+def _debit_overhead_o2(sim, kind: str) -> None:
+    if kind == "cr_oxide":
+        sp_data = sim.vapor_pressures["oxide_vapors"]["CrO2"]
+        stoich = sim._evaporation_stoich("CrO2", sp_data)
+        rate = _product_rate_kg_hr(sim, "CrO2", sp_data, _DEBIT_O2_MOL)
+        _ensure_parent_oxide_kg(
+            sim,
+            stoich["parent_oxide"],
+            rate * sim.process_dt_hr() * float(stoich["oxide_per_product_kg"]),
+        )
+        sim._credit_evaporation_transition(
+            "CrO2",
+            rate,
+            rate,
+            sp_data,
+            apply_evaporative_redox_source_terms=False,
+        )
+        return
+    if kind != "condensation":
+        raise AssertionError(kind)
+    uptake_mol = 4.0 * _DEBIT_O2_MOL
+    molar = sim.species_formula_registry["Na"].molar_mass_kg_per_mol()
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"Na": uptake_mol},
+        source="test condensation vapor",
+        material_origin="feedstock",
+    )
+    route = CondensationRouteResult(
+        stage3_reactive_alkali_by_species={
+            "Na": {
+                "uptake_mol": uptake_mol,
+                "oxide_species": "Na2O",
+                "oxide_product_mol": uptake_mol / 2.0,
+                "oxygen_debit_mol": _DEBIT_O2_MOL,
+            },
+        },
+    )
+    credited_kg = sim._dispatch_condensation_route(
+        "Na",
+        uptake_mol * molar,
+        sim.vapor_pressures["metals"]["Na"],
+        route,
+    )
+    assert credited_kg > 0.0
+
+
+def _overhead_split_takes_the_tap(sim) -> dict:
+    assert abs(sim.melt.oxygen_reservoir.exchange_o2_mol) <= 1.0e-12
+    fe2o3_before = float(
+        sim.atom_ledger.mol_by_account("process.cleaned_melt").get("Fe2O3", 0.0)
+        or 0.0
+    )
+    counter_before = float(sim._evaporation_coproduct_o2_mol_this_hr)
+    diagnostic = sim._apply_fe_redox_respeciation(
+        oxygen_source=FE_REDOX_OXYGEN_SOURCE_OVERHEAD,
+        fO2_log_override=-2.0,
+        gate_authority={"liquidus_T_C": 1200.0, "source": "test"},
+    )
+    assert float(sim._evaporation_coproduct_o2_mol_this_hr) == pytest.approx(
+        counter_before,
+        abs=1.0e-12,
+    )
+    assert diagnostic["status"] == "ok", diagnostic
+    assert diagnostic["oxygen_source"] == FE_REDOX_OXYGEN_SOURCE_OVERHEAD
+    assert diagnostic["respeciation_status"] == "partial", diagnostic
+    assert float(diagnostic["required_o2_mol"]) > _LEGITIMATE_O2_MOL, diagnostic
+    assert diagnostic["available_o2_mol"] == pytest.approx(
+        _LEGITIMATE_O2_MOL,
+        abs=1.0e-9,
+    )
+    assert diagnostic["applied_o2_mol"] == pytest.approx(
+        _LEGITIMATE_O2_MOL,
+        abs=1.0e-9,
+    )
+    assert float(diagnostic["applied_o2_mol"]) >= _TAP_O2_MOL
+    fe2o3_after = float(
+        sim.atom_ledger.mol_by_account("process.cleaned_melt").get("Fe2O3", 0.0)
+        or 0.0
+    )
+    assert fe2o3_after - fe2o3_before == pytest.approx(
+        fe2o3_mol_for_ferric_o2(_LEGITIMATE_O2_MOL),
+        abs=1.0e-9,
+    )
+    assert _o2_mol(sim, "process.overhead_gas") == pytest.approx(
+        _COPRODUCT_O2_MOL - _DEBIT_O2_MOL,
+        abs=1.0e-9,
+    )
+    return diagnostic
+
+
+@pytest.mark.parametrize("kind", ["condensation", "cr_oxide"])
+def test_overhead_debit_shrink_lets_fe_split_take_the_remaining_tap(
+    kind,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    """Deleting the counter shrink at the condensation debit or the
+    Cr-oxide evaporation debit restores the gross-counter refusal, and
+    this overhead split no longer takes the remaining tap."""
+
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    assert sim.process_dt_hr() == 1.0
+    _plant_mixed_overhead(sim)
+    _debit_overhead_o2(sim, kind)
+    assert sim._evaporation_coproduct_o2_mol_this_hr == pytest.approx(
+        _COPRODUCT_O2_MOL - _DEBIT_O2_MOL,
+        abs=1.0e-9,
+    )
+    _overhead_split_takes_the_tap(sim)

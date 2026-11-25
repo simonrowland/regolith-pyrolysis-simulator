@@ -62,8 +62,16 @@ METAL_PHASE_FE_ACCOUNTS = (
 # evaporation has no fO2 tangent, so melt fO2 stays on the Fe metal line
 # instead of log10(P_total). Metal-vapour p ∝ fO2^(-n), and this sum
 # (SiO + Si + SiO2 + FeSi over the pipe-segment wall accounts) is the
-# measured load. The assert does not split those four species.
+# measured load. Each species is pinned on its own below. The dominant
+# species and its segment are filled from this tree's staged receipt.
 STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 0.14929136844379295
+STAGED_WALL_DEPOSIT_KG_BY_SPECIES = {
+    "SiO": 0.0,
+    "Si": 0.0,
+    "SiO2": 0.0,
+    "FeSi": 0.0,
+}
+_WALL_DEPOSIT_SPECIES = tuple(STAGED_WALL_DEPOSIT_KG_BY_SPECIES)
 
 
 def _run_script(lines: list[str]):
@@ -334,6 +342,54 @@ def test_c2a_staged_does_not_ferricize_from_evaporation():
     )
 
 
+def _pipe_segment_wall_kg(sim):
+    """Kg of each fouling species on each pipe-segment wall account."""
+
+    prefix = "process.wall_deposit_segment_"
+    by_species = {species: 0.0 for species in _WALL_DEPOSIT_SPECIES}
+    by_segment = {}
+    for account in PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS:
+        segment = account[len(prefix):] if account.startswith(prefix) else account
+        kg = sim.atom_ledger.kg_by_account(account)
+        species_kg = {}
+        for species in _WALL_DEPOSIT_SPECIES:
+            amount = float(kg.get(species, 0.0) or 0.0)
+            by_species[species] += amount
+            if amount:
+                species_kg[species] = amount
+        if species_kg:
+            by_segment[segment] = species_kg
+    return by_species, by_segment
+
+
+def _dominant_wall_deposit(sim, by_segment):
+    """The heaviest (segment, species) deposit, with that pipe's wall temperature.
+
+    Stage 3 is the designated SiO condenser. ``stage_N_to_stage_M`` is
+    upstream of that condenser when M <= 3. A pipe that leaves stage 3
+    (``stage_3_to_stage_4``) is the condenser-adjacent segment.
+    """
+
+    dominant = None
+    for segment, species_kg in by_segment.items():
+        for species, amount in species_kg.items():
+            if dominant is None or amount > dominant["kg"]:
+                dominant = {
+                    "segment": segment,
+                    "species": species,
+                    "kg": amount,
+                }
+    if dominant is None:
+        return {"segment": "", "species": "", "kg": 0.0}
+    temperatures = {
+        segment.name: float(segment.wall_temperature_C)
+        for segment in sim.condensation_model.pipe_segments
+    }
+    name = dominant["segment"]
+    dominant["wall_temperature_C"] = temperatures.get(name)
+    return dominant
+
+
 def test_c2a_staged_pipework_flags_upstream_cold_spots():
     sim = _run_staged()
     cold_spot_history = list(
@@ -344,25 +400,26 @@ def test_c2a_staged_pipework_flags_upstream_cold_spots():
         for diagnostic in cold_spot_history
         for warning in diagnostic.get("warnings", [])
     ]
-    segment_wall_sio_kg = sum(
-        sum(
-            sim.atom_ledger.kg_by_account(account).get(species, 0.0)
-            for species in ("SiO", "Si", "SiO2", "FeSi")
-        )
-        for account in PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS
-    )
+    by_species, by_segment = _pipe_segment_wall_kg(sim)
+    segment_wall_sio_kg = sum(by_species.values())
+    dominant = _dominant_wall_deposit(sim, by_segment)
 
     # d-402 evaluates pO2-free wall bounds for reactive vapours, so cold
     # upstream surfaces are reported instead of being hidden by a refusal.
     assert warnings
     assert any("CrO sees 1800.0 C before stage 2" in warning for warning in warnings)
     # The upstream cold-spot reports do not change the routed wall product.
-    # The 2026-06-29 reactive SiO wall-product fix keeps its magnitude nonzero.
     # 2026-06-30 cold-wall SiO uses the grounded Pound 1972 unity condensation
     # gate below the Wetzel/Gail evaporation-Arrhenius validity floor.
     # 2026-07-01 C4b stores the wall deposit as Si/SiO2/FeSi products, not SiO.
+    # Species pins and the dominant segment are the measured fouling mass.
+    # The dominant-species sentence is written from this tree's receipt.
+    assert by_species == pytest.approx(
+        STAGED_WALL_DEPOSIT_KG_BY_SPECIES,
+        abs=1e-15,
+    ), {"by_species_kg": by_species, "by_segment_kg": by_segment, "dominant": dominant}
     assert segment_wall_sio_kg == pytest.approx(
         STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG,
         abs=1e-15,
-    )
+    ), {"by_species_kg": by_species, "by_segment_kg": by_segment, "dominant": dominant}
     assert _max_mass_balance_pct(sim) < MASS_BALANCE_MAX_PCT

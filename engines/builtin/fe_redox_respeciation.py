@@ -286,7 +286,16 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
                     0.0,
                     ledger_overhead_o2_mol - evaporation_coproduct_o2_mol,
                 )
-                applied_delta_fe2o3_mol = delta_fe2o3_mol
+                # 2 FeO + 1/2 O2 = Fe2O3, so the Fe2O3 mol the tap can
+                # fund is twice the available O2 mol.
+                # Unit: mol Fe2O3 = (mol O2) / 0.5.
+                # Available O2 of 0 funds nothing, so the couple does not
+                # move. Available O2 at or above the O2 the Kress delta
+                # books (half that Fe2O3 delta) applies the full delta.
+                applied_delta_fe2o3_mol = min(
+                    delta_fe2o3_mol,
+                    fe2o3_mol_for_ferric_o2(available_o2_mol),
+                )
             feo_debit_mol = 2.0 * applied_delta_fe2o3_mol
             o2_debit_mol = ferric_couple_o2_mol(applied_delta_fe2o3_mol)
             if (

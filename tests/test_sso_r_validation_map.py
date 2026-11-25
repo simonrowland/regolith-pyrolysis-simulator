@@ -618,6 +618,17 @@ def test_owner_pn2_anchor_reports_current_certification_state(
         expected_owner = CONFIGURED_OWNER_PN2_ANCHORS
         expected_native_fe_pool_mol = expected_owner["native_fe_pool_mol"]
         expected_stage_3_Fe_wt_pct = expected_owner["stage_3_Fe_wt_pct"]
+        # One comparison, so a moved row prints every anchor. Pytest
+        # would otherwise stop on the pool and hide tap, vapor, escape,
+        # stage-3 Fe, SiO pO2, and SiO flux.
+        measured_owner = {
+            key: owner[key] for key in CONFIGURED_OWNER_PN2_ANCHORS
+        }
+        assert measured_owner == pytest.approx(
+            CONFIGURED_OWNER_PN2_ANCHORS,
+            rel=0.0,
+            abs=1.0e-9,
+        ), measured_owner
     else:
         expected_owner = json.loads(
             CONFIGLESS_GOLDEN_PATH.read_text(encoding="utf-8")
