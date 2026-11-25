@@ -958,8 +958,8 @@ def absolute_frame_admission(
 
 _LOG_DEFINED_OXYGEN_ROUTES = frozenset({
     "observation_gas_couple_equilibrium",
-    "graphite_c_co_buffer",
-    "buffer_relation",
+    "observation_gas_composition_method_implied_pressure",
+    *_BUFFER_ROUTES,
 })
 _PA_BACKED_OXYGEN_ROUTES = (
     TYPED_RUN_OXYGEN_ROUTES

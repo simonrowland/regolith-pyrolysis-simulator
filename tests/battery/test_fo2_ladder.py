@@ -69,7 +69,6 @@ from simulator.battery.waypoints import (
     oxygen_condition,
 )
 from simulator.fe_redox import (
-    intrinsic_melt_fO2,
     kress91_log10_fO2_from_fe3_over_sigma_fe,
     melt_mol_fractions_for_kress91,
 )
@@ -858,22 +857,18 @@ def test_printed_gas_mix_rejects_unregistered_pressure_evidence() -> None:
     )
 
 
-def test_vacuum_fo2_proxy_is_explicitly_flagged() -> None:
-    from simulator.battery.score import composition_wt_pct
-
+def test_vacuum_dp019_boundary_is_explicitly_flagged() -> None:
     experiment, bench, observation = _feo_case()
     experiment = replace(experiment, method=State.of(MethodToken.VACUUM_CHAMBER_PYROLYSIS))
     resolved = resolve_row_fo2(experiment, bench, observation, quantity=Quantity.ACTIVITY)
     assert resolved is not None
-    assert resolved.route == "fo2_vacuum_cell_proxy"
+    assert resolved.route == "dp019_vacuum_boundary"
     assert resolved.borrowed is False
     notice = fo2_tier_notice(Quantity.ACTIVITY, resolved)
-    assert notice.kind is NoticeKind.FO2_VACUUM_CELL_PROXY
-    assert "legacy intrinsic-melt clamp" in notice.reason
-    weights = composition_wt_pct(observation.identity.composition.value)
-    assert resolved.log10_fO2_bar == float(
-        intrinsic_melt_fO2(weights, float(observation.identity.temperature_K.value))
-    )
+    assert notice.kind is NoticeKind.METHOD_IMPLIED
+    assert notice.policy is not None and notice.policy.id == "DP-019"
+    assert "DP-019 method-implied high-vacuum boundary" in notice.reason
+    assert resolved.log10_fO2_bar == pytest.approx(-6.0, abs=5e-13)
 
 
 def test_container_buffers_use_the_existing_frost_owner() -> None:
@@ -1201,8 +1196,8 @@ def test_unresolved_tier_refuses_every_engine_alike() -> None:
     ]
     assert len(set(signatures)) == 1
     names = {gap.waypoint for gap in comparable[0].readiness.gaps}
-    assert "oxygen_condition" in names
     assert "temperature_K" in names
+    assert "oxygen_condition" not in names
 
 
 def test_non_multivalent_row_without_printed_fo2_omits_oxygen() -> None:
