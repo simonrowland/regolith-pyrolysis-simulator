@@ -12,6 +12,12 @@ from tools.validate_literature_extracts import check_all_fidelity_samples_match
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/borisov-borisovskiy-2024-ti-zircon.yaml"
 RECIPE_ID = "borisov_borisovskiy_2024_starting_mixture_recipe"
+RECIPE_TRANSCRIPTION_PATH = (
+    "text/borisov-borisovskiy-2024-ti-zircon/pdftotext-layout.txt"
+)
+RECIPE_TRANSCRIPTION_SHA256 = (
+    "d7c967376fa893ed67cac36a9d40e507470a0765643162f557a17556ec727a58"
+)
 
 
 def test_printed_recipe_is_pinned_but_measured_glass_is_not_run_input() -> None:
@@ -46,38 +52,50 @@ def test_printed_recipe_is_pinned_but_measured_glass_is_not_run_input() -> None:
         f"species.TiO2.context[{RECIPE_ID}].values.components_as_printed.SiO2": (
             "56.9",
             "column left; printed starting-mixture SiO2 wt.% cell",
+            "98",
         ),
         f"species.TiO2.context[{RECIPE_ID}].values.components_as_printed.Al2O3": (
             "10.1",
             "column left; printed starting-mixture Al2O3 wt.% cell",
+            "98",
         ),
         f"species.TiO2.context[{RECIPE_ID}].values.components_as_printed.MgO": (
             "9.4",
             "column left; printed starting-mixture MgO wt.% cell",
+            "98",
         ),
         f"species.TiO2.context[{RECIPE_ID}].values.components_as_printed.CaO": (
             "10.1",
             "column left; printed starting-mixture CaO wt.% cell",
+            "98",
         ),
         f"species.TiO2.context[{RECIPE_ID}].values.components_as_printed.ZrO2": (
             "13.5",
             "column left; printed starting-mixture ZrO2 wt.% cell",
+            "98",
         ),
         f"species.TiO2.context[{RECIPE_ID}].values.TiO2_target_wt_percent_as_printed.T8.value": (
             "8",
             "column left; approximate starting-mixture TiO2 target for T8",
+            "108",
         ),
         f"species.TiO2.context[{RECIPE_ID}].values.TiO2_target_wt_percent_as_printed.T15.value": (
             "15",
             "column left; approximate starting-mixture TiO2 target for T15",
+            "108",
         ),
         f"species.TiO2.context[{RECIPE_ID}].values.TiO2_target_wt_percent_as_printed.T25.value": (
             "25",
             "column left; approximate starting-mixture TiO2 target for T25",
+            "108",
         ),
     }
     recipe_pins = {
-        sample["path"]: (sample["value"], sample["locator"]["note"])
+        sample["path"]: (
+            sample["value"],
+            sample["locator"]["note"],
+            sample["locator"]["line_range"],
+        )
         for sample in document["fidelity_samples"]
         if sample.get("path", "").startswith(
             f"species.TiO2.context[{RECIPE_ID}]."
@@ -85,8 +103,8 @@ def test_printed_recipe_is_pinned_but_measured_glass_is_not_run_input() -> None:
     }
     assert recipe_pins == expected_fidelity_pins
     assert all(
-        sample["locator"]["source_path"] == recipe["locator"]["source_path"]
-        and sample["locator"]["source_sha256"] == recipe["locator"]["source_sha256"]
+        sample["locator"]["source_path"] == RECIPE_TRANSCRIPTION_PATH
+        and sample["locator"]["source_sha256"] == RECIPE_TRANSCRIPTION_SHA256
         and sample["locator"]["page"] == 2
         and sample["locator"]["published_page"] == 498
         and sample["locator"]["pdf_page_index"] == 1
