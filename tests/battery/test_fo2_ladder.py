@@ -11,6 +11,7 @@ from decimal import Decimal
 
 import pytest
 
+from simulator.battery import fo2_ladder as fo2_ladder_module
 from simulator.battery.enums import (
     Authority,
     AmountBasis,
@@ -750,6 +751,10 @@ def test_dp010_ambient_air_default_is_pinned_on_every_engine() -> None:
     assert resolved is not None
     assert resolved.log10_fO2_bar == pytest.approx(-0.672064092852, abs=5e-13)
     assert resolved.po2_bar == pytest.approx(0.2127825, abs=1e-15)
+    assert any(
+        item.policy is not None and item.policy.id == "DP-010"
+        for item in resolved.notices
+    )
     notice = fo2_tier_notice(Quantity.ACTIVITY, resolved)
     assert notice.kind is NoticeKind.FO2_DEFAULT_AMBIENT_AIR_UNPRINTED_ATMOSPHERE
     assert notice.policy is not None
@@ -864,11 +869,52 @@ def test_vacuum_dp019_boundary_is_explicitly_flagged() -> None:
     assert resolved is not None
     assert resolved.route == "dp019_vacuum_boundary"
     assert resolved.borrowed is False
+    assert any(
+        item.policy is not None and item.policy.id == "DP-019"
+        for item in resolved.notices
+    )
     notice = fo2_tier_notice(Quantity.ACTIVITY, resolved)
     assert notice.kind is NoticeKind.METHOD_IMPLIED
     assert notice.policy is not None and notice.policy.id == "DP-019"
     assert "DP-019 method-implied high-vacuum boundary" in notice.reason
     assert resolved.log10_fO2_bar == pytest.approx(-6.0, abs=5e-13)
+
+
+def test_policy_notice_mutation_breaks_both_default_paths(monkeypatch) -> None:
+    monkeypatch.setattr(
+        fo2_ladder_module,
+        "_with_policy_notice",
+        lambda _quantity, resolved: resolved,
+    )
+    experiment, bench, observation = _feo_case()
+
+    dp010_experiment = replace(
+        experiment, method=State.of(MethodToken.TABULATION)
+    )
+    dp010 = resolve_row_fo2(
+        dp010_experiment, bench, observation, quantity=Quantity.ACTIVITY
+    )
+    assert dp010 is not None
+    assert dp010.route == "dp010_ambient_air_unprinted_atmosphere"
+    with pytest.raises(AssertionError):
+        assert any(
+            notice.policy is not None and notice.policy.id == "DP-010"
+            for notice in dp010.notices
+        )
+
+    dp019_experiment = replace(
+        experiment, method=State.of(MethodToken.VACUUM_CHAMBER_PYROLYSIS)
+    )
+    dp019 = resolve_row_fo2(
+        dp019_experiment, bench, observation, quantity=Quantity.ACTIVITY
+    )
+    assert dp019 is not None
+    assert dp019.route == "dp019_vacuum_boundary"
+    with pytest.raises(AssertionError):
+        assert any(
+            notice.policy is not None and notice.policy.id == "DP-019"
+            for notice in dp019.notices
+        )
 
 
 def test_container_buffers_use_the_existing_frost_owner() -> None:
