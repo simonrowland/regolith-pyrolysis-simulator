@@ -153,15 +153,16 @@ def test_zhang_si_migrates_percent_and_keeps_unprinted_fo2_unknown() -> None:
             Quantity.RESIDUE_COMPONENT_COMPOSITION,
         }:
             continue
-        for field_name, expected in (
-            ("ramp_start_C", Decimal("850")),
-            ("ramp_rate_C_per_min", Decimal("40")),
-        ):
+        for field_name, (expected, page, line_range) in {
+            "ramp_start_C": (Decimal("850"), 8, "208"),
+            "ramp_rate_C_per_min": (Decimal("40"), 9, "211 and 214"),
+        }.items():
             located = observation.point_conditions[field_name]
             assert located.state.is_value
             assert located.state.value == expected
             assert located.locator is not None
-            assert located.locator.page == 8
+            assert located.locator.page == page
+            assert located.locator.line_range == line_range
             assert located.locator.section == "2.2 Vacuum evaporation experiments"
 
     residue = next(

@@ -26964,24 +26964,34 @@ class Migrator:
                     continue
                 printed_schedule = values.get("heating_schedule")
                 if isinstance(printed_schedule, Mapping):
-                    schedule_locator = locator_from_mapping(
-                        printed_schedule.get("locator")
+                    ramp_start_record = printed_schedule.get("ramp_start_C")
+                    ramp_rate_record = printed_schedule.get(
+                        "ramp_rate_C_per_min"
                     )
-                    ramp_start = _as_dec_or_none(
-                        printed_schedule.get("ramp_start_C")
-                    )
-                    ramp_rate = _as_dec_or_none(
-                        printed_schedule.get("ramp_rate_C_per_min")
-                    )
-                    if ramp_start is not None and ramp_rate is not None:
-                        heating_schedule = {
-                            "ramp_start_C": located_value(
-                                ramp_start, schedule_locator
-                            ),
-                            "ramp_rate_C_per_min": located_value(
-                                ramp_rate, schedule_locator
-                            ),
-                        }
+                    if isinstance(ramp_start_record, Mapping) and isinstance(
+                        ramp_rate_record, Mapping
+                    ):
+                        ramp_start = _as_dec_or_none(
+                            ramp_start_record.get("value")
+                        )
+                        ramp_rate = _as_dec_or_none(
+                            ramp_rate_record.get("value")
+                        )
+                        if ramp_start is not None and ramp_rate is not None:
+                            heating_schedule = {
+                                "ramp_start_C": located_value(
+                                    ramp_start,
+                                    locator_from_mapping(
+                                        ramp_start_record.get("locator")
+                                    ),
+                                ),
+                                "ramp_rate_C_per_min": located_value(
+                                    ramp_rate,
+                                    locator_from_mapping(
+                                        ramp_rate_record.get("locator")
+                                    ),
+                                ),
+                            }
                 for sample in values.get("runs") or ():
                     if not isinstance(sample, Mapping) or not sample.get("sample"):
                         continue
