@@ -7505,9 +7505,42 @@ def _capture_recursive_equilibrium_row(
         )
         key = store._equilibrium_key(sim)
         payload = copy.deepcopy(store._entries[_key_hash(key)]["payload"])
-        sim._freeze_gate_curve()
+        _capture_recursive_gate_curve_in_context(store, sim)
     assert store.capture_sequence[-1]["artifact"] == "freeze_gate_curve"
     return sim, result, key, payload
+
+
+def _capture_recursive_gate_curve_in_context(
+    store: PT0DeterminismStore,
+    sim: Any,
+) -> dict[str, Any]:
+    projected_diagnostic, notice = _lunar_composition_projected_diagnostic(
+        sim
+    )
+    assert projected_diagnostic["backend_status"] == "out_of_domain"
+    curve = sim._freeze_gate_curve_from_bounds(
+        solidus_T_C=1200.0,
+        liquidus_T_C=1500.0,
+        source="unit-test:recursive-admission",
+        reasons=[],
+    )
+    assert isinstance(curve, Mapping)
+    curve = copy.deepcopy(dict(curve))
+    curve["composition_projected_notice"] = notice
+    fO2_log = float(sim._current_melt_redox_fO2_log())
+    seed_gate_curve_memo_record(
+        sim,
+        curve,
+        repair_notices=[],
+    )
+    store.capture_gate_curve(
+        sim,
+        fO2_log=fO2_log,
+        curve=curve,
+        repair_notices=[],
+        law_disclosures=[],
+    )
+    return curve
 
 
 def _capture_recursive_gate_row(
@@ -7528,32 +7561,7 @@ def _capture_recursive_gate_row(
     sim = _build_pt0_sim(capture)
     with pytest.MonkeyPatch.context() as monkeypatch:
         _configure_recursive_gate_sim(sim, monkeypatch)
-        projected_diagnostic, notice = _lunar_composition_projected_diagnostic(
-            sim
-        )
-        assert projected_diagnostic["backend_status"] == "out_of_domain"
-        curve = sim._freeze_gate_curve_from_bounds(
-            solidus_T_C=1200.0,
-            liquidus_T_C=1500.0,
-            source="unit-test:recursive-admission",
-            reasons=[],
-        )
-        assert isinstance(curve, Mapping)
-        curve = copy.deepcopy(dict(curve))
-        curve["composition_projected_notice"] = notice
-        fO2_log = float(sim._current_melt_redox_fO2_log())
-        seed_gate_curve_memo_record(
-            sim,
-            curve,
-            repair_notices=[],
-        )
-        capture.capture_gate_curve(
-            sim,
-            fO2_log=fO2_log,
-            curve=curve,
-            repair_notices=[],
-            law_disclosures=[],
-        )
+        curve = _capture_recursive_gate_curve_in_context(capture, sim)
     assert isinstance(curve.get("composition_projected_notice"), Mapping)
     assert capture.capture_sequence[-1]["artifact"] == "freeze_gate_curve"
     key = copy.deepcopy(capture.capture_sequence[-1]["key"])
@@ -8206,7 +8214,7 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
         query_sim.melt.melt_fO2_log = -9.0
     _configure_recursive_gate_sim(query_sim, monkeypatch)
     query_key = capture._equilibrium_key(query_sim)
-    query_sim._freeze_gate_curve()
+    _capture_recursive_gate_curve_in_context(capture, query_sim)
     assert capture._equilibrium_key(query_sim) == query_key
     if persistent:
         assert capture.persistent_store is not None
