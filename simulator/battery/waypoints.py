@@ -149,6 +149,14 @@ class WaypointResult:
 
 
 @dataclass(frozen=True)
+class PredictionPressure:
+    """Pressure selected by a scoring owner and passed to oxygen inversion."""
+
+    value: State
+    route: str
+
+
+@dataclass(frozen=True)
 class SpeciesWaypoints(Mapping[str, WaypointResult]):
     by_species: Mapping[str, WaypointResult]
     absence: WaypointAbsence | None = None

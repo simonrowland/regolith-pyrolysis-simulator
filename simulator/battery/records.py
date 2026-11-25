@@ -513,16 +513,44 @@ class Locator:
             return True
         return False
 
+    @staticmethod
+    def _is_pdf_page_index(index: object) -> bool:
+        return type(index) is int and index >= 0
+
+    def has_published_page(self) -> bool:
+        """A printed folio, separate from the physical PDF page.
+
+        Article identifiers may start their numeric group with zero
+        (E02S13). A bare scan filename (4.pdf) or a bare viewer counter
+        (4 of 21) is not a printed folio. A running header such as
+        Page 3 of 6 is.
+        """
+        page = self.published_page
+        if type(page) is int:
+            return page > 0
+        if not isinstance(page, str):
+            return False
+        text = page.strip()
+        if not text:
+            return False
+        if re.fullmatch(
+            r"(?i)(?:page\s+[1-9]\d*(?:\s+of\s+[1-9]\d*)?|(?:[a-z]{1,8}-?)?0*[1-9]\d*(?:[a-z]{1,8}\d*)?(?:[-–](?:[a-z]{1,8}-?)?0*[1-9]\d*(?:[a-z]{1,8}\d*)?)?)",
+            text,
+        ):
+            return True
+        return re.fullmatch(
+            r"(?i)(?=.)m{0,3}(cm|cd|d?c{0,3})(xc|xl|l?x{0,3})(ix|iv|v?i{0,3})",
+            text,
+        ) is not None
+
     def has_method_location(self) -> bool:
         """A physical page plus a section, paragraph, equation, or table anchor."""
 
         page = self.page
         has_physical_page = (
             isinstance(page, int) and not isinstance(page, bool) and page > 0
-        ) or (isinstance(page, str) and bool(page.strip())) or (
-            isinstance(self.pdf_page_index, int)
-            and not isinstance(self.pdf_page_index, bool)
-            and self.pdf_page_index >= 0
+        ) or (isinstance(page, str) and bool(page.strip())) or self._is_pdf_page_index(
+            self.pdf_page_index
         )
         has_method_anchor = any(
             isinstance(value, str) and bool(value.strip())

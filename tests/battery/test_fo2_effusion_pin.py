@@ -6,6 +6,7 @@ the Table Ia pO2 cell for X(SiO2)=0.50 (physical PDF p. 2).
 
 from __future__ import annotations
 
+from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
 
@@ -134,6 +135,29 @@ def test_internal_analytical_in_process_and_isolated_values_match(
         assert isolated.value == in_process.value, observation_id
         assert isolated.notices == in_process.notices, observation_id
         assert isolated.refusal_reason == in_process.refusal_reason, observation_id
+
+
+def test_internal_isolation_equality_probe_rejects_nan_closure_mutation(
+    monkeypatch: pytest.MonkeyPatch,
+    _score_context,
+) -> None:
+    from simulator.battery import fo2_ladder
+
+    original_notice = fo2_ladder.fo2_tier_notice
+
+    def nan_closure_notice(quantity, resolved, *, original_reason=None):
+        notice = original_notice(
+            quantity, resolved, original_reason=original_reason
+        )
+        if resolved.closure:
+            return replace(notice, selected_fO2_Pa=Decimal("NaN"))
+        return notice
+
+    monkeypatch.setattr(fo2_ladder, "fo2_tier_notice", nan_closure_notice)
+    with pytest.raises(AssertionError):
+        test_internal_analytical_in_process_and_isolated_values_match(
+            _score_context
+        )
 
 
 def test_default_ia_isolation_ignores_other_engine_handle(

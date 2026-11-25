@@ -2474,6 +2474,29 @@ _SCORED_NUMERIC_CONDITIONS = (
 )
 # A locator cites a condition. Its page numbers are not measured leaves.
 _CONDITION_PROVENANCE_KEYS = frozenset({"locator"})
+# Locator fields and extractor labels embedded in ``values`` are provenance,
+# not measured leaves. The quote note can be measured evidence; its location
+# coordinates and table address are not.
+_VALUE_PROVENANCE_KEYS = frozenset(
+    {
+        "cell_locators",
+        "composition_column_locators",
+        "published_page",
+        "pdf_page_index",
+        "page",
+        "folio",
+        "table",
+        "record",
+        "column",
+        "section",
+        "source_path",
+        "quotes_path",
+        "source_sha256",
+        "line_range",
+        "quantity",
+        "composition_basis_as_published",
+    }
+)
 # Closed keys whose string values are extractor-authored annotation, not
 # transcriptions. Numeric values under these keys remain measured leaves.
 ANNOTATION_KEYS = frozenset(
@@ -2508,7 +2531,16 @@ def _is_annotation_string(
     tag stay leaves, at the observation root and nested under ``values``.
     Numbers stay leaves. A nested ``locator.note`` is not a direct child
     of ``values``, so it stays a leaf.
+
+    The Kennedy ``regime_as_printed.state.value`` is a row-level summary
+    derived from run duration; its locator note carries the printed prose.
     """
+    if (
+        key == "value"
+        and isinstance(value, str)
+        and prefix[-2:] == ("regime_as_printed", "state")
+    ):
+        return True
     if not isinstance(value, str) or key not in ANNOTATION_KEYS:
         return False
     if key != "reason":
@@ -2599,7 +2631,7 @@ def _scored_evidence_leaves(
         non_finite.extend(child_non_finite)
 
     if "values" in observation:
-        take(observation.get("values"), ("values",), frozenset())
+        take(observation.get("values"), ("values",), _VALUE_PROVENANCE_KEYS)
     for key in _SCORED_NUMERIC_CONDITIONS:
         if key not in observation or observation.get(key) is None:
             continue
@@ -2678,7 +2710,7 @@ def _observation_has_digit_bearing_string(observation: Mapping[str, Any]) -> boo
         return False
 
     if "values" in observation and contains(
-        observation.get("values"), ("values",), frozenset()
+        observation.get("values"), ("values",), _VALUE_PROVENANCE_KEYS
     ):
         return True
     for key in _SCORED_NUMERIC_CONDITIONS:
@@ -3813,8 +3845,9 @@ def _locator_source_blind_reason(
     if isinstance(record, str) and record.strip():
         text = record.strip()
         token = text.split()[0]
-        candidates = [text] if token == text else [text, token]
-        candidate_groups.append(("record", candidates))
+        if any(token.startswith(prefix) for prefix in _SOURCE_ARTIFACT_PREFIXES):
+            candidates = [text] if token == text else [text, token]
+            candidate_groups.append(("record", candidates))
     if not candidate_groups:
         return _LocatorSourceBlindReason(
             "locator was not opened: no source_path, quotes_path, or file record "

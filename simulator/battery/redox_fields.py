@@ -16,8 +16,16 @@ from simulator.battery.printed_cells import (
     same_printed_cell,
 )
 
+from simulator.battery.enums import Quantity
+
 FE3_FE2_RATIO_PRINTED_FIELDS: tuple[str, ...] = ("fe3_fe2_ratio", "Fe3_over_Fe2")
 FERRIC_FRACTION_FIELDS: tuple[str, ...] = ("Fe3_over_FeT", "Fe3_over_sum_Fe")
+
+# These targets may consume independent ferric evidence; Fe targets themselves
+# still cannot use their scored value as an oxygen condition.
+SCORED_REDOX_QUANTITIES = frozenset(
+    {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}
+)
 KRESS_FE2O3_WT_PCT_FIELD = "Fe2O3_wt_pct"
 KRESS_FEO_WT_PCT_FIELD = "FeO_wt_pct"
 

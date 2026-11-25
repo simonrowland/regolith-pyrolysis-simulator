@@ -38,6 +38,10 @@ from simulator.policy.enums import (
 )
 
 
+NON_EQUILIBRIUM_RUN_CAVEAT = "non_equilibrium_run"
+CRYSTAL_BEARING_BULK_COMPOSITION_CAVEAT = "crystal_bearing_bulk_composition"
+
+
 class Engine(StrEnum):
     """Closed first-class engine tokens. Not derived from resolve_backend."""
 

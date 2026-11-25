@@ -104,6 +104,42 @@ def test_hand_example_relabels_cations_and_derives_excess() -> None:
     assert "Cl" not in dict(decision.oxide_mole_fractions)
 
 
+def test_measured_oxygen_notice_uses_policy_enum_owner_mutation_probe(monkeypatch):
+    from enum import StrEnum
+
+    from simulator.battery import composition
+    from simulator.policy.enums import NoticeKind as PolicyNoticeKind
+
+    def assert_policy_notice_owner():
+        decision = _decision(
+            {"Si": "28.085", "Fe": "55.845", "O": "51.99675"}
+        )
+        notice = next(
+            item
+            for item in decision.notices
+            if item.reason.startswith(
+                PolicyNoticeKind.REDOX_FROM_MEASURED_OXYGEN_FE_ONLY_ASSUMPTION.value
+            )
+        )
+        assert (
+            notice.kind
+            is PolicyNoticeKind.REDOX_FROM_MEASURED_OXYGEN_FE_ONLY_ASSUMPTION
+        )
+
+    assert_policy_notice_owner()
+
+    duplicate_notice_kind = StrEnum(
+        "DuplicateNoticeKind",
+        {
+            name: member.value
+            for name, member in PolicyNoticeKind.__members__.items()
+        },
+    )
+    monkeypatch.setattr(composition, "NoticeKind", duplicate_notice_kind)
+    with pytest.raises(AssertionError):
+        assert_policy_notice_owner()
+
+
 def test_extra_oxygen_mass_fraction_is_one_over_oxygen_weight() -> None:
     """One extra gram of oxygen on stoichiometric FeO.
 

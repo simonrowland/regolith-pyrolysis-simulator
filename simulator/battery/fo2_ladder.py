@@ -41,6 +41,7 @@ from simulator.battery.enums import (
     Fo2Mode,
     MethodToken,
     Phase,
+    PHASE_COMPOSITION_QUANTITIES,
     ReferenceStateConvention,
     NoticeKind,
     Quantity,
@@ -69,6 +70,7 @@ from simulator.source_ids import RYS_SOURCE_ID
 from simulator.battery.waypoints import (
     GapReason,
     EXPERIMENT_RUN_OXYGEN_ROUTES,
+    PredictionPressure,
     TYPED_RUN_OXYGEN_ROUTES,
     Waypoint,
     WaypointAuthority,
@@ -137,7 +139,12 @@ _PHYSICS_RUNG_LABELS = {
 }
 
 
-def fo2_tier_notice(quantity: Quantity, resolved: ResolvedFo2) -> Notice:
+def fo2_tier_notice(
+    quantity: Quantity,
+    resolved: ResolvedFo2,
+    *,
+    original_reason: str | None = None,
+) -> Notice:
     reason = f"fo2_tier={resolved.tier}"
     policy = None
     policy_flag = None
@@ -246,7 +253,19 @@ def fo2_tier_notice(quantity: Quantity, resolved: ResolvedFo2) -> Notice:
     )
     if out_of_band_kress:
         kind = NoticeKind.OUT_OF_CERTIFIED_BAND
-    return Notice(
+    selected_bar = (
+        resolved.po2_bar
+        if resolved.po2_bar is not None
+        else 10.0**resolved.log10_fO2_bar
+    )
+    selected_pa = (
+        None
+        if resolved.closure or not math.isfinite(selected_bar)
+        else Decimal(str(selected_bar * PA_PER_BAR))
+    )
+    if original_reason is not None:
+        reason = f"{reason}; original_reason={original_reason}"
+    notice = Notice(
         kind=kind,
         affected_quantities=(quantity,),
         reason=reason,
@@ -268,6 +287,18 @@ def fo2_tier_notice(quantity: Quantity, resolved: ResolvedFo2) -> Notice:
         fo2_mode=Fo2Mode.SHARED_LADDER,
         policy=policy,
     )
+    if resolved.route == _VACUUM_ROUTE:
+        notice = replace(
+            notice,
+            kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+            band="vacuum pO2 upper bound substituted at Ptotal",
+            authority=Authority.EXTRAPOLATED,
+            reason=(
+                f"{reason}; selected_fO2_Pa={selected_pa}; "
+                "Dalton pO2 <= Ptotal; the upper bound was substituted as a point"
+            ),
+        )
+    return notice
 
 
 def fo2_refusal_notice(quantity: Quantity) -> Notice:
@@ -345,7 +376,7 @@ def resolve_row_fo2(
     oxygen: WaypointResult | None = None,
     source_oxygen_bar: float | None = None,
     quantity: Quantity | None = None,
-    include_ferric_inverse: bool = True,
+    prediction_pressure: PredictionPressure | None = None,
 ) -> ResolvedFo2 | None:
     """Resolve one fO2 for this row. None when every evidence path fails.
 
@@ -356,9 +387,9 @@ def resolve_row_fo2(
     ``quantity`` selects the effusion closure and the air / DP-010 receipts.
     A melt-activity row never takes the vapour closure.
 
-    ``include_ferric_inverse`` is false for phase and redox. Named failure:
-    scoring a ferric ratio or a phase composition must not command fO2 from
-    that same ratio. Activity and vapour keep the Kress inverse.
+    The ladder never derives oxygen from a scored ferric target or phase
+    composition. A different valence target can use independent printed Fe
+    evidence. Activity and vapour keep the inverse.
     """
 
     identity = _identity(observation)
@@ -417,11 +448,31 @@ def resolve_row_fo2(
     weights = _weight_percent(composition, composition_moles, composition_wt, identity)
     # On a Knudsen vapour row, an unprinted ferric ratio or melt redox estimate
     # does not replace the cell's explicit oxygen control or effusion balance.
-    # Phase and redox pass include_ferric_inverse=False: their target is the
-    # ferric split, so the inverse would command oxygen from the quantity
-    # being scored.
-    if include_ferric_inverse and not knudsen_vapour:
-        tier2 = _tier2(observation, weights, temperature, experiment, bench, identity)
+    # A ferric target cannot command its own oxygen through the inverse. A
+    # different named valence target can still use independent Fe evidence.
+    scored_ferric_target = (
+        quantity is Quantity.FE3_FE2_RATIO
+        or (
+            quantity is Quantity.VALENCE_RATIO
+            and identity is not None
+            and identity.species is not None
+            and identity.species.formula == "Fe"
+        )
+    )
+    if (
+        not knudsen_vapour
+        and not scored_ferric_target
+        and quantity not in PHASE_COMPOSITION_QUANTITIES
+    ):
+        tier2 = _tier2(
+            observation,
+            weights,
+            temperature,
+            experiment,
+            bench,
+            identity,
+            prediction_pressure,
+        )
         if tier2 is not None:
             return _with_exact_pascals(tier2)
     for route in routes:
@@ -1296,6 +1347,7 @@ def _tier2(
     experiment: Experiment | None,
     bench: object | None,
     identity: Identity | None,
+    prediction_pressure: PredictionPressure | None = None,
 ) -> ResolvedFo2 | None:
     if temperature_K is None:
         return None
@@ -1303,7 +1355,7 @@ def _tier2(
     if fraction is None:
         return None
     pressure_bar, pressure_route = _kress_pressure_bar(
-        experiment, bench, observation, identity
+        experiment, bench, observation, identity, prediction_pressure
     )
     mol_fractions: Mapping[str, float] = {}
     if weights:
@@ -1413,7 +1465,13 @@ def _kress_pressure_bar(
     bench: object | None,
     observation: Observation | None,
     identity: Identity | None,
+    prediction_pressure: PredictionPressure | None = None,
 ) -> tuple[float | None, str]:
+    if prediction_pressure is not None:
+        pascal = nominal_pressure_pa(prediction_pressure.value)
+        if pascal is not None and pascal.is_finite() and pascal > 0:
+            return float(pascal) / PA_PER_BAR, prediction_pressure.route
+        return None, prediction_pressure.route
     if identity is not None and identity.total_pressure_Pa is not None:
         state = identity.total_pressure_Pa
         if state.is_value and state.value is not None:

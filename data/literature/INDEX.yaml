@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 861
-  extracts: 854
+  sources: 862
+  extracts: 855
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 88
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 854
+  extracts_without_pdf: 855
   alias_groups_needing_resolution: 94
 gaps:
   pdfs_without_extract: []
@@ -368,6 +368,7 @@ gaps:
   - kems-217-hastie-plante-1981-nbsir-81-2293
   - kems-218-schneider-1981-nbsir-81-2306
   - kems-ms2000-044
+  - kennedy-1948-ferric-ferrous-silicate-melts
   - khedim-2008-chromia-solubility-thesis
   - khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics
   - khedim-katrina-podor-panteix-rapin-vilasi-2010-cr-soda-lime-silicate
@@ -22093,6 +22094,64 @@ sources:
       last_stage: deepened
       date: '2026-09-06'
     commit: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
+- source_id: kennedy-1948-ferric-ferrous-silicate-melts
+  aliases: []
+  citation: Kennedy, G. C. (1948). Equilibrium between volatiles and iron oxides in igneous rocks. American
+    Journal of Science, 246(9), 529–549.
+  doi: 10.2475/ajs.246.9.529
+  report_number: null
+  identifier: 10.2475/ajs.246.9.529
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kennedy-1948-ferric-ferrous-silicate-melts.yaml
+    review_status: draft
+    rows: 1
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kennedy-1948-ferric-ferrous-silicate-melts/kennedy-1948-ferric-ferrous-silicate-melts.pdf
+      present: true
+      sha256: bd58d51ee519d30ad714f01c6c08485bfe0376d78b0a39d975c8e5d0cd578b39
+      matches_simulator: null
+    sidecar:
+      path: raw/kennedy-1948-ferric-ferrous-silicate-melts/sidecar.yaml
+      present: true
+    text:
+      path: text/kennedy-1948-ferric-ferrous-silicate-melts
+      exists: true
+      file_count: 49
+    tables:
+      path: tables/kennedy-1948-ferric-ferrous-silicate-melts
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/kennedy-1948-ferric-ferrous-silicate-melts.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/kennedy-1948-ferric-ferrous-silicate-melts.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: af693af9d0dcd86177db6e0ff94a70ec548330c2
 - source_id: khedim-2008-chromia-solubility-thesis
   aliases: []
   citation: Khedim, H. (2008). Etude de la limite de solubilité de la chromine « Cr2O3 » dans les liquides

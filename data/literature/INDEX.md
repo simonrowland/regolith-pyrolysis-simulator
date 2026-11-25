@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 861
-- Extracts (`literature_extract.v1`): 854
+- Sources: 862
+- Extracts (`literature_extract.v1`): 855
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 854
+- Extracts with no PDF: 855
 - Alias groups needing owner/controller resolution: 94
 - Extracts with private/non-public row locators: 88
 
@@ -379,6 +379,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `kems-217-hastie-plante-1981-nbsir-81-2293` | Hastie, J. W. & Plante, E. R. (1981), Mass Spectrometric Studies of MHD Slag Thermochemistry, NBSIR 81-2293, National Bureau of Standards, interim report, June 1981. | 10.6028/NBS.IR.81-2293 | ABSENT, `` | `raw/kems-217-hastie-plante-1981-nbsir-81-2293/kems-217-hastie-plante-1981-nbsir-81-2293.pdf` (present, 69760e98); `text/kems-217-hastie-plante-1981-nbsir-81-2293/` (26 files, exists); `tables/kems-217-hastie-plante-1981-nbsir-81-2293/` (2 files, exists) | `data/literature/extracts/kems-217-hastie-plante-1981-nbsir-81-2293.yaml` (0 rows, draft) | `ledger/kems-217-hastie-plante-1981-nbsir-81-2293.yaml`: validated (2026-10-05) |
 | `kems-218-schneider-1981-nbsir-81-2306` | Schneider, S. J. (Project Manager) (1981). MHD Materials—Seed/Slag Interactions and Effects, Quarterly Progress Report, January 1–March 31, 1981. NBSIR 81-2306. National Bureau of Standards, prepared for the U.S. Department of Energy. | NBSIR 81-2306 | ABSENT, `` | `raw/kems-218-schneider-1981-nbsir-81-2306/kems-218-schneider-1981-nbsir-81-2306.pdf` (present, ced17b5d); `text/kems-218-schneider-1981-nbsir-81-2306/` (26 files, exists); `tables/kems-218-schneider-1981-nbsir-81-2306/` (6 files, exists) | `data/literature/extracts/kems-218-schneider-1981-nbsir-81-2306.yaml` (0 rows, draft) | `ledger/kems-218-schneider-1981-nbsir-81-2306.yaml`: extracted (2026-10-04) |
 | `kems-ms2000-044` | Tsaplin, A. A., Zaitsev, A. I., Shelkova, N. E. & Mogutnov, B. M., "Thermodynamic properties and phase equilibria in Na2O-SiO2 and K2O-SiO2 systems", conference preprint, 24 pp. |  | ABSENT, `` | `raw/kems-ms2000-044/kems-ms2000-044.pdf` (present, 3d78f4e6); `text/kems-ms2000-044/` (24 files, exists); `tables/kems-ms2000-044/` (8 files, exists) | `data/literature/extracts/kems-ms2000-044.yaml` (100 rows, draft, private_path) | `ledger/kems-ms2000-044.yaml`: deepened (2026-09-06) |
+| `kennedy-1948-ferric-ferrous-silicate-melts` | Kennedy, G. C. (1948). Equilibrium between volatiles and iron oxides in igneous rocks. American Journal of Science, 246(9), 529–549. | 10.2475/ajs.246.9.529 | ABSENT, `` | `raw/kennedy-1948-ferric-ferrous-silicate-melts/kennedy-1948-ferric-ferrous-silicate-melts.pdf` (present, bd58d51e); `text/kennedy-1948-ferric-ferrous-silicate-melts/` (49 files, exists); `tables/kennedy-1948-ferric-ferrous-silicate-melts/` (0 files, ABSENT) | `data/literature/extracts/kennedy-1948-ferric-ferrous-silicate-melts.yaml` (1 rows, draft) | `ledger/kennedy-1948-ferric-ferrous-silicate-melts.yaml`: — (—) |
 | `khedim-2008-chromia-solubility-thesis` | Khedim, H. (2008). Etude de la limite de solubilité de la chromine « Cr2O3 » dans les liquides silicates – détermination de grandeurs thermodynamique et physico-chimique [Doctoral thesis, Université Henri Poincaré Nancy 1]. |  | ABSENT, `` | `raw/khedim-2008-chromia-solubility-thesis/khedim-2008-chromia-solubility-thesis.pdf` (present, 5c8c6cb3); `text/khedim-2008-chromia-solubility-thesis/` (330 files, exists); `tables/khedim-2008-chromia-solubility-thesis/` (0 files, ABSENT) | `data/literature/extracts/khedim-2008-chromia-solubility-thesis.yaml` (25 rows, draft) | `ledger/khedim-2008-chromia-solubility-thesis.yaml`: — (—) |
 | `khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics` | Khedim, H., Abdelouhab, S., Podor, R., Rapin, C., Vilasi, M., Panteix, P.-J., Toplis, M. & Faure, F. (2011). Kinetic and equilibrium factors affecting saturation of chromium oxide in soda-silicate melts. Journal of Non-Crystalline Solids, 357(1), 31-42. | 10.1016/j.jnoncrysol.2010.10.012 | ABSENT, `` | `raw/khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics/khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics.pdf` (present, 00f14127); `text/khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics/` (32 files, exists); `tables/khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics/` (0 files, ABSENT) | `data/literature/extracts/khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics.yaml` (1 rows, draft) | `ledger/khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics.yaml`: — (—) |
 | `khedim-katrina-podor-panteix-rapin-vilasi-2010-cr-soda-lime-silicate` | Khedim, H., Katrina, T., Podor, R., Panteix, P.-J., Rapin, C. & Vilasi, M. (2010). Solubility of Cr2O3 and speciation of chromium in soda-lime-silicate melts. Journal of the American Ceramic Society, 93(5), 1347-1354. | 10.1111/j.1551-2916.2009.03581.x | ABSENT, `` | `raw/khedim-katrina-podor-panteix-rapin-vilasi-2010-cr-soda-lime-silicate/khedim-katrina-podor-panteix-rapin-vilasi-2010-cr-soda-lime-silicate.pdf` (present, 981786fa); `text/khedim-katrina-podor-panteix-rapin-vilasi-2010-cr-soda-lime-silicate/` (65 files, exists); `tables/khedim-katrina-podor-panteix-rapin-vilasi-2010-cr-soda-lime-silicate/` (0 files, ABSENT) | `data/literature/extracts/khedim-katrina-podor-panteix-rapin-vilasi-2010-cr-soda-lime-silicate.yaml` (0 rows, draft) | `ledger/khedim-katrina-podor-panteix-rapin-vilasi-2010-cr-soda-lime-silicate.yaml`: — (—) |
@@ -1244,6 +1245,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `kems-217-hastie-plante-1981-nbsir-81-2293`
 - `kems-218-schneider-1981-nbsir-81-2306`
 - `kems-ms2000-044`
+- `kennedy-1948-ferric-ferrous-silicate-melts`
 - `khedim-2008-chromia-solubility-thesis`
 - `khedim-abdelouhab-2011-cr2o3-soda-silicate-kinetics`
 - `khedim-katrina-podor-panteix-rapin-vilasi-2010-cr-soda-lime-silicate`

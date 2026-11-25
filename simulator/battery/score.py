@@ -76,6 +76,7 @@ from simulator.battery.enums import (
     AmountBasis,
     Authority,
     CellMaterial,
+    CRYSTAL_BEARING_BULK_COMPOSITION_CAVEAT,
     CONDENSED_PHASES,
     DEFAULT_POLICY_NOTICE_KINDS,
     EQUILIBRIUM_FIT_QUANTITIES,
@@ -92,6 +93,7 @@ from simulator.battery.enums import (
     MetricOperation,
     MethodToken,
     NoticeKind,
+    NON_EQUILIBRIUM_RUN_CAVEAT,
     PHASE_COMPOSITION_QUANTITIES,
     PROSE_MOLE_PERCENT_PHASE_COMPONENT,
     effective_phase_basis,
@@ -174,6 +176,7 @@ from simulator.physical_constants import (
 
 if TYPE_CHECKING:
     from simulator.diagnostic_helpers.binary_pot_battery import Po2Request
+    from simulator.battery.waypoints import PredictionPressure
 from simulator.battery.migrate import (
     REPO_ROOT,
     _COMPOSITION_COMPONENTS,
@@ -9221,15 +9224,16 @@ def _comparison_identity(
     return replace(identity, **updates), pressure_notice
 
 
+# Clauses the ladder owns. They are qualification, not the route name.
+# ``original_reason`` is a caller suffix and may follow any of them.
 def _selected_shared_ladder_oxygen(
     prediction: EnginePrediction,
 ) -> tuple[Decimal | None, int, int | None, str] | None:
     """Read the selected pressure, generic tier, physics rung, and route once.
 
     The prediction identity is the pressure passed to the engine. The ladder
-    notice records generic tier and physics rung separately. Effusion balance
-    has no commanded pressure, so use its solver output when the engine
-    reports one.
+    notice records the route and qualification. Effusion balance has no
+    commanded pressure, so use its solver output when the engine reports one.
     """
 
     for notice in prediction.notices:
@@ -9244,7 +9248,8 @@ def _selected_shared_ladder_oxygen(
         )
         if match is None:
             continue
-        route = match.group(3).partition("; kress91_temperature_band_status=")[0]
+        route = match.group(3).partition("; original_reason=")[0]
+        route = route.partition("; kress91_temperature_band_status=")[0]
         borrowed_suffix = "; borrowed"
         if route.endswith(borrowed_suffix):
             route = route[:-len(borrowed_suffix)]
@@ -10452,7 +10457,6 @@ def _predict_redox(
             },
             identity=identity,
         )
-
     melts = engine in _MELTS_FE_REDOX_ENGINES
     melts_sources = ENGINE_COEFFICIENT_SOURCES[engine]
     material_notices: list[Notice] = []
@@ -10517,6 +10521,14 @@ def _predict_redox(
     if pressure_notice is not None:
         material_notices.append(pressure_notice)
 
+    from simulator.battery.waypoints import PredictionPressure
+
+    prediction_pressure = (
+        None
+        if pressure_pa is None or not pressure_pa.is_value
+        else PredictionPressure(pressure_pa, "score_total_pressure")
+    )
+
     # Offer 20 checks printed fO2 and Fe atoms before any Kress projection.
     # Internal-analytical and MELTS keep the stack's FeOt gate here.
     kress_basis: _FeRedoxKressBasis | None = None
@@ -10534,6 +10546,7 @@ def _predict_redox(
         material.temperature,
         quantity,
         bench,
+        prediction_pressure=prediction_pressure,
     )
     material_notices.extend(fo2_notice)
     policy_id = next(
@@ -10547,8 +10560,9 @@ def _predict_redox(
         material_notices.append(gap_notice)
     handle: object | None = None
     if fo2_log is None and melts:
-        # Missing printed fO2 is a refusal unless this engine computes its own.
-        # The flag is on the opened handle, not a hardcoded engine name.
+        # Missing printed fO2 is a refusal unless this engine computes its own
+        # or can take an imposed shared-ladder default. The flag is on the
+        # opened handle, not a hardcoded engine name.
         handle, _owns_handle = _open_cached_battery_handle(engine, handles)
         if not getattr(handle, "available", False) or getattr(
             handle, "backend", None
@@ -10566,16 +10580,38 @@ def _predict_redox(
                     f"open_battery_engine:{getattr(handle, 'name', engine.value)}"
                 ),
             )
+        # An intrinsic engine keeps its own oxygen. A handle that can take
+        # imposed oxygen gets the same flagged shared default as the other
+        # redox engines. Otherwise the printed pressure is still required.
         if not getattr(handle, "supports_intrinsic_fo2", False):
+            if not getattr(handle, "takes_fo2", False):
+                return refused(
+                    RefusalReason.IDENTITY_INCOMPLETE,
+                    {"reason": "missing_input", "input": "printed_fO2"},
+                )
+            selected = _unprinted_redox_oxygen(
+                experiment, bench, observation, material, prediction_pressure
+            )
+            if selected is None:
+                return refused(
+                    RefusalReason.IDENTITY_INCOMPLETE,
+                    {"reason": "missing_input", "input": "printed_fO2"},
+                )
+            fo2_log, commanded_fo2_pa, oxygen_notice = selected
+            identity = replace(identity, fO2_Pa=commanded_fo2_pa)
+            material_notices.append(oxygen_notice)
+    elif fo2_log is None:
+        selected = _unprinted_redox_oxygen(
+            experiment, bench, observation, material, prediction_pressure
+        )
+        if selected is None:
             return refused(
                 RefusalReason.IDENTITY_INCOMPLETE,
                 {"reason": "missing_input", "input": "printed_fO2"},
             )
-    elif fo2_log is None:
-        return refused(
-            RefusalReason.IDENTITY_INCOMPLETE,
-            {"reason": "missing_input", "input": "printed_fO2"},
-        )
+        fo2_log, commanded_fo2_pa, oxygen_notice = selected
+        identity = replace(identity, fO2_Pa=commanded_fo2_pa)
+        material_notices.append(oxygen_notice)
 
     prediction_oxygen = identity.fO2_Pa
 
@@ -12489,12 +12525,13 @@ def _resolve_row_fo2(
     temperature_K: Decimal,
     quantity: Quantity | None,
     bench: Bench | None = None,
+    prediction_pressure: PredictionPressure | None = None,
 ) -> tuple[Identity, Decimal | None, tuple[Notice, ...]]:
     """Read the one oxygen decision. Phase and redox do not rebuild it.
 
-    The ferric inverse stays off. Named failure: these callers score the
-    ferric split, so commanding fO2 from that split would move the target.
-    Waypoints are collected even when the bench is absent; the ladder skips
+    The ferric inverse stays off for Fe redox and phase targets; an independent
+    Fe assay may supply fO2 for a different named valence target. Waypoints are
+    collected even when the bench is absent; the ladder skips
     ``oxygen_condition`` in that case and would drop a printed run pressure.
     """
 
@@ -12517,7 +12554,7 @@ def _resolve_row_fo2(
         temperature_K=float(temperature_K),
         oxygen=oxygen,
         quantity=quantity,
-        include_ferric_inverse=False,
+        prediction_pressure=prediction_pressure,
     )
     if resolved is None or resolved.closure or resolved.pressure_pa is None:
         return identity, None, () if resolved is None else resolved.notices
@@ -12536,6 +12573,50 @@ def _resolve_row_fo2(
     if current != resolved.pressure_pa:
         updated = replace(updated, fO2_Pa=State.of(resolved.pressure_pa))
     return updated, decimal_log10_bar(resolved.pressure_pa), resolved.notices
+
+
+def _unprinted_redox_oxygen(
+    experiment: Experiment | None,
+    bench: Bench | None,
+    observation: Observation,
+    material: _FeRedoxMaterial,
+    prediction_pressure: PredictionPressure | None = None,
+) -> tuple[float, State[Decimal], Notice] | None:
+    """Use the row ladder when the redox target has no independent printed fO2."""
+
+    from simulator.battery.fo2_ladder import fo2_tier_notice, resolve_row_fo2
+
+    quantity = quantity_token(observation.identity)
+    if quantity is None:
+        return None
+    resolved = resolve_row_fo2(
+        experiment,
+        bench,
+        observation,
+        composition_wt=material.composition_wt,
+        temperature_K=float(material.temperature),
+        quantity=quantity,
+        prediction_pressure=prediction_pressure,
+    )
+    if resolved is None or resolved.closure:
+        return None
+    fo2_log = resolved.log10_fO2_bar
+    if not math.isfinite(fo2_log):
+        return None
+    oxygen_pa = resolved.pressure_pa
+    if oxygen_pa is None:
+        pressure_bar = resolved.po2_bar
+        if pressure_bar is None:
+            pressure_bar = 10.0**fo2_log
+        if not math.isfinite(pressure_bar) or pressure_bar <= 0:
+            return None
+        oxygen_pa = Decimal(str(pressure_bar)) * PA_PER_BAR_DEC
+    notice = fo2_tier_notice(
+        quantity,
+        resolved,
+        original_reason="source does not print fO2 for this run",
+    )
+    return fo2_log, State.of(oxygen_pa), notice
 
 
 def _select_phase_composition(
@@ -14431,7 +14512,6 @@ def predict_with_engine(
             exclude=provided_handles,
             active_error=sys.exc_info()[1],
         )
-
 
 _BUILTIN_SCORE_PREDICTOR = predict_with_engine
 
@@ -20126,6 +20206,39 @@ def _compile_residual_with_lineage(
         geometry_interval_notices,
         _quench_notices(reference),
     )
+    bulk_not_liquid = (
+        engine in SINGLE_LIQUID_ENGINES
+        and _is_bulk_not_liquid_composition(reference)
+    )
+    point_conditions = reference.point_conditions or {}
+    phase = point_conditions.get("phase_as_printed")
+    flagged_bulk_redox = (
+        bulk_not_liquid
+        and engine in (Engine.INTERNAL_ANALYTICAL, Engine.OPENIMCC)
+        and quantity is Quantity.FE3_FE2_RATIO
+        and phase is not None
+        and phase.state.is_value
+        and phase.locator is not None
+        and phase.inference is None
+    )
+    if quantity is Quantity.FE3_FE2_RATIO:
+        if flagged_bulk_redox:
+            notices = union_notices(notices, (Notice(
+                kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                affected_quantities=(quantity,),
+                reason=(
+                    f"{CRYSTAL_BEARING_BULK_COMPOSITION_CAVEAT}: prediction uses "
+                    "the starting bulk composition as liquid"
+                ),
+                origin=reference.observation_id,
+            ),))
+        if any(n.kind is NoticeKind.TOTAL_PRESSURE_AMBIENT_OPEN_FURNACE for n in notices):
+            notices = union_notices(notices, (Notice(
+                kind=NoticeKind.APPROXIMATE_PRESSURE,
+                affected_quantities=(quantity,),
+                reason="total pressure inferred from ambient apparatus evidence",
+                origin=reference.observation_id,
+            ),))
     liquid_sample_domain_notice = (
         liquid_model_subsolidus_sample_notice(
             identity,
@@ -20303,7 +20416,7 @@ def _compile_residual_with_lineage(
             },
             execution=Execution(state=ExecutionState.NOT_PROBED),
         )
-    if engine in SINGLE_LIQUID_ENGINES and _is_bulk_not_liquid_composition(reference):
+    if bulk_not_liquid and not flagged_bulk_redox:
         bulk_detail: dict[str, object] = {
             "reason": RefusalReason.BULK_NOT_LIQUID_COMPOSITION.value,
             "composition_status": TWO_PHASE_BULK_COMPOSITION_STATUS,

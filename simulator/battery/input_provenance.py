@@ -26,6 +26,7 @@ from simulator.battery.enums import (
 )
 from simulator.battery.identity import Identity, quantity_token
 from simulator.battery.records import Composition, Experiment, Locator, Notice, Observation
+from simulator.battery.redox_fields import SCORED_REDOX_QUANTITIES
 from simulator.feedstock_composition import _TOTAL_IRON_AS_FEO_KEYS
 
 SCORED_PHASE_ANALYSIS = "scored_phase_analysis"
@@ -47,7 +48,6 @@ INPUT_PROVENANCE_TOKENS = frozenset(
 # Melt observables that are not input components (d-323). A major oxide is
 # not in this set. Trace elements outside this list stay on the echo refusal.
 _NON_INPUT_MELT_FORMULAS = frozenset({"S", "Cl", "H2O", "CO2", "H", "C"})
-_REDOX_QUANTITIES = frozenset({Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO})
 # A saturation-defined quantity. The saturating phase is the definition, so
 # crystalline text does not refuse it. Dissolved S as a phase composition
 # stays on the non-input formula list and still needs printed single-melt
@@ -244,7 +244,7 @@ def is_d323_candidate(
     formula: str,
     phase_role: PhaseRole | None,
 ) -> bool:
-    if quantity in _REDOX_QUANTITIES or quantity in _SATURATION_QUANTITIES:
+    if quantity in SCORED_REDOX_QUANTITIES or quantity in _SATURATION_QUANTITIES:
         return True
     if quantity is not Quantity.EQUILIBRIUM_PHASE_COMPOSITION:
         return False
@@ -302,7 +302,7 @@ def input_composition_echo_detail(identity: Identity) -> dict[str, object] | Non
         return refused("input_composition_is_scored_phase_analysis")
     if provenance != SCORED_PHASE_ANALYSIS:
         return None
-    if quantity in _REDOX_QUANTITIES:
+    if quantity in SCORED_REDOX_QUANTITIES:
         split = "FeO" in names and "Fe2O3" in names
         total_iron = bool(names.intersection(_TOTAL_IRON_AS_FEO_KEYS)) and not split
         if total_iron:

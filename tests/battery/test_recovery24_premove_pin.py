@@ -11,9 +11,20 @@ from decimal import Decimal
 from pathlib import Path
 from types import SimpleNamespace
 
-from simulator.battery.enums import Authority, Engine, ExecutionState, RefusalReason
+from simulator.battery.enums import (
+    Authority,
+    Engine,
+    ExecutionState,
+    NoticeKind,
+    Quantity,
+    RefusalReason,
+)
 from simulator.battery.migrate import load_yaml
-from simulator.battery.score import predict_with_engine
+from simulator.battery.score import (
+    _selected_shared_ladder_oxygen,
+    flagged_strata,
+    predict_with_engine,
+)
 from tests.battery.factories import migrate_one_extract
 from tests.battery.test_melt_activity_requirements import _case, _composition
 
@@ -136,15 +147,31 @@ def test_kress_fe_redox_output_is_bit_identical():
         identity=replace(rows["row4"].identity, fO2_Pa=None),
     )
     missing_prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, missing)
-    assert missing_prediction.value is None
-    assert missing_prediction.authority is Authority.REFUSED
-    assert missing_prediction.execution.state is ExecutionState.NOT_PROBED
-    assert missing_prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
-    assert missing_prediction.refusal_detail == {
-        "reason": "missing_input",
-        "input": "printed_fO2",
-    }
+    assert missing_prediction.value is not None
+    assert missing_prediction.authority is not Authority.REFUSED
+    assert missing_prediction.execution.state is ExecutionState.PRODUCED
+    assert missing_prediction.refusal_reason is None
     assert missing_prediction.coefficient_sources == _KRESS_SOURCES
+    oxygen = [
+        notice
+        for notice in missing_prediction.notices
+        if notice.origin == "fo2_ladder"
+    ]
+    assert len(oxygen) == 1
+    assert "selected_fO2_Pa=" in oxygen[0].reason
+    assert "source does not print fO2 for this run" in oxygen[0].reason
+    assert Quantity.FE3_FE2_RATIO in oxygen[0].affected_quantities
+    selected = _selected_shared_ladder_oxygen(missing_prediction)
+    assert selected is not None
+    _pressure, tier, _rung, route = selected
+    assert not route.startswith("kress_inverse")
+    assert "selected_fO2_Pa" not in route
+    assert "original_reason" not in route
+    assert "borrowed" not in route
+    if tier == 4:
+        assert route == "intrinsic_melt_fO2"
+        assert oxygen[0].kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        assert "out_of_certified_band" in flagged_strata(missing_prediction.notices)
 
 
 def test_battery_handle_open_cache_output_is_bit_identical(monkeypatch):

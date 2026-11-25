@@ -223,7 +223,9 @@ def test_engine_request_preserves_and_rejects_temkin_coefficient_basis(
 
 
 @pytest.mark.parametrize("consumer", ("fo2", "coefficient", "catalog", "bench"))
-def test_temkin_rejection_arms_are_behavioral(migration, consumer: str) -> None:
+def test_temkin_rejection_arms_are_behavioral(
+    migration, consumer: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
     from simulator.battery.fo2_ladder import (
         metal_saturation_activity_refusal,
         resolve_row_fo2,
@@ -264,6 +266,12 @@ def test_temkin_rejection_arms_are_behavioral(migration, consumer: str) -> None:
                 experiment, activity, Quantity.ACTIVITY
             )
             is None
+        )
+        monkeypatch.setattr(
+            "simulator.battery.fo2_ladder._kress_pressure_bar",
+            lambda *_args, **_kwargs: pytest.fail(
+                "Kress pressure must wait until tier-2 eligibility"
+            ),
         )
         # The measured activity does not supply its own oxygen input. A
         # callable row receives DP-010's flagged ambient-air default.
