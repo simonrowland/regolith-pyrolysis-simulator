@@ -408,7 +408,7 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
     assert published_lvp1_total.locator is not None
     assert published_lvp1_total.locator.page == 3
     assert published_lvp1_total.locator.table == "1"
-    assert "LVP-1" in (published_lvp1_total.locator.record or "")
+    assert "row=LVP-1" in (published_lvp1_total.locator.note or "")
     assert projection_derivation.relation == "source_composition_projection"
     assert projection_derivation.method is not None
     assert projection_derivation.method.state.value == "elemental wt %"

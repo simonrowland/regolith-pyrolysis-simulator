@@ -7731,6 +7731,8 @@ def _project_source_declared_composition(
     quantity: Quantity | None,
     locator: Locator | None,
     source_rows: Sequence[object] = (),
+    source_context_rows: Sequence[object] = (),
+    projection_cache: dict[tuple[str, ...], Located[Composition]] | None = None,
 ) -> Located[Composition] | None:
     """Resolve all located source composition alternatives through one owner."""
 
@@ -7741,6 +7743,86 @@ def _project_source_declared_composition(
         or quantity.value not in rule.applies_to_quantities
     ):
         return None
+    cache_key: tuple[str, ...] | None = None
+    experiment = obs.get("experiment")
+    values = obs.get("values")
+    # The cache is owned by this extract migration, so the complete located
+    # source_rows and source_context_rows alternatives are fixed for its
+    # lifetime. For Xu,
+    # experiment alone is too broad: S2 repeats an experiment across physical
+    # analyses, so keep its table row, sample, and analysis identity. For
+    # oxide maps, the extract's experiment id is the analytical row. The
+    # current component amount is already one of source_rows' alternatives.
+    if isinstance(experiment, str) and experiment.strip():
+        if (
+            rule.source_basis == "elemental wt %"
+            and quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+        ):
+            row_key = _composition_projection_source_row_locator_key(
+                obs.get("locator")
+            )
+            sample_id = (
+                values.get("sample_id_as_published")
+                if isinstance(values, Mapping)
+                else None
+            )
+            analysis_id = (
+                values.get("analysis_id_as_published")
+                if isinstance(values, Mapping)
+                else None
+            )
+            if (
+                row_key is not None
+                and isinstance(sample_id, str)
+                and sample_id.strip()
+                and isinstance(analysis_id, str)
+                and analysis_id.strip()
+            ):
+                cache_key = (
+                    source_id,
+                    quantity.value,
+                    experiment,
+                    row_key[0],
+                    row_key[1],
+                    sample_id.strip(),
+                    analysis_id.strip(),
+                )
+        else:
+            cache_key = (source_id, quantity.value, experiment)
+    if projection_cache is not None and cache_key is not None:
+        cached = projection_cache.get(cache_key)
+        if cached is not None:
+            return cached
+    projection = _resolve_source_declared_composition(
+        source_id,
+        obs,
+        quantity=quantity,
+        locator=locator,
+        source_rows=source_rows,
+        source_context_rows=source_context_rows,
+        rule=rule,
+    )
+    if (
+        projection is not None
+        and projection_cache is not None
+        and cache_key is not None
+    ):
+        projection_cache[cache_key] = projection
+    return projection
+
+
+def _resolve_source_declared_composition(
+    source_id: str,
+    obs: Mapping[str, Any],
+    *,
+    quantity: Quantity,
+    locator: Locator | None,
+    source_rows: Sequence[object],
+    source_context_rows: Sequence[object],
+    rule: CompositionProjectionRule,
+) -> Located[Composition] | None:
+    """Compute one source-row projection after the owner cache misses."""
+
     values = obs.get("values")
     if not isinstance(values, Mapping):
         return None
@@ -7782,12 +7864,101 @@ def _project_source_declared_composition(
                 ),
                 locator=locator,
             )
-    aliases = dict(rule.element_aliases) if elemental_projection else {}
     candidate_rows = (
         source_rows
         if quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
         else ()
     )
+    published_analytical_total: Decimal | None = None
+    published_total_locator: Locator | None = None
+    if elemental_projection:
+        for candidate in source_context_rows:
+            if (
+                not isinstance(candidate, tuple)
+                or len(candidate) != 2
+                or not isinstance(candidate[0], str)
+                or not isinstance(candidate[1], Mapping)
+            ):
+                continue
+            _context_formula, context_row = candidate
+            if context_row.get("experiment") != experiment:
+                continue
+            context_values = context_row.get("values")
+            if not isinstance(context_values, Mapping):
+                continue
+            context_locator = context_row.get("locator")
+            context_table = (
+                str(context_locator.get("table") or "")
+                if isinstance(context_locator, Mapping)
+                else ""
+            )
+            if (
+                current_row_locator is not None
+                and context_table
+                and context_table != current_row_locator[0]
+            ):
+                continue
+            total_amount = _as_dec_or_none(
+                context_values.get("total_wt_percent_as_published")
+                or context_values.get("total_wt_percent")
+            )
+            if (
+                total_amount is not None
+                and context_values.get("sample_id_as_published") == sample_id
+                and context_values.get("analysis_id_as_published") == analysis_id
+            ):
+                if (
+                    published_analytical_total is not None
+                    and published_analytical_total != total_amount
+                ):
+                    return Located(
+                        State.unknown(
+                            "published analytical totals disagree within the source row"
+                        ),
+                        locator=locator,
+                    )
+                published_analytical_total = total_amount
+                published_total_locator = locator_from_mapping(context_locator)
+            analysis_records = context_values.get("analyses_as_published")
+            if isinstance(analysis_records, (list, tuple)):
+                for analysis_record in analysis_records:
+                    if not isinstance(analysis_record, Mapping):
+                        continue
+                    if (
+                        analysis_record.get("experiment"),
+                        analysis_record.get("sample_id_as_published"),
+                        analysis_record.get("analysis_id_as_published"),
+                    ) != (experiment, sample_id, analysis_id):
+                        continue
+                    source_row_number = analysis_record.get("source_row")
+                    if (
+                        current_row_locator is not None
+                        and isinstance(source_row_number, (str, int))
+                        and str(source_row_number).strip()
+                        and str(source_row_number).strip()
+                        != current_row_locator[1]
+                    ):
+                        continue
+                    total_amount = _as_dec_or_none(
+                        analysis_record.get("total_wt_percent_as_published")
+                    )
+                    if total_amount is None:
+                        continue
+                    if (
+                        published_analytical_total is not None
+                        and published_analytical_total != total_amount
+                    ):
+                        return Located(
+                            State.unknown(
+                                "published analytical totals disagree within the source row"
+                            ),
+                            locator=locator,
+                        )
+                    published_analytical_total = total_amount
+                    published_total_locator = (
+                        locator_from_mapping(analysis_record.get("locator"))
+                        or locator_from_mapping(context_locator)
+                    )
     for candidate in candidate_rows:
         if (
             not isinstance(candidate, tuple)
@@ -7862,10 +8033,9 @@ def _project_source_declared_composition(
         component_values[component_name] = amount
         source_locator = locator_from_mapping(source_row.get("locator"))
         if elemental_projection:
-            element_symbol = canonical_element_symbol(component_name)
-            if element_symbol == "Si" and elemental_projection_locator is None:
+            if component_name == "Si" and elemental_projection_locator is None:
                 elemental_projection_locator = source_locator
-            if element_symbol == "O" and elemental_oxygen_locator is None:
+            if component_name == "O" and elemental_oxygen_locator is None:
                 elemental_oxygen_locator = source_locator
         elif component_name == "SiO2" and sibling_projection_locator is None:
             sibling_projection_locator = source_locator
@@ -7922,7 +8092,7 @@ def _project_source_declared_composition(
     if elemental_projection:
         normalized_elements: dict[str, Any] = {}
         for raw_name, amount in declared_map.items():
-            name = aliases.get(str(raw_name), str(raw_name))
+            name = canonical_element_symbol(str(raw_name).strip())
             previous = normalized_elements.get(name)
             if (
                 previous is not None
@@ -7937,14 +8107,11 @@ def _project_source_declared_composition(
             normalized_elements[name] = amount
         declared_map = normalized_elements
     if elemental_projection:
-        available_elements = {
-            canonical_element_symbol(str(name))
-            for name in declared_map
-        }
+        available_elements = set(declared_map)
         missing_required = tuple(
             name
             for name in rule.required_elements
-            if canonical_element_symbol(name) not in available_elements
+            if name not in available_elements
             or _as_dec_or_none(declared_map.get(name)) is None
         )
     else:
@@ -8017,6 +8184,13 @@ def _project_source_declared_composition(
                 ),
                 locator=projection_locator,
             )
+        if published_analytical_total is None:
+            return Located(
+                State.unknown(
+                    "elemental run composition has no published analytical total"
+                ),
+                locator=projection_locator,
+            )
         parameters.extend(
             (
                 (
@@ -8035,11 +8209,13 @@ def _project_source_declared_composition(
                 ),
             )
         )
-        original_total = sum(wt.values(), Decimal("0"))
         parameters.append(
             (
                 "original_analytical_total_wt_pct",
-                Located(State.of(original_total), locator=projection_locator),
+                Located(
+                    State.of(published_analytical_total),
+                    locator=published_total_locator or projection_locator,
+                ),
             )
         )
         assumptions = (
@@ -8051,7 +8227,7 @@ def _project_source_declared_composition(
             "not projected into the composition",
             "oxygen balance residual = measured O wt% - stoichiometric O wt% "
             "implied by projected components",
-            "original analytical total is the sum of the printed elemental wt% inputs",
+            "original analytical total is the published analytical total, including its source locator",
             "printed Cl/CO2/H2O are retained; absent components are not filled",
             "weight-percent renormalized: false",
             "formula-unit mole fractions are normalized to their sum",
@@ -26791,6 +26967,14 @@ class Migrator:
         source_context = dict(pressure_identity_context or {})
         source_context = sg.attach_extract_declarations(source_context, doc)
         source_context["composition_projection_rows"] = tuple(rows)
+        source_context["composition_projection_context_rows"] = tuple(
+            (str(formula), dict(context_row))
+            for formula, body in (doc.get("species") or {}).items()
+            if isinstance(body, Mapping)
+            for context_row in body.get("context") or ()
+            if isinstance(context_row, Mapping)
+        )
+        source_context["composition_projection_cache"] = {}
         source_context["experiment_source_rows"] = experiment_source_rows
         source_context["printed_atmospheres_for_set"] = (
             printed_atmospheres_for_set
@@ -28641,6 +28825,19 @@ class Migrator:
                 context.get("composition_projection_rows", ())
                 if isinstance(context.get("composition_projection_rows", ()), Sequence)
                 else ()
+            ),
+            source_context_rows=(
+                context.get("composition_projection_context_rows", ())
+                if isinstance(
+                    context.get("composition_projection_context_rows", ()),
+                    Sequence,
+                )
+                else ()
+            ),
+            projection_cache=(
+                context.get("composition_projection_cache")
+                if isinstance(context.get("composition_projection_cache"), dict)
+                else None
             ),
         )
         if source_projection is not None:

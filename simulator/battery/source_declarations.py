@@ -29,7 +29,6 @@ class CompositionProjectionRule:
     reason: str
     applies_to_quantities: tuple[str, ...]
     default_valences: tuple[tuple[str, int], ...] = ()
-    element_aliases: tuple[tuple[str, str], ...] = ()
     required_elements: tuple[str, ...] = ()
     required_components: tuple[str, ...] = ()
     retained_components: tuple[str, ...] = ()
@@ -74,7 +73,6 @@ SOURCE_DECLARATIONS: dict[str, dict[str, SourceRule]] = {
                     "Na2O",
                     "K2O",
                 ),
-                retained_components=("Cl", "S", "F"),
             ),
             "Project a located Rusiecka run analysis at migration",
         ),
@@ -93,14 +91,13 @@ SOURCE_DECLARATIONS: dict[str, dict[str, SourceRule]] = {
                     ("Si", 4),
                     ("Ti", 4),
                     ("Al", 3),
-                    ("Fe", 3),
                     ("Mg", 2),
                     ("Ca", 2),
                     ("Na", 1),
                     ("K", 1),
                     ("Pt", 4),
+                    ("Fe", 3),
                 ),
-                element_aliases=(("FeT", "Fe"),),
                 required_elements=(
                     "Si",
                     "Ti",
