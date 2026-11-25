@@ -4,7 +4,14 @@ from collections import Counter, defaultdict
 from math import sqrt
 import warnings
 
-from simulator.battery.enums import AmountBasis, Engine, MethodToken, Quantity, Rail
+from simulator.battery.enums import (
+    AmountBasis,
+    Engine,
+    MethodToken,
+    NoticeKind,
+    Quantity,
+    Rail,
+)
 from simulator.battery.residue import _langmuir_residue_row_id
 from simulator.battery.score import ScoreContext
 from tests.battery.wang_2001_langmuir_support import (
@@ -309,7 +316,20 @@ def test_wang_residue_cells_emit_one_production_score_event_each(monkeypatch):
         notice.reason.startswith("initial_oxide_valence_choice:")
         for residual in ree_refusals
         for notice in residual.notices
-    ) == 32
+    ) == 0
+    ree_channel_notices = [
+        notice
+        for residual in ree_refusals
+        for notice in residual.notices
+        if notice.reason.startswith("ree_channels_absent_no_valence_selected:")
+    ]
+    assert len(ree_channel_notices) == 32
+    assert all(
+        notice.kind is NoticeKind.INPUT_OMITTED
+        and "the REE vapor channel is absent" in notice.reason
+        and "no oxide valence was selected" in notice.reason
+        for notice in ree_channel_notices
+    )
     assert all(
         any(
             notice.kind.value == "input_omitted"
@@ -326,3 +346,52 @@ def test_wang_residue_cells_emit_one_production_score_event_each(monkeypatch):
         )
         for residual in numeric
     )
+
+
+def test_wang_ce_eu_refusals_name_absent_channel_without_selecting_valence(
+    monkeypatch,
+):
+    import simulator.battery.residue as residue_module
+    import simulator.battery.score as score_module
+
+    from simulator.battery.residue import ResidueInventoryRefusal
+
+    context, observations = wang_context()
+    references = wang_residue_rows(observations)
+    selected = {
+        formula: next(
+            reference
+            for reference in references.values()
+            if reference.identity.species.formula == formula
+        )
+        for formula in ("Ce", "Eu")
+    }
+
+    def refuse_for_missing_channel(*_args, **_kwargs):
+        raise ResidueInventoryRefusal("awaits_ree_channels_sossipar")
+
+    monkeypatch.setattr(
+        residue_module,
+        "predict_langmuir_residue_composition",
+        refuse_for_missing_channel,
+    )
+    for reference in selected.values():
+        prediction = score_module._langmuir_residue_prediction(
+            context, reference, Engine.OPENIMCC
+        )
+        assert prediction.refusal_detail["reason"] == (
+            "awaits_ree_channels_sossipar"
+        )
+        assert any(
+            notice.kind is NoticeKind.INPUT_OMITTED
+            and notice.reason
+            == (
+                "ree_channels_absent_no_valence_selected: the REE vapor "
+                "channel is absent; no oxide valence was selected"
+            )
+            for notice in prediction.notices
+        )
+        assert all(
+            not notice.reason.startswith("initial_oxide_valence_choice:")
+            for notice in prediction.notices
+        )

@@ -17993,23 +17993,16 @@ def _langmuir_residue_prediction(
             and exc.reason == "awaits_ree_channels_sossipar"
             and formula in {"Ce", "Eu"}
         ):
-            valence_alternative = (
-                "Ce4+ as CeO2 may apply"
-                if formula == "Ce"
-                else "Eu2+ as EuO may apply at low fO2"
-            )
             notices = (
                 *notices,
                 Notice(
-                    kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                    kind=NoticeKind.INPUT_OMITTED,
                     affected_quantities=(
                         Quantity.RESIDUE_COMPONENT_COMPOSITION,
                     ),
                     reason=(
-                        "initial_oxide_valence_choice: trivalent Ln2O3 is the "
-                        "selected runtime convention; "
-                        f"{valence_alternative}; the source does not print "
-                        "this valence"
+                        "ree_channels_absent_no_valence_selected: the REE "
+                        "vapor channel is absent; no oxide valence was selected"
                     ),
                     origin=reference.observation_id,
                 ),
