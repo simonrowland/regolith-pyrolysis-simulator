@@ -722,16 +722,33 @@ def openimcc_binding_selected_by_inputs(
     controls: Mapping[str, Any],
     quantity_class: str = "activity",
 ) -> bool:
+    """Return whether this quantity uses OpenIMCC.
+
+    The decision lives in ``resolve_role_engines``. This caller passes the
+    vapour-switch constant and a domain loader, and it does not decide the
+    comparison itself. The loader runs only when the owner evaluates the
+    activity gate.
+    """
+
     if quantity_class not in {"activity", "vapour"}:
         raise ValueError(f"Unknown OpenIMCC quantity class: {quantity_class!r}")
-    mode = normalize_high_t_melt_activity(
-        controls.get("high_t_melt_activity", "openimcc")
+    from simulator.chemistry.role_engines import resolve_role_engines
+
+    override = controls.get("role_engine_override")
+    decision = resolve_role_engines(
+        backend_name=None,
+        high_t_melt_activity=controls.get("high_t_melt_activity", "openimcc"),
+        temperature_K=temperature_K,
+        intrinsic_fO2_supplied=controls.get("intrinsic_fO2_log") is not None,
+        vapour_openimcc_above_K=BUILTIN_VAPOUR_CHANNEL_SWITCH_K,
+        role_override=override if isinstance(override, Mapping) else None,
+        surface="run",
+        evaluate=quantity_class,
+        load_activity_domain_low_K=lambda: openimcc_bridge._temperature_domain_K()[0],
     )
-    if mode != "openimcc":
-        return False
     if quantity_class == "vapour":
-        return temperature_K > BUILTIN_VAPOUR_CHANNEL_SWITCH_K
-    return temperature_K >= openimcc_bridge._temperature_domain_K()[0]
+        return decision.vapour == "openimcc"
+    return decision.melt_activity == "openimcc"
 
 
 def _high_t_composition_vector(composition_mol: Mapping[str, float]) -> dict[str, float]:

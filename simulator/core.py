@@ -10584,14 +10584,36 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         high_t_control_inputs: dict[str, Any] = {}
         from engines.builtin.vapor_pressure import openimcc_binding_selected_by_inputs
 
-        if openimcc_binding_selected_by_inputs(
-            temperature_K=T_C + 273.15, controls={},
+        # Unpinned calls keep controls={} so the gate's default mode is unchanged.
+        # A role pin is the only reason this dict is non-empty.
+        role_override = getattr(self, "_role_engine_override", None)
+        binding_controls: dict[str, Any] = {}
+        if role_override:
+            binding_controls = {
+                "high_t_melt_activity": getattr(
+                    self, "_high_t_melt_activity", "openimcc"
+                ),
+                "role_engine_override": role_override,
+            }
+        activity_selected = openimcc_binding_selected_by_inputs(
+            temperature_K=T_C + 273.15,
+            controls=binding_controls,
             quantity_class="activity",
-        ):
+        )
+        if activity_selected:
             high_t_control_inputs = {
                 'high_t_melt_activity': getattr(
                     self, '_high_t_melt_activity', 'openimcc'
                 ),
+            }
+            if role_override:
+                high_t_control_inputs["role_engine_override"] = role_override
+        elif role_override:
+            high_t_control_inputs = {
+                "high_t_melt_activity": getattr(
+                    self, "_high_t_melt_activity", "openimcc"
+                ),
+                "role_engine_override": role_override,
             }
         dispatch_kwargs = {
             'control_inputs': {

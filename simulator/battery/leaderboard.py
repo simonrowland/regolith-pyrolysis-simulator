@@ -266,6 +266,17 @@ def _formula_info(
 
 
 def _engine_roles(report: Mapping[str, Any], rows: Sequence[Mapping[str, Any]]) -> dict[str, set[str]]:
+    # A stored decision is the owner's result. Do not mix it with the derivation.
+    for source in (report, _mapping(report.get("run_metadata"))):
+        decision = source.get("role_engine_decision")
+        if isinstance(decision, Mapping) and decision:
+            pinned: dict[str, set[str]] = defaultdict(set)
+            for role, engine in decision.items():
+                token = str(engine).strip()
+                if token and token.casefold() not in {"none", "unknown"}:
+                    pinned[str(role)].add(token)
+            return pinned
+
     roles: dict[str, set[str]] = defaultdict(set)
 
     def add(role: str | None, raw: object) -> None:

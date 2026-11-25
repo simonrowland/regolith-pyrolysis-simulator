@@ -1417,6 +1417,123 @@ def _append_omission_notices(notices: list[Any], callbacks: Mapping[Any, Any]) -
         for notice in getattr(callback, "below_threshold_omission_notices", ()):
             if notice not in notices:
                 notices.append(notice)
+        for notice in getattr(callback, "handoff_notices", ()):
+            if notice not in notices:
+                notices.append(notice)
+
+
+def _analytical_handoff_fields(
+    response: object,
+) -> tuple[
+    Mapping[str, object] | None,
+    Mapping[str, object] | None,
+    dict[str, float] | None,
+    float | None,
+]:
+    """Read the activity and fO2 fields an analytical vapour response already carries.
+
+    The pressure model is the second caller. This reader does not recompute them.
+    """
+
+    diagnostic: Mapping[str, object] = {}
+    response_diagnostics = getattr(response, "diagnostics", None)
+    if isinstance(response_diagnostics, Mapping):
+        vapor_diagnostic = response_diagnostics.get("vapor_pressure_diagnostic")
+        if isinstance(vapor_diagnostic, Mapping):
+            diagnostic = vapor_diagnostic
+    high_t = diagnostic.get("high_t_melt_activity")
+    producer_state = None
+    if isinstance(high_t, Mapping):
+        raw_producer = high_t.get("selected_parent_activities_standard_state")
+        if isinstance(raw_producer, Mapping):
+            producer_state = raw_producer
+    raw_consumer = diagnostic.get("activities_standard_state")
+    consumer_state = raw_consumer if isinstance(raw_consumer, Mapping) else None
+    vapour_fo2 = diagnostic.get("source_reaction_fO2_log10")
+    extra_fo2 = None
+    if (
+        isinstance(vapour_fo2, (int, float))
+        and not isinstance(vapour_fo2, bool)
+        and math.isfinite(float(vapour_fo2))
+    ):
+        extra_fo2 = {"vapour": float(vapour_fo2)}
+    liquid = getattr(response, "liquid_fraction", None)
+    return producer_state, consumer_state, extra_fo2, liquid
+
+
+def _record_residue_handoff(
+    bucket: list[Any],
+    decision: Any,
+    *,
+    producer_inventory: Mapping[str, float],
+    consumer_inventory: Mapping[str, float],
+    log10_pO2_bar: float,
+    temperature_K: float,
+    producer_standard_state: Mapping[str, object] | None,
+    consumer_standard_state: Mapping[str, object] | None,
+    fo2_log10_by_role: Mapping[str, float] | None = None,
+    liquid_fraction: float | None = None,
+    solid_fraction: float | None = None,
+) -> None:
+    """Append handoff findings. The inventories and pressures are not changed."""
+
+    from simulator.battery.enums import NoticeKind, Quantity
+    from simulator.battery.records import Notice
+    from simulator.chemistry.role_engines import HandoffCrossing, handoff_notices
+
+    fo2 = {"redox": float(log10_pO2_bar)}
+    if fo2_log10_by_role:
+        fo2.update({str(role): float(value) for role, value in fo2_log10_by_role.items()})
+    crossing = HandoffCrossing(
+        producer_role="melt_activity",
+        consumer_role="vapour",
+        producer_inventory_mol=producer_inventory,
+        consumer_inventory_mol=consumer_inventory,
+        producer_standard_state=producer_standard_state,
+        consumer_standard_state=consumer_standard_state,
+        fo2_log10_by_role=fo2,
+        liquid_fraction=liquid_fraction,
+        solid_fraction=solid_fraction,
+        consumer_assumes_liquid_only=True,
+        phase_engine_requested=decision.phase_equilibrium,
+        phase_engine_applied=decision.phase_equilibrium == "liquid_only",
+        activity_handoff=True,
+    )
+    for finding in handoff_notices(crossing):
+        notice = Notice(
+            kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+            affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+            reason=f"handoff:{finding.code}: {finding.detail}",
+            origin="role handoff",
+        )
+        if notice not in bucket:
+            bucket.append(notice)
+
+
+def _residue_role_decision(
+    engine: str,
+    temperature_K: float,
+    role_override: Mapping[str, str] | None,
+) -> Any:
+    if not role_override:
+        return None
+    from engines.builtin.vapor_pressure import BUILTIN_VAPOUR_CHANNEL_SWITCH_K
+    from simulator.chemistry.role_engines import RoleEngineRefusal, resolve_role_engines
+
+    try:
+        return resolve_role_engines(
+            backend_name=engine,
+            high_t_melt_activity="openimcc",
+            temperature_K=temperature_K,
+            intrinsic_fO2_supplied=False,
+            vapour_openimcc_above_K=BUILTIN_VAPOUR_CHANNEL_SWITCH_K,
+            role_override=role_override,
+            surface="residue",
+            engine_argument=engine,
+            evaluate="all",
+        )
+    except RoleEngineRefusal as exc:
+        raise ResidueInventoryRefusal(exc.code, exc.detail) from exc
 
 
 def _make_residue_pressure_model(
@@ -1431,8 +1548,12 @@ def _make_residue_pressure_model(
     missing_channels_reason: str,
     caller: str,
     floor_inversion_diagnostics: dict[str, dict[str, object]] | None = None,
+    role_override: Mapping[str, str] | None = None,
 ) -> Callable[[Mapping[str, float], float], Mapping[str, float]]:
     """Build the engine pressure closure shared by the residue cohorts."""
+    decision = _residue_role_decision(engine, temperature_K, role_override)
+    vapour_engine = engine if decision is None else decision.vapour
+    handoff_bucket: list[Any] = []
     pressure_exponents = {
         str(species): (
             1.0
@@ -1441,7 +1562,7 @@ def _make_residue_pressure_model(
         )
         for species, reaction in gas_channels
     }
-    if engine == "openimcc":
+    if vapour_engine == "openimcc":
         from openimcc.kernel import ImccNonconvergenceError
 
         from simulator.diagnostic_helpers.binary_pot_battery import (
@@ -1505,7 +1626,7 @@ def _make_residue_pressure_model(
                 )
                 pressure_state_cache[key] = base_pressure_bar
             pO2_bar = 10.0**float(log10_pO2_bar)
-            return {
+            pressures = {
                 str(species): (
                     float(base_pressure_bar.get(species, 0.0))
                     * pO2_bar ** pressure_exponents[str(species)]
@@ -1513,10 +1634,29 @@ def _make_residue_pressure_model(
                 )
                 for species, _reaction in gas_channels
             }
+            if decision is not None:
+                _record_residue_handoff(
+                    handoff_bucket,
+                    decision,
+                    producer_inventory=inventory,
+                    consumer_inventory={
+                        str(oxide): float(amount)
+                        for oxide, amount in inventory.items()
+                        if float(amount) > 0.0
+                    },
+                    log10_pO2_bar=float(log10_pO2_bar),
+                    temperature_K=temperature_K,
+                    producer_standard_state=None,
+                    consumer_standard_state=None,
+                )
+            return pressures
 
+        if decision is not None:
+            pressure_model.role_engine_decision = decision.as_mapping()
+            pressure_model.handoff_notices = handoff_bucket
         return pressure_model
 
-    if engine == "internal-analytical":
+    if vapour_engine == "internal-analytical":
         from simulator.diagnostic_helpers.binary_pot_battery import (
             PO2_COMMANDED,
             Po2Request,
@@ -1530,6 +1670,16 @@ def _make_residue_pressure_model(
         from simulator.vapour_rail.nasa_cea import NasaCeaError
 
         analytical_core = _new_internal_analytical_core()
+        if decision is not None and role_override:
+            provider_override = {
+                role: role_override[role]
+                for role in ("melt_activity", "vapour")
+                if role in role_override
+            }
+            if "melt_activity" in role_override:
+                analytical_core._high_t_melt_activity = decision.melt_activity
+            if provider_override:
+                analytical_core._role_engine_override = provider_override
         accepted_diagnostics_by_logp: dict[
             float, tuple[dict[str, object], ...]
         ] = {}
@@ -1644,15 +1794,35 @@ def _make_residue_pressure_model(
                         separators=(",", ":"),
                     )
                 raise ResidueInventoryRefusal(missing_channels_reason, detail)
-            return {
+            reported = {
                 str(species): float(pressures[str(species)])
                 for species, _reaction in gas_channels
             }
+            if decision is not None:
+                producer_state, consumer_state, extra_fo2, liquid_fraction = (
+                    _analytical_handoff_fields(response)
+                )
+                _record_residue_handoff(
+                    handoff_bucket,
+                    decision,
+                    producer_inventory=inventory,
+                    consumer_inventory=inventory,
+                    log10_pO2_bar=float(log10_pO2_bar),
+                    temperature_K=temperature_K,
+                    producer_standard_state=producer_state,
+                    consumer_standard_state=consumer_state,
+                    fo2_log10_by_role=extra_fo2,
+                    liquid_fraction=liquid_fraction,
+                )
+            return reported
 
         if floor_inversion_diagnostics is not None:
             pressure_model._on_accepted_evaluation = accept_pressure_diagnostics
         pressure_model.below_threshold_omission_notices = omission_notices
         pressure_model.below_threshold_omission_records = omission_records
+        if decision is not None:
+            pressure_model.role_engine_decision = decision.as_mapping()
+            pressure_model.handoff_notices = handoff_bucket
         return pressure_model
 
     raise ResidueInventoryRefusal(
@@ -1983,6 +2153,8 @@ def _mass_loss_corner_bounds(
 
 def predict_knudsen_residue_composition(
     engine: str, reference, experiment, observations, bench=None,
+    *,
+    role_override: Mapping[str, str] | None = None,
 ) -> dict[str, object]:
     """Predict a residue at its own printed loss, never at its measured composition."""
     from dataclasses import replace
@@ -2133,6 +2305,7 @@ def predict_knudsen_residue_composition(
                     engine_metadata=metadata, engine_flags=flags,
                     missing_channels_reason="residue_pressure_channels_missing",
                     caller="Knudsen residue prediction",
+                    role_override=role_override,
                 )
             return pressure_callbacks[temperature_K](inventory, logp)
 
@@ -2153,7 +2326,7 @@ def predict_knudsen_residue_composition(
             amount * _formula_terms(oxide)[0].get("O", 0.0)
             for oxide, amount in primary.residue_mol.items()
         )
-        return {
+        result = {
             "composition_wt_pct": composition, "linear_temperature_diagnostic": diagnostic,
             "measured_mass_loss_fraction": target, "temperature_path": path,
             "oxygen_sources": oxygen_sources, "notices": tuple(notices),
@@ -2167,8 +2340,19 @@ def predict_knudsen_residue_composition(
             "escaped_mass_fraction": math.fsum(n * _formula_terms(s)[1] for s, n in primary.evaporated_mol.items()) / math.fsum(n * _formula_terms(s)[1] for s, n in initial.items()),
             "engine_flags": tuple(sorted(flags)), "engine_metadata": metadata,
         }
+        for callback in pressure_callbacks.values():
+            decision_mapping = getattr(callback, "role_engine_decision", None)
+            if decision_mapping is not None:
+                result["role_engine_decision"] = decision_mapping
+                break
+        return result
     except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
         _append_omission_notices(notices, pressure_callbacks)
+        for callback in pressure_callbacks.values():
+            decision_mapping = getattr(callback, "role_engine_decision", None)
+            if decision_mapping is not None:
+                provenance = {**provenance, "role_engine_decision": decision_mapping}
+                break
         exc.provenance = provenance
         exc.notices = tuple(notices)
         raise
@@ -2181,6 +2365,7 @@ def predict_mass_loss_fraction(
     temperature_K: float | None,
     source_document: Mapping[str, Any] | None = None,
     observation: object | None = None,
+    role_override: Mapping[str, str] | None = None,
 ) -> ResidueMassLossPrediction:
     """Predict one bulk mass-loss point through the existing residue integrator."""
     if engine not in {"openimcc", "internal-analytical"}:
@@ -2326,6 +2511,12 @@ def predict_mass_loss_fraction(
             )
             if adapted not in omission_notices:
                 omission_notices.append(adapted)
+        for notice in getattr(pressure_model, "handoff_notices", ()) or ():
+            adapted = replace(
+                notice, affected_quantities=(Quantity.MASS_LOSS_FRACTION,)
+            )
+            if adapted not in omission_notices:
+                omission_notices.append(adapted)
         for formula, record in (
             getattr(pressure_model, "below_threshold_omission_records", {}) or {}
         ).items():
@@ -2385,6 +2576,7 @@ def predict_mass_loss_fraction(
             total_pressure_Pa=total_pressure_Pa, engine_metadata=metadata,
             engine_flags=flags, missing_channels_reason="residue_pressure_channels_missing",
             caller="Mass-loss residue prediction",
+            role_override=role_override,
         )
         def measure(incoming, active_channels, area, duration):
             bounds, corners = _mass_loss_corner_bounds(
@@ -2835,6 +3027,7 @@ def _hashimoto_run_setup(
     engine: str,
     engine_metadata: Mapping[str, str],
     reference_printed_wt_pct: Mapping[str, Any],
+    role_override: Mapping[str, str] | None = None,
 ) -> _HashimotoRunSetup:
     """Build the shared per-run inputs used by cohort and refinement checks."""
     from simulator.battery.oxygen_balance import _OXYGEN_GAS_ALPHA_SOURCE
@@ -2950,6 +3143,11 @@ def _hashimoto_run_setup(
     if not any(channel.parent_oxide for channel in common_channels):
         raise ResidueInventoryRefusal("hashimoto_common_unity_channels_missing")
     engine_floor_inversion_diagnostics: dict[str, dict[str, object]] = {}
+    floor_engine = engine
+    if role_override:
+        floor_engine = _residue_role_decision(
+            engine, temperature_K, role_override
+        ).vapour
     pressure_model = _make_residue_pressure_model(
         engine,
         gas_channels,
@@ -2962,9 +3160,10 @@ def _hashimoto_run_setup(
         caller="Hashimoto residue cohort",
         floor_inversion_diagnostics=(
             engine_floor_inversion_diagnostics
-            if engine == "internal-analytical"
+            if floor_engine == "internal-analytical"
             else None
         ),
+        role_override=role_override,
     )
     return _HashimotoRunSetup(
         experiment_id=experiment_id,
@@ -3008,6 +3207,7 @@ def _predict_hashimoto_residue_cohort(
     engine: str = "openimcc",
     selected_experiment_ids: frozenset[str] | None = None,
     _allow_partial_cohort_for_test: bool = False,
+    role_override: Mapping[str, str] | None = None,
 ) -> tuple[_HashimotoResiduePrediction, ...]:
     """Produce both alpha arms and geometry bands, without reading residues."""
     if engine not in {"openimcc", "internal-analytical"}:
@@ -3080,6 +3280,7 @@ def _predict_hashimoto_residue_cohort(
             engine=engine,
             engine_metadata=melt_pack_identity,
             reference_printed_wt_pct=printed_wt_pct,
+            role_override=role_override,
         )
         temperature_K = setup.temperature_K
         duration_s = setup.duration_s
@@ -3294,6 +3495,10 @@ def _predict_hashimoto_residue_cohort(
                 row = {"reason": notice.reason, "kind": str(notice.kind.value)}
                 if row not in refinement_notices:
                     refinement_notices.append(row)
+            for notice in getattr(pressure_model, "handoff_notices", ()) or ():
+                row = {"reason": notice.reason, "kind": str(notice.kind.value)}
+                if row not in refinement_notices:
+                    refinement_notices.append(row)
             band = {
                 oxide: (
                     min(values[oxide] for values in geometry_predictions.values()),
@@ -3453,6 +3658,13 @@ def _predict_hashimoto_residue_cohort(
                     else "complete"
                 ),
                 "assumption_flags": assumption_flags,
+                **(
+                    {}
+                    if getattr(pressure_model, "role_engine_decision", None) is None
+                    else {
+                        "role_engine_decision": pressure_model.role_engine_decision,
+                    }
+                ),
             }
             if geometry_inventory_mol[primary_geometry] is not None:
                 provenance["integrated_inventory_mol"] = dict(
@@ -3747,10 +3959,27 @@ def _predict_sossi_residue_cohort(
     buffered_fO2_log_by_experiment: Mapping[str, float],
     engine: str,
     selected_experiment_ids: frozenset[str] | None = None,
+    role_override: Mapping[str, str] | None = None,
 ) -> tuple[_SossiResiduePrediction, ...]:
     """Predict Sossi Mn/Ti with the shared buffered inventory integrator."""
     if engine not in {"openimcc", "internal-analytical"}:
         raise ResidueInventoryRefusal("sossi_engine_unsupported", engine)
+    # Residue role defaults do not read temperature. One decision selects the
+    # gas pack for the whole cohort. Without a pin, vapour_engine is engine.
+    vapour_engine = engine
+    sossi_decision = None
+    if role_override:
+        sossi_decision = _residue_role_decision(engine, 1.0, role_override)
+        vapour_engine = sossi_decision.vapour
+
+    def _pin_provenance(notices: list[Any]) -> dict[str, Any]:
+        if sossi_decision is None:
+            return {}
+        return {
+            "role_engine_decision": sossi_decision.as_mapping(),
+            "handoff_notices": [notice.reason for notice in notices],
+        }
+
     from simulator.battery.oxygen_balance import _OXYGEN_GAS_ALPHA_SOURCE
     from simulator.condensation import alpha_s
     from simulator.diagnostic_helpers.binary_pot_battery import (
@@ -3775,7 +4004,7 @@ def _predict_sossi_residue_cohort(
             "selected runs must be a non-empty subset of the supplied experiments",
         )
     engine_binding_identity: dict[str, str] | None = None
-    if engine == "openimcc":
+    if vapour_engine == "openimcc":
         try:
             import openimcc
             from openimcc import load_gas_datapack
@@ -3842,7 +4071,7 @@ def _predict_sossi_residue_cohort(
         for element, parent in _SOSSI_TRACE_PARENTS.items():
             available = [
                 item for item in gas_channels if item[1] == parent
-            ] if engine == "openimcc" else [
+            ] if vapour_engine == "openimcc" else [
                 (str(row.get("formula")), parent, 1.0, 0.0)
                 for _name, row in catalog_rows
                 if row.get("formula")
@@ -3896,7 +4125,8 @@ def _predict_sossi_residue_cohort(
         melt_pack_identity: dict[str, str] = {}
         melt_activity_input_policy: dict[str, Any] = {}
         melt_activity_extensions: dict[str, dict[str, Any]] = {}
-        if engine == "openimcc":
+        handoff_bucket: list[Any] = []
+        if vapour_engine == "openimcc":
             from simulator.diagnostic_helpers.binary_pot_battery import (
                 _ENGINE_OUTER_TIMEOUT_S,
             )
@@ -4002,13 +4232,29 @@ def _predict_sossi_residue_cohort(
                     base = dict(gas_result)
                     pressure_cache[key] = base
                 pO2_bar = 10.0**log10_pO2_bar
-                return {
+                pressures = {
                     species: float(base.get(species, 0.0))
                     * pO2_bar ** pO2_exponents[species]
                     * PA_PER_BAR
                     for species, _parent, _n, _o2 in gas_channels
                     if species in pO2_exponents
                 }
+                if sossi_decision is not None:
+                    _record_residue_handoff(
+                        handoff_bucket,
+                        sossi_decision,
+                        producer_inventory=composition,
+                        consumer_inventory={
+                            str(oxide): float(amount)
+                            for oxide, amount in composition.items()
+                            if float(amount) > 0.0
+                        },
+                        log10_pO2_bar=float(log10_pO2_bar),
+                        temperature_K=temperature_K,
+                        producer_standard_state=None,
+                        consumer_standard_state=None,
+                    )
+                return pressures
         else:
             from simulator.diagnostic_helpers.binary_pot_battery import (
                 PO2_COMMANDED,
@@ -4018,6 +4264,16 @@ def _predict_sossi_residue_cohort(
             )
 
             analytical_core = _new_internal_analytical_core()
+            if sossi_decision is not None and role_override:
+                provider_override = {
+                    role: role_override[role]
+                    for role in ("melt_activity", "vapour")
+                    if role in role_override
+                }
+                if "melt_activity" in role_override:
+                    analytical_core._high_t_melt_activity = sossi_decision.melt_activity
+                if provider_override:
+                    analytical_core._role_engine_override = provider_override
 
             def pressure_model(
                 composition: Mapping[str, float], log10_pO2_bar: float
@@ -4035,7 +4291,24 @@ def _predict_sossi_residue_cohort(
                     ),
                     include_diagnostic_shadows=False,
                 )
-                return response.vapor_pressures_Pa
+                pressures = response.vapor_pressures_Pa
+                if sossi_decision is not None:
+                    producer_state, consumer_state, extra_fo2, liquid_fraction = (
+                        _analytical_handoff_fields(response)
+                    )
+                    _record_residue_handoff(
+                        handoff_bucket,
+                        sossi_decision,
+                        producer_inventory=composition,
+                        consumer_inventory=composition,
+                        log10_pO2_bar=float(log10_pO2_bar),
+                        temperature_K=temperature_K,
+                        producer_standard_state=producer_state,
+                        consumer_standard_state=consumer_state,
+                        fo2_log10_by_role=extra_fo2,
+                        liquid_fraction=liquid_fraction,
+                    )
+                return pressures
 
         try:
             initial_pressures = pressure_model(inventory, buffered_logp)
@@ -4055,6 +4328,7 @@ def _predict_sossi_residue_cohort(
                             **exc.as_record(),
                             "cohort": "sossi_residue_cohort",
                         },
+                        **_pin_provenance(handoff_bucket),
                     },
                 )
             )
@@ -4096,7 +4370,7 @@ def _predict_sossi_residue_cohort(
                 ),
                 temperature_K,
             )
-            if engine == "openimcc"
+            if vapour_engine == "openimcc"
             else ()
         )
 
@@ -4195,6 +4469,7 @@ def _predict_sossi_residue_cohort(
                             **run_refusal.as_record(),
                             "cohort": "sossi_residue_cohort",
                         },
+                        **_pin_provenance(handoff_bucket),
                     },
                 )
             )
@@ -4292,6 +4567,7 @@ def _predict_sossi_residue_cohort(
                         "density_fallback_2700_kg_m3": True,
                         "bc_open_furnace_langmuir_limit_diagnostic": True,
                     },
+                    **_pin_provenance(handoff_bucket),
                 },
             )
         )

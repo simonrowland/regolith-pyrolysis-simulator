@@ -4030,6 +4030,12 @@ def internal_analytical_residue_vapor_pressure(
             "po2": None if po2_request is None else po2_request.as_payload(),
             "engine_settings": _internal_analytical_cache_settings(core),
         }
+        role_override = getattr(core, "_role_engine_override", None)
+        if role_override:
+            request["role_engine_override"] = {
+                str(role): str(engine_name)
+                for role, engine_name in sorted(role_override.items())
+            }
         result = cached_engine_call("internal-analytical", _internal_analytical_cache_inputs(request), solve)
     if (
         isinstance(result, Mapping)
