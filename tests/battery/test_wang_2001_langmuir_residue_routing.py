@@ -10,6 +10,7 @@ from simulator.battery.score import ScoreContext
 from tests.battery.wang_2001_langmuir_support import (
     ROOT,
     SOURCE_ID,
+    wang_all_residue_rows,
     wang_context,
     wang_residue_rows,
     wang_sc1_residue_pair,
@@ -24,8 +25,10 @@ def _benchm1_residual_report(residuals, references):
     refusal_counts = Counter()
     oxides = ("MgO", "Al2O3", "SiO2", "CaO", "TiO2", "FeO", "WO3")
     runs = set()
-    for residual in residuals:
-        reference = references[residual.reference]
+    residual_by_reference = {
+        residual.reference: residual for residual in residuals
+    }
+    for reference in references.values():
         observation_id = reference.observation_id
         method = (
             "EMP" if "electron_microprobe" in observation_id
@@ -38,47 +41,69 @@ def _benchm1_residual_report(residuals, references):
         assert method in {"EMP", "IMP"}
         run = _langmuir_residue_row_id(reference.locator) or "unknown"
         runs.add(run)
-        method_status[(method, residual.status.value)] += 1
-        for notice in residual.notices:
-            flag_counts[(notice.kind.value, notice.reason)] += 1
         formula = reference.identity.species.formula
         unit = "wt%" if formula in oxides else "ppm"
         printed = reference.value.point
-        if residual.numeric is None:
+        residual = residual_by_reference.get(reference.observation_id)
+        if residual is None:
+            assert formula == "WO3"
+            assert reference.admission.status.value == "rejected"
+            model = delta = None
+            outcome = "C"
+            detail = reference.admission.reason
+        elif residual.numeric is None:
+            method_status[(method, residual.status.value)] += 1
+            for notice in residual.notices:
+                flag_counts[(notice.kind.value, notice.reason)] += 1
             model = delta = None
             outcome = "R"
-            detail = None if residual.refusal is None else residual.refusal.detail
+            raw_detail = None if residual.refusal is None else residual.refusal.detail
             reason = (
-                detail.get("reason", str(detail))
-                if isinstance(detail, dict)
-                else str(detail or residual.status.value)
+                raw_detail.get("reason", str(raw_detail))
+                if isinstance(raw_detail, dict)
+                else str(raw_detail or residual.status.value)
+            )
+            detail = (
+                raw_detail.get("detail", reason)
+                if isinstance(raw_detail, dict)
+                else reason
             )
             refusal_counts[reason] += 1
         else:
+            method_status[(method, residual.status.value)] += 1
+            for notice in residual.notices:
+                flag_counts[(notice.kind.value, notice.reason)] += 1
             delta = float(residual.numeric.value)
             # The production residual is model minus printed; reverse it to
             # report the model without evaluating the owner a second time.
             model = float(printed) + delta
             outcome = "S" if residual.status.value == "scored" else "F"
+            detail = ""
             if formula in oxides:
                 oxide_residuals[(method, run, formula)].append(delta)
-        time_min = reference.point_conditions["time_min"].state.value
-        temperature_K = reference.identity.temperature_K.value
+        time_condition = (reference.point_conditions or {}).get("time_min")
+        time_min = (
+            time_condition.state.value
+            if time_condition is not None and time_condition.state.is_value
+            else "—"
+        )
+        temperature = reference.identity.temperature_K
+        temperature_K = temperature.value if temperature.is_value else "—"
         rows.append((method, run, time_min, temperature_K, formula, unit,
-                     printed, model, delta, outcome))
+                     printed, model, delta, outcome, detail))
 
     output = [
         "## Full residue table",
-        "| Method | Run | Time (min) | T (K) | Species | Unit | Printed | Model | Residual | Outcome |",
-        "|---|---|---:|---:|---|---|---:|---:|---:|---|",
+        "| Method | Run | Time (min) | T (K) | Species | Unit | Printed | Model | Residual | Outcome | Detail |",
+        "|---|---|---:|---:|---|---|---:|---:|---:|---|---|",
     ]
     for row in rows:
-        method, run, time_min, temperature, formula, unit, printed, model, delta, outcome = row
+        method, run, time_min, temperature, formula, unit, printed, model, delta, outcome, detail = row
         model_text = "—" if model is None else f"{model:.10g}"
         delta_text = "—" if delta is None else f"{delta:.10g}"
         output.append(
             f"| {method} | {run.upper()} | {time_min} | {temperature} | {formula} | "
-            f"{unit} | {printed} | {model_text} | {delta_text} | {outcome} |"
+            f"{unit} | {printed} | {model_text} | {delta_text} | {outcome} | {detail} |"
         )
 
     output.extend((
@@ -99,7 +124,10 @@ def _benchm1_residual_report(residuals, references):
                 else:
                     cells.append("—")
             output.append(f"| {method} | {run.upper()} | " + " | ".join(cells) + " |")
-    output.append("Outcome legend: S=scored, F=flagged, R=typed refusal.")
+    output.append(
+        "Outcome legend: S=scored, F=flagged numeric, R=typed refusal, "
+        "C=condition-only (not a score event)."
+    )
     for (method, status), count in sorted(method_status.items()):
         output.append(f"WANG_STATUS_COUNT={method}|{status}|{count}")
     for (kind, reason), count in sorted(flag_counts.items()):
@@ -107,7 +135,8 @@ def _benchm1_residual_report(residuals, references):
     for reason, count in sorted(refusal_counts.items()):
         output.append(f"WANG_REFUSAL_COUNT={count}|{reason}")
     output.extend((
-        f"WANG_ADMITTED_RESIDUE_POINTS={len(references)}",
+        f"WANG_RESIDUE_POINTS={len(references)}",
+        f"WANG_ADMITTED_RESIDUE_POINTS={sum(row.admission.status.value == 'admitted' for row in references.values())}",
         f"WANG_SCORER_EVENTS={len(residuals)}",
     ))
     warnings.warn("\n".join(output), UserWarning, stacklevel=1)
@@ -118,9 +147,23 @@ def test_wang_residue_cells_emit_one_production_score_event_each(monkeypatch):
     import simulator.battery.score as score_module
 
     context, observations = wang_context()
+    all_references = wang_all_residue_rows(observations)
     references = wang_residue_rows(observations)
-    assert len(references) == 432
-    experiment_ids = {reference.experiment_id for reference in references.values()}
+    assert len(all_references) == 432
+    assert len(references) == 416
+    condition_rows = {
+        key: row for key, row in all_references.items()
+        if row.admission.status.value != "admitted"
+    }
+    assert len(condition_rows) == 16
+    assert all(
+        row.identity.species.formula == "WO3"
+        and row.admission.status.value == "rejected"
+        and row.admission.reason
+        == "container_contamination_not_evaporation_observable"
+        for row in condition_rows.values()
+    )
+    experiment_ids = {reference.experiment_id for reference in all_references.values()}
     assert len(experiment_ids) == 1
     experiment = context.experiments[next(iter(experiment_ids))]
     starting = experiment.sample.initial_composition
@@ -128,13 +171,37 @@ def test_wang_residue_cells_emit_one_production_score_event_each(monkeypatch):
     assert starting.state.value.amount_basis is AmountBasis.MOLE_FRACTION
     assert starting.locator is not None
     assert starting.locator.page == 4 and starting.locator.table == "1"
-    for reference in references.values():
-        assert reference.identity.species.phase.is_unknown
+    for reference in all_references.values():
+        assert reference.provenance["printed_phase"] == "unknown"
         temperature = reference.identity.temperature_K
         time = (reference.point_conditions or {}).get("time_min")
         assert temperature is not None and temperature.is_value
         assert time is not None and time.state.is_value
         assert time.locator is not None and time.locator.table == "2"
+
+    starting_ppm = {
+        "La": "87.1", "Ce": "82.3", "Pr": "85.1", "Nd": "86.4",
+        "Sm": "85.6", "Eu": "86.9", "Gd": "88.6", "Tb": "91.3",
+        "Dy": "88.6", "Ho": "86.1", "Er": "90.2", "Tm": "87.7",
+        "Yb": "88.4", "Lu": "88.5",
+    }
+    for reference in references.values():
+        formula = reference.identity.species.formula
+        subtype = reference.identity.subtype
+        if formula not in starting_ppm:
+            continue
+        assert subtype is not None and subtype.is_value
+        assert subtype.value == "element_ppm_by_mass"
+        start = (reference.point_conditions or {}).get("starting_component_ppm")
+        assert start is not None and start.state.is_value
+        assert str(start.state.value) == starting_ppm[formula]
+        assert start.locator is not None
+        assert (
+            start.locator.page == 4
+            and start.locator.published_page == 482
+            and start.locator.table == "1"
+            and start.locator.note == "Table 1 measured starting abundance in column b."
+        )
     assert all(
         score_module._extent_residue_method(
             reference,
@@ -184,7 +251,7 @@ def test_wang_residue_cells_emit_one_production_score_event_each(monkeypatch):
     )
     by_reference = {residual.reference: residual for residual in residuals}
     assert set(by_reference) == set(references)
-    assert len(residuals) == 432
+    assert len(residuals) == 416
     assert predictions_by_run_row == Counter({row_id: 1 for row_id in by_run_row})
 
     # Mutate the source selector back to its previous Mendybaev-only rule.
@@ -215,9 +282,31 @@ def test_wang_residue_cells_emit_one_production_score_event_each(monkeypatch):
     )
     assert all(residual.reference != reference.observation_id for residual in mutated)
 
-    _benchm1_residual_report(residuals, references)
+    _benchm1_residual_report(residuals, all_references)
     numeric = [residual for residual in residuals if residual.numeric is not None]
-    assert len(numeric) == len(residuals)
+    assert len(numeric) == 192
+    ree_refusals = [
+        residual for residual in residuals
+        if references[residual.reference].identity.species.formula
+        in starting_ppm
+    ]
+    assert len(ree_refusals) == 224
+    for residual in ree_refusals:
+        assert residual.numeric is None
+        assert residual.refusal is not None
+        assert residual.refusal.detail == {
+            "reason": "awaits_ree_channels_sossipar",
+            "detail": "awaits_ree_channels_sossipar",
+        }
+    assert not any(
+        references[residual.reference].identity.species.formula == "WO3"
+        for residual in residuals
+    )
+    assert sum(
+        notice.reason.startswith("initial_oxide_valence_choice:")
+        for residual in ree_refusals
+        for notice in residual.notices
+    ) == 32
     assert all(
         any(
             notice.kind.value == "input_omitted"

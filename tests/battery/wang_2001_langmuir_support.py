@@ -25,13 +25,20 @@ def wang_context():
     return context, observations
 
 
-def wang_residue_rows(observations):
+def wang_all_residue_rows(observations):
     return {
         row.observation_id: row
         for row in observations.values()
         if row.source_id == SOURCE_ID
         and row.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
-        and row.admission.status.value == "admitted"
+    }
+
+
+def wang_residue_rows(observations):
+    return {
+        observation_id: row
+        for observation_id, row in wang_all_residue_rows(observations).items()
+        if row.admission.status.value == "admitted"
     }
 
 

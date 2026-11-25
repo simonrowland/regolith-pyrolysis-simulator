@@ -128,6 +128,188 @@ fidelity_samples:
     table: '4'
     row: SC6
     column: 25Mg/24Mg
+- species: La
+  observable: residue_component_composition
+  observation_id: wang_2001_table1_la_residue_concentration
+  field: starting_measured_ppm
+  value: '87.1'
+  locator:
+    page: 4
+    published_page: 482
+    pdf_page_index: 3
+    table: '1'
+    row: Starting comp.
+    column: b
+    note: Table 1 measured starting abundance in column b.
+- species: Ce
+  observable: residue_component_composition
+  observation_id: wang_2001_table1_ce_residue_concentration
+  field: starting_measured_ppm
+  value: '82.3'
+  locator:
+    page: 4
+    published_page: 482
+    pdf_page_index: 3
+    table: '1'
+    row: Starting comp.
+    column: b
+    note: Table 1 measured starting abundance in column b.
+- species: Pr
+  observable: residue_component_composition
+  observation_id: wang_2001_table1_pr_residue_concentration
+  field: starting_measured_ppm
+  value: '85.1'
+  locator:
+    page: 4
+    published_page: 482
+    pdf_page_index: 3
+    table: '1'
+    row: Starting comp.
+    column: b
+    note: Table 1 measured starting abundance in column b.
+- species: Nd
+  observable: residue_component_composition
+  observation_id: wang_2001_table1_nd_residue_concentration
+  field: starting_measured_ppm
+  value: '86.4'
+  locator:
+    page: 4
+    published_page: 482
+    pdf_page_index: 3
+    table: '1'
+    row: Starting comp.
+    column: b
+    note: Table 1 measured starting abundance in column b.
+- species: Sm
+  observable: residue_component_composition
+  observation_id: wang_2001_table1_sm_residue_concentration
+  field: starting_measured_ppm
+  value: '85.6'
+  locator:
+    page: 4
+    published_page: 482
+    pdf_page_index: 3
+    table: '1'
+    row: Starting comp.
+    column: b
+    note: Table 1 measured starting abundance in column b.
+- species: Eu
+  observable: residue_component_composition
+  observation_id: wang_2001_table1_eu_residue_concentration
+  field: starting_measured_ppm
+  value: '86.9'
+  locator:
+    page: 4
+    published_page: 482
+    pdf_page_index: 3
+    table: '1'
+    row: Starting comp.
+    column: b
+    note: Table 1 measured starting abundance in column b.
+- species: Gd
+  observable: residue_component_composition
+  observation_id: wang_2001_table1_gd_residue_concentration
+  field: starting_measured_ppm
+  value: '88.6'
+  locator:
+    page: 4
+    published_page: 482
+    pdf_page_index: 3
+    table: '1'
+    row: Starting comp.
+    column: b
+    note: Table 1 measured starting abundance in column b.
+- species: Tb
+  observable: residue_component_composition
+  observation_id: wang_2001_table1_tb_residue_concentration
+  field: starting_measured_ppm
+  value: '91.3'
+  locator:
+    page: 4
+    published_page: 482
+    pdf_page_index: 3
+    table: '1'
+    row: Starting comp.
+    column: b
+    note: Table 1 measured starting abundance in column b.
+- species: Dy
+  observable: residue_component_composition
+  observation_id: wang_2001_table1_dy_residue_concentration
+  field: starting_measured_ppm
+  value: '88.6'
+  locator:
+    page: 4
+    published_page: 482
+    pdf_page_index: 3
+    table: '1'
+    row: Starting comp.
+    column: b
+    note: Table 1 measured starting abundance in column b.
+- species: Ho
+  observable: residue_component_composition
+  observation_id: wang_2001_table1_ho_residue_concentration
+  field: starting_measured_ppm
+  value: '86.1'
+  locator:
+    page: 4
+    published_page: 482
+    pdf_page_index: 3
+    table: '1'
+    row: Starting comp.
+    column: b
+    note: Table 1 measured starting abundance in column b.
+- species: Er
+  observable: residue_component_composition
+  observation_id: wang_2001_table1_er_residue_concentration
+  field: starting_measured_ppm
+  value: '90.2'
+  locator:
+    page: 4
+    published_page: 482
+    pdf_page_index: 3
+    table: '1'
+    row: Starting comp.
+    column: b
+    note: Table 1 measured starting abundance in column b.
+- species: Tm
+  observable: residue_component_composition
+  observation_id: wang_2001_table1_tm_residue_concentration
+  field: starting_measured_ppm
+  value: '87.7'
+  locator:
+    page: 4
+    published_page: 482
+    pdf_page_index: 3
+    table: '1'
+    row: Starting comp.
+    column: b
+    note: Table 1 measured starting abundance in column b.
+- species: Yb
+  observable: residue_component_composition
+  observation_id: wang_2001_table1_yb_residue_concentration
+  field: starting_measured_ppm
+  value: '88.4'
+  locator:
+    page: 4
+    published_page: 482
+    pdf_page_index: 3
+    table: '1'
+    row: Starting comp.
+    column: b
+    note: Table 1 measured starting abundance in column b.
+- species: Lu
+  observable: residue_component_composition
+  observation_id: wang_2001_table1_lu_residue_concentration
+  field: starting_measured_ppm
+  value: '88.5'
+  locator:
+    page: 4
+    published_page: 482
+    pdf_page_index: 3
+    table: '1'
+    row: Starting comp.
+    column: b
+    note: Table 1 measured starting abundance in column b.
 species:
   SiO2:
     observations:
@@ -1375,9 +1557,6 @@ species:
         - sample: SC4
           formula: FeO
           sigma: '0.0'
-        - sample: SC4
-          formula: WO3
-          sigma: '0.000'
         - sample: SC6
           formula: Al2O3
           sigma: '0.0'
@@ -1451,13 +1630,11 @@ species:
             CaO: '0.13'
             TiO2: '0.010'
             FeO: '0.3'
-            WO3: '0.002'
           Al2O3_wt_pct: '2.28'
           SiO2_wt_pct: '35.1'
           CaO_wt_pct: '1.72'
           TiO2_wt_pct: '0.090'
           FeO_wt_pct: '36.7'
-          WO3_wt_pct: '0.010'
         - sample: SC11
           T_C: '1500'
           t_min: '0'
@@ -1522,13 +1699,11 @@ species:
             CaO: '0.55'
             TiO2: '0.022'
             FeO: '0.8'
-            WO3: '0.010'
           Al2O3_wt_pct: '2.51'
           SiO2_wt_pct: '34.6'
           CaO_wt_pct: '2.23'
           TiO2_wt_pct: '0.084'
           FeO_wt_pct: '34.9'
-          WO3_wt_pct: '0.201'
         - sample: SC5
           T_C: '1800'
           t_min: '0'
@@ -1593,13 +1768,11 @@ species:
             CaO: '0.01'
             TiO2: '0.018'
             FeO: '1.4'
-            WO3: '0.008'
           Al2O3_wt_pct: '3.26'
           SiO2_wt_pct: '36.1'
           CaO_wt_pct: '2.49'
           TiO2_wt_pct: '0.094'
           FeO_wt_pct: '34.0'
-          WO3_wt_pct: '0.096'
         - sample: SC13
           T_C: '1800'
           t_min: '7'
@@ -1664,13 +1837,11 @@ species:
             CaO: '0.17'
             TiO2: '0.007'
             FeO: '0.2'
-            WO3: '0.070'
           Al2O3_wt_pct: '3.61'
           SiO2_wt_pct: '40.1'
           CaO_wt_pct: '2.87'
           TiO2_wt_pct: '0.167'
           FeO_wt_pct: '24.1'
-          WO3_wt_pct: '0.729'
         - sample: SC8
           T_C: '2000'
           t_min: '0'
@@ -1735,13 +1906,11 @@ species:
             CaO: '0.15'
             TiO2: '0.011'
             FeO: '0.3'
-            WO3: '0.074'
           Al2O3_wt_pct: '3.95'
           SiO2_wt_pct: '40.3'
           CaO_wt_pct: '2.91'
           TiO2_wt_pct: '0.163'
           FeO_wt_pct: '18.2'
-          WO3_wt_pct: '0.592'
         - sample: SC4
           T_C: '1800'
           t_min: '15'
@@ -1810,7 +1979,6 @@ species:
           CaO_wt_pct: '3.70'
           TiO2_wt_pct: '0.202'
           FeO_wt_pct: '11.3'
-          WO3_wt_pct: '0.781'
         - sample: SC14
           T_C: '1800'
           t_min: '40'
@@ -1875,13 +2043,11 @@ species:
             CaO: '0.09'
             TiO2: '0.010'
             FeO: '0.033'
-            WO3: '0.030'
           Al2O3_wt_pct: '6.90'
           SiO2_wt_pct: '46.3'
           CaO_wt_pct: '5.29'
           TiO2_wt_pct: '0.286'
           FeO_wt_pct: '0.803'
-          WO3_wt_pct: '0.357'
         - sample: SC1
           T_C: '1800'
           t_min: '60'
@@ -1946,13 +2112,11 @@ species:
             CaO: '0.07'
             TiO2: '0.010'
             FeO: '0.014'
-            WO3: '0.007'
           Al2O3_wt_pct: '7.16'
           SiO2_wt_pct: '44.8'
           CaO_wt_pct: '5.20'
           TiO2_wt_pct: '0.270'
           FeO_wt_pct: '0.114'
-          WO3_wt_pct: '0.174'
         - sample: SC7
           T_C: '2000'
           t_min: '5'
@@ -2017,13 +2181,11 @@ species:
             CaO: '0.43'
             TiO2: '0.032'
             FeO: '0.009'
-            WO3: '0.006'
           Al2O3_wt_pct: '7.41'
           SiO2_wt_pct: '42.7'
           CaO_wt_pct: '5.31'
           TiO2_wt_pct: '0.264'
           FeO_wt_pct: '0.259'
-          WO3_wt_pct: '0.355'
         - sample: SC2
           T_C: '1800'
           t_min: '180'
@@ -2088,13 +2250,11 @@ species:
             CaO: '0.37'
             TiO2: '0.019'
             FeO: '0.023'
-            WO3: '0.013'
           Al2O3_wt_pct: '9.29'
           SiO2_wt_pct: '41.7'
           CaO_wt_pct: '6.41'
           TiO2_wt_pct: '0.302'
           FeO_wt_pct: '0.059'
-          WO3_wt_pct: '0.119'
         - sample: SC16
           T_C: '1800'
           t_min: '120'
@@ -2159,13 +2319,11 @@ species:
             CaO: '0.15'
             TiO2: '0.014'
             FeO: '0.016'
-            WO3: '0.006'
           Al2O3_wt_pct: '9.91'
           SiO2_wt_pct: '41.4'
           CaO_wt_pct: '7.27'
           TiO2_wt_pct: '0.365'
           FeO_wt_pct: '0.076'
-          WO3_wt_pct: '0.092'
         - sample: SC6
           T_C: '2000'
           t_min: '15'
@@ -2229,13 +2387,11 @@ species:
             CaO: '0.9'
             TiO2: '0.039'
             FeO: '0.027'
-            WO3: '0.017'
           Al2O3_wt_pct: '14.2'
           SiO2_wt_pct: '37.0'
           CaO_wt_pct: '11.1'
           TiO2_wt_pct: '0.462'
           FeO_wt_pct: '0.073'
-          WO3_wt_pct: '0.119'
         - sample: SC3
           T_C: '1800'
           t_min: '300'
@@ -2300,13 +2456,11 @@ species:
             CaO: '0.67'
             TiO2: '0.037'
             FeO: '0.030'
-            WO3: '0.002'
           Al2O3_wt_pct: '18.48'
           SiO2_wt_pct: '36.4'
           CaO_wt_pct: '13.39'
           TiO2_wt_pct: '0.493'
           FeO_wt_pct: '0.055'
-          WO3_wt_pct: '0.061'
         - sample: SC15
           T_C: '1800'
           t_min: '220'
@@ -2371,13 +2525,11 @@ species:
             CaO: '0.8'
             TiO2: '0.026'
             FeO: '0.0087'
-            WO3: '0.003'
           Al2O3_wt_pct: '21.1'
           SiO2_wt_pct: '34.9'
           CaO_wt_pct: '17.4'
           TiO2_wt_pct: '0.652'
           FeO_wt_pct: '0.0853'
-          WO3_wt_pct: '0.069'
         - sample: SC10
           T_C: '2000'
           t_min: '20'
@@ -2442,13 +2594,11 @@ species:
             CaO: '0.7'
             TiO2: '0.027'
             FeO: '0.020'
-            WO3: '0.011'
           Al2O3_wt_pct: '23.9'
           SiO2_wt_pct: '31.8'
           CaO_wt_pct: '17.1'
           TiO2_wt_pct: '0.647'
           FeO_wt_pct: '0.080'
-          WO3_wt_pct: '0.103'
         - sample: SC9
           T_C: '2000'
           t_min: '25'
@@ -2514,13 +2664,11 @@ species:
             CaO: '1.7'
             TiO2: '0.07'
             FeO: '0.016'
-            WO3: '0.010'
           Al2O3_wt_pct: '55.3'
           SiO2_wt_pct: '4.20'
           CaO_wt_pct: '36.4'
           TiO2_wt_pct: '1.11'
           FeO_wt_pct: '0.066'
-          WO3_wt_pct: '0.061'
     - observation_id: wang_2001_table2_sc1_mass_loss
       experiment: wang-2001-langmuir-residue-series
       type: rate_series
@@ -5197,6 +5345,7 @@ species:
         quantity: residue_component_composition
         method_class: measured_direct
         analyte: La
+        starting_measured_ppm: '87.1'
         series:
         - sample: SC12
           T_C: '1400'
@@ -6129,6 +6278,7 @@ species:
         quantity: residue_component_composition
         method_class: measured_direct
         analyte: Ce
+        starting_measured_ppm: '82.3'
         series:
         - sample: SC12
           T_C: '1400'
@@ -7061,6 +7211,7 @@ species:
         quantity: residue_component_composition
         method_class: measured_direct
         analyte: Pr
+        starting_measured_ppm: '85.1'
         series:
         - sample: SC12
           T_C: '1400'
@@ -7993,6 +8144,7 @@ species:
         quantity: residue_component_composition
         method_class: measured_direct
         analyte: Nd
+        starting_measured_ppm: '86.4'
         series:
         - sample: SC12
           T_C: '1400'
@@ -8924,6 +9076,7 @@ species:
         quantity: residue_component_composition
         method_class: measured_direct
         analyte: Sm
+        starting_measured_ppm: '85.6'
         series:
         - sample: SC12
           T_C: '1400'
@@ -9856,6 +10009,7 @@ species:
         quantity: residue_component_composition
         method_class: measured_direct
         analyte: Eu
+        starting_measured_ppm: '86.9'
         series:
         - sample: SC12
           T_C: '1400'
@@ -10788,6 +10942,7 @@ species:
         quantity: residue_component_composition
         method_class: measured_direct
         analyte: Gd
+        starting_measured_ppm: '88.6'
         series:
         - sample: SC12
           T_C: '1400'
@@ -11719,6 +11874,7 @@ species:
         quantity: residue_component_composition
         method_class: measured_direct
         analyte: Tb
+        starting_measured_ppm: '91.3'
         series:
         - sample: SC12
           T_C: '1400'
@@ -12651,6 +12807,7 @@ species:
         quantity: residue_component_composition
         method_class: measured_direct
         analyte: Dy
+        starting_measured_ppm: '88.6'
         series:
         - sample: SC12
           T_C: '1400'
@@ -13583,6 +13740,7 @@ species:
         quantity: residue_component_composition
         method_class: measured_direct
         analyte: Ho
+        starting_measured_ppm: '86.1'
         series:
         - sample: SC12
           T_C: '1400'
@@ -14515,6 +14673,7 @@ species:
         quantity: residue_component_composition
         method_class: measured_direct
         analyte: Er
+        starting_measured_ppm: '90.2'
         series:
         - sample: SC12
           T_C: '1400'
@@ -15446,6 +15605,7 @@ species:
         quantity: residue_component_composition
         method_class: measured_direct
         analyte: Tm
+        starting_measured_ppm: '87.7'
         series:
         - sample: SC12
           T_C: '1400'
@@ -16378,6 +16538,7 @@ species:
         quantity: residue_component_composition
         method_class: measured_direct
         analyte: Yb
+        starting_measured_ppm: '88.4'
         series:
         - sample: SC12
           T_C: '1400'
@@ -17310,6 +17471,7 @@ species:
         quantity: residue_component_composition
         method_class: measured_direct
         analyte: Lu
+        starting_measured_ppm: '88.5'
         series:
         - sample: SC12
           T_C: '1400'
@@ -23431,3 +23593,646 @@ species:
           data.
         method_class: measured_direct
         note: The source states an interference but gives no per-cell correction; values remain as printed.
+
+  W:
+    observations:
+    - observation_id: wang_2001_table1_ion_microprobe_wo3_conditions
+      experiment: wang-2001-langmuir-residue-series
+      type: composition_series
+      locator:
+        page: 4
+        published_page: 482
+        pdf_page_index: 3
+        table: '1'
+        column: WO3
+        note: Ion-microprobe WO3 residue values; treated as container or wire pickup, not evaporation.
+      phase: unknown
+      regime: langmuir_free_evaporation
+      units: wt%
+      admission_status: typed_refusal
+      refusal_reason: container_contamination_not_evaporation_observable
+      uncertainty:
+        confidence_level: one_sigma
+        note: “Uncertainties are ±1σ standard errors calculated from replicate analyses.”
+        locator:
+          page: 5
+          published_page: 483
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 footnote on replicate-analysis standard errors.
+        zero_width_cells:
+        - sample: SC4
+          formula: WO3
+          sigma: '0.000'
+      values:
+        quantity: residue_composition_vs_time
+        method_class: measured_direct
+        analytical_method: ion microprobe
+        system_class: silicate_melt
+        series:
+        - sample: SC12
+          T_C: '1400'
+          t_min: '0'
+          VF_wt_pct: '0.38'
+          locator:
+            page: 4
+            published_page: 482
+            pdf_page_index: 3
+            table: '1'
+            row: SC12
+            note: Table 1 measured residue composition; run temperature and duration are joined to this printed
+              sample ID from Table 2.
+            column: WO3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1673.15'
+              locator:
+                page: 6
+                published_page: 484
+                pdf_page_index: 5
+                table: '2'
+                row: SC12
+                note: Table 2 prints 1400 °C; temperature converted to kelvin.
+            time_min:
+              state:
+                tag: value
+                value: '0'
+              locator:
+                page: 6
+                published_page: 484
+                pdf_page_index: 5
+                table: '2'
+                row: SC12
+          WO3_wt_pct: '0.010'
+          standard_errors:
+            WO3: '0.002'
+        - sample: SC11
+          T_C: '1500'
+          t_min: '0'
+          VF_wt_pct: '3.43'
+          locator:
+            page: 4
+            published_page: 482
+            pdf_page_index: 3
+            table: '1'
+            row: SC11
+            note: Table 1 measured residue composition; run temperature and duration are joined to this printed
+              sample ID from Table 2.
+            column: WO3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '1773.15'
+              locator:
+                page: 6
+                published_page: 484
+                pdf_page_index: 5
+                table: '2'
+                row: SC11
+                note: Table 2 prints 1500 °C; temperature converted to kelvin.
+            time_min:
+              state:
+                tag: value
+                value: '0'
+              locator:
+                page: 6
+                published_page: 484
+                pdf_page_index: 5
+                table: '2'
+                row: SC11
+          WO3_wt_pct: '0.201'
+          standard_errors:
+            WO3: '0.010'
+        - sample: SC5
+          T_C: '1800'
+          t_min: '0'
+          VF_wt_pct: '7.58'
+          locator:
+            page: 4
+            published_page: 482
+            pdf_page_index: 3
+            table: '1'
+            row: SC5
+            note: Table 1 measured residue composition; run temperature and duration are joined to this printed
+              sample ID from Table 2.
+            column: WO3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2073.15'
+              locator:
+                page: 6
+                published_page: 484
+                pdf_page_index: 5
+                table: '2'
+                row: SC5
+                note: Table 2 prints 1800 °C; temperature converted to kelvin.
+            time_min:
+              state:
+                tag: value
+                value: '0'
+              locator:
+                page: 6
+                published_page: 484
+                pdf_page_index: 5
+                table: '2'
+                row: SC5
+          WO3_wt_pct: '0.096'
+          standard_errors:
+            WO3: '0.008'
+        - sample: SC13
+          T_C: '1800'
+          t_min: '7'
+          VF_wt_pct: '21.80'
+          locator:
+            page: 4
+            published_page: 482
+            pdf_page_index: 3
+            table: '1'
+            row: SC13
+            note: Table 1 measured residue composition; run temperature and duration are joined to this printed
+              sample ID from Table 2.
+            column: WO3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2073.15'
+              locator:
+                page: 6
+                published_page: 484
+                pdf_page_index: 5
+                table: '2'
+                row: SC13
+                note: Table 2 prints 1800 °C; temperature converted to kelvin.
+            time_min:
+              state:
+                tag: value
+                value: '7'
+              locator:
+                page: 6
+                published_page: 484
+                pdf_page_index: 5
+                table: '2'
+                row: SC13
+          WO3_wt_pct: '0.729'
+          standard_errors:
+            WO3: '0.070'
+        - sample: SC8
+          T_C: '2000'
+          t_min: '0'
+          VF_wt_pct: '32.15'
+          locator:
+            page: 4
+            published_page: 482
+            pdf_page_index: 3
+            table: '1'
+            row: SC8
+            note: Table 1 measured residue composition; run temperature and duration are joined to this printed
+              sample ID from Table 2.
+            column: WO3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2273.15'
+              locator:
+                page: 6
+                published_page: 484
+                pdf_page_index: 5
+                table: '2'
+                row: SC8
+                note: Table 2 prints 2000 °C; temperature converted to kelvin.
+            time_min:
+              state:
+                tag: value
+                value: '0'
+              locator:
+                page: 6
+                published_page: 484
+                pdf_page_index: 5
+                table: '2'
+                row: SC8
+          WO3_wt_pct: '0.592'
+          standard_errors:
+            WO3: '0.074'
+        - sample: SC4
+          T_C: '1800'
+          t_min: '15'
+          VF_wt_pct: '36.68'
+          locator:
+            page: 4
+            published_page: 482
+            pdf_page_index: 3
+            table: '1'
+            row: SC4
+            note: Table 1 measured residue composition; run temperature and duration are joined to this printed
+              sample ID from Table 2.
+            column: WO3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2073.15'
+              locator:
+                page: 6
+                published_page: 484
+                pdf_page_index: 5
+                table: '2'
+                row: SC4
+                note: Table 2 prints 1800 °C; temperature converted to kelvin.
+            time_min:
+              state:
+                tag: value
+                value: '15'
+              locator:
+                page: 6
+                published_page: 484
+                pdf_page_index: 5
+                table: '2'
+                row: SC4
+          WO3_wt_pct: '0.781'
+        - sample: SC14
+          T_C: '1800'
+          t_min: '40'
+          VF_wt_pct: '52.54'
+          locator:
+            page: 4
+            published_page: 482
+            pdf_page_index: 3
+            table: '1'
+            row: SC14
+            note: Table 1 measured residue composition; run temperature and duration are joined to this printed
+              sample ID from Table 2.
+            column: WO3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2073.15'
+              locator:
+                page: 6
+                published_page: 484
+                pdf_page_index: 5
+                table: '2'
+                row: SC14
+                note: Table 2 prints 1800 °C; temperature converted to kelvin.
+            time_min:
+              state:
+                tag: value
+                value: '40'
+              locator:
+                page: 6
+                published_page: 484
+                pdf_page_index: 5
+                table: '2'
+                row: SC14
+          WO3_wt_pct: '0.357'
+          standard_errors:
+            WO3: '0.030'
+        - sample: SC1
+          T_C: '1800'
+          t_min: '60'
+          VF_wt_pct: '57.35'
+          locator:
+            page: 4
+            published_page: 482
+            pdf_page_index: 3
+            table: '1'
+            row: SC1
+            note: Table 1 measured residue composition; run temperature and duration are joined to this printed
+              sample ID from Table 2.
+            column: WO3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2073.15'
+              locator:
+                page: 6
+                published_page: 484
+                pdf_page_index: 5
+                table: '2'
+                row: SC1
+                note: Table 2 prints 1800 °C; temperature converted to kelvin.
+            time_min:
+              state:
+                tag: value
+                value: '60'
+              locator:
+                page: 6
+                published_page: 484
+                pdf_page_index: 5
+                table: '2'
+                row: SC1
+          WO3_wt_pct: '0.174'
+          standard_errors:
+            WO3: '0.007'
+        - sample: SC7
+          T_C: '2000'
+          t_min: '5'
+          VF_wt_pct: '60.38'
+          locator:
+            page: 5
+            published_page: 483
+            pdf_page_index: 4
+            table: '1'
+            row: SC7
+            note: Table 1 measured residue composition; run temperature and duration are joined to this printed
+              sample ID from Table 2.
+            column: WO3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2273.15'
+              locator:
+                page: 6
+                published_page: 484
+                pdf_page_index: 5
+                table: '2'
+                row: SC7
+                note: Table 2 prints 2000 °C; temperature converted to kelvin.
+            time_min:
+              state:
+                tag: value
+                value: '5'
+              locator:
+                page: 6
+                published_page: 484
+                pdf_page_index: 5
+                table: '2'
+                row: SC7
+          WO3_wt_pct: '0.355'
+          standard_errors:
+            WO3: '0.006'
+        - sample: SC2
+          T_C: '1800'
+          t_min: '180'
+          VF_wt_pct: '69.17'
+          locator:
+            page: 5
+            published_page: 483
+            pdf_page_index: 4
+            table: '1'
+            row: SC2
+            note: Table 1 measured residue composition; run temperature and duration are joined to this printed
+              sample ID from Table 2.
+            column: WO3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2073.15'
+              locator:
+                page: 6
+                published_page: 484
+                pdf_page_index: 5
+                table: '2'
+                row: SC2
+                note: Table 2 prints 1800 °C; temperature converted to kelvin.
+            time_min:
+              state:
+                tag: value
+                value: '180'
+              locator:
+                page: 6
+                published_page: 484
+                pdf_page_index: 5
+                table: '2'
+                row: SC2
+          WO3_wt_pct: '0.119'
+          standard_errors:
+            WO3: '0.013'
+        - sample: SC16
+          T_C: '1800'
+          t_min: '120'
+          VF_wt_pct: '72.06'
+          locator:
+            page: 5
+            published_page: 483
+            pdf_page_index: 4
+            table: '1'
+            row: SC16
+            note: Table 1 measured residue composition; run temperature and duration are joined to this printed
+              sample ID from Table 2.
+            column: WO3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2073.15'
+              locator:
+                page: 6
+                published_page: 484
+                pdf_page_index: 5
+                table: '2'
+                row: SC16
+                note: Table 2 prints 1800 °C; temperature converted to kelvin.
+            time_min:
+              state:
+                tag: value
+                value: '120'
+              locator:
+                page: 6
+                published_page: 484
+                pdf_page_index: 5
+                table: '2'
+                row: SC16
+          WO3_wt_pct: '0.092'
+          standard_errors:
+            WO3: '0.006'
+        - sample: SC6
+          T_C: '2000'
+          t_min: '15'
+          VF_wt_pct: '82.91'
+          locator:
+            page: 5
+            published_page: 483
+            pdf_page_index: 4
+            table: '1'
+            row: SC6
+            note: Table 1 measured residue composition; run temperature and duration are joined to this printed
+              sample ID from Table 2.
+            column: WO3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2273.15'
+              locator:
+                page: 6
+                published_page: 484
+                pdf_page_index: 5
+                table: '2'
+                row: SC6
+                note: Table 2 prints 2000 °C; temperature converted to kelvin.
+            time_min:
+              state:
+                tag: value
+                value: '15'
+              locator:
+                page: 6
+                published_page: 484
+                pdf_page_index: 5
+                table: '2'
+                row: SC6
+          WO3_wt_pct: '0.119'
+          standard_errors:
+            WO3: '0.017'
+        - sample: SC3
+          T_C: '1800'
+          t_min: '300'
+          VF_wt_pct: '86.34'
+          locator:
+            page: 5
+            published_page: 483
+            pdf_page_index: 4
+            table: '1'
+            row: SC3
+            note: Table 1 measured residue composition; run temperature and duration are joined to this printed
+              sample ID from Table 2.
+            column: WO3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2073.15'
+              locator:
+                page: 6
+                published_page: 484
+                pdf_page_index: 5
+                table: '2'
+                row: SC3
+                note: Table 2 prints 1800 °C; temperature converted to kelvin.
+            time_min:
+              state:
+                tag: value
+                value: '300'
+              locator:
+                page: 6
+                published_page: 484
+                pdf_page_index: 5
+                table: '2'
+                row: SC3
+          WO3_wt_pct: '0.061'
+          standard_errors:
+            WO3: '0.002'
+        - sample: SC15
+          T_C: '1800'
+          t_min: '220'
+          VF_wt_pct: '88.59'
+          locator:
+            page: 5
+            published_page: 483
+            pdf_page_index: 4
+            table: '1'
+            row: SC15
+            note: Table 1 measured residue composition; run temperature and duration are joined to this printed
+              sample ID from Table 2.
+            column: WO3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2073.15'
+              locator:
+                page: 6
+                published_page: 484
+                pdf_page_index: 5
+                table: '2'
+                row: SC15
+                note: Table 2 prints 1800 °C; temperature converted to kelvin.
+            time_min:
+              state:
+                tag: value
+                value: '220'
+              locator:
+                page: 6
+                published_page: 484
+                pdf_page_index: 5
+                table: '2'
+                row: SC15
+          WO3_wt_pct: '0.069'
+          standard_errors:
+            WO3: '0.003'
+        - sample: SC10
+          T_C: '2000'
+          t_min: '20'
+          VF_wt_pct: '89.61'
+          locator:
+            page: 5
+            published_page: 483
+            pdf_page_index: 4
+            table: '1'
+            row: SC10
+            note: Table 1 measured residue composition; run temperature and duration are joined to this printed
+              sample ID from Table 2.
+            column: WO3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2273.15'
+              locator:
+                page: 6
+                published_page: 484
+                pdf_page_index: 5
+                table: '2'
+                row: SC10
+                note: Table 2 prints 2000 °C; temperature converted to kelvin.
+            time_min:
+              state:
+                tag: value
+                value: '20'
+              locator:
+                page: 6
+                published_page: 484
+                pdf_page_index: 5
+                table: '2'
+                row: SC10
+          WO3_wt_pct: '0.103'
+          standard_errors:
+            WO3: '0.011'
+        - sample: SC9
+          T_C: '2000'
+          t_min: '25'
+          VF_wt_pct: '95.36'
+          locator:
+            page: 5
+            published_page: 483
+            pdf_page_index: 4
+            table: '1'
+            row: SC9
+            note: Table 1 measured residue composition; run temperature and duration are joined to this printed
+              sample ID from Table 2.
+            column: WO3
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: '2273.15'
+              locator:
+                page: 6
+                published_page: 484
+                pdf_page_index: 5
+                table: '2'
+                row: SC9
+                note: Table 2 prints 2000 °C; temperature converted to kelvin.
+            time_min:
+              state:
+                tag: value
+                value: '25'
+              locator:
+                page: 6
+                published_page: 484
+                pdf_page_index: 5
+                table: '2'
+                row: SC9
+          WO3_wt_pct: '0.061'
+          standard_errors:
+            WO3: '0.010'

@@ -17929,6 +17929,7 @@ def _langmuir_residue_prediction(
     experiment = context.experiments.get(reference.experiment_id)
     channel = ENGINE_CHANNELS[engine]
     sources = ENGINE_COEFFICIENT_SOURCES[engine]
+    formula = reference.identity.species.formula
     cache_locator = (
         f"{getattr(reference.locator, 'table', None)}:"
         f"{getattr(reference.locator, 'note', None)}"
@@ -17956,9 +17957,18 @@ def _langmuir_residue_prediction(
                 _residue_prediction_cache_entry(
                     cache, cache_source_id, engine, value=result
                 )
-        formula = reference.identity.species.formula
         value = result["composition_wt_pct"].get(formula)
         if value is None:
+            subtype = reference.identity.subtype
+            if (
+                reference.source_id == _WANG_2001_SOURCE_ID
+                and subtype is not None
+                and subtype.is_value
+                and subtype.value == "element_ppm_by_mass"
+            ):
+                raise ResidueInventoryRefusal(
+                    "awaits_ree_channels_sossipar"
+                )
             raise ResidueInventoryRefusal("channel_missing", formula)
         provenance = {key: item for key, item in result.items() if key != "notices"}
         return EnginePrediction(
@@ -17977,6 +17987,33 @@ def _langmuir_residue_prediction(
             refusal_detail=provenance,
         )
     except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
+        notices = getattr(exc, "notices", ())
+        if (
+            isinstance(exc, ResidueInventoryRefusal)
+            and exc.reason == "awaits_ree_channels_sossipar"
+            and formula in {"Ce", "Eu"}
+        ):
+            valence_alternative = (
+                "Ce4+ as CeO2 may apply"
+                if formula == "Ce"
+                else "Eu2+ as EuO may apply at low fO2"
+            )
+            notices = (
+                *notices,
+                Notice(
+                    kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                    affected_quantities=(
+                        Quantity.RESIDUE_COMPONENT_COMPOSITION,
+                    ),
+                    reason=(
+                        "initial_oxide_valence_choice: trivalent Ln2O3 is the "
+                        "selected runtime convention; "
+                        f"{valence_alternative}; the source does not print "
+                        "this valence"
+                    ),
+                    origin=reference.observation_id,
+                ),
+            )
         return EnginePrediction(
             engine=engine,
             channel=channel,
@@ -17988,7 +18025,7 @@ def _langmuir_residue_prediction(
                 )
             ),
             coefficient_sources=sources,
-            notices=getattr(exc, "notices", ()),
+            notices=notices,
             lineage_complete=False,
             refusal_reason=(
                 RefusalReason.ATTEMPTED_UNAVAILABLE
