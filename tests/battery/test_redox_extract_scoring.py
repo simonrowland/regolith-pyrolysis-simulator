@@ -396,9 +396,9 @@ def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
         separators=(",", ":"),
         ensure_ascii=False,
     ).encode()
-    # Provisional pin; regenerate at the final integration pin.
+    # Regenerated at OpenIMCC chemistry v4 on the final integration stack.
     assert hashlib.sha256(encoded).hexdigest() == (
-        "cdbef7d7303e5c0dea58ff312dbdfa59dcaff988cb5417b1a11db2d825cea011"
+        "a3f1a432d953ba786e7cad4e212ce60e194f1d51e298bb8dffd5bbd270dbc292"
     )
     for backlog in (
         score_module.notice_backlog(residuals),
@@ -1989,6 +1989,13 @@ def test_kress_table1_redox_rows_score_at_ambient_furnace_pressure():
     for row in redox_rows:
         assert row.identity.total_pressure_Pa.is_value
         assert row.identity.total_pressure_Pa.value == Decimal("101325")
+        assert row.identity.temperature_K.is_value
+        assert row.identity.composition is not None
+        assert row.identity.composition.is_value
+        row_composition = (row.point_conditions or {}).get("composition")
+        assert row_composition is not None and row_composition.state.is_value
+        row_fugacity = (row.point_conditions or {}).get("fO2_log")
+        assert row_fugacity is not None and row_fugacity.state.is_value
         ambient = [
             notice
             for notice in row.notices
