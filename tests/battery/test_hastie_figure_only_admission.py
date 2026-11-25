@@ -197,7 +197,7 @@ def test_hastie_figure_rows_without_supported_inputs_keep_typed_refusals(
             assert prediction.refusal_detail["reason"] == "quantity_unknown"
 
 
-def test_hastie_mixed_kms_regime_defaults_without_method_refusal(
+def test_hastie_unknown_kms_regime_rows_still_refuse_with_their_reason(
     tmp_path,
 ) -> None:
     works, experiments, observations = _hastie_store(tmp_path)
@@ -206,12 +206,9 @@ def test_hastie_mixed_kms_regime_defaults_without_method_refusal(
         for row in observations.values()
         if row.source_id == SOURCE_ID
         and quantity_token(row.identity) is Quantity.ACTIVITY_COEFFICIENT
-        and any(
-            notice.kind is NoticeKind.METHOD_UNSTATED
-            and "original_reason=source method text is not mapped: mixed_kms_tms"
-            in notice.reason
-            for notice in row.notices
-        )
+        and experiments[row.experiment_id].method.is_value
+        and experiments[row.experiment_id].method.value
+        is MethodToken.KNUDSEN_EFFUSION
     )
     assert len(rows) == 18
     context = ScoreContext(
@@ -224,19 +221,14 @@ def test_hastie_mixed_kms_regime_defaults_without_method_refusal(
 
     for row in rows:
         experiment = experiments[row.experiment_id]
-        assert experiment.method == State.of(MethodToken.UNSPECIFIED)
-        assert any(
-            notice.kind is NoticeKind.METHOD_UNSTATED for notice in row.notices
-        )
         gates = run_validity_gates(
             experiment,
             row,
             point_observations=tuple(observations.values()),
         )
-        assert gates.reason not in {
-            RefusalReason.METHOD_UNKNOWN,
-            RefusalReason.EFFUSION_REGIME_UNVERIFIED,
-        }
+        assert not gates.passed
+        assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+        assert gates.primary_check == "in_cell_partial_pressure_sum"
         for engine in SCORING_ENGINES:
             residual, _candidate = compile_residual(
                 row,
@@ -244,10 +236,9 @@ def test_hastie_mixed_kms_regime_defaults_without_method_refusal(
                 context=context,
                 point_observations=tuple(observations.values()),
             )
-            assert residual.refusal is None or residual.refusal.reason not in {
-                RefusalReason.METHOD_UNKNOWN,
-                RefusalReason.EFFUSION_REGIME_UNVERIFIED,
-            }
+            assert residual.numeric is None
+            assert residual.refusal is not None
+            assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
 
 
 def test_hastie_fig5_points_use_the_printed_initial_glass_proxy(tmp_path) -> None:

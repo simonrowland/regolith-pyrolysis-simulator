@@ -13763,6 +13763,46 @@ def _method_inference_from_evidence(
     return None
 
 
+# Figure-series labels b274 leaves on a registered knudsen-effusion experiment.
+# They are not a second technique and must not conflict-split that experiment.
+_HASTIE_KNUDSEN_FIGURE_REGIMES = frozenset(
+    {
+        "mixed_kms_tms",
+        "knudsen_mass_spectrometry",
+    }
+)
+
+
+def _row_text_inherits_declared_method(
+    method_raw: str | None,
+    declared: State[MethodToken] | None,
+    *,
+    printed_only: bool,
+) -> bool:
+    """Whether row text keeps the registered experiment method.
+
+    A method_as_printed sentence that did not map or infer is the
+    registered experiment's description (Guo Table 5 quench_equilibration),
+    not a second technique. A regime or method claim still resolves on its
+    own. The Hastie figure-series regimes inherit knudsen_effusion when the
+    experiment already registers it.
+    """
+
+    if (
+        declared is None
+        or not declared.is_value
+        or declared.value is MethodToken.UNSPECIFIED
+        or not method_raw
+    ):
+        return False
+    if (
+        method_raw in _HASTIE_KNUDSEN_FIGURE_REGIMES
+        and declared.value is MethodToken.KNUDSEN_EFFUSION
+    ):
+        return True
+    return printed_only
+
+
 def _method_inference_notice(
     method: MethodToken,
     evidence: str,
@@ -25955,6 +25995,7 @@ class Migrator:
         experiment_id: str,
         method: State[MethodToken],
         method_raw_candidates: tuple[object, ...],
+        printed_method_candidates: tuple[object, ...] = (),
         method_evidence_candidates: tuple[object, ...],
         evidence_candidates: tuple[object, ...],
         quantity: Quantity | None,
@@ -25964,7 +26005,7 @@ class Migrator:
         declared_experiment_method = self._declared_experiment_methods.get(
             experiment_id
         )
-        method_raw = next(
+        claim_raw = next(
             (
                 text
                 for candidate in method_raw_candidates
@@ -25972,11 +26013,24 @@ class Migrator:
             ),
             None,
         )
+        printed_raw = next(
+            (
+                text
+                for candidate in printed_method_candidates
+                if (text := _method_text_value(candidate)) is not None
+            ),
+            None,
+        )
+        # A printed description is the method claim only when the row has no
+        # regime or method of its own. Callers pass both; this owner decides.
+        method_raw = claim_raw if claim_raw is not None else printed_raw
+        printed_only = claim_raw is None and printed_raw is not None
         method_source_text = next(
             (
                 text
                 for candidate in (
                     *method_raw_candidates,
+                    *printed_method_candidates,
                     *method_evidence_candidates,
                     *evidence_candidates,
                 )
@@ -26036,6 +26090,15 @@ class Migrator:
                     original_reason,
                 )
                 method = State.of(method_token)
+            elif _row_text_inherits_declared_method(
+                method_raw,
+                declared_experiment_method,
+                printed_only=printed_only,
+            ):
+                # Unmapped method_as_printed prose, and the Hastie figure-series
+                # regimes b274 keeps on knudsen effusion, are not a second technique.
+                method = declared_experiment_method
+                method_was_unspecified = False
             elif method_source_text is not None and method.is_unknown:
                 method = State.unknown(
                     f"source method text is not mapped: {method_source_text}"
@@ -26046,17 +26109,29 @@ class Migrator:
                 # state's reason in the DP-106 notice instead of queueing it.
                 method_was_unspecified = True
         if method_was_unspecified:
-            original_reason = (
-                method.reason
-                or (
-                    self._unstated_method_original_reason_by_experiment.get(
-                        experiment_id
-                    )
-                    if method_raw is None and method_source_text is None
-                    else None
+            cached_reason = (
+                self._unstated_method_original_reason_by_experiment.get(
+                    experiment_id
                 )
-                or "source does not state method"
+                if method_raw is None and method_source_text is None
+                else None
             )
+            if method.reason:
+                original_reason = method.reason
+            elif cached_reason:
+                original_reason = cached_reason
+            elif (
+                observation_id in self.result.observations
+                and method_raw is None
+                and method_source_text is None
+            ):
+                # The first copy cached the original reason. Losing that cache
+                # must change this copy's payload so the duplicate guard fires.
+                original_reason = (
+                    "source does not state method; original method reason lost"
+                )
+            else:
+                original_reason = "source does not state method"
             if method.is_unknown:
                 self._unstated_method_original_reason_by_experiment.setdefault(
                     experiment_id, original_reason
@@ -28890,17 +28965,19 @@ class Migrator:
         method_raw_candidates = (
             obs.get("regime"),
             obs.get("method"),
-            obs.get("method_as_printed"),
             obs.get("measured_by_as_printed"),
             obs.get("method_text"),
             obs.get("analytical_method"),
             obs.get("method_detail_as_printed"),
             values.get("method"),
-            values.get("method_as_printed"),
             values.get("measured_by_as_printed"),
             values.get("method_text"),
             values.get("analytical_method"),
             values.get("method_detail_as_printed"),
+        )
+        printed_method_candidates = (
+            obs.get("method_as_printed"),
+            values.get("method_as_printed"),
         )
         method_evidence_candidates = (
             *derivation_method_candidates,
@@ -28913,6 +28990,7 @@ class Migrator:
             experiment_id=experiment_id,
             method=method,
             method_raw_candidates=method_raw_candidates,
+            printed_method_candidates=printed_method_candidates,
             method_evidence_candidates=method_evidence_candidates,
             evidence_candidates=(
                 obs.get("method_as_printed"),
