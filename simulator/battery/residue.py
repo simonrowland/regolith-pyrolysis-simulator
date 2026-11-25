@@ -1429,8 +1429,9 @@ def _analytical_handoff_fields(
     Mapping[str, object] | None,
     dict[str, float] | None,
     float | None,
+    float | None,
 ]:
-    """Read the activity and fO2 fields an analytical vapour response already carries.
+    """Read the activity, fO2, and phase fields a vapour response already carries.
 
     The pressure model is the second caller. This reader does not recompute them.
     """
@@ -1458,24 +1459,39 @@ def _analytical_handoff_fields(
     ):
         extra_fo2 = {"vapour": float(vapour_fo2)}
     liquid = getattr(response, "liquid_fraction", None)
-    return producer_state, consumer_state, extra_fo2, liquid
+    solid = getattr(response, "solid_fraction", None)
+    if (
+        isinstance(solid, bool)
+        or not isinstance(solid, (int, float))
+        or not math.isfinite(float(solid))
+    ):
+        solid = None
+    else:
+        solid = float(solid)
+    return producer_state, consumer_state, extra_fo2, liquid, solid
 
 
 def _record_residue_handoff(
     bucket: list[Any],
     decision: Any,
     *,
-    producer_inventory: Mapping[str, float],
-    consumer_inventory: Mapping[str, float],
     log10_pO2_bar: float,
     temperature_K: float,
     producer_standard_state: Mapping[str, object] | None,
     consumer_standard_state: Mapping[str, object] | None,
+    producer_inventory: Mapping[str, float] | None = None,
+    consumer_inventory: Mapping[str, float] | None = None,
     fo2_log10_by_role: Mapping[str, float] | None = None,
     liquid_fraction: float | None = None,
     solid_fraction: float | None = None,
 ) -> None:
-    """Append handoff findings. The inventories and pressures are not changed."""
+    """Append handoff findings. Callers pass only a crossing that exists.
+
+    Oxide moles are passed only when the activity role handed the vapour
+    role a different inventory. Activity values are not moles, and the same
+    inventory on both sides is not a crossing. ``solid_fraction`` is passed
+    only when the response carries one. Pressures are not an input.
+    """
 
     from simulator.battery.enums import NoticeKind, Quantity
     from simulator.battery.records import Notice
@@ -1519,6 +1535,7 @@ def _residue_role_decision(
         return None
     from engines.builtin.vapor_pressure import BUILTIN_VAPOUR_CHANNEL_SWITCH_K
     from simulator.chemistry.role_engines import RoleEngineRefusal, resolve_role_engines
+    from simulator.melt_backend import openimcc_bridge
 
     try:
         return resolve_role_engines(
@@ -1531,9 +1548,35 @@ def _residue_role_decision(
             surface="residue",
             engine_argument=engine,
             evaluate="all",
+            load_activity_domain_low_K=lambda: openimcc_bridge._temperature_domain_K()[0],
         )
     except RoleEngineRefusal as exc:
         raise ResidueInventoryRefusal(exc.code, exc.detail) from exc
+
+
+def _apply_analytical_core_pin(
+    analytical_core: Any,
+    decision: Any,
+    role_override: Mapping[str, str] | None,
+) -> None:
+    """Copy pinned melt and vapour tokens onto the analytical core.
+
+    Phase and redox stay off the core. The run-surface gate refuses residue
+    redox ``source_oxygen``. A phase-only pin leaves the core attributes unset,
+    so the provider's own gate still selects melt and vapour.
+    """
+
+    if decision is None or not role_override:
+        return
+    provider_override = {
+        role: role_override[role]
+        for role in ("melt_activity", "vapour")
+        if role in role_override
+    }
+    if "melt_activity" in role_override:
+        analytical_core._high_t_melt_activity = decision.melt_activity
+    if provider_override:
+        analytical_core._role_engine_override = provider_override
 
 
 def _make_residue_pressure_model(
@@ -1635,15 +1678,11 @@ def _make_residue_pressure_model(
                 for species, _reaction in gas_channels
             }
             if decision is not None:
+                # evaluate_gas consumes parent activities, not a second mole
+                # inventory. The bridge result has no solid fraction.
                 _record_residue_handoff(
                     handoff_bucket,
                     decision,
-                    producer_inventory=inventory,
-                    consumer_inventory={
-                        str(oxide): float(amount)
-                        for oxide, amount in inventory.items()
-                        if float(amount) > 0.0
-                    },
                     log10_pO2_bar=float(log10_pO2_bar),
                     temperature_K=temperature_K,
                     producer_standard_state=None,
@@ -1670,16 +1709,7 @@ def _make_residue_pressure_model(
         from simulator.vapour_rail.nasa_cea import NasaCeaError
 
         analytical_core = _new_internal_analytical_core()
-        if decision is not None and role_override:
-            provider_override = {
-                role: role_override[role]
-                for role in ("melt_activity", "vapour")
-                if role in role_override
-            }
-            if "melt_activity" in role_override:
-                analytical_core._high_t_melt_activity = decision.melt_activity
-            if provider_override:
-                analytical_core._role_engine_override = provider_override
+        _apply_analytical_core_pin(analytical_core, decision, role_override)
         accepted_diagnostics_by_logp: dict[
             float, tuple[dict[str, object], ...]
         ] = {}
@@ -1799,20 +1829,23 @@ def _make_residue_pressure_model(
                 for species, _reaction in gas_channels
             }
             if decision is not None:
-                producer_state, consumer_state, extra_fo2, liquid_fraction = (
-                    _analytical_handoff_fields(response)
-                )
+                (
+                    producer_state,
+                    consumer_state,
+                    extra_fo2,
+                    liquid_fraction,
+                    solid_fraction,
+                ) = _analytical_handoff_fields(response)
                 _record_residue_handoff(
                     handoff_bucket,
                     decision,
-                    producer_inventory=inventory,
-                    consumer_inventory=inventory,
                     log10_pO2_bar=float(log10_pO2_bar),
                     temperature_K=temperature_K,
                     producer_standard_state=producer_state,
                     consumer_standard_state=consumer_state,
                     fo2_log10_by_role=extra_fo2,
                     liquid_fraction=liquid_fraction,
+                    solid_fraction=solid_fraction,
                 )
             return reported
 
@@ -3964,13 +3997,21 @@ def _predict_sossi_residue_cohort(
     """Predict Sossi Mn/Ti with the shared buffered inventory integrator."""
     if engine not in {"openimcc", "internal-analytical"}:
         raise ResidueInventoryRefusal("sossi_engine_unsupported", engine)
-    # Residue role defaults do not read temperature. One decision selects the
-    # gas pack for the whole cohort. Without a pin, vapour_engine is engine.
+    # Without a pin, vapour_engine stays the engine argument. A pin's vapour
+    # and melt tokens follow the builtin gate at each row's temperature.
     vapour_engine = engine
     sossi_decision = None
     if role_override:
-        sossi_decision = _residue_role_decision(engine, 1.0, role_override)
-        vapour_engine = sossi_decision.vapour
+        from simulator.chemistry.role_engines import (
+            RoleEngineRefusal,
+            _clean_override,
+            _require_override_engines,
+        )
+
+        try:
+            _require_override_engines("residue", _clean_override(role_override))
+        except RoleEngineRefusal as exc:
+            raise ResidueInventoryRefusal(exc.code, exc.detail) from exc
 
     def _pin_provenance(notices: list[Any]) -> dict[str, Any]:
         if sossi_decision is None:
@@ -4004,14 +4045,23 @@ def _predict_sossi_residue_cohort(
             "selected runs must be a non-empty subset of the supplied experiments",
         )
     engine_binding_identity: dict[str, str] | None = None
-    if vapour_engine == "openimcc":
+    gas_pack = None
+    omissions = ()
+    gas_channels: list[Any] = []
+    openimcc_bridge: Any = None
+    imcc_nonconvergence_error: type[BaseException] | None = None
+
+    def _load_sossi_openimcc_gas() -> None:
+        nonlocal gas_pack, omissions, gas_channels, engine_binding_identity
+        nonlocal imcc_nonconvergence_error, openimcc_bridge
         try:
-            import openimcc
             from openimcc import load_gas_datapack
             from openimcc.kernel import ImccNonconvergenceError
-            from simulator.melt_backend import openimcc_bridge
+            from simulator.melt_backend import openimcc_bridge as loaded_bridge
         except ImportError as exc:
             raise ResidueInventoryRefusal("openimcc_not_importable", str(exc)) from exc
+        imcc_nonconvergence_error = ImccNonconvergenceError
+        openimcc_bridge = loaded_bridge
         gas_pack = load_gas_datapack()
         engine_binding_identity = openimcc_bridge.engine_binding_identity(
             openimcc_bridge._load_pack(
@@ -4027,10 +4077,9 @@ def _predict_sossi_residue_cohort(
             for species, reaction in raw_gas_channels
             if str(reaction[0]) in set(_SOSSI_TRACE_PARENTS.values())
         ]
-    else:
-        gas_pack = None
-        omissions = ()
-        gas_channels = []
+
+    if not role_override and engine == "openimcc":
+        _load_sossi_openimcc_gas()
 
     prediction_rows: list[_SossiResiduePrediction] = []
     for experiment in experiments:
@@ -4049,6 +4098,11 @@ def _predict_sossi_residue_cohort(
         temperature_K = _hashimoto_point_value(
             setpoints[0].get("temperature_K", {})
         )
+        if role_override:
+            sossi_decision = _residue_role_decision(engine, temperature_K, role_override)
+            vapour_engine = sossi_decision.vapour
+            if vapour_engine == "openimcc" and gas_pack is None:
+                _load_sossi_openimcc_gas()
         duration_s = _hashimoto_point_value(
             schedule.get("total_duration_s", {})
         )
@@ -4159,7 +4213,7 @@ def _predict_sossi_residue_cohort(
                             allow_extrapolation=True,
                             allow_out_of_envelope=True,
                         )
-                    except ImccNonconvergenceError as exc:
+                    except imcc_nonconvergence_error as exc:
                         raise ResidueEngineNonconvergence("openimcc", str(exc)) from exc
                     except TimeoutError as exc:
                         raise ResidueEngineNonconvergence(
@@ -4243,12 +4297,6 @@ def _predict_sossi_residue_cohort(
                     _record_residue_handoff(
                         handoff_bucket,
                         sossi_decision,
-                        producer_inventory=composition,
-                        consumer_inventory={
-                            str(oxide): float(amount)
-                            for oxide, amount in composition.items()
-                            if float(amount) > 0.0
-                        },
                         log10_pO2_bar=float(log10_pO2_bar),
                         temperature_K=temperature_K,
                         producer_standard_state=None,
@@ -4264,16 +4312,7 @@ def _predict_sossi_residue_cohort(
             )
 
             analytical_core = _new_internal_analytical_core()
-            if sossi_decision is not None and role_override:
-                provider_override = {
-                    role: role_override[role]
-                    for role in ("melt_activity", "vapour")
-                    if role in role_override
-                }
-                if "melt_activity" in role_override:
-                    analytical_core._high_t_melt_activity = sossi_decision.melt_activity
-                if provider_override:
-                    analytical_core._role_engine_override = provider_override
+            _apply_analytical_core_pin(analytical_core, sossi_decision, role_override)
 
             def pressure_model(
                 composition: Mapping[str, float], log10_pO2_bar: float
@@ -4293,20 +4332,23 @@ def _predict_sossi_residue_cohort(
                 )
                 pressures = response.vapor_pressures_Pa
                 if sossi_decision is not None:
-                    producer_state, consumer_state, extra_fo2, liquid_fraction = (
-                        _analytical_handoff_fields(response)
-                    )
+                    (
+                        producer_state,
+                        consumer_state,
+                        extra_fo2,
+                        liquid_fraction,
+                        solid_fraction,
+                    ) = _analytical_handoff_fields(response)
                     _record_residue_handoff(
                         handoff_bucket,
                         sossi_decision,
-                        producer_inventory=composition,
-                        consumer_inventory=composition,
                         log10_pO2_bar=float(log10_pO2_bar),
                         temperature_K=temperature_K,
                         producer_standard_state=producer_state,
                         consumer_standard_state=consumer_state,
                         fo2_log10_by_role=extra_fo2,
                         liquid_fraction=liquid_fraction,
+                        solid_fraction=solid_fraction,
                     )
                 return pressures
 
@@ -4543,11 +4585,16 @@ def _predict_sossi_residue_cohort(
                     ],
                     "geometry_sensitivity_band_ppm": bands,
                     "integration": geometry_refinement,
-                    "gas_channel_omissions": omissions,
+                    "gas_channel_omissions": (
+                        omissions if vapour_engine == "openimcc" else ()
+                    ),
                     "channel_missing_elements": tuple(missing_elements),
                     **(
                         {"engine_binding_identity": engine_binding_identity}
-                        if engine_binding_identity is not None
+                        if (
+                            vapour_engine == "openimcc"
+                            and engine_binding_identity is not None
+                        )
                         else {}
                     ),
                     "liquid_rows_used": liquid_rows_used,

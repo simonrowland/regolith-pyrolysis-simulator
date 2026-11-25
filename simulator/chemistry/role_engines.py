@@ -105,15 +105,16 @@ def resolve_role_engines(
 ) -> RoleEngineDecision:
     """Choose one engine per role.
 
-    An absent override reproduces the historical selectors. On the run
-    surface the vapour selector is ``temperature_K > vapour_openimcc_above_K``
-    while the melt-activity mode is openimcc, and the activity selector is
+    An absent override reproduces the historical selectors. Vapour is
+    ``openimcc`` only when the mode is openimcc and
+    ``temperature_K > vapour_openimcc_above_K``. Melt activity is
+    ``openimcc`` only when that mode is openimcc and
     ``temperature_K >=`` the loader's domain low. The loader is called only
-    when that activity comparison is actually evaluated. The residue surface
-    does not use the temperature switch: its unpinned vapour engine is the
-    engine argument, because that is the branch ``predict_knudsen`` already
-    takes. A present override replaces that role after the default, including
-    through the temperature switch.
+    when that activity comparison is actually evaluated. Residue prediction
+    does not call this function without a pin: the unpinned caller keeps
+    the engine argument and does not consult these gates. A present override
+    replaces that role after the default. A pin that omits vapour or melt
+    still stores the gate's token at this temperature.
     """
 
     if surface not in {"run", "residue"}:
@@ -122,6 +123,8 @@ def resolve_role_engines(
         raise RoleEngineRefusal("role_evaluate_unsupported", evaluate)
     mode = normalize_high_t_melt_activity(high_t_melt_activity)
     override = _clean_override(role_override)
+    # Illegal pin tokens are refused before the activity gate can load a pack.
+    _require_override_engines(surface, override)
 
     vapour = _vapour_default(
         surface=surface,
@@ -134,13 +137,10 @@ def resolve_role_engines(
         vapour = override["vapour"]
 
     melt = _melt_default(
-        surface=surface,
         mode=mode,
         temperature_K=temperature_K,
-        engine_argument=engine_argument,
         evaluate=evaluate,
         override=override,
-        vapour=vapour,
         load_activity_domain_low_K=load_activity_domain_low_K,
     )
     if "melt_activity" in override:
@@ -252,6 +252,23 @@ def _require_engine(role: str, engine: str, allowed: frozenset[str]) -> None:
         )
 
 
+def _require_override_engines(surface: str, override: Mapping[str, str]) -> None:
+    """Refuse a named pin before a temperature gate loads the activity domain."""
+
+    if not override:
+        return
+    allowed = {
+        "phase_equilibrium": PHASE_EQUILIBRIUM_ENGINES,
+        "melt_activity": MELT_ACTIVITY_ENGINES,
+        "vapour": VAPOUR_ENGINES,
+        "redox": (
+            REDOX_ENGINES_RESIDUE if surface == "residue" else REDOX_ENGINES_RUN
+        ),
+    }
+    for role, engine in override.items():
+        _require_engine(role, engine, allowed[role])
+
+
 def _vapour_default(
     *,
     surface: str,
@@ -260,13 +277,13 @@ def _vapour_default(
     vapour_openimcc_above_K: float,
     engine_argument: str | None,
 ) -> str:
-    if surface == "residue":
-        if engine_argument not in VAPOUR_ENGINES:
-            raise RoleEngineRefusal(
-                "role_engine_unsupported",
-                f"role=vapour; engine={engine_argument}",
-            )
-        return str(engine_argument)
+    if surface == "residue" and engine_argument not in VAPOUR_ENGINES:
+        # The residue caller can only run these two vapour engines. The
+        # token below is still the builtin gate, not this argument.
+        raise RoleEngineRefusal(
+            "role_engine_unsupported",
+            f"role=vapour; engine={engine_argument}",
+        )
     if mode == "openimcc" and temperature_K > vapour_openimcc_above_K:
         return "openimcc"
     return "internal-analytical"
@@ -274,23 +291,16 @@ def _vapour_default(
 
 def _melt_default(
     *,
-    surface: str,
     mode: str,
     temperature_K: float,
-    engine_argument: str | None,
     evaluate: str,
     override: Mapping[str, str],
-    vapour: str,
     load_activity_domain_low_K: Callable[[], float] | None,
 ) -> str:
     """Return the melt token, or '' when this call must not load the domain."""
 
     if "melt_activity" in override:
         return override["melt_activity"]
-    if surface == "residue":
-        if engine_argument == "openimcc" or vapour == "openimcc":
-            return "openimcc"
-        return mode
     if mode != "openimcc":
         return "constant_gamma"
     # Vapour questions load the activity domain only to reject the illegal

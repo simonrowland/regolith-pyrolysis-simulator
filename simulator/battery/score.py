@@ -16550,6 +16550,7 @@ def _hashimoto_residue_prediction(
         cache, _HASHIMOTO_SOURCE_ID, engine, cohort_selection,
         role_override=role_override,
     )
+    primary_provenance = None
     try:
         if engine not in {Engine.INTERNAL_ANALYTICAL, Engine.OPENIMCC}:
             raise ValueError("engine_not_supported_for_hashimoto_residue")
@@ -16857,6 +16858,19 @@ def _hashimoto_residue_prediction(
         }
         if getattr(exc, "detail", None):
             detail["detail"] = str(exc.detail)
+        # The cohort already stored the decision on the row, and a refusal
+        # raised from that row drops the row. Copy it onto the scored detail.
+        # Unpinned rows have no decision, so the detail keys stay as they were.
+        carried = getattr(exc, "provenance", None)
+        decision = (
+            carried.get("role_engine_decision")
+            if isinstance(carried, Mapping)
+            else None
+        )
+        if decision is None and isinstance(primary_provenance, Mapping):
+            decision = primary_provenance.get("role_engine_decision")
+        if isinstance(decision, Mapping) and decision:
+            detail["role_engine_decision"] = dict(decision)
         engine_floor_diagnostics: object = ()
         if getattr(exc, "reason", None) == "hashimoto_internal_analytical_channels_missing":
             try:
