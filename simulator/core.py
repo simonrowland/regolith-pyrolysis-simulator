@@ -8125,12 +8125,23 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # tangent would not move fO2, and booking another buffer debit
         # would drain atoms for nothing.
         # Driving pressure is the O2 partial the surface sees, not the
-        # effervescence bound and not the analyzer setpoint.
+        # analyzer setpoint. Holdup nRT/V can exceed ambient total
+        # pressure before the bleed. The melt cannot hold fO2 above
+        # that pressure, so the exchange target is capped at the
+        # effervescence bound.
         drive_pO2 = self._overhead_exchange_drive_pO2_bar()
         # A zero inventory is physically near 0. The numerical floor
         # exists so the logarithm is defined. It is not a hard 0 and
         # it is not this pressure.
-        log_drive_pO2 = max(drive_pO2, self._oxygen_numerical_floor_bar())
+        # Premise: ideal gas, f_O2/bar <= P_total/bar. The bound is
+        # _melt_redox_fO2_upper_bound_log (vacuum-floored bar).
+        # Algebra: p_target = min(max(p_ledger, p_numerical), 10**bound).
+        # Units: bar. Limit: p_ledger <= P_total leaves p_ledger unchanged.
+        # A melt already above the bound is not snapped; only the target is.
+        log_drive_pO2 = min(
+            max(drive_pO2, self._oxygen_numerical_floor_bar()),
+            10.0 ** self._melt_redox_fO2_upper_bound_log(),
+        )
         melt_below_headspace = (
             math.isfinite(log_drive_pO2)
             and log_drive_pO2 > 0.0
@@ -8175,14 +8186,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return reservoir
 
         x_m = base_fO2_log * math.log(10.0)
-        # The exchange target is the same headspace partial that decided
-        # the credit above: y_O2 * P_total from the overhead inventory.
-        # Solve dn against that target so the ledger move and the
-        # potential stay paired. The melt is not driven by the
-        # effervescence bound. This landing is not raised to the
-        # metal line. Native Fe precipitation, later in the hour,
-        # books the oxygen that returns a below-line melt, and the
-        # publication floor runs after that split.
+        # The exchange target is the same capped headspace partial that
+        # decided the credit above. Solve dn against that target so the
+        # ledger move and the potential stay paired. The cap is the
+        # effervescence bound, so this step cannot publish fO2 above
+        # log10(P_total). This landing is not raised to the metal line.
+        # Native Fe precipitation, later in the hour, books the oxygen
+        # that returns a below-line melt, and the publication floor
+        # runs after that split.
         if not math.isfinite(log_drive_pO2) or log_drive_pO2 <= 0.0:
             raise AccountingError(
                 'oxygen reservoir exchange requires finite positive drive pO2; '
