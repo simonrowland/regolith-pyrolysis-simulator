@@ -1248,6 +1248,7 @@ def test_engine_boundary_excludes_unsupported_oxides_and_keeps_supported_ones(
     )
     assert set(calls[-1]["composition_kg"]) == {"SiO2"}
     assert calls[-1]["composition_kg"]["SiO2"] == pytest.approx(0.1)
+    assert calls[-1]["fO2_log"] is None
     exclusion = next(
         notice
         for notice in excluded.notices

@@ -13794,7 +13794,7 @@ def _predict_phase_row(
             engine,
             temperature_C=float(temperature - Decimal("273.15")),
             composition_kg={name: amount / 1000.0 for name, amount in wt.items()},
-            fO2_log=float(fo2_log),
+            fO2_log=None if fo2_log is None else float(fo2_log),
             pressure_bar=float(pressure_bar),
             **call_kwargs,
             redox_mode=redox_mode,
