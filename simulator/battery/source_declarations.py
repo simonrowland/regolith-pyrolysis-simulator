@@ -136,7 +136,7 @@ SOURCE_DECLARATIONS: dict[str, dict[str, SourceRule]] = {
     },
     JIN_2022_SOURCE_ID: {
         JIN_BASELINE_STARTING_COMPOSITION: SourceRule(
-            True,
+            "1",
             "Jin et al. (2022) Table 1 prints the nominal 161SAS batch used for the baseline BL glass",
         ),
         JIN_TABLE4_MEASURED_PRODUCT_COMPOSITION: SourceRule(

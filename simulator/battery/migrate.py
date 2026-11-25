@@ -26339,13 +26339,6 @@ class Migrator:
         source_context = dict(pressure_identity_context or {})
         source_context = sg.attach_extract_declarations(source_context, doc)
         source_context["experiment_source_rows"] = experiment_source_rows
-        source_context["observation_source_rows"] = {
-            str(row["observation_id"]): row
-            for _formula, row in rows
-            if isinstance(row, Mapping)
-            and isinstance(row.get("observation_id"), str)
-            and row.get("observation_id")
-        }
         source_context["printed_atmospheres_for_set"] = (
             printed_atmospheres_for_set
         )
@@ -26632,102 +26625,6 @@ class Migrator:
             key = (formula, str(table), str(row))
             by_row[key].append(observation)
         return {key: tuple(candidates) for key, candidates in by_row.items()}
-
-    @staticmethod
-    def _unanimous_derived_temperature(
-        raw_derived_from: object,
-        observation_source_rows: Mapping[str, Any],
-        source_id: str,
-    ) -> Located[Decimal] | None:
-        """Carry a source-located temperature shared by every derived row."""
-
-        if not isinstance(raw_derived_from, (list, tuple)) or not raw_derived_from:
-            return None
-        parent_ids = tuple(raw_derived_from)
-        if (
-            any(not isinstance(parent_id, str) or not parent_id for parent_id in parent_ids)
-            or len(set(parent_ids)) != len(parent_ids)
-        ):
-            return None
-
-        selected_temperatures: list[tuple[Decimal, Locator]] = []
-        for parent_id in parent_ids:
-            parent = observation_source_rows.get(parent_id)
-            if not isinstance(parent, Mapping):
-                return None
-            parent_values = parent.get("values")
-            if not isinstance(parent_values, Mapping):
-                return None
-            payload = dict(parent_values)
-            for key in ("T_K", "T_C", "temperature_C", "temp_C", "T_range_K"):
-                if parent.get(key) is not None:
-                    payload.setdefault(key, parent[key])
-            parent_conditions = parent.get("point_conditions")
-            if isinstance(parent_conditions, Mapping):
-                value_conditions = payload.get("point_conditions")
-                parent_conditions = {
-                    **parent_conditions,
-                    **(
-                        value_conditions
-                        if isinstance(value_conditions, Mapping)
-                        else {}
-                    ),
-                }
-                payload["point_conditions"] = parent_conditions
-            selection = select_declared_source(
-                AXIS_TEMPERATURE_K, None, payload
-            )
-            if (
-                not selection.available
-                or selection.amount is None
-                or selection.value.approximate
-                or selection.condition_ranges
-            ):
-                return None
-
-            parent_temperature = None
-            if isinstance(parent_conditions, Mapping):
-                raw_condition = parent_conditions.get("temperature_K")
-                if raw_condition is not None:
-                    parent_temperature = _point_condition_from_plain(
-                        raw_condition, key="temperature_K"
-                    )
-                    if not parent_temperature.state.is_value:
-                        return None
-                    condition_amount = _temperature_number(
-                        parent_temperature.state.value
-                    )
-                    if condition_amount != selection.amount:
-                        return None
-            parent_locator = (
-                parent_temperature.locator
-                if parent_temperature is not None
-                else None
-            ) or _temperature_field_locator(
-                payload,
-                selection.field_name,
-                locator_from_mapping(parent.get("locator")),
-            )
-            if parent_locator is None:
-                return None
-            selected_temperatures.append((selection.amount, parent_locator))
-
-        common_temperature = selected_temperatures[0][0]
-        if any(
-            temperature != common_temperature
-            for temperature, _locator in selected_temperatures[1:]
-        ):
-            return None
-        return Located(
-            State.of(common_temperature),
-            locator=selected_temperatures[0][1],
-            inference=Derivation(
-                relation="unanimous_derived_run_temperature",
-                inputs=tuple(f"{source_id}::{parent_id}" for parent_id in parent_ids),
-                parameters=(),
-                output_unit="K",
-            ),
-        )
 
     def _migrate_extract_observation(
         self,
@@ -27324,17 +27221,6 @@ class Migrator:
         temperature_locator = _temperature_field_locator(
             t_payload, t_sel.field_name, locator
         )
-        derived_temperature = None
-        source_rows_by_id = context.get("observation_source_rows")
-        if (
-            not t_sel.available
-            and t_sel.field_name is None
-            and not t_sel.condition_ranges
-            and isinstance(source_rows_by_id, Mapping)
-        ):
-            derived_temperature = self._unanimous_derived_temperature(
-                obs.get("derived_from"), source_rows_by_id, source_id
-            )
         if (
             q_token in FUSION_QUANTITIES
             and t_sel.field_name is None
@@ -27442,15 +27328,7 @@ class Migrator:
                         t_sel = select_declared_source(
                             AXIS_TEMPERATURE_K, None, t_payload
                         )
-        if t_sel.available or t_sel.condition_ranges:
-            derived_temperature = None
-        t_known = (
-            t_sel.amount
-            if t_sel.available
-            else derived_temperature.state.value
-            if derived_temperature is not None
-            else None
-        )
+        t_known = t_sel.amount if t_sel.available else None
         if t_sel.condition_ranges and t_known is None and q_token is not Quantity.ACTIVITY_COEFFICIENT:
             measured.range_only_T += 1
             name, lo, hi = t_sel.condition_ranges[0]
@@ -28262,9 +28140,7 @@ class Migrator:
         if t_known is not None:
             point_conditions = {
                 **(point_conditions or {}),
-                "temperature_K": derived_temperature
-                if derived_temperature is not None
-                else _converted_temperature(
+                "temperature_K": _converted_temperature(
                     t_known,
                     t_sel.unit_trail,
                     _temperature_field_raw(t_payload, t_sel.field_name),
@@ -28273,7 +28149,7 @@ class Migrator:
                         t_payload, t_sel.field_name
                     ),
                     read_from=choose_read_from(work, temperature_locator),
-                ),
+                )
             }
         elif (
             not t_sel.condition_ranges
@@ -28286,6 +28162,22 @@ class Migrator:
                     State.unknown(t_sel.reason),
                     locator=temperature_locator or locator,
                 ),
+            }
+        raw_point_conditions = obs.get("point_conditions")
+        if (
+            q_token is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+            and isinstance(raw_point_conditions, Mapping)
+        ):
+            point_conditions = {
+                **(point_conditions or {}),
+                **{
+                    str(key): _point_condition_from_plain(
+                        value,
+                        key=str(key),
+                        closure_context=composition_closure_context,
+                    )
+                    for key, value in raw_point_conditions.items()
+                },
             }
         # b-1052: an explicit point composition already carries its printed
         # locator. A values map is anchored at the observation and must not
@@ -28810,10 +28702,6 @@ class Migrator:
             explicit_conditions = _explicit_point_conditions(
                 values.get("point_conditions")
             )
-        if derived_temperature is not None:
-            # The unanimous parent condition outranks the aggregate's raw
-            # unknown when phase-row conditions are reassembled.
-            explicit_conditions.pop("temperature_K", None)
         if explicit_conditions:
             point_conditions = {
                 **(point_conditions or {}),
@@ -32200,20 +32088,18 @@ class Migrator:
                             )
                         )
                     )
-                    baseline_start_rule = source_rules.get(
+                    declared_starting_composition = source_rules.get(
                         JIN_BASELINE_STARTING_COMPOSITION
                     )
                     composition_locator = located_composition.locator
-                    promotes_jin_baseline_start = (
-                        source_id == JIN_2022_SOURCE_ID
-                        and q_token_point
+                    promotes_declared_starting_composition = (
+                        q_token_point
                         is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
-                        and baseline_start_rule is not None
-                        and baseline_start_rule.value is True
+                        and declared_starting_composition is not None
+                        and isinstance(declared_starting_composition.value, str)
                         and composition_locator is not None
-                        and composition_locator.table == "1"
-                        and "nominal_as_printed"
-                        in (composition_locator.note or "")
+                        and composition_locator.table
+                        == declared_starting_composition.value
                     )
                     promotes_typed_composition = (
                         q_token_point in {Quantity.VALENCE_RATIO, Quantity.DENSITY}
@@ -32225,11 +32111,11 @@ class Migrator:
                         )
                         or is_printed_mol_inventory
                         or promotes_gas_volume
-                        or promotes_jin_baseline_start
+                        or promotes_declared_starting_composition
                     )
                     if promotes_typed_composition:
                         promoted = raw_composition
-                        if promotes_jin_baseline_start:
+                        if promotes_declared_starting_composition:
                             promoted = composition_with_provenance(
                                 raw_composition, PRINTED_STARTING_BULK
                             )

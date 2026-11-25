@@ -13,11 +13,7 @@ import yaml
 
 from simulator.battery.enums import EvidenceClass, MethodToken
 from simulator.battery.identity import profile_for
-from simulator.battery.migrate import (
-    Migrator,
-    _log_fO2_to_pa,
-    wt_pct_to_mole_fraction,
-)
+from simulator.battery.migrate import _log_fO2_to_pa, wt_pct_to_mole_fraction
 from tests.battery.test_migrate import _migrate_real_extract
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -350,21 +346,7 @@ def test_isolated_migration_preserves_species_conditions_quench_and_activity_bas
             assert observation.point_conditions["temperature_K"].state.is_value
             assert observation.point_conditions["temperature_K"].state.value == expected_t
         elif "temperature_K" in conditions:
-            condition = observation.point_conditions["temperature_K"]
-            if condition.state.is_unknown:
-                assert (
-                    observation.identity.temperature_K is None
-                    or observation.identity.temperature_K.is_unknown
-                )
-            else:
-                assert source_row.get("derived_from")
-                assert condition.inference is not None
-                assert condition.inference.relation == (
-                    "unanimous_derived_run_temperature"
-                )
-                assert observation.identity.temperature_K is not None
-                assert observation.identity.temperature_K.is_value
-                assert observation.identity.temperature_K.value == condition.state.value
+            assert observation.point_conditions["temperature_K"].state.is_unknown
         if "fO2_log" in conditions:
             if conditions["fO2_log"]["state"]["tag"] == "value":
                 f_value = Decimal(conditions["fO2_log"]["state"]["value"])
@@ -583,78 +565,3 @@ def test_scoring_gap_compositions_and_temperatures_reach_migration(tmp_path):
     # reused as its own scoring input.
     assert changed.identity.composition.value.components == expected.components
     assert changed.identity.composition.value.input_provenance == "scored_phase_analysis"
-
-
-def test_table1_aggregate_inherits_only_unanimous_parent_temperature(tmp_path):
-    document = _document()
-    source_rows = _observations(document)
-    observation_id = "borisov2008_t1_csa12_al2o3"
-    source_row = source_rows[observation_id][1]
-    parent_ids = source_row["derived_from"]
-    assert len(parent_ids) == 20
-    assert {
-        source_rows[parent_id][1]["values"]["T_C"]
-        for parent_id in parent_ids
-    } == {"1470"}
-    assert source_row["point_conditions"]["temperature_K"]["state"]["tag"] == "unknown"
-
-    result = _migrate_real_extract(tmp_path / "unanimous", EXTRACT_NAME)
-    migrated = next(
-        row for row in result.observations.values()
-        if row.observation_id.endswith(observation_id)
-    )
-    expected_temperature = Decimal("1743.15")
-    assert migrated.identity.temperature_K.is_value
-    assert migrated.identity.temperature_K.value == expected_temperature
-    condition = migrated.point_conditions["temperature_K"]
-    assert condition.state.value == expected_temperature
-    first_parent_condition = source_rows[parent_ids[0]][1]["point_conditions"][
-        "temperature_K"
-    ]
-    assert condition.locator.page == first_parent_condition["locator"]["page"] == 3
-    assert condition.locator.table == first_parent_condition["locator"]["table"] == "2"
-    assert first_parent_condition["locator"]["row"] == "3"
-    assert condition.inference.relation == "unanimous_derived_run_temperature"
-    assert condition.inference.inputs == tuple(
-        f"{SID}::{parent_id}" for parent_id in parent_ids
-    )
-
-    conflicting = copy.deepcopy(document)
-    conflicting_parent = _observations(conflicting)[parent_ids[-1]][1]
-    conflicting_parent["values"]["T_C"] = "1300"
-    conflicting_parent["point_conditions"]["temperature_K"]["state"][
-        "value"
-    ] = "1573.15"
-    result = _migrate_real_extract(
-        tmp_path / "conflicting", EXTRACT_NAME, extract_doc=conflicting
-    )
-    migrated = next(
-        row for row in result.observations.values()
-        if row.observation_id.endswith(observation_id)
-    )
-    assert migrated.identity.temperature_K.is_unknown
-    assert migrated.point_conditions["temperature_K"].state.is_unknown
-
-
-def test_parent_temperature_link_contract_fails_under_previous_no_link_rule(
-    monkeypatch, tmp_path
-):
-    monkeypatch.setattr(
-        Migrator,
-        "_unanimous_derived_temperature",
-        staticmethod(lambda *_args: None),
-    )
-    result = _migrate_real_extract(tmp_path / "old-rule", EXTRACT_NAME)
-    observation_id = "borisov2008_t1_csa12_al2o3"
-    migrated = next(
-        row for row in result.observations.values()
-        if row.observation_id.endswith(observation_id)
-    )
-
-    def assert_parent_temperature_linked():
-        assert migrated.identity.temperature_K is not None
-        assert migrated.identity.temperature_K.is_value
-        assert migrated.identity.temperature_K.value == Decimal("1743.15")
-
-    with pytest.raises(AssertionError):
-        assert_parent_temperature_linked()
