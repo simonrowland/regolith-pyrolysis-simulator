@@ -35,7 +35,10 @@ from simulator.vacuum_oxygen_balance import (
 from simulator.battery.records import nominal_pressure_pa
 from simulator.source_ids import (
     HASHIMOTO_SOURCE_ID,
+    IVANOVA_2018_SPINEL_RICH_CAI_SOURCE_ID,
     SOSSI_SOURCE_ID as _SOSSI_SOURCE_ID,
+    TIME_FORWARD_RESIDUE_SOURCE_IDS,
+    ZHANG_2021_ACSESC_SOURCE_ID,
 )
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.fe_redox import _engine_fe_speciation
@@ -2040,7 +2043,9 @@ def _make_residue_pressure_model(
     )
 
 
-def _located_point(located: object | None) -> float | None:
+def _located_point(
+    located: object | None, *, allow_scalar: bool = False,
+) -> float | None:
     if located is None:
         return None
     state = getattr(located, "state", None)
@@ -2048,17 +2053,232 @@ def _located_point(located: object | None) -> float | None:
         return None
     value = getattr(state, "value", None)
     kind = getattr(value, "kind", None)
-    if getattr(kind, "value", kind) != "point":
+    if kind is not None:
+        if getattr(kind, "value", kind) != "point":
+            return None
+        value = getattr(value, "point", None)
+        if value is None:
+            return None
+    elif allow_scalar and hasattr(value, "point"):
+        value = value.point
+    elif isinstance(value, str):
+        return None
+    elif not allow_scalar:
         return None
     try:
-        number = float(value.point)
-    except (AttributeError, TypeError, ValueError, OverflowError):
+        number = float(value)
+    except (TypeError, ValueError, OverflowError):
         return None
     return number if math.isfinite(number) else None
 
 
-def _initial_oxide_wt_percent(sample: object) -> dict[str, float]:
-    initial = getattr(sample, "initial_composition", None)
+def _time_forward_thermal_segments(
+    source_id: str, observation: object, temperature_K: float,
+) -> tuple[tuple[float, float], ...]:
+    point_conditions = getattr(observation, "point_conditions", None) or {}
+    duration_min = _located_point(
+        point_conditions.get("time_min"), allow_scalar=True
+    )
+    if duration_min is None or duration_min < 0.0:
+        raise ResidueInventoryRefusal(
+            "duration_not_stated", "located point_conditions.time_min"
+        )
+    if source_id == IVANOVA_2018_SPINEL_RICH_CAI_SOURCE_ID:
+        # The abstract gives the 1900 C isothermal dwell but no heating ramp;
+        # score from the ramp endpoint and report the omitted ramp explicitly.
+        # At its printed zero-minute point, the prediction is the starting
+        # composition; an empty path records that without asking the integrator
+        # to accept a physically invalid zero-duration step.
+        if duration_min == 0.0:
+            return ()
+        return ((temperature_K, duration_min * 60.0),)
+    if source_id != ZHANG_2021_ACSESC_SOURCE_ID:
+        raise ResidueInventoryRefusal("time_forward_source_unsupported", source_id)
+
+    # Convert the located absolute temperature to the paper's Celsius scale.
+    celsius = temperature_K - 273.15
+    if not math.isclose(celsius, 1200.0, abs_tol=1e-7) and not math.isclose(
+        celsius, 1400.0, abs_tol=1e-7
+    ):
+        raise ResidueInventoryRefusal(
+            "temperature_path_not_supported", f"Zhang run at {celsius:g} C"
+        )
+    # Zhang reports a 40 C/min ramp from 850 C. Its 1200 C runs include a
+    # five-minute hold at the target; 1400 C zero-time specimens are quenched
+    # on reaching 1400 C. A 60 s midpoint partition preserves the printed ramp
+    # rate while bounding the predictor's integration step. Published 1200 C
+    # times are effective dwell minus the common five minutes, so restore that
+    # dwell only on the 1200 C path.
+    ramp_rate_K_s = 40.0 / 60.0
+    segments: list[tuple[float, float]] = []
+
+    def ramp(start_K: float, end_K: float) -> None:
+        # For a constant printed ramp rate, duration is ΔT divided by dT/dt.
+        duration_s = (end_K - start_K) / ramp_rate_K_s
+        steps = max(1, math.ceil(duration_s / 60.0))
+        for index in range(steps):
+            # Integrate each equal-duration ramp bin at its midpoint temperature.
+            midpoint = start_K + (end_K - start_K) * (index + 0.5) / steps
+            segments.append((midpoint, duration_s / steps))
+
+    start_K = 850.0 + 273.15
+    at_1200_K = 1200.0 + 273.15
+    if math.isclose(celsius, 1200.0, abs_tol=1e-7):
+        ramp(start_K, at_1200_K)
+        segments.append((at_1200_K, 300.0))
+        segments.append((temperature_K, duration_min * 60.0))
+    else:
+        ramp(start_K, temperature_K)
+        segments.append((temperature_K, duration_min * 60.0))
+    return tuple(segments)
+
+
+def _sphere_geometry_from_mass(
+    sample_mass_kg: float, density_kg_m3: float,
+) -> tuple[float, float]:
+    """Return sphere radius and area for a mass and density."""
+    # For a sphere V=m/rho=4πr³/3 [m³], so r=(3m/(4πrho))^(1/3) [m].
+    radius_m = (
+        3.0 * sample_mass_kg / (4.0 * math.pi * density_kg_m3)
+    ) ** (1.0 / 3.0)
+    return radius_m, _sphere_area_m2(radius_m)
+
+
+def _sphere_area_m2(radius_m: float) -> float:
+    """Return a sphere's surface area from its radius in metres."""
+    # A=4πr²; radius is in metres, so the result is in square metres.
+    return 4.0 * math.pi * radius_m**2
+
+
+def _langmuir_default_geometry(
+    sample_mass_kg: float | None = None,
+) -> dict[str, float | str | tuple[str, ...]]:
+    """Resolve DP-116 sphere geometry from printed mass or a 2 mm default."""
+    try:
+        from simulator.material_densities import resolve_melt_density_kg_m3
+    except ImportError:
+        density_kg_m3, density_source = 2_800.0, "DP-116 fallback"
+    else:
+        density_kg_m3, density_source = resolve_melt_density_kg_m3(None)
+    missing_inputs: list[str] = ["exposed_area_not_printed"]
+    if sample_mass_kg is None:
+        radius_m = 0.001
+        # For an unprinted mass and size, DP-116 uses a 2 mm sphere. For a
+        # sphere, m=(4/3)πr³ρ [kg] and A=4πr² [m²], hence A/m=3/(ρr).
+        # With r=1 mm and the resolved 2700 kg/m³ density, A/m is 1.111111...
+        sample_mass_kg = (4.0 / 3.0) * math.pi * radius_m**3 * density_kg_m3
+        area_m2 = _sphere_area_m2(radius_m)
+        missing_inputs.insert(0, "sample_mass_not_printed")
+    else:
+        if not math.isfinite(sample_mass_kg) or sample_mass_kg <= 0.0:
+            raise ResidueInventoryRefusal("sample_mass_invalid")
+        # With printed mass but no size, the shared sphere geometry owner
+        # solves r=(3m/(4πρ))^(1/3); A/m then follows from A=4πr².
+        radius_m, area_m2 = _sphere_geometry_from_mass(
+            sample_mass_kg, density_kg_m3
+        )
+    # The free-evaporation extent rate scales with exposed area per unit mass.
+    area_to_mass_m2_per_kg = area_m2 / sample_mass_kg
+    return {
+        "sample_mass_kg": sample_mass_kg,
+        "area_m2": area_m2,
+        "area_to_mass_m2_per_kg": area_to_mass_m2_per_kg,
+        "density_kg_m3": density_kg_m3,
+        "density_source": density_source,
+        "missing_inputs": tuple(missing_inputs),
+    }
+
+
+def _time_forward_extent_notices(
+    source_id: str | None,
+    engine_flags: Sequence[str],
+    engine_metadata: Mapping[str, str],
+    quantity: Any,
+    origin: str,
+) -> tuple[Any, ...]:
+    """Translate shared time-forward extent decisions to typed notices."""
+    from simulator.battery.default_policy import resolve as resolve_default_policy
+    from simulator.battery.enums import Authority, NoticeKind
+    from simulator.battery.records import Notice, NoticePolicy
+
+    from_time_series = source_id in TIME_FORWARD_RESIDUE_SOURCE_IDS
+    notices: list[Any] = []
+    if "DP-005_alpha_unmeasured" in engine_flags:
+        alpha = resolve_default_policy("DP-005")
+        notices.append(
+            Notice(
+                kind=alpha.flag,
+                affected_quantities=(quantity,),
+                reason=(
+                    "DP-005 alpha_assumed: unsourced Langmuir evaporation "
+                    "coefficients use the existing alpha=1 default."
+                ),
+                origin=origin,
+                policy=NoticePolicy(**alpha.payload["policy"]),
+            )
+        )
+    geometry_policy = engine_metadata.get("DP-116")
+    if geometry_policy:
+        geometry = json.loads(geometry_policy)
+        resolved = resolve_default_policy(
+            "DP-116", formula_result=geometry["area_to_mass_m2_per_kg"]
+        )
+        for reason in geometry["missing_inputs"]:
+            notices.append(
+                Notice(
+                    kind=resolved.flag,
+                    affected_quantities=(quantity,),
+                    reason=(
+                        f"{reason}: DP-116 uses spherical geometry and "
+                        "the repository melt-density resolver."
+                    ),
+                    origin=origin,
+                    authority=Authority.CONVENTION,
+                    policy=NoticePolicy(**resolved.payload["policy"]),
+                )
+            )
+    if from_time_series:
+        for flag in engine_flags:
+            if flag in {
+                "surface_area_interpolated_between_printed_endpoints",
+                "area_shape_conflicts_with_self_similar",
+                "area_uncertainty_not_printed",
+                "zero_time_ramp_not_modelled",
+                "mass_loss_pressure_upper_bound",
+            } or flag.startswith(
+                (
+                    "mass_loss_pO2_not_printed:",
+                    "mass_loss_oxygen_escape_assumption:",
+                )
+            ):
+                notices.append(
+                    Notice(
+                        kind=NoticeKind.FALLBACK,
+                        affected_quantities=(quantity,),
+                        reason=flag,
+                        origin=origin,
+                    )
+                )
+        if source_id == IVANOVA_2018_SPINEL_RICH_CAI_SOURCE_ID:
+            notices.append(
+                Notice(
+                    kind=NoticeKind.FALLBACK,
+                    affected_quantities=(quantity,),
+                    reason=(
+                        "phase_state_not_printed: the source identifies a "
+                        "vacuum-furnace evaporation experiment but does not "
+                        "state the residue phase; predictor phase handling is used."
+                    ),
+                    origin=origin,
+                )
+            )
+    return tuple(notices)
+
+
+def _initial_oxide_wt_percent(
+    sample: object, *, initial_composition: object | None = None,
+) -> dict[str, float]:
+    initial = getattr(sample, "initial_composition", None) or initial_composition
     state = None if initial is None else getattr(initial, "state", None)
     if state is None or not getattr(state, "is_value", False):
         raise ResidueInventoryRefusal(
@@ -2072,6 +2292,16 @@ def _initial_oxide_wt_percent(sample: object) -> dict[str, float]:
         )
     raw_basis = getattr(composition, "amount_basis", "")
     amount_basis = str(getattr(raw_basis, "value", raw_basis))
+    if amount_basis == "mass_percent":
+        try:
+            amounts = {str(oxide): float(amount) for oxide, amount in components}
+        except (TypeError, ValueError, OverflowError) as exc:
+            raise ResidueInventoryRefusal("initial_composition_invalid") from exc
+        if any(not math.isfinite(x) or x < 0.0 for x in amounts.values()):
+            raise ResidueInventoryRefusal("initial_composition_invalid")
+        if not any(amount > 0.0 for amount in amounts.values()):
+            raise ResidueInventoryRefusal("initial_composition_invalid")
+        return amounts
     if amount_basis not in {"mole_fraction", "moles", "mole"}:
         raise ResidueInventoryRefusal(
             "initial_composition_basis_not_supported", amount_basis
@@ -2947,8 +3177,8 @@ def predict_langmuir_residue_composition(
     from dataclasses import replace
 
     from simulator.battery.enums import (
-        AdmissionStatus, MEASURED_EVIDENCE, MethodToken, NoticeKind, Quantity,
-        ValueKind,
+        AdmissionStatus, MEASURED_EVIDENCE, MethodToken, NoticeKind,
+        Quantity, ValueKind,
     )
     from simulator.battery.identity import quantity_token
     from simulator.battery.records import Notice, Value
@@ -2956,13 +3186,75 @@ def predict_langmuir_residue_composition(
 
     if engine not in {"openimcc", "internal-analytical"}:
         raise ResidueInventoryRefusal("engine_capability_unsupported", engine)
-    if (
-        experiment is None or not experiment.method.is_value
-        or experiment.method.value is not MethodToken.LANGMUIR_FREE_EVAPORATION
+    time_forward_source = (
+        getattr(reference, "source_id", None) in TIME_FORWARD_RESIDUE_SOURCE_IDS
+    )
+    if experiment is None or (
+        not time_forward_source
+        and (
+            not experiment.method.is_value
+            or experiment.method.value is not MethodToken.LANGMUIR_FREE_EVAPORATION
+        )
     ):
         raise ResidueInventoryRefusal("langmuir_free_evaporation_required")
     if quantity_token(reference.identity) is not Quantity.RESIDUE_COMPONENT_COMPOSITION:
         raise ResidueInventoryRefusal("residue_composition_required")
+
+    if time_forward_source:
+        temperature = reference.identity.temperature_K
+        if (
+            temperature is None or not temperature.is_value
+            or not math.isfinite(float(temperature.value))
+            or float(temperature.value) <= 0.0
+        ):
+            raise ResidueInventoryRefusal(
+                "printed_temperature_path_missing_or_invalid"
+            )
+        prediction = predict_mass_loss_fraction(
+            engine,
+            experiment,
+            temperature_K=float(temperature.value),
+            observation=reference,
+        )
+        try:
+            composition = json.loads(
+                prediction.engine_metadata["residue_composition_wt_pct"]
+            )
+        except (KeyError, TypeError, ValueError) as exc:
+            raise ResidueInventoryRefusal(
+                "time_forward_residue_inventory_unavailable", str(exc)
+            ) from exc
+        notices = list(
+            _time_forward_extent_notices(
+                reference.source_id,
+                prediction.engine_flags,
+                prediction.engine_metadata,
+                Quantity.RESIDUE_COMPONENT_COMPOSITION,
+                reference.observation_id,
+            )
+        )
+        fallback_row = replace(
+            reference,
+            provenance={
+                **(reference.provenance or {}),
+                "source_oxygen_fallback": "no_oxygen_condition_printed",
+            },
+        )
+        notices.append(
+            source_oxygen_closure_notice(
+                Quantity.RESIDUE_COMPONENT_COMPOSITION, fallback_row
+            )
+        )
+        return {
+            "composition_wt_pct": composition,
+            "notices": tuple(notices),
+            "mass_loss_fraction": prediction.mass_loss_fraction,
+            "temperature_path": prediction.engine_metadata.get(
+                "temperature_path", "[]"
+            ),
+            "engine_flags": prediction.engine_flags,
+            "engine_metadata": prediction.engine_metadata,
+        }
 
     locator = reference.locator
     if locator is None or not locator.table or not locator.note:
@@ -3131,6 +3423,7 @@ def predict_langmuir_residue_composition(
             total_pressure_Pa=p_bulk_Pa,
             engine_metadata=metadata,
             engine_flags=flags,
+            starting_inventory=initial,
             missing_channels_reason="residue_pressure_channels_missing",
             caller="Langmuir residue prediction",
         )
@@ -3192,37 +3485,130 @@ def predict_mass_loss_fraction(
             f"engine={engine}; capability=free_evaporation_residue_integrator",
         )
 
+    source_id = getattr(observation, "source_id", None)
+    time_forward_source = source_id in TIME_FORWARD_RESIDUE_SOURCE_IDS
+    point_conditions = getattr(observation, "point_conditions", None) or {}
+    source_flags: set[str] = set()
+    geometry_policy: dict[str, float | str] | None = None
     sample = getattr(experiment, "sample", None)
-    wt_pct = _initial_oxide_wt_percent(sample)
-    schedule = getattr(experiment, "thermal_schedule", None)
-    duration_s = _located_point(
-        None if schedule is None else getattr(schedule, "total_duration_s", None)
+    identity = getattr(observation, "identity", None)
+    wt_pct = _initial_oxide_wt_percent(
+        sample,
+        initial_composition=(
+            None
+            if time_forward_source
+            else getattr(identity, "composition", None)
+        ),
     )
-    if duration_s is None or duration_s <= 0.0:
-        raise ResidueInventoryRefusal(
-            "duration_not_stated", "thermal_schedule.total_duration_s"
+    if time_forward_source:
+        if temperature_K is None or not math.isfinite(float(temperature_K)):
+            raise ResidueInventoryRefusal(
+                "temperature_not_stated", "identity.temperature_K"
+            )
+        segments = _time_forward_thermal_segments(
+            str(source_id), observation, float(temperature_K)
         )
-    if temperature_K is None or not math.isfinite(float(temperature_K)):
-        raise ResidueInventoryRefusal("temperature_not_stated", "identity.temperature_K")
-    sample_mass_kg = _located_point(getattr(sample, "mass_kg", None))
+        duration_s = math.fsum(seconds for _at_K, seconds in segments)
+        preheat_maximum_K = 0.0
+        preheat_duration_s = 0.0
+    else:
+        schedule = getattr(experiment, "thermal_schedule", None)
+        duration_s = _located_point(
+            None if schedule is None else getattr(schedule, "total_duration_s", None)
+        )
+        if duration_s is None or duration_s <= 0.0:
+            raise ResidueInventoryRefusal(
+                "duration_not_stated", "thermal_schedule.total_duration_s"
+            )
+        if temperature_K is None or not math.isfinite(float(temperature_K)):
+            raise ResidueInventoryRefusal(
+                "temperature_not_stated", "identity.temperature_K"
+            )
+        segments = ()
+        preheat_maximum_K = 0.0
+        preheat_duration_s = 0.0
+
+    sample_mass_kg = _located_point(
+        getattr(sample, "mass_kg", None), allow_scalar=time_forward_source
+    )
+    if sample_mass_kg is None:
+        sample_mass_kg = _located_point(
+            point_conditions.get("sample_mass_kg"),
+            allow_scalar=time_forward_source,
+        )
+    if sample_mass_kg is None:
+        identity_mass = getattr(identity, "sample_mass_kg", None)
+        sample_mass_kg = (
+            float(identity_mass.value)
+            if identity_mass is not None and identity_mass.is_value
+            else None
+        )
+    area_m2 = _located_point(
+        point_conditions.get("exposed_area_initial_m2"),
+        allow_scalar=time_forward_source,
+    )
+    final_area_m2 = _located_point(
+        point_conditions.get("exposed_area_final_m2"),
+        allow_scalar=time_forward_source,
+    )
+    if area_m2 is None:
+        apparatus = getattr(experiment, "apparatus", None)
+        geometry = None if apparatus is None else getattr(apparatus, "geometry", None)
+        area_m2 = _located_point(
+            None if geometry is None else getattr(geometry, "exposed_area_m2", None),
+            allow_scalar=time_forward_source,
+        )
+    if time_forward_source and (sample_mass_kg is None or area_m2 is None):
+        geometry_policy = _langmuir_default_geometry(sample_mass_kg)
+        sample_mass_kg = float(geometry_policy["sample_mass_kg"])
+        area_m2 = float(geometry_policy["area_m2"])
+        final_area_m2 = area_m2
+        source_flags.update(geometry_policy["missing_inputs"])
     if sample_mass_kg is None or sample_mass_kg <= 0.0:
         raise ResidueInventoryRefusal("sample_mass_not_stated", "sample.mass_kg point")
-    apparatus = getattr(experiment, "apparatus", None)
-    geometry = None if apparatus is None else getattr(apparatus, "geometry", None)
-    area_m2 = _located_point(
-        None if geometry is None else getattr(geometry, "exposed_area_m2", None)
-    )
     if area_m2 is None or area_m2 <= 0.0:
         raise ResidueInventoryRefusal(
             "sample_geometry_not_stated",
-            "apparatus.geometry.exposed_area_m2 point",
+            "point_conditions.exposed_area_initial_m2",
         )
+    if final_area_m2 is None:
+        final_area_m2 = area_m2
+
+    if time_forward_source and source_id == ZHANG_2021_ACSESC_SOURCE_ID:
+        if (
+            _located_point(
+                point_conditions.get("exposed_area_initial_m2"),
+                allow_scalar=True,
+            )
+            is not None
+            and _located_point(
+                point_conditions.get("exposed_area_final_m2"),
+                allow_scalar=True,
+            )
+            is not None
+        ):
+            source_flags.add(
+                "surface_area_interpolated_between_printed_endpoints"
+            )
+        source_flags.add("area_uncertainty_not_printed")
+        mass_after = _located_point(
+            point_conditions.get("sample_mass_after_kg"),
+            allow_scalar=True,
+        )
+        if (
+            final_area_m2 > area_m2
+            and mass_after is not None
+            and mass_after < sample_mass_kg
+        ):
+            source_flags.add("area_shape_conflicts_with_self_similar")
 
     method_state = getattr(experiment, "method", None)
     method = getattr(method_state, "value", None) if getattr(
         method_state, "is_value", False
     ) else None
-    if getattr(method, "value", method) != "langmuir_free_evaporation":
+    if not time_forward_source and getattr(
+        method, "value", method
+    ) != "langmuir_free_evaporation":
         raise ResidueInventoryRefusal(
             "residue_method_unsupported",
             "capability=free_evaporation_residue_integrator; "
@@ -3233,7 +3619,8 @@ def predict_mass_loss_fraction(
     total_pressure_Pa = _located_point(
         None
         if pressure_environment is None
-        else getattr(pressure_environment, "total_pressure_Pa", None)
+        else getattr(pressure_environment, "total_pressure_Pa", None),
+        allow_scalar=time_forward_source,
     )
     pressure_value = getattr(getattr(
         getattr(pressure_environment, "total_pressure_Pa", None), "state", None
@@ -3244,6 +3631,32 @@ def predict_mass_loss_fraction(
     )
     if pressure_is_bound:
         total_pressure_Pa = float(pressure_value.bound_value)
+    if time_forward_source:
+        from simulator.battery.enums import ValueKind
+        from simulator.battery.records import Value
+
+        row_pressure = point_conditions.get("total_pressure_Pa")
+        row_pressure_state = getattr(row_pressure, "state", None)
+        row_pressure_value = (
+            row_pressure_state.value
+            if row_pressure_state is not None and row_pressure_state.is_value
+            else None
+        )
+        if isinstance(row_pressure_value, Value):
+            if row_pressure_value.kind is ValueKind.POINT:
+                total_pressure_Pa = (
+                    None
+                    if row_pressure_value.point is None
+                    else float(row_pressure_value.point)
+                )
+                pressure_is_bound = False
+            elif (
+                row_pressure_value.kind is ValueKind.BOUND
+                and row_pressure_value.bound_operator in {"<", "<="}
+                and row_pressure_value.bound_value is not None
+            ):
+                total_pressure_Pa = float(row_pressure_value.bound_value)
+                pressure_is_bound = True
     if engine == "internal-analytical" and total_pressure_Pa is None:
         raise ResidueInventoryRefusal("total_pressure_not_stated")
 
@@ -3277,19 +3690,53 @@ def predict_mass_loss_fraction(
         raise ResidueInventoryRefusal("residue_gas_channel_missing", str(omissions))
     if not gas_channels:
         raise ResidueInventoryRefusal("residue_gas_channels_missing")
-    fits = _mass_loss_sourced_alphas(
-        experiment, source_document or {}, float(temperature_K)
-    )
+    try:
+        fits = _mass_loss_sourced_alphas(
+            experiment, source_document or {}, float(temperature_K)
+        )
+    except ResidueInventoryRefusal as exc:
+        if not time_forward_source or exc.reason != "evaporation_coefficients_not_sourced":
+            raise
+        from simulator.battery.default_policy import resolve as resolve_default_policy
+
+        alpha = float(resolve_default_policy("DP-005").value)
+        fits = {
+            str(species): {
+                "alpha": alpha,
+                "source_observation_id": "DP-005",
+                "locator": {},
+                "T_range_K": [],
+                "extrapolated": False,
+            }
+            for species, (parent, *_rest) in gas_channels
+            if parent
+        }
+        source_flags.add("DP-005_alpha_unmeasured")
     if total_pressure_Pa is None or not math.isfinite(total_pressure_Pa) or total_pressure_Pa < 0:
         raise ResidueInventoryRefusal("total_pressure_not_stated")
-    area_m2, final_area_m2, area_uncertainty = _mass_loss_area_inputs(
-        experiment, observation, source_document or {}
-    )
-    preheat_maximum_K, preheat_duration_s, segments = _mass_loss_thermal_segments(
-        experiment, float(temperature_K)
-    )
+    area_uncertainty = None
+    if not time_forward_source:
+        area_m2, final_area_m2, area_uncertainty = _mass_loss_area_inputs(
+            experiment, observation, source_document or {}
+        )
+        preheat_maximum_K, preheat_duration_s, segments = _mass_loss_thermal_segments(
+            experiment, float(temperature_K)
+        )
     flags: set[str] = set()
     metadata: dict[str, str] = {}
+    flags.update(source_flags)
+    if geometry_policy is not None:
+        metadata["DP-116"] = json.dumps(geometry_policy, sort_keys=True)
+    if time_forward_source:
+        metadata["DP-005"] = "alpha=1; existing Langmuir default"
+    if source_id == IVANOVA_2018_SPINEL_RICH_CAI_SOURCE_ID:
+        source_flags.add("zero_time_ramp_not_modelled")
+        flags.add("zero_time_ramp_not_modelled")
+    if time_forward_source:
+        flags.add(
+            "mass_loss_pO2_not_printed: solved by the existing residue "
+            "oxygen-balance model"
+        )
     pressure_law_diagnostics_by_arm: dict[
         str, dict[str, PressureLawChannelDiagnostic]
     ] = {}
@@ -3302,15 +3749,16 @@ def predict_mass_loss_fraction(
     if pressure_is_bound:
         flags.add(f"mass_loss_pressure_upper_bound: evaluated at {total_pressure_Pa:.17g} Pa; "
                   "channel bulk partial ceiling; zero-pressure arms are bounds only")
-    flags.add(
-        f"mass_loss_preheat_rectangle: maximum_K={preheat_maximum_K}; "
-        f"duration_s={preheat_duration_s}; approximate printed duration; "
-        "excluded from point loss; rectangle enters B only"
-    )
-    flags.add(
-        f"mass_loss_area_self_similarity: initial_m2={area_m2}; final_m2={final_area_m2}; "
-        f"relative_area_uncertainty={area_uncertainty}"
-    )
+    if not time_forward_source:
+        flags.add(
+            f"mass_loss_preheat_rectangle: maximum_K={preheat_maximum_K}; "
+            f"duration_s={preheat_duration_s}; approximate printed duration; "
+            "excluded from point loss; rectangle enters B only"
+        )
+        flags.add(
+            f"mass_loss_area_self_similarity: initial_m2={area_m2}; final_m2={final_area_m2}; "
+            f"relative_area_uncertainty={area_uncertainty}"
+        )
     unsourced = tuple(str(species) for species, (parent, *_rest) in gas_channels
                       if parent and str(species) not in fits)
 
@@ -3387,9 +3835,15 @@ def predict_mass_loss_fraction(
     def run_segment(
         inventory: Mapping[str, float], at_K: float, seconds: float, *,
         rectangle: bool = False, unsourced_unity: bool = False,
+        segment_area_start_m2: float | None = None,
+        segment_area_end_m2: float | None = None,
     ) -> tuple[Mapping[str, float], float]:
         nonlocal corner_evaluations, corner_root_solves, corner_neighbour_evaluations
-        at_fits = _mass_loss_sourced_alphas(experiment, source_document or {}, at_K)
+        at_fits = (
+            fits
+            if time_forward_source
+            else _mass_loss_sourced_alphas(experiment, source_document or {}, at_K)
+        )
         for species, fit in at_fits.items():
             if fit["extrapolated"]:
                 flags.add(f"alpha_extrapolated:{species}:source_domain_K={fit['T_range_K']}")
@@ -3438,12 +3892,23 @@ def predict_mass_loss_fraction(
             if not rectangle:
                 corner_records.append(corners)
 
+        integration_area_m2 = (
+            area_m2
+            if segment_area_start_m2 is None
+            else segment_area_start_m2
+        )
         try:
             result = _hashimoto_integrate_geometry(
                 inventory, channels, pressure_model, temperature_K=at_K,
                 duration_s=seconds, steps=min(_HASHIMOTO_N_CAP, max(1, math.ceil(seconds / 60.0))),
-                geometry_policy_id="sphere_constant" if rectangle else "sphere_shrinking",
-                initial_area_m2=area_m2, initial_sample_mass_kg=sample_mass_kg,
+                geometry_policy_id=(
+                    "linear_time_endpoints"
+                    if time_forward_source and segment_area_end_m2 is not None
+                    else "sphere_constant" if rectangle else "sphere_shrinking"
+                ),
+                initial_area_m2=integration_area_m2,
+                final_area_m2=segment_area_end_m2,
+                initial_sample_mass_kg=sample_mass_kg,
                 background_pressure_Pa=0.0 if unsourced_unity else total_pressure_Pa,
                 **({"on_step": measure} if rectangle or (not unsourced_unity and unsourced) else {}),
             )
@@ -3509,6 +3974,69 @@ def predict_mass_loss_fraction(
             return result.inventory_mol, math.fsum(parent_loss.values())
         finally:
             retain_omissions(pressure_model)
+
+    if time_forward_source:
+        total_path_duration_s = math.fsum(seconds for _at_K, seconds in segments)
+        elapsed_path_s = 0.0
+        inventory = initial_inventory_mol
+        predicted_loss_kg = 0.0
+        try:
+            for at_K, seconds in segments:
+                next_elapsed_s = elapsed_path_s + seconds
+                start_fraction = (
+                    elapsed_path_s / total_path_duration_s
+                    if total_path_duration_s > 0.0
+                    else 1.0
+                )
+                end_fraction = (
+                    next_elapsed_s / total_path_duration_s
+                    if total_path_duration_s > 0.0
+                    else 1.0
+                )
+                area_start = area_m2 + (final_area_m2 - area_m2) * start_fraction
+                area_end = area_m2 + (final_area_m2 - area_m2) * end_fraction
+                inventory, segment_loss_kg = run_segment(
+                    inventory,
+                    at_K,
+                    seconds,
+                    segment_area_start_m2=area_start,
+                    segment_area_end_m2=area_end,
+                )
+                predicted_loss_kg += segment_loss_kg
+                elapsed_path_s = next_elapsed_s
+            final_composition = _hashimoto_project_oxide_wt_pct(inventory)
+            metadata["residue_composition_wt_pct"] = json.dumps(
+                final_composition, sort_keys=True
+            )
+            metadata["temperature_path"] = json.dumps(
+                segments, separators=(",", ":")
+            )
+            metadata["final_inventory_mol"] = json.dumps(
+                inventory, sort_keys=True
+            )
+            metadata["mass_loss_prediction_basis"] = "time_forward_source_rows"
+            return ResidueMassLossPrediction(
+                # Fractional loss is modeled removed mass over initial mass.
+                mass_loss_fraction=predicted_loss_kg / sample_mass_kg,
+                engine_flags=tuple(sorted(flags)),
+                engine_metadata=metadata,
+                pressure_law_diagnostics=tuple(
+                    diagnostic
+                    for diagnostics in pressure_law_diagnostics_by_arm.values()
+                    for diagnostic in diagnostics.values()
+                ),
+            )
+        except IsolatedOpenImccWorkerError as exc:
+            exc.engine_flags = tuple(sorted(flags))
+            exc.engine_metadata = dict(metadata)
+            attach_omissions(exc)
+            raise
+        except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
+            if time_forward_source:
+                exc.engine_flags = tuple(sorted(flags))
+                exc.engine_metadata = dict(metadata)
+            attach_omissions(exc)
+            raise
 
     # The unknown preheat is an upper rectangle only: do not debit it as a
     # measured trajectory. All its removal, not just unsourced channels, joins B.
@@ -3702,9 +4230,10 @@ def _hashimoto_geometry_areas(
     sample_mass_kg: float, preform_dimensions_mm: Mapping[str, float]
 ) -> dict[str, float]:
     density = _HASHIMOTO_DENSITY_KG_M3
-    radius_m = (3.0 * sample_mass_kg / (4.0 * math.pi * density)) ** (1.0 / 3.0)
+    radius_m, sphere_area_m2 = _sphere_geometry_from_mass(
+        sample_mass_kg, density
+    )
     diameter_mm = float(preform_dimensions_mm["diameter"])
-    sphere_area_m2 = 4.0 * math.pi * radius_m**2
     disk_area_m2 = math.pi * (diameter_mm / 2_000.0) ** 2
     return {
         "sphere_constant": sphere_area_m2,
@@ -3760,6 +4289,7 @@ def _hashimoto_integrate_geometry(
     steps: int,
     geometry_policy_id: str,
     initial_area_m2: float,
+    final_area_m2: float | None = None,
     initial_sample_mass_kg: float | None = None,
     background_pressure_Pa: float = 0.0,
     on_step: Callable[[Mapping[str, float], Sequence[ResidueChannel], float, float], None] | None = None,
@@ -3808,6 +4338,22 @@ def _hashimoto_integrate_geometry(
                 inventory[oxide] = 0.0
 
     def area_for_current_inventory() -> float:
+        if geometry_policy_id == "linear_time_endpoints":
+            if final_area_m2 is None:
+                raise ResidueInventoryRefusal(
+                    "sample_area_endpoints_not_stated"
+                )
+            fraction = (
+                min(1.0, max(0.0, (elapsed_s + duration_s / (2.0 * steps)) / duration_s))
+                if duration_s > 0.0
+                else 1.0
+            )
+            # The measured areas are authoritative. Interpolate as
+            # A(t)=A0+(A1-A0)t/T across elapsed exposure; mass loss does not
+            # replace the printed endpoint geometry.
+            return initial_area_m2 + (
+                final_area_m2 - initial_area_m2
+            ) * fraction
         if geometry_policy_id != "sphere_shrinking":
             return initial_area_m2
         remaining_mass_kg = math.fsum(
@@ -4670,8 +5216,9 @@ def _sossi_initial_inventory(
 def _sossi_geometry_areas(sample_mass_kg: float) -> dict[str, float]:
     density_kg_m3 = _HASHIMOTO_DENSITY_KG_M3
     volume_m3 = sample_mass_kg / density_kg_m3
-    radius_m = (3.0 * volume_m3 / (4.0 * math.pi)) ** (1.0 / 3.0)
-    sphere_area = 4.0 * math.pi * radius_m**2
+    radius_m, sphere_area = _sphere_geometry_from_mass(
+        sample_mass_kg, density_kg_m3
+    )
     # The comparison disk has the same bead volume and diameter as its height.
     disk_area = volume_m3 / (2.0 * radius_m)
     return {

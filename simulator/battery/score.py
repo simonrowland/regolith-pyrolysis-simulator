@@ -63,6 +63,7 @@ from simulator.battery.source_declarations import (
 )
 from simulator.source_ids import (
     HASHIMOTO_SOURCE_ID as _HASHIMOTO_SOURCE_ID,
+    TIME_FORWARD_RESIDUE_SOURCE_IDS,
     SF04_WORKBOOK_SOURCE_ID,
     SOSSI_SOURCE_ID as _SOSSI_SOURCE_ID,
 )
@@ -13350,6 +13351,42 @@ def _predict_phase_row(
     )
 
 
+def _openimcc_residue_component_refusal(
+    engine: Engine,
+    channel: str,
+    sources: tuple[str, ...],
+    identity: Identity,
+    error: object,
+    notices: tuple[Notice, ...] = (),
+) -> EnginePrediction | None:
+    """Translate an unsupported OpenIMCC component to a score diagnostic."""
+    from simulator.melt_backend.openimcc_bridge import (
+        ISOLATED_OPENIMCC_CACHEABLE_ERRORS,
+    )
+
+    engine_reason = ISOLATED_OPENIMCC_CACHEABLE_ERRORS.get(
+        str(getattr(error, "error_name", ""))
+    )
+    if engine is not Engine.OPENIMCC or engine_reason != "imcc_component_outside_domain":
+        return None
+    return EnginePrediction(
+        engine=engine,
+        channel=channel,
+        execution=Execution(state=ExecutionState.UNSUPPORTED),
+        authority=Authority.REFUSED,
+        coefficient_sources=sources,
+        lineage_complete=False,
+        refusal_reason=RefusalReason.OUTSIDE_SUPPORTED_SPECIES,
+        refusal_detail={
+            "reason": RefusalReason.OUTSIDE_SUPPORTED_SPECIES.value,
+            "engine_reason": engine_reason,
+            "detail": getattr(error, "detail", str(error)),
+        },
+        notices=notices,
+        identity=identity,
+    )
+
+
 def _predict_mass_loss_with_residue(
     engine: Engine,
     identity: Identity,
@@ -13359,8 +13396,10 @@ def _predict_mass_loss_with_residue(
     observation: Observation,
 ) -> EnginePrediction:
     from simulator.battery.residue import (
+        IsolatedOpenImccWorkerError,
         ResidueEngineNonconvergence,
         ResidueInventoryRefusal,
+        _time_forward_extent_notices,
         predict_mass_loss_fraction,
     )
 
@@ -13408,6 +13447,21 @@ def _predict_mass_loss_with_residue(
             source_document=source_document,
             observation=observation,
         )
+    except IsolatedOpenImccWorkerError as exc:
+        time_forward_notices = _time_forward_extent_notices(
+            observation.source_id,
+            getattr(exc, "engine_flags", ()),
+            getattr(exc, "engine_metadata", {}),
+            Quantity.MASS_LOSS_FRACTION,
+            observation.observation_id,
+        )
+        refusal = _openimcc_residue_component_refusal(
+            engine, channel, sources, identity, exc,
+            notices=time_forward_notices,
+        )
+        if refusal is None:
+            raise
+        return refusal
     except ResidueInventoryRefusal as exc:
         reason = exc.reason
         if reason in {
@@ -13451,7 +13505,14 @@ def _predict_mass_loss_with_residue(
             lineage_complete=False,
             refusal_reason=refusal,
             refusal_detail=detail,
-            notices=omission_notices(payload),
+            notices=omission_notices(payload)
+            + _time_forward_extent_notices(
+                observation.source_id,
+                getattr(exc, "engine_flags", ()),
+                getattr(exc, "engine_metadata", {}),
+                Quantity.MASS_LOSS_FRACTION,
+                observation.observation_id,
+            ),
             identity=identity,
         )
     except ResidueEngineNonconvergence as exc:
@@ -13471,7 +13532,14 @@ def _predict_mass_loss_with_residue(
             lineage_complete=False,
             refusal_reason=RefusalReason.ATTEMPTED_UNAVAILABLE,
             refusal_detail=detail,
-            notices=omission_notices(payload),
+            notices=omission_notices(payload)
+            + _time_forward_extent_notices(
+                observation.source_id,
+                getattr(exc, "engine_flags", ()),
+                getattr(exc, "engine_metadata", {}),
+                Quantity.MASS_LOSS_FRACTION,
+                observation.observation_id,
+            ),
             identity=identity,
         )
 
@@ -13489,6 +13557,13 @@ def _predict_mass_loss_with_residue(
         if "paper-demonstrated-window" in flag or flag == "openimcc_extrapolated"
         or flag.startswith(("alpha_extrapolated:", "mass_loss_"))
     ) + omission_notices(result.engine_metadata.get("below_threshold_omissions"))
+    notices += _time_forward_extent_notices(
+        observation.source_id,
+        result.engine_flags,
+        result.engine_metadata,
+        Quantity.MASS_LOSS_FRACTION,
+        observation.observation_id,
+    )
     notices += _residue_redox_flag_notices(
         result.engine_flags,
         quantity=Quantity.MASS_LOSS_FRACTION,
@@ -17919,8 +17994,10 @@ def _langmuir_residue_prediction(
 ) -> EnginePrediction:
     """Translate the per-bead Langmuir extent result to one oxide score."""
     from simulator.battery.residue import (
+        IsolatedOpenImccWorkerError,
         ResidueEngineNonconvergence,
         ResidueInventoryRefusal,
+        _time_forward_extent_notices,
         predict_langmuir_residue_composition,
     )
 
@@ -17932,6 +18009,32 @@ def _langmuir_residue_prediction(
         f"{getattr(reference.locator, 'table', None)}:"
         f"{getattr(reference.locator, 'note', None)}"
     )
+    if reference.source_id in TIME_FORWARD_RESIDUE_SOURCE_IDS:
+        point_conditions = reference.point_conditions or {}
+        identity_temperature = reference.identity.temperature_K
+        identity_pressure = reference.identity.total_pressure_Pa
+        route_inputs = {
+            name: str(
+                getattr(
+                    getattr(point_conditions.get(name), "state", None),
+                    "value",
+                    None,
+                )
+            )
+            for name in (
+                "time_min",
+                "sample_mass_kg",
+                "sample_mass_after_kg",
+                "exposed_area_initial_m2",
+                "exposed_area_final_m2",
+                "total_pressure_Pa",
+            )
+        }
+        # These identity inputs can vary within a study experiment and the
+        # predictor reads them directly, so they belong in the cache contract.
+        route_inputs["identity_temperature_K"] = str(identity_temperature)
+        route_inputs["identity_total_pressure_Pa"] = str(identity_pressure)
+        cache_source_id += ":" + json.dumps(route_inputs, sort_keys=True)
     try:
         result = (
             None if cache is None else
@@ -17965,6 +18068,21 @@ def _langmuir_residue_prediction(
             identity=reference.identity,
             refusal_detail=provenance,
         )
+    except IsolatedOpenImccWorkerError as exc:
+        time_forward_notices = _time_forward_extent_notices(
+            reference.source_id,
+            getattr(exc, "engine_flags", ()),
+            getattr(exc, "engine_metadata", {}),
+            Quantity.RESIDUE_COMPONENT_COMPOSITION,
+            reference.observation_id,
+        )
+        refusal = _openimcc_residue_component_refusal(
+            engine, channel, sources, reference.identity, exc,
+            notices=time_forward_notices,
+        )
+        if refusal is None:
+            raise
+        return refusal
     except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
         return EnginePrediction(
             engine=engine,
@@ -17977,7 +18095,14 @@ def _langmuir_residue_prediction(
                 )
             ),
             coefficient_sources=sources,
-            notices=getattr(exc, "notices", ()),
+            notices=tuple(getattr(exc, "notices", ()))
+            + _time_forward_extent_notices(
+                reference.source_id,
+                getattr(exc, "engine_flags", ()),
+                getattr(exc, "engine_metadata", {}),
+                Quantity.RESIDUE_COMPONENT_COMPOSITION,
+                reference.observation_id,
+            ),
             lineage_complete=False,
             refusal_reason=(
                 RefusalReason.ATTEMPTED_UNAVAILABLE
@@ -17996,9 +18121,18 @@ def _langmuir_residue_prediction(
 def _extent_residue_method(reference, experiment, quantity) -> MethodToken | None:
     """Select a method-specific extent adapter without widening cohort locks."""
     if (
-        experiment is None or not experiment.method.is_value
-        or quantity is None
+        experiment is None or quantity is None
     ):
+        return None
+    if (
+        quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and reference.source_id in TIME_FORWARD_RESIDUE_SOURCE_IDS
+    ):
+        # These two sources are explicitly authorized for the existing
+        # time-forward Langmuir integrator, even though Ivanova names its
+        # apparatus method as vacuum-chamber pyrolysis.
+        return MethodToken.LANGMUIR_FREE_EVAPORATION
+    if not experiment.method.is_value:
         return None
     if (
         experiment.method.value is MethodToken.KNUDSEN_EFFUSION

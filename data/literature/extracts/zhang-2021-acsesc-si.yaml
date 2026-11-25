@@ -160,6 +160,55 @@ species:
             page: 9
             table: S1
             row: Bas1200C40h
+      equipment:
+        sample_surface_area:
+          value:
+          - sample: Bas1400C0m1
+            initial_area_mm2: 28.4
+            final_area_mm2: 29.4
+            locator: {page: 9, table: S1, row: Bas1400C0m1}
+          - sample: Bas1400C15m
+            initial_area_mm2: 30.8
+            final_area_mm2: 34.1
+            locator: {page: 9, table: S1, row: Bas1400C15m}
+          - sample: Bas1400C30m
+            initial_area_mm2: 31.0
+            final_area_mm2: 31.3
+            locator: {page: 9, table: S1, row: Bas1400C30m}
+          - sample: Bas1400C60m
+            initial_area_mm2: 27.6
+            final_area_mm2: 42.7
+            locator: {page: 9, table: S1, row: Bas1400C60m}
+          - sample: Bas1400C90m
+            initial_area_mm2: 23.4
+            final_area_mm2: 28.2
+            locator: {page: 9, table: S1, row: Bas1400C90m}
+          - sample: Bas1200C0h1
+            initial_area_mm2: 16.4
+            final_area_mm2: 13.8
+            locator: {page: 9, table: S1, row: Bas1200C0h1}
+          - sample: Bas1200C0h2
+            initial_area_mm2: 29.0
+            final_area_mm2: 28.5
+            locator: {page: 9, table: S1, row: Bas1200C0h2}
+          - sample: Bas1200C1h
+            initial_area_mm2: 30.2
+            final_area_mm2: 29.5
+            locator: {page: 9, table: S1, row: Bas1200C1h}
+          - sample: Bas1200C4h
+            initial_area_mm2: 26.3
+            final_area_mm2: 29.3
+            locator: {page: 9, table: S1, row: Bas1200C4h}
+          - sample: Bas1200C10h
+            initial_area_mm2: 30.8
+            final_area_mm2: 31.0
+            locator: {page: 9, table: S1, row: Bas1200C10h}
+          - sample: Bas1200C40h
+            initial_area_mm2: 19.1
+            final_area_mm2: 23.2
+            locator: {page: 9, table: S1, row: Bas1200C40h}
+          units: mm2
+          locator: {page: 9, table: S1, note: "Before and after experimental surface areas as printed; no area uncertainty stated."}
     - observation_id: zhang_2021_table1_bas1400c0m1_residue_composition
       type: rate_series
       locator: &id001

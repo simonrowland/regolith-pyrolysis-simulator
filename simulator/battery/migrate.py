@@ -99,7 +99,10 @@ from simulator.battery.source_declarations import (
     KEMS_137_SOURCE_ID as _KEMS_137_SOURCE_ID,
     SOURCE_DECLARATIONS,
 )
-from simulator.source_ids import SOSSI_FEGLEY_SOURCE_ID
+from simulator.source_ids import (
+    SOSSI_FEGLEY_SOURCE_ID,
+    ZHANG_2021_ACSESC_SOURCE_ID,
+)
 from simulator.battery.oxygen_identity import (
     _AIR_O2_MOLE_FRACTION,
     _ATM_BAR,
@@ -26948,6 +26951,66 @@ class Migrator:
         source_context["same_row_composition_closure_components"] = (
             _same_row_composition_closure_components(rows)
         )
+        if source_id == ZHANG_2021_ACSESC_SOURCE_ID:
+            # Table S1's weights and area endpoints are printed in separate
+            # columns of the same sample table. Keep the row join here, where
+            # extract locators are still available, and pass located facts to
+            # each observation without writing derived values into the extract.
+            run_inputs: dict[str, dict[str, Any]] = {}
+            for _formula, row in rows:
+                values = row.get("values")
+                if not isinstance(values, Mapping):
+                    continue
+                for sample in values.get("runs") or ():
+                    if not isinstance(sample, Mapping) or not sample.get("sample"):
+                        continue
+                    mass_locator = locator_from_mapping(sample.get("locator"))
+                    try:
+                        mass_before = convert_mass_to_kg(
+                            sample.get("mass_before_mg"), "mg"
+                        )[0]
+                        mass_after = convert_mass_to_kg(
+                            sample.get("mass_after_mg"), "mg"
+                        )[0]
+                    except (ArithmeticError, TypeError, ValueError):
+                        continue
+                    if mass_before is None or mass_after is None:
+                        continue
+                    run_inputs[str(sample["sample"])] = {
+                        "sample_mass_kg": located_value(mass_before, mass_locator),
+                        "sample_mass_after_kg": located_value(mass_after, mass_locator),
+                        "mass_locator": mass_locator,
+                    }
+                equipment = row.get("equipment")
+                surface = (
+                    equipment.get("sample_surface_area")
+                    if isinstance(equipment, Mapping)
+                    else None
+                )
+                area_rows = surface.get("value") if isinstance(surface, Mapping) else None
+                for sample in area_rows or ():
+                    if not isinstance(sample, Mapping) or not sample.get("sample"):
+                        continue
+                    area_locator = locator_from_mapping(sample.get("locator"))
+                    try:
+                        area_before = convert_area_to_m2(
+                            sample.get("initial_area_mm2"), "mm2"
+                        )[0]
+                        area_after = convert_area_to_m2(
+                            sample.get("final_area_mm2"), "mm2"
+                        )[0]
+                    except (ArithmeticError, TypeError, ValueError):
+                        continue
+                    if area_before is None or area_after is None:
+                        continue
+                    target = run_inputs.setdefault(str(sample["sample"]), {})
+                    target["exposed_area_initial_m2"] = located_value(
+                        area_before, area_locator
+                    )
+                    target["exposed_area_final_m2"] = located_value(
+                        area_after, area_locator
+                    )
+            source_context["zhang_sample_run_inputs"] = run_inputs
         records = phase_field_records(doc)
         self._phase_field_records[source_id] = records
         for problem in () if records is None else records.problems:
@@ -28756,6 +28819,11 @@ class Migrator:
         method_raw = obs.get("regime")
         if "regime" not in obs:
             method_raw = values.get("method")
+        if (
+            source_id == ZHANG_2021_ACSESC_SOURCE_ID
+            and q_token is Quantity.MASS_LOSS_FRACTION
+        ):
+            method_raw = obs.get("method") or method_raw
         method = map_method(method_raw)
         quantity_for_notice = q_token if isinstance(q_token, Quantity) else None
         method, method_notice = self._resolve_method_for_observation(
@@ -29419,6 +29487,70 @@ class Migrator:
                 **(point_conditions or {}),
                 **explicit_conditions,
             }
+        if (
+            source_id == ZHANG_2021_ACSESC_SOURCE_ID
+            and q_token in {
+                Quantity.MASS_LOSS_FRACTION,
+                Quantity.RESIDUE_COMPONENT_COMPOSITION,
+            }
+        ):
+            sample_name = values.get("sample")
+            if not isinstance(sample_name, str) and locator is not None:
+                sample_name = locator.paragraph
+            sample_facts = (source_context or {}).get(
+                "zhang_sample_run_inputs", {}
+            ).get(sample_name, {})
+            if isinstance(sample_facts, Mapping):
+                for field_name in (
+                    "sample_mass_kg",
+                    "sample_mass_after_kg",
+                    "exposed_area_initial_m2",
+                    "exposed_area_final_m2",
+                ):
+                    located = sample_facts.get(field_name)
+                    if isinstance(located, Located):
+                        point_conditions = {
+                            **(point_conditions or {}),
+                            field_name: located,
+                        }
+                sample_mass = sample_facts.get("sample_mass_kg")
+                if isinstance(sample_mass, Located) and sample_mass.state.is_value:
+                    ident_kwargs["sample_mass_kg"] = sample_mass.state
+
+                duration_min = _as_dec_or_none(
+                    values.get("duration_min_as_published")
+                )
+                duration_locator = locator
+                if duration_min is None:
+                    located_time = (point_conditions or {}).get("time_min")
+                    if isinstance(located_time, Located) and located_time.state.is_value:
+                        duration_min = as_decimal(located_time.state.value)
+                        duration_locator = located_time.locator or locator
+                elif duration_locator is not None:
+                    point_conditions = {
+                        **(point_conditions or {}),
+                        "time_min": located_value(duration_min, duration_locator),
+                    }
+                if duration_min is not None and duration_min >= 0:
+                    # Convert the printed time condition into identity seconds;
+                    # the predictor separately includes the printed ramp/hold.
+                    duration_s = duration_min * Decimal("60")
+                    initial_area = (point_conditions or {}).get(
+                        "exposed_area_initial_m2"
+                    )
+                    area_state = (
+                        initial_area.state
+                        if isinstance(initial_area, Located)
+                        else State.unknown(
+                            "source does not state an initial exposed area"
+                        )
+                    )
+                    ident_kwargs["exposure"] = State.of(
+                        Exposure(
+                            area_m2=area_state,
+                            duration_s=State.of(duration_s),
+                        )
+                    )
         # Keep row oxygen separate from inherited facts. Resolve experiment
         # pressure first, then stamp oxygen before inherited fO2 can fill it.
         # Printed oxygen beats a derived graphite C–CO pressure. The scratch

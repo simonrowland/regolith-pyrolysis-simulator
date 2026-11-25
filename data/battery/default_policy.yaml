@@ -406,3 +406,23 @@ policies:
     canonized_by: null
     canonized_at: null
     history: []
+  - id: DP-116
+    condition: "Langmuir residue prediction has unprinted sample size or area"
+    formula: "Assume a sphere; derive radius from printed mass, or if mass is also unprinted use a 2 mm diameter sphere; rho from melt-density resolver or 2800 kg/m3; A/m = 3/(rho_melt*r)"
+    formula_owner: "simulator.battery.residue._langmuir_default_geometry"
+    units: "m2/kg"
+    physical_basis: "Conventional stated geometry; with printed mass, solve the sphere volume equation for radius; otherwise use the approved 2 mm sphere."
+    authority: convention
+    notices: [sample_mass_not_printed, exposed_area_not_printed]
+    sensitivity: [0.5, 2.0]
+    bias: "The default diameter controls the predicted extent; the declared x0.5 and x2 A/m sensitivity exposes its effect."
+    flag: knob_defaulted
+    ruling: "w1125tszi2 controller ruling, 2026-11-25"
+    version: 1
+    status: proposed
+    proposed_by: w1125tszi2
+    proposed_at: "2026-11-25"
+    evidence: "Ivanova 2018 pp. 1-2: no sample mass, bead/droplet/loop dimension, or sample size printed; 2 mm sphere approved by controller."
+    canonized_by: null
+    canonized_at: null
+    history: []

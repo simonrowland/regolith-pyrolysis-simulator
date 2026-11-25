@@ -8,7 +8,7 @@ import pytest
 import yaml
 
 from simulator.battery.migrate import Migrator
-from simulator.battery.enums import Quantity, ValueKind
+from simulator.battery.enums import MethodToken, Quantity, ValueKind
 from simulator.battery.records import ApproxPressure, BandBasis
 
 EXTRACT = (
@@ -118,6 +118,33 @@ def test_zhang_si_migrates_percent_and_keeps_unprinted_fo2_unknown() -> None:
             pressure.value.band_basis is BandBasis.HALF_DECADE_ORDER_OF_MAGNITUDE
         )
         assert identity.fO2_Pa.is_unknown
+
+    for observation in mass_loss_rows.values():
+        identity = observation.identity
+        assert identity.method.is_value
+        assert identity.method.value is MethodToken.LANGMUIR_FREE_EVAPORATION
+        assert identity.temperature_K.is_value
+        assert identity.composition.is_value
+        assert identity.fO2_Pa.is_unknown
+        assert identity.sample_mass_kg is not None
+        assert identity.sample_mass_kg.is_value
+        assert identity.exposure is not None and identity.exposure.is_value
+        assert identity.exposure.value.duration_s.is_value
+        assert observation.point_conditions["time_min"].locator is not None
+        assert observation.point_conditions["sample_mass_kg"].locator is not None
+        assert observation.point_conditions["sample_mass_after_kg"].locator is not None
+        if observation.observation_id.endswith(
+            "zhang_si_table_s1_bas1400c0m2_mass_loss"
+        ):
+            assert identity.exposure.value.area_m2.is_unknown
+        else:
+            assert identity.exposure.value.area_m2.is_value
+            assert observation.point_conditions[
+                "exposed_area_initial_m2"
+            ].locator is not None
+            assert observation.point_conditions[
+                "exposed_area_final_m2"
+            ].locator is not None
 
     residue = next(
         observation
