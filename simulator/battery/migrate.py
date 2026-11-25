@@ -7752,6 +7752,7 @@ def _project_source_declared_composition(
         and quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
     )
     elemental_projection_locator: Locator | None = None
+    elemental_oxygen_locator: Locator | None = None
     if elemental_projection:
         sample_id = values.get("sample_id_as_published")
         analysis_id = values.get("analysis_id_as_published")
@@ -7815,6 +7816,11 @@ def _project_source_declared_composition(
                 and elemental_projection_locator is None
             ):
                 elemental_projection_locator = source_locator
+            if (
+                canonical_element_symbol(name) == "O"
+                and elemental_oxygen_locator is None
+            ):
+                elemental_oxygen_locator = source_locator
             component_rows.append(
                 (
                     str(source_row.get("observation_id") or name),
@@ -8018,32 +8024,63 @@ def _project_source_declared_composition(
             )
         parameters: list[tuple[str, Located[Decimal]]] = []
         for name, valence in valences.items():
-            parameter_name = (
-                f"assumed_valence_{name}"
-                if name == "Fe"
-                else f"source_formula_valence_{name}"
-            )
+            parameter_name = f"assumed_valence_{name}"
             parameters.append(
                 (
                     parameter_name,
                     Located(State.of(Decimal(valence)), locator=projection_locator),
                 )
             )
-        if projected.oxygen_closure_residual_wt_percent is not None:
-            parameters.append(
-                (
-                    "oxygen_closure_residual_wt_percent",
-                    Located(
-                        State.of(projected.oxygen_closure_residual_wt_percent),
-                        locator=projection_locator,
-                    ),
-                )
+        measured_oxygen = _as_dec_or_none(declared_map.get("O"))
+        residual = projected.oxygen_closure_residual_wt_percent
+        if measured_oxygen is None or residual is None:
+            return Located(
+                State.unknown(
+                    "elemental run composition has no measured-oxygen balance residual"
+                ),
+                locator=projection_locator,
             )
+        parameters.extend(
+            (
+                (
+                    "measured_oxygen_wt_percent",
+                    Located(
+                        State.of(measured_oxygen),
+                        locator=elemental_oxygen_locator or projection_locator,
+                    ),
+                ),
+                (
+                    "oxygen_balance_residual_wt_percent",
+                    Located(
+                        State.of(residual),
+                        locator=elemental_oxygen_locator or projection_locator,
+                    ),
+                ),
+            )
+        )
+        assumptions = (
+            f"source basis: {rule.source_basis}",
+            rule.reason,
+            "declared cation valences are recorded as assumed_valence parameters",
+            "FeT labels resolve to Fe",
+            "measured O is used only for the oxygen balance residual, "
+            "not projected into the composition",
+            "oxygen balance residual = measured O wt% - stoichiometric O wt% "
+            "implied by projected components",
+            "printed Cl/CO2/H2O are retained; absent components are not filled",
+            "weight-percent renormalized: false",
+            "formula-unit mole fractions are normalized to their sum",
+        )
+        input_ids = tuple(row_id for row_id, _record in component_rows)
+        reference_inputs = tuple(
+            dict.fromkeys((*input_ids, *assumptions))
+        )
         derivation = Derivation(
-            relation="element_wt_percent_stoichiometric_oxide_projection",
-            inputs=tuple(row_id for row_id, _record in component_rows),
+            relation="source_composition_projection",
+            inputs=reference_inputs,
             parameters=tuple(parameters),
             output_unit="mole_fraction",
+            method=Located(State.of(rule.source_basis), locator=projection_locator),
             references=tuple(source_references),
         )
         return Located(

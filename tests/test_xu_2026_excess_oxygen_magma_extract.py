@@ -220,16 +220,36 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
         assert located_composition.inference is not None
         assert (
             located_composition.inference.relation
-            == "element_wt_percent_stoichiometric_oxide_projection"
+            == "source_composition_projection"
         )
         assert located_composition.inference.output_unit == "mole_fraction"
+        assert located_composition.inference.method is not None
+        assert located_composition.inference.method.state.value == "elemental wt %"
+        row_projection_parameters = dict(located_composition.inference.parameters)
+        assert (
+            row_projection_parameters[
+                "oxygen_balance_residual_wt_percent"
+            ].state.is_value
+        )
+        assert (
+            "measured O is used only for the oxygen balance residual, not projected into the composition"
+            in located_composition.inference.inputs
+        )
+        assert (
+            "weight-percent renormalized: false"
+            in located_composition.inference.inputs
+        )
+        assert any(
+            item.startswith("oxygen balance residual = measured O wt% -")
+            for item in located_composition.inference.inputs
+        )
         group_prefix = row["observation_id"].rsplit("_", 1)[0]
         expected_inputs = {
             "xu-2026-excess-oxygen-magma::" + observation_id
             for observation_id in raw_observations
             if observation_id.rsplit("_", 1)[0] == group_prefix
         }
-        assert set(located_composition.inference.inputs) == expected_inputs
+        assert expected_inputs.issubset(set(located_composition.inference.inputs))
         assert observation.value.kind is ValueKind.POINT
         assert observation.value.point == Decimal(row["component_amount"])
         assert observation.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
@@ -325,8 +345,29 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
     lvp1_composition = observations[table1_lvp1[0]["observation_id"].split("::", 1)[-1]]
     projection_derivation = lvp1_composition.point_conditions["composition"].inference
     projection_parameters = dict(projection_derivation.parameters)
-    assert "source_formula_valence_Fe" not in projection_parameters
-    assert projection_parameters["assumed_valence_Fe"].state.value == 3
+    assert projection_derivation.relation == "source_composition_projection"
+    assert projection_derivation.method is not None
+    assert projection_derivation.method.state.value == "elemental wt %"
+    expected_valences = {
+        "Si": 4,
+        "Ti": 4,
+        "Al": 3,
+        "Fe": 3,
+        "Mg": 2,
+        "Ca": 2,
+        "Na": 1,
+        "K": 1,
+        "Pt": 4,
+    }
+    assert {
+        name.removeprefix("assumed_valence_"): int(parameter.state.value)
+        for name, parameter in projection_derivation.parameters
+        if name.startswith("assumed_valence_")
+    } == expected_valences
+    assert any(
+        "all experimental Fe is trivalent" in value
+        for value in projection_derivation.inputs
+    )
     assert dict(lvp1_composition.identity.composition.value.components) == {
         "SiO2": Decimal("0.5531183156263053760382113461"),
         "TiO2": Decimal("0.008043932072763917401742288490"),
@@ -341,16 +382,15 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
     }
     assert (
         projection_parameters[
-            "oxygen_closure_residual_wt_percent"
+            "oxygen_balance_residual_wt_percent"
         ].state.value
         == Decimal("-0.22587040322009958874924728")
     )
     valences = {
-        name.removeprefix("source_formula_valence_"): int(parameter.state.value)
+        name.removeprefix("assumed_valence_"): int(parameter.state.value)
         for name, parameter in projection_derivation.parameters
-        if name.startswith("source_formula_valence_")
+        if name.startswith("assumed_valence_")
     }
-    valences["Fe"] = int(projection_parameters["assumed_valence_Fe"].state.value)
     retained_components = tuple(
         name for name in ("Cl", "CO2", "H2O") if name in elemental_wt_percent
     )
@@ -364,8 +404,18 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
     )
     assert dict(projected.components)["Cl"] > 0
     assert projection_parameters[
-        "oxygen_closure_residual_wt_percent"
+        "oxygen_balance_residual_wt_percent"
     ].state.value == projected.oxygen_closure_residual_wt_percent
+    assert projection_parameters[
+        "oxygen_balance_residual_wt_percent"
+    ].state.value < 0
+    s2_row_100 = observations["xu_2026_s2_row_100_si"]
+    s2_row_100_residual = dict(
+        s2_row_100.point_conditions["composition"].inference.parameters
+    )["oxygen_balance_residual_wt_percent"]
+    assert s2_row_100_residual.locator == observations[
+        "xu_2026_s2_row_100_o"
+    ].locator
     oxygen_changed = dict(elemental_wt_percent)
     oxygen_changed["O"] = str(Decimal(oxygen_changed["O"]) + 1)
     oxygen_check_only = _element_wt_percent_stoichiometric_oxide_projection(
@@ -445,3 +495,49 @@ def test_lvp1_table1_redox_cell_is_empty_in_excess_oxygen_context() -> None:
     ]
     assert len(lvp1_rows) == 1
     assert lvp1_rows[0]["values"]["redox_condition_as_published"] == ""
+
+
+def test_elemental_projection_oxide_mass_factors_match_hand_computed_values() -> None:
+    cases = (
+        (
+            "Si",
+            4,
+            "SiO2",
+            Decimal("60.0843") / Decimal("28.0855"),
+        ),
+        (
+            "Al",
+            3,
+            "Al2O3",
+            (2 * Decimal("26.9815385") + 3 * Decimal("15.9994"))
+            / (2 * Decimal("26.9815385")),
+        ),
+        (
+            "Fe",
+            2,
+            "FeO",
+            (Decimal("55.845") + Decimal("15.9994")) / Decimal("55.845"),
+        ),
+        (
+            "Mg",
+            2,
+            "MgO",
+            (Decimal("24.305") + Decimal("15.9994")) / Decimal("24.305"),
+        ),
+        (
+            "Na",
+            1,
+            "Na2O",
+            (2 * Decimal("22.98976928") + Decimal("15.9994"))
+            / (2 * Decimal("22.98976928")),
+        ),
+    )
+    for element, valence, oxide, expected_factor in cases:
+        projected = _element_wt_percent_stoichiometric_oxide_projection(
+            {element: Decimal("1")},
+            valence_by_element={element: valence},
+        )
+        actual_factor = dict(projected.projected_component_mass_g_per_100g)[
+            oxide
+        ]
+        assert abs(actual_factor - expected_factor) < Decimal("1e-25")
