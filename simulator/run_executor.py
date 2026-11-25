@@ -39,6 +39,7 @@ from simulator.session import (
     SimSessionConfig,
     _at_stage0_exit as _session_at_stage0_exit,
     _drive_session_with_budget_intent,
+    _run_flags_for_export,
     drive_session,
 )
 from simulator.scalar_boundary import is_declared_real_scalar
@@ -644,7 +645,7 @@ class RunExecutor:
                     ),
                 ),
                 campaigns_elapsed_start=campaigns_elapsed_start,
-                run_flags=tuple(getattr(session, "_run_flags", ()) or ()),
+                run_flags=_run_flags_for_export(session),
                 campaign_stops=tuple(campaign_stops),
             )
         except Exception as envelope_exc:  # noqa: BLE001 -- reporting must survive
@@ -733,7 +734,7 @@ class RunExecutor:
                     ),
                 ),
                 campaigns_elapsed_start=campaigns_elapsed_start,
-                run_flags=tuple(getattr(session, "_run_flags", ()) or ()),
+                run_flags=_run_flags_for_export(session),
                 campaign_stops=tuple(campaign_stops),
             )
 

@@ -148,6 +148,7 @@ from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.session import (
     SimSession,
     SimSessionConfig,
+    _run_flags_for_export,
 )
 from simulator.state import (
     Atmosphere,
@@ -5883,7 +5884,12 @@ def _attach_execution_diagnostics(
     campaign_stops: Sequence[Mapping[str, Any]] | None = None,
 ) -> None:
     if execution is not None:
-        run_flags = getattr(execution, "run_flags", ())
+        session = getattr(execution, "session", None)
+        run_flags = (
+            _run_flags_for_export(session)
+            if isinstance(session, SimSession)
+            else getattr(execution, "run_flags", ())
+        )
         campaign_stops = getattr(execution, "campaign_stops", ())
     run_flags = list(run_flags or ())
     if run_flags:

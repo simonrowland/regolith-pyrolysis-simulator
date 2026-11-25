@@ -857,6 +857,18 @@ class SimSession:
         return build_per_hour_summary(sim, snapshot)
 
 
+def _run_flags_for_export(session: SimSession) -> tuple[dict[str, Any], ...]:
+    run_flags = tuple(getattr(session, "_run_flags", ()) or ())
+    sim = getattr(session, "_sim", None)
+    if sim is None or not sim.is_complete():
+        return run_flags
+    return tuple(
+        flag
+        for flag in run_flags
+        if flag.get("code") != _RUN_HOUR_BUDGET_FLAG_CODE
+    )
+
+
 def drive_auto_apply(
     session: SimSession,
     hours: int,

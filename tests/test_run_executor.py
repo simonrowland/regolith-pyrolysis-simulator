@@ -538,6 +538,49 @@ def test_campaign_time_cap_flag_identifies_pending_successor_decision():
     assert cap_flag["detail"]["pending_decision"] == "C6_PROCEED"
 
 
+def test_completed_c6_no_filters_budget_flag_at_zero_hour_export():
+    run = _run(campaign="C2A", hours=1)
+    session = _started_internal_session(run)
+    sim = session.simulator
+    sim.record.path = "A_post_mg_boiloff"
+    sim.record.branch = "two"
+    sim.campaign_mgr.campaigns["C2A_continuous"]["max_hold_hr"] = 1
+
+    pending_execution = RunExecutor().execute_session(session, hours=1)
+
+    assert sim.pending_decision is not None
+    assert sim.pending_decision.decision_type is DecisionType.C6_PROCEED
+    assert any(
+        flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+        for flag in pending_execution.run_flags
+    )
+    pending_projection = RunExecutor().execute_session(session, hours=0)
+    assert any(
+        flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+        for flag in pending_projection.run_flags
+    )
+    pending_payload = run._build_output(pending_projection)
+    assert any(
+        flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+        for flag in pending_payload["run_metadata"].get("run_flags", ())
+    )
+
+    session.decide("no")
+    assert session.is_complete()
+
+    completed_execution = RunExecutor().execute_session(session, hours=0)
+
+    assert not any(
+        flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+        for flag in completed_execution.run_flags
+    )
+    completed_payload = run._build_output(completed_execution)
+    assert not any(
+        flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+        for flag in completed_payload["run_metadata"].get("run_flags", ())
+    )
+
+
 def test_budget_flag_uses_live_campaign_adjustment():
     session = _started_internal_session(_run(campaign="C2A", hours=1))
     session.adjust(

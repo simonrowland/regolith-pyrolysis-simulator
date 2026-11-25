@@ -77,6 +77,7 @@ from simulator.session import (
     DecisionPolicy,
     SimSession,
     SimSessionConfig,
+    _run_flags_for_export,
     drive_session,
     normalize_mre_policy,
 )
@@ -2902,7 +2903,7 @@ def _available_runner_payload(
         metadata['refusal_diagnostic'] = copy.deepcopy(
             dict(refusal_diagnostic)
         )
-    run_flags = getattr(session, '_run_flags', ()) or ()
+    run_flags = _run_flags_for_export(session)
     campaign_stops = _campaign_stops_for_trace(session)
     _attach_execution_diagnostics(
         metadata,
