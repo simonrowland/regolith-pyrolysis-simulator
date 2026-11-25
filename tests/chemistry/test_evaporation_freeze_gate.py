@@ -6361,20 +6361,13 @@ def test_redox_operation_holds_failed_authority_until_recovery_next_operation(
         / math.log(10.0)
     )
 
+    assert sim._melt_redox_gate_authority_tick_hour is None
     assert curve_calls == 1
     assert fallback_fO2 == pytest.approx(expected_fO2)
     assert fallback_operation['respeciation_status'] == 'ok'
     assert fallback_operation['transition_name'] == 'fe_redox_respeciation'
     assert fallback_authority['status'] == 'liquidus_unavailable_floor_fallback'
 
-    held_authority = sim._resolved_melt_redox_gate_authority()
-    assert held_authority is sim._melt_redox_gate_authority_this_tick
-    assert curve_calls == 1
-
-    sim._clear_melt_redox_gate_authority_for_completed_hour(
-        int(sim.melt.hour)
-    )
-    sim.melt.hour += 1
     recovered_operation = sim._apply_fe_redox_respeciation()
 
     assert curve_calls == 2
@@ -6426,17 +6419,8 @@ def test_full_tick_pins_failed_authority_and_poisoned_retry(
     )
     per_operation_sim._apply_fe_redox_respeciation()
     mixed_transition = per_operation_sim.atom_ledger.transitions[-1]
-    held_authority = (
-        per_operation_sim._resolved_melt_redox_gate_authority()
-    )
-    assert held_authority is (
-        per_operation_sim._melt_redox_gate_authority_this_tick
-    )
     assert per_operation_calls == 1
-    per_operation_sim._clear_melt_redox_gate_authority_for_completed_hour(
-        int(per_operation_sim.melt.hour)
-    )
-    per_operation_sim.melt.hour += 1
+    assert per_operation_sim._melt_redox_gate_authority_tick_hour is None
     mixed_liquid_fraction = (
         per_operation_sim._freeze_gate_liquid_fraction_factor()
     )
