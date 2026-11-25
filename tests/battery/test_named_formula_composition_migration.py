@@ -109,7 +109,47 @@ def test_kassis_na2o_silicate_recipe_derives_hand_computed_oxide_weights(
         )
 
 
-def test_shornikov_derived_charge_flag_does_not_block_vapour_qualification(
+def test_jacobson_table_1_printed_charge_is_linked_with_basis_default_flag(
+    tmp_path: Path,
+) -> None:
+    source_id = "kems-139-jacobson-2024"
+    result = _migrate_real_extract(tmp_path, f"{source_id}.yaml", write=False)
+    rows = [
+        row
+        for row in _partial_pressure_rows(result, source_id)
+        if "jacobson_2024_t1_factsage_2500k_predicted_psat" in row.observation_id
+    ]
+
+    assert len(rows) == 21
+    row = next(row for row in rows if row.identity.species.formula == "SiO")
+    composition = row.identity.composition.value
+    assert composition.proxy_flag == "assumed_mass_percent_basis"
+    assert "no printed wt% or mol% header" in composition.proxy_source
+    assert set(composition_wt_pct(composition) or {}) == {
+        "SiO2",
+        "TiO2",
+        "Al2O3",
+        "FeO",
+        "MnO",
+        "MgO",
+        "CaO",
+        "Na2O",
+        "K2O",
+        "P2O5",
+    }
+    located = row.point_conditions["composition"]
+    assert located.locator.page == 19
+    assert located.locator.published_page == 18
+    assert located.locator.table == "1"
+    assert any(
+        notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        and "assumed_mass_percent_basis" in notice.reason
+        and "no printed wt% or mol% header" in notice.reason
+        for notice in row.notices
+    )
+
+
+def test_named_formula_caveat_does_not_set_blocking_qualification_conjunct(
     tmp_path: Path,
 ) -> None:
     source_id = "shornikov-2008-redox-oxide-evaporation"
@@ -126,6 +166,8 @@ def test_shornikov_derived_charge_flag_does_not_block_vapour_qualification(
         and "calculated_from_named_formula" in notice.reason
         for notice in row.notices
     )
+    # This pins only the notice's qualification behavior. Source evidence and
+    # pressure requirements remain separate gates for overall eligibility.
     conjuncts = build_conjuncts(
         status=ResidualStatus.NO_BAND,
         reference=row,
@@ -230,3 +272,84 @@ def test_malformed_shornikov_charge_keeps_its_typed_refusal(
         and "not-a-number" in (issue.detail or "")
         for issue in result.validation.hard_issues
     )
+
+
+def test_conflicting_shornikov_mole_map_is_a_typed_refusal(
+    tmp_path: Path,
+) -> None:
+    source_id = "shornikov-2008-redox-oxide-evaporation"
+    path = REPO_ROOT / "data" / "literature" / "extracts" / f"{source_id}.yaml"
+    extract_doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+    observation = next(
+        item
+        for item in extract_doc["species"]["Ca"]["observations"]
+        if item["observation_id"] == "shornikov_2008_t1_ca_reducing"
+    )
+    point = observation["values"]["points"][0]
+    point["composition_mol"] = {"MgO": 1.0}
+    point["oxide_as_printed"] = "CaO"
+
+    result = _migrate_real_extract(
+        tmp_path,
+        f"{source_id}.yaml",
+        write=False,
+        extract_doc=extract_doc,
+    )
+    row = next(
+        row
+        for row in _partial_pressure_rows(result, source_id)
+        if "shornikov_2008_t1_ca_reducing" in row.observation_id
+    )
+    assert row.identity.composition.is_unknown
+    assert "named formula composition conflict" in row.identity.composition.reason
+    assert row.point_conditions["composition"].state.reason == (
+        row.identity.composition.reason
+    )
+    assert any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and "CaO conflicts with printed composition_mol" in (issue.detail or "")
+        for issue in result.validation.hard_issues
+    )
+
+
+def test_explicit_kassis_row_composition_not_applicable_wins(
+    tmp_path: Path,
+) -> None:
+    source_id = "kassis-frischat-1981-silicate-glass-vapour"
+    path = REPO_ROOT / "data" / "literature" / "extracts" / f"{source_id}.yaml"
+    extract_doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+    observation = next(
+        item
+        for item in extract_doc["species"]["Na"]["observations"]
+        if item["observation_id"] == "kassis_1981_fig2_pna"
+    )
+    observation["values"]["points"][0]["point_conditions"] = {
+        "composition": {
+            "state": {
+                "tag": "not_applicable",
+                "reason": "explicit row-level composition disposition",
+            },
+            "locator": {
+                "page": 2,
+                "published_page": "C-29",
+                "figure": "2",
+            },
+        }
+    }
+
+    result = _migrate_real_extract(
+        tmp_path,
+        f"{source_id}.yaml",
+        write=False,
+        extract_doc=extract_doc,
+    )
+    row = next(
+        row
+        for row in _partial_pressure_rows(result, source_id)
+        if "kassis_1981_fig2_pna" in row.observation_id
+        and row.point_conditions["composition"].state.is_not_applicable
+    )
+    assert row.point_conditions["composition"].state.reason == (
+        "explicit row-level composition disposition"
+    )
+    assert row.identity.composition.is_not_applicable

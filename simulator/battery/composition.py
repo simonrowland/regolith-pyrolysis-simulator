@@ -120,7 +120,8 @@ def _named_formula_oxide_composition(
     formula: str,
     *,
     locator: Locator,
-    composition: Composition | None = None,
+    printed_composition_mol: Mapping[str, object] | None = None,
+    pure_oxide_composition: Composition | None = None,
 ) -> Located[Composition] | None:
     """Return a located charge and its formula-unit-to-wt% derivation.
 
@@ -128,32 +129,77 @@ def _named_formula_oxide_composition(
     ``composition_wt_pct``. For Na2O.3SiO2, one mole Na2O weighs 61.97853856 g
     and three moles SiO2 weigh 180.249 g, giving 25.5869/74.4131 wt%.
     Units: mol × g/mol = g, then 100 × g/g = wt%.
+
+    A separately printed mole map is checked against the named formula. It
+    never supplies the composition being derived: a conflicting map is a
+    source conflict, not a reason to relabel that map as the named formula.
     """
 
-    if composition is None:
-        if not isinstance(formula, str) or not formula.strip():
+    if not isinstance(formula, str) or not formula.strip():
+        return None
+    formula_units: dict[str, Decimal] = {}
+    for raw_unit in re.split(r"[.·⋅∙]", formula):
+        match = re.fullmatch(r"(?:(\d+))?([A-Z][A-Za-z0-9]*)", raw_unit.strip())
+        if match is None:
             return None
-        formula_units: dict[str, Decimal] = {}
-        for raw_unit in re.split(r"[.·⋅∙]", formula):
-            match = re.fullmatch(r"(?:(\d+))?([A-Z][A-Za-z0-9]*)", raw_unit.strip())
-            if match is None:
-                return None
-            oxide = match.group(2)
-            parsed = formula_composition(oxide)
-            if parsed is None or not any(
-                element == "O" and count > 0 for element, count in parsed
-            ):
-                return None
-            amount = Decimal(match.group(1) or "1")
-            formula_units[oxide] = formula_units.get(oxide, Decimal("0")) + amount
-        total = sum(formula_units.values(), Decimal("0"))
-        if total <= 0:
+        oxide = match.group(2)
+        parsed = formula_composition(oxide)
+        if parsed is None or not any(
+            element == "O" and count > 0 for element, count in parsed
+        ):
             return None
+        amount = Decimal(match.group(1) or "1")
+        formula_units[oxide] = formula_units.get(oxide, Decimal("0")) + amount
+    total = sum(formula_units.values(), Decimal("0"))
+    if total <= 0:
+        return None
+    formula_components = {
+        oxide: amount / total for oxide, amount in formula_units.items()
+    }
+    if printed_composition_mol:
+        printed_amounts: dict[str, Decimal] = {}
+        try:
+            for oxide, raw_amount in printed_composition_mol.items():
+                if isinstance(raw_amount, bool):
+                    raise ValueError("boolean component amount")
+                amount = Decimal(str(raw_amount))
+                if not amount.is_finite() or amount < 0:
+                    raise ValueError("non-finite or negative component amount")
+                printed_amounts[oxide] = amount
+        except (ArithmeticError, ValueError) as exc:
+            raise NamedFormulaCompositionConflict(
+                f"{formula} conflicts with printed composition_mol: {exc}"
+            ) from exc
+        printed_total = sum(printed_amounts.values(), Decimal("0"))
+        normalized_printed = (
+            {
+                oxide: amount / printed_total
+                for oxide, amount in printed_amounts.items()
+            }
+            if printed_total > 0
+            else {}
+        )
+        if normalized_printed != formula_components:
+            raise NamedFormulaCompositionConflict(
+                f"{formula} conflicts with printed composition_mol "
+                f"{dict(printed_composition_mol)!r}"
+            )
+    if pure_oxide_composition is not None:
+        if (
+            len(formula_components) != 1
+            or pure_oxide_composition.basis != "pure_oxide_system"
+            or pure_oxide_composition.amount_basis is not AmountBasis.MOLE_FRACTION
+            or dict(pure_oxide_composition.components) != formula_components
+        ):
+            raise NamedFormulaCompositionConflict(
+                f"{formula} conflicts with the resolved pure-oxide composition "
+                f"{pure_oxide_composition.components!r}"
+            )
+        composition = pure_oxide_composition
+    else:
         composition = Composition(
             basis="named_formula_oxide_moles",
-            components=tuple(
-                (oxide, amount / total) for oxide, amount in formula_units.items()
-            ),
+            components=tuple(formula_components.items()),
             amount_basis=AmountBasis.MOLE_FRACTION,
         )
     composition = replace(
@@ -182,6 +228,10 @@ def _named_formula_oxide_composition(
         ),
     )
     return Located(State.of(composition), locator=locator, inference=derivation)
+
+
+class NamedFormulaCompositionConflict(ValueError):
+    """A located formula and a separately printed mole map disagree."""
 
 
 def mass_weighted_mixture_wt_pct(

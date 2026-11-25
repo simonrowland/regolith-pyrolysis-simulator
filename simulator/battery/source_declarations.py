@@ -2,12 +2,11 @@
 
 from dataclasses import dataclass
 
-from simulator.battery.enums import Phase, Quantity
-from simulator.battery.records import Located, Locator
+from simulator.battery.enums import Phase
+from simulator.battery.records import Locator
 from simulator.reference_data.robie_hemingway_fisher_1978_usgs_b1452_loader import (
     SOURCE_ID as B1452_SOURCE_ID,
 )
-from simulator.state_types import State
 from simulator.reference_data.robie_waldbaum_1968_usgs_b1259_loader import (
     SOURCE_ID as B1259_SOURCE_ID,
 )
@@ -33,7 +32,7 @@ class NamedFormulaCharge:
     formula: str
     locator: Locator
     note: str | None = None
-    composition_mol_basis: str | None = None
+    derive_via_pure_oxide_parser: bool = False
 
 
 DISTIN_SOURCE_ID = "distin-1971-ferrous-silicate-melts"
@@ -178,40 +177,40 @@ _KASSIS_FRISCHAT_EXPERIMENTAL_METHOD = Locator(
 NAMED_FORMULA_CHARGES: dict[str, dict[str, NamedFormulaCharge]] = {
     "shornikov-2008-redox-oxide-evaporation": {
         "shornikov_2008_t1_ca_reducing": NamedFormulaCharge(
-            "CaO", _SHORNIKOV_2008_TABLE_1, composition_mol_basis="pure_oxide_system"
+            "CaO", _SHORNIKOV_2008_TABLE_1, derive_via_pure_oxide_parser=True
         ),
         "shornikov_2008_t1_ca_neutral": NamedFormulaCharge(
-            "CaO", _SHORNIKOV_2008_TABLE_1, composition_mol_basis="pure_oxide_system"
+            "CaO", _SHORNIKOV_2008_TABLE_1, derive_via_pure_oxide_parser=True
         ),
         "shornikov_2008_t1_mg_reducing": NamedFormulaCharge(
-            "MgO", _SHORNIKOV_2008_TABLE_1, composition_mol_basis="pure_oxide_system"
+            "MgO", _SHORNIKOV_2008_TABLE_1, derive_via_pure_oxide_parser=True
         ),
         "shornikov_2008_t1_mg_neutral": NamedFormulaCharge(
-            "MgO", _SHORNIKOV_2008_TABLE_1, composition_mol_basis="pure_oxide_system"
+            "MgO", _SHORNIKOV_2008_TABLE_1, derive_via_pure_oxide_parser=True
         ),
         "shornikov_2008_t1_fe_reducing": NamedFormulaCharge(
             "FeO",
             _SHORNIKOV_2008_TABLE_1,
             "nominal ferrous starting charge; no valence ratio or fO2 inferred",
-            "pure_oxide_system",
+            derive_via_pure_oxide_parser=True,
         ),
         "shornikov_2008_t1_fe_neutral": NamedFormulaCharge(
             "FeO",
             _SHORNIKOV_2008_TABLE_1,
             "nominal ferrous starting charge; no valence ratio or fO2 inferred",
-            "pure_oxide_system",
+            derive_via_pure_oxide_parser=True,
         ),
         "shornikov_2008_t1_al_reducing": NamedFormulaCharge(
-            "Al2O3", _SHORNIKOV_2008_TABLE_1, composition_mol_basis="pure_oxide_system"
+            "Al2O3", _SHORNIKOV_2008_TABLE_1, derive_via_pure_oxide_parser=True
         ),
         "shornikov_2008_t1_al_neutral": NamedFormulaCharge(
-            "Al2O3", _SHORNIKOV_2008_TABLE_1, composition_mol_basis="pure_oxide_system"
+            "Al2O3", _SHORNIKOV_2008_TABLE_1, derive_via_pure_oxide_parser=True
         ),
         "shornikov_2008_t1_sio_reducing": NamedFormulaCharge(
-            "SiO2", _SHORNIKOV_2008_TABLE_1, composition_mol_basis="pure_oxide_system"
+            "SiO2", _SHORNIKOV_2008_TABLE_1, derive_via_pure_oxide_parser=True
         ),
         "shornikov_2008_t1_sio_neutral": NamedFormulaCharge(
-            "SiO2", _SHORNIKOV_2008_TABLE_1, composition_mol_basis="pure_oxide_system"
+            "SiO2", _SHORNIKOV_2008_TABLE_1, derive_via_pure_oxide_parser=True
         ),
     },
     "kassis-frischat-1981-silicate-glass-vapour": {
@@ -224,66 +223,17 @@ NAMED_FORMULA_CHARGES: dict[str, dict[str, NamedFormulaCharge]] = {
     },
 }
 
-
-def declared_named_formula_charge(
-    source_id: str,
-    parent_observation_id: str,
-    *,
-    quantity: Quantity | None,
-    located_compositions: tuple[State[object] | Located[object] | None, ...],
-    refusal_reasons: tuple[str, ...],
-    malformed_composition_reason: str | None,
-    omitted_components: tuple[str, ...],
-) -> NamedFormulaCharge | None:
-    """Return the source formula only when migration found no usable input.
-
-    Located values and typed refusals belong to the normal composition
-    resolver. An unknown ``numerical_bulk_composition_not_published`` state
-    also remains authoritative, even when an unrelated oxide formula is
-    present on a vapor row.
-    """
-
-    if (
-        quantity is not Quantity.P_PARTIAL
-        or refusal_reasons
-        or malformed_composition_reason is not None
-        or omitted_components
-    ):
-        return None
-    prefix = f"{source_id}::"
-    observation_id = (
-        parent_observation_id[len(prefix) :]
-        if parent_observation_id.startswith(prefix)
-        else parent_observation_id
-    )
-    declaration = NAMED_FORMULA_CHARGES.get(source_id, {}).get(observation_id)
-    if declaration is None:
-        return None
-
-    for candidate in located_compositions:
-        state = candidate.state if isinstance(candidate, Located) else candidate
-        if state is None:
-            continue
-        if state.is_unknown:
-            reason = (state.reason or "").casefold()
-            if (
-                "numerical_bulk_composition_not_published" in reason
-                or "invalid_source" in reason
-                or reason != "no composition mapped from source"
-            ):
-                return None
-            continue
-        if state.is_not_applicable:
-            continue
-        if state.is_value:
-            # The source-linked formula is a named reservoir, not a printed
-            # numeric map. Any other located value keeps precedence.
-            value = state.value
-            if isinstance(value, str) and value.strip() == declaration.formula:
-                continue
-            return None
-        return None
-    return declaration
+PRINTED_CHARGE_COMPOSITION_LINKS: dict[str, dict[str, dict[str, str]]] = {
+    "kems-139-jacobson-2024": {
+        "jacobson_2024_t1_factsage_2500k_predicted_psat": {
+            "composition_observation_id": "jacobson_2024_t1_snyder_12022_composition",
+            "amount_basis_default": "mass_percent",
+            "basis_default_reason": (
+                "Table 1 chemical-analysis values have no printed wt% or mol% header"
+            ),
+        },
+    },
+}
 
 
 def source_rule_enabled(source_id: str | None, key: str) -> bool:

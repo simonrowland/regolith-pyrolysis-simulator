@@ -90,8 +90,9 @@ from simulator.battery.source_declarations import (
     B677_SOURCE_ID,
     B2131_SOURCE_ID as _B2131_SOURCE_ID,
     KEMS_137_SOURCE_ID as _KEMS_137_SOURCE_ID,
+    NAMED_FORMULA_CHARGES,
+    PRINTED_CHARGE_COMPOSITION_LINKS,
     SOURCE_DECLARATIONS,
-    declared_named_formula_charge,
 )
 from simulator.source_ids import SOSSI_FEGLEY_SOURCE_ID
 from simulator.battery.oxygen_identity import (
@@ -128,6 +129,7 @@ from simulator.battery.input_provenance import (
 )
 from simulator.battery.composition import (
     ELEMENT_WT_PERCENT_FEO_T_BASIS,
+    NamedFormulaCompositionConflict,
     SLAG_METAL_CHARGE_BASIS,
     ElementMassFractionRedox,
     _named_formula_oxide_composition,
@@ -26356,6 +26358,12 @@ class Migrator:
         source_context["same_row_composition_closure_components"] = (
             _same_row_composition_closure_components(rows)
         )
+        if PRINTED_CHARGE_COMPOSITION_LINKS.get(source_id):
+            source_context["extract_observations_by_id"] = {
+                str(row["observation_id"]): row
+                for _formula, row in rows
+                if isinstance(row.get("observation_id"), str)
+            }
         records = phase_field_records(doc)
         self._phase_field_records[source_id] = records
         for problem in () if records is None else records.problems:
@@ -27176,6 +27184,100 @@ class Migrator:
                 source=source_key,
                 observation_id=obs_id,
             )
+        source_declared_composition: Located[Composition] | None = None
+        printed_charge_link = PRINTED_CHARGE_COMPOSITION_LINKS.get(
+            source_id, {}
+        ).get(raw_obs_id)
+        linked_observation_rows = context.get("extract_observations_by_id")
+        linked_composition_row = (
+            linked_observation_rows.get(
+                printed_charge_link.get("composition_observation_id")
+            )
+            if isinstance(printed_charge_link, Mapping)
+            and isinstance(linked_observation_rows, Mapping)
+            else None
+        )
+        linked_composition_values = (
+            linked_composition_row.get("values")
+            if isinstance(linked_composition_row, Mapping)
+            else None
+        )
+        printed_oxide_cells = (
+            linked_composition_values.get("oxides")
+            if isinstance(linked_composition_values, Mapping)
+            else None
+        )
+        if (
+            q_token is Quantity.P_PARTIAL
+            and isinstance(printed_charge_link, Mapping)
+            and printed_charge_link.get("amount_basis_default") == "mass_percent"
+            and isinstance(linked_composition_row, Mapping)
+            and isinstance(printed_oxide_cells, list)
+        ):
+            linked_oxide_wt: dict[str, Decimal] = {}
+            valid_linked_oxide_cells = bool(printed_oxide_cells)
+            for cell in printed_oxide_cells:
+                if not isinstance(cell, Mapping):
+                    valid_linked_oxide_cells = False
+                    break
+                oxide_name = cell.get("oxide_as_printed")
+                amount = _printed_composition_amount(
+                    cell.get("value_as_printed", cell.get("value"))
+                )
+                if (
+                    not isinstance(oxide_name, str)
+                    or not oxide_name.strip()
+                    or amount is None
+                    or oxide_name in linked_oxide_wt
+                ):
+                    valid_linked_oxide_cells = False
+                    break
+                linked_oxide_wt[oxide_name] = amount
+            basis_default_reason = str(
+                printed_charge_link.get("basis_default_reason") or ""
+            )
+            if (
+                valid_linked_oxide_cells
+                and len(linked_oxide_wt) >= 2
+                and basis_default_reason.strip()
+            ):
+                linked_locator = locator_from_mapping(
+                    linked_composition_row.get("locator")
+                )
+                linked_composition = _mass_percent_composition_located(
+                    linked_oxide_wt,
+                    basis="printed_bulk_assumed_mass_percent",
+                    locator=linked_locator,
+                    closure_context={"composition_mass_percent": linked_oxide_wt},
+                    declared_component_map=linked_oxide_wt,
+                )
+                if linked_composition.state.is_value:
+                    flagged_composition = replace(
+                        linked_composition.state.value,
+                        proxy_flag="assumed_mass_percent_basis",
+                        proxy_source=(
+                            f"{source_id}::{printed_charge_link.get('composition_observation_id')}; "
+                            f"assumed mass percent because {basis_default_reason}"
+                        ),
+                    )
+                    derivation = linked_composition.inference
+                    if derivation is not None:
+                        derivation = replace(
+                            derivation,
+                            inputs=tuple(
+                                dict.fromkeys(
+                                    (
+                                        *derivation.inputs,
+                                        f"assumed mass percent: {basis_default_reason}",
+                                    )
+                                )
+                            ),
+                        )
+                    source_declared_composition = Located(
+                        State.of(flagged_composition),
+                        locator=linked_composition.locator,
+                        inference=derivation,
+                    )
         if q_token in _BULK_PROPERTY_QUANTITIES:
             species_formula = bulk_property_species_formula(
                 quantity=q_token,
@@ -29328,6 +29430,7 @@ class Migrator:
                     composition_datum_declared=declares_composition_datum,
                     provenance=observation_provenance,
                     parent_point_conditions=point_conditions,
+                    source_declared_composition=source_declared_composition,
                 )
             if (
                 self._count(source_key).observations_out > before
@@ -29462,6 +29565,7 @@ class Migrator:
                         composition_datum_declared=declares_composition_datum,
                         provenance=observation_provenance,
                         parent_point_conditions=point_conditions,
+                        source_declared_composition=source_declared_composition,
                         source_point_oxide_map=_mass_loss_oxide_map_from_mapping(
                             raw_item, fields=valid_fields
                         ),
@@ -29601,6 +29705,7 @@ class Migrator:
                     composition_datum_declared=declares_composition_datum,
                     provenance=observation_provenance,
                     parent_point_conditions=point_conditions,
+                    source_declared_composition=source_declared_composition,
                 )
                 if not child_carries_value:
                     children_carry_values = False
@@ -29802,6 +29907,7 @@ class Migrator:
                         parent_point_conditions=(
                             point_parent_conditions if non_yield_points else point_conditions
                         ),
+                        source_declared_composition=source_declared_composition,
                         content_stable_id=True,
                         use_printed_point_species=non_yield_points,
                     )
@@ -30404,6 +30510,7 @@ class Migrator:
         parent_point_conditions: Mapping[str, Located[Any]] | None = None,
         source_point_oxide_map: Mapping[str, Decimal] | None = None,
         source_point_composition_context: Mapping[str, Any] | None = None,
+        source_declared_composition: Located[Composition] | None = None,
         source_point_residue_fields: Sequence[str] | None = None,
         content_stable_id: bool = False,
         ordinal_point_id: str | None = None,
@@ -31858,89 +31965,133 @@ class Migrator:
                 **parent_point_conditions,
                 **(point_conditions or {}),
             }
-        experiment = self.result.experiments.get(experiment_id)
-        experiment_sample_composition = (
-            experiment.sample.printed_composition
-            if experiment is not None
-            else None
-        )
-        point_formula_value = (
-            raw_item.get("oxide_as_printed")
+        point_condition_composition = (point_conditions or {}).get("composition")
+        raw_point_conditions = (
+            raw_item.get("point_conditions")
             if isinstance(raw_item, Mapping)
             else None
         )
-        point_formula = (
-            Located(State.of(point_formula_value), locator=point_locator)
-            if point_formula_value is not None
-            else None
+        explicit_point_composition = (
+            isinstance(raw_point_conditions, Mapping)
+            and "composition" in raw_point_conditions
         )
-        parent_formula_value = (
-            parent_values.get("melt_composition_as_printed")
-            if isinstance(parent_values, Mapping)
-            else None
+        point_condition_authoritative = isinstance(
+            point_condition_composition, Located
+        ) and (
+            explicit_point_composition
+            or point_condition_composition.state.is_value
+            or (
+                point_condition_composition.state.is_unknown
+                and point_condition_composition.state.reason
+                != "no composition mapped from source"
+            )
         )
-        parent_formula = (
-            Located(State.of(parent_formula_value), locator=locator)
-            if parent_formula_value is not None
-            else None
-        )
-        point_condition_composition = (point_conditions or {}).get("composition")
-        named_formula_charge = declared_named_formula_charge(
-            source_id,
-            parent_id,
-            quantity=q_token_point,
-            located_compositions=(
-                identity.composition,
-                point_composition_located,
-                point_printed_composition,
-                point_catalogue,
-                point_condition_composition
-                if isinstance(point_condition_composition, Located)
-                else None,
-                experiment_sample_composition,
-                point_formula,
-                parent_formula,
-            ),
-            refusal_reasons=tuple(point_composition_refusal)
-            + (
-                (point_composition_role_refusal,)
-                if point_composition_role_refusal is not None
-                else ()
-            ),
-            malformed_composition_reason=malformed_composition_amount,
-            omitted_components=point_composition_omitted_components,
-        )
+        named_formula_charge = None
+        if q_token_point is Quantity.P_PARTIAL:
+            prefix = f"{source_id}::"
+            source_observation_id = (
+                parent_id[len(prefix) :]
+                if parent_id.startswith(prefix)
+                else parent_id
+            )
+            named_formula_charge = NAMED_FORMULA_CHARGES.get(source_id, {}).get(
+                source_observation_id
+            )
         named_formula_composition: Located[Composition] | None = None
-        if named_formula_charge is not None:
-            if named_formula_charge.composition_mol_basis is not None:
-                source_values = (
+        if (
+            (source_declared_composition is not None or named_formula_charge is not None)
+            and point_condition_authoritative
+            and isinstance(point_condition_composition, Located)
+        ):
+            identity = replace(
+                identity, composition=point_condition_composition.state
+            )
+        resolved_composition = identity.composition
+        composition_missing = resolved_composition is None or (
+            resolved_composition.is_unknown
+            and resolved_composition.reason == "no composition mapped from source"
+        ) or (
+            resolved_composition.is_not_applicable
+            and not explicit_point_composition
+        )
+        formula_composition: Located[Composition] | None = None
+        if (
+            named_formula_charge is not None
+            and composition_missing
+            and malformed_composition_amount is None
+        ):
+            printed_mole_map = None
+            if isinstance(raw_item, Mapping):
+                for key in ("composition_mol", "composition_mole_fraction"):
+                    candidate = raw_item.get(key)
+                    if isinstance(candidate, Mapping) and candidate:
+                        printed_mole_map = candidate
+                        break
+            pure_oxide_composition = None
+            pure_oxide_input = printed_mole_map
+            if named_formula_charge.derive_via_pure_oxide_parser:
+                pure_oxide_values = (
                     dict(raw_item) if isinstance(raw_item, Mapping) else {}
                 )
-                source_values["composition_mol_basis"] = (
-                    named_formula_charge.composition_mol_basis
+                if printed_mole_map is None:
+                    pure_oxide_values["composition_mol"] = {
+                        named_formula_charge.formula: "1"
+                    }
+                pure_oxide_values["composition_mol_basis"] = "pure_oxide_system"
+                pure_oxide_composition, pure_oxide_omitted = (
+                    _mole_fraction_composition_from_values(pure_oxide_values)
                 )
-                composition, omitted = _mole_fraction_composition_from_values(
-                    source_values
-                )
-                if composition is not None and not omitted:
-                    named_formula_composition = _named_formula_oxide_composition(
+                if pure_oxide_omitted:
+                    pure_oxide_composition = None
+                # The source declaration supplies the formula only when no
+                # map is printed. A printed map remains available for the
+                # formula owner to check for a typed conflict.
+                if printed_mole_map is None:
+                    pure_oxide_input = None
+            try:
+                if (
+                    not named_formula_charge.derive_via_pure_oxide_parser
+                    or pure_oxide_composition is not None
+                ):
+                    formula_composition = _named_formula_oxide_composition(
                         named_formula_charge.formula,
                         locator=named_formula_charge.locator,
-                        composition=composition,
+                        printed_composition_mol=pure_oxide_input,
+                        pure_oxide_composition=pure_oxide_composition,
                     )
-            else:
-                named_formula_composition = _named_formula_oxide_composition(
-                    named_formula_charge.formula,
-                    locator=named_formula_charge.locator,
+            except NamedFormulaCompositionConflict as exc:
+                conflict = State.unknown(
+                    f"named formula composition conflict: {exc}"
                 )
-            if named_formula_composition is not None:
-                identity = replace(
-                    identity, composition=named_formula_composition.state
-                )
+                identity = replace(identity, composition=conflict)
                 point_conditions = {
                     **(point_conditions or {}),
-                    "composition": named_formula_composition,
+                    "composition": Located(conflict, locator=point_locator),
                 }
+                self.result.registry_issues.append(
+                    ValidationIssue(
+                        path=f"observations.{point_id}.values.composition_mol",
+                        reason=RefusalReason.INVALID_SOURCE,
+                        detail=str(exc),
+                    )
+                )
+        composition_alternative = source_declared_composition or formula_composition
+        source_declared_composition_applied = False
+        if (
+            composition_alternative is not None
+            and composition_alternative.state.is_value
+            and malformed_composition_amount is None
+            and composition_missing
+        ):
+            identity = replace(identity, composition=composition_alternative.state)
+            point_conditions = {
+                **(point_conditions or {}),
+                "composition": composition_alternative,
+            }
+            if composition_alternative is source_declared_composition:
+                source_declared_composition_applied = True
+            else:
+                named_formula_composition = composition_alternative
         row_composition = (point_conditions or {}).get("composition")
         if (
             identity.quantity.is_value
@@ -32255,6 +32406,24 @@ class Migrator:
                             if named_formula_charge.note
                             else ""
                         )
+                    ),
+                    origin=point_id,
+                )
+            )
+        if (
+            source_declared_composition_applied
+            and source_declared_composition is not None
+            and isinstance(q_token_point, Quantity)
+        ):
+            assumed = source_declared_composition.state.value
+            child_notices.append(
+                Notice(
+                    kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                    affected_quantities=(q_token_point,),
+                    reason=(
+                        f"composition_input_{assumed.proxy_flag}: "
+                        f"{assumed.proxy_source}; locator="
+                        f"{source_declared_composition.locator}"
                     ),
                     origin=point_id,
                 )
