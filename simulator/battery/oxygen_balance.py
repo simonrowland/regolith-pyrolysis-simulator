@@ -353,12 +353,17 @@ def _solve_vacuum_oxygen_balance(
         on_accepted_evaluation(root)
 
     if zero_oxygen_boundary:
-        residual, pressures, oxygen_flux, parent_flux = evaluate(root, {
-            channel.species: (
-                0.0 if channel.pO2_exponent > 0.0 else pressures[channel.species]
-            )
-            for channel in active_channels
-        })
+        residual, pressures, oxygen_flux, parent_flux, _root_activities = evaluate(
+            root,
+            {
+                channel.species: (
+                    0.0
+                    if channel.pO2_exponent > 0.0
+                    else pressures[channel.species]
+                )
+                for channel in active_channels
+            },
+        )
     relative_residual = abs(residual) / max(oxygen_flux, parent_flux, 1.0e-300)
     fluxes = {
         channel.species: molar_flux(channel, pressures[channel.species])

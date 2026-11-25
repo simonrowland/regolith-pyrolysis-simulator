@@ -65,6 +65,8 @@ def test_deterministic_refusal_allowlist_is_explicit():
         "internal_analytical_invalid_composition",
         "internal_analytical_missing_oxygen_condition",
         "internal_analytical_invalid_oxygen_condition",
+        # d-474: reject a deterministic activity-basis/K formula mismatch.
+        "vapor_pressure_activity_basis_k_mismatch",
         "openimcc_composition_canonicalization",
         "imcc_composition_incomplete",
         "imcc_ferric_input_unsupported",

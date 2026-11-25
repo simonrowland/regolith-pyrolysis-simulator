@@ -4010,10 +4010,11 @@ def internal_analytical_residue_vapor_pressure(
                     include_diagnostic_shadows=include_diagnostic_shadows,
                 )
         except VaporPressureComputationError as exc:
-            if exc.reason_code != "vapor_pressure_activity_basis_k_mismatch":
+            reason_code = getattr(exc, "reason_code", None)
+            if reason_code != "vapor_pressure_activity_basis_k_mismatch":
                 raise
             raise _InternalAnalyticalInputRefusal(
-                2, exc.reason_code, str(exc)
+                2, reason_code, str(exc)
             ) from exc
         return result
 

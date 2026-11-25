@@ -123,6 +123,42 @@ def test_internal_analytical_constant_gamma_reports_per_species_activity_states(
     }
 
 
+def test_internal_analytical_residue_preserves_unrelated_vapor_pressure_error(
+    monkeypatch,
+) -> None:
+    from engines.builtin.vapor_pressure import VaporPressureComputationError
+    from simulator import engine_cache
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+
+    error = VaporPressureComputationError(
+        "vapor_pressure_nonfinite: species=SiO field=P_reference_Antoine_Pa"
+    )
+
+    def fail_adapter(**_kwargs):
+        raise error
+
+    monkeypatch.setattr(
+        battery, "_internal_analytical_vapor_pressure_adapter", fail_adapter
+    )
+    monkeypatch.setattr(engine_cache, "_configured_engine_cache_path", lambda: None)
+
+    with pytest.raises(VaporPressureComputationError) as raised:
+        battery.internal_analytical_residue_vapor_pressure(
+            core=_new_internal_analytical_core(),
+            temperature_C=1700.0 - 273.15,
+            pressure_bar=1.0e-6,
+            composition_kg=None,
+            composition_mol=_markova_first_interval_moles(),
+            fO2_log=-8.0,
+            po2_request=Po2Request(
+                mode=PO2_COMMANDED, po2_bar=1.0e-8
+            ),
+            include_diagnostic_shadows=False,
+        )
+
+    assert raised.value is error
+
+
 def _markova_first_interval_moles() -> dict[str, float]:
     # Markova 1984 first-interval residual-melt composition used by the
     # residue prediction regressions.
