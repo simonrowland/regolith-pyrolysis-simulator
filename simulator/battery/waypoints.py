@@ -10,7 +10,13 @@ from collections.abc import Iterator, Mapping
 
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.battery.decimal_tokens import decimal_token
-from simulator.battery.enums import AmountBasis, MethodToken, Quantity, ValueKind
+from simulator.battery.enums import (
+    AmountBasis,
+    FO2Channel,
+    MethodToken,
+    Quantity,
+    ValueKind,
+)
 from simulator.battery.composition_roles import is_initial_charge_composition
 from simulator.battery.composition import (
     excluded_component_notice_reason,
@@ -2379,7 +2385,9 @@ def oxygen_condition(
             )
         ) or container_tokens.intersection({"re", "ru", "mo", "w"}):
             unsupported_container = str(container.state.value)
-    if control is not None:
+    if control is not None and not (
+        control.channel.is_value and control.channel.value is FO2Channel.BUFFER
+    ):
         pressure = _value(control.oxygen_partial_pressure_Pa)
         if pressure is not None:
             value = _log_pressure(pressure)
