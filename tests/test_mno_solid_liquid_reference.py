@@ -271,7 +271,7 @@ def _chen_rows():
     return context, rows
 
 
-def test_chen_mno_rows_leave_the_janaf_fusion_refusal() -> None:
+def test_chen_mno_rows_leave_the_janaf_fusion_refusal(capfd) -> None:
     context, rows = _chen_rows()
     assert len(rows) == 37
     assert all(
@@ -282,6 +282,7 @@ def test_chen_mno_rows_leave_the_janaf_fusion_refusal() -> None:
         for row in rows
     )
     counts: dict[str, Counter] = {}
+    stub_lines: list[str] = []
     for engine in _MELT_ENGINES:
         counts[engine.value] = Counter()
         for row in rows:
@@ -330,10 +331,14 @@ def test_chen_mno_rows_leave_the_janaf_fusion_refusal() -> None:
                 assert barin
                 assert not missing_input
                 if refusal is None and residual.numeric is not None:
-                    print(
+                    stub_lines.append(
                         f"STUB {engine.value} {row.observation_id} "
                         f"residual={residual.numeric.value} {residual.numeric.unit}"
                     )
+    lines = list(stub_lines)
     for engine_name, counter in counts.items():
         rendered = ", ".join(f"{reason}={n}" for reason, n in sorted(counter.items()))
-        print(f"CHEN MnO {engine_name}: {rendered}")
+        lines.append(f"CHEN MnO {engine_name}: {rendered}")
+    # The remote profile refuses pytest -s. Disable capture for this receipt only.
+    with capfd.disabled():
+        print("\n".join(lines), flush=True)
