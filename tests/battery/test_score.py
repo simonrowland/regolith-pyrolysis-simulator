@@ -458,6 +458,52 @@ def test_prediction_refusal_reports_unknown_composition_component() -> None:
     assert prediction.refusal_detail["detail"] == reason
 
 
+def test_activity_fallback_notice_has_validated_from_and_to(monkeypatch) -> None:
+    from simulator.battery.validate import _check_notice
+    from simulator.chemistry.melt_activity import MeltOxideActivity
+    import simulator.chemistry.melt_activity as melt_activity
+
+    identity = F.activity_identity(formula="NaO0.5")
+    experiment = F.tabulation_experiment(T_K=Decimal("1643.15"))
+    observation = F.observation(
+        "uncertified-activity-fallback",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.4"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="uncertified-activity-fallback",
+    )
+    activity = MeltOxideActivity(
+        parent_oxide="NaO0.5",
+        single_cation_component="NaO0.5",
+        gamma=1.0,
+        x_single_cation=0.4,
+        activity=0.4,
+        citation="fixture coefficient without certification",
+        evidence_tier="UNCERTIFIED",
+    )
+    monkeypatch.setattr(
+        melt_activity, "melt_oxide_activity", lambda *_args, **_kwargs: activity
+    )
+
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        observation,
+        experiment=experiment,
+        isolated=False,
+    )
+    notice = next(
+        notice
+        for notice in prediction.notices
+        if notice.kind is NoticeKind.FALLBACK
+    )
+    assert notice.source == "certified melt-activity evidence"
+    assert notice.destination == "uncertified melt-activity bridge result"
+    issues = []
+    _check_notice("activity-fallback", notice, issues)
+    assert issues == []
+
+
 def test_feot_conversion_notice_reaches_scorer_residual() -> None:
     experiment = F.tabulation_experiment()
     identity = F.activity_identity()
@@ -8409,6 +8455,7 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path(tmp_path: Path) -> 
 def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
     from simulator.battery.score import (
         FLAGGED_STRATUM_BINARY_COMPLEMENT_COMPOSITION,
+        FLAGGED_STRATUM_FALLBACK,
         FLAGGED_STRATUM_OXIDE_FROM_ELEMENT_MASS_PERCENT_COMPOSITION,
         FLAGGED_STRATUM_CATALOGUE_COMPOSITION,
         FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION,
@@ -8479,6 +8526,11 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
             FLAGGED_STRATUM_APPROXIMATE_VALUE,
             NoticeKind.APPROXIMATE_VALUE,
             "approximate_printed_value",
+        ),
+        (
+            FLAGGED_STRATUM_FALLBACK,
+            NoticeKind.FALLBACK,
+            "melt_activity_default_ideal",
         ),
     )
     for stratum, kind, reason in cases:

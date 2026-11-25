@@ -624,6 +624,7 @@ FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED = "liquidus-position-contested"
 FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND = "out_of_certified_band"
 FLAGGED_STRATUM_OUT_OF_GAMMA_DOMAIN = "out_of_gamma_domain"
 FLAGGED_STRATUM_QUENCH_ALTERED = "quench_altered"
+FLAGGED_STRATUM_FALLBACK = "fallback"
 
 
 @dataclass(frozen=True)
@@ -2545,6 +2546,8 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_OUT_OF_GAMMA_DOMAIN)
     if NoticeKind.QUENCH_ALTERED.value in kinds:
         strata.append(FLAGGED_STRATUM_QUENCH_ALTERED)
+    if NoticeKind.FALLBACK.value in kinds:
+        strata.append(FLAGGED_STRATUM_FALLBACK)
     return tuple(strata)
 
 
@@ -14823,6 +14826,8 @@ def _predict_with_engine(
                         origin=(
                             "simulator.chemistry.melt_activity.melt_oxide_activity"
                         ),
+                        source="certified melt-activity evidence",
+                        destination="uncertified melt-activity bridge result",
                         authority=Authority.BRIDGE,
                     )
                 )
@@ -17304,8 +17309,17 @@ def _sossi_residue_prediction(
                             affected_quantities=(reported_quantity,),
                             reason=_IDEAL_MELT_ACTIVITY_DEFAULT_FLAG,
                             origin="sossi-residue-r5",
+                            source="measured parent-oxide activity",
+                            destination="Raoultian gamma=1 ideal-activity convention",
                             band=(
-                                f"parent_oxide={parent_oxide}; gamma=1; "
+                                f"parent_oxide={parent_oxide}; "
+                                + (
+                                    "printed dopant=V2O5; scored parent=V2O3 "
+                                    "per controller ruling; "
+                                    if parent_oxide == "V2O3"
+                                    else ""
+                                )
+                                + "gamma=1; "
                                 "activity=Raoultian single-cation component"
                             ),
                             authority=Authority.CONVENTION,
@@ -17373,7 +17387,10 @@ def _sossi_residue_prediction(
             channel=channel,
             execution=Execution(
                 state=ExecutionState.PRODUCED,
-                call_evidence=f"{engine.value}:sossi:{short_id}:alpha_runtime_catalog",
+                call_evidence=(
+                    f"{engine.value}:sossi:{short_id}:"
+                    f"{provenance.get('alpha_arm') or 'alpha_arm_unspecified'}"
+                ),
             ),
             value=Decimal(str(value)),
             unit=QUANTITY_UNITS[reported_quantity],

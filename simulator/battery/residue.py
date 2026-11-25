@@ -493,10 +493,7 @@ def _openimcc_residue_parent_inputs(
         parent_oxide, composition, temperature_K=temperature_K
     )
     if activity is None:
-        raise ResidueInventoryRefusal(
-            "melt_activity_unavailable",
-            f"OpenIMCC gas channels need a {parent_oxide} activity",
-        )
+        return _OpenIMCCResidueParentInputs(channels, None, None, None)
     parent_activity = activity.thermodynamic_parent_activity()
     if not math.isfinite(parent_activity) or parent_activity < 0.0:
         raise ResidueInventoryRefusal(
@@ -4167,8 +4164,12 @@ def _predict_sossi_residue_cohort(
                 parent_inputs = _openimcc_residue_parent_inputs(
                     parent, gas_channels, inventory, temperature_K
                 )
-                selected_channels.extend(parent_inputs.channels)
-                added = len(parent_inputs.channels)
+                if (
+                    parent_inputs.channels
+                    and parent_inputs.parent_activity is not None
+                ):
+                    selected_channels.extend(parent_inputs.channels)
+                    added = len(parent_inputs.channels)
             else:
                 available = [
                     (str(row.get("formula")), parent, 1.0, 0.0)
@@ -4307,10 +4308,15 @@ def _predict_sossi_residue_cohort(
                                 available_activities,
                             )
                             if parent_inputs.parent_activity is None:
-                                raise ResidueInventoryRefusal(
-                                    "melt_activity_unavailable",
-                                    f"OpenIMCC {element} gas channel needs a {parent} activity",
+                                if element not in missing_elements:
+                                    missing_elements.append(element)
+                                gas_parent_oxide_activities.pop(parent, None)
+                                gas_parent_oxides = tuple(
+                                    oxide
+                                    for oxide in gas_parent_oxides
+                                    if oxide != parent
                                 )
+                                continue
                             gas_parent_oxide_activities[parent] = (
                                 parent_inputs.parent_activity
                             )
