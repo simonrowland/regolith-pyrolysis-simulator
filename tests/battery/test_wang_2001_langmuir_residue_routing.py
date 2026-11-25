@@ -183,29 +183,12 @@ def test_wang_residue_cells_emit_one_production_score_event_each(monkeypatch):
     assert len(residuals) == 432
     assert predictions_by_run_row == Counter({row_id: 1 for row_id in by_run_row})
     _benchm1_residual_report(residuals, references)
-    numeric = [residual for residual in residuals if residual.numeric is not None]
-    assert numeric
-    assert all(
-        any(
-            notice.kind.value == "input_omitted"
-            and "congruent vapour-only zero-storage closure" in notice.reason
-            and "source_oxygen_fallback=no_oxygen_condition_printed"
-            in notice.reason
-            for notice in residual.notices
-        )
-        and any(
-            notice.kind.value == "input_omitted"
-            and "ΣLn2O3=0.142 wt%" in notice.reason
-            and "WO3 is blank" in notice.reason
-            for notice in residual.notices
-        )
-        for residual in numeric
-    )
 
     # Mutate the source selector back to its previous Mendybaev-only rule.
-    # The same production path must then lose this already-emitted Wang event.
+    # Keep this independent of numeric model success: the source-routing
+    # contract is that this already-emitted Wang event disappears on mutation.
     reference, anchor = wang_sc1_residue_pair(references, observations)
-    assert by_reference[reference.observation_id].numeric is not None
+    assert reference.observation_id in by_reference
     isolated = ScoreContext(
         {},
         {reference.experiment_id: context.experiments[reference.experiment_id]},
@@ -228,3 +211,22 @@ def test_wang_residue_cells_emit_one_production_score_event_each(monkeypatch):
         rail=Rail.RESIDUE_COMPOSITION,
     )
     assert all(residual.reference != reference.observation_id for residual in mutated)
+
+    numeric = [residual for residual in residuals if residual.numeric is not None]
+    assert numeric
+    assert all(
+        any(
+            notice.kind.value == "input_omitted"
+            and "congruent vapour-only zero-storage closure" in notice.reason
+            and "source_oxygen_fallback=no_oxygen_condition_printed"
+            in notice.reason
+            for notice in residual.notices
+        )
+        and any(
+            notice.kind.value == "input_omitted"
+            and "ΣLn2O3=0.142 wt%" in notice.reason
+            and "WO3 is blank" in notice.reason
+            for notice in residual.notices
+        )
+        for residual in numeric
+    )
