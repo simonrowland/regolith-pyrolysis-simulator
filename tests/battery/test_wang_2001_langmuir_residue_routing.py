@@ -149,6 +149,29 @@ def _benchm1_residual_report(residuals, references):
     warnings.warn("\n".join(output), UserWarning, stacklevel=1)
 
 
+def _owner_notices_before_pressure_model(
+    monkeypatch, reference, experiment, observations
+):
+    import simulator.battery.residue as residue_module
+
+    from simulator.battery.residue import ResidueInventoryRefusal
+
+    def refuse_before_integration(*_args, **_kwargs):
+        raise ResidueInventoryRefusal("test_notice_probe")
+
+    monkeypatch.setattr(
+        residue_module, "_make_residue_pressure_model", refuse_before_integration
+    )
+    try:
+        residue_module.predict_langmuir_residue_composition(
+            "openimcc", reference, experiment, observations
+        )
+    except ResidueInventoryRefusal as exc:
+        assert exc.reason == "test_notice_probe"
+        return exc.notices
+    raise AssertionError("expected the owner to stop before pressure integration")
+
+
 def test_wang_residue_cells_emit_one_production_score_event_each(monkeypatch):
     import simulator.battery.residue as residue_module
     import simulator.battery.score as score_module
@@ -345,6 +368,79 @@ def test_wang_residue_cells_emit_one_production_score_event_each(monkeypatch):
             for notice in residual.notices
         )
         for residual in numeric
+    )
+    for residual in numeric:
+        reference = references[residual.reference]
+        basis_notices = [
+            notice for notice in residual.notices
+            if notice.reason.startswith("wang_imp_closure_basis:")
+        ]
+        is_imp = reference.observation_id.rsplit("::", maxsplit=1)[-1] == (
+            "wang_2001_table1_ion_microprobe_residue_compositions"
+        )
+        assert len(basis_notices) == (1 if is_imp else 0)
+        if is_imp:
+            assert basis_notices[0].kind is NoticeKind.ENGINE_MODEL_CAVEAT
+            assert (
+                "model basis is six-oxide wt% summing to 100"
+                in basis_notices[0].reason
+            )
+            assert (
+                "printed basis is total ion-microprobe wt%"
+                in basis_notices[0].reason
+            )
+            assert "including ΣLn2O3 and WO3" in basis_notices[0].reason
+
+
+def test_wang_imp_closure_notice_preserves_printed_wt_percent(monkeypatch):
+    from decimal import Decimal
+
+    from simulator.battery.residue import _langmuir_residue_row_id
+
+    context, observations = wang_context()
+    references = wang_residue_rows(observations)
+    imp_reference = next(
+        reference
+        for reference in references.values()
+        if reference.identity.species.formula == "SiO2"
+        and reference.observation_id.rsplit("::", maxsplit=1)[-1]
+        == "wang_2001_table1_ion_microprobe_residue_compositions"
+        and _langmuir_residue_row_id(reference.locator) == "sc12"
+    )
+    emp_reference = next(
+        reference
+        for reference in references.values()
+        if reference.identity.species.formula == "SiO2"
+        and reference.observation_id.rsplit("::", maxsplit=1)[-1]
+        == "wang_2001_table1_electron_microprobe_residue_compositions"
+        and _langmuir_residue_row_id(reference.locator) == "sc12"
+    )
+    assert imp_reference.value.point == Decimal("35.1")
+    experiment = context.experiments[imp_reference.experiment_id]
+    imp_notices = _owner_notices_before_pressure_model(
+        monkeypatch, imp_reference, experiment, observations.values()
+    )
+    imp_flag = next(
+        notice
+        for notice in imp_notices
+        if notice.reason.startswith("wang_imp_closure_basis:")
+    )
+    assert imp_flag.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+    assert "model basis is six-oxide wt% summing to 100" in imp_flag.reason
+    assert "printed basis is total ion-microprobe wt%" in imp_flag.reason
+    assert "including ΣLn2O3 and WO3" in imp_flag.reason
+    assert "without renormalization" in imp_flag.reason
+    assert imp_reference.value.point == Decimal("35.1")
+
+    emp_notices = _owner_notices_before_pressure_model(
+        monkeypatch,
+        emp_reference,
+        context.experiments[emp_reference.experiment_id],
+        observations.values(),
+    )
+    assert not any(
+        notice.reason.startswith("wang_imp_closure_basis:")
+        for notice in emp_notices
     )
 
 

@@ -3114,6 +3114,24 @@ def predict_langmuir_residue_composition(
             origin="Langmuir residue pressure",
         ),
     ]
+    if (
+        reference.source_id == WANG_2001_SOURCE_ID
+        and reference.observation_id.rsplit("::", maxsplit=1)[-1]
+        == "wang_2001_table1_ion_microprobe_residue_compositions"
+    ):
+        notices.append(
+            Notice(
+                kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+                reason=(
+                    "wang_imp_closure_basis: model basis is six-oxide wt% "
+                    "summing to 100; printed basis is total ion-microprobe "
+                    "wt% including ΣLn2O3 and WO3. Printed values are compared "
+                    "as reported without renormalization."
+                ),
+                origin=reference.observation_id,
+            )
+        )
     if reference.source_id == WANG_2001_SOURCE_ID:
         notices.append(
             Notice(
