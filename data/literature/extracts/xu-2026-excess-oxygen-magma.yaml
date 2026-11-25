@@ -22,8 +22,8 @@ fidelity_samples:
     page: 3
     table: '1'
     row: LVP-1, Si
-- path: species.Fe.observations[xu_2026_moessbauer_starting_glass_fe3_fet].values.points[0].value
-  value: '70'
+- path: species.Fe.observations[xu_2026_moessbauer_starting_glass_fe3_fet].values.Fe3_over_FeT
+  value: '0.70'
   locator:
     pdf_page_index: 21
     page: 22
@@ -83508,7 +83508,7 @@ species:
     observations:
     - observation_id: xu_2026_moessbauer_starting_glass_fe3_fet
       type: concentration_series
-      units: '%'
+      units: fraction (Fe3+/FeT)
       locator:
         source_path: XuEtAl_Suppl_0820.pdf
         pdf_page_index: 21
@@ -83517,18 +83517,13 @@ species:
         row: Fe3+ area
         record: Supplementary Table S1 _ 072226.xlsx; sheet "Table S1"; Fe3+ area cell B11
       phase: glass
-      uncertainty:
-        confidence_level: not_stated
-        note: The printed parenthetical width has no stated confidence level.
       values:
-        quantity: valence_ratio
-        valence_basis:
-          numerator_oxidation_states:
-          - 3
-          denominator_kind: total_element
-          denominator_oxidation_state: null
-          value_form: fraction
-        formula: Fe
+        quantity: fe3_fe2_ratio
+        Fe3_over_FeT: '0.70'
+        value_as_published: 70(3)%
+        phase_label: glass
+        phase_label_as_published: synthetic MORB glass starting material
+        sample_id_as_published: MORB glass starting material
         method_class: measured_reduced
         analytical_method: Mössbauer fit to relative Fe2+ and Fe3+ doublet areas
         admission_status: admitted
@@ -83543,22 +83538,10 @@ species:
             page: 3
             section: Starting materials
             note: The Fe3+/ΣFe result is measured in the resulting starting glass; the source does not state preservation of iron valence through quenching.
-        points:
-        - value: '70'
-          value_as_published: '70(3)%'
-          sigma: '3'
-          unit: '%'
-          sample: synthetic MORB glass starting material
-          locator:
-            source_path: XuEtAl_Suppl_0820.pdf
-            pdf_page_index: 21
-            page: 22
-            table: S1
-            row: Fe3+ area
-            record: Supplementary Table S1 _ 072226.xlsx; sheet "Table S1"; Fe3+ area cell B11
+        note: The prose also reports Fe3+/ΣFe = 0.70 ± 0.03 from relative areas (same observation; SI section Mössbauer spectroscopic analysis). The printed ±0.03 applies to the ferric fraction; no uncertainty for the converted Fe3+/Fe2+ ratio is reported.
       derivation:
-        relation: Fe3+/ΣFe is the fitted Fe3+ doublet area as a fraction of total Fe.
-        output_unit: '%'
+        relation: Fe3+/ΣFe determined from the relative areas of fitted Fe2+ and Fe3+ Mössbauer doublets.
+        output_unit: dimensionless
         raw_inputs:
           state:
             tag: value

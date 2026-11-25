@@ -13,13 +13,12 @@ import yaml
 
 from simulator.battery.enums import (
     AmountBasis,
+    NoticeKind,
     Phase,
     PhaseRole,
     Quantity,
     RawInputStatus,
     UncertaintyKind,
-    ValenceDenominatorKind,
-    ValenceValueForm,
     ValueKind,
 )
 from simulator.battery.composition import (
@@ -31,7 +30,6 @@ from simulator.battery.input_provenance import (
     PRINTED_STARTING_BULK,
     composition_with_provenance,
 )
-from simulator.battery.score import _printed_uncertainty_band
 from tests.battery.factories import migrate_one_extract
 from tests.battery.literature_extract_grids import (
     assert_observation_grid_matches,
@@ -413,6 +411,8 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
         assert "composition" not in raw_observations[row["observation_id"]].get(
             "point_conditions", {}
         )
+        # D-305 removes the row's own glass analysis as an input; W3b keeps
+        # the independently printed MORB starting bulk as the identity input.
         assert observation.identity.composition.is_value
         composition = observation.identity.composition.value
         assert composition.basis == "stoichiometric_oxide_projection"
@@ -504,45 +504,23 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
 
     assert sum(bool(row["sigma"]) for row in table1) == 262
 
-    fe_matches = [
-        row
-        for key, row in numeric_observations.items()
-        if key == fe_observation_id or key.startswith(f"{fe_observation_id}::")
-    ]
-    assert len(fe_matches) == 1
-    fe = fe_matches[0]
+    fe = observations["xu_2026_moessbauer_starting_glass_fe3_fet"]
     assert fe.value.kind is ValueKind.POINT
-    assert fe.value.point == Decimal("0.70")
-    assert fe.identity.quantity.value is Quantity.VALENCE_RATIO
+    assert fe.value.point == Decimal(7) / Decimal(3)
+    assert fe.identity.quantity.value is Quantity.FE3_FE2_RATIO
     assert fe.identity.species.formula == "Fe"
     assert fe.identity.species.phase.value is Phase.GLASS
-    assert fe.identity.valence_basis.is_value
-    valence_basis = fe.identity.valence_basis.value
-    assert valence_basis.numerator_oxidation_states == (3,)
-    assert valence_basis.denominator_kind is ValenceDenominatorKind.TOTAL_ELEMENT
-    assert valence_basis.value_form is ValenceValueForm.FRACTION
-    assert fe.uncertainty.kind is UncertaintyKind.PRINTED
-    assert fe.uncertainty.verbatim["sigma"] == "3"
-    assert fe.uncertainty.verbatim["printed_units"] == "%"
-    assert fe.uncertainty.value == Decimal("0.03")
-    assert fe.uncertainty.verbatim["units"] == "dimensionless"
-    assert fe.uncertainty.basis == "dimensionless"
-    assert fe.uncertainty.verbatim["confidence_level"] == "not_stated"
-    fe_band = _printed_uncertainty_band(
-        fe.identity.quantity.value,
-        fe.uncertainty,
-        fe.value.point,
-        source_observation=fe,
-    )
-    assert fe_band.refusal is None
-    assert fe_band.band is not None
-    assert fe_band.band.value == Decimal("0.01902323731343039656308462938")
+    assert fe.uncertainty.kind is UncertaintyKind.NONE
     fe_source = next(
         row
         for row in document["species"]["Fe"]["observations"]
         if row["observation_id"] == "xu_2026_moessbauer_starting_glass_fe3_fet"
     )
-    fe_point = fe_source["values"]["points"][0]
+    assert fe_source["values"]["Fe3_over_FeT"] == "0.70"
+    assert fe_source["values"]["value_as_published"] == "70(3)%"
+    assert "no uncertainty for the converted Fe3+/Fe2+ ratio is reported" in (
+        fe_source["values"]["note"]
+    )
     fe_table_context = next(
         context
         for context in document["species"]["Fe"]["context"]
@@ -550,14 +528,8 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
     )
     assert fe_table_context["locator"]["page"] == 22
     assert fe_table_context["values"]["Fe3_plus"]["relative_area_percent"] == "70(3)"
-    assert fe_point["value"] == "70"
-    assert fe_point["value_as_published"] == "70(3)%"
-    assert fe_point["sigma"] == "3"
-    assert fe_point["unit"] == "%"
-    assert fe_point["locator"]["row"] == "Fe3+ area"
     assert fe_source["locator"]["page"] == 22
     assert fe_source["locator"]["pdf_page_index"] == 21
-    assert fe_point["locator"]["page"] == 22
     starting_glass_quench = fe_source["values"]["quench_statement"]
     assert starting_glass_quench["preservation"] == "not_stated"
     assert starting_glass_quench["quench_direction"] == "not_stated"
@@ -577,7 +549,17 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
         == "Mössbauer spectroscopic analysis"
     )
     assert not fe.derived_from
-    assert not fe.notices
+    assert len(fe.notices) == 1
+    method_notice = fe.notices[0]
+    assert method_notice.kind is NoticeKind.METHOD_UNSTATED
+    assert method_notice.affected_quantities == (Quantity.FE3_FE2_RATIO,)
+    assert method_notice.reason == (
+        "method_unstated: default=unspecified; "
+        "original_reason=source does not state method"
+    )
+    assert method_notice.policy is not None
+    assert method_notice.policy.id == "DP-106"
+    assert method_notice.policy.value == "unspecified"
 
     start_elements = {
         formula: Decimal(value)
@@ -599,12 +581,13 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
         },
         retained_components=("Cl", "CO2", "H2O"),
     )
+    fe3_fraction = Decimal(fe_source["values"]["Fe3_over_FeT"])
     fe2_projection = _element_wt_percent_stoichiometric_oxide_projection(
-        {"Fe": fe_total * (Decimal("1") - fe.value.point)},
+        {"Fe": fe_total * (Decimal("1") - fe3_fraction)},
         valence_by_element={"Fe": 2},
     )
     fe3_projection = _element_wt_percent_stoichiometric_oxide_projection(
-        {"Fe": fe_total * fe.value.point},
+        {"Fe": fe_total * fe3_fraction},
         valence_by_element={"Fe": 3},
     )
     oxide_weights = dict(base_projection.projected_component_mass_g_per_100g)
