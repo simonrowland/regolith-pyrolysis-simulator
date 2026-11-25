@@ -1546,6 +1546,20 @@ def _make_residue_pressure_model(
         from simulator.vapour_rail.nasa_cea import NasaCeaError
 
         analytical_core = _new_internal_analytical_core()
+        compiled_species = getattr(
+            getattr(analytical_core, "vapour_rail_catalog", None), "species", {}
+        )
+        compiled_activity_exponents: dict[str, float] = {}
+        if isinstance(compiled_species, Mapping):
+            for species, compiled in compiled_species.items():
+                evaluator = getattr(compiled, "evaluator", None)
+                activity_exponent = getattr(
+                    evaluator, "activity_exponent", None
+                )
+                if activity_exponent is not None:
+                    compiled_activity_exponents[str(species)] = float(
+                        activity_exponent
+                    )
         accepted_diagnostics_by_logp: dict[
             float, tuple[dict[str, object], ...]
         ] = {}
@@ -1607,13 +1621,17 @@ def _make_residue_pressure_model(
                 if formula in pressures:
                     raise ResidueInventoryRefusal("residue_pressure_channels_ambiguous", formula)
                 pressures[formula] = float(pressure)
-                activity = (
-                    reported_activities.get(channel)
-                    if isinstance(reported_activities, Mapping)
-                    else None
-                )
-                if activity is None and isinstance(cached_activities, Mapping):
-                    activity = cached_activities.get(channel)
+                # A zero-exponent compiled carrier consumes no parent
+                # activity. Ignore legacy diagnostic and cache fields alike.
+                activity = None
+                if compiled_activity_exponents.get(str(channel)) != 0.0:
+                    activity = (
+                        reported_activities.get(channel)
+                        if isinstance(reported_activities, Mapping)
+                        else None
+                    )
+                    if activity is None and isinstance(cached_activities, Mapping):
+                        activity = cached_activities.get(channel)
                 if activity is not None:
                     parent_activities[formula] = float(activity)
             required = {str(species) for species, _reaction in gas_channels}
@@ -1637,9 +1655,6 @@ def _make_residue_pressure_model(
                 noticed_omissions,
             )
             if floor_inversion_diagnostics is not None:
-                vapor_diagnostic = response.diagnostics.get(
-                    "vapor_pressure_diagnostic"
-                )
                 floor_notices = (
                     vapor_diagnostic.get("pO2_floor_inversion_notices_by_species")
                     if isinstance(vapor_diagnostic, Mapping)

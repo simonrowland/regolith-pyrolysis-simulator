@@ -408,6 +408,97 @@ def _real_analytical_cmas_pressure(temperature_K, inventory=None, extra_channels
     return inventory, channels, pressure_model
 
 
+def test_zero_exponent_carrier_ignores_stale_parent_activity(monkeypatch):
+    from simulator.battery.residue import (
+        _channel_terms,
+        _make_residue_pressure_model,
+        _residue_oxygen_balance,
+    )
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+
+    analytical_core = battery._new_internal_analytical_core()
+    compiled_association = analytical_core.vapour_rail_catalog.species[
+        "FeO_association_gas"
+    ]
+    assert compiled_association.evaluator.activity_exponent == 0.0
+    monkeypatch.setattr(
+        battery, "_new_internal_analytical_core", lambda: analytical_core
+    )
+    gas_channels = (
+        ("Fe", ("FeO", 1.0, 0.5)),
+        ("FeO_association_gas", ("FeO", 1.0, -0.5)),
+        ("O2", (None, 1.0, -1.0)),
+    )
+    activity_source = ["fresh"]
+
+    def evaluate_pressure(**kwargs):
+        pO2_bar = float(kwargs["po2_request"].po2_bar)
+        stale_activity = pO2_bar**0.1
+        response = {
+            "status": "ok",
+            "vapor_pressures_Pa": {
+                "Fe": 1.0e-8 * pO2_bar**-0.5,
+                "FeO_association_gas": 1.0e-9 * pO2_bar**0.5,
+            },
+        }
+        if activity_source[0] == "cached":
+            # Pre-d-474 cache rows retained this legacy channel activity.
+            response["activity_coefficients"] = {
+                "FeO_association_gas": stale_activity
+            }
+        elif activity_source[0] == "diagnostic":
+            response["diagnostics"] = {
+                "vapor_pressure_diagnostic": {
+                    "activities": {
+                        "FeO_association_gas": stale_activity
+                    }
+                }
+            }
+        else:
+            response["diagnostics"] = {
+                "vapor_pressure_diagnostic": {"activities": {}}
+            }
+            response["activity_coefficients"] = {}
+        return SimpleNamespace(**response)
+
+    monkeypatch.setattr(
+        battery, "internal_analytical_residue_vapor_pressure", evaluate_pressure
+    )
+    pressure_model = _make_residue_pressure_model(
+        "internal-analytical",
+        gas_channels,
+        object(),
+        temperature_K=1905.15,
+        total_pressure_Pa=0.0,
+        engine_metadata={},
+        engine_flags=set(),
+        missing_channels_reason="residue_pressure_channels_missing",
+        caller="zero-exponent cache regression",
+        floor_inversion_diagnostics={},
+    )
+    terms = _channel_terms(
+        (
+            ResidueChannel("Fe", "Fe", "FeO", 1.0, "regression"),
+            ResidueChannel("FeO", "FeO", "FeO", 1.0, "regression"),
+            ResidueChannel("O2", "O2", None, 1.0, "regression"),
+        )
+    )
+
+    def check_result(source: str) -> tuple[str, str]:
+        activity_source[0] = source
+        with pytest.raises(ResidueInventoryRefusal) as refusal:
+            _residue_oxygen_balance(
+                terms, {"FeO": 1.0}, pressure_model, 1905.15
+            )
+        return refusal.value.reason, refusal.value.detail
+
+    fresh_miss = check_result("fresh")
+    assert "'FeO': declared 0.0, observed " in fresh_miss[1]
+    assert "raw total slope " in fresh_miss[1]
+    assert check_result("cached") == fresh_miss
+    assert check_result("diagnostic") == fresh_miss
+
+
 def _read_markova_residue_cache_in_fresh_process(
     cache_path: str,
     result_path: str,
@@ -563,8 +654,8 @@ def test_real_analytical_closure_and_extent_preserve_exponent_contract_refusal()
         _residue_oxygen_balance(_channel_terms(channels), inventory,
                                 lambda p: pressure(inventory, p), 1905.15)
     assert root.value.reason == "residue_pressure_law_exponent_mismatch"
-    # d-474 fixes Fe at fixed activity; FeO(g)'s +1/2 still reflects the
-    # d-369 a_Fe=1 metal-saturation cap segment, which remains pending.
+    # d-474: FeO_association_gas uses pure-Fe Antoine at a_Fe=1 with compiled
+    # activity exponent 0; its +1/2 slope comes from Fe(g) + 1/2 O2 -> FeO(g).
     assert "'FeO': declared 0.0, observed 0.5" in root.value.detail
     with pytest.raises(ResidueInventoryRefusal) as extent:
         integrate_knudsen_residue_inventory(
@@ -603,7 +694,7 @@ def test_parentless_oxygen_pressure_is_required_and_validated(oxygen_parent, oxy
     (1749.15, 0.0117, {"SiO2": 52.32, "Al2O3": 19.13, "FeO": 9.37, "MgO": 6.25, "CaO": 12.93}),
 ))
 def test_real_markova_first_interval_zeroes_omitted_al_and_keeps_exponent_refusal(temperature_K, extent, wt):
-    """Al is present and the capped FeO(g) pressure-law refusal remains."""
+    """Al is present and the FeO association pressure-law refusal remains."""
     from simulator.accounting.formulas import parse_formula
     from simulator.battery.residue import _channel_terms, _residue_oxygen_balance
     inventory = {s: w / 100 / float(parse_formula(s).molar_mass_kg_per_mol()) for s, w in wt.items()}
@@ -614,8 +705,8 @@ def test_real_markova_first_interval_zeroes_omitted_al_and_keeps_exponent_refusa
         _residue_oxygen_balance(_channel_terms(channels), inventory,
                                 lambda p: pressure(inventory, p), temperature_K)
     assert root.value.reason == "residue_pressure_law_exponent_mismatch"
-    # d-474 fixes Fe at fixed activity; d-369's a_Fe=1 cap segment is pending,
-    # so FeO(g)'s raw +1/2 exponent must remain a typed refusal.
+    # d-474: pure-Fe Antoine at a_Fe=1 has activity exponent 0; the association
+    # reaction Fe(g) + 1/2 O2 -> FeO(g) gives the raw +1/2 slope.
     assert root.value.detail.startswith(
         "pressure law exponent mismatch for 'FeO': declared 0.0, observed 0.5 "
     )
