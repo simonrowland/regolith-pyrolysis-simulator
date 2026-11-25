@@ -12,6 +12,7 @@ import math
 from pathlib import Path
 
 import pytest
+import simulator.runner as runner
 
 from simulator.campaigns import CampaignManager
 from simulator.equipment import EquipmentDesigner
@@ -227,6 +228,29 @@ def test_robinot_power_trace_steps_at_one_minute_and_flags_the_prediction():
     assert observed[0]["source_class"] == "literature_sidecar"
     assert observed[0]["qualifier"] == "approximate_peak"
     assert reported_temperature_observations((record,)) == ()
+
+
+def test_dropping_focal_spot_qualifier_from_driver_breaks_the_notice_contract(
+    monkeypatch,
+):
+    original = runner.furnace_power_driver_payload
+
+    def omit_focal_spot_qualifier(*args, **kwargs):
+        kwargs.pop("focal_spot_diameter_qualifier", None)
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(
+        runner,
+        "furnace_power_driver_payload",
+        omit_focal_spot_qualifier,
+    )
+    record = _series(_robinot_schedule())[0][2]
+
+    with pytest.raises(AssertionError, match="focal_spot_diameter_m"):
+        assert any(
+            notice.get("knob") == "focal_spot_diameter_m"
+            for notice in record["notices"]
+        ), "focal_spot_diameter_m notice missing"
 
 
 def test_doubled_robinot_power_raises_the_predicted_temperature():

@@ -756,6 +756,11 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
             pellet_diameter_m=lengths.get("pellet_diameter_m"),
             pellet_height_m=lengths.get("pellet_height_m"),
             focal_spot_diameter_m=lengths.get("focal_spot_diameter_m"),
+            focal_spot_diameter_qualifier=(
+                sample.get("focal_spot_diameter_qualifier")
+                if isinstance(sample, Mapping)
+                else None
+            ),
             radiating_face_set=face_set,
         )
         if not timestep.is_one_hour:

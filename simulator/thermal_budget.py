@@ -1335,6 +1335,7 @@ def furnace_power_driver_payload(
     pellet_diameter_m: float | None = None,
     pellet_height_m: float | None = None,
     focal_spot_diameter_m: float | None = None,
+    focal_spot_diameter_qualifier: str | None = None,
     radiating_face_set: str | None = None,
     solar_absorptance: float | None = None,
     window_transmittance: float | None = None,
@@ -1344,10 +1345,11 @@ def furnace_power_driver_payload(
 
     The loader does not invent an emissivity. ``None`` tells the solver
     to take ``EquipmentDesigner.MELT_EMISSIVITY`` and notice it. A focal
-    spot is booked only when the deck declares both diameters. Absorptance,
-    window transmittance, and pellet conductivity stay unset so the solver
-    notices its own defaults. This function does not multiply the trace
-    and does not carry a holder temperature.
+    spot is booked only when the deck declares both diameters; its source
+    qualifier is carried so the step owner can publish the notice.
+    Absorptance, window transmittance, and pellet conductivity stay unset
+    so the solver notices its own defaults. This function does not multiply
+    the trace and does not carry a holder temperature.
     """
 
     if not isinstance(trace, Mapping):
@@ -1355,7 +1357,7 @@ def furnace_power_driver_payload(
             "furnace_power_trace_malformed",
             "trace must be a mapping",
         )
-    return {
+    payload = {
         "trace": copy.deepcopy(trace),
         "mass_kg": mass_kg,
         "exposed_area_m2": exposed_area_m2,
@@ -1368,6 +1370,9 @@ def furnace_power_driver_payload(
         "window_transmittance": window_transmittance,
         "conductivity_W_m_K": conductivity_W_m_K,
     }
+    if focal_spot_diameter_qualifier is not None:
+        payload["focal_spot_diameter_qualifier"] = focal_spot_diameter_qualifier
+    return payload
 
 
 def declared_benchtop_lengths_m(
