@@ -619,8 +619,9 @@ def _decode_payload_for_admission(
 
         for diagnostic in provenance_diagnostics:
             high_t_activity = diagnostic.get("high_t_melt_activity")
-            if "high_t_melt_activity" in diagnostic and not isinstance(
-                high_t_activity, Mapping
+            if "high_t_melt_activity" in diagnostic and (
+                not isinstance(high_t_activity, Mapping)
+                or not is_finite_number(high_t_activity.get("temperature_K"))
             ):
                 return None
             # VapoRock writes this field as species-to-pressure data; the

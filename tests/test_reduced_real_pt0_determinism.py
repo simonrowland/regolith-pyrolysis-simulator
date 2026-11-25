@@ -8530,6 +8530,12 @@ def test_real_cache_payload_recursive_mutations_miss_or_replay_identically(
             "vaporock_full_speciation_Pa.SiO wrong-scalar"
         )
         assert outcomes[vaporock_inner_path] == "miss"
+        high_t_temperature_path = (
+            "injected-high_t_melt_activity: "
+            "root.last_vapor_pressure_diagnostic."
+            "high_t_melt_activity.temperature_K wrong-scalar"
+        )
+        assert outcomes[high_t_temperature_path] == "miss"
 
 
 class _MemoryInterpolationCandidates:
@@ -8866,4 +8872,10 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
         "vaporock_full_speciation_Pa.SiO wrong-scalar"
     )
     assert outcomes[vaporock_inner_path] == "miss"
+    high_t_temperature_path = (
+        "injected-high_t_melt_activity: "
+        "root.last_vapor_pressure_diagnostic."
+        "high_t_melt_activity.temperature_K wrong-scalar"
+    )
+    assert outcomes[high_t_temperature_path] == "miss"
     assert not failures, "\n".join(failures)
