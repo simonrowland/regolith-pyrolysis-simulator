@@ -9063,12 +9063,15 @@ def test_gate_capture_rejects_foreign_origin_with_valid_consumer_receipt(
 
     sim._chem_registry = ProviderRegistry()
     register_synthetic_gate_curve_producer(sim)
-    curve = {
-        'source': 'gate_liquid_fraction:fallback:test',
-        'status': 'ok',
-        'solidus_T_C': 1000.0,
-        'liquidus_T_C': 1300.0,
-    }
+    curve = _freeze_gate_curve_fixture(
+        sim,
+        {
+            'source': 'gate_liquid_fraction:fallback:test',
+            'status': 'ok',
+            'solidus_T_C': 1000.0,
+            'liquidus_T_C': 1300.0,
+        },
+    )
     record = engine_binding_admission.write_gate_curve_memo_record(sim, curve)
     record['provider_outcome'] = GateCurveProviderOutcome.PRODUCED
     sim._freeze_gate_liquid_fraction_cache = {
@@ -9151,12 +9154,15 @@ def test_gate_capture_requires_curve_associated_with_active_record(
 
     sim._chem_registry = ProviderRegistry()
     register_synthetic_gate_curve_producer(sim)
-    curve = {
-        'source': 'gate_liquid_fraction:fallback:test',
-        'status': 'ok',
-        'solidus_T_C': 1000.0,
-        'liquidus_T_C': 1300.0,
-    }
+    curve = _freeze_gate_curve_fixture(
+        sim,
+        {
+            'source': 'gate_liquid_fraction:fallback:test',
+            'status': 'ok',
+            'solidus_T_C': 1000.0,
+            'liquidus_T_C': 1300.0,
+        },
+    )
     record = engine_binding_admission.write_gate_curve_memo_record(sim, curve)
     record['provider_outcome'] = GateCurveProviderOutcome.FAILED
     sim._freeze_gate_liquid_fraction_cache = {

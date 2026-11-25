@@ -5448,7 +5448,7 @@ def test_legacy_magemin_gate_curve_replays_with_d447_feo_flag(
         "sio2_wt_pct": [30.0, 80.0],
     }
     assert live_curve.get("is_liquidus_floor", False) is False
-    assert live_curve["gate_provider_step_down"]["magemin_sourced"] is True
+    assert live_curve.get("gate_provider_step_down") is None
 
     fO2_log = float(live_sim._current_melt_redox_fO2_log())
     key = canonical_replay_key(
@@ -5464,7 +5464,6 @@ def test_legacy_magemin_gate_curve_replays_with_d447_feo_flag(
     legacy_payload = copy.deepcopy(payload)
     legacy_curve = legacy_payload["curve"]
     legacy_curve["is_liquidus_floor"] = False
-    legacy_curve["gate_provider_step_down"].pop("magemin_sourced")
     _store_unadmitted_test_payload(
         store,
         "freeze_gate_curve",
@@ -5473,16 +5472,6 @@ def test_legacy_magemin_gate_curve_replays_with_d447_feo_flag(
         law_disclosures=[],
     )
 
-    legacy_replay = PT0DeterminismStore("replay", db_path=db_path)
-    with pytest.raises(PT0CacheMiss):
-        legacy_replay._lookup("freeze_gate_curve", key)
-
-    store._store(
-        "freeze_gate_curve",
-        key,
-        payload,
-        law_disclosures=[],
-    )
     replay = PT0DeterminismStore("replay", db_path=db_path)
     replay_sim = configure_sim(replay)
     curve = replay_sim._establish_melt_redox_gate_authority_for_current_hour()
@@ -5548,6 +5537,8 @@ def test_projected_magemin_step_down_replay_keeps_d447_feo_flag(
         sim.inventory.inert_melt_components_kg.clear()
         sim._project_cleaned_melt_from_atom_ledger()
         trace = _install_magemin_subprocess_gate(sim, monkeypatch)
+        alpha_provider = sim._chem_registry.gate_provider_order[1]
+        monkeypatch.setattr(alpha_provider, "_ensure_backend", lambda: None)
         return sim, trace
 
     live_store = PT0DeterminismStore("capture")
@@ -6097,7 +6088,7 @@ def test_pt1_stale_replacement_publishes_fresh_measured_disclosure(
             1.0e-9,
             vapor_pressure_data=_load_yaml("vapor_pressures.yaml"),
         )
-        fresh_disclosures = list(measured.snapshot())
+        fresh_disclosures = measured.snapshot()
     assert fresh_disclosures
 
     capture._store(

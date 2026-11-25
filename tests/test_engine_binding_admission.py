@@ -1374,7 +1374,7 @@ def test_gate_curve_memo_reuse_is_ineligible_without_verifiable_producer_provena
         "selected_binding_provenance",
         lambda _identity, _sim: provenance,
     )
-    sim = SimpleNamespace()
+    sim = SimpleNamespace(_stage0_sulfur_input_ppm=lambda: 0.0)
 
     evidence = admission.gate_curve_memo_evidence(
         sim,
