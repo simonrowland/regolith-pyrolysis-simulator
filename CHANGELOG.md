@@ -10,7 +10,9 @@ so minor versions may carry significant changes.
   CaSiO3−SiO2 exchange potential to JANAF's printed solid-lime reference. The
   shared scorer reports the phase-specific Berman/HHR CaSiO3(cr) consistency
   band on CaO; ThermoEngine also reports its live pWo fusion residual on CaO.
-  Neither is applied as a correction.
+  AlphaMELTS does not expose liquid/pWo pure-phase G0 for that fusion band, so
+  its CaO activity carries a caveat and uses ThermoEngine's same-temperature
+  band as the reference. Neither residual is applied as a correction.
 
 ## [0.6.8] — 2026-11-12
 

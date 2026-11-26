@@ -614,17 +614,24 @@ def test_alphamelts_cao_scoring_uses_raw_cell_exchange_and_scopes_hhr(
     )
     assert hhr_flag.affected_quantities == (Quantity.ACTIVITY,)
     assert hhr_flag.band is not None and 'dex at 1933 K' in hhr_flag.band
-    # AlphaMELTS's cell currently has no pWo/liquid G0 pair for the dynamic
-    # fusion residual; this checks the shared HHR scoring path only.
-    assert not any(
-        notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
-        and 'CaSiO3(l)-pWo fusion residual' in notice.reason
-        for notice in cao_candidate.notices
+    fusion_gap = next(
+        notice for notice in cao_candidate.notices
+        if notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        and 'AlphaMELTS CaSiO3 fusion residual band is not computed'
+        in notice.reason
+    )
+    assert fusion_gap.affected_quantities == (Quantity.ACTIVITY,)
+    assert fusion_gap.band is None
+    assert 'liquid/pWo pure-phase G0' in fusion_gap.reason
+    assert 'shared MELTS database' in fusion_gap.reason
+    assert 'ThermoEngine CaO fusion band at the same T is the reference' in (
+        fusion_gap.reason
     )
     assert not any(
         notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
         and (
-            'CaSiO3(l)-pWo fusion residual' in notice.reason
+            'AlphaMELTS CaSiO3 fusion residual band is not computed'
+            in notice.reason
             or 'Berman-vs-HHR CaSiO3(cr) reassessment' in notice.reason
         )
         for notice in non_cao_candidate.notices

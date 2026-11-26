@@ -17101,6 +17101,28 @@ def _predict_with_engine(
                             ),
                         ),
                     )
+                    if engine is Engine.ALPHAMELTS:
+                        notices = union_notices(
+                            notices,
+                            (
+                                Notice(
+                                    kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                                    affected_quantities=(Quantity.ACTIVITY,),
+                                    reason=(
+                                        'AlphaMELTS CaSiO3 fusion residual band '
+                                        'is not computed because its cell does '
+                                        'not expose liquid/pWo pure-phase G0. '
+                                        'Both engines use the shared MELTS '
+                                        'database; the ThermoEngine CaO fusion '
+                                        'band at the same T is the reference.'
+                                    ),
+                                    origin=(
+                                        'simulator.battery.score.'
+                                        'd476_alphamelts_fusion_band_gap'
+                                    ),
+                                ),
+                            ),
+                        )
         else:
             value, converter_reason = melts_endmember_to_parent_oxide_activity(
                 reported, compared,
