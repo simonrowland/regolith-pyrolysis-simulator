@@ -1141,6 +1141,26 @@ print(json.dumps({
     )
 
 
+def test_harness_ledgers_guard_rejects_battery_import_mutation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    files = _project_files(ROOT)
+    module = "simulator.runner.__main__"
+    relpath, source = files[module]
+    assert relpath == "simulator/runner/__main__.py"
+    files[module] = (
+        relpath,
+        f"{source}\nfrom simulator.battery.score import flagged_strata\n",
+    )
+    monkeypatch.setitem(globals(), "_project_files", lambda _root: files)
+
+    with pytest.raises(
+        AssertionError,
+        match="static simulation entry/engine import closure reaches a battery module",
+    ):
+        test_harness_ledgers_are_not_simulation_runtime_inputs()
+
+
 def test_demand_manifest_counts_are_truthful() -> None:
     pairs = MANIFEST["pairs"]
     assert len(pairs) == len(DEMAND_BY_KEY), "duplicate demand pair"
