@@ -1769,6 +1769,15 @@ def _quench_row(
         point_conditions["quench_direction"] = Located(
             State.of(quench_direction), locator=Locator(page=12)
         )
+    # The quoted template may carry DP-106 method_unstated. d-460 keeps that
+    # flag out of the measured headline. This row is a constructed quench case,
+    # so the method default is not the rule under test.
+    notices = tuple(
+        notice
+        for notice in template.notices
+        if notice.kind
+        not in {NoticeKind.METHOD_UNSTATED, NoticeKind.METHOD_INFERRED}
+    )
     return replace(
         template,
         observation_id=observation_id,
@@ -1779,6 +1788,7 @@ def _quench_row(
             template.evidence, class_=State.of(EvidenceClass.MEASURED_DIRECT)
         ),
         point_conditions=point_conditions,
+        notices=notices,
     )
 
 
