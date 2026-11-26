@@ -202,6 +202,23 @@ def _corrupt_current_gate_curve_row(db_path: Path, key_hash: str) -> bytes:
     return malformed_bytes
 
 
+def _write_current_invalid_json_gate_curve(db_path: Path, key_hash: str) -> bytes:
+    malformed_bytes = b'{"curve":'
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+            "SET payload_bytes = ?, payload_sha256 = ?, payload_codec_version = ? "
+            "WHERE key_hash = ?",
+            (
+                sqlite3.Binary(malformed_bytes),
+                hashlib.sha256(malformed_bytes).hexdigest(),
+                rrd.PT0_GATE_CURVE_CODEC_VERSION,
+                key_hash,
+            ),
+        )
+    return malformed_bytes
+
+
 def test_pt1_put_rejects_current_codec_gate_curve_that_fails_decode(
     tmp_path: Path,
 ) -> None:
@@ -256,6 +273,76 @@ def test_pt1_merge_rejects_current_codec_gate_curve_that_fails_decode(
     ) as target_conn:
         source_conn.backup(target_conn)
     malformed_bytes = _corrupt_current_gate_curve_row(target_db, key_hash)
+
+    with pytest.raises(
+        PT1PersistentStoreCorrupt,
+        match="current payload fails codec admission",
+    ):
+        merge_cache_source(source_db, target_db)
+
+    with sqlite3.connect(target_db) as conn:
+        persisted_bytes = conn.execute(
+            f"SELECT payload_bytes FROM {PT1_EQUILIBRIUM_TABLE} "
+            "WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()[0]
+    assert bytes(persisted_bytes) == malformed_bytes
+
+
+def test_pt1_put_rejects_current_codec_gate_curve_with_invalid_json(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "current-invalid-json-put.sqlite"
+    capture, _sim, _fO2_log, _curve = _capture_pt0_gate_curve(
+        db_path,
+        solidus_T_C=1200.0,
+    )
+    key_hash = str(capture.capture_sequence[-1]["hash"])
+    entry = capture._entries[key_hash]
+    malformed_bytes = _write_current_invalid_json_gate_curve(db_path, key_hash)
+    payload = entry["payload"]
+    payload_bytes = canonical_json_bytes(payload)
+
+    with pytest.raises(
+        PT1PersistentStoreCorrupt,
+        match="current payload fails codec admission",
+    ):
+        PT1PersistentEquilibriumStore(db_path).put(
+            artifact="freeze_gate_curve",
+            key=entry["key"],
+            key_bytes=entry["key_bytes"].encode("utf-8"),
+            key_hash=key_hash,
+            payload=payload,
+            payload_bytes=payload_bytes,
+            payload_hash=hashlib.sha256(payload_bytes).hexdigest(),
+            repair_notices_json=entry["repair_notices_json"],
+            law_disclosures=entry["law_disclosures"],
+        )
+
+    with sqlite3.connect(db_path) as conn:
+        persisted_bytes = conn.execute(
+            f"SELECT payload_bytes FROM {PT1_EQUILIBRIUM_TABLE} "
+            "WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()[0]
+    assert bytes(persisted_bytes) == malformed_bytes
+
+
+def test_pt1_merge_rejects_current_codec_gate_curve_with_invalid_json(
+    tmp_path: Path,
+) -> None:
+    source_db = tmp_path / "current-invalid-json-source.sqlite"
+    target_db = tmp_path / "current-invalid-json-target.sqlite"
+    capture, _sim, _fO2_log, _curve = _capture_pt0_gate_curve(
+        source_db,
+        solidus_T_C=1200.0,
+    )
+    key_hash = str(capture.capture_sequence[-1]["hash"])
+    with sqlite3.connect(source_db) as source_conn, sqlite3.connect(
+        target_db
+    ) as target_conn:
+        source_conn.backup(target_conn)
+    malformed_bytes = _write_current_invalid_json_gate_curve(target_db, key_hash)
 
     with pytest.raises(
         PT1PersistentStoreCorrupt,

@@ -819,6 +819,8 @@ def _silicate_equilibrium_key(
 
 def _pt0_equilibrium_capture_context(
     store: PT0DeterminismStore,
+    *,
+    strict_vapor_default: bool = False,
 ) -> tuple[Any, EquilibriumResult]:
     class AlphaMELTSBackend(RealBackendAuthority):
         real_backend_family = RealBackendFamily.ALPHAMELTS
@@ -830,7 +832,11 @@ def _pt0_equilibrium_capture_context(
         provider_id="alphamelts-diagnostic",
         engine_version="alpha-v1",
     )
-    sim = _build_pt0_sim(store)
+    sim = (
+        _build_pt0_sim_with_strict_vapor_default(store)
+        if strict_vapor_default
+        else _build_pt0_sim(store)
+    )
     sim.backend = AlphaMELTSBackend()
     sim._chem_registry.register(
         provider,
@@ -5140,8 +5146,9 @@ def _store_raw_replay_payload(
     payload: dict,
     *,
     law_disclosures=(),
+    stale_codec: bool = True,
 ) -> None:
-    """Inject a legacy payload whose missing codec semantics make it stale."""
+    """Inject a replay payload, optionally marking its codec stamp stale."""
 
     key_bytes = rrd.canonical_json_bytes(key)
     payload_bytes = rrd.canonical_json_bytes(payload)
@@ -5157,7 +5164,7 @@ def _store_raw_replay_payload(
         law_disclosures=law_disclosures,
     )
     codec_version = rrd._payload_codec_version(artifact)
-    if codec_version is not None:
+    if stale_codec and codec_version is not None:
         with sqlite3.connect(store.persistent_path) as conn:
             conn.execute(
                 f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
@@ -5237,7 +5244,13 @@ def test_pt0_gate_curve_codec_misses_floor_rows_without_magemin_source(
         key,
         markerless_payload,
         law_disclosures=[markerless_disclosure],
+        stale_codec=False,
     )
+    with sqlite3.connect(db_path) as conn:
+        (stored_codec_version,) = conn.execute(
+            f"SELECT payload_codec_version FROM {PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+    assert stored_codec_version == rrd.PT0_GATE_CURVE_CODEC_VERSION
     old_replay = PT0DeterminismStore('replay', db_path=db_path)
     with pytest.raises(PT0CacheMiss):
         old_replay._lookup('freeze_gate_curve', key)

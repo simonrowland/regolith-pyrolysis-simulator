@@ -119,43 +119,23 @@ def _mark_authorityless_v3_gate_row(
 
 
 def _put_real_equilibrium_cache_row(db_path: Path) -> None:
-    key = {
-        "schema_version": SCHEMA_VERSION,
-        "namespace_id": "alphamelts:equilibrium-composite",
-        "artifact": "equilibrium_post_record",
-        "intent": "EQUILIBRIUM",
-        "vapor_pressure_provider_selection": "builtin-vapor-pressure",
-        "code_version": "test",
-        "data_digests": {},
-    }
-    payload = {
-        "authority": {
-            "schema": "reduced-real-authority-v1",
-            "evidence_class": "melts",
-            "backend_family": "alphamelts",
-            "backend": {
-                "backend_name": "AlphaMELTSBackend",
-                "backend_class": (
-                    "simulator.melt_backend.alphamelts.AlphaMELTSBackend"
-                ),
-            },
-            "provider": {
-                "resolved_provider_id": "alphamelts-diagnostic",
-                "resolved_role": "authoritative",
-                "authoritative_provider_id": "alphamelts-diagnostic",
-                "fallback_provider_id": None,
-            },
-            "vapor_pressure": {
-                "resolved_provider_id": "builtin-vapor-pressure",
-                "resolved_role": "authoritative",
-                "authoritative_provider_id": "builtin-vapor-pressure",
-                "fallback_provider_id": None,
-                "fallback_allowed": False,
-            },
-        },
-        "equilibrium_result": {"status": "ok"},
-        "last_vapor_pressures_source": {"Na": "builtin_authoritative"},
-    }
+    from tests.test_reduced_real_pt0_determinism import (
+        _pt0_equilibrium_capture_context,
+    )
+
+    capture = rrd.PT0DeterminismStore("capture")
+    sim, result = _pt0_equilibrium_capture_context(
+        capture,
+        strict_vapor_default=True,
+    )
+    sim._last_vapor_pressures_source = {"Na": "builtin_authoritative"}
+    key = capture._equilibrium_key(sim)
+    payload = rrd.equilibrium_payload(sim, result)
+    vapor_authority = payload["authority"]["vapor_pressure"]
+    assert vapor_authority["fallback_allowed"] is False
+    assert key["vapor_pressure_provider_selection"] == (
+        vapor_authority["resolved_provider_id"]
+    )
     key_bytes = canonical_json_bytes(key)
     payload_bytes = canonical_json_bytes(payload)
     PT1PersistentEquilibriumStore(db_path).put(

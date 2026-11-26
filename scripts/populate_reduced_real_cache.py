@@ -677,7 +677,7 @@ def _cache_payload_rows(db_path: Path) -> list[dict[str, Any]]:
         return rows
 
 
-def _validated_cache_payload_row(row: Mapping[str, Any]) -> dict[str, Any]:
+def _decoded_cache_payload_row(row: Mapping[str, Any]) -> dict[str, Any]:
     artifact = str(row["artifact"])
     key_bytes = bytes(row["key_bytes"])
     payload_bytes = bytes(row["payload_bytes"])
@@ -736,13 +736,6 @@ def _validated_cache_payload_row(row: Mapping[str, Any]) -> dict[str, Any]:
         )
     validate_repair_notices_json(repair_notices_json)
     validate_reduced_real_equilibrium_record_key(artifact, key, payload)
-    assert_strict_vapor_pt1_row(
-        artifact=artifact,
-        key=key,
-        key_hash=key_hash,
-        payload=payload,
-        context=f"PT-1 cache shard {artifact}:{key_hash}",
-    )
     physics_bucket_key = canonical_physics_bucket_key_from_replay_key(key)
     physics_bucket_bytes = canonical_json_bytes(physics_bucket_key)
     physics_bucket_hash = hashlib.sha256(physics_bucket_bytes).hexdigest()
@@ -767,7 +760,7 @@ def _validated_cache_payload_row(row: Mapping[str, Any]) -> dict[str, Any]:
 def _admitted_cache_payload_rows(
     payload_rows: list[dict[str, Any]],
 ) -> tuple[list[dict[str, Any]], int, set[str]]:
-    """Validate current rows and derive MAGEMin hashes from admitted keys."""
+    """Decode codec-admitted rows and derive MAGEMin hashes from their keys."""
 
     rows: list[dict[str, Any]] = []
     superseded_rows = 0
@@ -779,13 +772,12 @@ def _admitted_cache_payload_rows(
         if codec_stamp_is_current is False:
             superseded_rows += 1
             continue
-        validated_row = _validated_cache_payload_row(row)
         if not _pt1_row_admission(row):
             raise RuntimeError(
                 "PT-1 cache row failed current payload admission: "
                 f"{row['key_hash']}"
             )
-        rows.append(validated_row)
+        rows.append(_decoded_cache_payload_row(row))
     magemin_key_hashes = {
         str(row["key_hash"])
         for row in rows
@@ -834,6 +826,16 @@ def _merge_cache_shard(shard_path: Path, target_path: Path) -> dict[str, Any]:
     admitted_rows, superseded_rows, magemin_key_hashes = (
         _admitted_cache_payload_rows(rows)
     )
+    for row in admitted_rows:
+        assert_strict_vapor_pt1_row(
+            artifact=row["artifact"],
+            key=row["key"],
+            key_hash=row["key_hash"],
+            payload=row["payload"],
+            context=(
+                f"PT-1 cache shard {row['artifact']}:{row['key_hash']}"
+            ),
+        )
     admitted_key_hashes = {str(row["key_hash"]) for row in admitted_rows}
     result = _copy_pt1_equilibrium_rows(
         [shard_path],
