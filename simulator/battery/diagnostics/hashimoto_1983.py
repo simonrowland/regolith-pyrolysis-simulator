@@ -10,7 +10,7 @@ each residual record.
 from __future__ import annotations
 
 import argparse
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from decimal import Decimal
 import json
@@ -29,7 +29,7 @@ from simulator.yaml_cache import load_cached_safe_yaml
 
 
 SOURCE_ID = "kems-015-hashimoto-1983"
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_PRESET_PATH = ROOT / "data/literature/reproduction-inputs/hashimoto_1983.yaml"
 DEFAULT_OBSERVATIONS_PATH = (
     ROOT / "data/literature/extracts-v2/kems-015-hashimoto-1983.yaml"
@@ -250,18 +250,14 @@ def score_hashimoto_1983(
     preset: Mapping[str, Any] | None = None,
     observations: Sequence[HashimotoObservation] | None = None,
     runtime_outputs: Mapping[str, Mapping[str, Any]] | None = None,
-    flagged_strata_classifier: (
-        Callable[[Sequence[Notice]], Sequence[str]] | None
-    ) = None,
 ) -> tuple[HashimotoScoreRecord, ...]:
     """Emit a residual or typed refusal for every admitted Table 3 row.
 
     ``runtime_outputs`` maps each source experiment id to the process
     simulator's final oxide wt-percent map and its ``run_metadata``. The
     metadata carries runtime-applied defaults so predicted residuals stay out
-    of the clean measured headline. The battery caller supplies its policy
-    classifier for those runtime notices. Missing output is refused rather
-    than confused with a zero residual.
+    of the clean measured headline. Missing output is refused rather than
+    confused with a zero residual.
     """
 
     active_preset = preset if preset is not None else load_hashimoto_preset()
@@ -321,14 +317,6 @@ def score_hashimoto_1983(
                     )
                     if not 0.0 <= candidate <= 100.0:
                         raise Hashimoto1983Refusal("invalid_runtime_output")
-                    if (
-                        area_notice is not None
-                        and flagged_strata_classifier is None
-                    ):
-                        raise RuntimeError(
-                            "flagged_strata_classifier is required for "
-                            "runtime policy notices"
-                        )
                     simulated = candidate
                     if area_notice is not None:
                         policy_detail = area_notice["detail"]
@@ -341,9 +329,13 @@ def score_hashimoto_1983(
                             origin=observation.observation_id,
                             policy=area_notice["policy"],
                         )
+                        from simulator.battery.score import (
+                            flagged_strata as classify_flagged_strata,
+                        )
+
                         notices.add(policy_notice.kind.value)
                         flagged_strata = frozenset(
-                            flagged_strata_classifier((policy_notice,))
+                            classify_flagged_strata((policy_notice,))
                         )
                 except Hashimoto1983Refusal as exc:
                     refusal_reason = exc.reason
