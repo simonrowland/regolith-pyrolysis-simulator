@@ -8,9 +8,11 @@ import json
 import os
 import pickle
 from pathlib import Path
+import queue
 import sqlite3
 import subprocess
 import sys
+import threading
 import time
 from types import MappingProxyType
 
@@ -22,7 +24,11 @@ from simulator.backend_names import (
 )
 from simulator.chemistry.kernel import ProposalRejected
 from simulator.core import PoisonedHourError, PoisonedHourState
-from simulator.engine_pool import EngineWorkerRemoteError, EngineWorkerTimeout
+from simulator.engine_pool import (
+    EngineWorkerPool,
+    EngineWorkerRemoteError,
+    EngineWorkerTimeout,
+)
 import simulator.optimize.evaluate as evaluate_module
 import simulator.optimize.pool as pool_module
 from tests._plugins.time_isolation import patch_module_time
@@ -767,8 +773,11 @@ def test_engine_worker_pool_timeout_evicts_only_hung_slot(tmp_path: Path) -> Non
 
 
 def test_engine_worker_spawn_timeout_keeps_green_values_in_optimizer_result(
+    monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
+    from tests.test_engine_worker import _dead_worker_with_spawn_stall
+
     task = replace(
         _pool_task(
             0,
@@ -778,34 +787,62 @@ def test_engine_worker_spawn_timeout_keeps_green_values_in_optimizer_result(
         candidate_id='spawn-stalled',
         output_dir=str(tmp_path / 'spawn-stalled'),
     )
-    timeout = EngineWorkerTimeout(
-        'ThermoEngine equilibrium', 30.0, phase='initialization',
+    worker, startup_timeout_s = _dead_worker_with_spawn_stall(
+        monkeypatch,
+        name='optimizer engine worker',
     )
-    timeout.effective_wait_s = 31.0
-    timeout.diagnostic_detail = 'effective spawn wait 31s'
+    pool = object.__new__(EngineWorkerPool)
+    pool._queue = queue.Queue()
+    pool._workers = [worker]
+    pool._active_requests = {}
+    pool._request_workers = {}
+    pool._diagnostic_written_futures = set()
+    pool._active_requests_lock = threading.Lock()
+    pool._cancel_pending = threading.Event()
+    pool._lifecycle_lock = threading.Lock()
+    pool._closed = False
+    consumer = threading.Thread(target=pool._consume, args=(0, worker))
+    pool._threads = [consumer]
+    submitted: list[Future[object]] = []
+    submit = pool.submit
 
-    class ImmediatePool:
-        def submit(self, _request, *, timeout_s: float) -> Future[object]:
-            assert timeout_s == 30.0
-            future: Future[object] = Future()
-            future.set_exception(timeout)
-            return future
+    def capture_submit(request, *, timeout_s):
+        future = submit(request, timeout_s=timeout_s)
+        submitted.append(future)
+        return future
 
-        def close(self, *, cancel_pending: bool) -> None:
-            assert cancel_pending is False
+    monkeypatch.setattr(pool, 'submit', capture_submit)
+    consumer.start()
+    try:
+        result = pool_module._evaluate_tasks_in_engine_worker_pool(
+            (task,),
+            _fake_evaluate,
+            max_workers=1,
+            per_eval_timeout_seconds=30.0,
+            warm_runtime_spec=pool_module._WarmRuntimeSpec(
+                backend_name=ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+                feedstock_id='lunar_mare_low_ti',
+                stage0_subprocess_required=False,
+            ),
+            engine_worker_pool=pool,
+            close_pool=False,
+        )[0]
+    finally:
+        pool._queue.put(None)
+        consumer.join(timeout=30.0)
+        assert not consumer.is_alive()
+    launch = worker._spawn_stall_launch
+    launch.thread.join(timeout=30.0)
+    assert not launch.thread.is_alive()
+    assert launch.finished.is_set()
 
-    result = pool_module._evaluate_tasks_in_engine_worker_pool(
-        (task,),
-        _fake_evaluate,
-        max_workers=1,
-        per_eval_timeout_seconds=30.0,
-        warm_runtime_spec=pool_module._WarmRuntimeSpec(
-            backend_name=ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
-            feedstock_id='lunar_mare_low_ti',
-            stage0_subprocess_required=False,
-        ),
-        engine_worker_pool=ImmediatePool(),
-    )[0]
+    timeout = submitted[0].exception()
+    assert isinstance(timeout, EngineWorkerTimeout)
+    assert startup_timeout_s == 30.0
+    assert worker._spawn_stall_event.wait_timeouts == [31.0]
+    assert timeout.timeout_s == 30.0
+    assert timeout.effective_wait_s == 31.0
+    assert 'effective spawn wait 31s' in timeout.diagnostic_detail
 
     margin = result.feasibility_margins['optimizer_eval_wall_timeout']
     assert timeout.timeout_s == 30.0
