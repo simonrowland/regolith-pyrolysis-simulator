@@ -20,6 +20,7 @@ from simulator.reduced_real_determinism import (
     PT0DeterminismStore,
     PT1PersistentEquilibriumStore,
     PT1_READ_ONLY_BASE_ALIAS,
+    _curve_payload,
     canonical_json_bytes,
     canonical_physics_bucket_key_from_replay_key,
 )
@@ -35,8 +36,10 @@ def _put_cache_row(
     *,
     tag: str,
     artifact: str = "freeze_gate_curve",
-    complete_replay_vector: bool = False,
 ) -> dict:
+    from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
+
+    builtin_provider_id = BuiltinVaporPressureProvider.name
     key = {
         "artifact": artifact,
         "code_version": "test",
@@ -45,25 +48,45 @@ def _put_cache_row(
         "schema_version": "test",
         "tag": tag,
     }
-    if complete_replay_vector:
-        key.update(
-            {
-                "namespace_id": "test:freeze_gate_curve",
-                "vapor_pressure_provider_selection": "test-vapor-pressure",
-                "sulfur_side": {
-                    "S_input_ppm": 0.0,
-                    "inventory": {"salt_phase": {}, "sulfide_matte": {}},
-                    "sulfsat_available": False,
-                    "sulfsat_provider_selection": "test-sulfur",
-                },
-                "model": {
-                    "model": "test-model",
-                    "mode": "test",
-                    "magemin_database": None,
-                },
-            }
-        )
-    payload = {"curve": {"status": "in_range", "tag": tag}}
+    vapor_pressure_provider = {
+        "resolved_provider_id": builtin_provider_id,
+        "resolved_role": "authoritative",
+        "authoritative_provider_id": builtin_provider_id,
+        "fallback_provider_id": None,
+        "fallback_allowed": False,
+    }
+    key.update(
+        {
+            "namespace_id": "test:freeze_gate_curve",
+            "vapor_pressure_provider_selection": vapor_pressure_provider[
+                "resolved_provider_id"
+            ],
+            "sulfur_side": {
+                "S_input_ppm": 0.0,
+                "inventory": {"salt_phase": {}, "sulfide_matte": {}},
+                "sulfsat_available": False,
+                "sulfsat_provider_selection": "test-sulfur",
+            },
+            "model": {
+                "model": "test-model",
+                "mode": "test",
+                "magemin_database": None,
+            },
+        }
+    )
+    # 6d9a817da7 requires complete replay-key/curve fields; fab8e9a976
+    # requires a PT1 codec stamp, which put adds. Use the live built-in vapor
+    # provider identity so strict shard-source validation accepts the fixture.
+    curve = {
+        "source": "test",
+        "solidus_T_C": 1000.0,
+        "liquidus_T_C": 1200.0,
+        "path": ((1000.0, 0.0), (1200.0, 1.0)),
+        "is_liquidus_floor": False,
+    }
+    payload = {"curve": _curve_payload(curve)}
+    payload["curve"]["tag"] = tag
+    payload["authority"] = {"vapor_pressure": vapor_pressure_provider}
     key_bytes = canonical_json_bytes(key)
     payload_bytes = canonical_json_bytes(payload)
     PT1PersistentEquilibriumStore(db_path).put(
@@ -157,7 +180,6 @@ def test_read_only_base_attach_exact_hit(tmp_path: Path) -> None:
     key = _put_cache_row(
         base,
         tag="from-base",
-        complete_replay_vector=True,
     )
     PT1PersistentEquilibriumStore(shard)
 
