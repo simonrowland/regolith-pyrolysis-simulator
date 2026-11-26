@@ -7978,12 +7978,47 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             liquid_fraction is not None
             and legacy_raw_liquid_fraction_is_zero(liquid_fraction)
         ) and temperature_K >= 400.0:
-            batch_flux_pressures, _, _, _, _, _ = (
+            (
+                batch_flux_pressures,
+                batch_flux_overlay,
+                _vapour_batch,
+                resolve_error,
+                _vapor_pressure_diagnostic,
+                _effective_pressure_source,
+            ) = (
                 self._resolve_evaporation_batch_flux_state(
                     equilibrium,
                     temperature_K=temperature_K,
                 )
             )
+            unresolved_notices = [
+                notice
+                for notice in batch_flux_overlay.get("notices", ()) or ()
+                if isinstance(notice, Mapping)
+                and notice.get("kind") == "vapour_batch_unresolved"
+            ]
+            if resolve_error or unresolved_notices:
+                reason = str(
+                    (resolve_error or {}).get("reason")
+                    or next(
+                        (
+                            notice.get("reason")
+                            for notice in unresolved_notices
+                            if notice.get("reason")
+                        ),
+                        batch_flux_overlay.get("selection_source")
+                        or "vapour_batch_no_debiting_pressure_outcome",
+                    )
+                )
+                raise EvaporationFluxRefusal(
+                    reason,
+                    {
+                        **dict(resolve_error or {}),
+                        "reason": reason,
+                        "evaporation_flux_kg_hr": {},
+                        "vapour_batch_flux_overlay": batch_flux_overlay,
+                    },
+                )
         controls, molar_masses = self._evaporation_flux_control_inputs(
             equilibrium,
             overhead_partials_Pa=initial_partials,

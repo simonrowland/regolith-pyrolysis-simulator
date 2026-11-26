@@ -128,6 +128,50 @@ def test_c2a_staged_endpoint_prevalidates_all_species_before_yield_mutation():
     assert manager._c2a_staged_last_log_slope_by_species == before_slopes
 
 
+@pytest.mark.parametrize("depletion_mode", ["log_slope", "legacy_decay"])
+def test_c2a_staged_unresolved_species_does_not_count_as_depleted(
+    depletion_mode: str,
+) -> None:
+    setpoints = _setpoints()
+    staged = setpoints["campaigns"]["C2A_staged"]
+    staged["max_hold_hr"] = 10
+    if depletion_mode == "legacy_decay":
+        staged["depletion_flux_decay_fraction"] = 0.5
+    else:
+        staged["depletion_flux_decay_fraction"] = 0.0
+    staged["stages"] = [{
+        "name": "alkali_early_fe",
+        "duration_h": 10,
+        "target_C": 1250,
+        "ramp_rate_C_per_hr": 600,
+        "depletion_log_slope_epsilon_per_hr": (
+            0.01 if depletion_mode == "log_slope" else 0.0
+        ),
+        "endpoint": {"flux_decay_species": ["Na"], "min_hold_h": 1},
+    }]
+    manager = CampaignManager(setpoints)
+    manager._last_vapour_batch_flux_overlay = {
+        "notices": [{
+            "kind": "vapour_batch_unresolved",
+            "species": "Na",
+            "hour": 0,
+            "reason": "channel_refused",
+        }],
+    }
+    manager._c2a_staged_cumulative_yield_mol_by_species = {"Na": 1.0}
+    manager._c2a_staged_peak_flux_by_species = {"Na": 1.0}
+
+    assert manager.check_endpoint(
+        _melt(CampaignPhase.C2A_STAGED, 0, temperature_C=1250.0),
+        _flux(total_kg_hr=1.0, K=1.0),
+        CondensationTrain(),
+        BatchRecord(),
+    ) is False
+    assert manager._c2a_staged_stage_idx == 0
+    assert manager._c2a_staged_cumulative_yield_mol_by_species["Na"] == 1.0
+    assert manager._c2a_staged_peak_flux_by_species["Na"] == 1.0
+
+
 @pytest.mark.parametrize(
     (
         "campaign",
@@ -1334,6 +1378,28 @@ def test_sc109_c2a_soft_endpoint_completes_only_after_flux_arm_then_decay() -> N
     ) is True
 
 
+def test_c2a_soft_endpoint_holds_when_any_current_flux_channel_is_unresolved() -> None:
+    manager = CampaignManager(_setpoints())
+    manager._last_vapour_batch_flux_overlay = {
+        "notices": [{
+            "kind": "vapour_batch_unresolved",
+            "species": "Na",
+            "hour": 18,
+            "reason": "channel_refused",
+        }],
+    }
+    record = BatchRecord(
+        snapshots=[HourSnapshot(campaign=CampaignPhase.C2A, evap_flux=_flux(0.5))]
+    )
+
+    assert manager.check_endpoint(
+        _melt(CampaignPhase.C2A, 18),
+        _flux(total_kg_hr=0.05, SiO=0.05),
+        CondensationTrain(),
+        record,
+    ) is False
+
+
 def test_sc109_c2b_soft_endpoint_refuses_missing_species_zero_rate() -> None:
     """Fail-open input: Fe key absent → rate defaults 0.0 after min_hold."""
     manager = CampaignManager(_setpoints())
@@ -1358,6 +1424,28 @@ def test_sc109_c2b_soft_endpoint_completes_only_after_fe_arm_then_decay() -> Non
     assert manager.check_endpoint(
         melt, _flux(Fe=0.01), CondensationTrain(), record
     ) is True
+
+
+def test_c2b_armed_fe_endpoint_holds_when_fe_flux_is_unresolved() -> None:
+    manager = CampaignManager(_setpoints())
+    manager._last_vapour_batch_flux_overlay = {
+        "notices": [{
+            "kind": "vapour_batch_unresolved",
+            "species": "Fe",
+            "hour": 8,
+            "reason": "channel_refused",
+        }],
+    }
+    record = BatchRecord(
+        snapshots=[HourSnapshot(campaign=CampaignPhase.C2B, evap_flux=_flux(Fe=0.2))]
+    )
+
+    assert manager.check_endpoint(
+        _melt(CampaignPhase.C2B, 8),
+        _flux(total_kg_hr=0.5, SiO=0.5),
+        CondensationTrain(),
+        record,
+    ) is False
 
 
 def test_sc109_mre_baseline_soft_endpoint_refuses_unarmed_low_current() -> None:
@@ -1610,6 +1698,33 @@ def test_c4_armed_zero_mg_rate_still_depletes() -> None:
     ) is True
     assert manager.last_c4_termination["outcome"] == "mg_signal_depleted"
     assert manager.last_c4_termination["stop_reason"] == "mg_signal_depleted"
+
+
+def test_c4_armed_mg_endpoint_holds_when_mg_flux_is_unresolved() -> None:
+    manager = CampaignManager(_setpoints())
+    manager._last_vapour_batch_flux_overlay = {
+        "notices": [{
+            "kind": "vapour_batch_unresolved",
+            "species": "Mg",
+            "hour": 5,
+            "reason": "channel_refused",
+        }],
+    }
+    record = BatchRecord(
+        snapshots=[
+            _c4_snapshot(temperature_C=1580.0, mg_rate=1.0)
+            for _ in range(5)
+        ]
+    )
+
+    assert manager.check_endpoint(
+        _melt(CampaignPhase.C4, 5, temperature_C=1580.0),
+        _flux(total_kg_hr=0.5, SiO=0.5),
+        CondensationTrain(),
+        record,
+        atom_ledger=_c4_ledger(),
+    ) is False
+    assert manager.last_c4_termination is None
 
 
 def test_c5_armed_negative_current_is_typed_refusal_not_depletion() -> None:

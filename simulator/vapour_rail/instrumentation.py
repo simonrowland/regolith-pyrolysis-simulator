@@ -1185,6 +1185,9 @@ def flux_pressures_from_batch(
     )
     extra_source_species = sorted(source_species_ids - batch_active_species_ids)
     report["missing_effective_pressure_species"] = missing_source_species
+    report["unresolved_missing_effective_pressure_species"] = (
+        unresolved_missing_source_species
+    )
     report["catalog_continuation_flux_species"] = sorted(
         catalog_continuation_fallback_species_ids
     )

@@ -427,6 +427,146 @@ def test_lookup_optional_returns_cached_interpolated(tmp_path: Path) -> None:
     assert "cached_interpolated_linear_estimate" in payload["equilibrium_result"]["warnings"]
     assert "requested_fO2_log" not in payload["equilibrium_result"]
     assert "printed_fO2_echo_log" not in payload["equilibrium_result"]
+    # The expected bytes intentionally changed when interpolation stopped
+    # copying neighbor engine rows. Pin the query-owned shape: only the
+    # weighted fields and explicit interpolation disclosures survive, while
+    # requested_temperature_C belongs to this query.
+    result = payload["equilibrium_result"]
+    assert result["requested_temperature_C"] == pytest.approx(
+        query["controls"]["T_K"] - 273.15
+    )
+    assert result["phase_assemblage_available"] is False
+    assert result["status"] == "out_of_domain"
+    assert not {
+        "phases_present",
+        "phase_species_mol",
+        "phase_species_kg",
+        "phase_compositions",
+        "phase_thermo",
+        "phase_instances",
+        "system_enthalpy",
+        "system_entropy",
+        "system_volume",
+        "solid_composition_wt_pct",
+        "bulk_composition_wt_pct",
+        "chem_potentials",
+        "phase_affinities",
+        "liquid_viscosity_Pa_s",
+        "liquid_density_kg_m3",
+        "liquidus_T_C",
+        "sulfur_saturation",
+        "ledger_transition",
+    } & set(result)
+
+
+def test_interpolation_strips_neighbor_engine_rows_and_uses_query_temperature() -> None:
+    query = _interpolation_key("query", feo_fraction=0.20, temperature_K=1500.0)
+    low = _interpolation_key("low", feo_fraction=0.20, temperature_K=1490.0)
+    high = _interpolation_key("high", feo_fraction=0.20, temperature_K=1510.0)
+    neighbor_only = {
+        "phases_present": ["neighbor-solid"],
+        "phase_species_mol": {"neighbor-phase": {"FeO": 3.0}},
+        "phase_species_kg": {"neighbor-phase": {"FeO": 2.0}},
+        "phase_compositions": {"neighbor-phase": {"FeO": 90.0}},
+        "liquid_viscosity_Pa_s": 7.0,
+        "ledger_transition": {"neighbor": "transition"},
+        "sulfur_saturation": {"neighbor": True},
+        "liquidus_T_C": 1300.0,
+        "liquid_density_kg_m3": 2700.0,
+        "system_enthalpy": 1.0,
+        "system_entropy": 2.0,
+        "system_volume": 3.0,
+        "system_heat_capacity_Cp": 4.0,
+        "system_dVdP": 5.0,
+        "system_dVdT": 6.0,
+        "system_fO2_delta_QFM": 7.0,
+        "system_solid_density_rhos": 8.0,
+        "system_phi": 9.0,
+        "system_chisqr": 10.0,
+        "phase_thermo": {"neighbor-phase": {"gibbs": 11.0}},
+        "solid_composition_wt_pct": {"FeO": 12.0},
+        "bulk_composition_wt_pct": {"FeO": 13.0},
+        "chem_potentials": {"FeO": {"neighbor": 14.0}},
+        "phase_affinities": {"FeO": {"neighbor": 15.0}},
+        "phase_instances": [{"name": "neighbor-phase"}],
+        "neighbor_engine_extra": {"value": "not-query-evidence"},
+    }
+    neighbors = []
+    for key, liquid_fraction, sio_pa in (
+        (low, 0.7, 7.0),
+        (high, 0.71, 7.05),
+    ):
+        payload = _interpolation_payload(
+            liquid_fraction=liquid_fraction,
+            sio_pa=sio_pa,
+        )
+        result = payload["equilibrium_result"]
+        result.update(copy.deepcopy(neighbor_only))
+        result.update({
+            "phase_assemblage_available": True,
+            "status": "neighbor-status",
+            "requested_temperature_C": 999.0,
+            "diagnostics": {
+                "engine_status": "neighbor-only",
+                "source_reaction_fO2_bar": 1.0e-6,
+            },
+            "temperature_C": key["controls"]["T_K"] - 273.15,
+            "pressure_bar": query["controls"]["pressure_bar"],
+            "fO2_log": -9.0,
+        })
+        neighbors.append(_candidate(key, payload))
+
+    payload = rci.interpolate_equilibrium_payload(
+        query,
+        neighbors,
+        weights=[0.5, 0.5],
+    )
+    result = payload["equilibrium_result"]
+
+    # Interpolation byte identity changes here intentionally. These neighbor
+    # engine fields are removed because they describe another state point:
+    # phase assemblage/masses/composition/thermo/instances, system
+    # thermodynamics, chemical potentials/affinities, liquid properties,
+    # ledger transition, sulfur saturation, and unrecognized engine extras.
+    # The neighbor's requested_temperature_C is also replaced with this
+    # query's coordinate; none of those fields is valid query evidence.
+    assert set(result).isdisjoint(neighbor_only)
+    assert result["requested_temperature_C"] != 999.0
+    assert set(result) == {
+        "diagnostics",
+        "phase_assemblage_available",
+        "status",
+        "temperature_C",
+        "requested_temperature_C",
+        "pressure_bar",
+        "fO2_log",
+        "liquid_fraction",
+        "vapor_pressures_Pa",
+        "phase_masses_kg",
+        "liquid_composition_wt_pct",
+        "activity_coefficients",
+        "vapor_pressures_source",
+        "warnings",
+    }
+    assert result["requested_temperature_C"] == pytest.approx(
+        query["controls"]["T_K"] - 273.15
+    )
+    assert result["temperature_C"] == pytest.approx(
+        query["controls"]["T_K"] - 273.15
+    )
+    assert result["phase_assemblage_available"] is False
+    assert result["status"] == "ok"
+    assert result["diagnostics"] == {}
+    assert result["warnings"] == ["cached_interpolated_linear_estimate"]
+    assert result["liquid_fraction"] == pytest.approx(0.705)
+    assert result["phase_masses_kg"] == pytest.approx(
+        {"liquid": 0.705, "solid": 0.295}
+    )
+    assert result["vapor_pressures_Pa"]["SiO"] == pytest.approx(7.025)
+    assert result["liquid_composition_wt_pct"] == {
+        "SiO2": 45.0,
+        "FeO": 10.0,
+    }
 
 
 def test_obsolete_exact_row_does_not_hide_current_physics_bucket_row(
@@ -638,7 +778,12 @@ def test_cached_interpolation_preserves_legacy_engine_fo2_diagnostics(
         "requested_fO2_log": -9.0,
         "printed_fO2_echo_log": None,
     }
+    # These backends store their requested coordinate in legacy diagnostics,
+    # not the AlphaMELTS top-level fields. The producer must carry that
+    # query-coordinate request forward while removing the neighbor's solve
+    # diagnostics and withholding an engine-printed echo.
     assert "applied_fO2_buffer" not in interpolated_result["diagnostics"]
+    assert "solved_fO2_log" not in interpolated_result["diagnostics"]
     assert interpolated_result["warnings"] == [
         "cached_interpolated_linear_estimate",
     ]

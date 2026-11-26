@@ -485,6 +485,60 @@ def test_core_refusal_leaves_record_and_ledger_close_report_unchanged(
     assert _canonical_bytes(sim.atom_ledger.close_report()) == ledger_before
 
 
+def test_capacity_shadow_refuses_unresolved_vapour_before_empty_source_solve(
+    monkeypatch,
+):
+    sim = object.__new__(PyrolysisSimulator)
+    sim._langmuir_flux_closure_context = None
+    sim._cold_train_capacity_policy = lambda: (
+        FiniteCapacity(1.0),
+        SimpleNamespace(accumulator_enabled=False),
+    )
+    sim.atom_ledger = SimpleNamespace(
+        mol_by_account=lambda: {},
+        transitions=[],
+    )
+    sim._overhead_holdup_mol = lambda: {}
+    sim.melt = SimpleNamespace(temperature_C=1600.0)
+    overlay = {
+        "selection_source": "typed_failure_effective_pressure_species_set_mismatch",
+        "notices": [{
+            "kind": "vapour_batch_unresolved",
+            "species": "Na",
+            "hour": 3,
+            "reason": "typed_failure_effective_pressure_species_set_mismatch",
+        }],
+    }
+    resolve_error = {}
+    sim._resolve_evaporation_batch_flux_state = lambda *_args, **_kwargs: (
+        {}, overlay, None, resolve_error, {}, None
+    )
+
+    def forbidden_controls(*_args, **_kwargs):
+        pytest.fail("capacity path built controls for an unresolved source")
+
+    def forbidden_solve(**_kwargs):
+        pytest.fail("capacity path solved an empty vapour source")
+
+    sim._evaporation_flux_control_inputs = forbidden_controls
+    monkeypatch.setattr(capacity_coupling, "solve_capacity_shadow", forbidden_solve)
+
+    with pytest.raises(EvaporationFluxRefusal) as refusal:
+        PyrolysisSimulator._compute_capacity_coupling_shadow_impl(
+            sim,
+            SimpleNamespace(
+                liquid_fraction=1.0,
+                vapor_pressures_Pa={"Na": 1.0},
+            ),
+        )
+
+    assert refusal.value.reason == (
+        "typed_failure_effective_pressure_species_set_mismatch"
+    )
+    assert refusal.value.diagnostic["evaporation_flux_kg_hr"] == {}
+    assert refusal.value.diagnostic["vapour_batch_flux_overlay"] == overlay
+
+
 def test_real_finite_capacity_result_drives_live_short_session_once(monkeypatch):
     active = _real_capacity_sim()
     active.start_campaign(CampaignPhase.C0)

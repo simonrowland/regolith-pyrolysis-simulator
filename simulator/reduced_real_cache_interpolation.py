@@ -289,10 +289,14 @@ def interpolate_equilibrium_payload(
     if not isinstance(reference_result, Mapping):
         raise ValueError("interpolation neighbor equilibrium_result missing")
 
-    interpolated_result = copy.deepcopy(dict(reference_result))
-    # Weighted values describe the query. Neighbor diagnostics and warnings
-    # describe another state point and must not be inherited as query evidence.
-    interpolated_result["diagnostics"] = {}
+    # Build only fields synthesized for the query. Copying the first engine row
+    # would attach its phase assemblage and thermodynamic evidence to another
+    # state point.
+    interpolated_result: dict[str, Any] = {
+        "diagnostics": {},
+        "phase_assemblage_available": False,
+        "status": "ok",
+    }
     controls = query_key.get("controls", {})
     if not isinstance(controls, Mapping):
         controls = {}
@@ -346,6 +350,10 @@ def interpolate_equilibrium_payload(
         interpolated_result["temperature_C"] = solved_temperature_C
     elif requested_temperature_C is not None:
         interpolated_result["temperature_C"] = requested_temperature_C
+    if requested_temperature_C is not None:
+        interpolated_result["requested_temperature_C"] = (
+            requested_temperature_C
+        )
     if solved_pressure_bar is not None:
         interpolated_result["pressure_bar"] = solved_pressure_bar
     elif requested_pressure_bar is not None:
@@ -364,13 +372,18 @@ def interpolate_equilibrium_payload(
         # No engine printed an echo for the synthesized state.
         interpolated_result["requested_fO2_log"] = requested_fO2_log
         interpolated_result["printed_fO2_echo_log"] = None
-        if diagnostic_fO2_fields:
-            diagnostics = dict(interpolated_result.get("diagnostics") or {})
-            if "requested_fO2_log" in diagnostic_fO2_fields:
-                diagnostics["requested_fO2_log"] = requested_fO2_log
-            if "printed_fO2_echo_log" in diagnostic_fO2_fields:
-                diagnostics["printed_fO2_echo_log"] = None
-            interpolated_result["diagnostics"] = diagnostics
+    if diagnostic_fO2_fields:
+        diagnostics = dict(interpolated_result.get("diagnostics") or {})
+        if "requested_fO2_log" in diagnostic_fO2_fields:
+            diagnostics["requested_fO2_log"] = requested_fO2_log
+        if diagnostic_fO2_fields & {
+            "requested_fO2_log",
+            "printed_fO2_echo_log",
+        }:
+            # Legacy backends record the requested redox coordinate in
+            # diagnostics; the interpolated query has no engine-printed echo.
+            diagnostics["printed_fO2_echo_log"] = None
+        interpolated_result["diagnostics"] = diagnostics
 
     interpolated_result["liquid_fraction"] = _weighted_average_scalar(
         neighbors,

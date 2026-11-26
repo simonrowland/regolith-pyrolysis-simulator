@@ -1984,6 +1984,22 @@ class CampaignManager:
         except TypeError as exc:
             raise ValueError('endpoint.flux_decay_species must be a sequence') from exc
 
+    def _current_vapour_species_unresolved(
+        self,
+        species: str | None = None,
+    ) -> bool:
+        overlay = getattr(self, '_last_vapour_batch_flux_overlay', {}) or {}
+        notices = overlay.get('notices', ()) if isinstance(overlay, Mapping) else ()
+        for notice in notices or ():
+            if not isinstance(notice, Mapping):
+                continue
+            if notice.get('kind') != 'vapour_batch_unresolved':
+                continue
+            notice_species = notice.get('species')
+            if species is None or notice_species is None or notice_species == species:
+                return True
+        return False
+
     def _c2a_staged_log_slope_depletion_complete(
             self,
             *,
@@ -2007,7 +2023,11 @@ class CampaignManager:
 
         slopes: dict[str, float] = {}
         observed_species: list[str] = []
+        unresolved_species = False
         for species_name in species:
+            if self._current_vapour_species_unresolved(species_name):
+                unresolved_species = True
+                continue
             current_kg_hr = max(
                 0.0,
                 self._float(evap_flux.species_kg_hr.get(species_name, 0.0), 0.0),
@@ -2035,7 +2055,7 @@ class CampaignManager:
             )
 
         self._c2a_staged_last_log_slope_by_species = slopes
-        return bool(observed_species) and all(
+        return not unresolved_species and bool(observed_species) and all(
             slopes[species_name] <= epsilon_per_hr
             for species_name in observed_species
         )
@@ -2738,7 +2758,7 @@ class CampaignManager:
         species: str,
         threshold_kg_hr: float,
         *,
-        current_rate: float,
+        current_rate: float | None,
     ) -> bool:
         """True when current_rate or a same-campaign species kg/hr exceeds threshold.
 
@@ -2746,7 +2766,10 @@ class CampaignManager:
         ``EvaporationFlux.carrier_authority_by_species`` or any other
         authority field. The current-rate path has no authority argument.
         """
-        if float(current_rate) > float(threshold_kg_hr):
+        if (
+            current_rate is not None
+            and float(current_rate) > float(threshold_kg_hr)
+        ):
             return True
         for snapshot in record.snapshots:
             if snapshot.campaign != campaign:
@@ -3042,11 +3065,14 @@ class CampaignManager:
             # SC-109: soft depletion requires affirmative high-flux arming
             # (C4 signal_armed pattern). Continuous sub-threshold / never-
             # armed flux must not complete as if depletion occurred.
-            signal_armed = self._evap_total_signal_armed(
-                record,
-                CampaignPhase.C2A,
-                threshold_kg_hr,
-                current_rate=total_rate,
+            signal_armed = (
+                not self._current_vapour_species_unresolved()
+                and self._evap_total_signal_armed(
+                    record,
+                    CampaignPhase.C2A,
+                    threshold_kg_hr,
+                    current_rate=total_rate,
+                )
             )
             if signal_armed and melt.campaign_hour >= min_hold_hr:
                 total_rate = self._require_finite_nonnegative_depletion_signal(
@@ -3118,7 +3144,11 @@ class CampaignManager:
                 )
                 depletion_reason = 'depletion_log_slope'
             elif legacy_fraction > 0.0:
+                stage_flux_unavailable = False
                 for species_name in species:
+                    if self._current_vapour_species_unresolved(species_name):
+                        stage_flux_unavailable = True
+                        continue
                     raw_current = evap_flux.species_kg_hr.get(species_name, 0.0)
                     current = max(0.0, self._float(raw_current, 0.0))
                     previous = self._c2a_staged_peak_flux_by_species.get(
@@ -3136,7 +3166,8 @@ class CampaignManager:
                     if species_name in species and peak > 0.0
                 }
                 depletion_complete = (
-                    stage_elapsed_h >= min_hold_h
+                    not stage_flux_unavailable
+                    and stage_elapsed_h >= min_hold_h
                     and bool(observed_peaks)
                     and all(
                         max(
@@ -3205,7 +3236,14 @@ class CampaignManager:
             species = str(soft.get('species', ''))
             if not species:
                 raise ValueError('C2B.soft_endpoint.species is required')
-            rate = float(evap_flux.species_kg_hr.get(species, 0.0))
+            species_flux_unavailable = self._current_vapour_species_unresolved(
+                species
+            )
+            rate = (
+                None
+                if species_flux_unavailable
+                else float(evap_flux.species_kg_hr.get(species, 0.0))
+            )
             # SC-109: missing species key / never-above-threshold rate is not
             # depletion. Require a prior authorized high sample before low-rate
             # soft completion (C4 signal_armed pattern).
@@ -3216,7 +3254,11 @@ class CampaignManager:
                 threshold_kg_hr,
                 current_rate=rate,
             )
-            if signal_armed and melt.campaign_hour >= min_hold_hr:
+            if (
+                not species_flux_unavailable
+                and signal_armed
+                and melt.campaign_hour >= min_hold_hr
+            ):
                 rate = self._require_finite_nonnegative_depletion_signal(
                     rate,
                     name=f'C2B.{species}_kg_hr',
@@ -3282,7 +3324,14 @@ class CampaignManager:
             species = str(soft.get('species', ''))
             if not species:
                 raise ValueError('C4.soft_endpoint.species is required')
-            rate = evap_flux.species_kg_hr.get(species, 0.0)
+            species_flux_unavailable = self._current_vapour_species_unresolved(
+                species
+            )
+            rate = (
+                None
+                if species_flux_unavailable
+                else evap_flux.species_kg_hr.get(species, 0.0)
+            )
             raw_na_limit = self.setpoints.get(
                 'outdoor_alkali_loss_limit_fraction_of_feed'
             )
@@ -3537,9 +3586,14 @@ class CampaignManager:
                     .species_kg_hr.get(species, 0.0)
                 ) > threshold_kg_hr
                 for snapshot in c4_snapshots
-            ) or (current_in_window and rate > threshold_kg_hr)
+            ) or (
+                current_in_window
+                and rate is not None
+                and rate > threshold_kg_hr
+            )
             if (
                 current_in_window
+                and not species_flux_unavailable
                 and signal_armed
                 and completed_window_hr >= min_hold_hr
             ):
@@ -3570,7 +3624,7 @@ class CampaignManager:
                     'outcome': outcome,
                     'stop_reason': 'time_cap',
                     'species': species,
-                    'rate_kg_hr': float(rate),
+                    'rate_kg_hr': float(rate) if rate is not None else None,
                     'threshold_kg_hr': threshold_kg_hr,
                     'completed_window_hr': completed_window_hr,
                     'process_elapsed_hr': process_elapsed_hr,

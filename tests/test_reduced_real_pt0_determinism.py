@@ -36,6 +36,7 @@ from simulator.fe_redox import (
     RedoxState,
     kress91_referenced_log_fO2,
 )
+from simulator.evaporation import EvaporationFluxRefusal
 from simulator.config import (
     DEFAULT_ALPHAMELTS_MODEL,
     resolve_alphamelts_python_api_model,
@@ -98,10 +99,25 @@ def _synthetic_binding_receipt_for_pt0_store_tests(
     if request.node.name == 'test_pt0_real_magemin_capped_replay_contract':
         source = DATA_DIR.parent / 'engines' / 'engines.local.toml'
         (tmp_path / source.name).write_bytes(source.read_bytes())
+    direct_alphamelts_test = request.node.name in {
+        "test_interpolated_equilibrium_cache_miss_keeps_campaign_flux_and_ledger",
+        "test_interpolated_flux_replay_mutation_cannot_finish_campaign_hour",
+    }
+    identity_override = None
+    if direct_alphamelts_test:
+        from simulator.engine_binding_admission import BindingIdentity
+
+        identity_override = BindingIdentity(
+            "alphamelts",
+            "MELTSv1.0.2",
+            "alphamelts-r1",
+            "subprocess",
+        )
     install_synthetic_binding_receipt(
         tmp_path,
         monkeypatch,
-        bind_direct_backend=False,
+        bind_direct_backend=direct_alphamelts_test,
+        identity_override=identity_override,
     )
 
 
@@ -7950,68 +7966,113 @@ def test_pt0_real_magemin_capped_replay_contract(tmp_path: Path) -> None:
     ] >= 1
 
 
+def _run_interpolation_class_guard_hour(
+    store: PT0DeterminismStore,
+    *,
+    interpolation_source: Mapping[str, Any] | None = None,
+    monkeypatch: pytest.MonkeyPatch | None = None,
+    replay_interpolation_into_flux: bool = False,
+) -> tuple[Any, Any, int]:
+    sim = _build_pt0_sim(store)
+    provider = _CountingSilicateEquilibriumProvider(
+        provider_id="alphamelts-diagnostic",
+        engine_version="alpha-v1",
+    )
+    provider._test_model = "MELTSv1.0.2"
+    provider._test_mode = "subprocess"
+
+    class AlphaMELTSBackend(RealBackendAuthority):
+        real_backend_family = RealBackendFamily.ALPHAMELTS
+        _model = "MELTSv1.0.2"
+        _mode = "subprocess"
+
+        def is_available(self) -> bool:
+            return True
+
+        def get_engine_version(self) -> str:
+            return provider.engine_version
+
+        def equilibrate(self, *_args: Any, **_kwargs: Any) -> Any:
+            raise AssertionError(
+                "registered deterministic provider must handle the live solve"
+            )
+
+    sim.backend = AlphaMELTSBackend()
+    provider._backend = sim.backend
+    from simulator.engine_binding_admission import publish_live_backend_admission
+
+    publish_live_backend_admission(sim.backend)
+    sim._chem_registry.register(
+        provider,
+        [ChemistryIntent.SILICATE_EQUILIBRIUM],
+    )
+    sim.start_campaign(CampaignPhase.C2A_STAGED)
+    sim.melt.temperature_C = 1500.0
+    assert store._cached_real_binding_eligible(sim)
+    if interpolation_source is not None:
+        def candidates(**kwargs: Any) -> list[dict[str, Any]]:
+            query_key = kwargs["query_key"]
+            result = []
+            for offset in (-1.0, 1.0):
+                key = copy.deepcopy(query_key)
+                key["controls"]["T_K"] = (
+                    float(query_key["controls"]["T_K"]) + offset
+                )
+                payload = copy.deepcopy(interpolation_source["payload"])
+                payload["equilibrium_result"]["temperature_C"] = (
+                    float(key["controls"]["T_K"])
+                    - CELSIUS_TO_KELVIN_OFFSET
+                )
+                key_hash = rrd._sha256(canonical_json_bytes(key))
+                result.append({
+                    **copy.deepcopy(dict(interpolation_source)),
+                    "key": key,
+                    "key_hash": key_hash,
+                    "payload": payload,
+                })
+            return result
+
+        assert store.persistent_store is not None
+        store.persistent_store._list_interpolation_candidates = candidates
+    if replay_interpolation_into_flux:
+        assert monkeypatch is not None
+        original_lookup = store._lookup_interpolated
+
+        def unguarded_flux_lookup(
+            artifact: str,
+            key: Mapping[str, Any],
+            *,
+            sim: Any | None = None,
+            return_decoded: bool = False,
+            flux_consumer: bool = False,
+        ) -> Any | None:
+            return original_lookup(
+                artifact,
+                key,
+                sim=sim,
+                return_decoded=return_decoded,
+                flux_consumer=False,
+            )
+
+        monkeypatch.setattr(store, "_lookup_interpolated", unguarded_flux_lookup)
+    snapshot = sim.step()
+    return sim, snapshot, provider.calls
+
+
 def test_interpolated_equilibrium_cache_miss_keeps_campaign_flux_and_ledger(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """An available interpolation candidate must still run the live engine."""
+    """A production-eligible interpolation candidate still runs the live engine."""
     import simulator.reduced_real_cache_interpolation as interpolation
-
-    def run_one_hour(
-        store: PT0DeterminismStore,
-        *,
-        interpolation_source: Mapping[str, Any] | None = None,
-    ) -> tuple[Any, Any, int]:
-        sim = _build_pt0_sim(store)
-        store._cached_real_binding_eligible = (
-            lambda *_args, **_kwargs: True
-        )
-        sim.start_campaign(CampaignPhase.C2A_STAGED)
-        sim.melt.temperature_C = 1500.0
-        original_equilibrate = sim.backend.equilibrate
-        calls = 0
-
-        def counted_equilibrate(*args: Any, **kwargs: Any) -> Any:
-            nonlocal calls
-            calls += 1
-            return original_equilibrate(*args, **kwargs)
-
-        sim.backend.equilibrate = counted_equilibrate
-        if interpolation_source is not None:
-            def candidates(**kwargs: Any) -> list[dict[str, Any]]:
-                query_key = kwargs["query_key"]
-                result = []
-                for offset in (-1.0, 1.0):
-                    key = copy.deepcopy(query_key)
-                    key["controls"]["T_K"] = (
-                        float(query_key["controls"]["T_K"]) + offset
-                    )
-                    payload = copy.deepcopy(
-                        interpolation_source["payload"]
-                    )
-                    payload["equilibrium_result"]["temperature_C"] = (
-                        float(key["controls"]["T_K"])
-                        - CELSIUS_TO_KELVIN_OFFSET
-                    )
-                    key_hash = rrd._sha256(canonical_json_bytes(key))
-                    result.append({
-                        **copy.deepcopy(dict(interpolation_source)),
-                        "key": key,
-                        "key_hash": key_hash,
-                        "payload": payload,
-                    })
-                return result
-
-            assert store.persistent_store is not None
-            store.persistent_store._list_interpolation_candidates = candidates
-        snapshot = sim.step()
-        return sim, snapshot, calls
 
     cold_store = PT0DeterminismStore(
         "capture",
         db_path=tmp_path / "interpolation-class-cold.sqlite",
     )
-    cold_sim, cold_snapshot, cold_calls = run_one_hour(cold_store)
+    cold_sim, cold_snapshot, cold_calls = _run_interpolation_class_guard_hour(
+        cold_store
+    )
     assert cold_calls > 0
     cold_rows = [
         entry
@@ -8032,7 +8093,7 @@ def test_interpolated_equilibrium_cache_miss_keeps_campaign_flux_and_ledger(
             attempted_interpolations.append(attempt)
         return attempt
 
-    admitted_interpolations: list[EquilibriumResult] = []
+    admitted_interpolations: list[rrd._DecodedEquilibriumReplayPayload] = []
     production_admission = rrd._decode_payload_for_admission
 
     def record_interpolation_admission(
@@ -8041,8 +8102,9 @@ def test_interpolated_equilibrium_cache_miss_keeps_campaign_flux_and_ledger(
         **kwargs: Any,
     ) -> Any:
         decoded = production_admission(artifact, payload, **kwargs)
-        if kwargs.get("interpolation_synthesized") and isinstance(
-            decoded, EquilibriumResult
+        if (
+            kwargs.get("interpolation_synthesized")
+            and isinstance(decoded, rrd._DecodedEquilibriumReplayPayload)
         ):
             admitted_interpolations.append(decoded)
         return decoded
@@ -8061,16 +8123,21 @@ def test_interpolated_equilibrium_cache_miss_keeps_campaign_flux_and_ledger(
         "capture",
         db_path=tmp_path / "interpolation-class-warm.sqlite",
     )
-    warm_sim, warm_snapshot, warm_calls = run_one_hour(
+    warm_sim, warm_snapshot, warm_calls = _run_interpolation_class_guard_hour(
         warm_store,
         interpolation_source=cold_rows[0],
     )
 
     assert attempted_interpolations
     assert admitted_interpolations
+    assert all(
+        isinstance(item.result, EquilibriumResult)
+        for item in admitted_interpolations
+    )
     assert warm_calls > 0
     assert not any(
-        event.get("cache_state") == "cached_interpolated"
+        event.get("artifact") == "equilibrium_post_record"
+        and event.get("cache_state") == "cached_interpolated"
         for event in warm_store.replay_sequence
     )
     assert cold_snapshot.evap_flux.species_kg_hr
@@ -8089,6 +8156,34 @@ def test_interpolated_equilibrium_cache_miss_keeps_campaign_flux_and_ledger(
             cold_species,
             rel=1.0e-12,
             abs=1.0e-12,
+        )
+
+
+def test_interpolated_flux_replay_mutation_cannot_finish_campaign_hour(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    cold_store = PT0DeterminismStore(
+        "capture",
+        db_path=tmp_path / "interpolation-mutation-cold.sqlite",
+    )
+    _run_interpolation_class_guard_hour(cold_store)
+    cold_row = next(
+        entry
+        for entry in cold_store._entries.values()
+        if entry.get("artifact") == "equilibrium_post_record"
+    )
+    warm_store = PT0DeterminismStore(
+        "capture",
+        db_path=tmp_path / "interpolation-mutation-warm.sqlite",
+    )
+
+    with pytest.raises(EvaporationFluxRefusal):
+        _run_interpolation_class_guard_hour(
+            warm_store,
+            interpolation_source=cold_row,
+            monkeypatch=monkeypatch,
+            replay_interpolation_into_flux=True,
         )
 
 
@@ -9579,7 +9674,11 @@ def test_real_interpolated_payload_recursive_mutations_use_nonflux_admission(
         )
 
     baseline_result = lookup_nonflux()
-    assert isinstance(baseline_result, EquilibriumResult)
+    assert isinstance(
+        baseline_result,
+        rrd._DecodedEquilibriumReplayPayload,
+    )
+    assert isinstance(baseline_result.result, EquilibriumResult)
     assert capture.hits == 1
     assert capture.last_cache_state == "cached_interpolated"
     _exercise_sio_yield_report_diagnostic(query_sim)
@@ -9654,7 +9753,10 @@ def test_real_interpolated_payload_recursive_mutations_use_nonflux_admission(
                     failures.append(f"{case_name}: rejected interpolation changed disclosures")
             else:
                 outcomes[case_name] = "admitted"
-                if not isinstance(result, EquilibriumResult):
+                if not isinstance(
+                    result,
+                    rrd._DecodedEquilibriumReplayPayload,
+                ):
                     failures.append(f"{case_name}: admitted result has wrong type")
                 if capture.hits != 1:
                     failures.append(
@@ -9682,7 +9784,10 @@ def test_real_interpolated_payload_recursive_mutations_use_nonflux_admission(
             capture.last_cache_state = None
             capture._accepted_hit_disclosures = None
             restored_result = lookup_nonflux()
-            if not isinstance(restored_result, EquilibriumResult):
+            if not isinstance(
+                restored_result,
+                rrd._DecodedEquilibriumReplayPayload,
+            ):
                 failures.append(f"{case_name}: restored interpolation missed")
             if capture.hits != 1:
                 failures.append(f"{case_name}: restored interpolation hit {capture.hits} times")

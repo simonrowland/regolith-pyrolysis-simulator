@@ -1903,9 +1903,23 @@ class EvaporationMixin:
                 resolution_error=resolve_error or None,
             )
         )
+        requested_species_ids = frozenset(
+            getattr(vapour_batch, "requested_species_ids", ()) or ()
+        )
+        if vapour_batch is None:
+            catalog = getattr(self, "vapour_rail_catalog", None)
+            ledger = getattr(self, "atom_ledger", None)
+            request_builder = getattr(catalog, "build_request", None)
+            inventory_reader = getattr(ledger, "mol_by_account", None)
+            if callable(request_builder) and callable(inventory_reader):
+                try:
+                    requested_species_ids = frozenset(
+                        request_builder(inventory_reader())
+                    )
+                except Exception:  # noqa: BLE001 — preserve the resolver refusal
+                    requested_species_ids = frozenset()
         if resolve_error:
-            unresolved_species = sorted(effective_pressure_source.species_ids)
-            for species in unresolved_species or [None]:
+            for species in sorted(requested_species_ids) or [None]:
                 _append_vapour_batch_unresolved_notice(
                     self,
                     flux_overlay_report,
@@ -1916,17 +1930,13 @@ class EvaporationMixin:
                     ),
                 )
         else:
-            missing_source_species = set(
-                flux_overlay_report.get("missing_effective_pressure_species", ())
+            unresolved_missing_species = (
+                flux_overlay_report.get(
+                    "unresolved_missing_effective_pressure_species", ()
+                )
                 or ()
             )
-            catalog_fallback_species = set(
-                flux_overlay_report.get("catalog_continuation_flux_species", ())
-                or ()
-            )
-            for species in sorted(
-                missing_source_species - catalog_fallback_species
-            ):
+            for species in sorted(unresolved_missing_species):
                 _append_vapour_batch_unresolved_notice(
                     self,
                     flux_overlay_report,

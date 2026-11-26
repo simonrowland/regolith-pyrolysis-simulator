@@ -801,6 +801,7 @@ def test_in_domain_effective_pressure_set_mismatch_fails_closed() -> None:
         "typed_failure_effective_pressure_species_set_mismatch"
     )
     assert report["missing_effective_pressure_species"] == ["Na"]
+    assert report["unresolved_missing_effective_pressure_species"] == ["Na"]
     assert report["catalog_continuation_flux_species"] == []
 
 
@@ -956,10 +957,24 @@ def test_flux_pressures_resolution_error_is_typed_failure() -> None:
 def test_evaporation_resolver_failure_at_900c_is_typed_refusal() -> None:
     """Null: the inherited sub-1050 C shortcut converts resolver failure to zero."""
 
+    from simulator.vapour_rail.catalog import compile_vapour_rail_catalog
+    from tests.test_vapour_batch_request import _minimal_family, _u0_stub
+
+    catalog = compile_vapour_rail_catalog(
+        _minimal_family("K"),
+        u0_manifest=_u0_stub("K"),
+    )
+
     model = SimpleNamespace(
         melt=SimpleNamespace(temperature_C=900.0, hour=0),
         setpoints={},
         vapor_pressures={},
+        vapour_rail_catalog=catalog,
+        atom_ledger=SimpleNamespace(
+            mol_by_account=lambda: {
+                "process.cleaned_melt": {"K2O": 1.0, "KO0.5": 0.5},
+            }
+        ),
     )
 
     def fail_resolution(
@@ -995,7 +1010,7 @@ def test_evaporation_resolver_failure_at_900c_is_typed_refusal() -> None:
     assert exc_info.value.diagnostic["vapour_batch_flux_overlay"]["notices"] == [
         {
             "kind": "vapour_batch_unresolved",
-            "species": "Na",
+            "species": "K",
             "hour": 0,
             "reason": "vapour_batch_resolve_failed",
         },
