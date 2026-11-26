@@ -27,6 +27,63 @@ from tests.battery.wang_2001_langmuir_support import (
 )
 
 
+_WANG_REE_FORMULAS = (
+    "La", "Ce", "Pr", "Nd", "Sm", "Eu", "Gd",
+    "Tb", "Dy", "Ho", "Er", "Tm", "Yb", "Lu",
+)
+
+# Captured from the untouched scorer on c661581627 (remote receipt
+# b8fae130d643406ebe4ce7146f9e614a, mac-studio-256-1). The move of the
+# retention owner must keep this digest.
+_WANG_REE_DEX_PIN = (
+    '{"Ce": {"mean_dex": 1.098450330314588, "n": 16, "rms_dex": 1.6918878256617227}, '
+    '"Dy": {"mean_dex": -0.053187794662897456, "n": 16, "rms_dex": 0.08086684352839037}, '
+    '"Er": {"mean_dex": -0.06933190744119572, "n": 16, "rms_dex": 0.0928269221034844}, '
+    '"Eu": {"mean_dex": 0.02167316007913287, "n": 16, "rms_dex": 0.060073410332808504}, '
+    '"Gd": {"mean_dex": 0.0015607187712339972, "n": 16, "rms_dex": 0.06097663226175852}, '
+    '"Ho": {"mean_dex": -0.05074188341727137, "n": 16, "rms_dex": 0.08057807921803438}, '
+    '"La": {"mean_dex": -0.04685128372487344, "n": 16, "rms_dex": 0.07244807048291114}, '
+    '"Lu": {"mean_dex": -0.07906856852966322, "n": 16, "rms_dex": 0.10280373320512891}, '
+    '"Nd": {"mean_dex": 0.04063707604026164, "n": 16, "rms_dex": 0.0683384490404025}, '
+    '"Pr": {"mean_dex": -0.007085826587320151, "n": 16, "rms_dex": 0.08906975662683633}, '
+    '"Sm": {"mean_dex": 0.017017888729405406, "n": 16, "rms_dex": 0.05828799700344608}, '
+    '"Tb": {"mean_dex": -0.05785322010487203, "n": 16, "rms_dex": 0.08357424032574698}, '
+    '"Tm": {"mean_dex": -0.041494490115031556, "n": 16, "rms_dex": 0.072308265861075}, '
+    '"Yb": {"mean_dex": -0.023713315581647305, "n": 16, "rms_dex": 0.06368871753551417}}'
+)
+
+
+def _wang_ree_dex_summary(residuals, references):
+    """Mean and RMS dex for each Wang REE, in reference order."""
+
+    residual_by_reference = {
+        residual.reference: residual for residual in residuals
+    }
+    dex_by_formula: dict[str, list[float]] = defaultdict(list)
+    for reference in references.values():
+        formula = reference.identity.species.formula
+        if formula not in _WANG_REE_FORMULAS:
+            continue
+        residual = residual_by_reference.get(reference.observation_id)
+        if residual is None or residual.numeric is None:
+            continue
+        dex_by_formula[formula].append(float(residual.numeric.value))
+    summary = {}
+    for formula in _WANG_REE_FORMULAS:
+        values = dex_by_formula[formula]
+        if not values:
+            summary[formula] = {"n": 0}
+            continue
+        mean = sum(values) / len(values)
+        rms = sqrt(sum(value * value for value in values) / len(values))
+        summary[formula] = {
+            "n": len(values),
+            "mean_dex": mean,
+            "rms_dex": rms,
+        }
+    return summary
+
+
 def _benchm1_residual_report(residuals, references):
     rows = []
     oxide_residuals = defaultdict(list)
@@ -147,29 +204,7 @@ def _benchm1_residual_report(residuals, references):
         output.append(f"WANG_FLAG_COUNT={kind}|{count}|{reason}")
     for reason, count in sorted(refusal_counts.items()):
         output.append(f"WANG_REFUSAL_COUNT={count}|{reason}")
-    ree = (
-        "La", "Ce", "Pr", "Nd", "Sm", "Eu", "Gd",
-        "Tb", "Dy", "Ho", "Er", "Tm", "Yb", "Lu",
-    )
-    dex_by_formula: dict[str, list[float]] = defaultdict(list)
-    for row in rows:
-        formula = row[4]
-        delta = row[8]
-        if formula in ree and delta is not None:
-            dex_by_formula[formula].append(delta)
-    ree_summary = {}
-    for formula in ree:
-        values = dex_by_formula[formula]
-        if not values:
-            ree_summary[formula] = {"n": 0}
-            continue
-        mean = sum(values) / len(values)
-        rms = sqrt(sum(value * value for value in values) / len(values))
-        ree_summary[formula] = {
-            "n": len(values),
-            "mean_dex": mean,
-            "rms_dex": rms,
-        }
+    ree_summary = _wang_ree_dex_summary(residuals, references)
     output.extend((
         f"WANG_RESIDUE_POINTS={len(references)}",
         f"WANG_ADMITTED_RESIDUE_POINTS={sum(row.admission.status.value == 'admitted' for row in references.values())}",
@@ -368,6 +403,10 @@ def test_wang_residue_cells_emit_one_production_score_event_each(monkeypatch):
     assert all(residual.reference != reference.observation_id for residual in mutated)
 
     _benchm1_residual_report(residuals, all_references)
+    assert json.dumps(
+        _wang_ree_dex_summary(residuals, all_references),
+        sort_keys=True,
+    ) == _WANG_REE_DEX_PIN
     numeric = [residual for residual in residuals if residual.numeric is not None]
     ree_scored = [
         residual for residual in numeric
