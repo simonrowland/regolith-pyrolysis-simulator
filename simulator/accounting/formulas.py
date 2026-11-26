@@ -113,9 +113,33 @@ MOLAR_MASS_REL_TOLERANCE = 1e-6
 _OPEN_TO_CLOSE = {"(": ")", "[": "]", "{": "}"}
 _CLOSE_TO_OPEN = {v: k for k, v in _OPEN_TO_CLOSE.items()}
 _NUMBER_RE = re.compile(r"(?:\d+/\d+|\d+(?:\.\d+)?|\.\d+)")
+_FORMULA_PHASE_SUFFIXES = {
+    "aq": "aq",
+    "c": "cr",
+    "cr": "cr",
+    "g": "g",
+    "gl": "gl",
+    "glass": "gl",
+    "l": "l",
+    "liq": "l",
+    "liquid": "l",
+    "solid": "cr",
+    "s": "cr",
+    "gas": "g",
+    "vapor": "g",
+}
+_FORMULA_PHASE_SUFFIX_LABELS = tuple(_FORMULA_PHASE_SUFFIXES)
+_FORMULA_PHASE_SUFFIX_TOKEN = "(?:" + "|".join(
+    re.escape(label) for label in _FORMULA_PHASE_SUFFIX_LABELS
+) + ")"
 _PHASE_SUFFIX_RE = re.compile(
-    r"(?:\((?:s|l|g|aq|c|cr|gl|glass|liq|liquid|solid|gas|vapor)\)|"
-    r"\[(?:s|l|g|aq|cr|gl|glass|liq|liquid|solid|gas|vapor)\])$",
+    rf"(?:\((?P<paren>{_FORMULA_PHASE_SUFFIX_TOKEN})\)|"
+    rf"\[(?P<bracket>{_FORMULA_PHASE_SUFFIX_TOKEN})\])$",
+    re.IGNORECASE,
+)
+_RAW_PHASE_SUFFIX_RE = re.compile(
+    rf"(?:\(\s*(?P<paren>{_FORMULA_PHASE_SUFFIX_TOKEN})\s*\)|"
+    rf"\[\s*(?P<bracket>{_FORMULA_PHASE_SUFFIX_TOKEN})\s*\])\s*$",
     re.IGNORECASE,
 )
 
@@ -239,23 +263,43 @@ def parse_formula(
 ) -> SpeciesFormula:
     """Parse formula text and return a SpeciesFormula.
 
+    Element symbols and capitalization are exact here. A source spelling that
+    needs case folding or OCR correction may enter the formula path only via
+    ``_canonicalize_formula_from_printed_weight``: it requires a printed
+    formula weight and a parsed-mass match within max(0.05 g/mol, 0.02%).
+    This keeps case repair at the source acceptance point instead of guessing
+    from a later score-time formula string.
+
     An ASCII decimal may omit its leading zero after an element, as in
     ``Fe.875S``, ``Fe.90S``, and ``Fe.95O``. The ASCII-dot rule treats a dot
     as an adduct only when every separated segment contains at least two
     distinct integer-count elements; here the left segment is the single
     element Fe, so the dot is its decimal point.
 
-    Lower-case element spellings are normalized only when the letter run has
-    one tokenization using known element symbols. In mixed-case runs, printed
-    uppercase starts and lowercase second letters keep two-letter symbols
-    intact; a lowercase one-letter symbol is accepted at the end of a run.
-    This accepts source spellings such as ``Fe. 875 s``, ``CaFe2o4``,
-    ``CuFes2``, ``CaMgSio4``, ``NaAlSio4``, ``Na2so4·10H2o``, ``cao``, and
-    ``ws2``. Fully lower-case ambiguous runs such as ``coo`` (CoO or CO2),
-    ``caso4`` (CaSO4 or CAsO4), and ``cu`` (Cu or C+U) stay refused. A
-    repeated terminal oxygen written as lower-case ``o`` after a counted
-    oxygen is also refused because it can be an OCR degree mark
-    (``H4SiO4o``), not another oxygen.
+    The t-1795 census's exact-case spellings accepted without repair are
+    ``H2S2(g)``, ``H2SO4(l)``, ``H2SO4(g)``, ``$(NH_{4})_{2}CO_{3}(aq)$``,
+    ``$H_3AsO_3(aq)$``, ``$H_3AsO_4(aq)$``, ``$NH_{4}HCO_{3}(aq)$``,
+    ``$NH_{4}OH(aq)$``, ``$PCl_{3}(l)$``, ``$SO_3(l)$``,
+    ``$\\mathrm{CdSO}_{4}\\cdot8/3\\mathrm{H}_{2}\\mathrm{O}(c)$``,
+    ``H2AsO2(aq)``, ``H2CO3(aq)``, ``H2N2O2(aq)``, ``H2S(aq)``,
+    ``H2S2O8(aq)``, ``H2SO3(aq)``, ``H2SO4(aq)``, ``H2Se(aq)``,
+    ``H2SeO3(aq)``, ``H2SeO4(aq)``, ``H3PO4(aq)``, ``H3PO4·1/2H2O``,
+    ``HCN(aq)``, ``HCNO(aq)``, ``Na2B4O7(gl)``,
+    ``Ca1.02Na0.14K.01(Al2.18Si6.82O18) · 7.33H2O``, ``Fe.875S``, and
+    ``Fe.90S``. Their element capitalization and formula delimiters specify
+    one tokenization.
+
+    The source rows' 17 accepted case/OCR spellings are ``CaFe2o4``,
+    ``CaMgSio4``, ``CuFes2``, ``Fe. 875 s``, ``Fe.94 7o``, ``MgFe2o4``,
+    ``Na2so4·10H2o``, ``NaAlSio4``, ``Naf``, ``ZnFe2o4``, ``cawo4``,
+    ``cao``, ``srso4``, ``u``, ``v``, ``w``, and ``ws2``. Each has one
+    element-symbol tokenization; the source acceptance path admits it only
+    when the parsed mass matches the same row's printed formula weight within
+    max(0.05 g/mol, 0.02%). Ambiguous runs such as ``coo`` (CoO or CO2),
+    ``caso4`` (CaSO4 or CAsO4), and ``cu`` (Cu or C+U) remain refused even
+    when a weight is present. A repeated terminal oxygen written as lower-case
+    ``o`` after a counted oxygen is refused because it can be an OCR degree
+    mark (``H4SiO4o``), not another oxygen.
     An unrecognized all-lowercase terminal parenthesis remains a label or
     ambiguity instead of being tokenized as elements (for example ``S(mon)``).
     Middle-dot hydrates, including fractional coefficients such as
@@ -266,51 +310,146 @@ def parse_formula(
     The existing bullet separator spelling is accepted only between formula
     segments; empty trailing or repeated separators are rejected.
 
-    The t-1795 census spellings accepted by these rules are ``$NH_{4}OH(aq)$``,
-    ``$\\mathrm{CdSO}_{4}\\cdot8/3\\mathrm{H}_{2}\\mathrm{O}(c)$``,
-    ``H2Se(aq)``, ``H2S(aq)``, ``HCN(aq)``, ``HCNO(aq)``,
-    ``$(NH_{4})_{2}CO_{3}(aq)$``, ``H2N2O2(aq)``, ``H2SO4(aq)``,
-    ``H2CO3(aq)``, ``H2SO3(aq)``, ``Na2B4O7(gl)``,
-    ``$NH_{4}HCO_{3}(aq)$``, ``H3PO4·1/2H2O``, ``H2S2O8(aq)``,
-    ``H3PO4(aq)``, ``$PCl_{3}(l)$``, ``$SO_3(l)$``, ``H2AsO2(aq)``,
-    ``$H_3AsO_3(aq)$``, ``$H_3AsO_4(aq)$``, ``H2SeO3(aq)``,
-    ``Ca1.02Na0.14K.01(Al2.18Si6.82O18) · 7.33H2O``, ``CaFe2o4``,
-    ``CaMgSio4``, ``CuFes2``, ``Fe. 875 s``, ``Fe.875S``, ``Fe.90S``,
-    ``Fe.94 7o``, ``Fe2Tio4``, ``Hgf``, ``MgFe2o4``,
-    ``Na2so4·10H2o``, ``NaAlSio4``, ``Naf``, ``ZnFe2o4``, ``c``,
-    ``ca2Fe2  as``, ``cao``, ``cao2``, ``cawo4``, ``sr2``, ``srso4``,
-    ``u``, ``v``, ``w``, ``ws2``, ``zn2``, ``H2SeO4(aq)``, ``H2S2(g)``,
-    ``H2SO4(l)``, and ``H2SO4(g)``. The phase labels have one explicit
-    canonical phase token; TeX, Unicode, middle-dot, decimal, and whitespace
-    variants retain unique element counts; the case variants above have one
-    valid element-symbol segmentation. Isotopes, charges, names, mixtures,
-    and non-formula labels remain outside this accepted set.
+    Terminal ``(s)``, ``(l)``, ``(g)``, ``(aq)``, ``(c)``, ``(cr)``,
+    ``(gl)``, ``(glass)``, ``(liq)``, ``(liquid)``, ``(solid)``, ``(gas)``,
+    ``(vapor)``, and their supported bracket forms are phase labels; ``[c]``
+    is the crystal phase, not a carbon atom. Formula groups such as
+    ``[Al(OH)4]`` remain stoichiometry. TeX, Unicode, middle-dot hydrates,
+    and oxide decimals retain their explicit counts. Isotopes, charges,
+    names, mixtures, unweighted case variants, and non-formula labels remain
+    outside the accepted set. Bare lower-case ``c`` remains refused because
+    the source identifies diamond only by its mineral name.
     """
 
     cleaned = _clean_formula_text(formula)
     if not cleaned:
         raise UnknownSpeciesError("formula is required")
+    if name and re.search(r"\bdiamond\b", name, re.IGNORECASE):
+        raise UnknownSpeciesError(
+            "diamond polymorph is not represented by the formula identity"
+        )
     previous = None
     while cleaned and previous != cleaned:
         previous = cleaned
-        cleaned = _PHASE_SUFFIX_RE.sub("", cleaned)
+        cleaned, suffix = _strip_terminal_phase_suffix(cleaned)
+        if suffix is not None:
+            cleaned = _clean_formula_text(cleaned)
     if re.search(r"\([a-z][a-z0-9,.\-]*\)$", cleaned):
         raise UnknownSpeciesError(
             f"lowercase parenthetical suffix in {formula!r} is not a formula group"
         )
+    return _parse_formula_counts(cleaned, formula, species, name)
 
+
+def _strip_terminal_phase_suffix(formula: str) -> tuple[str, str | None]:
+    """Return a formula without one recognized terminal phase label.
+
+    Suffix membership belongs here so parsing, migration, scoring, and rail
+    diagnostics agree. Charge-bearing formula bodies such as ``Ag+(aq)`` are
+    deliberately left untouched.
+    """
+
+    raw = str(formula).strip()
+    math_wrapped = raw.startswith("$") and raw.endswith("$")
+    inner = raw[1:-1] if math_wrapped else raw
+    cleaned = _clean_formula_text(inner)
+    match = _PHASE_SUFFIX_RE.search(cleaned)
+    if match is None or cleaned[: match.start()].endswith(("+", "-")):
+        return formula, None
+    label = match.group("paren") or match.group("bracket")
+    if label is None:
+        return formula, None
+    raw_match = _RAW_PHASE_SUFFIX_RE.search(inner)
+    if raw_match is None:
+        stem = cleaned[: match.start()]
+    else:
+        stem = inner[: raw_match.start()].rstrip()
+    if math_wrapped:
+        stem = f"${stem}$"
+    return stem, _FORMULA_PHASE_SUFFIXES[label.casefold()]
+
+
+def _canonicalize_formula_from_printed_weight(
+    formula: str,
+    printed_weight_g_mol: object,
+    *,
+    name: str | None = None,
+    repaired: bool = False,
+) -> tuple[str | None, str]:
+    """Accept a case/OCR-repaired formula only against its printed mass.
+
+    ``repaired`` marks an explicit source transcription or raster correction.
+    Without that flag, this helper is a no-op for an exact-case parse and only
+    considers a unique element-symbol case normalization. The return reason
+    is suitable for census evidence and typed-refusal diagnostics.
+    """
+
+    cleaned = _clean_formula_text(formula)
+    if not cleaned:
+        return None, "formula is empty"
+    body, phase_suffix = _strip_terminal_phase_suffix(cleaned)
+    body = _clean_formula_text(body)
+    if re.search(r"\([a-z][a-z0-9,.\-]*\)$", body):
+        return None, "unrecognized parenthetical suffix"
     try:
-        return _parse_formula_counts(cleaned, formula, species, name)
-    except AccountingError as original_error:
-        normalized = _unambiguous_element_case(cleaned)
-        if normalized == cleaned:
-            raise
-        if re.search(r"O\d+(?:\.\d+)?O$", normalized):
-            raise original_error
+        parse_formula(body, name=name)
+        normalized = body
+        exact_case_parses = True
+    except AccountingError as exc:
+        if "diamond polymorph" in str(exc):
+            return None, str(exc)
+        exact_case_parses = False
         try:
-            return _parse_formula_counts(normalized, formula, species, name)
-        except AccountingError:
-            raise original_error
+            normalized = _unambiguous_element_case(body)
+        except UnknownSpeciesError as exc:
+            return None, f"ambiguous element case: {exc}"
+    case_changed = normalized != body
+    if not repaired and exact_case_parses:
+        try:
+            parse_formula(formula, name=name)
+        except AccountingError as exc:
+            return None, f"exact-case formula did not parse: {exc}"
+        return formula, "accepted exact-case formula"
+    if not repaired and not case_changed:
+        try:
+            parse_formula(formula, name=name)
+        except AccountingError as exc:
+            return None, f"exact-case formula did not parse: {exc}"
+        return formula, "accepted exact-case formula"
+    if printed_weight_g_mol is None or isinstance(printed_weight_g_mol, bool):
+        return None, "case/OCR repair has no printed formula weight"
+    try:
+        printed_mass = float(printed_weight_g_mol)
+    except (TypeError, ValueError):
+        return None, "printed formula weight is not numeric"
+    if not math.isfinite(printed_mass) or printed_mass <= 0.0:
+        return None, "printed formula weight is not positive and finite"
+    candidate = normalized
+    if phase_suffix is not None:
+        raw_formula = cleaned[1:-1] if cleaned.startswith("$") and cleaned.endswith("$") else cleaned
+        raw_suffix = _RAW_PHASE_SUFFIX_RE.search(raw_formula)
+        candidate += (
+            raw_suffix.group(0)
+            if raw_suffix is not None
+            else f"({phase_suffix})"
+        )
+    try:
+        parsed = parse_formula(candidate, name=name)
+    except AccountingError as exc:
+        return None, f"repaired formula did not parse: {exc}"
+    difference = abs(parsed.molar_mass_g_mol - printed_mass)
+    tolerance = max(0.05, abs(printed_mass) * 0.0002)
+    if difference > tolerance:
+        return None, (
+            f"parsed mass {parsed.molar_mass_g_mol:.6f} g/mol differs from printed "
+            f"{printed_mass:.6f} g/mol by {difference:.6f} g/mol "
+            f"(tolerance {tolerance:.6f})"
+        )
+    return candidate, (
+        f"parsed mass {parsed.molar_mass_g_mol:.6f} g/mol matches printed "
+        f"{printed_mass:.6f} g/mol (difference {difference:.6f}; "
+        f"tolerance {tolerance:.6f})"
+    )
 
 
 def _parse_formula_counts(
@@ -382,15 +521,28 @@ def atoms_parse_formula_else_janaf(
     A successful ``parse_formula`` wins. A hydrate stays waters
     (``CuSO4.5H2O`` and ``CuSO4·5H2O`` are five waters, not decimal
     oxygen). A printed decimal subscript stays one species and is not
-    integerised (``FeO1.5``, ``KO0.5``, ``Fe0.947O``). ``AccountingError``
-    falls back to JANAF ``formula_composition``. None means both failed.
+    integerised (``FeO1.5``, ``KO0.5``, ``Fe0.947O``). After an accounting
+    parse failure, JANAF fallback is allowed only when element case is already
+    exact; case-foldable and ambiguous spellings stay refused without the
+    source-level printed-weight gate. None means both paths failed.
     Other exceptions propagate.
     """
 
     try:
         parsed = parse_formula(formula)
     except AccountingError:
-        from simulator.reference_data.janaf import formula_composition
+        body, _phase = _strip_terminal_phase_suffix(formula)
+        cleaned_body = _clean_formula_text(body)
+        from simulator.reference_data.janaf import (
+            formula_composition,
+            formula_normalised,
+        )
+
+        janaf_formula = formula_normalised(cleaned_body)
+        source_letters = re.sub(r"[^A-Za-z]", "", cleaned_body)
+        janaf_letters = re.sub(r"[^A-Za-z]", "", janaf_formula)
+        if source_letters != janaf_letters:
+            return None
 
         return formula_composition(formula)
     return tuple(
@@ -724,12 +876,6 @@ def _clean_formula_text(formula: str) -> str:
         text,
     )
     return fold_subscript_digits(text)
-
-
-def _normalize_leading_dot_subscripts(formula: str) -> str:
-    """Expand JANAF-compatible leading-dot element counts using this parser's rule."""
-
-    return re.sub(r"([A-Z][a-z]?)\.(\d+)", r"\g<1>0.\2", formula)
 
 
 def _strip_one_leading_integer(part: str) -> str:

@@ -46,6 +46,7 @@ import yaml
 
 from simulator.accounting.formulas import (
     _clean_formula_text,
+    _strip_terminal_phase_suffix,
     atoms_parse_formula_else_janaf,
 )
 from simulator.battery.decimal_tokens import decimal_token as _dec_token
@@ -1223,28 +1224,22 @@ def parse_species_formula(
     if "$" in text:
         return None
     phase_labels = {
-        "c": Phase.CR,
         "cr": Phase.CR,
-        "s": Phase.CR,
-        "solid": Phase.CR,
         "gl": Phase.GLASS,
-        "glass": Phase.GLASS,
         "l": Phase.L,
-        "liq": Phase.L,
-        "liquid": Phase.L,
         "g": Phase.G,
-        "gas": Phase.G,
-        "vapor": Phase.G,
         "aq": Phase.AQ,
     }
-    annotation = re.search(r"\(([^()]*)\)$", text)
-    if annotation is not None:
-        label = annotation.group(1).strip().lower()
-        annotated_phase = phase_labels.get(label)
-        if annotated_phase is not None:
-            if not _species_axis_matches_phase(species, annotated_phase):
-                return None
-        else:
+    formula_body, phase_suffix = _strip_terminal_phase_suffix(text)
+    if phase_suffix is not None:
+        annotated_phase = phase_labels[phase_suffix]
+        if not _species_axis_matches_phase(species, annotated_phase):
+            return None
+        text = formula_body
+    else:
+        annotation = re.search(r"\(([^()]*)\)$", text)
+        if annotation is not None:
+            label = annotation.group(1).strip().lower()
             from simulator.battery.polymorph_dictionary import coerce_polymorph_token
 
             try:
@@ -1255,27 +1250,12 @@ def parse_species_formula(
                 if species is None or polymorph_token(species) is not annotated_polymorph:
                     return None
                 text = text[: annotation.start()]
-        if annotated_phase is not None:
-            text = text[: annotation.start()]
 
     melt_suffix = re.search(r"_melt$", text, re.IGNORECASE)
     if melt_suffix is not None:
         if not _species_axis_matches_phase(species, Phase.L):
             return None
         text = text[: melt_suffix.start()]
-
-    # Accounting strips these terminal brackets with no species axis. Bare
-    # [c] is not in that suffix list and stays unmatched.
-    bracket = re.search(r"\[([^\[\]]*)\]$", text)
-    if bracket is not None:
-        label = bracket.group(1).strip().lower()
-        if label == "c":
-            return None
-        annotated_phase = phase_labels.get(label)
-        if annotated_phase is not None:
-            if not _species_axis_matches_phase(species, annotated_phase):
-                return None
-            text = text[: bracket.start()]
 
     # NASA Glenn's E±n suffix carries ionic charge, not another element.
     # Its charge must agree with the typed species before the suffix is dropped.

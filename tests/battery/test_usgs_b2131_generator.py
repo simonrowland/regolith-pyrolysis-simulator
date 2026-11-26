@@ -3,6 +3,7 @@
 import json
 from decimal import Decimal
 
+from simulator.accounting.formulas import _canonicalize_formula_from_printed_weight
 from simulator.battery.enums import PerBasis, Phase, Quantity, UncertaintyKind, ValueKind
 from simulator.battery.generators.compilation_formula import aligned_raster_formula
 from simulator.battery.generators.usgs_b2131 import (
@@ -11,6 +12,7 @@ from simulator.battery.generators.usgs_b2131 import (
     generate_record,
     owns_record,
     phase_windows,
+    _printed_formula_weight,
 )
 from simulator.battery.generators.usgs_b2131_raster import (
     FORMULA_RASTER,
@@ -74,10 +76,52 @@ def test_committed_raster_rows_are_allowed_edits() -> None:
         assert aligned_raster_formula(published, corrected) == corrected
         assert quote
         document = _load(_compilation_path(record_id))
+        name = str(document.get("name_as_published") or "")
+        accepted, reason = _canonicalize_formula_from_printed_weight(
+            corrected,
+            _printed_formula_weight(document),
+            name=name,
+            repaired=True,
+        )
         formula, evidence = formula_for_record(document)
-        assert formula == corrected
-        assert evidence == quote
+        if accepted is not None:
+            assert formula == accepted == corrected
+            assert evidence is not None and quote in evidence
+            assert "source formula weight confirms" in evidence
+        else:
+            published_as_exact, _raw_reason = _canonicalize_formula_from_printed_weight(
+                published,
+                None,
+                name=name,
+            )
+            if published_as_exact is None:
+                assert formula == published
+                assert evidence is None
+            else:
+                assert formula == f"{published} (unverified source correction)"
+                assert evidence is not None and "refused" in evidence
+                assert reason in evidence
         assert document["formula_as_published"] == published
+
+
+def test_formula_weight_is_read_after_its_heading_label() -> None:
+    glass = _load("records/high-temperature-p368.json")
+    assert _printed_formula_weight(glass) == Decimal("278.332")
+    formula, evidence = formula_for_record(glass)
+    assert formula == "KAlSi3O8"
+    assert evidence is not None and "278.332000" in evidence
+
+    datolite = _load("records/high-temperature-p317.json")
+    printed_weight = _printed_formula_weight(datolite)
+    assert printed_weight == Decimal("159.979")
+    candidate, reason = _canonicalize_formula_from_printed_weight(
+        "CaB(Si4)OH",
+        printed_weight,
+        name="DATOLITE",
+        repaired=True,
+    )
+    assert candidate is None
+    assert "differs from printed 159.979000" in reason
 
 
 def test_phase_sentence_overrides_keep_the_mineru_bounds() -> None:
@@ -232,23 +276,30 @@ def test_printed_formula_transcriptions_restore_numeric_rows() -> None:
             "SrCO3",
             (Decimal("298.15"), Decimal("-1137.6")),
             (Decimal("1400"), Decimal("-850.8")),
+            True,
         ),
         "high-temperature-p367": (
             "KAlSi309",
             "KAlSi3O8",
             (Decimal("298.15"), Decimal("-3745.8")),
             (Decimal("1400"), Decimal("-2902.2")),
+            True,
         ),
     }
-    for record_id, (ocr_formula, printed_formula, first, last) in expected.items():
+    for record_id, (ocr_formula, printed_formula, first, last, mass_verified) in expected.items():
         document = _load(f"records/{record_id}.json")
         assert PRINTED_FORMULA_TRANSCRIPTIONS[record_id][:2] == (
             ocr_formula,
             printed_formula,
         )
         formula, evidence = formula_for_record(document)
-        assert formula == printed_formula
-        assert evidence and "printed page" in evidence
+        if mass_verified:
+            assert formula == printed_formula
+            assert evidence and "printed page" in evidence
+            assert "source formula weight confirms" in evidence
+        else:
+            assert formula == f"{ocr_formula} (unverified source correction)"
+            assert evidence and "refused" in evidence
         gibbs = [
             observation
             for observation in generate_record(document).observations

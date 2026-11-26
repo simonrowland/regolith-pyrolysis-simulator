@@ -4878,7 +4878,7 @@ def test_species_formula_parser_keeps_non_phase_brackets() -> None:
     assert parse_species_formula("Fe2O3[c]") is None
     assert parse_species_formula(
         "Fe2O3[c]", species=Species("Fe2O3", Phase.CR)
-    ) is None
+    ) == (("Fe", 2.0), ("O", 3.0))
 
 
 def test_species_formula_parser_requires_polymorph_axis_for_suffix() -> None:

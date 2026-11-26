@@ -25,6 +25,7 @@ from dataclasses import dataclass, replace
 from decimal import Decimal, InvalidOperation
 from typing import Any, Mapping
 
+from simulator.accounting.formulas import _canonicalize_formula_from_printed_weight
 from simulator.battery.enums import (
     QUANTITY_UNITS,
     EvidenceClass,
@@ -89,6 +90,11 @@ _SUFFIX = {
     Quantity.LOG10_KF: "log10_Kf",
 }
 _PLAIN_DECIMAL = re.compile(r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)")
+_FORMULA_WEIGHT_RE = re.compile(
+    r"\bformula\s*(?:wt\.?|weight)\b\s*[:=]?\s*"
+    r"(\d+(?:\.\d+)?)(?=$|[\s,;])",
+    re.IGNORECASE,
+)
 _PHASE_RANGE = re.compile(
     r"(\d+(?:\.\d+)?)\.?\s*(?:K|X|It)?\s*(?:to|–|—|-)\s+"
     r"(?:[A-Za-z~']+\s+){0,4}"
@@ -151,33 +157,82 @@ def _published_formula(doc: Mapping[str, Any]) -> str:
     return str(doc.get("formula_as_published") or doc.get("formula") or "")
 
 
-def formula_for_record(doc: Mapping[str, Any]) -> tuple[str, str | None]:
-    """Stored formula, plus source evidence when a correction is applied.
+def _printed_formula_weight(doc: Mapping[str, Any]) -> Decimal | None:
+    """Read the formula weight printed for this compilation record, if present."""
+    if str(doc.get("record_id") or "").startswith("reference-"):
+        for row in doc.get("rows") or []:
+            if not isinstance(row, Mapping):
+                continue
+            cells = row.get("cells")
+            if not isinstance(cells, Mapping):
+                continue
+            weight = _decimal_cell(cells.get("weight"))
+            if weight is not None and weight[0] > 0:
+                return weight[0]
 
-    The table is re-checked with the alignment rule. A row that is not an
-    allowed case or digit-to-element edit is ignored. Two formulas whose OCR
-    token needs inserted characters are transcribed directly from the printed
-    source page instead.
+    for metadata in doc.get("metadata") or []:
+        if not isinstance(metadata, Mapping) or metadata.get("section") != "heading":
+            continue
+        for heading_key in ("raster_reading", "raw"):
+            heading = str(metadata.get(heading_key) or "")
+            reading = _FORMULA_WEIGHT_RE.search(heading)
+            if reading is not None:
+                value = Decimal(reading.group(1))
+                if value.is_finite() and value > 0:
+                    return value
+    return None
+
+
+def formula_for_record(doc: Mapping[str, Any]) -> tuple[str, str | None]:
+    """Stored formula, plus evidence when case or OCR correction is applied.
+
+    Raster and case corrections pass through the formula owner's printed-mass
+    gate. A correction without a printed formula weight, or whose parsed mass
+    misses it, leaves the published spelling in place for typed refusal.
     """
 
     published = _published_formula(doc)
     record_id = str(doc.get("record_id") or "")
+    candidate = published
+    quote = None
     transcription = PRINTED_FORMULA_TRANSCRIPTIONS.get(record_id)
     if transcription is not None:
         ocr_formula, printed_formula, pdf_page, printed_page = transcription
-        if published != ocr_formula:
-            return published, None
-        return (
-            printed_formula,
-            f"printed page {printed_page} (PDF page {pdf_page}): {printed_formula}",
+        if published == ocr_formula:
+            candidate = printed_formula
+            quote = f"printed page {printed_page} (PDF page {pdf_page}): {printed_formula}"
+    else:
+        row = FORMULA_RASTER.get(record_id)
+        if row is not None and row[0] == published:
+            corrected = aligned_raster_formula(published, row[1])
+            if corrected == row[1]:
+                candidate = corrected
+                quote = row[2]
+
+    corrected = candidate != published
+    printed_weight = _printed_formula_weight(doc)
+    accepted, mass_reason = _canonicalize_formula_from_printed_weight(
+        candidate,
+        printed_weight,
+        name=str(doc.get("name_as_published") or ""),
+        repaired=corrected,
+    )
+    if accepted is None:
+        published_as_formula, _reason = _canonicalize_formula_from_printed_weight(
+            published,
+            None,
         )
-    row = FORMULA_RASTER.get(record_id)
-    if row is None or row[0] != published:
+        if published_as_formula is not None:
+            return (
+                f"{published} (unverified source correction)",
+                f"proposed formula {candidate!r} refused: {mass_reason}",
+            )
         return published, None
-    corrected = aligned_raster_formula(published, row[1])
-    if corrected != row[1]:
-        return published, None
-    return corrected, row[2]
+    if accepted != candidate and quote is None:
+        quote = f"source formula weight confirms {mass_reason}"
+    elif corrected:
+        quote = f"{quote}; source formula weight confirms {mass_reason}"
+    return accepted, quote
 
 
 def phase_windows(text: str) -> tuple[_Window, ...]:

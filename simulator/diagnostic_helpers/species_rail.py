@@ -27,15 +27,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, Mapping
 
-from simulator.accounting.formulas import _normalize_leading_dot_subscripts
+from simulator.accounting.formulas import atoms_parse_formula_else_janaf
 from simulator.reference_data.janaf import (
     ELEMENT_SYMBOLS,
     FEEDSTOCKS_PATH,
     _NON_FORMULA_FEEDSTOCK_KEYS,
     feedstock_element_symbols,
-    formula_composition,
-    formula_elements,
-    formula_normalised,
 )
 from simulator.yaml_cache import load_cached_safe_yaml
 
@@ -59,9 +56,6 @@ TIER_RANK = {TIER_MAJOR: 0, TIER_MINOR: 1, TIER_TRACE: 2}
 # Thresholds are the gap edges; element names are not stored here.
 MAJOR_MIN_FEEDSTOCKS = 18
 MINOR_MIN_FEEDSTOCKS = 7
-
-_ANY_PHASE_SUFFIX_RE = re.compile(r"\([^)]*\)$")
-
 
 @dataclass(frozen=True)
 class SpeciesRail:
@@ -116,41 +110,21 @@ class SpeciesRail:
 
 
 def parse_formula_elements(formula: str) -> tuple[str, ...] | None:
-    """Element symbols in a compilation formula. Decimals kept; phase suffix stripped.
+    """Element symbols from the accounting formula owner's parser/fallback.
 
-    The accounting formula owner expands ``Fe.947O`` to ``Fe0.947O`` for the
-    legacy JANAF tokenizer. The keyed formula string is not rewritten by
-    callers; this helper is parse-only. Returns None when the string is not a
-    composition.
+    Decimal counts and recognized phase suffixes follow the same rules as
+    battery scoring. Returns None when neither the parser nor its JANAF
+    fallback can read a composition.
     """
 
-    raw = str(formula or "").strip()
-    if not raw:
-        return None
-    raw = _ANY_PHASE_SUFFIX_RE.sub("", raw)
-    raw = _normalize_leading_dot_subscripts(raw)
-    if raw in ELEMENT_SYMBOLS:
-        return (raw,)
-    elements = formula_elements(raw)
-    if elements:
-        return elements
-    composition = formula_composition(formula_normalised(raw))
-    if composition:
-        return tuple(element for element, _count in composition)
-    return None
+    composition = atoms_parse_formula_else_janaf(str(formula or ""))
+    return tuple(element for element, _count in composition) if composition else None
 
 
 def parse_formula_composition(formula: str) -> tuple[tuple[str, float], ...] | None:
-    """(element, count) pairs. Same decimal/suffix normalisation as the element parse."""
+    """(element, count) pairs from the shared formula parser/fallback."""
 
-    raw = str(formula or "").strip()
-    if not raw:
-        return None
-    raw = _ANY_PHASE_SUFFIX_RE.sub("", raw)
-    raw = _normalize_leading_dot_subscripts(raw)
-    if raw in ELEMENT_SYMBOLS:
-        return ((raw, 1.0),)
-    return formula_composition(raw)
+    return atoms_parse_formula_else_janaf(str(formula or ""))
 
 
 def _positive_amount(value: object) -> bool:

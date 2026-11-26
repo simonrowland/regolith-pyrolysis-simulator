@@ -1,3 +1,4 @@
+import importlib
 from dataclasses import replace
 from decimal import Decimal
 
@@ -5,7 +6,12 @@ import pytest
 import yaml
 
 from simulator.battery.enums import Engine, EvidenceClass, Phase, RefusalReason
-from simulator.battery.migrate import _formula_phase_suffix, migrate
+from simulator.battery.migrate import (
+    REPO_ROOT,
+    Migrator,
+    _formula_phase_suffix,
+    migrate,
+)
 from simulator.battery.records import Species
 from simulator.battery.score import (
     ScoreContext,
@@ -68,6 +74,16 @@ NON_FORMULA_OR_AMBIGUOUS = (
     "CaSO4(sol.α)",
     "C(diamond)",
     "HNO2(cis,g)",
+    "Hgf",
+    "Hgf+",
+    "ca2Fe2  as",
+    "cao2",
+    "sr2",
+    "sr2+",
+    "zn2",
+    "zn2+",
+    "Fe2Tio4",
+    "c",
 )
 
 NASA_GLENN_IONIC_FORMULAS = (
@@ -94,23 +110,40 @@ CLASS_B_FORMULAS = NON_FORMULA_OR_AMBIGUOUS + NASA_GLENN_IONIC_FORMULAS
 
 
 @pytest.mark.parametrize(
+    "formula",
+    (
+        "CaFe2o4",
+        "CaMgSio4",
+        "CuFes2",
+        "Fe. 875 s",
+        "Fe.94 7o",
+        "MgFe2o4",
+        "Na2so4·10H2o",
+        "NaAlSio4",
+        "Naf",
+        "ZnFe2o4",
+        "cawo4",
+        "cao",
+        "srso4",
+        "u",
+        "v",
+        "w",
+        "ws2",
+    ),
+)
+def test_case_repair_without_source_weight_stays_unparsed(formula: str) -> None:
+    assert parse_species_formula(formula) is None
+
+
+@pytest.mark.parametrize(
     ("formula", "expected"),
     (
         ("Fe.875S", (("Fe", 0.875), ("S", 1.0))),
         ("Fe.90S", (("Fe", 0.90), ("S", 1.0))),
         ("Fe.95O", (("Fe", 0.95), ("O", 1.0))),
-        ("CuFes2", (("Cu", 1.0), ("Fe", 1.0), ("S", 2.0))),
-        (
-            "CaMgSio4",
-            (("Ca", 1.0), ("Mg", 1.0), ("O", 4.0), ("Si", 1.0)),
-        ),
-        (
-            "NaAlSio4",
-            (("Al", 1.0), ("Na", 1.0), ("O", 4.0), ("Si", 1.0)),
-        ),
     ),
 )
-def test_scoring_formula_parser_accepts_class_a_spelling(
+def test_exact_case_formula_remains_parseable_without_source_weight(
     formula: str, expected: tuple[tuple[str, float], ...]
 ) -> None:
     assert parse_species_formula(formula) == expected
@@ -161,7 +194,7 @@ def test_non_formula_and_ambiguous_species_keep_typed_refusal(
 
 def test_ledger_phase_suffix_moves_to_species_identity(tmp_path) -> None:
     root = _write_min_tree(tmp_path)
-    formulas = ("H2S2(g)", "H2SO4(l)", "H2SO4(g)")
+    formulas = ("H2S2(g)", "H2SO4(l)", "H2SO4(g)", "Fe2O3[c]")
     (root / "data" / "literature" / "species_rail_differential_ledger.yaml").write_text(
         yaml.safe_dump(
             {
@@ -184,9 +217,64 @@ def test_ledger_phase_suffix_moves_to_species_identity(tmp_path) -> None:
         encoding="utf-8",
     )
     result = migrate(root, write=False)
-    expected = ((Phase.G, "H2S2"), (Phase.L, "H2SO4"), (Phase.G, "H2SO4"))
+    expected = (
+        (Phase.G, "H2S2"),
+        (Phase.L, "H2SO4"),
+        (Phase.G, "H2SO4"),
+        (Phase.CR, "Fe2O3"),
+    )
     for index, (phase, formula) in enumerate(expected):
         species = result.observations[f"t1795-phase-{index}"].identity.species
         assert species.formula == formula
         assert species.phase.is_value and species.phase.value is phase
         assert parse_species_formula(species.formula, species=species) is not None
+
+
+def _assert_pankratz_shard_one_phase_suffixes_lift() -> None:
+    source_dir = (
+        REPO_ROOT
+        / "data/literature/compilations/pankratz-1987-usbm-b689"
+    )
+    migrator = Migrator(root=REPO_ROOT)
+    migrator.migrate_compilations(source_dir)
+    migrator.finalize()
+
+    expected = {
+        "page-0143": ("H2S2", Phase.G),
+        "page-0144": ("H2S2", Phase.G),
+        "page-0145": ("H2SO4", Phase.L),
+        "page-0146": ("H2SO4", Phase.L),
+        "page-0147": ("H2SO4", Phase.G),
+        "page-0148": ("H2SO4", Phase.G),
+    }
+    for record_id, (formula, phase) in expected.items():
+        rows = [
+            observation
+            for observation in migrator.result.observations.values()
+            if f":{record_id}" in observation.observation_id
+        ]
+        assert rows
+        assert all(
+            observation.identity.species is not None
+            and observation.identity.species.formula == formula
+            and observation.identity.species.phase.is_value
+            and observation.identity.species.phase.value is phase
+            for observation in rows
+        )
+
+
+def test_pankratz_shard_one_phase_suffixes_lift_on_real_records() -> None:
+    _assert_pankratz_shard_one_phase_suffixes_lift()
+
+
+def test_phase_lift_mutation_probe_detects_old_pankratz_consumer(
+    monkeypatch,
+) -> None:
+    migrate_module = importlib.import_module("simulator.battery.migrate")
+    monkeypatch.setattr(
+        migrate_module,
+        "_formula_phase_suffix",
+        lambda formula, printed_phase: (formula, None),
+    )
+    with pytest.raises(AssertionError):
+        _assert_pankratz_shard_one_phase_suffixes_lift()

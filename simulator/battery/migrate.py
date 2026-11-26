@@ -84,7 +84,10 @@ from simulator.reference_data.robie_hemingway_fisher_1978_usgs_b1452_loader impo
 from simulator.reference_data.robie_waldbaum_1968_usgs_b1259_loader import (
     SOURCE_ID as _B1259_SOURCE_ID,
 )
-from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
+from simulator.accounting.formulas import (
+    ATOMIC_WEIGHTS_G_PER_MOL,
+    _strip_terminal_phase_suffix,
+)
 from simulator.battery.decimal_tokens import decimal_token as _dec_str
 from simulator.battery.uncertainty_conventions import (
     UncertaintyConventionConflict,
@@ -11408,32 +11411,19 @@ def compilation_phase_text(doc: Mapping[str, Any]) -> object:
     return None
 
 
-_FORMULA_PHASE_SUFFIXES = frozenset({"aq", "c", "cr", "g", "gl", "glass", "l", "s"})
-
-
 def _formula_phase_suffix(
     formula: str, printed_phase: object
 ) -> tuple[str, State[Phase] | None]:
     """Move a recognized trailing phase suffix to the separate phase field.
 
-    The closed suffix set covers Kelley & King and the ledger phase spellings
-    in the t-1795 census. Polymorph and material labels stay in the formula.
+    Suffix membership is owned by accounting.formulas. Polymorph and material
+    labels stay in the formula.
     """
 
-    math_wrapped = formula.startswith("$") and formula.endswith("$")
-    formula_text = formula[1:-1] if math_wrapped else formula
-    match = re.search(r"\(([^()]*)\)$", formula_text)
-    if match is None:
+    normalized, suffix_token = _strip_terminal_phase_suffix(formula)
+    if suffix_token is None:
         return formula, None
-    if formula_text[: match.start()].endswith(("+", "-")):
-        return formula, None
-    suffix_token = match.group(1).casefold()
-    if suffix_token not in _FORMULA_PHASE_SUFFIXES:
-        return formula, None
-    phase, _reason = map_phase(match.group(0))
-    if not phase.is_value:
-        phase_token = "solid" if suffix_token == "s" else suffix_token
-        phase, _reason = map_phase(phase_token)
+    phase, _reason = map_phase(suffix_token)
     if not phase.is_value:
         return formula, None
 
@@ -11444,13 +11434,11 @@ def _formula_phase_suffix(
         else ""
     )
     if printed and printed not in {
-        match.group(0).casefold(),
-        match.group(1).casefold(),
+        suffix_token,
+        f"({suffix_token})",
+        f"[{suffix_token}]",
     } and (not explicit.is_value or explicit.value is not phase.value):
         return formula, None
-    normalized = formula_text[: match.start()]
-    if math_wrapped:
-        normalized = f"${normalized}$"
     return normalized, phase
 
 
@@ -34673,19 +34661,19 @@ class Migrator:
         printed_phase = compilation_phase_text(doc)
         phase, _unmapped = map_phase(printed_phase)
         if (
-            source_basis_protocol is not None
-            and source_basis_protocol.value == "b592"
+            (source_basis_protocol is not None and source_basis_protocol.value == "b592")
+            or source_id == "pankratz-1987-usbm-b689"
         ):
             formula, suffix_phase = _formula_phase_suffix(
                 formula, printed_phase
             )
             if suffix_phase is not None:
                 phase = suffix_phase
-        elif (
-            source_id == "pankratz-1987-usbm-b689"
-            and printed_phase == "c"
-        ):
-            phase, _unmapped = map_phase("(c)")
+            elif (
+                source_id == "pankratz-1987-usbm-b689"
+                and printed_phase == "c"
+            ):
+                phase, _unmapped = map_phase("(c)")
         loc_raw = doc.get("source_locator")
         locator = locator_from_mapping(loc_raw, fallback=record_id) or Locator(record=record_id)
         if not locator.source_path:
