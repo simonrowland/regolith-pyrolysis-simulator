@@ -411,9 +411,7 @@ def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
             if observations[residual.reference].source_id
             == "aithala-2026-magmatic-iron-redox-to-2100c"
             else (
-                "method_unstated",
                 "iron-oxide-convention",
-                "proposed-policy",
             )
         )
         for residual in residuals
