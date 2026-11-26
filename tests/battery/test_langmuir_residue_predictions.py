@@ -1,5 +1,6 @@
 """Per-bead Langmuir residue extent scoring for Mendybaev Table 1."""
 
+import math
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
@@ -196,6 +197,217 @@ def test_mendybaev_residue_scores_are_flagged_by_bead_group(bead_group, mendybae
             )
             assert anchor.value.point > 0
     assert has_zero_time is (bead_group in MENDYBAEV_ZERO_TIME_BEADS)
+
+
+def test_score_store_emits_all_mendybaev_langmuir_residue_rows(
+    mendybaev_context,
+):
+    context, _rows = mendybaev_context
+    residuals, _ = score_store(
+        context,
+        # The reported headline RMS values are from the pinned OpenIMCC run.
+        engines=(Engine.OPENIMCC,),
+        rail=Rail.RESIDUE_COMPOSITION,
+    )
+    assert len(residuals) == 96
+    for residual in residuals:
+        assert residual.numeric is not None
+        assert residual.status is not ResidualStatus.REFUSED
+        assert residual.score_eligible is False
+        assert (
+            FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND
+            in flagged_strata(residual.notices)
+        )
+
+    errors_by_oxide = {}
+    for residual in residuals:
+        assert residual.numeric is not None
+        reference = context.observations[residual.reference]
+        errors_by_oxide.setdefault(reference.identity.species.formula, []).append(
+            float(residual.numeric.value)
+        )
+    expected_rms_wt_pct = {
+        "Al2O3": 2.40,
+        "CaO": 2.01,
+        "MgO": 3.98,
+        "SiO2": 2.40,
+    }
+    assert set(errors_by_oxide) == set(expected_rms_wt_pct)
+    assert {oxide: len(errors) for oxide, errors in errors_by_oxide.items()} == {
+        oxide: 24 for oxide in expected_rms_wt_pct
+    }
+    # The cited headline values are rounded to 0.01 wt%; half that last digit
+    # is the tightest tolerance that preserves the published rounding.
+    actual_rms_wt_pct = {}
+    for oxide, expected in expected_rms_wt_pct.items():
+        actual_rms_wt_pct[oxide] = math.sqrt(
+            sum(error * error for error in errors_by_oxide[oxide])
+            / len(errors_by_oxide[oxide])
+        )
+    assert actual_rms_wt_pct == pytest.approx(expected_rms_wt_pct, abs=0.005)
+
+
+def test_mendybaev_located_point_masses_reach_residue_identity(
+    mendybaev_context,
+):
+    _context, rows = mendybaev_context
+    residue_rows = [
+        row
+        for row in rows.values()
+        if row.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    ]
+    assert len(residue_rows) == 96
+    for row in residue_rows:
+        point_mass = row.point_conditions["sample_mass_kg"]
+        assert point_mass.locator is not None
+        assert point_mass.state.is_value
+        assert row.identity.sample_mass_kg == point_mass.state
+
+
+def test_pressure_model_receives_located_per_bead_starting_inventory(monkeypatch):
+    import simulator.battery.residue as residue
+
+    context, rows = _mendybaev_context()
+    reference = _row(rows, "FUN1-10")
+    expected_mass_kg = float(Decimal("0.0214") / Decimal("1000"))
+    original = residue._make_residue_pressure_model
+    seen_inventories = []
+
+    def capture_inventory(*args, **kwargs):
+        inventory = kwargs["starting_inventory"]
+        seen_inventories.append(dict(inventory))
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(residue, "_make_residue_pressure_model", capture_inventory)
+    result = predict_langmuir_residue_composition(
+        "internal-analytical",
+        reference,
+        context.experiments[reference.experiment_id],
+        rows.values(),
+    )
+    assert len(seen_inventories) == 1
+    assert result["initial_inventory_mol"] == seen_inventories[0]
+    reconstructed_mass_kg = sum(
+        amount * residue._formula_terms(oxide)[1]
+        for oxide, amount in seen_inventories[0].items()
+    )
+    assert abs(reconstructed_mass_kg - expected_mass_kg) < 1e-12
+    assert result["sample_mass_kg"] == expected_mass_kg
+    assert not any(
+        notice.kind is NoticeKind.INPUT_OMITTED
+        and "sample mass defaulted" in notice.reason
+        for notice in result["notices"]
+    )
+
+
+def test_unprinted_run_mass_uses_visible_reference_mass_default():
+    context, rows = _mendybaev_context()
+    reference = _row(rows, "FUN1-10")
+    point_conditions = dict(reference.point_conditions)
+    point_conditions.pop("sample_mass_kg")
+    reference_without_mass = replace(
+        reference,
+        identity=replace(
+            reference.identity,
+            sample_mass_kg=State.unknown("per_run_initial_charge_mass_not_published"),
+        ),
+        point_conditions=point_conditions,
+    )
+    result = predict_langmuir_residue_composition(
+        "internal-analytical",
+        reference_without_mass,
+        context.experiments[reference.experiment_id],
+        rows.values(),
+    )
+    assert result["sample_mass_kg"] == 1.0
+    assert any(
+        notice.kind is NoticeKind.INPUT_OMITTED
+        and "sample mass defaulted to 1 kg" in notice.reason
+        and "per_run_initial_charge_mass_not_published" in notice.reason
+        for notice in result["notices"]
+    )
+
+
+def test_conflicting_located_run_masses_use_flagged_reference_default():
+    context, rows = _mendybaev_context()
+    reference = _row(rows, "FUN1-10")
+    conflicting_reference = replace(
+        reference,
+        identity=replace(
+            reference.identity,
+            sample_mass_kg=State.of(Decimal("0.03")),
+        ),
+    )
+    result = predict_langmuir_residue_composition(
+        "internal-analytical",
+        conflicting_reference,
+        context.experiments[reference.experiment_id],
+        rows.values(),
+    )
+    assert result["sample_mass_kg"] == 1.0
+    assert any(
+        notice.kind is NoticeKind.INPUT_OMITTED
+        and "sample mass defaulted to 1 kg" in notice.reason
+        and "located mass alternatives disagree" in notice.reason
+        for notice in result["notices"]
+    )
+
+
+def test_exact_decimal_mass_mismatch_that_collapses_to_same_float_defaults():
+    context, rows = _mendybaev_context()
+    reference = _row(rows, "FUN1-10")
+    point_mass = reference.point_conditions["sample_mass_kg"].state.value
+    identity_mass = point_mass + Decimal("1e-25")
+    assert point_mass != identity_mass
+    assert float(point_mass) == float(identity_mass)
+    conflicting_reference = replace(
+        reference,
+        identity=replace(
+            reference.identity,
+            sample_mass_kg=State.of(identity_mass),
+        ),
+    )
+
+    result = predict_langmuir_residue_composition(
+        "internal-analytical",
+        conflicting_reference,
+        context.experiments[reference.experiment_id],
+        rows.values(),
+    )
+
+    assert result["sample_mass_kg"] == 1.0
+    assert any(
+        notice.kind is NoticeKind.INPUT_OMITTED
+        and "sample mass defaulted to 1 kg" in notice.reason
+        and "located mass alternatives disagree" in notice.reason
+        for notice in result["notices"]
+    )
+
+
+def test_langmuir_isothermal_notice_uses_scored_temperature():
+    context, rows = _mendybaev_context()
+    reference = _row(rows, "FUN1-10")
+    run_at_2000_c = replace(
+        reference,
+        identity=replace(
+            reference.identity,
+            temperature_K=State.of(Decimal("2273.15")),
+        ),
+    )
+
+    result = predict_langmuir_residue_composition(
+        "internal-analytical",
+        run_at_2000_c,
+        context.experiments[reference.experiment_id],
+        rows.values(),
+    )
+
+    assert any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and "isothermal at 2000 C" in notice.reason
+        and "1900 C" not in notice.reason
+        for notice in result["notices"]
+    )
 
 
 def test_nonunit_alpha_keeps_the_shared_extent_integrator_refusal():

@@ -32,14 +32,14 @@ from simulator.vacuum_oxygen_balance import (
     PressureLawExponentMismatch,
     iron_mean_oxygen_per_atom,
 )
-from simulator.battery.records import nominal_pressure_pa
+from simulator.battery.records import as_decimal, nominal_pressure_pa
 from simulator.source_ids import (
     HASHIMOTO_SOURCE_ID,
     SOSSI_SOURCE_ID as _SOSSI_SOURCE_ID,
 )
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.fe_redox import _engine_fe_speciation
-from simulator.physical_constants import PA_PER_BAR
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET, PA_PER_BAR
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
 
 
@@ -3536,7 +3536,68 @@ def predict_langmuir_residue_composition(
         raise ResidueInventoryRefusal("printed_temperature_path_missing_or_invalid")
     temperature_K = float(temperature.value)
     wt_pct = _initial_oxide_wt_percent(experiment.sample)
-    initial = _oxide_wt_percent_to_mol_inventory(wt_pct)
+    mass_condition = (reference.point_conditions or {}).get("sample_mass_kg")
+    mass_states = (
+        (
+            "point_conditions.sample_mass_kg",
+            getattr(mass_condition, "state", None),
+        ),
+        ("identity.sample_mass_kg", reference.identity.sample_mass_kg),
+    )
+    mass_inputs: list[tuple[str, Decimal]] = []
+    for origin, state in mass_states:
+        if state is None or not getattr(state, "is_value", False):
+            continue
+        raw_mass = state.value
+        if isinstance(raw_mass, Value):
+            if raw_mass.kind is not ValueKind.POINT or raw_mass.point is None:
+                continue
+            raw_mass = raw_mass.point
+        try:
+            candidate_mass_kg = as_decimal(raw_mass)
+        except (TypeError, ValueError, OverflowError) as exc:
+            raise ResidueInventoryRefusal(
+                "sample_mass_invalid", f"{origin}: {raw_mass!r}"
+            ) from exc
+        if not candidate_mass_kg.is_finite() or candidate_mass_kg <= 0:
+            raise ResidueInventoryRefusal(
+                "sample_mass_invalid", f"{origin}: {raw_mass!r}"
+            )
+        mass_inputs.append((origin, candidate_mass_kg))
+    has_consistent_mass = mass_inputs and all(
+        value == mass_inputs[0][1] for _, value in mass_inputs[1:]
+    )
+    if has_consistent_mass:
+        sample_mass_kg = float(mass_inputs[0][1])
+        sample_mass_origin = ", ".join(origin for origin, _ in mass_inputs)
+        sample_mass_default_reason = None
+    else:
+        sample_mass_kg = _OXIDE_WT_PERCENT_REFERENCE_MASS_KG
+        if mass_inputs:
+            unknown_reason = "located mass alternatives disagree: " + ", ".join(
+                f"{origin}={value} kg" for origin, value in mass_inputs
+            )
+        else:
+            unknown_reason = next(
+                (
+                    state.reason
+                    for _, state in mass_states
+                    if state is not None
+                    and getattr(state, "is_unknown", False)
+                    and getattr(state, "reason", None)
+                ),
+                None,
+            )
+        sample_mass_default_reason = (
+            f"sample mass defaulted to {sample_mass_kg:g} kg reference inventory "
+            f"because {unknown_reason or 'no exact per-run mass was located'}; "
+            "residue composition is normalized to inventory scale."
+        )
+        sample_mass_origin = "stated 1 kg reference inventory default"
+    initial = {
+        oxide: amount * sample_mass_kg / _OXIDE_WT_PERCENT_REFERENCE_MASS_KG
+        for oxide, amount in _oxide_wt_percent_to_mol_inventory(wt_pct).items()
+    }
 
     pressure_environment = experiment.pressure_environment
     pressure_record = next(
@@ -3616,7 +3677,8 @@ def predict_langmuir_residue_composition(
             affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
             reason=(
                 "xi includes the furnace ramp; the scored extent path is isothermal "
-                "at 1900 C and does not model ramp evaporation."
+                f"at {temperature_K - CELSIUS_TO_KELVIN_OFFSET:g} C and does not "
+                "model ramp evaporation."
             ),
             origin="Langmuir residue extent",
         ),
@@ -3627,6 +3689,15 @@ def predict_langmuir_residue_composition(
             origin="Langmuir residue pressure",
         ),
     ]
+    if sample_mass_default_reason is not None:
+        notices.append(
+            Notice(
+                kind=NoticeKind.INPUT_OMITTED,
+                affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+                reason=sample_mass_default_reason,
+                origin="Langmuir starting inventory",
+            )
+        )
     fallback_row = replace(
         reference,
         provenance={
@@ -3696,6 +3767,8 @@ def predict_langmuir_residue_composition(
             "temperature_path": [(xi, temperature_K)],
             "p_bulk_Pa": p_bulk_Pa,
             "printed_pressure": pressure_source,
+            "sample_mass_kg": sample_mass_kg,
+            "sample_mass_origin": sample_mass_origin,
             "initial_inventory_mol": dict(initial),
             "final_inventory_mol": dict(result.residue_mol),
             "atom_closure_mol": dict(result.atom_closure_mol),
@@ -3714,6 +3787,8 @@ def predict_langmuir_residue_composition(
             "temperature_path": [(xi, temperature_K)],
             "p_bulk_Pa": p_bulk_Pa,
             "printed_pressure": pressure_source,
+            "sample_mass_kg": sample_mass_kg,
+            "sample_mass_origin": sample_mass_origin,
         }
         exc.notices = tuple(notices)
         raise
