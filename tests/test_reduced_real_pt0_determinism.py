@@ -8145,6 +8145,78 @@ def _recursive_payload_paths(payload: Any):
     yield from walk(payload, ())
 
 
+def _bounded_recursive_payload_paths(payload: Any):
+    """Cover cache fields while sampling entries in large uniform maps/lists."""
+    paths: list[tuple[tuple[Any, ...], Any]] = []
+
+    def value_shape(value: Any) -> Any:
+        if isinstance(value, Mapping):
+            return (
+                "mapping",
+                tuple(sorted((type(key).__name__, repr(key)) for key in value)),
+            )
+        if isinstance(value, (list, tuple)):
+            return (type(value), len(value))
+        if isinstance(value, bool):
+            return bool
+        if isinstance(value, (int, float)):
+            return "number"
+        return type(value)
+
+    def sample_indices(length: int) -> tuple[int, ...]:
+        return tuple(sorted({0, length // 2, length - 1}))
+
+    def walk_nested(
+        value: Any,
+        path: tuple[Any, ...],
+        *,
+        all_fields: bool = False,
+    ) -> None:
+        paths.append((path, value))
+        if isinstance(value, Mapping):
+            items = list(value.items())
+            shapes = {value_shape(child) for _key, child in items}
+            if (
+                not all_fields
+                and len(items) > 8
+                and len(shapes) == 1
+            ):
+                ordered_keys = sorted(
+                    (key for key, _child in items),
+                    key=lambda key: (type(key).__name__, repr(key)),
+                )
+                selected = set(sample_indices(len(ordered_keys)))
+                items = [
+                    (key, value[key])
+                    for index, key in enumerate(ordered_keys)
+                    if index in selected
+                ]
+            for key, child in items:
+                paths.append(((*path, _RecursiveMappingKey(key)), key))
+                child_path = (*path, str(key))
+                walk_nested(
+                    child,
+                    child_path,
+                    all_fields=(
+                        child_path
+                        == (rrd._EQUILIBRIUM_REPLAY_SIDE_FIELDS[1],)
+                    ),
+                )
+        elif isinstance(value, (list, tuple)):
+            items = list(enumerate(value))
+            if (
+                len(items) > 8
+                and len({value_shape(child) for _index, child in items}) == 1
+            ):
+                selected = set(sample_indices(len(items)))
+                items = [item for item in items if item[0] in selected]
+            for index, child in items:
+                walk_nested(child, (*path, index))
+
+    walk_nested(payload, (), all_fields=True)
+    return paths
+
+
 def _recursive_mutation_value(value: Any) -> Any:
     if isinstance(value, Mapping):
         return []
@@ -8743,6 +8815,41 @@ def test_real_cache_payload_recursive_mutations_miss_or_replay_identically(
     payload_kind: str,
     persistent: bool,
 ) -> None:
+    _run_real_cache_payload_recursive_mutations(
+        tmp_path,
+        payload_kind,
+        persistent,
+        exhaustive_sweep=False,
+    )
+
+
+@pytest.mark.nightly
+@pytest.mark.parametrize(
+    "payload_kind",
+    ("equilibrium", "gate"),
+    ids=("production-equilibrium-capture", "production-gate-capture"),
+)
+@pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))
+def test_real_cache_payload_recursive_mutations_exhaustive_nightly(
+    tmp_path: Path,
+    payload_kind: str,
+    persistent: bool,
+) -> None:
+    _run_real_cache_payload_recursive_mutations(
+        tmp_path,
+        payload_kind,
+        persistent,
+        exhaustive_sweep=True,
+    )
+
+
+def _run_real_cache_payload_recursive_mutations(
+    tmp_path: Path,
+    payload_kind: str,
+    persistent: bool,
+    *,
+    exhaustive_sweep: bool,
+) -> None:
     from simulator.evaporation import EvaporationFluxRefusal
 
     (
@@ -8808,10 +8915,15 @@ def test_real_cache_payload_recursive_mutations_miss_or_replay_identically(
         mutation_sources.append(
             _real_gate_step_down_mutation_source(baseline, key)
         )
+    path_selector = (
+        _recursive_payload_paths
+        if exhaustive_sweep
+        else _bounded_recursive_payload_paths
+    )
     mutation_paths = [
         (source_name, mutation_baseline, path, value)
         for source_name, mutation_baseline in mutation_sources
-        for path, value in _recursive_payload_paths(mutation_baseline)
+        for path, value in path_selector(mutation_baseline)
     ]
 
     def reset_reader_for_next_row() -> None:
