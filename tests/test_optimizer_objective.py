@@ -11453,11 +11453,13 @@ def test_sso2_owner_execution_uses_certified_na_dose_and_partition_path() -> Non
     assert evidence["metal_product_path"]["Fe_kg"] == pytest.approx(0.0)
     assert evidence["metal_product_path"]["product_ledger_Fe_kg"] > 0.0
     fallback = evidence["prototype_alpha_fallback_provenance"]
-    # Receipt d0f75638. 0.5 Cr2O3(l) + 0.25 O2 -> CrO2(g), so
-    # O2_per_product_kg is negative. The depletion gate drops that rate
-    # when overhead O2 is at or below 1e-12 kg. Oxide Fe now leaves its
-    # oxygen behind (f187184015), overhead O2 stays above the gate, and
-    # the proxy flux is committed. Authority stays proxy/bridge.
+    # Receipt faba7dd0 on the restored shared residual, and d0f75638
+    # before it. 0.5 Cr2O3(l) + 0.25 O2 -> CrO2(g), so O2_per_product_kg
+    # is negative. The depletion gate reads process.overhead_gas O2 and
+    # drops the rate only while that account is at or below 1e-12 kg.
+    # The account stays above the gate after the pool and the oxide route
+    # share one Langmuir ceiling, so the full-ceiling debit is not the
+    # oxygen this commit needs. Authority stays proxy/bridge.
     assert (
         execution.simulator._alpha_authority_status_by_species_engaged.get("CrO2")
         == "proxy/bridge"
@@ -11486,12 +11488,13 @@ def test_sso2_owner_execution_uses_certified_na_dose_and_partition_path() -> Non
     assert "engaged_species=`CrO2`" in report
     assert f"engagement_count=`{fallback['total_engagement_count']}`" in report
 
-    # Receipt a2016cb1. CrO2's stored alpha is the metals-Cr broad proxy
+    # Receipt faba7dd0 on the restored shared residual, and a2016cb1
+    # before it. CrO2's stored alpha is the metals-Cr broad proxy
     # (0.9, authority proxy/bridge). b-1195 does not let the legacy
-    # opt-in withhold that flux. The depletion gate used to drop it
-    # while overhead O2 was at or below 1e-12 kg. The oxide-Fe debit
-    # (f187184015) leaves that oxygen, so the opt-in-off path commits
-    # the same vapor. CrO2 stays out of missing_alpha.
+    # opt-in withhold that flux. The depletion gate drops it only while
+    # process.overhead_gas O2 is at or below 1e-12 kg. That account stays
+    # above the gate with the shared residual cap, so the opt-in-off path
+    # still commits the same vapor. CrO2 stays out of missing_alpha.
     default_sim, missing_by_hour = _sso2_sim_alpha_fallback_disabled(hours=3)
     assert all("CrO2" not in hourly for hourly in missing_by_hour)
     assert any(

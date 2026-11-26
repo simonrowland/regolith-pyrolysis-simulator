@@ -57,16 +57,19 @@ METAL_PHASE_FE_ACCOUNTS = (
 # 0990232.
 # 2026-07-21 B1 wall-gate fix: the staged C2A pipework is all hot-wall
 # (1800 C, above SiO T_cond 1050 C), so the disproportionation backstop
-# stays off. Receipt 055806a5 sum is 0.1386500350490508 kg of SiO2 and
-# no Si, SiO, or FeSi: stage_0_to_stage_1 0.0623297494029 kg,
-# stage_1_to_stage_2 0.00814079101249 kg, stage_2_to_stage_4_bypass
-# 0.0681794946337 kg (12 significant figures). The deposit is the
-# oxidative wall reaction SiO + 1/2 O2 -> SiO2. Oxidative Psat is
-# unbounded at pO2 = 0, and the oxide-Fe debit (f187184015) leaves the
-# oxygen that arms this leg.
+# stays off. The deposit is the oxidative wall reaction
+# SiO + 1/2 O2 -> SiO2. Adding O2 can only lower wall Psat.
+# 2026-11-26 b274 fold 3 receipt 89a03741. Debit-era sum
+# 0.1386500350490508 kg (055806a5, SiO2 only) -> 0.15875718479216178 kg.
+# The shared residual cap books no oxide Fe(g) and no partner O2 once
+# the native pool fills the hour. p_SiO ∝ pO2^-0.5, and the same
+# receipt's e2e decade returns to |log10(1.08/0.6546)|, so more SiO
+# reaches the pipes. That supply increase is the rise. The leg does
+# not go to 0, so it is not armed only by the partner O2. The
+# 055806a5 per-stage split belonged to the debit-era sum.
 # Direction CORRECTION. The cold-segment scenario lives in
 # test_intentional_pipe_cold_spot_flags_and_changes_wall_deposit.
-STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 0.1386500350490508
+STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 0.15875718479216178
 
 
 def _run_script(lines: list[str]):

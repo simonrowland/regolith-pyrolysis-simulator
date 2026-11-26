@@ -3045,18 +3045,29 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             )
             # a_FeO above was evaluated at the unfloored log. Flooring
             # first would hide a collapsed shuttle state inside Kress.
-            dissociation_fO2_log, metal_saturation_floor_notice = (
-                apply_melt_metal_saturation_floor(
-                    float(intrinsic_fO2_log),
-                    T_K,
-                    _dissociation_metal_floor_activities(
-                        melt_account_mol,
-                        temperature_K=T_K,
-                        authority=vapour_activity_authority,
-                        a_feo_stoich=float(below_cap_fe_activity),
-                    ),
+            # dissociation_at_printed_fO2 is the vapour-rail comparison
+            # only. VapoRock equilibrated at the printed log, so this
+            # cell must use that same log. The floor is the published
+            # melt bound (a_M would exceed 1 below it). It still applies
+            # to every caller that does not set the flag. At 1950 K and
+            # log10(fO2/bar) = -9 the Fe floor is 0.075286 dex more
+            # oxidizing; p_Al then moves by -3/4 of that and p_Ti by -1.
+            if controls.get("dissociation_at_printed_fO2") is True:
+                dissociation_fO2_log = float(intrinsic_fO2_log)
+                metal_saturation_floor_notice = None
+            else:
+                dissociation_fO2_log, metal_saturation_floor_notice = (
+                    apply_melt_metal_saturation_floor(
+                        float(intrinsic_fO2_log),
+                        T_K,
+                        _dissociation_metal_floor_activities(
+                            melt_account_mol,
+                            temperature_K=T_K,
+                            authority=vapour_activity_authority,
+                            a_feo_stoich=float(below_cap_fe_activity),
+                        ),
+                    )
                 )
-            )
             if metal_saturation_floor_notice is not None:
                 warnings.append(
                     f"{metal_saturation_floor_notice['kind']}: "

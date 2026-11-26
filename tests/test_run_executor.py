@@ -1201,13 +1201,19 @@ def test_finite_capacity_in_domain_rates_match_parent_nonbinding_baseline(
     assert not sim._last_evaporation_flux_diagnostic.get(
         "continuum_extrapolation_notice"
     )
-    # 2026-11-26 receipt 17e0816e at 6db27b213e. Fe is new at
-    # 3.3904576358450609e-07 kg/h: d-469 (8f174cc807) precipitates native
-    # Fe and f187184015 lets the oxide-Fe debit use the Langmuir capacity,
-    # so Fe vapor clears the 1e-12 kg/h floor. SiO rises
-    # 7.769179203709372e-09 -> 8.6442356840838498e-08 kg/h because that
-    # debit leaves oxygen in the gas (a95942989e ledger fO2). The other
-    # carriers move by a few percent on the same oxygen balance.
+    # 2026-11-26 fold 3 receipt 00b11dee on the restored shared residual.
+    # Fe is absent below 1e-12 kg/h. One equilibrium p_Fe is one Langmuir
+    # ceiling. The native pool fills the hour, the leftover is 0, and
+    # oxide Fe(g) is 0. The debit-era 3.3904576358450609e-07 kg/h was
+    # that second booking. SiO stays 8.6442356840838498e-08 kg/h
+    # (7.769179203709372e-09 on the older pin). It does not fall when
+    # the partner O2 is unbooked. SiO2 = SiO(g) + 1/2 O2, so
+    # p_SiO ∝ pO2^-0.5 and oxygen left behind would lower p_SiO.
+    # log10(8.6442356840838498e-08 / 7.769179203709372e-09)
+    # = 1.0463514603711137 dex in p_SiO, so Δlog10(pO2) = −2.0927029207422274.
+    # That is the reducing direction, the same way the hot C0 publish
+    # moves (−9 → −10.95).
+    # The other in-domain rates held at the debit-era pins.
     expected_rates = {
         "Al": 1.789269763883407e-10,
         "AlO": 2.4971541382164936e-10,
@@ -1217,7 +1223,6 @@ def test_finite_capacity_in_domain_rates_match_parent_nonbinding_baseline(
         "CrO": 8.8127454105578785e-06,
         "CrO2": 2.9337358745904382e-06,
         "CrO3": 8.2451709834535378e-10,
-        "Fe": 3.3904576358450609e-07,
         "K": 0.00017763926333385068,
         "K2": 1.567366908980952e-11,
         "Mg": 7.1307107081973212e-05,

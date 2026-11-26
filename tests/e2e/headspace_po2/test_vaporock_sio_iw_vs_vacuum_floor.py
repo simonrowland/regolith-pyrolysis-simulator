@@ -104,18 +104,19 @@ SIO_ANCHOR_HOUR = 6
 # mass-balance artifact (AtomLedger closes). Pin = executed probe value;
 # never hand-pasted. See docs-private/research/2026-08-09-b151-disposition/.
 # b-850: alkali composite vapour rows now use the parent-oxide activity.
-# 2026-11-26 b274. Pair 8152945d executed this anchor at f187184015 and
-# at b7a91af39c. Both gave 0.23295293140555928
-# (|log10(1.08 / 0.6314)|). Nothing after the oxide-Fe debit moved it.
-# The candidate 397cdd443f was already 0.2172763760591016
-# (|log10(1.08 / 0.6546)|). The finite leg stays on the vacuum floor
-# (~1.08 Pa). The IW leg is _compute_intrinsic_melt_fO2. Oxide Fe leaves
-# and its oxygen stays (f187184015), so the ferric term
-# 0.25*log10(fe2o3/feo) rises. p_SiO ∝ pO2^-0.5.
-# IW p_SiO 0.6546 → 0.6314 is Δlog10(p_SiO) = log10(0.6314/0.6546)
-# = -0.01567, so Δlog10(pO2) = -2 * that = +0.0313 dex (more oxidizing).
-# The 0.209 → 0.217 gap was already on the candidate.
-EXPECTED_SIO_DECADE_DRIFT = 0.23295293140555928
+# 2026-11-26 b274 fold 3. Receipt 89a03741 on the restored shared Fe
+# Langmuir residual (23c5bd4436). One equilibrium p_Fe at the Fe line
+# is one Hertz-Knudsen-Langmuir ceiling. When the native pool fills
+# that ceiling, oxide Fe(g) is 0 and no partner O2 is booked.
+# The debit-era pin 0.23295293140555928 is |log10(1.08/0.6314)|.
+# This hour returns to 0.2172763760591016, |log10(1.08/0.6546)|,
+# the pre-debit candidate. The finite leg stays on the vacuum floor
+# (~1.08 Pa). The IW leg is _compute_intrinsic_melt_fO2.
+# p_SiO ∝ pO2^-0.5. IW p_SiO 0.6314 → 0.6546 is
+# Δlog10(p_SiO) = log10(0.6546/0.6314) = +0.01567, so
+# Δlog10(pO2) = -2 * that = -0.0313 dex (the partner O2 is gone).
+# The older green anchor 0.2090602025512069 is not this hour.
+EXPECTED_SIO_DECADE_DRIFT = 0.2172763760591016
 
 
 def test_vaporock_sio_iw_vs_vacuum_floor_hot_c2a_anchor():

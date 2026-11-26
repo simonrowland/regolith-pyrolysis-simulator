@@ -367,17 +367,25 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
         # the same supply books there too. Disproportionation Psat is
         # 2731 Pa at 1500 C and cannot make the three masses agree.
         # The hour-path oxygen clip (60a659627a) equals the inventory at
-        # dt_h = 1, which is this report's step. The oxygen that arms the
-        # oxidative leg is the committed inventory left when oxide Fe
-        # evaporates and the oxygen stays (f187184015).
+        # dt_h = 1, which is this report's step. Receipts 89a03741 and
+        # 00b11dee, restored shared residual. One p_Fe, so one Langmuir
+        # ceiling: pool vapour at the ceiling books no oxide Fe(g) and
+        # no partner O2. The three masses stay supply-capped and nearly
+        # flat. They do not return to 0, and disproportionation Psat
+        # (1.145 / 754 / 2731 Pa) still cannot order them:
+        #   1050 C 1.3825809621333287e-05 -> 1.3825826395036143e-05
+        #   1400 C 1.3800219536e-05 -> 1.38002353167e-05
+        #   1500 C 1.35194903715e-05 -> 1.35266747792e-05
+        # Relative shifts are 1.213e-6, 1.144e-6, and 5.314e-4. The oxygen
+        # that arms the leg is the hour's inventory, not the partner O2.
         assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
-            1.3825809621333287e-05, rel=1e-9
+            1.3825826395036143e-05, rel=1e-9
         )
         assert _sio_wall_product_deposit_kg(1400.0) == pytest.approx(
-            1.3800219536e-05, rel=1e-9
+            1.38002353167e-05, rel=1e-9
         )
         assert _sio_wall_product_deposit_kg(1500.0) == pytest.approx(
-            1.35194903715e-05, rel=1e-9
+            1.35266747792e-05, rel=1e-9
         )
     finally:
         _report_at_wall_T.cache_clear()

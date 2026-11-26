@@ -3853,10 +3853,12 @@ def test_parallel_composition_target_stub_study_completes(
                 "resinter_threshold_ungrounded"
             )
             assert summary["has_positive_qualified_fouling"] is True
-            # Receipt ab6a568b at b7a91af39c. 6.181281691758682e-12 ->
-            # 3.600782827250454e-08 kg. Native Fe now precipitates on the
-            # Fe line (d-469 8f174cc807) and oxide Fe leaves its oxygen
-            # behind (f187184015), so more Fe reaches the cold wall.
+            # Receipt ab6a568b at b7a91af39c, held by 68053ef6 on the
+            # restored shared residual (160 passed). 6.181281691758682e-12
+            # -> 3.600782827250454e-08 kg. Native Fe precipitates on the
+            # Fe line (d-469 8f174cc807) and that dust reaches the cold
+            # wall. Dropping the full-ceiling oxide booking left this
+            # mass in place.
             assert summary["wall_deposit_kg_by_species"]["Fe"] == pytest.approx(
                 3.600782827250454e-08,
                 rel=1e-9,

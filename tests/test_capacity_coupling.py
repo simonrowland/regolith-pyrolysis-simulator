@@ -1050,13 +1050,19 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     #
     # The hour publishes the Kress inverse of the loaded Fe3+/ΣFe,
     # log10(fO2/bar) = -10.95393128857757. The condensed-metal floor
-    # does not bind. Na and K read that melt oxygen (NaO0.5 → Na(g) +
-    # 0.25 O2, ν = -1/4, reference 1 bar). Against the old -9 seed the
-    # pressure ratio is 10^(0.25 × 1.95393128857757) = 3.079518533436423.
-    # Na is 0.18138877088440097 kg/h of this total. Transport pO2 stays
-    # 1e-9 bar, so SiO does not follow the melt oxygen. The 1 mbar Ar
-    # film is unchanged, and saturation moves with the flux. At the -9
-    # seed the ratio is 1.
+    # does not bind. Na and K both read that melt oxygen
+    # (MO0.5 → M(g) + 0.25 O2, ν = -1/4, reference 1 bar). Against the
+    # old -9 seed the pressure ratio is
+    # 10^(0.25 × 1.95393128857757) = 3.079518533436423.
+    # The total is not that ratio applied to Na alone. Na is
+    # 0.18138877088440097 kg/h of 0.19308943834122952 kg/h. Backing Na
+    # out of the old 0.06423669542196676 kg/h total by the same ratio
+    # leaves 0.00533502981582087 kg/h of other flux. Replacing only the
+    # Na term predicts 0.18672380070022185 kg/h. The measured total is
+    # 0.00636563764100767 kg/h higher. K shares ν = -1/4, so that gap
+    # is the rest of the family. Transport pO2 stays 1e-9 bar, so SiO
+    # does not follow the melt oxygen. The 1 mbar Ar film is unchanged,
+    # and saturation moves with the flux. At the -9 seed the ratio is 1.
     assert pins["non_phosphorus_kg_hr"] == pytest.approx(
         0.19308943834122952, rel=1e-12, abs=1e-12
     )
