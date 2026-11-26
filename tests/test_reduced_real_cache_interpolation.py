@@ -416,9 +416,22 @@ def test_lookup_optional_returns_cached_interpolated(tmp_path: Path) -> None:
         ],
         weights=[0.5, 0.5],
     )
-    assert hashlib.sha256(payload_bytes).hexdigest() == hashlib.sha256(
-        canonical_json_bytes(without_diagnostics)
-    ).hexdigest()
+    # The stored lookup adds the actual neighbor key hashes to its
+    # served_from provenance. The direct producer call has no stored keys, so
+    # compare the synthesized query result and its other projection separately.
+    assert canonical_json_bytes(payload["equilibrium_result"]) == (
+        canonical_json_bytes(without_diagnostics["equilibrium_result"])
+    )
+    assert payload["last_vapor_pressures_source"] == (
+        without_diagnostics["last_vapor_pressures_source"]
+    )
+    served_from = payload["last_vapor_pressure_diagnostic"]["served_from"]
+    assert served_from["source"] == "cached_interpolated"
+    assert len(served_from["interpolation_neighbor_key_hashes"]) == 2
+    assert all(
+        len(key_hash) == 64
+        for key_hash in served_from["interpolation_neighbor_key_hashes"]
+    )
     summary = store.summary()
     assert summary["interpolation_uncertainty_points"] == 1
     assert summary["interpolation_uncertainty_ranked_table_drain"]["selected"]

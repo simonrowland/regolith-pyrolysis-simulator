@@ -7974,6 +7974,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         liquid_fraction = getattr(equilibrium, 'liquid_fraction', None)
         temperature_K = float(self.melt.temperature_C) + 273.15
         batch_flux_pressures = None
+        batch_flux_overlay: dict[str, Any] = {}
+        resolve_error: dict[str, Any] = {}
         if not (
             liquid_fraction is not None
             and legacy_raw_liquid_fraction_is_zero(liquid_fraction)
@@ -7991,34 +7993,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     temperature_K=temperature_K,
                 )
             )
-            unresolved_notices = [
-                notice
-                for notice in batch_flux_overlay.get("notices", ()) or ()
-                if isinstance(notice, Mapping)
-                and notice.get("kind") == "vapour_batch_unresolved"
-            ]
-            if resolve_error or unresolved_notices:
-                reason = str(
-                    (resolve_error or {}).get("reason")
-                    or next(
-                        (
-                            notice.get("reason")
-                            for notice in unresolved_notices
-                            if notice.get("reason")
-                        ),
-                        batch_flux_overlay.get("selection_source")
-                        or "vapour_batch_no_debiting_pressure_outcome",
-                    )
-                )
-                raise EvaporationFluxRefusal(
-                    reason,
-                    {
-                        **dict(resolve_error or {}),
-                        "reason": reason,
-                        "evaporation_flux_kg_hr": {},
-                        "vapour_batch_flux_overlay": batch_flux_overlay,
-                    },
-                )
+            refusal = EvaporationMixin._vapour_batch_resolution_refusal(
+                self,
+                resolve_error,
+                batch_flux_overlay,
+                flux_pressures=batch_flux_pressures,
+                include_unresolved_notices=True,
+            )
+            if refusal is not None:
+                raise refusal
         controls, molar_masses = self._evaporation_flux_control_inputs(
             equilibrium,
             overhead_partials_Pa=initial_partials,
@@ -8089,8 +8072,24 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # the shadow; this trial must not keep that flag.
             owns_oxygen_drive = False
             if reclosed is not None:
+                reclosed_pressures = dict(reclosed.pressures_Pa)
+                EvaporationMixin._record_langmuir_refusal_notices(
+                    self,
+                    batch_flux_overlay,
+                    reclosed,
+                    final_pressures=reclosed_pressures,
+                )
+                refusal = EvaporationMixin._vapour_batch_resolution_refusal(
+                    self,
+                    {},
+                    batch_flux_overlay,
+                    flux_pressures=reclosed_pressures,
+                    include_unresolved_notices=True,
+                )
+                if refusal is not None:
+                    raise refusal
                 iteration_controls['vapour_batch_flux_pressures_Pa'] = dict(
-                    reclosed.pressures_Pa
+                    reclosed_pressures
                 )
                 owns_oxygen_drive = bool(
                     reclosed.applied and reclosed.surface_pO2_bar is not None
@@ -16340,6 +16339,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self.train,
                 self.record,
                 atom_ledger=getattr(self, 'atom_ledger', None),
+                vapour_overlay=(
+                    getattr(self, '_last_vapour_batch_flux_overlay', {}) or {}
+                ),
                 transport_state={
                     'binding_cause': str(getattr(
                         self.overhead,

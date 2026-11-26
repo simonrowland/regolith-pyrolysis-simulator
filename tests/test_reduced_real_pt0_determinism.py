@@ -7974,6 +7974,8 @@ def _run_interpolation_class_guard_hour(
     replay_interpolation_into_flux: bool = False,
 ) -> tuple[Any, Any, int]:
     sim = _build_pt0_sim(store)
+    gate_backend = sim.backend
+    gate_backend.is_available = lambda: True
     provider = _CountingSilicateEquilibriumProvider(
         provider_id="alphamelts-diagnostic",
         engine_version="alpha-v1",
@@ -8007,6 +8009,14 @@ def _run_interpolation_class_guard_hour(
         [ChemistryIntent.SILICATE_EQUILIBRIUM],
     )
     sim.start_campaign(CampaignPhase.C2A_STAGED)
+    from engines.alphamelts import AlphaMELTSProvider
+
+    alpha_gate_provider = next(
+        provider
+        for provider in sim._chem_registry.gate_provider_order
+        if isinstance(provider, AlphaMELTSProvider)
+    )
+    alpha_gate_provider._backend = gate_backend
     sim.melt.temperature_C = 1500.0
     assert store._cached_real_binding_eligible(sim)
     if interpolation_source is not None:
@@ -9624,6 +9634,11 @@ def test_real_interpolated_payload_recursive_mutations_use_nonflux_admission(
             f"weight_info={weight_info}"
         )
     baseline = copy.deepcopy(attempt["payload"])
+    synthesized_result = baseline["equilibrium_result"]
+    assert not {"phases_present", "phase_thermo"} & set(synthesized_result)
+    assert rrd._INTERPOLATED_EQUILIBRIUM_REQUIRED_FIELDS <= set(
+        synthesized_result
+    )
     assert rrd._admission_rejection(
         "equilibrium_post_record",
         baseline,

@@ -133,6 +133,20 @@ _EQUILIBRIUM_RESULT_FIELD_TYPES = get_type_hints(EquilibriumResult)
 _EQUILIBRIUM_RESULT_FIELDS_OMITTED_WHEN_NONE = frozenset(
     {"requested_fO2_log", "printed_fO2_echo_log"}
 )
+_INTERPOLATED_EQUILIBRIUM_REQUIRED_FIELDS = frozenset({
+    "diagnostics",
+    "phase_assemblage_available",
+    "status",
+    "temperature_C",
+    "requested_temperature_C",
+    "liquid_fraction",
+    "vapor_pressures_Pa",
+    "phase_masses_kg",
+    "liquid_composition_wt_pct",
+    "activity_coefficients",
+    "vapor_pressures_source",
+    "warnings",
+})
 _EQUILIBRIUM_REPLAY_SIDE_FIELDS = (
     "last_vapor_pressures_source",
     "last_vapor_pressure_diagnostic",
@@ -506,11 +520,27 @@ def _admission_rejection(
         return None
     if artifact == "equilibrium_post_record":
         equilibrium_result = payload.get("equilibrium_result")
-        required_result_fields = {
-            field.name
-            for field in _equilibrium_result_payload_fields()
-            if field.name not in _EQUILIBRIUM_RESULT_FIELDS_OMITTED_WHEN_NONE
-        }
+        if interpolation_synthesized:
+            required_result_fields = set(
+                _INTERPOLATED_EQUILIBRIUM_REQUIRED_FIELDS
+            )
+            query_controls = (
+                keys[0].get("controls", {})
+                if keys and isinstance(keys[0], Mapping)
+                else {}
+            )
+            if isinstance(query_controls, Mapping):
+                if query_controls.get("pressure_bar") is not None:
+                    required_result_fields.add("pressure_bar")
+                if query_controls.get("log_fO2") is not None:
+                    required_result_fields.add("fO2_log")
+        else:
+            required_result_fields = {
+                field.name
+                for field in _equilibrium_result_payload_fields()
+                if field.name
+                not in _EQUILIBRIUM_RESULT_FIELDS_OMITTED_WHEN_NONE
+            }
         if not isinstance(equilibrium_result, Mapping):
             return "equilibrium.result.type"
         missing_result_fields = required_result_fields.difference(

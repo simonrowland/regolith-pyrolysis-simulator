@@ -463,6 +463,10 @@ _REFUSAL_EXPLANATIONS = {
         'The vapour batch supplied no authoritative debiting pressure for any '
         'requested channel, so empty flux cannot be treated as physical zero.'
     ),
+    'typed_failure_effective_pressure_species_set_mismatch': (
+        'The requested vapour channels do not match the available effective '
+        'pressure species, so the unresolved flux was not priced as zero.'
+    ),
     'vapour_batch_builder_missing': (
         'The vapour-batch builder is unavailable, so authoritative evaporation '
         'pressures cannot be constructed.'

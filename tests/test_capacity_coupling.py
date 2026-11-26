@@ -34,6 +34,7 @@ from simulator.condensation_routing import (
 from simulator.core import PyrolysisSimulator
 from simulator.evaporation import (
     EvaporationFluxRefusal,
+    EvaporationMixin,
     _STAGE0_PHOSPHORUS_VAPOUR_CARRIERS,
     _pre_rg_effective_pressure_source,
 )
@@ -44,8 +45,8 @@ from simulator.vapour_rail.batch import FluxEligible, PressureRefusal, PressureV
 from simulator.vapour_rail.catalog import OUT_OF_RANGE_STATUS
 from simulator.vapour_rail.instrumentation import (
     EffectivePressureSource,
+    TYPED_FAILURE_EFFECTIVE_PRESSURE_SPECIES_SET_MISMATCH,
     VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE,
-    compare_live_shadow_to_batch_flux,
     flux_pressures_from_batch,
     serialize_vapour_batch,
     vapour_carrier_authority_status,
@@ -501,12 +502,12 @@ def test_capacity_shadow_refuses_unresolved_vapour_before_empty_source_solve(
     sim._overhead_holdup_mol = lambda: {}
     sim.melt = SimpleNamespace(temperature_C=1600.0)
     overlay = {
-        "selection_source": "typed_failure_effective_pressure_species_set_mismatch",
+        "selection_source": TYPED_FAILURE_EFFECTIVE_PRESSURE_SPECIES_SET_MISMATCH,
         "notices": [{
             "kind": "vapour_batch_unresolved",
             "species": "Na",
             "hour": 3,
-            "reason": "typed_failure_effective_pressure_species_set_mismatch",
+            "reason": TYPED_FAILURE_EFFECTIVE_PRESSURE_SPECIES_SET_MISMATCH,
         }],
     }
     resolve_error = {}
@@ -537,6 +538,38 @@ def test_capacity_shadow_refuses_unresolved_vapour_before_empty_source_solve(
     )
     assert refusal.value.diagnostic["evaporation_flux_kg_hr"] == {}
     assert refusal.value.diagnostic["vapour_batch_flux_overlay"] == overlay
+
+
+def test_capacity_resolution_decision_is_owned_by_evaporation() -> None:
+    overlay = {
+        "selection_source": TYPED_FAILURE_EFFECTIVE_PRESSURE_SPECIES_SET_MISMATCH,
+        "batch_channel_states": {"Na": "refusal", "SiO": "eligible"},
+        "notices": [{
+            "kind": "vapour_batch_unresolved",
+            "species": "Na",
+            "hour": 3,
+            "reason": TYPED_FAILURE_EFFECTIVE_PRESSURE_SPECIES_SET_MISMATCH,
+        }],
+    }
+
+    assert EvaporationMixin._vapour_batch_resolution_refusal(
+        SimpleNamespace(),
+        {},
+        overlay,
+        flux_pressures={"SiO": 1.0},
+        include_unresolved_notices=True,
+    ) is None
+    refusal = EvaporationMixin._vapour_batch_resolution_refusal(
+        SimpleNamespace(),
+        {},
+        overlay,
+        flux_pressures={},
+        include_unresolved_notices=True,
+    )
+
+    assert isinstance(refusal, EvaporationFluxRefusal)
+    assert refusal.reason == TYPED_FAILURE_EFFECTIVE_PRESSURE_SPECIES_SET_MISMATCH
+    assert refusal.diagnostic["vapour_batch_flux_overlay"] == overlay
 
 
 def test_real_finite_capacity_result_drives_live_short_session_once(monkeypatch):
@@ -1566,34 +1599,29 @@ def test_live_and_picard_share_evaporation_control_construction(monkeypatch):
         temperature_K=sim.melt.temperature_C + 273.15,
         effective_pressure_source=effective_pressure_source,
     )
-    batch_pressures, batch_overlay = flux_pressures_from_batch(
-        vapour_batch,
-        effective_pressure_source=effective_pressure_source,
-    )
-    batch_overlay.update(
-        compare_live_shadow_to_batch_flux(
-            batch=vapour_batch,
-            live_pressures_Pa=None,
-            batch_flux_pressures_Pa=batch_pressures,
-        )
-    )
-    expected_partials = dict(partials)
-    for species in batch_pressures:
-        expected_partials.setdefault(species, 0.0)
-    expected, _ = sim._evaporation_flux_control_inputs(
-        equilibrium,
-        overhead_partials_Pa=expected_partials,
-        overhead_pressure_pa=sim._evaporation_overhead_total_pressure_Pa(
-            expected_partials
-        ),
-        vapour_batch_flux_pressures_Pa=batch_pressures,
-        vapour_batch_report=serialize_vapour_batch(vapour_batch),
-        vapour_batch_flux_overlay=batch_overlay,
-    )
     monkeypatch.setattr(
         sim,
         "_resolve_evaporation_vapour_batch",
         lambda _equilibrium, *, temperature_K, effective_pressure_source: vapour_batch,
+    )
+    expected_pressures, expected_overlay, expected_batch, *_ = (
+        sim._resolve_evaporation_batch_flux_state(
+            equilibrium,
+            temperature_K=sim.melt.temperature_C + 273.15,
+            overhead_partials_Pa=partials,
+        )
+    )
+    expected_partials, expected_pressure = sim._evaporation_publisher_film(
+        expected_pressures,
+        partials,
+    )
+    expected, _ = sim._evaporation_flux_control_inputs(
+        equilibrium,
+        overhead_partials_Pa=expected_partials,
+        overhead_pressure_pa=expected_pressure,
+        vapour_batch_flux_pressures_Pa=expected_pressures,
+        vapour_batch_report=serialize_vapour_batch(expected_batch),
+        vapour_batch_flux_overlay=expected_overlay,
     )
     captured = []
 
@@ -1612,8 +1640,8 @@ def test_live_and_picard_share_evaporation_control_construction(monkeypatch):
 
     assert captured == [expected]
     assert "vapour_batch_flux_pressures_Pa" in captured[0]
-    assert captured[0]["vapour_batch_flux_pressures_Pa"] == batch_pressures
-    assert captured[0]["overhead_pressure_pa"] == pytest.approx(500.0)
+    assert captured[0]["vapour_batch_flux_pressures_Pa"] == expected_pressures
+    assert captured[0]["overhead_pressure_pa"] == pytest.approx(expected_pressure)
 
 
 def test_no_cold_train_reuses_head_bleed_without_evaluating_shadow_flux():

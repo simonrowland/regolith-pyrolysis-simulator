@@ -1986,10 +1986,14 @@ class CampaignManager:
 
     def _current_vapour_species_unresolved(
         self,
+        vapour_overlay: Mapping[str, object] | None = None,
         species: str | None = None,
     ) -> bool:
-        overlay = getattr(self, '_last_vapour_batch_flux_overlay', {}) or {}
-        notices = overlay.get('notices', ()) if isinstance(overlay, Mapping) else ()
+        notices = (
+            vapour_overlay.get('notices', ())
+            if isinstance(vapour_overlay, Mapping)
+            else ()
+        )
         for notice in notices or ():
             if not isinstance(notice, Mapping):
                 continue
@@ -2001,12 +2005,14 @@ class CampaignManager:
         return False
 
     def _c2a_staged_log_slope_depletion_complete(
-            self,
-            *,
-            species: tuple[str, ...],
-            evap_flux: EvaporationFlux,
-            epsilon_per_hr: float,
-            dt_hr: float = 1.0) -> bool:
+        self,
+        *,
+        species: tuple[str, ...],
+        evap_flux: EvaporationFlux,
+        epsilon_per_hr: float,
+        vapour_overlay: Mapping[str, object] | None = None,
+        dt_hr: float = 1.0,
+    ) -> bool:
         if epsilon_per_hr <= 0.0 or not species:
             self._c2a_staged_last_log_slope_by_species = {}
             return False
@@ -2025,7 +2031,10 @@ class CampaignManager:
         observed_species: list[str] = []
         unresolved_species = False
         for species_name in species:
-            if self._current_vapour_species_unresolved(species_name):
+            if self._current_vapour_species_unresolved(
+                vapour_overlay,
+                species_name,
+            ):
                 unresolved_species = True
                 continue
             current_kg_hr = max(
@@ -2885,14 +2894,17 @@ class CampaignManager:
         self.last_campaign_stop = record
         return True
 
-    def check_endpoint(self, melt: MeltState,
-                       evap_flux: EvaporationFlux,
-                       train: CondensationTrain,
-                       record: BatchRecord,
-                       *,
-                       transport_state: Mapping[str, object] | None = None,
-                       atom_ledger: object | None = None,
-                       ) -> bool:
+    def check_endpoint(
+        self,
+        melt: MeltState,
+        evap_flux: EvaporationFlux,
+        train: CondensationTrain,
+        record: BatchRecord,
+        *,
+        transport_state: Mapping[str, object] | None = None,
+        atom_ledger: object | None = None,
+        vapour_overlay: Mapping[str, object] | None = None,
+    ) -> bool:
         """
         Check if the current campaign has reached its endpoint.
 
@@ -3066,7 +3078,7 @@ class CampaignManager:
             # (C4 signal_armed pattern). Continuous sub-threshold / never-
             # armed flux must not complete as if depletion occurred.
             signal_armed = (
-                not self._current_vapour_species_unresolved()
+                not self._current_vapour_species_unresolved(vapour_overlay)
                 and self._evap_total_signal_armed(
                     record,
                     CampaignPhase.C2A,
@@ -3136,6 +3148,7 @@ class CampaignManager:
                 log_slope_complete = self._c2a_staged_log_slope_depletion_complete(
                     species=species,
                     evap_flux=evap_flux,
+                    vapour_overlay=vapour_overlay,
                     epsilon_per_hr=log_slope_epsilon,
                 )
                 depletion_complete = (
@@ -3146,7 +3159,10 @@ class CampaignManager:
             elif legacy_fraction > 0.0:
                 stage_flux_unavailable = False
                 for species_name in species:
-                    if self._current_vapour_species_unresolved(species_name):
+                    if self._current_vapour_species_unresolved(
+                        vapour_overlay,
+                        species_name,
+                    ):
                         stage_flux_unavailable = True
                         continue
                     raw_current = evap_flux.species_kg_hr.get(species_name, 0.0)
@@ -3237,7 +3253,8 @@ class CampaignManager:
             if not species:
                 raise ValueError('C2B.soft_endpoint.species is required')
             species_flux_unavailable = self._current_vapour_species_unresolved(
-                species
+                vapour_overlay,
+                species,
             )
             rate = (
                 None
@@ -3325,7 +3342,8 @@ class CampaignManager:
             if not species:
                 raise ValueError('C4.soft_endpoint.species is required')
             species_flux_unavailable = self._current_vapour_species_unresolved(
-                species
+                vapour_overlay,
+                species,
             )
             rate = (
                 None

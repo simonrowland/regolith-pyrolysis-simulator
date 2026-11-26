@@ -751,6 +751,7 @@ def test_stage0_p_markers_activate_only_p2o5_sourced_rules() -> None:
 @pytest.mark.parametrize("phase,stage", [(None, None), ("", None), (None, ""), ("", "")])
 def test_missing_cleanup_context_is_refused_not_dormant(phase, stage):
     from simulator.vapour_rail.instrumentation import _channel_flux_gate_state
+    from simulator.vapour_rail.request import REFUSAL_INAPPLICABLE_PREDICATE
 
     rule = RequestRule(
         species_id="PO", source_account="process.cleaned_melt",
@@ -767,7 +768,7 @@ def test_missing_cleanup_context_is_refused_not_dormant(phase, stage):
     answer = result.answers["PO"]
     assert answer.is_refused
     assert answer.extra["applicability_evidence"]["active"] is False
-    assert _channel_flux_gate_state(answer) == "refusal"
+    assert _channel_flux_gate_state(answer) == REFUSAL_INAPPLICABLE_PREDICATE
 
 
 # ---------------------------------------------------------------------------

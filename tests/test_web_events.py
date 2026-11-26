@@ -6728,6 +6728,7 @@ def test_web_refusal_registry_covers_stable_typed_reasons():
         "uncertified_melt_resistance_model",
         "evaporation_flux_configuration_error",
         "vapour_batch_no_debiting_pressure_outcome",
+        "typed_failure_effective_pressure_species_set_mismatch",
         "vapour_batch_builder_missing",
         "vapour_batch_resolve_failed",
         "vapour_batch_unavailable",

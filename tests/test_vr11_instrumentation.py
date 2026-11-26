@@ -72,6 +72,7 @@ from simulator.vapour_rail.instrumentation import (
     vapour_carrier_authority_severity,
     vapour_carrier_authority_status,
 )
+from simulator.vapour_rail.request import REFUSAL_INAPPLICABLE_PREDICATE
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -766,6 +767,44 @@ def _flux_with_live_shadow(
     return flux, report
 
 
+def test_flux_selector_keeps_declared_inapplicability_as_typed_non_debit() -> None:
+    answer = replace(
+        _toy_answer("Fe", refused=True),
+        pressure=PressureRefusal(
+            code=REFUSAL_INAPPLICABLE_PREDICATE,
+            detail="declared predicate is inactive",
+        ),
+        selected_runtime_pressure=PressureRefusal(
+            code=REFUSAL_INAPPLICABLE_PREDICATE,
+            detail="declared predicate is inactive",
+        ),
+        flux=FluxRefusal(
+            code=REFUSAL_INAPPLICABLE_PREDICATE,
+            detail="declared predicate is inactive",
+        ),
+        refusal_code=REFUSAL_INAPPLICABLE_PREDICATE,
+    )
+    batch = VapourBatch(
+        requested_species_ids=frozenset({"Fe"}),
+        channels_by_species={"Fe": answer},
+        flux_active_species_ids=frozenset(),
+    )
+
+    pressures, report = flux_pressures_from_batch(
+        batch,
+        effective_pressure_source=EffectivePressureSource(
+            "test_effective_pressure_source",
+            {},
+        ),
+    )
+
+    assert pressures == {}
+    assert report["batch_channel_states"]["Fe"] == (
+        REFUSAL_INAPPLICABLE_PREDICATE
+    )
+    assert report.get("notices", []) == []
+
+
 def test_flux_pressures_from_batch_channel_unions() -> None:
     """Batch gates channels while the typed source supplies effective Pa."""
 
@@ -856,6 +895,77 @@ def test_evaporation_effective_pressure_mismatch_publishes_notice(
             "reason": "typed_failure_effective_pressure_species_set_mismatch",
         },
     ]
+
+
+def test_post_langmuir_closure_notice_keeps_peer_flux(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator import evaporation
+    from simulator.langmuir_surface_oxygen import (
+        LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED,
+    )
+
+    batch = _toy_batch({"Fe", "Na"}, pressures={"Fe": 1.0, "Na": 2.0})
+    model = SimpleNamespace(
+        melt=SimpleNamespace(hour=12),
+        vapor_pressures={},
+        _last_vapor_pressure_diagnostic={},
+        _last_vapour_batch_resolve_error={},
+        _resolve_evaporation_vapour_batch=lambda _equilibrium, **_kwargs: batch,
+    )
+    model._resolve_evaporation_batch_flux_state = MethodType(
+        EvaporationMixin._resolve_evaporation_batch_flux_state,
+        model,
+    )
+    monkeypatch.setattr(
+        evaporation,
+        "_pre_rg_effective_pressure_source",
+        lambda *_args: EffectivePressureSource(
+            "test_effective_pressure_source",
+            {"Fe": 1.0, "Na": 2.0},
+        ),
+    )
+    monkeypatch.setattr(
+        EvaporationMixin,
+        "_langmuir_headspace_partials_Pa",
+        lambda _self, _pressures: {},
+    )
+    monkeypatch.setattr(
+        EvaporationMixin,
+        "_langmuir_film",
+        lambda _self, partials: (dict(partials), 0.0),
+    )
+
+    def closure(_self, _pressures, **_kwargs):
+        return SimpleNamespace(
+            applied=True,
+            surface_pO2_bar=0.1,
+            pressures_Pa={"Na": 2.0},
+            refused_species={"Fe": "surface pressure could not be resolved"},
+            refusal_codes_by_species={
+                "Fe": LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED,
+            },
+            as_diagnostic=lambda: {},
+        )
+
+    monkeypatch.setattr(
+        EvaporationMixin,
+        "_closed_langmuir_pressures_for_partials",
+        closure,
+    )
+
+    pressures, overlay, *_ = model._resolve_evaporation_batch_flux_state(
+        SimpleNamespace(temperature_C=1600.0, vapor_pressures_Pa={}),
+        temperature_K=1873.15,
+    )
+
+    assert pressures == {"Na": 2.0}
+    assert overlay["notices"] == [{
+        "kind": "vapour_batch_unresolved",
+        "species": "Fe",
+        "hour": 12,
+        "reason": LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED,
+    }]
 
 
 def test_flux_pressures_proved_when_legacy_and_batch_agree() -> None:

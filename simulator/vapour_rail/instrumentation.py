@@ -36,6 +36,7 @@ from simulator.vapour_rail.batch import (
     VERDICT_AUTHORITATIVE,
     ZeroByPhysics,
 )
+from simulator.vapour_rail.request import REFUSAL_INAPPLICABLE_PREDICATE
 
 # Shadow-equal outcome vocabulary (never collapse to a vacuous True).
 SHADOW_PROVED = "proved"
@@ -47,6 +48,9 @@ SHADOW_REFUSED_VS_LIVE = "refused_vs_live_disagreement"
 SHADOW_MISSING_KEYS = "missing_keys"
 SHADOW_NONFINITE_LIVE = "nonfinite_live"
 SHADOW_ABSENT_COMPARISON = "absent_comparison"
+TYPED_FAILURE_EFFECTIVE_PRESSURE_SPECIES_SET_MISMATCH = (
+    "typed_failure_effective_pressure_species_set_mismatch"
+)
 
 _SHADOW_EQUAL_TRUE_OUTCOMES = frozenset({SHADOW_PROVED})
 
@@ -923,6 +927,19 @@ def _channel_flux_gate_state(answer: VapourAnswer) -> str:
     if answer.extra.get("applicability_evidence", {}).get("flux_dormant") is True:
         return "dormant_by_epoch"
     if isinstance(pressure, PressureRefusal) or isinstance(flux, FluxRefusal):
+        if (
+            getattr(answer, "refusal_code", None)
+            == REFUSAL_INAPPLICABLE_PREDICATE
+            or (
+                isinstance(pressure, PressureRefusal)
+                and pressure.code == REFUSAL_INAPPLICABLE_PREDICATE
+            )
+            or (
+                isinstance(flux, FluxRefusal)
+                and flux.code == REFUSAL_INAPPLICABLE_PREDICATE
+            )
+        ):
+            return REFUSAL_INAPPLICABLE_PREDICATE
         return "refusal"
     if isinstance(flux, FluxDiagnosticUpperBound) or isinstance(
         pressure, PressureUpperBound
@@ -1198,7 +1215,7 @@ def flux_pressures_from_batch(
     # accepting its catalog point would be an implicit RG-1 value cutover.
     if unresolved_missing_source_species:
         report["selection_source"] = (
-            "typed_failure_effective_pressure_species_set_mismatch"
+            TYPED_FAILURE_EFFECTIVE_PRESSURE_SPECIES_SET_MISMATCH
         )
         return {}, report
     # Source extras that the batch marks as genuine upper bounds are expected
