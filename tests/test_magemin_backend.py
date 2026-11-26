@@ -1016,20 +1016,42 @@ def test_magemin_runtime_pool_uses_right_sized_warm_timeout(monkeypatch, request
 
 
 @pytest.mark.parametrize(
-    ('completion_s', 'should_timeout'),
+    (
+        'completion_s',
+        'should_timeout',
+        'cancel_succeeds',
+        'expected_wait_state',
+    ),
     [
-        pytest.param(45.97, False, id='legal-spawn-startup-solve'),
-        pytest.param(47.45, True, id='one-poll-tick-past-envelope'),
+        pytest.param(
+            45.97, False, False, None,
+            id='legal-spawn-startup-solve',
+        ),
+        # This duration models an assigned cold-start request still running
+        # when the envelope expires; cancel() must fail for that case.
+        pytest.param(
+            47.45, True, False, 'running',
+            id='one-poll-tick-past-envelope-running',
+        ),
+        # The paired case models pool backlog: the request was never assigned,
+        # so real Future.cancel() succeeds and the detail says queued.
+        pytest.param(
+            47.45, True, True, 'queued',
+            id='one-poll-tick-past-envelope-queued',
+        ),
     ],
 )
 def test_magemin_cold_start_envelope_covers_spawn_startup_and_solve(
     completion_s,
     should_timeout,
+    cancel_succeeds,
+    expected_wait_state,
 ):
     class ScheduledFuture:
         def __init__(self):
             self.timeout_s = None
             self.cancelled = False
+            self.cancel_succeeds = cancel_succeeds
 
         def result(self, timeout=None):
             self.timeout_s = timeout
@@ -1039,7 +1061,7 @@ def test_magemin_cold_start_envelope_covers_spawn_startup_and_solve(
 
         def cancel(self):
             self.cancelled = True
-            return False
+            return self.cancel_succeeds
 
     class ScheduledPool:
         def __init__(self):
@@ -1081,7 +1103,7 @@ def test_magemin_cold_start_envelope_covers_spawn_startup_and_solve(
         assert detail['pool_timeout'] == {
             'configured_per_job_timeout_s': 15.0,
             'effective_wait_timeout_s': 47.4,
-            'wait_state': 'queued',
+            'wait_state': expected_wait_state,
         }
         assert pool.future.cancelled
         assert pool.abort_detail is not None

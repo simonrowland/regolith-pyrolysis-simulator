@@ -2294,6 +2294,81 @@ def test_constructor_normalizes_magemin_startup_timeout(monkeypatch):
     assert any('slot 1' in entry for entry in second_logs)
 
 
+def test_constructor_mixed_startup_failure_logs_all_slots(monkeypatch):
+    startup_timeout_s = 0.1
+    startup_logs = []
+    monkeypatch.setattr(
+        engine_pool_module,
+        '_pool_debug',
+        startup_logs.append,
+    )
+    never_ready = threading.Event()
+
+    class MixedStartupWorker:
+        def __init__(self, index):
+            self.index = index
+            self.name = f'mixed-startup slot {index}'
+            self.startup_timeout_s = startup_timeout_s
+
+        def start(self, *, timeout_s=None):
+            if self.index == 0:
+                raise EngineWorkerTimeout(
+                    self.name,
+                    startup_timeout_s,
+                    phase='initialization',
+                )
+            never_ready.wait(timeout=3600)
+
+        def request_disable(self):
+            never_ready.set()
+
+        def _reap_pending(self, *, timeout_s):
+            return True
+
+        def close(self):
+            never_ready.set()
+
+    ready_wait_s = _pool_ready_wait_s([
+        MixedStartupWorker(0),
+        MixedStartupWorker(1),
+    ])
+    with pytest.raises(EngineWorkerTimeout) as caught:
+        EngineWorkerPool(MixedStartupWorker, size=2)
+
+    timeout = caught.value
+    diagnostic = timeout.serialized_diagnostic_fields()
+    assert timeout.phase == 'initialization'
+    assert timeout.worker_name == 'mixed-startup slot 0'
+    assert timeout.timeout_s == pytest.approx(startup_timeout_s)
+    assert tuple(timeout.failed_slots) == ()
+    assert diagnostic == {
+        'exception_class': 'EngineWorkerTimeout',
+        'exception_message': (
+            'mixed-startup startup initialization exceeded hard timeout '
+            'of 0.1s'
+        ),
+        'reason': EngineWorkerTimeout.reason_code,
+        'backend': 'mixed-startup',
+        'timeout_s': startup_timeout_s,
+        'phase': 'initialization',
+        'operation': 'startup',
+    }
+    assert '0: mixed-startup slot 0' in timeout.diagnostic_detail
+    assert '1: mixed-startup slot 1' in timeout.diagnostic_detail
+    assert f'pool ready wait budget {ready_wait_s:g}s' in timeout.diagnostic_detail
+    assert all(
+        slot not in diagnostic['exception_message']
+        for slot in ('slot 0', 'slot 1')
+    )
+    startup_detail_logs = [
+        entry for entry in startup_logs if 'startup timeout' in entry
+    ]
+    assert len(startup_detail_logs) == 1
+    assert '0: mixed-startup slot 0' in startup_detail_logs[0]
+    assert '1: mixed-startup slot 1' in startup_detail_logs[0]
+    assert f'pool ready wait budget {ready_wait_s:g}s' in startup_detail_logs[0]
+
+
 def test_pool_startup_timeout_message_omits_missing_slot_count(monkeypatch):
     startup_logs = []
     monkeypatch.setattr(

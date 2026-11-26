@@ -2962,9 +2962,14 @@ class EngineWorkerPool:
             if errors:
                 index, error = errors[0]
                 if isinstance(error, EngineWorkerTimeout):
+                    failed_or_missing = tuple(sorted(
+                        {failed_index for failed_index, _ in errors}
+                        | set(missing)
+                    ))
                     self._normalize_startup_timeout(
                         error,
-                        failed_slots=(index,),
+                        failed_slots=failed_or_missing,
+                        ready_wait_s=ready_wait_s,
                     )
                 if close_error is not None:
                     raise error from close_error
