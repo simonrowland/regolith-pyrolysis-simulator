@@ -894,8 +894,9 @@ def test_internal_analytical_sossi_aithala_redox_payload_pin():
     # governed by the separate scorer assertions above.
     # b274 refreshes its prior 3fc087... payload pin, and the row-specific
     # experiment IDs produce this merged metadata digest.
+    # The Sossi XANES method alias removes its lone method_unstated notice.
     assert hashlib.sha256(encoded).hexdigest() == (
-        "3032738c8adb3635df9699111f9f7387277ceaff27a1105ee1244e029454b5db"
+        "9d1888c0ad721e9eb64c4af53fd256af673e1229fb4e261da300f96b168d0e05"
     )
 
 
