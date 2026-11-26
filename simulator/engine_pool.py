@@ -1457,12 +1457,13 @@ class WarmEngineWorker:
             raise
         handshake_exc: BaseException | None = None
         try:
-            if not launch.started.wait(
-                timeout=startup_timeout + ENGINE_WORKER_SPAWN_SLACK_S
-            ):
+            spawn_wait_timeout_s = (
+                startup_timeout + ENGINE_WORKER_SPAWN_SLACK_S
+            )
+            if not launch.started.wait(timeout=spawn_wait_timeout_s):
                 raise EngineWorkerTimeout(
                     self.name,
-                    startup_timeout,
+                    spawn_wait_timeout_s,
                     phase='initialization',
                 )
             if launch.start_error is not None:
@@ -2970,6 +2971,9 @@ class EngineWorkerPool:
                         error,
                         failed_slots=failed_or_missing,
                         ready_wait_s=ready_wait_s,
+                        configured_timeout_s=(
+                            _worker_startup_timeout_s(self._workers[index])
+                        ),
                     )
                 if close_error is not None:
                     raise error from close_error
@@ -3165,6 +3169,9 @@ class EngineWorkerPool:
                         self._normalize_startup_timeout(
                             exc,
                             failed_slots=(index,),
+                            configured_timeout_s=(
+                                _worker_startup_timeout_s(worker)
+                            ),
                         )
                     call_finished.set()
                     with self._active_requests_lock:

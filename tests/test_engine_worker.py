@@ -810,6 +810,22 @@ class _DeadlineRaceEvent:
         return self.signaled
 
 
+class _DeadlineRaceSpawnStallEvent:
+    def __init__(self):
+        self.signaled = False
+        self.wait_timeouts = []
+
+    def set(self):
+        self.signaled = True
+
+    def is_set(self):
+        return self.signaled
+
+    def wait(self, timeout=None):
+        self.wait_timeouts.append(timeout)
+        return False
+
+
 class _DeadlineRaceReader:
     def __init__(
         self,
@@ -971,6 +987,7 @@ def _deadline_race_start_worker(
     call_timeout_s=30.0,
     use_real_discard=False,
     fd_registry=None,
+    spawn_start_stall=False,
 ):
     clock = _DeadlineRaceClock()
     connections = [
@@ -1059,6 +1076,9 @@ def _deadline_race_start_worker(
         event_index = event_count % 7
         event_count += 1
         if event_index < 6:
+            if spawn_start_stall and event_index == 3:
+                worker._spawn_stall_event = _DeadlineRaceSpawnStallEvent()
+                return worker._spawn_stall_event
             return threading.Event()
         return _DeadlineRaceEvent(clock)
 
@@ -1404,6 +1424,71 @@ def test_start_receipt_abort_uses_configured_call_timeout(monkeypatch):
 
     assert caught.value.phase == 'job'
     assert caught.value.timeout_s == pytest.approx(30.0)
+
+
+def test_dead_worker_spawn_stall_reports_full_restart_wait(monkeypatch):
+    startup_timeout_s = 30.0
+    worker, _clock, _discarded, _processes, _connections, _readers = (
+        _deadline_race_start_worker(
+            monkeypatch,
+            [{
+                'ready_at': 0.0,
+                'completed_at': 0.0,
+                'response': ('ready', 'unused'),
+            }],
+            [],
+            startup_timeout_s=startup_timeout_s,
+            call_timeout_s=15.0,
+            spawn_start_stall=True,
+        )
+    )
+    worker.name = 'MAGEMin subprocess pool slot 5'
+    worker.process = SimpleNamespace(
+        alive=False,
+        exitcode=-9,
+        is_alive=lambda: False,
+    )
+    worker.connection = SimpleNamespace(closed=False)
+    startup_logs = []
+    monkeypatch.setattr(
+        engine_pool_module,
+        '_pool_debug',
+        startup_logs.append,
+    )
+
+    with pytest.raises(EngineWorkerTimeout) as caught:
+        worker.call({})
+
+    timeout = caught.value
+    effective_wait_s = startup_timeout_s + ENGINE_WORKER_SPAWN_SLACK_S
+    assert worker._spawn_stall_event.wait_timeouts == [effective_wait_s]
+    assert timeout.phase == 'initialization'
+    assert timeout.timeout_s == pytest.approx(effective_wait_s)
+
+    pool = object.__new__(EngineWorkerPool)
+    pool._workers = [worker]
+    pool._normalize_startup_timeout(
+        timeout,
+        failed_slots=(0,),
+        configured_timeout_s=startup_timeout_s,
+    )
+
+    diagnostic = timeout.serialized_diagnostic_fields()
+    assert diagnostic['timeout_s'] == pytest.approx(startup_timeout_s)
+    assert timeout.diagnostic_timeout_s == pytest.approx(startup_timeout_s)
+    assert diagnostic['exception_message'] == (
+        'MAGEMin startup initialization exceeded hard timeout of 30s'
+    )
+    assert 'slot 5' in timeout.diagnostic_detail
+    startup_detail_logs = [
+        entry for entry in startup_logs if 'startup timeout' in entry
+    ]
+    assert len(startup_detail_logs) == 1
+    assert 'slot 5' in startup_detail_logs[0]
+    launch = worker._launch_owner
+    if launch is not None:
+        launch.thread.join(timeout=1.0)
+        assert not launch.thread.is_alive()
 
 
 def test_late_job_frame_completion_times_out(monkeypatch):
