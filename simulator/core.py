@@ -6954,7 +6954,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         bookable_o2_mol = (
             self._bookable_ferric_o2_mol() if has_cleaned_melt else 0.0
         )
-        reducing_demand = net_o2_equiv_mol < -OXYGEN_RESERVOIR_NOOP_MOL
         # The lock's noop is a closed reducing tangent, not a saturated
         # derivative. Honoring it must keep the skip. A derivative that
         # has collapsed at the ceiling, with ferric still on the ledger,
@@ -6964,6 +6963,24 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             and bool(honor_ferric_exhaustion)
             and not self._ferric_inventory_reappeared()
         )
+        # The electrolysis transition already booked
+        # Fe2O3 → 2 FeO + 1/2 O2 onto the anode. This label is that
+        # credit's mirror (mol = -anode O2), not a second release.
+        # Premise: booking it again debits the residual Fe2O3. The
+        # aim then hits the effervescence bound (p_total = 0 → -9),
+        # which is more reducing than the demand-sized q, so the
+        # split empties the couple into overhead. Anode O2 stays the
+        # Faraday slice while converted Fe counts the overhead too.
+        # Algebra: booking_net = net - mirror. A call that is only
+        # the mirror has booking demand 0. The tangent still sees
+        # the full net. Limit: mirror 0 leaves booking_net = net.
+        mirror_mol = float(
+            terms.get('redox_source:mre_electrolysis_reduction', 0.0) or 0.0
+        )
+        booking_net_o2_equiv_mol = net_o2_equiv_mol - mirror_mol
+        booking_reducing_demand = (
+            booking_net_o2_equiv_mol < -OXYGEN_RESERVOIR_NOOP_MOL
+        )
         # One reducing arm, whatever C_m is (d-463 ext 3a). The finite
         # tangent caps and locks but does not book Fe2O3. C_m at the
         # noop used to be the only arm that did. Both book
@@ -6972,7 +6989,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # predictor for an oxidizing step and for a reducing step whose
         # ferric inventory is already the noop.
         reducing_books = (
-            reducing_demand
+            booking_reducing_demand
             and bookable_o2_mol > OXYGEN_RESERVOIR_NOOP_MOL
             and not lock_honored
         )
@@ -7004,7 +7021,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # diagnosed hour's equilibrium q at log10(0.013) books
             # 1.790e-4 mol and minute 43 reads the melt-activity floor,
             # not -1.886.
-            demand_o2_mol = -net_o2_equiv_mol
+            demand_o2_mol = -booking_net_o2_equiv_mol
             if demand_o2_mol > bookable_o2_mol + OXYGEN_RESERVOIR_NOOP_MOL:
                 self._ferric_tangent_exhausted = True
                 self._ferric_exhausted_bookable_o2_mol = bookable_o2_mol
