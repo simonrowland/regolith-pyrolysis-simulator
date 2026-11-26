@@ -16,8 +16,10 @@ from tests.battery.test_redox_extract_scoring import (
 )
 
 # Studio table, internal-analytical only. sossi_2020_per_f_o2_1_xanes is
-# the printed 1 bar pure-O2 end member. The other seventeen rows are the
-# unaffected numeric, provenance, and eligibility pins.
+# the printed 1 bar pure-O2 end member. The twelve Sossi rows map their printed
+# analytical_method "Fe K-edge XANES" to XANES_SPECTROSCOPY, so they carry no
+# DP-106 method_unstated notice. The six Aithala rows and numeric pins are
+# unaffected.
 _EXCLUSIONS = (
     "source_relation_independent_complete_ancestry",
     "no_blocking_qualification",

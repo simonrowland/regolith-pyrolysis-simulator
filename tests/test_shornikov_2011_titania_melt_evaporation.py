@@ -349,8 +349,11 @@ def test_isolated_migration_reaches_temperature_on_every_row():
         is MethodToken.UNSPECIFIED
         for row in curves
     )
+    # figure_only admission is a separate owner. The unstated method
+    # notice does not replace it.
     assert all(
-        {notice.kind.value for notice in row.notices} == {"method_unstated"}
+        {notice.kind.value for notice in row.notices}
+        == {"admission_from_legacy_token", "method_unstated"}
         for row in curves
     ), [(row.observation_id, {notice.kind.value for notice in row.notices}) for row in curves]
 

@@ -5,12 +5,12 @@ from typing import Any
 
 import pytest
 
-import simulator.diagnostic_helpers.hashimoto_1983 as hashimoto
+import simulator.battery.diagnostics.hashimoto_1983 as hashimoto
 from simulator.battery.default_policy import (
     load_policy_table,
 )
 from simulator.battery.enums import NoticeKind
-from simulator.diagnostic_helpers.hashimoto_1983 import (
+from simulator.battery.diagnostics.hashimoto_1983 import (
     DEFAULT_OBSERVATIONS_PATH,
     DEFAULT_PRESET_PATH,
     Hashimoto1983Refusal,

@@ -1,9 +1,12 @@
 """Only measured rows with a printed gas formula become molar yields."""
 
+from dataclasses import replace
 from decimal import Decimal
 
-from simulator.battery.enums import Phase, Quantity, ValueKind
-from simulator.battery.migrate import REPO_ROOT, select_declared_source
+import pytest
+
+from simulator.battery.enums import MethodToken, NoticeKind, Phase, Quantity, ValueKind
+from simulator.battery.migrate import REPO_ROOT, Migrator, select_declared_source
 from tests.battery.factories import migrate_one_extract
 
 
@@ -140,13 +143,36 @@ def test_printed_degassing_methods_are_located_on_named_measurements() -> None:
             for migrated_id, experiment in migrator.result.experiments.items()
             if migrated_id.endswith(f"::{experiment_id}")
         )
-        assert experiment.method.is_unknown
-        assert printed_phrase in (experiment.method.reason or "")
-        assert "газовом хроматографе “Кристал-Люкс 4000М”" in (
-            experiment.method.reason or ""
+        # DP-106 stores the untokenized published method as UNSPECIFIED.
+        # The printed text stays on the measurement's method_unstated notice.
+        assert experiment.method.is_value
+        assert experiment.method.value is MethodToken.UNSPECIFIED
+        located = [
+            observation
+            for observation in migrator.result.observations.values()
+            if observation.experiment_id == experiment.experiment_id
+            and any(
+                notice.kind is NoticeKind.METHOD_UNSTATED
+                and printed_phrase in (notice.reason or "")
+                and "газовом хроматографе “Кристал-Люкс 4000М”" in (
+                    notice.reason or ""
+                )
+                and "no existing MethodToken represents" in (notice.reason or "")
+                for notice in observation.notices
+            )
+        ]
+        unstated_reasons = sorted(
+            {
+                (notice.reason or "")[:240]
+                for observation in migrator.result.observations.values()
+                if observation.experiment_id == experiment.experiment_id
+                for notice in observation.notices
+                if notice.kind is NoticeKind.METHOD_UNSTATED
+            }
         )
-        assert "no existing MethodToken represents" in (
-            experiment.method.reason or ""
+        assert located, (
+            f"missing published method sentence {printed_phrase!r} "
+            f"on {experiment.experiment_id}; method_unstated={unstated_reasons[:6]}"
         )
         assert experiment.locator is not None
         assert experiment.locator.published_page == 574
@@ -171,7 +197,15 @@ def test_printed_degassing_methods_are_located_on_named_measurements() -> None:
         assert observation.identity.species.formula == formula
         assert observation.identity.temperature_K is not None
         assert observation.identity.temperature_K.value == temperature_K
-        assert migrator.result.experiments[observation.experiment_id].method.is_unknown
+        assert (
+            migrator.result.experiments[observation.experiment_id].method.value
+            is MethodToken.UNSPECIFIED
+        )
+        assert any(
+            notice.kind is NoticeKind.METHOD_UNSTATED
+            and expected_method_phrases[experiment_id] in (notice.reason or "")
+            for notice in observation.notices
+        )
 
     boudouard = migrator.result.observations[
         "murchison-degassing-2023-springer::voropaev_2023_boudouard_kp_model_derived"
@@ -182,6 +216,43 @@ def test_printed_degassing_methods_are_located_on_named_measurements() -> None:
     assert boudouard.derivation.method.locator.page == 6
     assert boudouard.derivation.method.locator.published_page == 576
     assert boudouard.derivation.method.locator.pdf_page_index == 6
+
+
+def test_regime_label_cannot_replace_the_published_method_sentence(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Restoring the unmapped-regime reason must fail the named-series pin."""
+
+    real = Migrator._resolve_method_for_observation
+    rewritten: list[str] = []
+
+    def regime_erases_published_sentence(self, *args, **kwargs):
+        method, notice = real(self, *args, **kwargs)
+        if (
+            notice is not None
+            and notice.kind is NoticeKind.METHOD_UNSTATED
+            and notice.reason
+            and "экспериментов с изотермической выдержкой" in notice.reason
+        ):
+            rewritten.append(notice.origin)
+            notice = replace(
+                notice,
+                reason=(
+                    "method_unstated: default=unspecified; "
+                    "original_reason=source method text is not mapped: "
+                    "isothermal_degassing_helium_headspace_GC"
+                ),
+            )
+        return method, notice
+
+    monkeypatch.setattr(
+        Migrator,
+        "_resolve_method_for_observation",
+        regime_erases_published_sentence,
+    )
+    with pytest.raises(AssertionError, match="изотермической"):
+        test_printed_degassing_methods_are_located_on_named_measurements()
+    assert rewritten, "mutation did not observe the published sentence"
 
 
 def test_specific_gas_yield_refuses_a_missing_printed_gas_species() -> None:

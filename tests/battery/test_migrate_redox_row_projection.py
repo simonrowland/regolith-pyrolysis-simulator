@@ -30,6 +30,19 @@ AITHALA_ALLF_RUNS = {
     "aithala-2026-2000-120",
     "aithala-2026-2100-30",
 }
+
+
+def _named_run(experiment_id: str, names: set[str]) -> str | None:
+    """The source run id inside an experiment id.
+
+    A printed analytical method (XANES, Mössbauer) splits off the quench
+    run, so the run is a segment, not always the last one.
+    """
+
+    for part in experiment_id.split("::"):
+        if part in names:
+            return part
+    return None
 JAYASURIYA = REPO / "data/literature/extracts/jayasuriya-2004-iron-mossbauer.yaml"
 
 
@@ -239,7 +252,7 @@ def test_aithala_redox_row_projects_experiment_glass_analysis_and_f_o2() -> None
         row
         for row in result.observations.values()
         if row.source_id == "aithala-2026-magmatic-iron-redox-to-2100c"
-        and row.experiment_id.rsplit("::", 1)[-1] in AITHALA_ALLF_RUNS
+        and _named_run(row.experiment_id, AITHALA_ALLF_RUNS) is not None
         and row.observation_id.rsplit("::", 1)[-1].endswith("_xanes")
         and row.identity.quantity.is_value
         and row.identity.quantity.value.value == "fe3_fe2_ratio"
@@ -348,14 +361,15 @@ def test_aithala_vf_redox_rows_project_printed_sample_compositions() -> None:
         if row.source_id == "aithala-2026-magmatic-iron-redox-to-2100c"
         and row.identity.quantity.is_value
         and row.identity.quantity.value.value == "fe3_fe2_ratio"
-        and row.experiment_id.rsplit("::", 1)[-1] in printed
+        and _named_run(row.experiment_id, set(printed)) is not None
     ]
     assert len(redox_rows) == 10
-    assert {row.experiment_id.rsplit("::", 1)[-1] for row in redox_rows} == set(
+    assert {_named_run(row.experiment_id, set(printed)) for row in redox_rows} == set(
         printed
     )
     for row in redox_rows:
-        run_id = row.experiment_id.rsplit("::", 1)[-1]
+        run_id = _named_run(row.experiment_id, set(printed))
+        assert run_id is not None
         sample = printed[run_id]
         source = source_rows[row.observation_id.rsplit("::", 1)[-1]]
         assert source["values"]["sample_id"] == sample["sample_id"]

@@ -193,6 +193,83 @@ def test_internal_analytical_full_payload_pin():
 
 
 @pytest.mark.parametrize(
+    "engine",
+    (Engine.INTERNAL_ANALYTICAL, Engine.OPENIMCC),
+    ids=lambda value: value.value,
+)
+def test_sossi_xanes_payload_changes_only_by_the_method_notice(engine, monkeypatch):
+    if engine is Engine.OPENIMCC:
+        pytest.importorskip("openimcc")
+    import simulator.battery.migrate as migrate
+
+    printed_method = "Fe K-edge XANES"
+    context, observations = _sossi_aithala_redox_context()
+    with_alias, _metadata = score_store(
+        context, engines=(engine,), rail=Rail.REDOX
+    )
+    with_alias_payloads = {
+        residual.reference: score_module.residual_to_plain(residual)
+        for residual in with_alias
+    }
+    aliases_without_sossi_xanes = {
+        alias: token
+        for alias, token in migrate.METHOD_TOKEN_ALIASES.items()
+        if alias != printed_method
+    }
+    monkeypatch.setattr(
+        migrate, "METHOD_TOKEN_ALIASES", aliases_without_sossi_xanes
+    )
+    context_without_alias, observations_without_alias = _sossi_aithala_redox_context()
+    without_alias, _metadata = score_store(
+        context_without_alias, engines=(engine,), rail=Rail.REDOX
+    )
+    without_alias_payloads = {
+        residual.reference: score_module.residual_to_plain(residual)
+        for residual in without_alias
+    }
+    assert set(with_alias_payloads) == set(without_alias_payloads)
+    sossi_references = {
+        reference
+        for reference, observation in observations.items()
+        if observation.source_id == "sossi-2020-magma-ocean-redox"
+    }
+    assert len(sossi_references) == 12
+    assert sossi_references == {
+        reference
+        for reference, observation in observations_without_alias.items()
+        if observation.source_id == "sossi-2020-magma-ocean-redox"
+    }
+    for reference in sossi_references:
+        before = with_alias_payloads[reference]
+        after = without_alias_payloads[reference]
+        assert not any(
+            notice["kind"] == NoticeKind.METHOD_UNSTATED.value
+            for notice in before["notices"]
+        )
+        method_notices = [
+            notice
+            for notice in after["notices"]
+            if notice["kind"] == NoticeKind.METHOD_UNSTATED.value
+        ]
+        assert len(method_notices) == 1
+        assert method_notices[0]["policy"]["id"] == "DP-106"
+        assert method_notices[0]["origin"] == reference
+        assert (
+            f"source method text is not mapped: {printed_method}"
+            in method_notices[0]["reason"]
+        )
+        without_method_notice = {
+            **after,
+            "notices": [
+                notice
+                for notice in after["notices"]
+                if notice["kind"] != NoticeKind.METHOD_UNSTATED.value
+            ],
+        }
+        assert without_method_notice == before
+
+
+@pytest.mark.parametrize(
     "engine", (Engine.INTERNAL_ANALYTICAL, Engine.OPENIMCC), ids=lambda value: value.value
 )
 def test_full_payload_pin_detects_notice_origin_moved_between_rows(engine, monkeypatch):

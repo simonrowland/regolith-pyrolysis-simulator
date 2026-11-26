@@ -718,7 +718,17 @@ def test_shornikov_2017_emit_matches_cells_and_explains_stored_twins(
         (4, 2),
         (4, 3),
     ]
-    assert len(reviewed["species"]["MgAl2O4"]["context"]) == 8
+    context = reviewed["species"]["MgAl2O4"]["context"]
+    table1_rows = [
+        row
+        for row in context
+        if str(row["observation_id"]).startswith("shornikov_2017_table1_row_")
+    ]
+    assert len(table1_rows) == 8
+    assert any(
+        row["observation_id"] == "shornikov_2017_spinel_evaporation_apparatus_record"
+        for row in context
+    )
 
     emitted = _observations(fragment)
     assert all("needs_render_check" not in row for row in emitted)
@@ -1017,8 +1027,11 @@ def test_merged_shornikov_fragments_migrate_with_temperature_and_conditions(
         assert record.derivation is not None
         assert set(record.derivation.inputs) == set(record.derived_from)
         assert record.derivation.references
-        assert "Glushko handbook [10]" in record.derivation.references[0]
-        assert "not numerically printed here" in record.derivation.relation
+        assert record.derivation.references[0] == (
+            "Glushko et al. (1978–1982), Thermodynamical Properties of "
+            "Individual Substances [10]"
+        )
+        assert "is not printed in the method prose" in record.derivation.relation
     for record in records_2017:
         assert record.identity.temperature_K.is_value
         condition = record.point_conditions["temperature_K"]

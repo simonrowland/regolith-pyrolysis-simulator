@@ -651,9 +651,26 @@ def _is_integer_compound_adduct(text: str) -> bool:
     return True
 
 
+_DECIMAL_WATER_RE = re.compile(r"^(.+)\.(\d+)\.(\d+)(H2O)$")
+_FRACTION_WATER_RE = re.compile(r"^(.+)\.(\d+)/(\d+)(H2O)$")
+
+
 def _split_ascii_adducts(text: str) -> list[str]:
     if not text:
         return []
+    # ``H2SO4.6.5H2O`` is 6.5 waters. ``CaSO4.1/2H2O`` is half a water.
+    # An integer adduct (``CuSO4.5H2O``, ``Al2O3.2SiO2.2H2O``) does not match
+    # these endings and stays on the integer-adduct split below.
+    decimal_water = _DECIMAL_WATER_RE.match(text)
+    if decimal_water is not None:
+        body, whole, frac, hydrate = decimal_water.groups()
+        if body and not body.endswith("."):
+            return [body, f"{whole}.{frac}{hydrate}"]
+    fraction_water = _FRACTION_WATER_RE.match(text)
+    if fraction_water is not None:
+        body, num, den, hydrate = fraction_water.groups()
+        if body and den != "0":
+            return [body, f"{num}/{den}{hydrate}"]
     if _is_integer_compound_adduct(text):
         return text.split(".")
     return [text]
@@ -684,6 +701,17 @@ def _split_formula_segments(formula: str) -> list[str]:
 
 
 def _leading_multiplier(segment: str) -> tuple[float, str]:
+    fraction = re.match(r"(\d+)/(\d+)(?=[A-Za-z(])", segment)
+    if fraction is not None:
+        denominator = int(fraction.group(2))
+        if denominator == 0:
+            raise UnknownSpeciesError(
+                f"formula segment {segment!r} has a zero hydrate denominator"
+            )
+        body = segment[fraction.end() :]
+        if not body:
+            raise UnknownSpeciesError(f"formula segment {segment!r} has no body")
+        return int(fraction.group(1)) / denominator, body
     match = _NUMBER_RE.match(segment)
     if match is None:
         return 1.0, segment

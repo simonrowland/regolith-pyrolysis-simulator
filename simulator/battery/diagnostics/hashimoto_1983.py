@@ -29,7 +29,7 @@ from simulator.yaml_cache import load_cached_safe_yaml
 
 
 SOURCE_ID = "kems-015-hashimoto-1983"
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_PRESET_PATH = ROOT / "data/literature/reproduction-inputs/hashimoto_1983.yaml"
 DEFAULT_OBSERVATIONS_PATH = (
     ROOT / "data/literature/extracts-v2/kems-015-hashimoto-1983.yaml"

@@ -282,6 +282,55 @@ def test_britt_registry_sample_map_stays_owned_after_method_split(tmp_path):
     _assert_britt_registry_map_is_not_repeated(result)
 
 
+def _britt_method_field_split_extract():
+    """The CI row names knudsen; the declared technique is electron microprobe.
+
+    Regime no longer mints an experiment id, so the post-split sample-map
+    key has to be proved on a method field. The declared token is the home.
+    Knudsen leaves, and the registry map must stay off that row's point.
+    """
+
+    extract = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts" / BRITT_FILENAME).read_text(
+            encoding="utf-8"
+        )
+    )
+    for experiment in extract["experiments"]:
+        if experiment.get("experiment_id") == "xrf-ci":
+            experiment["method"] = MethodToken.ELECTRON_MICROPROBE.value
+    for block in extract["species"].values():
+        observations = block.get("observations") or []
+        for row in observations:
+            if row.get("observation_id") == BRITT_CI_ROW:
+                row["method"] = MethodToken.KNUDSEN_EFFUSION.value
+                row.pop("regime", None)
+    return extract
+
+
+def _assert_method_field_split_keeps_registry_map(result):
+    rows = _rows_for_local_id(result, BRITT_SOURCE, BRITT_CI_ROW)
+    assert rows
+    assert any(
+        row.experiment_id.endswith(
+            f"::method:{MethodToken.KNUDSEN_EFFUSION.value}"
+        )
+        for row in rows
+    )
+    assert all(
+        "printed_composition" not in (row.point_conditions or {})
+        for row in rows
+    )
+
+
+def test_method_field_split_keeps_declared_sample_map_off_the_point(tmp_path):
+    result = _migrate_real_extract(
+        tmp_path,
+        BRITT_FILENAME,
+        extract_doc=_britt_method_field_split_extract(),
+    )
+    _assert_method_field_split_keeps_registry_map(result)
+
+
 def test_britt_registry_repeat_mutation_restores_post_split_key_bug(
     tmp_path, monkeypatch
 ):
@@ -300,8 +349,279 @@ def test_britt_registry_repeat_mutation_restores_post_split_key_bug(
             Migrator, "_repeats_declared_sample_map", legacy_post_split_key
         )
         result = _migrate_real_extract(
-            tmp_path / "mutated", BRITT_FILENAME
+            tmp_path / "mutated",
+            BRITT_FILENAME,
+            extract_doc=_britt_method_field_split_extract(),
         )
 
     with pytest.raises(AssertionError):
-        _assert_britt_registry_map_is_not_repeated(result)
+        _assert_method_field_split_keeps_registry_map(result)
+
+
+def _fixture_with_unstated_method():
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    source_row = extract["species"]["Na"]["observations"][0]
+    source_row.pop("regime", None)
+    source_row["experiment"] = "declared-run"
+    source_row["observation_id"] = "unstated-a"
+    other = yaml.safe_load(yaml.safe_dump(source_row))
+    other["observation_id"] = "unstated-b"
+    extract["experiments"] = [{"experiment_id": "declared-run"}]
+    extract["species"]["Na"]["observations"] = [source_row, other]
+    return extract
+
+
+def _unstated_experiment_ids(result, source_id):
+    rows = [
+        *_rows_for_local_id(result, source_id, "unstated-a"),
+        *_rows_for_local_id(result, source_id, "unstated-b"),
+    ]
+    assert rows
+    return {row.experiment_id for row in rows}
+
+
+def test_unstated_method_does_not_mint_a_second_experiment(tmp_path):
+    extract = _fixture_with_unstated_method()
+    result = _migrate_real_extract(
+        tmp_path, "zhang-2021-acsesc-si.yaml", extract_doc=extract
+    )
+    experiment_ids = _unstated_experiment_ids(result, extract["source_id"])
+    assert len(experiment_ids) == 1
+    assert not any(experiment_id.endswith(":unspecified") for experiment_id in experiment_ids)
+
+
+def test_legacy_unspecified_split_mints_a_second_experiment(tmp_path, monkeypatch):
+    """The old rule treated UNSPECIFIED as its own method and doubled the run."""
+
+    extract = _fixture_with_unstated_method()
+    original = Migrator._method_row_splits
+
+    def split_unspecified(self, experiment_id, method):
+        if (
+            method.is_value
+            and method.value is MethodToken.UNSPECIFIED
+            and experiment_id in self._method_split_home
+        ):
+            return True
+        return original(self, experiment_id, method)
+
+    monkeypatch.setattr(Migrator, "_method_row_splits", split_unspecified)
+    result = _migrate_real_extract(
+        tmp_path, "zhang-2021-acsesc-si.yaml", extract_doc=extract
+    )
+    with pytest.raises(AssertionError):
+        experiment_ids = _unstated_experiment_ids(result, extract["source_id"])
+        assert len(experiment_ids) == 1
+        assert not any(
+            experiment_id.endswith(":unspecified") for experiment_id in experiment_ids
+        )
+
+
+def _assay_on_named_run_extract():
+    """Piston-cylinder run; the row prose is the electron-microprobe assay."""
+
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    row.pop("regime", None)
+    row["experiment"] = "named-run"
+    row["observation_id"] = "assay-row"
+    row["regime"] = "quench_equilibration"
+    row["values"]["method_as_printed"] = (
+        "Electron microprobe WDS for the sulfur concentration"
+    )
+    extract["experiments"] = [
+        {
+            "experiment_id": "named-run",
+            "method": "piston_cylinder_equilibration_quench",
+        }
+    ]
+    return extract
+
+
+def _assert_assay_stays_on_named_run(result, source_id):
+    rows = _rows_for_local_id(result, source_id, "assay-row")
+    assert rows
+    assert len({row.experiment_id for row in rows}) == 1
+    assert all("::method:" not in row.experiment_id for row in rows)
+    assert all(
+        row.experiment_id.endswith("::experiment::named-run") for row in rows
+    )
+
+
+def test_assay_prose_stays_on_the_named_run(tmp_path):
+    extract = _assay_on_named_run_extract()
+    result = _migrate_real_extract(
+        tmp_path, "zhang-2021-acsesc-si.yaml", extract_doc=extract
+    )
+    _assert_assay_stays_on_named_run(result, extract["source_id"])
+
+
+def _agreeing_regime_on_named_run_extract():
+    """Knudsen run. The regime is the exact alias; the method sentence is not."""
+
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    row["experiment"] = "named-knudsen"
+    row["observation_id"] = "agreeing-regime-row"
+    row["regime"] = "kems_effusion"
+    row["method"] = (
+        "Knudsen effusion with high-temperature mass-spectral analysis of the vapor"
+    )
+    extract["experiments"] = [
+        {"experiment_id": "named-knudsen", "method": "knudsen_effusion"}
+    ]
+    return extract
+
+
+def _assert_agreeing_regime_has_no_method_notice(result, source_id):
+    rows = _rows_for_local_id(result, source_id, "agreeing-regime-row")
+    assert rows
+    assert all(
+        row.experiment_id.endswith("::experiment::named-knudsen") for row in rows
+    )
+    assert all("::method:" not in row.experiment_id for row in rows)
+    assert all(
+        result.experiments[row.experiment_id].method.is_value
+        and result.experiments[row.experiment_id].method.value
+        is MethodToken.KNUDSEN_EFFUSION
+        for row in rows
+    )
+    assert all(
+        not any(
+            notice.kind in {NoticeKind.METHOD_UNSTATED, NoticeKind.METHOD_INFERRED}
+            for notice in row.notices
+        )
+        for row in rows
+    )
+
+
+def test_agreeing_regime_resolves_without_a_method_notice(tmp_path):
+    extract = _agreeing_regime_on_named_run_extract()
+    result = _migrate_real_extract(
+        tmp_path, "zhang-2021-acsesc-si.yaml", extract_doc=extract
+    )
+    _assert_agreeing_regime_has_no_method_notice(result, extract["source_id"])
+
+
+def test_dropping_an_agreeing_regime_emits_a_method_notice(tmp_path, monkeypatch):
+    extract = _agreeing_regime_on_named_run_extract()
+    original = Migrator._resolve_method_for_observation
+
+    def drop_regime(self, *args, **kwargs):
+        kwargs["regime_candidates"] = ()
+        return original(self, *args, **kwargs)
+
+    monkeypatch.setattr(Migrator, "_resolve_method_for_observation", drop_regime)
+    result = _migrate_real_extract(
+        tmp_path, "zhang-2021-acsesc-si.yaml", extract_doc=extract
+    )
+    with pytest.raises(AssertionError):
+        _assert_agreeing_regime_has_no_method_notice(result, extract["source_id"])
+
+
+def test_treating_assay_prose_as_a_method_field_mints_a_second_id(
+    tmp_path, monkeypatch
+):
+    import simulator.battery.migrate as migrate_module
+
+    extract = _assay_on_named_run_extract()
+    original = migrate_module._method_claim_fields
+
+    def assay_as_method_field(obs, values):
+        regime, raw, printed, evidence, notice_evidence = original(obs, values)
+        return regime, (*raw, *printed), (), evidence, notice_evidence
+
+    monkeypatch.setattr(migrate_module, "_method_claim_fields", assay_as_method_field)
+    result = _migrate_real_extract(
+        tmp_path, "zhang-2021-acsesc-si.yaml", extract_doc=extract
+    )
+    with pytest.raises(AssertionError):
+        _assert_assay_stays_on_named_run(result, extract["source_id"])
+
+
+def _prose_declared_method_with_unmapped_regime():
+    """Prose declared method. Calorimetry is home. Knudsen carries a bad regime."""
+
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    source_row = extract["species"]["Na"]["observations"][0]
+    source_row.pop("regime", None)
+    source_row["experiment"] = "named-run"
+    source_row["observation_id"] = "calorimetry-home"
+    source_row["method"] = "calorimetry"
+    knudsen_row = yaml.safe_load(yaml.safe_dump(source_row))
+    knudsen_row["observation_id"] = "knudsen-beside-unmapped-regime"
+    knudsen_row["method"] = "knudsen_effusion"
+    knudsen_row["regime"] = "not_a_closed_method_label"
+    extract["experiments"] = [
+        {
+            "experiment_id": "named-run",
+            "method": "laboratory campaign on one named run",
+        }
+    ]
+    extract["species"]["Na"]["observations"] = [source_row, knudsen_row]
+    return extract
+
+
+def _assert_printed_knudsen_survives_unmapped_regime(result, source_id):
+    calorimetry = _rows_for_local_id(result, source_id, "calorimetry-home")
+    knudsen = _rows_for_local_id(
+        result, source_id, "knudsen-beside-unmapped-regime"
+    )
+    assert calorimetry and knudsen
+    assert all(
+        row.experiment_id.endswith("::experiment::named-run")
+        and "::method:" not in row.experiment_id
+        for row in calorimetry
+    )
+    stored = []
+    for row in knudsen:
+        experiment = result.experiments[row.experiment_id]
+        method_value = (
+            experiment.method.value.value if experiment.method.is_value else None
+        )
+        stored.append((row.experiment_id, method_value))
+        assert row.experiment_id.endswith("::method:knudsen_effusion"), stored
+        assert method_value == "knudsen_effusion", stored
+        assert "unspecified" not in row.experiment_id
+        assert not any(
+            "not_a_closed_method_label" in notice.reason for notice in row.notices
+        ), stored
+    return stored
+
+
+def test_unmapped_regime_does_not_replace_a_printed_method_on_the_split(
+    tmp_path,
+):
+    extract = _prose_declared_method_with_unmapped_regime()
+    result = _migrate_real_extract(
+        tmp_path, "fixture-source.yaml", extract_doc=extract
+    )
+    _assert_printed_knudsen_survives_unmapped_regime(result, extract["source_id"])
+
+
+def test_old_candidate_order_lets_the_unmapped_regime_lead(tmp_path, monkeypatch):
+    import simulator.battery.migrate as migrate_module
+
+    def old_order(
+        *,
+        method_field_is_printed,
+        declared_method_is_printed,
+        regime_agrees_with_declared,
+    ):
+        return (not declared_method_is_printed) or (
+            regime_agrees_with_declared and not method_field_is_printed
+        )
+
+    monkeypatch.setattr(
+        migrate_module,
+        "_regime_candidates_precede_method_field",
+        old_order,
+    )
+    extract = _prose_declared_method_with_unmapped_regime()
+    result = _migrate_real_extract(
+        tmp_path, "fixture-source.yaml", extract_doc=extract
+    )
+    with pytest.raises(AssertionError):
+        _assert_printed_knudsen_survives_unmapped_regime(
+            result, extract["source_id"]
+        )

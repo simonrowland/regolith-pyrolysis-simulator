@@ -67,8 +67,11 @@ _RESIDUAL_SHA256_BEFORE_STANDARD_STEP = {
 # Fe_tO (t-1802 Eq. 23 / d-432) does not move this row: cf2a0c7fe and
 # f96f7cace serialize the same bytes.
 # sha before d-443: 6ca537f3aebbf954650edbfa6a1c2cac43c4daef05def1348711beccf0123a9a
+# The named experiment is one id. DP-106 puts the unstated method on the
+# row, so the line digest moves. Dex, status, and value_Pa stay as above.
+# sha before that notice: 462c30162f7ac8a6bc1f9639f8b9a191383bb6bf72bee3391dc788dd19c73874
 _DISTIN_1880_RESIDUAL_SHA256 = (
-    "462c30162f7ac8a6bc1f9639f8b9a191383bb6bf72bee3391dc788dd19c73874"
+    "9206a1a305d94842e2ded966bf29c00d6c07b67b14d1d7428d4b6a4697b3a3cc"
 )
 _DISTIN_1880_RESIDUAL_DEX = Decimal("-0.10057837869175247")
 

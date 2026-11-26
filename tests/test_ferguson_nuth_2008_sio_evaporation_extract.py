@@ -126,7 +126,17 @@ def test_table_rows_migrate_temperature_conditions_and_source_pins(
         if observation.observation_id.startswith(ROW_PREFIX)
         and ":row=1" in observation.observation_id
     )
-    assert changed_result.experiments[changed_row.experiment_id].method.is_unknown
+    # No experiment declares a technique. The misspelled regime is not an
+    # alias and does not infer, so DP-106 states UNSPECIFIED on the same
+    # experiment. It must not mint a second id.
+    assert changed_row.experiment_id == next(iter(rows.values())).experiment_id
+    assert (
+        changed_result.experiments[changed_row.experiment_id].method.value
+        is MethodToken.UNSPECIFIED
+    )
+    assert any(
+        notice.kind.value == "method_unstated" for notice in changed_row.notices
+    )
 
     validation = validate_corpus(
         result.works,
