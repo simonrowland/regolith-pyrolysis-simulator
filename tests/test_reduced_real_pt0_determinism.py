@@ -8167,6 +8167,20 @@ def _curated_recursive_mutations(
                 0,
             ),
             (("equilibrium_result", "pressure_bar"), "none", None),
+            # Exhaustive coverage found the nullable authority field can pass
+            # structural admission but must miss when it no longer matches
+            # the validated provider identity.
+            (
+                ("authority", "provider", "authoritative_provider_id"),
+                "none",
+                None,
+            ),
+            # The provider shape must reject this wrong scalar before replay.
+            (
+                ("authority", "provider", "fallback_provider_id"),
+                "wrong-scalar",
+                0,
+            ),
             (
                 ("last_vapor_pressure_diagnostic", "source_reaction_fO2_bar"),
                 "bool",
@@ -9309,6 +9323,16 @@ def _run_real_cache_payload_recursive_mutations(
             "vaporock_cap_K wrong-scalar"
         )
         assert outcomes[high_t_cap_path] == "miss"
+        authoritative_provider_path = (
+            "encoded-row: "
+            "root.authority.provider.authoritative_provider_id none"
+        )
+        assert outcomes[authoritative_provider_path] == "miss"
+        fallback_provider_path = (
+            "encoded-row: root.authority.provider.fallback_provider_id "
+            "wrong-scalar"
+        )
+        assert outcomes[fallback_provider_path] == "miss"
     else:
         admitted_step_down_path = (
             "real-gate-step-down-output: "
