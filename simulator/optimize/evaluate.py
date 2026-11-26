@@ -6683,7 +6683,12 @@ def _cache_trace_payload(
     # Per-step stop reasons are part of the ranking trace. A time cap that
     # carries a residual into the next campaign stays visible as time_cap
     # plus the cap name. Missing reasons are not rewritten to endpoint_met.
-    campaign_stops = _campaign_stops_for_trace(run_execution)
+    # Ranking traces pair stops with this execution's snapshots; canonical
+    # batch documents use the full live session history.
+    campaign_stops = _campaign_stops_for_trace(
+        run_execution,
+        execution_local=True,
+    )
     if campaign_stops:
         payload["campaign_stops"] = campaign_stops
 

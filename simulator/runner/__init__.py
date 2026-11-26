@@ -1383,18 +1383,7 @@ class PyrolysisRun:
             except Exception:
                 # Diagnostic bookkeeping must not mask the primary envelope.
                 pass
-            if output.get("status") in {"failed", "refused"}:
-                attached_metadata = dict(run_metadata)
-                try:
-                    _attach_execution_diagnostics(attached_metadata, session)
-                except Exception:
-                    # Preserve the complete primary failure envelope if an
-                    # optional diagnostic projection cannot be built.
-                    pass
-                else:
-                    run_metadata.update(attached_metadata)
-            else:
-                _attach_execution_diagnostics(run_metadata, session)
+            _attach_execution_diagnostics(run_metadata, session)
         return output
 
     def _minimal_failure_output(

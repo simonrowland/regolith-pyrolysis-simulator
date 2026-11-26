@@ -1082,6 +1082,42 @@ def test_live_document_replaces_stale_non_list_budget_flag():
     assert session.result_document()["run_metadata"]["run_flags"] == live_flag
 
 
+@pytest.mark.parametrize(
+    ("stored_flags", "expected_present"),
+    [
+        (
+            {
+                "kind": "run_diagnostic",
+                "code": "run_hour_budget_exhausted_mid_campaign",
+                "detail": {"campaign": "recorded"},
+            },
+            False,
+        ),
+        (None, True),
+    ],
+)
+def test_live_document_drops_only_stale_budget_flag_without_live_flag(
+    monkeypatch,
+    stored_flags,
+    expected_present,
+):
+    session = _started_internal_session(_run(campaign="C2A", hours=1))
+    session._set_result_document({
+        "status": "ok",
+        "run_metadata": {"run_flags": stored_flags},
+    })
+    monkeypatch.setattr(
+        "simulator.session._run_flags_for_export",
+        lambda _session: [],
+    )
+
+    exported = session.result_document()["run_metadata"]
+
+    assert ("run_flags" in exported) is expected_present
+    if expected_present:
+        assert exported["run_flags"] is None
+
+
 def test_failure_envelope_survives_campaign_stop_projection_failure(monkeypatch):
     run = _run(campaign="C2A", hours=1)
     session = _started_internal_session(run)
@@ -1093,6 +1129,7 @@ def test_failure_envelope_survives_campaign_stop_projection_failure(monkeypatch)
         error_message="primary execution failure",
         envelope_detail_unavailable="diagnostic envelope unavailable",
     )
+    base_payload = run._minimal_failure_output(execution)
 
     def raise_campaign_stop_projection(_session):
         raise RuntimeError("campaign stop projection failed")
@@ -1104,10 +1141,60 @@ def test_failure_envelope_survives_campaign_stop_projection_failure(monkeypatch)
 
     payload = run._build_output(execution)
 
+    assert payload == base_payload
     assert payload["status"] == "failed"
     assert payload["reason"] == "primary_failure"
     assert "primary execution failure" in payload["error_message"]
     assert "diagnostic envelope unavailable" in payload["error_message"]
+
+
+def test_successful_output_survives_campaign_stop_projection_failure(monkeypatch):
+    run = _run(campaign="C2A", hours=1)
+    session = _started_internal_session(run)
+    execution = RunExecutor().execute_session(session, hours=1)
+    base_payload = run._build_output_detail(execution)
+
+    def raise_campaign_stop_projection(_session):
+        raise RuntimeError("campaign stop projection failed")
+
+    monkeypatch.setattr(
+        "simulator.session._campaign_stops_for_trace",
+        raise_campaign_stop_projection,
+    )
+
+    payload = run._build_output(execution)
+
+    assert payload == base_payload
+
+
+def test_cached_failure_document_survives_campaign_stop_projection_failure(
+    monkeypatch,
+):
+    run = _run(campaign="C2A", hours=1)
+    session = _started_internal_session(run)
+    execution = RunExecutor().execute_session(session, hours=1)
+    execution = replace(
+        execution,
+        status="failed",
+        reason="primary_failure",
+        error_message="primary execution failure",
+        envelope_detail_unavailable="diagnostic envelope unavailable",
+    )
+    base_document = run._minimal_failure_output(execution)
+    session._set_result_document(base_document)
+
+    def raise_campaign_stop_projection(_session):
+        raise RuntimeError("campaign stop projection failed")
+
+    monkeypatch.setattr(
+        "simulator.session._campaign_stops_for_trace",
+        raise_campaign_stop_projection,
+    )
+
+    exported = session.result_document()
+
+    assert exported == base_document
+    assert exported["reason"] == "primary_failure"
 
 
 def test_live_result_document_recomputes_budget_flag_when_chain_completes():
@@ -1398,6 +1485,49 @@ def test_resumed_execution_campaign_stops_include_only_new_stops():
     assert any(
         stop["campaign"] == "C4"
         for stop in payload["run_metadata"]["campaign_stops"]
+    )
+
+
+def test_resumed_optimizer_ranking_trace_excludes_prior_c4_stop():
+    from simulator.optimize.evaluate import _cache_trace_payload
+
+    run = _run(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C4",
+        hours=1,
+        additives_kg={},
+    )
+    session = _started_internal_session(run)
+    sim = session.simulator
+    sim.record.branch = "two"
+    sim.campaign_mgr.campaigns["C4"]["max_target_acquisition_hr"] = 1.0
+
+    first_execution = RunExecutor().execute_session(session, hours=1)
+    assert any(
+        stop["campaign"] == "C4" for stop in first_execution.campaign_stops
+    )
+    assert sim.melt.campaign is CampaignPhase.C2A
+
+    sim.record.path = "A_post_mg_boiloff"
+    sim.record.branch = "two"
+    sim.campaign_mgr.campaigns["C2A_continuous"]["max_hold_hr"] = 1
+    resumed_execution = RunExecutor().execute_session(session, hours=1)
+    assert any(
+        stop["campaign"] == "C2A"
+        for stop in resumed_execution.campaign_stops
+    )
+    session.decide("no")
+    assert session.is_complete()
+
+    ranking_trace = _cache_trace_payload(resumed_execution, None)
+    assert [stop["campaign"] for stop in ranking_trace["campaign_stops"]] == [
+        "C2A"
+    ]
+
+    canonical_payload = run._build_output(resumed_execution)
+    assert any(
+        stop["campaign"] == "C4"
+        for stop in canonical_payload["run_metadata"]["campaign_stops"]
     )
 
 

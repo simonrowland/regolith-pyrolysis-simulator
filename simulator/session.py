@@ -1087,21 +1087,28 @@ def campaign_stop_record(summary: Mapping[str, Any] | None) -> dict[str, Any] | 
 
 def _campaign_stops_for_trace(
     run_execution: Any,
+    *,
+    execution_local: bool = False,
 ) -> tuple[dict[str, Any], ...]:
-    """Project stop records from live session history or its recorded artifact."""
+    """Project full live history or one execution's recorded stop records."""
 
     session = getattr(run_execution, "session", run_execution)
-    has_live_session = getattr(session, "_sim", None) is not None
-    if has_live_session:
-        stored = None
+    if execution_local:
+        stored = getattr(run_execution, "campaign_stops", ()) or ()
     else:
-        stored = getattr(run_execution, "campaign_stops", None)
-    if stored is None or not stored:
-        stored = []
-        for result in getattr(session, "_step_results", ()) or ():
-            record = campaign_stop_record(getattr(result, "campaign_summary", None))
-            if record is not None:
-                stored.append(record)
+        has_live_session = getattr(session, "_sim", None) is not None
+        if has_live_session:
+            stored = None
+        else:
+            stored = getattr(run_execution, "campaign_stops", None)
+        if stored is None or not stored:
+            stored = []
+            for result in getattr(session, "_step_results", ()) or ():
+                record = campaign_stop_record(
+                    getattr(result, "campaign_summary", None)
+                )
+                if record is not None:
+                    stored.append(record)
     records: list[dict[str, Any]] = []
     for item in stored:
         record = campaign_stop_record(item)
@@ -1114,19 +1121,29 @@ def _attach_execution_diagnostics(
     run_metadata: dict[str, Any],
     session: Any,
 ) -> None:
-    """Attach live run flags and campaign-stop history to one result document."""
+    """Attach diagnostics atomically; diagnostic failures leave output untouched."""
 
-    if getattr(session, "_sim", None) is None:
+    try:
+        if getattr(session, "_sim", None) is None:
+            return
+        attached_metadata = dict(run_metadata)
+        stored_run_flags = attached_metadata.get("run_flags", [])
+        live_flags = _run_flags_for_export(session)
+        live_budget_flag = live_flags[0] if live_flags else None
+        run_flags = _merge_run_flags(stored_run_flags, live_budget_flag)
+        if run_flags is not stored_run_flags:
+            if run_flags is None:
+                attached_metadata.pop("run_flags", None)
+            else:
+                _write_run_flags_to_metadata(attached_metadata, run_flags)
+        attached_metadata["campaign_stops"] = _json_safe(
+            list(_campaign_stops_for_trace(session))
+        )
+    except Exception:
+        # A secondary projection must never mask or partially rewrite its result.
         return
-    stored_run_flags = run_metadata.get("run_flags", [])
-    live_flags = _run_flags_for_export(session)
-    live_budget_flag = live_flags[0] if live_flags else None
-    run_flags = _merge_run_flags(stored_run_flags, live_budget_flag)
-    if run_flags is not stored_run_flags:
-        _write_run_flags_to_metadata(run_metadata, run_flags)
-    run_metadata["campaign_stops"] = _json_safe(
-        list(_campaign_stops_for_trace(session))
-    )
+    run_metadata.clear()
+    run_metadata.update(attached_metadata)
 
 
 def drive_auto_apply(
