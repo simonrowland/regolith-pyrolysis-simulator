@@ -25245,6 +25245,11 @@ class Migrator:
             str, tuple[MethodToken, str, str]
         ] = {}
         self._declared_experiment_methods: dict[str, State[MethodToken]] = {}
+        # Experiment method sentences that are not closed aliases. Row
+        # resolution infers from this text when the row's own claim does not
+        # map. The live experiment method is replaced once a row infers, so
+        # the sentence has to stay here for every later row.
+        self._unmapped_experiment_method_text: dict[str, str] = {}
         self._unstated_method_original_reason_by_experiment: dict[str, str] = {}
         # Printed method that stays on the named experiment. None means no
         # printed method stays: UNSPECIFIED rows keep the named id, and any
@@ -26290,12 +26295,20 @@ class Migrator:
                     method = method_token
                 method_evidence = None
             else:
+                # The row claim is tried first. A declared experiment sentence
+                # that did not exact-map is the same evidence (Shornikov
+                # "Knudsen effusion" prose). It is not a second claim, and a
+                # row token that already mapped does not reach here.
+                experiment_method_text = self._unmapped_experiment_method_text.get(
+                    experiment_id
+                )
                 inference_candidates = (
-                    (method_raw,)
+                    (method_raw, experiment_method_text)
                     if method_raw is not None
                     else (
                         *method_evidence_candidates,
                         *evidence_candidates,
+                        experiment_method_text,
                     )
                 )
                 method_evidence = _method_inference_from_evidence(
@@ -26830,7 +26843,16 @@ class Migrator:
             elif method_raw is None:
                 method = to_plain(State.unknown("experiment method not published"))
             else:
-                method = to_plain(map_method(method_raw))
+                mapped = map_method(method_raw)
+                method = to_plain(mapped)
+                if (
+                    isinstance(method_raw, str)
+                    and method_raw.strip()
+                    and not mapped.is_value
+                ):
+                    self._unmapped_experiment_method_text[experiment_id] = (
+                        method_raw.strip()
+                    )
             pressure = raw.get("pressure_environment")
             if pressure is None:
                 pressure = to_plain(
