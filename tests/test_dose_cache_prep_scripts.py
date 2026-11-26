@@ -332,6 +332,76 @@ def test_reduced_real_prune_is_dry_by_default_and_deletes_only_stale_codecs(
     wal_connection.close()
 
 
+def test_reduced_real_prune_handles_pre_stamp_schema(
+    tmp_path: Path,
+    capsys,
+) -> None:
+    db_path = tmp_path / "reduced-real-pre-stamp.sqlite"
+    _put_cache_row(db_path, tag="pre-stamp-freeze")
+    _put_replayable_equilibrium_cache_row(
+        db_path,
+        tag="pre-stamp-equilibrium",
+    )
+    (
+        unversioned_key,
+        unversioned_payload,
+        unversioned_key_bytes,
+        unversioned_key_hash,
+    ) = _put_unversioned_equilibrium_cache_row(db_path, tag="pre-stamp-legacy")
+
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"ALTER TABLE {PT1_EQUILIBRIUM_TABLE} "
+            "DROP COLUMN payload_codec_version"
+        )
+        columns = {
+            str(row[1])
+            for row in conn.execute(
+                f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})"
+            )
+        }
+    assert "payload_codec_version" not in columns
+
+    dry_run = _run_reduced_real_prune(capsys, db_path)
+    assert dry_run["rows_by_artifact"] == {
+        "freeze_gate_curve": 1,
+        "equilibrium_post_record": 1,
+    }
+    assert dry_run["matched_by_artifact"] == {
+        "freeze_gate_curve": 1,
+        "equilibrium_post_record": 1,
+    }
+    assert dry_run["deleted_by_artifact"] == {
+        "freeze_gate_curve": 0,
+        "equilibrium_post_record": 0,
+    }
+
+    applied = _run_reduced_real_prune(capsys, db_path, "--apply")
+    assert applied["deleted_by_artifact"] == {
+        "freeze_gate_curve": 1,
+        "equilibrium_post_record": 1,
+    }
+    with sqlite3.connect(db_path) as conn:
+        conn.row_factory = sqlite3.Row
+        remaining = {
+            str(row["key_hash"]): str(row["artifact"])
+            for row in conn.execute(
+                f"SELECT key_hash, artifact FROM {PT1_EQUILIBRIUM_TABLE}"
+            )
+        }
+    assert remaining == {unversioned_key_hash: "equilibrium_result"}
+
+    store = PT1PersistentEquilibriumStore(db_path)
+    entry = store.get(
+        artifact="equilibrium_result",
+        key=unversioned_key,
+        key_bytes=unversioned_key_bytes,
+        key_hash=unversioned_key_hash,
+    )
+    assert entry is not None
+    assert entry["payload"] == unversioned_payload
+
+
 def test_reduced_real_prune_reports_delete_when_vacuum_fails_and_retries(
     tmp_path: Path,
     capsys,
