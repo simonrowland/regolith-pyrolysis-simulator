@@ -982,6 +982,9 @@ def test_magemin_runtime_pool_uses_right_sized_warm_timeout(
 ):
     import simulator.melt_backend.magemin as magemin_module
 
+    patch_module_time(
+        monkeypatch, magemin_module, monotonic=lambda: 100.0
+    )
     _use_test_magemin_slot_lock(monkeypatch, tmp_path)
 
     submitted = {}
@@ -2790,6 +2793,9 @@ def test_magemin_subprocess_timeout_clamped_to_remaining_budget(
     # budget during acquisition, surfacing 'cancelled while waiting for
     # subprocess slot' instead of the clamped-timeout message this test
     # pins — a flake that blamed the box instead of the shared lock.
+    patch_module_time(
+        monkeypatch, magemin_module, monotonic=lambda: 100.0
+    )
     monkeypatch.setattr(
         magemin_module, '_MAGEMIN_SUBPROCESS_LOCK_DIR', tmp_path,
     )
