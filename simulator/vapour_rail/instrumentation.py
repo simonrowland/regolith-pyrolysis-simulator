@@ -1145,6 +1145,7 @@ def flux_pressures_from_batch(
         "n_extrapolated_flux_species": 0,
         "extrapolated_flux_species": [],
         "batch_channel_states": {},
+        "unresolved_missing_effective_pressure_species": [],
         "note": (
             "VapourBatch owns channel refusal, eligibility, and the active set; "
             "values cross the typed pre-RG seam when present; eligible point "

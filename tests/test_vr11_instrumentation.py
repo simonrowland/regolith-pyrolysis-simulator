@@ -789,6 +789,7 @@ def test_flux_pressures_from_batch_channel_unions() -> None:
     assert report["shadow_equal"] is False
     assert report["shadow_outcome"] == SHADOW_MISMATCH
     assert report["catalog_pa_shadow_equal"] is False
+    assert report["unresolved_missing_effective_pressure_species"] == []
 
 
 def test_in_domain_effective_pressure_set_mismatch_fails_closed() -> None:
@@ -937,6 +938,7 @@ def test_flux_pressures_without_batch_is_typed_failure() -> None:
     flux, report = _flux_with_live_shadow(None, live)
     assert flux == {}
     assert report["batch_present"] is False
+    assert report["unresolved_missing_effective_pressure_species"] == []
     assert report["shadow_equal"] is False
     assert report["shadow_outcome"] == SHADOW_MISSING_BATCH
     assert report["selection_source"] == "typed_failure_missing_batch"
@@ -950,6 +952,7 @@ def test_flux_pressures_resolution_error_is_typed_failure() -> None:
         resolution_error={"reason": "vapour_batch_resolve_failed"},
     )
     assert flux == {}
+    assert report["unresolved_missing_effective_pressure_species"] == []
     assert report["shadow_equal"] is False
     assert report["shadow_outcome"] == SHADOW_RESOLUTION_ERROR
 
@@ -1753,6 +1756,7 @@ def test_vapour_rail_instrumentation_diagnostic_shape() -> None:
         _last_vapour_batch_flux_overlay={
             "shadow_equal": True,
             "shadow_outcome": SHADOW_PROVED,
+            "unresolved_missing_effective_pressure_species": ["Na"],
             "notices": [{
                 "kind": "vapour_batch_unresolved",
                 "species": "K",
@@ -1793,6 +1797,9 @@ def test_vapour_rail_instrumentation_diagnostic_shape() -> None:
     assert panel["n_requested"] == 1
     assert "Na" in panel["channels_by_species"]
     assert panel["channels_by_species"]["Na"]["is_flux_active"] is True
+    assert panel["flux_overlay"][
+        "unresolved_missing_effective_pressure_species"
+    ] == ["Na"]
     assert panel["flux_overlay"]["notices"][0]["kind"] == (
         "vapour_batch_unresolved"
     )
@@ -1806,6 +1813,9 @@ def test_vapour_rail_instrumentation_diagnostic_shape() -> None:
         "simulation_tick",
         {"vapour_rail_instrumentation_panel": panel},
     )
+    assert tick["vapour_rail_instrumentation_panel"]["flux_overlay"][
+        "unresolved_missing_effective_pressure_species"
+    ] == ["Na"]
     assert "notices" not in tick["vapour_rail_instrumentation_panel"][
         "flux_overlay"
     ]

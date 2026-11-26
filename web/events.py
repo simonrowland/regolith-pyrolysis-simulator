@@ -856,6 +856,7 @@ def _browser_socket_payload(event: str, payload):
                 'flux_overlay': {
                     key: flux_overlay[key]
                     for key in (
+                        'unresolved_missing_effective_pressure_species',
                         'catalog_pa_shadow_equal',
                         'catalog_pa_shadow_outcome',
                     )
