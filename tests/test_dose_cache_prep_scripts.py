@@ -11,6 +11,7 @@ import pytest
 
 from scripts import merge_grind_cache
 from scripts.analyze_dose_cache_study import load_provenance, summarize
+from scripts.prune_reduced_real_cache import main as prune_reduced_real_cache_main
 from scripts.seed_reduced_real_cache import (
     CacheMergeCollision,
     CacheSourceRowInvalid,
@@ -33,7 +34,7 @@ from simulator.reduced_real_determinism import (
 )
 
 
-def _put_cache_row(db_path: Path, *, tag: str) -> None:
+def _put_cache_row(db_path: Path, *, tag: str) -> str:
     key = {
         "artifact": "freeze_gate_curve",
         "code_version": "test",
@@ -57,25 +58,31 @@ def _put_cache_row(db_path: Path, *, tag: str) -> None:
     }
     key_bytes = canonical_json_bytes(key)
     payload_bytes = canonical_json_bytes(payload)
+    key_hash = hashlib.sha256(key_bytes).hexdigest()
     PT1PersistentEquilibriumStore(db_path).put(
         artifact="freeze_gate_curve",
         key=key,
         key_bytes=key_bytes,
-        key_hash=hashlib.sha256(key_bytes).hexdigest(),
+        key_hash=key_hash,
         payload=payload,
         payload_bytes=payload_bytes,
         payload_hash=hashlib.sha256(payload_bytes).hexdigest(),
     )
+    return key_hash
 
 
-def _put_real_equilibrium_cache_row(db_path: Path) -> None:
+def _put_real_equilibrium_cache_row(
+    db_path: Path,
+    *,
+    tag: str | None = None,
+) -> str:
     key = {
         "schema_version": SCHEMA_VERSION,
         "namespace_id": "alphamelts:equilibrium-composite",
         "artifact": "equilibrium_post_record",
         "intent": "EQUILIBRIUM",
         "vapor_pressure_provider_selection": "builtin-vapor-pressure",
-        "code_version": "test",
+        "code_version": f"test:{tag}" if tag is not None else "test",
         "data_digests": {},
     }
     payload = {
@@ -108,15 +115,149 @@ def _put_real_equilibrium_cache_row(db_path: Path) -> None:
     }
     key_bytes = canonical_json_bytes(key)
     payload_bytes = canonical_json_bytes(payload)
+    key_hash = hashlib.sha256(key_bytes).hexdigest()
     PT1PersistentEquilibriumStore(db_path).put(
         artifact="equilibrium_post_record",
         key=key,
         key_bytes=key_bytes,
-        key_hash=hashlib.sha256(key_bytes).hexdigest(),
+        key_hash=key_hash,
         payload=payload,
         payload_bytes=payload_bytes,
         payload_hash=hashlib.sha256(payload_bytes).hexdigest(),
     )
+    return key_hash
+
+
+def _run_reduced_real_prune(capsys, *args: object) -> dict[str, object]:
+    assert prune_reduced_real_cache_main([str(arg) for arg in args]) == 0
+    return json.loads(capsys.readouterr().out)
+
+
+def test_reduced_real_prune_is_dry_by_default_and_deletes_only_stale_codecs(
+    tmp_path: Path,
+    capsys,
+) -> None:
+    db_path = tmp_path / "reduced-real-prune.sqlite"
+    wal_connection = sqlite3.connect(db_path)
+    assert (
+        wal_connection.execute("PRAGMA journal_mode=WAL").fetchone()[0] == "wal"
+    )
+    freeze_artifact = "freeze_gate_curve"
+    equilibrium_artifact = "equilibrium_post_record"
+    freeze_version = rrd._payload_codec_version(freeze_artifact)
+    equilibrium_version = rrd._payload_codec_version(equilibrium_artifact)
+    assert freeze_version is not None
+    assert equilibrium_version is not None
+    rows = (
+        (freeze_artifact, "freeze-current", freeze_version),
+        (freeze_artifact, "freeze-missing", None),
+        (freeze_artifact, "freeze-stale", freeze_version - 1),
+        (equilibrium_artifact, "equilibrium-current", equilibrium_version),
+        (equilibrium_artifact, "equilibrium-missing", None),
+        (equilibrium_artifact, "equilibrium-stale", equilibrium_version - 1),
+    )
+    row_hashes: dict[tuple[str, str], str] = {}
+    for artifact, tag, _version in rows:
+        if artifact == "freeze_gate_curve":
+            row_hashes[(artifact, tag)] = _put_cache_row(db_path, tag=tag)
+        else:
+            row_hashes[(artifact, tag)] = _put_real_equilibrium_cache_row(
+                db_path, tag=tag
+            )
+
+    with sqlite3.connect(db_path) as conn:
+        conn.row_factory = sqlite3.Row
+        columns = [
+            str(row[1])
+            for row in conn.execute(
+                f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})"
+            )
+        ]
+        for artifact, tag, version in rows:
+            conn.execute(
+                f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+                "SET payload_codec_version = ? WHERE key_hash = ?",
+                (version, row_hashes[(artifact, tag)]),
+            )
+
+        current_freeze = conn.execute(
+            f"SELECT * FROM {PT1_EQUILIBRIUM_TABLE} "
+            "WHERE key_hash = ?",
+            (row_hashes[("freeze_gate_curve", "freeze-current")],),
+        ).fetchone()
+        unversioned = dict(current_freeze)
+        unversioned["key_hash"] = "unversioned-test-row"
+        unversioned["artifact"] = "unversioned_test_artifact"
+        unversioned["payload_codec_version"] = None
+        conn.execute(
+            f"INSERT INTO {PT1_EQUILIBRIUM_TABLE} "
+            f"({', '.join(columns)}) VALUES ({', '.join('?' for _ in columns)})",
+            tuple(unversioned[column] for column in columns),
+        )
+
+    assert Path(f"{db_path}-wal").exists()
+    assert Path(f"{db_path}-shm").exists()
+    row_count_before = payload_count(db_path)
+    dry_run = _run_reduced_real_prune(capsys, db_path)
+    assert dry_run["dry_run"] is True
+    assert dry_run["rows_by_artifact"] == {
+        freeze_artifact: 3,
+        equilibrium_artifact: 3,
+    }
+    assert dry_run["matched_by_artifact"] == {
+        freeze_artifact: 2,
+        equilibrium_artifact: 2,
+    }
+    assert dry_run["deleted_by_artifact"] == {
+        freeze_artifact: 0,
+        equilibrium_artifact: 0,
+    }
+    assert payload_count(db_path) == row_count_before
+
+    applied = _run_reduced_real_prune(capsys, db_path, "--apply")
+    assert applied["apply"] is True
+    assert applied["deleted_by_artifact"] == {
+        freeze_artifact: 2,
+        equilibrium_artifact: 2,
+    }
+    assert applied["vacuumed"] is True
+    assert payload_count(db_path) == 3
+
+    store = PT1PersistentEquilibriumStore(db_path)
+    with sqlite3.connect(db_path) as conn:
+        remaining_hashes = {
+            str(row[0])
+            for row in conn.execute(
+                f"SELECT key_hash FROM {PT1_EQUILIBRIUM_TABLE}"
+            )
+        }
+        assert conn.execute(
+            f"SELECT count(*) FROM {PT1_EQUILIBRIUM_TABLE} "
+            "WHERE artifact = 'unversioned_test_artifact'"
+        ).fetchone()[0] == 1
+    assert remaining_hashes == {
+        row_hashes[(freeze_artifact, "freeze-current")],
+        row_hashes[(equilibrium_artifact, "equilibrium-current")],
+        "unversioned-test-row",
+    }
+    for artifact, tag in (
+        (freeze_artifact, "freeze-current"),
+        (equilibrium_artifact, "equilibrium-current"),
+    ):
+        with sqlite3.connect(db_path) as conn:
+            key_bytes = bytes(conn.execute(
+                f"SELECT key_bytes FROM {PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
+                (row_hashes[(artifact, tag)],),
+            ).fetchone()[0])
+        key = json.loads(key_bytes.decode("utf-8"))
+        entry = store.get(
+            artifact=artifact,
+            key=key,
+            key_bytes=key_bytes,
+            key_hash=row_hashes[(artifact, tag)],
+        )
+        assert entry is not None
+    wal_connection.close()
 
 
 def _put_internal_analytical_cache_row(db_path: Path) -> None:

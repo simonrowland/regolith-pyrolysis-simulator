@@ -129,6 +129,10 @@ GATE_CURVE_IDENTITY_NOTICE_KEYS = tuple(
 GATE_CURVE_DOMAIN_KEYS = ('authority', 'certified_band')
 PT0_GATE_CURVE_CODEC_VERSION = 3
 PT1_EQUILIBRIUM_PAYLOAD_CODEC_VERSION = 2
+_PAYLOAD_CODEC_VERSION_BY_ARTIFACT = {
+    "freeze_gate_curve": PT0_GATE_CURVE_CODEC_VERSION,
+    "equilibrium_post_record": PT1_EQUILIBRIUM_PAYLOAD_CODEC_VERSION,
+}
 _EQUILIBRIUM_RESULT_FIELD_TYPES = get_type_hints(EquilibriumResult)
 
 
@@ -179,11 +183,101 @@ _SOURCE_MODULE_PATTERNS = (
 
 
 def _payload_codec_version(artifact: str) -> int | None:
-    if artifact == "freeze_gate_curve":
-        return PT0_GATE_CURVE_CODEC_VERSION
-    if artifact == "equilibrium_post_record":
-        return PT1_EQUILIBRIUM_PAYLOAD_CODEC_VERSION
-    return None
+    return _PAYLOAD_CODEC_VERSION_BY_ARTIFACT.get(artifact)
+
+
+def _prune_pt1_payload_codec_rows(
+    db_path: str | Path,
+    *,
+    apply: bool = False,
+) -> dict[str, Any]:
+    """Report or delete PT-1 rows with absent or superseded payload codecs."""
+
+    path = Path(db_path).expanduser()
+    if not path.is_file():
+        raise FileNotFoundError(str(path))
+
+    connection = sqlite3.connect(
+        str(path), timeout=DEFAULT_SHARD_BUSY_TIMEOUT_MS / 1000
+    )
+    try:
+        if apply:
+            connection.execute("BEGIN IMMEDIATE")
+
+        table_exists = connection.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?",
+            (PT1_EQUILIBRIUM_TABLE,),
+        ).fetchone()
+        if table_exists is None:
+            raise ValueError(f"not a PT-1 reduced-real cache: {path}")
+
+        columns = {
+            str(row[1])
+            for row in connection.execute(
+                f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})"
+            )
+        }
+        has_codec_column = "payload_codec_version" in columns
+        artifacts = tuple(_PAYLOAD_CODEC_VERSION_BY_ARTIFACT)
+        rows_by_artifact = {artifact: 0 for artifact in artifacts}
+        matched_by_artifact = {artifact: 0 for artifact in artifacts}
+        deleted_by_artifact = {artifact: 0 for artifact in artifacts}
+
+        for artifact in artifacts:
+            current_version = _payload_codec_version(artifact)
+            total = connection.execute(
+                f"SELECT count(*) FROM {PT1_EQUILIBRIUM_TABLE} WHERE artifact = ?",
+                (artifact,),
+            ).fetchone()[0]
+            rows_by_artifact[artifact] = int(total)
+
+            if current_version is None:
+                continue
+            predicate = (
+                "payload_codec_version IS NULL OR payload_codec_version != ?"
+                if has_codec_column
+                else "1"
+            )
+            params = (artifact, current_version) if has_codec_column else (artifact,)
+            matched = int(
+                connection.execute(
+                    f"SELECT count(*) FROM {PT1_EQUILIBRIUM_TABLE} "
+                    f"WHERE artifact = ? AND ({predicate})",
+                    params,
+                ).fetchone()[0]
+            )
+            matched_by_artifact[artifact] = matched
+            if apply and matched:
+                connection.execute(
+                    f"DELETE FROM {PT1_EQUILIBRIUM_TABLE} "
+                    f"WHERE artifact = ? AND ({predicate})",
+                    params,
+                )
+                deleted_by_artifact[artifact] = int(
+                    connection.execute("SELECT changes()").fetchone()[0]
+                )
+
+        if apply:
+            connection.commit()
+            if any(deleted_by_artifact.values()):
+                # The connection sees existing WAL/SHM sidecars; SQLite manages
+                # them through commit, VACUUM, and close.
+                connection.execute("VACUUM")
+    except BaseException:
+        if connection.in_transaction:
+            connection.rollback()
+        raise
+    finally:
+        connection.close()
+
+    return {
+        "apply": bool(apply),
+        "dry_run": not apply,
+        "rows_by_artifact": rows_by_artifact,
+        "matched_by_artifact": matched_by_artifact,
+        "deleted_by_artifact": deleted_by_artifact,
+        "vacuumed": bool(apply and any(deleted_by_artifact.values())),
+    }
 
 
 def _decode_payload_for_admission(
