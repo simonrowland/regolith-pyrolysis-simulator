@@ -19679,6 +19679,50 @@ def _knudsen_residue_prediction(
         )
 
 
+def _wang_ree_full_retention_ppm(reference, result, formula: str) -> Decimal | None:
+    """Located mass-retention of 1 when Wang has no REE vapour channel.
+
+    The row is element ppm, so retention 1 is not the number 1. Element mass
+    stays in the bead and the located mass-loss fraction concentrates it:
+    predicted_ppm = starting_ppm / (1 - measured_mass_loss_fraction).
+    Missing or non-physical located inputs return None; the caller refuses
+    instead of inventing a starting abundance or an extent.
+    """
+
+    if getattr(reference, "source_id", None) != _WANG_2001_SOURCE_ID:
+        return None
+    identity = getattr(reference, "identity", None)
+    subtype = None if identity is None else identity.subtype
+    if (
+        subtype is None
+        or not subtype.is_value
+        or subtype.value != "element_ppm_by_mass"
+    ):
+        return None
+    point_conditions = reference.point_conditions or {}
+    start = point_conditions.get("starting_component_ppm")
+    start_state = getattr(start, "state", None)
+    if start_state is None or not start_state.is_value:
+        return None
+    try:
+        start_ppm = Decimal(str(start_state.value))
+        mass_loss = Decimal(str(result.get("measured_mass_loss_fraction")))
+    except (InvalidOperation, ValueError, TypeError, ArithmeticError):
+        return None
+    if (
+        not start_ppm.is_finite()
+        or start_ppm <= 0
+        or not mass_loss.is_finite()
+        or mass_loss < 0
+        or mass_loss >= 1
+    ):
+        return None
+    remaining = Decimal(1) - mass_loss
+    if remaining <= 0:
+        return None
+    return start_ppm / remaining
+
+
 def _langmuir_residue_prediction(
     context,
     reference,
@@ -19759,6 +19803,65 @@ def _langmuir_residue_prediction(
                 )
         value = result["composition_wt_pct"].get(formula)
         if value is None:
+            retained_ppm = _wang_ree_full_retention_ppm(
+                reference, result, formula
+            )
+            if retained_ppm is not None:
+                provenance = {
+                    key: item for key, item in result.items() if key != "notices"
+                }
+                provenance["ree_retention_default"] = {
+                    "retention": "1",
+                    "missing_channel": formula,
+                    "starting_component_ppm": format(
+                        Decimal(
+                            str(
+                                reference.point_conditions[
+                                    "starting_component_ppm"
+                                ].state.value
+                            )
+                        ),
+                        "f",
+                    ),
+                    "measured_mass_loss_fraction": format(
+                        Decimal(str(result["measured_mass_loss_fraction"])),
+                        "f",
+                    ),
+                    "predicted_ppm": format(retained_ppm, "f"),
+                }
+                return EnginePrediction(
+                    engine=engine,
+                    channel=channel,
+                    execution=Execution(
+                        state=ExecutionState.PRODUCED,
+                        call_evidence=f"{engine.value}:langmuir_residue_extent",
+                    ),
+                    value=retained_ppm,
+                    unit=QUANTITY_UNITS[Quantity.RESIDUE_COMPONENT_COMPOSITION],
+                    coefficient_sources=sources,
+                    lineage_complete=False,
+                    notices=(
+                        *result["notices"],
+                        Notice(
+                            kind=NoticeKind.INPUT_OMITTED,
+                            affected_quantities=(
+                                Quantity.RESIDUE_COMPONENT_COMPOSITION,
+                            ),
+                            reason=(
+                                "ree_vapour_channel_missing_default_retained: "
+                                "default=retention 1; "
+                                f"missing vapour channel {formula}"
+                            ),
+                            origin=reference.observation_id,
+                        ),
+                        *_residue_engine_pressure_notices(
+                            result.get("pressure_notices"),
+                            Quantity.RESIDUE_COMPONENT_COMPOSITION,
+                        ),
+                    ),
+                    identity=reference.identity,
+                    refusal_detail=provenance,
+                )
             subtype = reference.identity.subtype
             if (
                 reference.source_id == _WANG_2001_SOURCE_ID

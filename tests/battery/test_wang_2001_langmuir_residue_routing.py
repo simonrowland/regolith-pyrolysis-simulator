@@ -1,13 +1,16 @@
 """Route Wang's measured Langmuir residues through the shared scorer owner."""
 
 from collections import Counter, defaultdict
+from decimal import Decimal
 from math import sqrt
+import json
 import warnings
 
 from simulator.battery.enums import (
     AmountBasis,
     Engine,
     MethodToken,
+    MetricOperation,
     NoticeKind,
     Quantity,
     Rail,
@@ -81,9 +84,12 @@ def _benchm1_residual_report(residuals, references):
             for notice in residual.notices:
                 flag_counts[(notice.kind.value, notice.reason)] += 1
             delta = float(residual.numeric.value)
-            # The production residual is model minus printed; reverse it to
-            # report the model without evaluating the owner a second time.
-            model = float(printed) + delta
+            # Absolute residuals are model minus printed. Element ppm is dex,
+            # log10(model / printed), so recover the model from that ratio.
+            if residual.numeric.operation is MetricOperation.DEX:
+                model = float(printed) * (10 ** delta)
+            else:
+                model = float(printed) + delta
             outcome = "S" if residual.status.value == "scored" else "F"
             detail = ""
             if formula in oxides:
@@ -141,10 +147,34 @@ def _benchm1_residual_report(residuals, references):
         output.append(f"WANG_FLAG_COUNT={kind}|{count}|{reason}")
     for reason, count in sorted(refusal_counts.items()):
         output.append(f"WANG_REFUSAL_COUNT={count}|{reason}")
+    ree = (
+        "La", "Ce", "Pr", "Nd", "Sm", "Eu", "Gd",
+        "Tb", "Dy", "Ho", "Er", "Tm", "Yb", "Lu",
+    )
+    dex_by_formula: dict[str, list[float]] = defaultdict(list)
+    for row in rows:
+        formula = row[4]
+        delta = row[8]
+        if formula in ree and delta is not None:
+            dex_by_formula[formula].append(delta)
+    ree_summary = {}
+    for formula in ree:
+        values = dex_by_formula[formula]
+        if not values:
+            ree_summary[formula] = {"n": 0}
+            continue
+        mean = sum(values) / len(values)
+        rms = sqrt(sum(value * value for value in values) / len(values))
+        ree_summary[formula] = {
+            "n": len(values),
+            "mean_dex": mean,
+            "rms_dex": rms,
+        }
     output.extend((
         f"WANG_RESIDUE_POINTS={len(references)}",
         f"WANG_ADMITTED_RESIDUE_POINTS={sum(row.admission.status.value == 'admitted' for row in references.values())}",
         f"WANG_SCORER_EVENTS={len(residuals)}",
+        "WANG_REE_DEX " + json.dumps(ree_summary, sort_keys=True),
     ))
     warnings.warn("\n".join(output), UserWarning, stacklevel=1)
 
@@ -297,7 +327,7 @@ def test_wang_residue_cells_emit_one_production_score_event_each(monkeypatch):
         count_real_owner_calls,
     )
     score_store = score_module.score_store
-    residuals, _ = score_store(
+    residuals, candidates = score_store(
         context,
         engines=(Engine.OPENIMCC,),
         rail=Rail.RESIDUE_COMPOSITION,
@@ -339,41 +369,57 @@ def test_wang_residue_cells_emit_one_production_score_event_each(monkeypatch):
 
     _benchm1_residual_report(residuals, all_references)
     numeric = [residual for residual in residuals if residual.numeric is not None]
-    assert len(numeric) == 192
-    ree_refusals = [
-        residual for residual in residuals
+    ree_scored = [
+        residual for residual in numeric
         if references[residual.reference].identity.species.formula
         in starting_ppm
     ]
-    assert len(ree_refusals) == 224
-    for residual in ree_refusals:
-        assert residual.numeric is None
-        assert residual.refusal is not None
-        assert residual.refusal.detail == {
-            "reason": "awaits_ree_channels_sossipar",
-            "detail": "awaits_ree_channels_sossipar",
-        }
+    oxide_numeric = [
+        residual for residual in numeric
+        if residual not in ree_scored
+    ]
+    assert len(oxide_numeric) == 192
+    assert len(ree_scored) == 224
+    assert len(numeric) == 416
+    for residual in ree_scored:
+        formula = references[residual.reference].identity.species.formula
+        assert residual.refusal is None
+        assert residual.numeric is not None
+        assert residual.numeric.operation is MetricOperation.DEX
+        default_notices = [
+            notice for notice in residual.notices
+            if notice.kind is NoticeKind.INPUT_OMITTED
+            and notice.reason.startswith(
+                "ree_vapour_channel_missing_default_retained:"
+            )
+        ]
+        assert len(default_notices) == 1
+        assert "default=retention 1" in default_notices[0].reason
+        assert f"missing vapour channel {formula}" in default_notices[0].reason
+        assert not any(
+            notice.reason.startswith("ree_channels_absent_no_valence_selected:")
+            or notice.reason.startswith("initial_oxide_valence_choice:")
+            for notice in residual.notices
+        )
+    ce_sc1 = next(
+        residual for residual in ree_scored
+        if references[residual.reference].identity.species.formula == "Ce"
+        and _langmuir_residue_row_id(
+            references[residual.reference].locator
+        ) == "sc1"
+    )
+    ce_candidate = candidates[ce_sc1.candidate]
+    ce_default = ce_candidate.provenance["ree_retention_default"]
+    ce_start = Decimal(ce_default["starting_component_ppm"])
+    ce_xi = Decimal(ce_default["measured_mass_loss_fraction"])
+    ce_predicted = Decimal(ce_default["predicted_ppm"])
+    assert ce_start == Decimal(starting_ppm["Ce"])
+    assert Decimal(0) <= ce_xi < Decimal(1)
+    assert ce_predicted == ce_start / (Decimal(1) - ce_xi)
+    assert ce_candidate.value.point == ce_predicted
     assert not any(
         references[residual.reference].identity.species.formula == "WO3"
         for residual in residuals
-    )
-    assert sum(
-        notice.reason.startswith("initial_oxide_valence_choice:")
-        for residual in ree_refusals
-        for notice in residual.notices
-    ) == 0
-    ree_channel_notices = [
-        notice
-        for residual in ree_refusals
-        for notice in residual.notices
-        if notice.reason.startswith("ree_channels_absent_no_valence_selected:")
-    ]
-    assert len(ree_channel_notices) == 32
-    assert all(
-        notice.kind is NoticeKind.INPUT_OMITTED
-        and "the REE vapor channel is absent" in notice.reason
-        and "no oxide valence was selected" in notice.reason
-        for notice in ree_channel_notices
     )
     assert all(
         any(
@@ -391,7 +437,7 @@ def test_wang_residue_cells_emit_one_production_score_event_each(monkeypatch):
         )
         for residual in numeric
     )
-    for residual in numeric:
+    for residual in oxide_numeric:
         reference = references[residual.reference]
         series_id = reference.observation_id.split("::", maxsplit=2)[1]
         is_imp = series_id == (
@@ -537,6 +583,64 @@ def test_wang_starting_aggregate_notice_tracks_located_extract_cell(monkeypatch)
     )
     assert "ΣLn2O3=0.143 wt%" in aggregate_notice.reason
     assert "ΣLn2O3=0.142 wt%" not in aggregate_notice.reason
+
+
+def test_removing_the_ree_retention_default_restores_the_channel_refusal(
+    monkeypatch,
+):
+    import simulator.battery.score as score_module
+
+    context, observations = wang_context()
+    references = wang_residue_rows(observations)
+    reference = next(
+        row for row in references.values()
+        if row.identity.species.formula == "Ce"
+        and _langmuir_residue_row_id(row.locator) == "sc1"
+    )
+    anchor = next(
+        row for row in observations.values()
+        if row.experiment_id == reference.experiment_id
+        and row.source_id == SOURCE_ID
+        and row.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
+        and _langmuir_residue_row_id(row.locator) == "sc1"
+        and row.admission.status.value == "admitted"
+    )
+
+    def no_retention_default(*_args, **_kwargs):
+        return None
+
+    monkeypatch.setattr(
+        score_module, "_wang_ree_full_retention_ppm", no_retention_default
+    )
+    isolated = ScoreContext(
+        {},
+        {reference.experiment_id: context.experiments[reference.experiment_id]},
+        {reference.observation_id: reference, anchor.observation_id: anchor},
+        root=ROOT,
+    )
+    residuals, _candidates = score_module.score_store(
+        isolated,
+        engines=(Engine.OPENIMCC,),
+        rail=Rail.RESIDUE_COMPOSITION,
+    )
+    assert [residual.reference for residual in residuals] == [
+        reference.observation_id
+    ]
+    residual = residuals[0]
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.detail["reason"] == "awaits_ree_channels_sossipar"
+    assert residual.refusal.detail["detail"] == "awaits_ree_channels_sossipar"
+    assert any(
+        notice.kind is NoticeKind.INPUT_OMITTED
+        and notice.reason.startswith("ree_channels_absent_no_valence_selected:")
+        for notice in residual.notices
+    )
+    assert not any(
+        notice.reason.startswith("ree_vapour_channel_missing_default_retained:")
+        or notice.reason.startswith("initial_oxide_valence_choice:")
+        for notice in residual.notices
+    )
 
 
 def test_wang_ce_eu_refusals_name_absent_channel_without_selecting_valence(
