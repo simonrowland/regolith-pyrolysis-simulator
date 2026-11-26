@@ -44,8 +44,10 @@ from typing import (
 
 import yaml
 
-from simulator.accounting.formulas import atoms_parse_formula_else_janaf
-from simulator.chemistry.formula_text import fold_subscript_digits
+from simulator.accounting.formulas import (
+    _clean_formula_text,
+    atoms_parse_formula_else_janaf,
+)
 from simulator.battery.decimal_tokens import decimal_token as _dec_token
 from simulator.policy.default_policy import resolve as resolve_default_policy
 from simulator.battery.oxygen_identity import (
@@ -1217,25 +1219,16 @@ def parse_species_formula(
     if not formula or formula.strip().lower() in {"unknown", "none", "n/a"}:
         return None
 
-    text = formula.strip()
-    if text.startswith("$") and text.endswith("$"):
-        text = text[1:-1].strip()
+    text = _clean_formula_text(formula)
     if "$" in text:
         return None
-    text = re.sub(r"\\(?:text|mathrm)\{([^{}]*)\}", r"\1", text)
-    text = (
-        text.replace(r"\cdot", "·")
-        .replace(r"\bullet", "·")
-        .replace("•", "·")
-        .replace("⋅", "·")
-    )
-    text = re.sub(r"_\{(\d+)\}|_(\d+)", lambda m: m.group(1) or m.group(2), text)
-    text = fold_subscript_digits(text)
     phase_labels = {
         "c": Phase.CR,
         "cr": Phase.CR,
         "s": Phase.CR,
         "solid": Phase.CR,
+        "gl": Phase.GLASS,
+        "glass": Phase.GLASS,
         "l": Phase.L,
         "liq": Phase.L,
         "liquid": Phase.L,
@@ -1276,12 +1269,13 @@ def parse_species_formula(
     bracket = re.search(r"\[([^\[\]]*)\]$", text)
     if bracket is not None:
         label = bracket.group(1).strip().lower()
-        if label != "c":
-            annotated_phase = phase_labels.get(label)
-            if annotated_phase is not None:
-                if not _species_axis_matches_phase(species, annotated_phase):
-                    return None
-                text = text[: bracket.start()]
+        if label == "c":
+            return None
+        annotated_phase = phase_labels.get(label)
+        if annotated_phase is not None:
+            if not _species_axis_matches_phase(species, annotated_phase):
+                return None
+            text = text[: bracket.start()]
 
     # NASA Glenn's E±n suffix carries ionic charge, not another element.
     # Its charge must agree with the typed species before the suffix is dropped.
@@ -1310,9 +1304,8 @@ def parse_species_formula(
     if text in {"Fe(1-x)O", "Fe_tO"}:
         return (("Fe", 1.0), ("O", 1.0))
 
-    # The accounting parser owns decimal-subscript versus adduct splitting.
-    # Keep only this source spelling normalization, which it does not accept.
-    text = re.sub(r"(?<=[A-Za-z])\.(\d+)$", r"0.\1", text)
+    # The accounting owner resolves decimal-subscript versus adduct splitting
+    # and unambiguous source element-case spellings.
     return atoms_parse_formula_else_janaf(text)
 
 

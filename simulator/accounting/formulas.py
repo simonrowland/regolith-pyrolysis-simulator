@@ -7,11 +7,13 @@ import re
 from collections import defaultdict
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
+from functools import lru_cache
 from pathlib import Path
 from types import MappingProxyType
 from typing import Any
 
 from simulator.accounting.exceptions import AccountingError, UnknownSpeciesError
+from simulator.chemistry.formula_text import fold_subscript_digits
 from simulator.yaml_cache import load_cached_safe_yaml
 
 
@@ -110,10 +112,10 @@ MOLAR_MASS_REL_TOLERANCE = 1e-6
 
 _OPEN_TO_CLOSE = {"(": ")", "[": "]", "{": "}"}
 _CLOSE_TO_OPEN = {v: k for k, v in _OPEN_TO_CLOSE.items()}
-_NUMBER_RE = re.compile(r"(?:\d+(?:\.\d+)?|\.\d+)")
+_NUMBER_RE = re.compile(r"(?:\d+/\d+|\d+(?:\.\d+)?|\.\d+)")
 _PHASE_SUFFIX_RE = re.compile(
-    r"(?:\((?:s|l|g|aq|cr|liq|liquid|solid|gas|vapor)\)|"
-    r"\[(?:s|l|g|aq|cr|liq|liquid|solid|gas|vapor)\])$",
+    r"(?:\((?:s|l|g|aq|c|cr|gl|glass|liq|liquid|solid|gas|vapor)\)|"
+    r"\[(?:s|l|g|aq|cr|gl|glass|liq|liquid|solid|gas|vapor)\])$",
     re.IGNORECASE,
 )
 
@@ -237,18 +239,86 @@ def parse_formula(
 ) -> SpeciesFormula:
     """Parse formula text and return a SpeciesFormula.
 
-    An ASCII decimal may omit its leading zero when it follows an element,
-    as in ``Fe.875S``, ``Fe.90S``, and ``Fe.95O``. The existing ASCII-dot
-    rule treats a dot as an adduct only when every separated segment contains
-    at least two distinct integer-count elements. Here the left segment is
-    the single element Fe, so the dot is the decimal point in Fe's printed
-    count; accepting the leading-dot number adds no alternative stoichiometry.
+    An ASCII decimal may omit its leading zero after an element, as in
+    ``Fe.875S``, ``Fe.90S``, and ``Fe.95O``. The ASCII-dot rule treats a dot
+    as an adduct only when every separated segment contains at least two
+    distinct integer-count elements; here the left segment is the single
+    element Fe, so the dot is its decimal point.
+
+    Lower-case element spellings are normalized only when the letter run has
+    one tokenization using known element symbols. In mixed-case runs, printed
+    uppercase starts and lowercase second letters keep two-letter symbols
+    intact; a lowercase one-letter symbol is accepted at the end of a run.
+    This accepts source spellings such as ``Fe. 875 s``, ``CaFe2o4``,
+    ``CuFes2``, ``CaMgSio4``, ``NaAlSio4``, ``Na2so4·10H2o``, ``cao``, and
+    ``ws2``. Fully lower-case ambiguous runs such as ``coo`` (CoO or CO2),
+    ``caso4`` (CaSO4 or CAsO4), and ``cu`` (Cu or C+U) stay refused. A
+    repeated terminal oxygen written as lower-case ``o`` after a counted
+    oxygen is also refused because it can be an OCR degree mark
+    (``H4SiO4o``), not another oxygen.
+    An unrecognized all-lowercase terminal parenthesis remains a label or
+    ambiguity instead of being tokenized as elements (for example ``S(mon)``).
+    Middle-dot hydrates, including fractional coefficients such as
+    ``H3PO4·1/2H2O``, Unicode subscripts, simple ``\\mathrm`` subscripts,
+    and explicit oxide decimals such as ``FeO1.5`` retain their printed
+    counts. A recognized phase suffix is removed for atom counting; callers
+    that carry a separate phase must store it on that identity axis.
+    The existing bullet separator spelling is accepted only between formula
+    segments; empty trailing or repeated separators are rejected.
+
+    The t-1795 census spellings accepted by these rules are ``$NH_{4}OH(aq)$``,
+    ``$\\mathrm{CdSO}_{4}\\cdot8/3\\mathrm{H}_{2}\\mathrm{O}(c)$``,
+    ``H2Se(aq)``, ``H2S(aq)``, ``HCN(aq)``, ``HCNO(aq)``,
+    ``$(NH_{4})_{2}CO_{3}(aq)$``, ``H2N2O2(aq)``, ``H2SO4(aq)``,
+    ``H2CO3(aq)``, ``H2SO3(aq)``, ``Na2B4O7(gl)``,
+    ``$NH_{4}HCO_{3}(aq)$``, ``H3PO4·1/2H2O``, ``H2S2O8(aq)``,
+    ``H3PO4(aq)``, ``$PCl_{3}(l)$``, ``$SO_3(l)$``, ``H2AsO2(aq)``,
+    ``$H_3AsO_3(aq)$``, ``$H_3AsO_4(aq)$``, ``H2SeO3(aq)``,
+    ``Ca1.02Na0.14K.01(Al2.18Si6.82O18) · 7.33H2O``, ``CaFe2o4``,
+    ``CaMgSio4``, ``CuFes2``, ``Fe. 875 s``, ``Fe.875S``, ``Fe.90S``,
+    ``Fe.94 7o``, ``Fe2Tio4``, ``Hgf``, ``MgFe2o4``,
+    ``Na2so4·10H2o``, ``NaAlSio4``, ``Naf``, ``ZnFe2o4``, ``c``,
+    ``ca2Fe2  as``, ``cao``, ``cao2``, ``cawo4``, ``sr2``, ``srso4``,
+    ``u``, ``v``, ``w``, ``ws2``, ``zn2``, ``H2SeO4(aq)``, ``H2S2(g)``,
+    ``H2SO4(l)``, and ``H2SO4(g)``. The phase labels have one explicit
+    canonical phase token; TeX, Unicode, middle-dot, decimal, and whitespace
+    variants retain unique element counts; the case variants above have one
+    valid element-symbol segmentation. Isotopes, charges, names, mixtures,
+    and non-formula labels remain outside this accepted set.
     """
 
     cleaned = _clean_formula_text(formula)
     if not cleaned:
         raise UnknownSpeciesError("formula is required")
+    previous = None
+    while cleaned and previous != cleaned:
+        previous = cleaned
+        cleaned = _PHASE_SUFFIX_RE.sub("", cleaned)
+    if re.search(r"\([a-z][a-z0-9,.\-]*\)$", cleaned):
+        raise UnknownSpeciesError(
+            f"lowercase parenthetical suffix in {formula!r} is not a formula group"
+        )
 
+    try:
+        return _parse_formula_counts(cleaned, formula, species, name)
+    except AccountingError as original_error:
+        normalized = _unambiguous_element_case(cleaned)
+        if normalized == cleaned:
+            raise
+        if re.search(r"O\d+(?:\.\d+)?O$", normalized):
+            raise original_error
+        try:
+            return _parse_formula_counts(normalized, formula, species, name)
+        except AccountingError:
+            raise original_error
+
+
+def _parse_formula_counts(
+    cleaned: str,
+    original_formula: str,
+    species: str | None,
+    name: str | None,
+) -> SpeciesFormula:
     totals: defaultdict[str, float] = defaultdict(float)
     for segment in _split_formula_segments(cleaned):
         multiplier, body = _leading_multiplier(segment)
@@ -257,8 +327,51 @@ def parse_formula(
         for element, count in elements.items():
             totals[element] += count * multiplier
 
-    species_id = species or name or str(formula).strip()
+    species_id = species or name or str(original_formula).strip()
     return SpeciesFormula(species=species_id, elements=totals)
+
+
+def _unambiguous_element_case(formula: str) -> str:
+    """Normalize each letter run only when its element segmentation is unique."""
+
+    symbols = tuple(
+        sorted(ATOMIC_WEIGHTS_G_PER_MOL, key=lambda symbol: (-len(symbol), symbol))
+    )
+
+    @lru_cache(maxsize=None)
+    def tokenizations(text: str, index: int) -> tuple[tuple[str, ...], ...]:
+        if index == len(text):
+            return ((),)
+        found: list[tuple[str, ...]] = []
+        for symbol in symbols:
+            end = index + len(symbol)
+            token = text[index:end]
+            if token.casefold() != symbol.casefold():
+                continue
+            if any(char.isupper() for char in text):
+                if len(symbol) == 1 and token.islower() and end != len(text):
+                    continue
+                if len(symbol) == 2 and not (
+                    token[0].isupper() and token[1].islower()
+                ):
+                    continue
+            for tail in tokenizations(text, end):
+                candidate = (symbol, *tail)
+                if candidate not in found:
+                    found.append(candidate)
+                    if len(found) == 2:
+                        return tuple(found)
+        return tuple(found)
+
+    def normalize_run(match: re.Match[str]) -> str:
+        options = tokenizations(match.group(), 0)
+        if len(options) != 1:
+            raise UnknownSpeciesError(
+                f"element case in {match.group()!r} is not uniquely tokenized"
+            )
+        return "".join(options[0])
+
+    return re.sub(r"[A-Za-z]+", normalize_run, formula)
 
 
 def atoms_parse_formula_else_janaf(
@@ -528,7 +641,7 @@ class _FormulaParser:
         if match.group(0).startswith(".") and not allow_leading_decimal:
             return default
         self.index = match.end()
-        value = float(match.group(0))
+        value = _formula_number(match.group(0))
         if value <= 0.0:
             raise AccountingError(f"formula multiplier must be positive in {self.text!r}")
         return value
@@ -596,11 +709,27 @@ def _declared_molar_mass(value: Mapping[str, Any]) -> float | None:
 
 def _clean_formula_text(formula: str) -> str:
     text = re.sub(r"\s+", "", str(formula).strip())
-    previous = None
-    while text and previous != text:
-        previous = text
-        text = _PHASE_SUFFIX_RE.sub("", text)
-    return text
+    if text.startswith("$") and text.endswith("$"):
+        text = text[1:-1]
+    text = re.sub(r"\\(?:text|mathrm)\{([^{}]*)\}", r"\1", text)
+    text = (
+        text.replace(r"\cdot", "·")
+        .replace(r"\bullet", "·")
+        .replace("⋅", "·")
+        .replace("•", "·")
+    )
+    text = re.sub(
+        r"_\{(\d+)\}|_(\d+)",
+        lambda match: match.group(1) or match.group(2),
+        text,
+    )
+    return fold_subscript_digits(text)
+
+
+def _normalize_leading_dot_subscripts(formula: str) -> str:
+    """Expand JANAF-compatible leading-dot element counts using this parser's rule."""
+
+    return re.sub(r"([A-Z][a-z]?)\.(\d+)", r"\g<1>0.\2", formula)
 
 
 def _strip_one_leading_integer(part: str) -> str:
@@ -686,12 +815,12 @@ def _split_formula_segments(formula: str) -> list[str]:
     species.
     """
 
-    pieces: list[str] = []
-    for part in formula.split("·"):
-        pieces.extend(_split_ascii_adducts(part))
-    segments = [segment for segment in pieces if segment]
-    if not segments:
-        raise UnknownSpeciesError("formula is required")
+    parts = formula.split("·")
+    if any(not part for part in parts):
+        raise UnknownSpeciesError(f"empty hydrate segment in {formula!r}")
+    segments = [segment for part in parts for segment in _split_ascii_adducts(part)]
+    if any(not segment for segment in segments):
+        raise UnknownSpeciesError(f"empty adduct segment in {formula!r}")
     return segments
 
 
@@ -702,7 +831,17 @@ def _leading_multiplier(segment: str) -> tuple[float, str]:
     body = segment[match.end() :]
     if not body:
         raise UnknownSpeciesError(f"formula segment {segment!r} has no body")
-    return float(match.group(0)), body
+    return _formula_number(match.group(0)), body
+
+
+def _formula_number(token: str) -> float:
+    if "/" not in token:
+        return float(token)
+    numerator, denominator = token.split("/", 1)
+    denominator_value = int(denominator)
+    if denominator_value == 0:
+        raise AccountingError(f"formula denominator must be nonzero in {token!r}")
+    return int(numerator) / denominator_value
 
 
 def _close_enough(left: float, right: float, absolute: float, relative: float) -> bool:

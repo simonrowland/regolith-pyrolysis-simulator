@@ -91,7 +91,7 @@ from simulator.battery.migrate import (
     load_migrated_context,
     QUANTITY_SOURCE_FIELDS,
     map_phase,
-    _kelley_king_formula_phase_suffix,
+    _formula_phase_suffix,
     map_quantity,
     select_declared_source,
     parse_quantity_suffix,
@@ -16008,7 +16008,9 @@ def test_g5_compilation_column_series_maps_pankratz_and_kelley() -> None:
         ("AlCl3(c)", "(c)", "AlCl3", Phase.CR),
         ("Ni(g)", "(g)", "Ni", Phase.G),
         ("Na(l)", "(l)", "Na", Phase.L),
-        ("H2O(aq)", "(aq)", "H2O(aq)", None),
+        ("H2O(aq)", "(aq)", "H2O", Phase.AQ),
+        ("$NH_{4}OH(aq)$", None, "$NH_{4}OH$", Phase.AQ),
+        ("Na2B4O7(gl)", None, "Na2B4O7", Phase.GLASS),
         ("AlCl3(c)", "(l)", "AlCl3(c)", None),
     ),
 )
@@ -16018,12 +16020,21 @@ def test_kelley_king_phase_suffix_is_separated_using_closed_map(
     expected_formula: str,
     expected_phase: Phase | None,
 ) -> None:
-    normalized, phase = _kelley_king_formula_phase_suffix(formula, printed_phase)
+    normalized, phase = _formula_phase_suffix(formula, printed_phase)
     assert normalized == expected_formula
     if expected_phase is None:
         assert phase is None
     else:
         assert phase is not None and phase.is_value and phase.value is expected_phase
+
+
+@pytest.mark.parametrize(
+    "formula", ("CN-(aq)", "Ag+(aq)", "Cu++(aq)", "HAsO4--(aq)")
+)
+def test_formula_phase_suffix_stays_with_ionic_refusal(formula: str) -> None:
+    normalized, phase = _formula_phase_suffix(formula, None)
+    assert normalized == formula
+    assert phase is None
 
 
 def test_kelley_king_phase_suffix_reaches_migrated_species(tmp_path: Path) -> None:

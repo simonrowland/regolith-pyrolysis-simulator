@@ -536,6 +536,7 @@ PHASE_MAP: dict[str, Phase] = {
     # Distin Table I's printed species phase is a liquid FeO-SiO2 slag.
     "liquid feo-sio2 slag": Phase.L,
     "aq": Phase.AQ,
+    "gl": Phase.GLASS,
     "glass": Phase.GLASS,
     "quenched silicate glass": Phase.GLASS,
     "quenched synthetic Martian basalt glass": Phase.GLASS,
@@ -11407,20 +11408,32 @@ def compilation_phase_text(doc: Mapping[str, Any]) -> object:
     return None
 
 
-def _kelley_king_formula_phase_suffix(
+_FORMULA_PHASE_SUFFIXES = frozenset({"aq", "c", "cr", "g", "gl", "glass", "l", "s"})
+
+
+def _formula_phase_suffix(
     formula: str, printed_phase: object
 ) -> tuple[str, State[Phase] | None]:
-    """Move a closed trailing Kelley & King phase suffix out of its formula."""
+    """Move a recognized trailing phase suffix to the separate phase field.
 
-    match = re.search(r"\(([^()]*)\)$", formula)
+    The closed suffix set covers Kelley & King and the ledger phase spellings
+    in the t-1795 census. Polymorph and material labels stay in the formula.
+    """
+
+    math_wrapped = formula.startswith("$") and formula.endswith("$")
+    formula_text = formula[1:-1] if math_wrapped else formula
+    match = re.search(r"\(([^()]*)\)$", formula_text)
     if match is None:
         return formula, None
+    if formula_text[: match.start()].endswith(("+", "-")):
+        return formula, None
     suffix_token = match.group(1).casefold()
-    if suffix_token not in {"c", "cr", "g", "l"}:
+    if suffix_token not in _FORMULA_PHASE_SUFFIXES:
         return formula, None
     phase, _reason = map_phase(match.group(0))
     if not phase.is_value:
-        phase, _reason = map_phase(suffix_token)
+        phase_token = "solid" if suffix_token == "s" else suffix_token
+        phase, _reason = map_phase(phase_token)
     if not phase.is_value:
         return formula, None
 
@@ -11435,7 +11448,10 @@ def _kelley_king_formula_phase_suffix(
         match.group(1).casefold(),
     } and (not explicit.is_value or explicit.value is not phase.value):
         return formula, None
-    return formula[: match.start()], phase
+    normalized = formula_text[: match.start()]
+    if math_wrapped:
+        normalized = f"${normalized}$"
+    return normalized, phase
 
 
 _TRANSITION_PHASES = {
@@ -34368,7 +34384,15 @@ class Migrator:
             value_reason = None
             reaction: Reaction | None = None
             standard_pressure_Pa: Decimal | None = None
-            obs_species = make_species(formula, map_phase(point.get("phase"))[0])
+            formula_for_identity, suffix_phase = _formula_phase_suffix(
+                formula, point.get("phase")
+            )
+            identity_phase = (
+                suffix_phase
+                if suffix_phase is not None
+                else map_phase(point.get("phase"))[0]
+            )
+            obs_species = make_species(formula_for_identity, identity_phase)
             if stated_q == "log10_Psat_over_P0":
                 note = str(point.get("note") or "")
                 lifted = lift_vaporization_reaction_from_ledger_note(formula, note)
@@ -34388,7 +34412,7 @@ class Migrator:
                     reaction, p0 = lifted
                     ledger_quantity = State.of(Quantity.DELTA_FG)
                     per = PerBasis.MOL_SPECIES
-                    obs_species = make_species(formula, Phase.G)
+                    obs_species = make_species(formula_for_identity, Phase.G)
                     if p0 is not None:
                         standard_pressure_Pa = p0
                     units = "kJ_per_mol" if energy_unit_ok else None
@@ -34652,7 +34676,7 @@ class Migrator:
             source_basis_protocol is not None
             and source_basis_protocol.value == "b592"
         ):
-            formula, suffix_phase = _kelley_king_formula_phase_suffix(
+            formula, suffix_phase = _formula_phase_suffix(
                 formula, printed_phase
             )
             if suffix_phase is not None:
