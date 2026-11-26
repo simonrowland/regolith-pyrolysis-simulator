@@ -3,6 +3,7 @@
 from decimal import Decimal
 from pathlib import Path
 
+import pytest
 import yaml
 
 from simulator.battery.enums import MethodToken, Phase, UncertaintyKind, ValueKind
@@ -122,6 +123,49 @@ def _migrated_rows():
 
 def _components(observation):
     return dict(observation.point_conditions["composition"].state.value.components)
+
+
+_PRESENT_STUDY_DSC = (
+    "sugawara_2011_t1_na6si8o19_eutectic_heat_of_fusion",
+    "sugawara_2011_t1_na2si2o5_heat_of_fusion",
+    "sugawara_2011_t1_na2sio3_heat_of_fusion",
+    "sugawara_2011_p2_na2sio3_dsc_fusion_enthalpy",
+    "sugawara_2011_p2_na2si2o5_dsc_fusion_enthalpy",
+)
+
+
+def _local_experiment_ids(result, observation_ids):
+    migrated = {
+        row.observation_id.rsplit("::", 1)[-1]: row
+        for row in result.observations.values()
+    }
+    return {migrated[observation_id].experiment_id for observation_id in observation_ids}
+
+
+def test_splitting_a_printed_method_off_the_minted_dsc_group_fails(monkeypatch):
+    """The old home left a minted group's one printed method with no home.
+
+    Table rows name differential scanning calorimetry. The prose rows only
+    say those values come from the DSC measurements, so they are unstated
+    for the split. Treating that as a method comparison minted a second id.
+    """
+
+    original = Migrator._method_row_splits
+
+    def split_the_home_method(self, experiment_id, method):
+        home = self._method_split_home.get(experiment_id)
+        if (
+            method.is_value
+            and method.value is not MethodToken.UNSPECIFIED
+            and home is method.value
+        ):
+            return True
+        return original(self, experiment_id, method)
+
+    monkeypatch.setattr(Migrator, "_method_row_splits", split_the_home_method)
+    result = _migrated_rows()
+    with pytest.raises(AssertionError):
+        assert len(_local_experiment_ids(result, _PRESENT_STUDY_DSC)) == 1
 
 
 def test_printed_rows_and_render_pins():

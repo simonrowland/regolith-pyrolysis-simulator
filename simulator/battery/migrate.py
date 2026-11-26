@@ -27229,13 +27229,16 @@ class Migrator:
         work: Work,
         source_id: str,
     ) -> None:
-        """Choose the printed method that stays on each named experiment.
+        """Choose the printed method that stays on each experiment.
 
         The choice uses every row, so it does not depend on arrival order.
         UNSPECIFIED is not a printed method. One shared printed method
-        stays (no second id). An unstated experiment that also has
-        unspecified rows keeps those rows and splits the printed method.
-        Several printed methods keep one home; the others split.
+        stays (no second id). A source-named experiment that also has
+        unstated rows keeps those rows and splits the one printed method
+        (Mysen wet chemistry stays; Mössbauer leaves). A minted group,
+        with no experiments entry, keeps that one printed method as its
+        home, so the unstated rows are not a second experiment. Several
+        printed methods keep one home; the others split.
         """
 
         printed: dict[str, set[MethodToken]] = defaultdict(set)
@@ -27289,9 +27292,16 @@ class Migrator:
                 and declared.value is not MethodToken.UNSPECIFIED
                 else None
             )
+            source_named = experiment_id in experiment_refs
             if declared_printed is not None:
                 home: MethodToken | None = declared_printed
-            elif len(tokens) == 1 and experiment_id not in saw_unstated:
+            elif len(tokens) == 1 and (
+                experiment_id not in saw_unstated or not source_named
+            ):
+                # A minted composition or source group has one technique.
+                # Unstated rows stay with it. A source-named comparison
+                # (the experiment is in the registry) still splits that
+                # technique off the unstated rows.
                 home = next(iter(tokens))
             elif len(tokens) > 1:
                 home = min(tokens, key=lambda token: token.value)
