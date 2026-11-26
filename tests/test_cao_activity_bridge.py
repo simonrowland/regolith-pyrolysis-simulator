@@ -4,6 +4,7 @@ import json
 import math
 from decimal import Decimal
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -382,29 +383,6 @@ def test_thermoengine_casio3_liquid_fusion_residual_is_a_dex_systematic() -> Non
         assert caveat['band'] == (
             f'{residual_dex:+.8g} dex at {temperature_K:g} K'
         )
-        hhr_caveat = next(
-            notice
-            for notice in result.diagnostics['imcc_notices']
-            if 'Berman-vs-HHR CaSiO3(cr) reassessment' in notice['reason']
-        )
-        assert hhr_caveat['kind'] == 'engine_model_caveat'
-        assert 'engine_reference_input/scoring_eligible:false' in hhr_caveat[
-            'reason'
-        ]
-        assert 'do not validate an engine against a compilation it consumes' in (
-            hhr_caveat['reason']
-        )
-        assert 'Haas/Hemingway' in hhr_caveat['reason']
-        assert '±0.608 kJ/mol' in hhr_caveat['reason']
-        assert 'Robie & Hemingway (1995, USGS B2131) is present' in (
-            hhr_caveat['reason']
-        )
-        assert '+3.151 kJ/mol at 1400 K' in hhr_caveat['reason']
-        assert '+2.947 kJ/mol at 1000 K' in hhr_caveat['reason']
-        assert hhr_caveat['band'] == (
-            f'{MELTS_CASIO3_HHR_SOLID_RESIDUAL_AT_1400_J_MOL / (GAS_CONSTANT * temperature_K * math.log(10.0)):+.8g} '
-            f'dex at {temperature_K:g} K from the measured +3.151 kJ/mol residual at 1400 K'
-        )
     finally:
         backend.close()
 
@@ -427,6 +405,7 @@ def test_thermoengine_cao_activity_uses_the_printed_solid_reference(
         score_store,
         temperature_of,
     )
+    from simulator.diagnostic_helpers import binary_pot_battery
 
     monkeypatch.setenv('REGOLITH_ENGINE_CACHE', str(tmp_path / 'cache.sqlite'))
     monkeypatch.setenv('REGOLITH_ENGINE_CACHE_MODE', '')
@@ -435,6 +414,7 @@ def test_thermoengine_cao_activity_uses_the_printed_solid_reference(
     migrated_root = tmp_path / 'migrated'
     _isolated_source_root(source_id, ROOT, migrated_root)
     migration = migrate(migrated_root, write=False)
+    engine = Engine.THERMOENGINE
     observations = [
         row
         for row in migration.observations.values()
@@ -461,9 +441,23 @@ def test_thermoengine_cao_activity_uses_the_printed_solid_reference(
         benches=migration.benches,
         root=Path(migrated_root),
     )
+    raw_cell_mu_by_pot: dict[str, float] = {}
+    equilibrate_cell = binary_pot_battery.equilibrate_cell
+
+    def capture_raw_cell_mu(handle, pot, **kwargs):
+        cell = equilibrate_cell(handle, pot, **kwargs)
+        if cell.mu_CaO_J_per_mol_melts_berman_apparent is not None:
+            raw_cell_mu_by_pot[pot.pot_id] = (
+                cell.mu_CaO_J_per_mol_melts_berman_apparent
+            )
+        return cell
+
+    monkeypatch.setattr(
+        binary_pot_battery, 'equilibrate_cell', capture_raw_cell_mu,
+    )
     residuals, predictions = score_store(
         context,
-        engines=(Engine.THERMOENGINE,),
+        engines=(engine,),
         work_id=source_id,
     )
     numeric = [row for row in residuals if row.numeric is not None]
@@ -474,6 +468,11 @@ def test_thermoengine_cao_activity_uses_the_printed_solid_reference(
     candidate = predictions.get(residual.candidate)
     assert candidate is not None and candidate.value.point is not None
     assert candidate.authority.value == 'bridge'
+    raw_mu = raw_cell_mu_by_pot[f'obs:{residual.reference}']
+    expected_activity, _ = cao_activity_from_melts_exchange_mu(
+        raw_mu, 1933.0, phase='cr',
+    )
+    assert candidate.value.point == Decimal(str(expected_activity))
     model_flags = [
         notice for notice in candidate.notices
         if notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
@@ -482,6 +481,186 @@ def test_thermoengine_cao_activity_uses_the_printed_solid_reference(
             or 'Berman-vs-HHR CaSiO3(cr) reassessment' in notice.reason
         )
     ]
-    assert len(model_flags) == 2
+    assert len(model_flags) == (
+        2 if engine is Engine.THERMOENGINE else 1
+    )
     assert all(notice.band is not None for notice in model_flags)
     assert all('dex at 1933 K' in notice.band for notice in model_flags)
+    hhr_flag = next(
+        notice for notice in model_flags
+        if 'Berman-vs-HHR CaSiO3(cr) reassessment' in notice.reason
+    )
+    assert hhr_flag.affected_quantities == (Quantity.ACTIVITY,)
+    assert 'cyclowollastonite' in hhr_flag.reason
+    assert 'wollastonite' in hhr_flag.reason
+    assert 'HHR does not extend to the row temperature' in hhr_flag.reason
+    hhr_residual_dex = MELTS_CASIO3_HHR_SOLID_RESIDUAL_AT_1400_J_MOL / (
+        GAS_CONSTANT * 1933.0 * math.log(10.0)
+    )
+    assert hhr_flag.band == (
+        f'{hhr_residual_dex:+.8g} '
+        'dex at 1933 K from the measured +3.151 kJ/mol residual at 1400 K'
+    )
+    if engine is Engine.THERMOENGINE:
+        assert any(
+            'CaSiO3(l)-pWo fusion residual' in notice.reason
+            for notice in model_flags
+        )
+    else:
+        assert len(model_flags) == 1
+
+
+def test_alphamelts_cao_scoring_uses_raw_cell_exchange_and_scopes_hhr(
+    tmp_path,
+    monkeypatch,
+) -> None:
+    from scripts.source_battery_report import ROOT, _isolated_source_root
+    from simulator.battery.enums import Engine, NoticeKind, Quantity
+    from simulator.battery.identity import quantity_token
+    from simulator.battery.migrate import migrate
+    from simulator.battery.score import ScoreContext, score_store, temperature_of
+    from simulator.diagnostic_helpers import binary_pot_battery
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        EquilibrateCell,
+        Po2Request,
+    )
+
+    source_id = 'stolyarova-1996-cao-alumina-silica-kems'
+    migrated_root = tmp_path / 'migrated'
+    _isolated_source_root(source_id, ROOT, migrated_root)
+    migration = migrate(migrated_root, write=False)
+    activity_rows = [
+        row
+        for row in migration.observations.values()
+        if row.source_id == source_id
+        and quantity_token(row.identity) is Quantity.ACTIVITY
+        and row.identity.species is not None
+        and temperature_of(row.identity) == Decimal('1933')
+    ]
+    cao = next(row for row in activity_rows if row.identity.species.formula == 'CaO')
+    silica = next(
+        row for row in activity_rows
+        if row.identity.species.formula == 'SiO2'
+    )
+    temperature_K = 1933.0
+    g0_solid_kJ_mol, _ = melts_reference_g0_cao_kJ_mol(
+        temperature_K, 'cr',
+    )
+    raw_mu = (
+        g0_solid_kJ_mol * 1000.0
+        + GAS_CONSTANT * temperature_K * math.log(0.4)
+    )
+    cell = EquilibrateCell(
+        pot_id='same-cell',
+        engine=Engine.ALPHAMELTS.value,
+        temperature_K=temperature_K,
+        po2=Po2Request(mode='engine_default', po2_bar=None),
+        status='ok',
+        refusal_reason=None,
+        engine_status='ok',
+        engine_reason=None,
+        melt_activities={'CaSiO3': 0.5, 'SiO2': 0.25},
+        gas_partial_pressures_Pa={},
+        liquid_fraction=1.0,
+        wall_s=0.0,
+        cpu_s=0.0,
+        hostname='test',
+        mu_CaO_J_per_mol_melts_berman_apparent=raw_mu,
+    )
+    handle = SimpleNamespace(
+        name=Engine.ALPHAMELTS.value,
+        available=True,
+        unavailable_reason='',
+        backend=None,
+    )
+    from simulator.battery import score as score_module
+
+    monkeypatch.setattr(
+        score_module, '_open_cached_battery_handle',
+        lambda *_args, **_kwargs: (handle, False),
+    )
+    monkeypatch.setattr(
+        binary_pot_battery, 'equilibrate_cell',
+        lambda *_args, **_kwargs: cell,
+    )
+    context = ScoreContext(
+        works=migration.works,
+        experiments=migration.experiments,
+        observations={cao.observation_id: cao, silica.observation_id: silica},
+        benches=migration.benches,
+        root=Path(migrated_root),
+    )
+    _residuals, predictions = score_store(
+        context,
+        engines=(Engine.ALPHAMELTS,),
+        work_id=source_id,
+    )
+    cao_candidate = next(
+        candidate for candidate in predictions.values()
+        if candidate.identity.species.formula == 'CaO'
+    )
+    non_cao_candidate = next(
+        candidate for candidate in predictions.values()
+        if candidate.identity.species.formula == 'SiO2'
+    )
+    expected, _ = cao_activity_from_melts_exchange_mu(
+        raw_mu, temperature_K, phase='cr',
+    )
+    assert cao_candidate.value.point == Decimal(str(expected))
+    hhr_flag = next(
+        notice for notice in cao_candidate.notices
+        if notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        and 'Berman-vs-HHR CaSiO3(cr) reassessment' in notice.reason
+    )
+    assert hhr_flag.affected_quantities == (Quantity.ACTIVITY,)
+    assert hhr_flag.band is not None and 'dex at 1933 K' in hhr_flag.band
+    # AlphaMELTS's cell currently has no pWo/liquid G0 pair for the dynamic
+    # fusion residual; this checks the shared HHR scoring path only.
+    assert not any(
+        notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        and 'CaSiO3(l)-pWo fusion residual' in notice.reason
+        for notice in cao_candidate.notices
+    )
+    assert not any(
+        notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        and (
+            'CaSiO3(l)-pWo fusion residual' in notice.reason
+            or 'Berman-vs-HHR CaSiO3(cr) reassessment' in notice.reason
+        )
+        for notice in non_cao_candidate.notices
+    )
+
+
+def test_melts_cao_cell_model_caveats_do_not_leak_to_other_activity_species() -> None:
+    from simulator.battery.enums import Engine, NoticeKind, Quantity
+    from simulator.battery.score import _cell_notices_for_activity_species
+
+    cell = SimpleNamespace(notices=[
+        {
+            'kind': 'engine_model_caveat',
+            'reason': 'ThermoEngine CaSiO3(l)-pWo fusion residual',
+            'band': '-0.006 dex at 1933 K',
+        },
+        {
+            'kind': 'engine_model_caveat',
+            'reason': 'Berman-vs-HHR CaSiO3(cr) reassessment',
+            'band': '+0.085 dex at 1933 K',
+        },
+    ])
+    cao_notices = _cell_notices_for_activity_species(
+        Quantity.ACTIVITY, Engine.THERMOENGINE, cell, 'CaO',
+    )
+    silica_notices = _cell_notices_for_activity_species(
+        Quantity.ACTIVITY, Engine.THERMOENGINE, cell, 'SiO2',
+    )
+    non_activity_notices = _cell_notices_for_activity_species(
+        Quantity.P_SAT, Engine.THERMOENGINE, cell, 'CaO',
+    )
+    assert len(cao_notices) == 2
+    assert all(
+        notice.affected_quantities == (Quantity.ACTIVITY,)
+        and notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        for notice in cao_notices
+    )
+    assert silica_notices == ()
+    assert non_activity_notices == ()

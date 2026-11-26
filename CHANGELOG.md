@@ -6,10 +6,11 @@ so minor versions may carry significant changes.
 
 ## Unreleased
 
-- d-476 converts ThermoEngine CaO activity from the raw CaSiO3−SiO2 exchange
-  potential to JANAF's printed solid-lime reference. It discloses both the
-  phase-specific Berman/HHR CaSiO3(cr) reassessment and the measured fusion
-  residual as model systematics; neither is applied as a correction.
+- d-476 converts AlphaMELTS and ThermoEngine CaO activities from the raw
+  CaSiO3−SiO2 exchange potential to JANAF's printed solid-lime reference. The
+  shared scorer reports the phase-specific Berman/HHR CaSiO3(cr) consistency
+  band on CaO; ThermoEngine also reports its live pWo fusion residual on CaO.
+  Neither is applied as a correction.
 
 ## [0.6.8] — 2026-11-12
 

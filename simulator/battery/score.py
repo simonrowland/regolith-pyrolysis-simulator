@@ -8315,6 +8315,34 @@ def cell_notices(
     return tuple(notices)
 
 
+def _cell_notices_for_activity_species(
+    quantity: Quantity,
+    engine: Engine,
+    cell: object,
+    species_formula: str,
+) -> tuple[Notice, ...]:
+    """Keep CaSiO3 model caveats on the CaO activity derived from that cell."""
+
+    notices = cell_notices(quantity, engine, cell)
+    if (
+        engine not in (Engine.ALPHAMELTS, Engine.THERMOENGINE)
+        or (quantity is Quantity.ACTIVITY and species_formula == "CaO")
+    ):
+        return notices
+    cao_model_reasons = (
+        "CaSiO3(l)-pWo fusion residual",
+        "Berman-vs-HHR CaSiO3(cr) reassessment",
+    )
+    return tuple(
+        notice
+        for notice in notices
+        if not (
+            notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+            and any(reason in notice.reason for reason in cao_model_reasons)
+        )
+    )
+
+
 def stated_pure_substance_reservoir(identity: Identity) -> tuple[str, str] | None:
     """Pot formula and phase when the row states a pure condensed reservoir.
 
@@ -16280,7 +16308,10 @@ def _predict_with_engine(
             )
         except Exception as exc:
             return engine_call_failure(exc)
-    notices = union_notices(tuple(extra_notices), cell_notices(quantity, engine, cell))
+    notices = union_notices(
+        tuple(extra_notices),
+        _cell_notices_for_activity_species(quantity, engine, cell, formula),
+    )
     authority, certified_band = _flags_from_scored_cell(cell, authority, certified_band)
     refusal = getattr(cell, "refusal_reason", None)
     status = getattr(cell, "status", None)
@@ -16565,7 +16596,10 @@ def _predict_with_engine(
             )
         except Exception as exc:
             return engine_call_failure(exc)
-        notices = union_notices(notices, cell_notices(quantity, engine, cell))
+        notices = union_notices(
+            notices,
+            _cell_notices_for_activity_species(quantity, engine, cell, formula),
+        )
         if getattr(cell, "status", None) != "ok":
             return EnginePrediction(
                 engine=engine,
@@ -16949,6 +16983,7 @@ def _predict_with_engine(
             melts_endmember_to_parent_oxide_activity,
         )
         from simulator.melt_backend.pure_phase_janaf_score import (
+            MELTS_CASIO3_HHR_SOLID_RESIDUAL_AT_1400_J_MOL,
             cao_activity_from_melts_exchange_mu,
         )
 
@@ -17027,6 +17062,45 @@ def _predict_with_engine(
                     )
                 if value is not None:
                     authority = Authority.BRIDGE
+                    hhr_residual_dex = (
+                        MELTS_CASIO3_HHR_SOLID_RESIDUAL_AT_1400_J_MOL
+                        / (GAS_CONSTANT * float(T) * math.log(10.0))
+                    )
+                    notices = union_notices(
+                        notices,
+                        (
+                            Notice(
+                                kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                                affected_quantities=(Quantity.ACTIVITY,),
+                                reason=(
+                                    'Phase-specific Berman-vs-HHR CaSiO3(cr) '
+                                    'reassessment: raw residual +3.151 kJ/mol '
+                                    'at 1400 K for cyclowollastonite (HHR table '
+                                    'through 1800 K), and +2.947 kJ/mol at '
+                                    '1000 K for wollastonite (through 1398 K). '
+                                    'HHR does not extend to the row temperature; '
+                                    'the band is frozen at the 1400 K same-phase '
+                                    'residual. Consistency disclosure only: do '
+                                    'not validate an engine against a compilation '
+                                    'it consumes. HHR (1982) is marked '
+                                    'engine_reference_input/scoring_eligible:false; '
+                                    'Berman (1988) used Haas/Hemingway data. '
+                                    'HHR pp. 49–50 reports ±0.608 kJ/mol. '
+                                    'Robie & Hemingway (1995, USGS B2131) is '
+                                    'present in the corpus.'
+                                ),
+                                origin=(
+                                    'simulator.battery.score.'
+                                    'd476_cao_activity_model_caveat'
+                                ),
+                                band=(
+                                    f'{hhr_residual_dex:+.8g} dex at '
+                                    f'{float(T):g} K from the measured '
+                                    '+3.151 kJ/mol residual at 1400 K'
+                                ),
+                            ),
+                        ),
+                    )
         else:
             value, converter_reason = melts_endmember_to_parent_oxide_activity(
                 reported, compared,
