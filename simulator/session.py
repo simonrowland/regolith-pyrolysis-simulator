@@ -844,7 +844,15 @@ class SimSession:
             elif run_metadata is None:
                 attached_metadata = {}
             else:
-                return payload
+                attached_metadata = {}
+                _write_run_flags_to_metadata(
+                    attached_metadata,
+                    [
+                        _diagnostic_unresolved_run_flag(
+                            type(run_metadata).__name__
+                        )
+                    ],
+                )
             _attach_execution_diagnostics(attached_metadata, self)
             payload["run_metadata"] = attached_metadata
         except Exception:
@@ -1123,25 +1131,37 @@ def _run_flags_for_export(
             )
 
     flags = [budget_flag] if budget_flag is not None else []
-    for result in step_results:
-        summary = getattr(result, "campaign_summary", None)
-        if not isinstance(summary, Mapping):
-            continue
-        for flag in summary.get("flags", ()):
-            error_type = _diagnostic_unresolved_error_type(flag)
-            if error_type is None:
-                detail = flag.get("detail") if isinstance(flag, Mapping) else None
-                error_type = (
-                    detail.get("error_type")
-                    if isinstance(detail, Mapping)
-                    and detail.get("unresolved") is True
-                    else None
-                )
-            if (
-                isinstance(error_type, str)
-                and not _has_diagnostic_unresolved_flag(flags, error_type)
-            ):
-                flags.append(_diagnostic_unresolved_run_flag(error_type))
+    try:
+        for result in step_results:
+            summary = getattr(result, "campaign_summary", None)
+            if not isinstance(summary, Mapping):
+                continue
+            summary_flags = summary.get("flags", ())
+            if not isinstance(summary_flags, list):
+                continue
+            for flag in summary_flags:
+                error_type = _diagnostic_unresolved_error_type(flag)
+                if error_type is None:
+                    detail = (
+                        flag.get("detail")
+                        if isinstance(flag, Mapping)
+                        else None
+                    )
+                    error_type = (
+                        detail.get("error_type")
+                        if isinstance(detail, Mapping)
+                        and detail.get("unresolved") is True
+                        else None
+                    )
+                if (
+                    isinstance(error_type, str)
+                    and not _has_diagnostic_unresolved_flag(flags, error_type)
+                ):
+                    flags.append(_diagnostic_unresolved_run_flag(error_type))
+    except Exception as exc:
+        error_type = type(exc).__name__
+        if not _has_diagnostic_unresolved_flag(flags, error_type):
+            flags.append(_diagnostic_unresolved_run_flag(error_type))
     return flags
 
 
@@ -1167,6 +1187,7 @@ def _campaign_stop_record(
     summary: Mapping[str, Any] | None,
     *,
     include_flags: bool,
+    unresolved_errors: list[str] | None = None,
 ) -> dict[str, Any] | None:
     """Compact ranking record for one completed campaign.
 
@@ -1200,16 +1221,34 @@ def _campaign_stop_record(
                     and _diagnostic_unresolved_error_type(flag) is None
                 ]
             except Exception as exc:
-                # Keep the stop itself; carry the copy failure through the
-                # step history so run-flag export can report it separately.
-                record.pop("flags", None)
-                if isinstance(summary, dict) and isinstance(flags, (list, tuple)):
-                    error_type = type(exc).__name__
-                    if not _has_diagnostic_unresolved_flag(flags, error_type):
-                        summary["flags"] = [
-                            *flags,
-                            _diagnostic_unresolved_run_flag(error_type),
-                        ]
+                # Preserve the failure on a fallback copy, never the live
+                # campaign summary. A retry can still project valid flags if
+                # the copy failure was transient.
+                error_type = type(exc).__name__
+                fallback_summary = dict(summary)
+                fallback_flags = list(flags)
+                if not _has_diagnostic_unresolved_flag(
+                    fallback_flags,
+                    error_type,
+                ):
+                    fallback_flags.append(
+                        _diagnostic_unresolved_run_flag(error_type)
+                    )
+                fallback_summary["flags"] = fallback_flags
+                if (
+                    unresolved_errors is not None
+                    and error_type not in unresolved_errors
+                ):
+                    unresolved_errors.append(error_type)
+                try:
+                    record["flags"] = [
+                        copy.deepcopy(dict(flag))
+                        for flag in fallback_summary["flags"]
+                        if isinstance(flag, Mapping)
+                        and _diagnostic_unresolved_error_type(flag) is None
+                    ]
+                except Exception:
+                    record.pop("flags", None)
     return record
 
 
@@ -1217,6 +1256,7 @@ def _campaign_stops_for_trace(
     run_execution: Any,
     *,
     execution_local: bool = False,
+    unresolved_errors: list[str] | None = None,
 ) -> tuple[dict[str, Any], ...]:
     """Project supplied execution stops or reconstruct the session history."""
 
@@ -1245,6 +1285,7 @@ def _campaign_stops_for_trace(
         record = _campaign_stop_record(
             item,
             include_flags=not execution_local,
+            unresolved_errors=unresolved_errors,
         )
         if record is not None:
             records.append(record)
@@ -1261,9 +1302,15 @@ def _attach_execution_diagnostics(
         return
 
     stored_run_flags = _MISSING_RESULT_DOCUMENT_RUN_FLAGS
+    campaign_stop_errors: list[str] = []
     try:
         run_metadata["campaign_stops"] = _json_safe(
-            list(_campaign_stops_for_trace(session))
+            list(
+                _campaign_stops_for_trace(
+                    session,
+                    unresolved_errors=campaign_stop_errors,
+                )
+            )
         )
     except Exception as exc:
         # A failed live projection must not revive a recorded stale list.
@@ -1324,6 +1371,19 @@ def _attach_execution_diagnostics(
                         current_run_flags,
                         flag["error_type"],
                     ),
+                )
+        for error_type in campaign_stop_errors:
+            current_run_flags = run_metadata.get(
+                "run_flags",
+                _MISSING_RESULT_DOCUMENT_RUN_FLAGS,
+            )
+            if not _has_diagnostic_unresolved_flag(
+                current_run_flags,
+                error_type,
+            ):
+                _write_run_flags_to_metadata(
+                    run_metadata,
+                    _run_flags_with_unresolved(current_run_flags, error_type),
                 )
     except Exception as exc:
         _write_run_flags_to_metadata(

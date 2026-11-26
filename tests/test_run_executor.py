@@ -774,7 +774,10 @@ def test_terminal_campaign_completion_does_not_emit_hour_budget_flag():
         if stop["campaign"] == "C7_CA_ALUMINOTHERMIC"
     )
     assert c7_stop["stop_reason"] == "time_cap"
-    assert "flags" not in c7_stop
+    assert any(
+        flag["code"] == "campaign_time_cap_unconverged"
+        for flag in c7_stop["flags"]
+    )
     output_stop = next(
         stop for stop in run._build_output(execution)["run_metadata"]["campaign_stops"]
         if stop["campaign"] == "C7_CA_ALUMINOTHERMIC"
@@ -1423,6 +1426,54 @@ def test_live_result_document_creates_missing_run_metadata(document):
     ]
 
 
+@pytest.mark.parametrize("stored_flags", [None, 1])
+def test_malformed_campaign_summary_flags_do_not_suppress_live_budget_flag(
+    stored_flags,
+):
+    session = _started_internal_session(_run(campaign="C2A", hours=1))
+    session._last_drive_stop = "hour_budget"
+    session._step_results.append(
+        SimpleNamespace(campaign_summary={"flags": stored_flags})
+    )
+
+    flags = _run_flags_for_export(session)
+
+    assert any(
+        flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+        for flag in flags
+    )
+    assert not any(flag["code"] == "diagnostic_unresolved" for flag in flags)
+
+
+@pytest.mark.parametrize(
+    ("stored_metadata", "error_type"),
+    [("legacy metadata", "str"), (7, "int"), (["legacy"], "list")],
+)
+def test_live_result_document_replaces_non_mapping_metadata_with_unresolved(
+    stored_metadata,
+    error_type,
+):
+    session = _started_internal_session(_run(campaign="C2A", hours=1))
+    session._last_drive_stop = "hour_budget"
+    session._set_result_document({
+        "status": "ok",
+        "run_metadata": stored_metadata,
+    })
+
+    exported = session.result_document()
+
+    assert isinstance(exported["run_metadata"], dict)
+    assert {
+        "kind": "run_diagnostic",
+        "code": "diagnostic_unresolved",
+        "error_type": error_type,
+    } in exported["run_metadata"]["run_flags"]
+    assert any(
+        flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+        for flag in exported["run_metadata"]["run_flags"]
+    )
+
+
 def test_campaign_stop_flag_copy_failure_does_not_abort_executor(monkeypatch):
     import simulator.session as session_module
 
@@ -1464,6 +1515,58 @@ def test_campaign_stop_flag_copy_failure_does_not_abort_executor(monkeypatch):
         "code": "diagnostic_unresolved",
         "error_type": "RuntimeError",
     } in output["run_metadata"]["run_flags"]
+
+
+def test_transient_campaign_stop_copy_failure_does_not_mutate_step_history(
+    monkeypatch,
+):
+    import simulator.session as session_module
+
+    run = _run(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C4",
+        hours=1,
+        additives_kg={},
+    )
+    session = _started_internal_session(run)
+    sim = session.simulator
+    sim.record.branch = "two"
+    sim.campaign_mgr.campaigns["C4"]["max_target_acquisition_hr"] = 1.0
+    RunExecutor().execute_session(session, hours=1)
+    c4_result = next(
+        result for result in session._step_results
+        if result.campaign_summary
+        and result.campaign_summary.get("campaign") == "C4"
+    )
+    summary = c4_result.campaign_summary
+    original_summary = deepcopy(summary)
+    session._set_result_document({"status": "ok", "run_metadata": {}})
+
+    real_deepcopy = session_module.copy.deepcopy
+    copy_failed = False
+
+    def fail_once(value, memo=None):
+        nonlocal copy_failed
+        if (
+            not copy_failed
+            and isinstance(value, dict)
+            and value.get("code") == "campaign_time_cap_unconverged"
+        ):
+            copy_failed = True
+            raise RuntimeError("transient stop flag copy failure")
+        return real_deepcopy(value, memo)
+
+    monkeypatch.setattr(session_module.copy, "deepcopy", fail_once)
+
+    exported = session.result_document()
+
+    assert copy_failed
+    assert summary == original_summary
+    assert {
+        "kind": "run_diagnostic",
+        "code": "diagnostic_unresolved",
+        "error_type": "RuntimeError",
+    } in exported["run_metadata"]["run_flags"]
 
 
 def test_live_result_document_recomputes_budget_flag_when_chain_completes():
