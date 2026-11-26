@@ -674,6 +674,35 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
                 1370.3125,
                 ((918.75, 0.0), (1370.3125, 1.0)),
             ),
+            # 2026-11-26 receipt 84f613c8. Ledger fO2 (a95942989e) and the
+            # d-469 floor (8f174cc807) move melt Fe redox, so the liquidus
+            # cache misses on more lunar hours. C0B stays 918.75/1370.3125.
+            # The old 921.875/1368.75 rows are gone. Adjacent 1.5625 C cells
+            # appear (915.625, 917.1875, 920.3125, 1371.875), and 1045.3125 C
+            # and 1050 C now miss the memo, including three C4 curves. Mars
+            # is unchanged. Each row keeps the magemin-shadow
+            # composition_projected source and the two-point path.
+            (
+                'C2A_STAGED',
+                'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
+                1045.3125,
+                1371.875,
+                ((1045.3125, 0.0), (1371.875, 1.0)),
+            ),
+            (
+                'C2A_STAGED',
+                'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
+                915.625,
+                1371.875,
+                ((915.625, 0.0), (1371.875, 1.0)),
+            ),
+            (
+                'C2A_STAGED',
+                'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
+                917.1875,
+                1370.3125,
+                ((917.1875, 0.0), (1370.3125, 1.0)),
+            ),
             (
                 'C2A_STAGED',
                 'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
@@ -689,25 +718,46 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
                 ((920.3125, 0.0), (1370.3125, 1.0)),
             ),
             (
-                'C2A_STAGED',
+                'C3_NA',
                 'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
-                921.875,
-                1368.75,
-                ((921.875, 0.0), (1368.75, 1.0)),
+                920.3125,
+                1370.3125,
+                ((920.3125, 0.0), (1370.3125, 1.0)),
             ),
             (
                 'C3_NA',
                 'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
-                921.875,
-                1368.75,
-                ((921.875, 0.0), (1368.75, 1.0)),
+                1050.0,
+                1370.3125,
+                ((1050.0, 0.0), (1370.3125, 1.0)),
             ),
             (
                 'C3_NA',
                 'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
-                921.875,
-                1368.75,
-                ((921.875, 0.0), (1368.75, 1.0)),
+                1050.0,
+                1370.3125,
+                ((1050.0, 0.0), (1370.3125, 1.0)),
+            ),
+            (
+                'C4',
+                'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
+                920.3125,
+                1370.3125,
+                ((920.3125, 0.0), (1370.3125, 1.0)),
+            ),
+            (
+                'C4',
+                'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
+                1050.0,
+                1370.3125,
+                ((1050.0, 0.0), (1370.3125, 1.0)),
+            ),
+            (
+                'C4',
+                'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
+                1050.0,
+                1370.3125,
+                ((1050.0, 0.0), (1370.3125, 1.0)),
             ),
         ],
         'mars_basalt_C2A_12h': [
