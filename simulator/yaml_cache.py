@@ -51,6 +51,24 @@ def _yaml12_safe_loader(base_loader: type) -> type:
             for key, resolvers in base_loader.yaml_implicit_resolvers.items()
         }
 
+        def resolve(self, kind, value, implicit):
+            # Repeated observation rows reuse scalar keys and values. For
+            # loaders without path resolvers, these three inputs fully decide
+            # the tag; keep the memo local to this document's loader instance.
+            if self.yaml_path_resolvers:
+                return super().resolve(kind, value, implicit)
+            cache = getattr(self, "_yaml12_resolved_tags", None)
+            if cache is None:
+                cache = {}
+                self._yaml12_resolved_tags = cache
+            key = (kind, value, implicit)
+            try:
+                return cache[key]
+            except KeyError:
+                tag = super().resolve(kind, value, implicit)
+                cache[key] = tag
+                return tag
+
     YAML12SafeLoader.__name__ = "YAML12SafeLoader"
     YAML12SafeLoader.__qualname__ = "YAML12SafeLoader"
     YAML12SafeLoader.add_implicit_resolver(

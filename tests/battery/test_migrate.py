@@ -16807,7 +16807,7 @@ def _load_store_if_needle(path: Path, needle: bytes, summary: dict[str, dict]) -
             return None
     elif needle not in raw:
         return None
-    stored = yaml.load(raw.decode("utf-8"), Loader=_YAML_LOADER)
+    stored = load_cached_safe_yaml(raw)
     return stored if isinstance(stored, dict) else {}
 
 
@@ -17515,9 +17515,7 @@ def test_f3_store_every_compilation_observation_has_existing_source_path() -> No
         pytest.skip("migrated store not generated yet")
     missing: list[str] = []
     for path in iter_observation_store_paths(obs_dir, "compilations-*.yaml"):
-        stored = yaml.load(
-            path.read_text(encoding="utf-8"), Loader=_FAST_SAFE_YAML_LOADER
-        )
+        stored = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
         for obs in stored.get("observations") or []:
             loc = obs.get("locator") or {}
             rel = loc.get("source_path")
@@ -21631,7 +21629,7 @@ def test_literature_store_has_no_duplicate_values_across_extracts() -> None:
             if compilation_family_from_store_path(path) is not None:
                 _account_compilation_shard(path, summary)
                 continue
-            stored = yaml.load(path.read_text(encoding="utf-8"), Loader=yaml.CSafeLoader)
+            stored = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
             if isinstance(stored, dict):
                 observations.extend(stored.get("observations") or [])
     duplicates = _same_work_observation_duplicate_pairs(observations)
