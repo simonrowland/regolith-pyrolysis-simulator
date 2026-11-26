@@ -924,18 +924,23 @@ def _merge_run_flags(
 ) -> Any:
     """Merge the derived d-473 flag without rewriting unrelated stored data."""
 
+    def is_budget_flag(value: Any) -> bool:
+        return (
+            isinstance(value, Mapping)
+            and value.get("code") == _RUN_HOUR_BUDGET_FLAG_CODE
+        )
+
     if not isinstance(stored_flags, list):
-        if live_budget_flag is None or stored_flags == live_budget_flag:
+        if is_budget_flag(stored_flags):
+            return live_budget_flag
+        if live_budget_flag is None:
             return stored_flags
         return [stored_flags, live_budget_flag]
 
     merged: list[Any] = []
     saw_budget_flag = False
     for flag in stored_flags:
-        if (
-            isinstance(flag, Mapping)
-            and flag.get("code") == _RUN_HOUR_BUDGET_FLAG_CODE
-        ):
+        if is_budget_flag(flag):
             if not saw_budget_flag:
                 if live_budget_flag is not None:
                     merged.append(live_budget_flag)
