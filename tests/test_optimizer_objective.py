@@ -11486,14 +11486,22 @@ def test_sso2_owner_execution_uses_certified_na_dose_and_partition_path() -> Non
     assert "engaged_species=`CrO2`" in report
     assert f"engagement_count=`{fallback['total_engagement_count']}`" in report
 
-    # Legacy opt-in controls cannot remove a flagged CrO2 prediction.
+    # Receipt a2016cb1. CrO2's stored alpha is the metals-Cr broad proxy
+    # (0.9, authority proxy/bridge). b-1195 does not let the legacy
+    # opt-in withhold that flux. The depletion gate used to drop it
+    # while overhead O2 was at or below 1e-12 kg. The oxide-Fe debit
+    # (f187184015) leaves that oxygen, so the opt-in-off path commits
+    # the same vapor. CrO2 stays out of missing_alpha.
     default_sim, missing_by_hour = _sso2_sim_alpha_fallback_disabled(hours=3)
     assert all("CrO2" not in hourly for hourly in missing_by_hour)
-    assert not any(
+    assert any(
         transition.reason == "evaporate_CrO2"
         for transition in default_sim.atom_ledger.transitions
     )
-    assert "CrO2" not in default_sim._alpha_authority_status_by_species_engaged
+    assert (
+        default_sim._alpha_authority_status_by_species_engaged.get("CrO2")
+        == "proxy/bridge"
+    )
 
 
 def test_sso2_owner_gate_timeout_uses_flagged_floor_and_completes(monkeypatch):
