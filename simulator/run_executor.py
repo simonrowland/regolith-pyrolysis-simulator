@@ -519,6 +519,9 @@ class RunExecutor:
         except Exception as exc:  # noqa: BLE001 -- envelope the error
             failure_exc = exc
             status = "failed"
+            reason_code = getattr(exc, "reason_code", None)
+            if reason_code:
+                reason = str(reason_code)
             error_message = _safe_exception_text(exc)
 
         try:

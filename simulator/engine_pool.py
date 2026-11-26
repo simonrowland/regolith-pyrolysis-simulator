@@ -2817,6 +2817,41 @@ class StdioRemoteEngineWorker(WarmEngineWorker):
 class EngineWorkerPool:
     """Queue-fed work-stealing pool of independent warm engine transports."""
 
+    def _normalize_startup_timeout(
+        self,
+        timeout: EngineWorkerTimeout,
+        *,
+        failed_slots: tuple[int, ...] | list[int],
+        ready_wait_s: float | None = None,
+    ) -> None:
+        """Keep startup timeout payloads stable and put slot detail in logs."""
+        if timeout.phase != 'initialization' or not failed_slots:
+            return
+        slot_details = [
+            f'{index}: {self._workers[index].name}'
+            for index in failed_slots
+        ]
+        first_worker_name = str(self._workers[failed_slots[0]].name)
+        worker_prefix, separator, slot_suffix = first_worker_name.rpartition(
+            ' slot '
+        )
+        backend = worker_prefix if separator and slot_suffix.isdecimal() else (
+            first_worker_name
+        )
+        for pool_suffix in (' subprocess pool', ' warm pool'):
+            if backend.endswith(pool_suffix):
+                backend = backend.removesuffix(pool_suffix)
+                break
+        detail = f'failed worker slot(s): {slot_details}'
+        if ready_wait_s is not None:
+            detail += f'; pool ready wait budget {ready_wait_s:g}s'
+        timeout.diagnostic_detail = detail
+        timeout._set_diagnostic_context(
+            backend=backend,
+            operation='startup',
+        )
+        _pool_debug(f'pool[{backend}]: startup timeout {detail}')
+
     def __init__(
         self,
         worker_factory: Callable[[int], WarmEngineWorker],
@@ -2914,14 +2949,29 @@ class EngineWorkerPool:
             # refusal. Losing start()'s worker_name is the defect: a
             # consumer discarding what the producer typed.
             if errors:
+                index, error = errors[0]
+                if isinstance(error, EngineWorkerTimeout):
+                    self._normalize_startup_timeout(
+                        error,
+                        failed_slots=(index,),
+                    )
                 if close_error is not None:
-                    raise errors[0][1] from close_error
-                raise errors[0][1]
+                    raise error from close_error
+                raise error
+            configured_startup_timeout_s = max(
+                _worker_startup_timeout_s(worker)
+                for worker in self._workers
+            )
             refusal = EngineWorkerTimeout(
-                f'engine worker pool slots {missing}',
-                ready_wait_s,
+                str(self._workers[missing[0]].name),
+                configured_startup_timeout_s,
                 phase='initialization',
                 failed_slots=missing,
+            )
+            self._normalize_startup_timeout(
+                refusal,
+                failed_slots=missing,
+                ready_wait_s=ready_wait_s,
             )
             if close_error is not None:
                 raise refusal from close_error

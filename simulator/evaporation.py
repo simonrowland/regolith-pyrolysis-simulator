@@ -3384,18 +3384,23 @@ class EvaporationMixin:
         self,
         curve: dict[str, Any],
         *,
-        timeout_reason: str | None,
+        diagnostic: Mapping[str, Any],
     ) -> dict[str, Any]:
+        from simulator.reduced_real_determinism import (
+            gate_curve_provider_diagnostic_reasons,
+        )
+
         if (
             self._liquid_fraction_provider != 'magemin'
-            or timeout_reason != 'engine_worker_timeout'
+            or 'engine_worker_timeout'
+            not in gate_curve_provider_diagnostic_reasons(diagnostic)
         ):
             return curve
 
         notice = {
             'type': 'typed_notice',
             'kind': 'freeze_gate_magemin_source_fallback',
-            'reason': timeout_reason,
+            'reason': 'engine_worker_timeout',
             'attempted_source': 'magemin',
             'source_used': str(curve.get('source') or ''),
         }
@@ -4442,7 +4447,7 @@ class EvaporationMixin:
                         }
                     return self._record_freeze_gate_magemin_timeout_fallback_notice(
                         held,
-                        timeout_reason=timeout_reason,
+                        diagnostic=diagnostic,
                     )
                 curve = self._freeze_gate_kress_floor_curve(None, reasons)
                 if curve is not None:
@@ -4470,7 +4475,7 @@ class EvaporationMixin:
                         }
                     return self._record_freeze_gate_magemin_timeout_fallback_notice(
                         curve,
-                        timeout_reason=timeout_reason,
+                        diagnostic=diagnostic,
                     )
             if diagnostic.get('exception_class'):
                 mark_uncacheable_replay_disposition(

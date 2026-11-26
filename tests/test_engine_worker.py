@@ -1998,7 +1998,7 @@ def test_canceling_close_fails_in_flight_request_without_orphan():
 
 @pytest.mark.cpu_budget(15)
 @pytest.mark.timeout(15)
-def test_constructor_refuses_when_worker_thread_never_reports_ready():
+def test_constructor_refuses_when_worker_thread_never_reports_ready(monkeypatch):
     """Pin: a silent worker thread must not park the constructor forever.
 
     The test thread joins a constructor thread — it does not call
@@ -2010,6 +2010,12 @@ def test_constructor_refuses_when_worker_thread_never_reports_ready():
 
     startup_timeout_s = 1.0
     size = 1
+    startup_logs = []
+    monkeypatch.setattr(
+        engine_pool,
+        '_pool_debug',
+        startup_logs.append,
+    )
 
     spawned_pids = []
 
@@ -2017,7 +2023,7 @@ def test_constructor_refuses_when_worker_thread_never_reports_ready():
         """Spawns a child, then never returns from start() so ready.put is skipped."""
 
         def __init__(self, index):
-            self.name = f'silent-ready-test-{index}'
+            self.name = f'silent-ready-test slot {index}'
             self.startup_timeout_s = startup_timeout_s
             self.process = None
             self._pending_reap = []
@@ -2129,7 +2135,18 @@ def test_constructor_refuses_when_worker_thread_never_reports_ready():
     assert isinstance(exc, EngineWorkerTimeout)
     assert exc.phase == 'initialization'
     assert tuple(getattr(exc, 'failed_slots', ())) == (0,)
-    assert exc.timeout_s == pytest.approx(ready_wait_s)
+    assert exc.timeout_s == pytest.approx(startup_timeout_s)
+    diagnostic = exc.serialized_diagnostic_fields()
+    assert diagnostic['reason'] == 'engine_worker_timeout'
+    assert diagnostic['backend'] == 'silent-ready-test'
+    assert diagnostic['operation'] == 'startup'
+    assert diagnostic['phase'] == 'initialization'
+    assert diagnostic['timeout_s'] == pytest.approx(startup_timeout_s)
+    assert 'slot 0' not in diagnostic['exception_message']
+    assert '[0]' not in diagnostic['exception_message']
+    assert 'slot 0' in exc.diagnostic_detail
+    assert '[0' in exc.diagnostic_detail
+    assert any('slot 0' in entry for entry in startup_logs)
     assert elapsed <= ready_wait_s + ENGINE_POOL_AUTOMATIC_PER_POOL_BUDGET_S + 1.0
     assert spawned_pids, 'worker thread never spawned a child to reap'
     for pid in spawned_pids:
@@ -2186,7 +2203,7 @@ def test_constructor_preserves_typed_handshake_timeout_identity():
     then _discard_current → _stop_pair join(0.1)+join(1.0) *before*
     ready.put. The constructor wait used to expire during that discard
     and rewrite the typed EngineWorkerTimeout as a generic missing-slot
-    refusal ('engine worker pool slots [0]').
+    timeout.
     """
     startup_timeout_s = 0.4
     # Same join wall as WarmEngineWorker._stop_pair (diagnostic=False).
@@ -2218,9 +2235,105 @@ def test_constructor_preserves_typed_handshake_timeout_identity():
     exc = exc_info.value
     assert exc.phase == 'initialization'
     assert exc.worker_name == 'typed-handshake slot 0'
-    assert 'engine worker pool slots' not in exc.worker_name
     assert exc.timeout_s == pytest.approx(startup_timeout_s)
     assert tuple(getattr(exc, 'failed_slots', ())) == ()
+
+
+def test_constructor_normalizes_magemin_startup_timeout(monkeypatch):
+    startup_timeout_s = 0.25
+
+    def serialized_startup_timeout(failed_slot):
+        startup_logs = []
+        monkeypatch.setattr(
+            engine_pool_module,
+            '_pool_debug',
+            startup_logs.append,
+        )
+
+        class StartupTimeoutWorker:
+            def __init__(self, index):
+                self.index = index
+                self.name = f'MAGEMin subprocess pool slot {index}'
+                self.startup_timeout_s = startup_timeout_s
+                self.process = None
+                self._pending_reap = []
+                _noop_disable_and_reap(self)
+
+            def start(self, *, timeout_s=None):
+                if self.index == failed_slot:
+                    raise EngineWorkerTimeout(
+                        self.name,
+                        startup_timeout_s,
+                        phase='initialization',
+                    )
+
+        with pytest.raises(EngineWorkerTimeout) as caught:
+            EngineWorkerPool(StartupTimeoutWorker, size=failed_slot + 1)
+        return caught.value, startup_logs
+
+    first, first_logs = serialized_startup_timeout(0)
+    second, second_logs = serialized_startup_timeout(1)
+    first_diagnostic = first.serialized_diagnostic_fields()
+    second_diagnostic = second.serialized_diagnostic_fields()
+    assert first_diagnostic == second_diagnostic
+    timeout = first
+    diagnostic = first_diagnostic
+    assert diagnostic['reason'] == 'engine_worker_timeout'
+    assert diagnostic['backend'] == 'MAGEMin'
+    assert diagnostic['operation'] == 'startup'
+    assert diagnostic['phase'] == 'initialization'
+    assert diagnostic['timeout_s'] == startup_timeout_s
+    assert diagnostic['exception_message'] == (
+        'MAGEMin startup initialization exceeded hard timeout of 0.25s'
+    )
+    assert 'slot 0' not in diagnostic['exception_message']
+    assert 'slot 0' in timeout.diagnostic_detail
+    assert 'slot 1' in second.diagnostic_detail
+    assert any('slot 0' in entry for entry in first_logs)
+    assert any('slot 1' in entry for entry in second_logs)
+
+
+def test_pool_startup_timeout_message_omits_missing_slot_count(monkeypatch):
+    startup_logs = []
+    monkeypatch.setattr(
+        engine_pool_module,
+        '_pool_debug',
+        startup_logs.append,
+    )
+    pool = object.__new__(EngineWorkerPool)
+    pool._workers = [
+        SimpleNamespace(name=f'MAGEMin subprocess pool slot {index}')
+        for index in range(3)
+    ]
+
+    def serialized_missing_slots(slots):
+        timeout = EngineWorkerTimeout(
+            'MAGEMin subprocess pool startup',
+            30.0,
+            phase='initialization',
+            failed_slots=slots,
+        )
+        pool._normalize_startup_timeout(
+            timeout,
+            failed_slots=slots,
+            ready_wait_s=32.15,
+        )
+        return timeout, timeout.serialized_diagnostic_fields()
+
+    one_missing, one_diagnostic = serialized_missing_slots([0])
+    two_missing, two_diagnostic = serialized_missing_slots([0, 2])
+
+    assert one_diagnostic == two_diagnostic
+    assert one_diagnostic['backend'] == 'MAGEMin'
+    assert one_diagnostic['operation'] == 'startup'
+    assert one_diagnostic['timeout_s'] == 30.0
+    assert 'slot' not in one_diagnostic['exception_message']
+    assert '[0' not in one_diagnostic['exception_message']
+    assert '0: MAGEMin subprocess pool slot 0' in one_missing.diagnostic_detail
+    assert '2: MAGEMin subprocess pool slot 2' in two_missing.diagnostic_detail
+    assert len(startup_logs) == 2
+    assert 'slot 0' in startup_logs[0]
+    assert 'slot 2' in startup_logs[1]
 
 
 @pytest.mark.cpu_budget(20)

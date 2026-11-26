@@ -705,3 +705,50 @@ def test_magemin_silica_notice_survives_provider_dispatch(monkeypatch):
     assert result.diagnostic['liquid_fraction'] == 1.
     assert result.transition is None
     assert any('authority=extrapolated' in w for w in result.warnings)
+
+
+def test_startup_timeout_keeps_shared_diagnostic_on_unavailable_route(
+    monkeypatch,
+):
+    from simulator.engine_pool import EngineWorkerTimeout
+
+    provider = MAGEMinShadowProvider(backend=object())
+    monkeypatch.setattr(provider, '_ensure_backend', lambda: None)
+    monkeypatch.setattr(
+        provider,
+        '_composition_wt_pct',
+        lambda *_: _basalt_wt_pct(),
+    )
+    timeout = EngineWorkerTimeout(
+        'MAGEMin subprocess pool slot 5',
+        30.0,
+        phase='initialization',
+    )
+    timeout._set_diagnostic_context(backend='MAGEMin', operation='startup')
+    timeout.diagnostic_detail = 'failed worker slot(s): [5]'
+    provider._backend_initialization_error = timeout
+    request = IntentRequest(
+        intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+        account_view=ProviderAccountView(
+            accounts={},
+            species_formula_registry={},
+        ),
+        temperature_C=1500.0,
+        pressure_bar=0.001,
+    )
+
+    result = provider.dispatch(request)
+
+    assert result.status == 'unavailable'
+    diagnostic = result.diagnostic
+    assert diagnostic['backend_status'] == 'unavailable'
+    assert diagnostic['backend_status_reason'] == 'engine_worker_timeout'
+    assert diagnostic['reason'] == 'engine_worker_timeout'
+    assert diagnostic['backend_diagnostics'] == (
+        timeout.serialized_diagnostic_fields()
+    )
+    assert diagnostic['backend_diagnostics']['backend'] == 'MAGEMin'
+    assert diagnostic['backend_diagnostics']['timeout_s'] == 30.0
+    assert diagnostic['backend_diagnostics']['phase'] == 'initialization'
+    assert diagnostic['backend_diagnostics']['operation'] == 'startup'
+    assert 'slot 5' not in diagnostic['backend_diagnostics']['exception_message']

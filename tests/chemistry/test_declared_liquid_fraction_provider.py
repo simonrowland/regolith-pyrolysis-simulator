@@ -27,7 +27,10 @@ from simulator.engine_pool import (
     EngineWorkerTimeout,
     WarmEngineWorker,
 )
-from simulator.melt_backend.liquidus import LiquidusSampleError
+from simulator.melt_backend.liquidus import (
+    LiquidusSampleError,
+    find_liquidus_solidus_by_fraction,
+)
 from simulator.melt_backend.base import EquilibriumResult
 from simulator.melt_backend.magemin import MAGEMinBackend
 import simulator.melt_backend.magemin as magemin_module
@@ -872,6 +875,60 @@ def test_first_call_gate_exception_uses_flagged_calibration_floor(
     notice = sim._melt_redox_liquidus_gate_curve()['gate_provider_refusal']
     assert notice['authority'] == 'extrapolated (lower-rung)'
     assert sim.atom_ledger.mol_by_account() == before
+
+
+def test_real_liquidus_timeout_diagnostic_keeps_magemin_fallback_notice(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    timeout = EngineWorkerTimeout(
+        'MAGEMin subprocess pool slot 3',
+        15.0,
+        phase='job',
+    )
+    MAGEMinBackend._attach_magemin_timeout_diagnostic(
+        timeout,
+        '{"request_id":"liquidus-fallback"}',
+    )
+
+    def fail_sample(_temperature_C):
+        raise timeout
+
+    liquidus_result = find_liquidus_solidus_by_fraction(
+        fail_sample,
+        min_T_C=800.0,
+        max_T_C=900.0,
+        scan_step_C=100.0,
+    )
+    diagnostic = MAGEMinShadowProvider._project_equilibrium(
+        liquidus_result,
+        mode='subprocess',
+        engine_version='test',
+    ).as_diagnostic()
+    assert diagnostic['backend_status_reason'] == (
+        'warm_call_equilibrium_timeout'
+    )
+    assert diagnostic['reason'] == 'engine_worker_timeout'
+
+    monkeypatch.setattr(
+        sim,
+        '_dispatch_only',
+        lambda _intent, **_kwargs: SimpleNamespace(
+            status=liquidus_result.status,
+            diagnostic=diagnostic,
+        ),
+    )
+
+    curve = sim._freeze_gate_curve()
+
+    assert curve['source'] == 'kress91_liquid_calibration_floor'
+    assert curve['gate_provider_refusal']['availability_notice'] == {
+        'type': 'typed_notice',
+        'kind': 'freeze_gate_magemin_source_fallback',
+        'reason': 'engine_worker_timeout',
+        'attempted_source': 'magemin',
+        'source_used': 'kress91_liquid_calibration_floor',
+    }
 
 
 def test_gate_provider_is_a_run_identity_input():
