@@ -22,12 +22,13 @@ def test_powell_1971_vapour_rows_and_schema_gap_set() -> None:
     migrator.finalize()
     observations = migrator.result.observations
     assert len(observations) == 290
-    # Forty unmapped regimes used to be method-axis queue entries. DP-106
-    # keeps that sentence on the notice: torsion_effusion 12,
-    # candidate_oxide_vapour_reaction 10, van_thoff_log_pressure_slope 7,
-    # sodium_sulphate_decomposition_equilibrium 6, and the five
-    # quoted_vapour_pressure rows whose notes do not name Knudsen. The other
-    # sixteen quoted rows infer Knudsen and were never queued.
+    # Fifty-six unmapped regimes used to be resolved by map_method. Forty of
+    # them were method-axis queue entries (the sixteen quoted_vapour_pressure
+    # rows whose notes name Knudsen inferred, and were not queued). The queue
+    # no longer carries that axis. The notice names the regime as unmapped
+    # text: torsion_effusion 12, candidate_oxide_vapour_reaction 10,
+    # van_thoff_log_pressure_slope 7,
+    # sodium_sulphate_decomposition_equilibrium 6, quoted_vapour_pressure 21.
     assert len(migrator.result.queue) == 581
     assert not any(
         "phase" in (item.axes or ()) for item in migrator.result.queue
@@ -44,11 +45,11 @@ def test_powell_1971_vapour_rows_and_schema_gap_set() -> None:
         for observation in observations.values()
         if any(
             notice.kind.value == "method_unstated"
-            and "is not a closed method token" in (notice.reason or "")
+            and "source method text is not mapped:" in (notice.reason or "")
             for notice in observation.notices
         )
     ]
-    assert len(unmapped_regime_notices) == 40
+    assert len(unmapped_regime_notices) == 56
     assert not [
         issue
         for issue in migrator.result.validation.issues
