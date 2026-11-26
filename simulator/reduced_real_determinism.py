@@ -1081,7 +1081,15 @@ class PT0DeterminismStore:
         self._store(
             "freeze_gate_curve",
             key,
-            {"curve": _curve_payload(curve)},
+            {
+                "curve": _curve_payload(curve),
+                "authority": {
+                    "vapor_pressure": _provider_identity(
+                        sim,
+                        ChemistryIntent.VAPOR_PRESSURE,
+                    ),
+                },
+            },
             engine_version_provenance=_engine_version_provenance(
                 sim,
                 ChemistryIntent.GATE_LIQUID_FRACTION,

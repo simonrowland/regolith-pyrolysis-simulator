@@ -18,7 +18,7 @@ import pytest
 import yaml
 
 from engines.alphamelts import AlphaMELTSProvider
-from scripts.seed_reduced_real_cache import seed_cache
+from scripts.seed_reduced_real_cache import merge_cache_source, seed_cache
 import simulator.reduced_real_determinism as rrd
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.chemistry.kernel.capabilities import CapabilityProfile
@@ -6985,6 +6985,50 @@ def test_tier_ceiling_cached_physics_bucket_refuses_interpolation(
 
     assert payload is None
     assert store.replay_sequence == []
+
+
+def test_stub_engine_hour_captures_strict_gate_row_and_merges(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    shard_db = tmp_path / "populate-shard.sqlite"
+    merged_db = tmp_path / "merged.sqlite"
+    capture = PT0DeterminismStore(
+        "capture",
+        db_path=shard_db,
+        strict_vapor_gate=True,
+    )
+    sim = _build_pt0_sim(capture, real_provider=True)
+    stub_engine = _install_magemin_subprocess_gate(sim, monkeypatch)
+    sim.start_campaign(CampaignPhase.C2A_STAGED)
+
+    sim.step()
+
+    assert stub_engine["evaluated_compositions"]
+    assert capture.summary()["capture_calls_by_artifact"][
+        "freeze_gate_curve"
+    ] >= 1
+    with sqlite3.connect(shard_db) as conn:
+        rows = conn.execute(
+            f"SELECT key_bytes, payload_bytes FROM {PT1_EQUILIBRIUM_TABLE} "
+            "WHERE artifact = 'freeze_gate_curve' ORDER BY key_hash"
+        ).fetchall()
+    assert rows
+    key = json.loads(bytes(rows[0][0]).decode("utf-8"))
+    payload = json.loads(bytes(rows[0][1]).decode("utf-8"))
+    resolved_vapor_authority = rrd._provider_identity(
+        sim,
+        ChemistryIntent.VAPOR_PRESSURE,
+    )
+    assert payload["authority"]["vapor_pressure"] == resolved_vapor_authority
+    assert key["vapor_pressure_provider_selection"] == "builtin-vapor-pressure"
+    assert key["vapor_pressure_provider_selection"] == (
+        resolved_vapor_authority["resolved_provider_id"]
+    )
+
+    merge_result = merge_cache_source(shard_db, merged_db)
+    assert merge_result["inserted_rows"] == merge_result["rows"]
+    assert _persistent_artifact_count(merged_db, "freeze_gate_curve") == len(rows)
 
 
 def test_tier_ceiling_default_preserves_pre_c5_lookup_behavior(tmp_path: Path) -> None:
