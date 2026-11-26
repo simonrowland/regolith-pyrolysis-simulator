@@ -2017,7 +2017,8 @@ def test_qualified_continuous_negative_margin_is_priced_not_constrained(gate: st
 def test_first_snapshot_volatile_throttle_ignores_downstream_partials() -> None:
     sim = object.__new__(PyrolysisSimulator)
     sim.campaign_mgr = SimpleNamespace(
-        get_temp_target=lambda *_args: (100.0, 10.0)
+        get_temp_target=lambda *_args: (100.0, 10.0),
+        _lab_schedule=lambda *_args: None,
     )
     sim.melt = SimpleNamespace(
         campaign=CampaignPhase.C0,
@@ -2030,6 +2031,7 @@ def test_first_snapshot_volatile_throttle_ignores_downstream_partials() -> None:
         turbine_utilization_pct=0.0,
         composition={"Na": 1.0e9, "K": 1.0e9},
     )
+    sim.process_timestep = simulator_core.ONE_HOUR
     sim._volatiles_train_spec = SimpleNamespace(max_throughput_kg_hr=1.0)
     sim.record = SimpleNamespace(snapshots=[])
 
