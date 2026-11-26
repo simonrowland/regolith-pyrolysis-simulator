@@ -16576,7 +16576,6 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity | str, tuple[str, ...]] = {
         "MnO_wt_pct",
         "Na2O_wt_pct",
         "K2O_wt_pct",
-        "Rb2O_wt_pct",
         "P2O5_wt_pct",
         "Fe2O3_wt_pct",
         "WO3_wt_pct",
