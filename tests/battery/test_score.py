@@ -9323,6 +9323,7 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
     from simulator.battery.score import (
         FLAGGED_STRATUM_IRON_OXIDE_CONVENTION,
         FLAGGED_STRATUM_BINARY_COMPLEMENT_COMPOSITION,
+        FLAGGED_STRATUM_FALLBACK,
         FLAGGED_STRATUM_OXIDE_FROM_ELEMENT_MASS_PERCENT_COMPOSITION,
         FLAGGED_STRATUM_CATALOGUE_COMPOSITION,
         FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION,
@@ -9409,6 +9410,11 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
             FLAGGED_STRATUM_RESIDUE_REDOX,
             NoticeKind.FALLBACK,
             "residue_fe_speciation_kress91_fallback",
+        ),
+        (
+            FLAGGED_STRATUM_FALLBACK,
+            NoticeKind.FALLBACK,
+            "melt_activity_default_ideal",
         ),
     )
     for stratum, kind, reason in cases:
@@ -9545,6 +9551,56 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
             ]
         }
     )
+
+
+def test_non_ideal_fallbacks_remain_unflagged_and_preserve_no_band_reasons() -> None:
+    from simulator.battery.score import (
+        _headline_payload_admits,
+        _owner_no_band_reasons,
+        flagged_strata,
+    )
+
+    for reason in (
+        "derived_band_insufficient_sources",
+        "zero_scatter_aligned_group",
+    ):
+        notice = Notice(
+            kind=NoticeKind.FALLBACK,
+            affected_quantities=(Quantity.P_PARTIAL,),
+            reason=reason,
+            origin="decision-band",
+        )
+        assert flagged_strata((notice,)) == ()
+        assert _owner_no_band_reasons((notice,)) == (reason,)
+        assert _headline_payload_admits(
+            {
+                "rail": "vapour",
+                "notices": [
+                    {"kind": NoticeKind.FALLBACK.value, "reason": reason}
+                ],
+            },
+            tier="all_numeric",
+        ) is True
+
+    mass_loss = Notice(
+        kind=NoticeKind.FALLBACK,
+        affected_quantities=(Quantity.MASS_LOSS_FRACTION,),
+        reason="mass_loss_oxygen_escape_assumption",
+        origin="simulator.battery.residue.predict_mass_loss_fraction",
+    )
+    assert flagged_strata((mass_loss,)) == ()
+    assert _headline_payload_admits(
+        {
+            "rail": "mass-loss",
+            "notices": [
+                {
+                    "kind": NoticeKind.FALLBACK.value,
+                    "reason": mass_loss.reason,
+                }
+            ],
+        },
+        tier="all_numeric",
+    ) is True
 
 
 def test_knudsen_absolute_flux_requires_orifice_area() -> None:

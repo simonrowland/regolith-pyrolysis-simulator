@@ -719,6 +719,7 @@ FLAGGED_STRATUM_IRON_OXIDE_CONVENTION = "iron-oxide-convention"
 _DEFAULT_POLICY_FLAG_VALUES = frozenset(
     kind.value for kind in DEFAULT_POLICY_NOTICE_KINDS
 )
+FLAGGED_STRATUM_FALLBACK = "fallback"
 
 
 @dataclass(frozen=True)
@@ -2595,6 +2596,18 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_QUENCH_ALTERED)
     if NoticeKind.QUENCH_OXIDISING.value in kinds:
         strata.append(NoticeKind.QUENCH_OXIDISING.value)
+    if any(kind == NoticeKind.FALLBACK.value for kind, _reason in notices):
+        from simulator.battery.residue import _IDEAL_MELT_ACTIVITY_DEFAULT_FLAG
+
+        ideal_activity_default = any(
+            kind == NoticeKind.FALLBACK.value
+            and reason == _IDEAL_MELT_ACTIVITY_DEFAULT_FLAG
+            for kind, reason in notices
+        )
+    else:
+        ideal_activity_default = False
+    if ideal_activity_default:
+        strata.append(FLAGGED_STRATUM_FALLBACK)
     return tuple(strata)
 
 
@@ -16538,7 +16551,11 @@ def _predict_engine_from_supplied_inputs(
                 requested_composition=requested,
             )
         if engine is Engine.INTERNAL_ANALYTICAL and quantity is Quantity.ACTIVITY:
-            from simulator.chemistry.melt_activity import melt_oxide_activity
+            from simulator.chemistry.melt_activity import (
+                MELT_OXIDE_IDEAL_SOLUTION_MODEL,
+                MELT_OXIDE_TABLE_GAMMA_MODEL,
+                melt_oxide_activity,
+            )
 
             activity = melt_oxide_activity(
                 formula,
@@ -16621,6 +16638,26 @@ def _predict_engine_from_supplied_inputs(
                         )
                     )
             elif activity.evidence_tier == "UNCERTIFIED" or activity.warning:
+                if activity.activity_model == MELT_OXIDE_IDEAL_SOLUTION_MODEL:
+                    fallback_source = "no measured parent-oxide activity"
+                    fallback_destination = (
+                        "Raoultian gamma=1 ideal-activity convention"
+                    )
+                elif activity.activity_model == MELT_OXIDE_TABLE_GAMMA_MODEL:
+                    fallback_source = (
+                        "certified melt-activity evidence unavailable at this point"
+                    )
+                    fallback_destination = (
+                        "constant activity-coefficient table "
+                        "(melt_activity.MELT_OXIDE_ACTIVITY_COEFFICIENTS)"
+                    )
+                else:
+                    fallback_source = (
+                        "certified melt-activity evidence unavailable at this point"
+                    )
+                    fallback_destination = (
+                        f"melt-activity model {activity.activity_model or 'unknown'}"
+                    )
                 notices.append(
                     Notice(
                         kind=NoticeKind.FALLBACK,
@@ -16632,6 +16669,8 @@ def _predict_engine_from_supplied_inputs(
                         origin=(
                             "simulator.chemistry.melt_activity.melt_oxide_activity"
                         ),
+                        source=fallback_source,
+                        destination=fallback_destination,
                         authority=Authority.BRIDGE,
                     )
                 )
@@ -19594,13 +19633,21 @@ def _sossi_residue_prediction(
     test_experiment_ids: frozenset[str] | None = None,
     role_override: Mapping[str, str] | None = None,
 ) -> EnginePrediction:
-    """Predict one Sossi Mn/Ti cell from the shared per-run inventory result."""
+    """Predict one Sossi trace cell from the shared per-run inventory result."""
     channel = ENGINE_CHANNELS[engine]
     sources = ENGINE_COEFFICIENT_SOURCES[engine]
     quantity = quantity_token(reference.identity)
     is_retention = quantity is Quantity.ELEMENT_RETENTION_RATIO
     reported_quantity = quantity or Quantity.RESIDUE_COMPONENT_COMPOSITION
     formula = reference.identity.species.formula
+    from simulator.battery.residue import (
+        _ALPHA_ASSUMED_UNITY_RATIO,
+        _ALPHA_ASSUMED_UNITY_RATIO_FLAG,
+        _IDEAL_MELT_ACTIVITY_DEFAULT_FLAG,
+        _SOSSI_TRACE_PARENTS,
+    )
+
+    sossi_trace_elements = frozenset(_SOSSI_TRACE_PARENTS)
     cohort_selection = _residue_cohort_selection(
         selected_experiment_ids, test_experiment_ids
     )
@@ -19611,7 +19658,7 @@ def _sossi_residue_prediction(
             experiment_id.rsplit("::", 1)[-1]
             for experiment_id in cohort_selection
         )
-    if formula not in {"Mn", "Ti"}:
+    if formula not in sossi_trace_elements:
         return EnginePrediction(
             engine=engine,
             channel=channel,
@@ -19668,7 +19715,7 @@ def _sossi_residue_prediction(
                 experiments_by_run[short_id] = {}
                 point = row.point_conditions or {}
                 element = row.identity.species.formula
-                if element in {"Mn", "Ti"}:
+                if element in sossi_trace_elements:
                     trace = point.get("starting_component_ppm")
                     trace_ppm_by_experiment.setdefault(short_id, {})[element] = (
                         trace.state.value
@@ -20043,30 +20090,76 @@ def _sossi_residue_prediction(
                 )
             )
         activity_extensions = provenance.get("melt_activity_extensions")
-        mno_activity_extension = (
-            activity_extensions.get("MnO")
-            if isinstance(activity_extensions, Mapping)
-            else None
+        has_ideal_activity_default = isinstance(
+            activity_extensions, Mapping
+        ) and any(
+            isinstance(extension, Mapping)
+            and extension.get("flag") == _IDEAL_MELT_ACTIVITY_DEFAULT_FLAG
+            for extension in activity_extensions.values()
         )
-        if isinstance(mno_activity_extension, Mapping):
-            authority_level = str(
-                mno_activity_extension.get("authority_level") or "unknown"
-            )
-            certified_band = mno_activity_extension.get("certified_band_K")
+        if isinstance(activity_extensions, Mapping):
+            for parent_oxide, extension in activity_extensions.items():
+                if not isinstance(extension, Mapping):
+                    continue
+                if extension.get("flag") == _IDEAL_MELT_ACTIVITY_DEFAULT_FLAG:
+                    notices.append(
+                        Notice(
+                            kind=NoticeKind.FALLBACK,
+                            affected_quantities=(reported_quantity,),
+                            reason=_IDEAL_MELT_ACTIVITY_DEFAULT_FLAG,
+                            origin="sossi-residue-r5",
+                            source="no measured parent-oxide activity",
+                            destination="Raoultian gamma=1 ideal-activity convention",
+                            band=(
+                                f"parent_oxide={parent_oxide}; "
+                                + (
+                                    "printed dopant=V2O5; scored parent=V2O3 "
+                                    "per controller ruling; "
+                                    if parent_oxide == "V2O3"
+                                    else ""
+                                )
+                                + "gamma=1; "
+                                "activity=Raoultian single-cation component"
+                            ),
+                            authority=Authority.CONVENTION,
+                        )
+                    )
+                elif parent_oxide == "MnO":
+                    authority_level = str(
+                        extension.get("authority_level") or "unknown"
+                    )
+                    certified_band = extension.get("certified_band_K")
+                    notices.append(
+                        Notice(
+                            kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                            affected_quantities=(reported_quantity,),
+                            reason=str(
+                                extension.get("reason")
+                                or "MnO activity uses an uncertified extension"
+                            ),
+                            origin="sossi-residue-r5",
+                            band=(
+                                f"authority_level={authority_level}; "
+                                "certified_band_K="
+                                f"{certified_band if certified_band is not None else 'none'}"
+                            ),
+                        )
+                    )
+        assumption_flags = provenance.get("assumption_flags")
+        if (
+            isinstance(assumption_flags, Mapping)
+            and assumption_flags.get(_ALPHA_ASSUMED_UNITY_RATIO_FLAG) is True
+        ):
             notices.append(
                 Notice(
-                    kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                    kind=NoticeKind.FALLBACK,
                     affected_quantities=(reported_quantity,),
-                    reason=str(
-                        mno_activity_extension.get("reason")
-                        or "MnO activity uses an uncertified extension"
-                    ),
+                    reason=_ALPHA_ASSUMED_UNITY_RATIO_FLAG,
                     origin="sossi-residue-r5",
-                    band=(
-                        f"authority_level={authority_level}; "
-                        "certified_band_K="
-                        f"{certified_band if certified_band is not None else 'none'}"
-                    ),
+                    source="unmeasured evaporation alpha",
+                    destination="DP-005 alpha_i=1 unity-ratio convention",
+                    band=f"assumed {_ALPHA_ASSUMED_UNITY_RATIO}; alpha_i set to 1",
+                    authority=Authority.CONVENTION,
                 )
             )
         notices.extend(
@@ -20093,10 +20186,16 @@ def _sossi_residue_prediction(
             channel=channel,
             execution=Execution(
                 state=ExecutionState.PRODUCED,
-                call_evidence=f"{engine.value}:sossi:{short_id}:alpha_runtime_catalog",
+                call_evidence=(
+                    f"{engine.value}:sossi:{short_id}:"
+                    f"{provenance.get('alpha_arm') or 'alpha_arm_unspecified'}"
+                ),
             ),
             value=Decimal(str(value)),
             unit=QUANTITY_UNITS[reported_quantity],
+            authority=(
+                Authority.CONVENTION if has_ideal_activity_default else None
+            ),
             coefficient_sources=sources,
             lineage_complete=False,
             notices=tuple(notices),
