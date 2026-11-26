@@ -72,6 +72,7 @@ from simulator.source_ids import (
     HASHIMOTO_SOURCE_ID as _HASHIMOTO_SOURCE_ID,
     SF04_WORKBOOK_SOURCE_ID,
     SOSSI_SOURCE_ID as _SOSSI_SOURCE_ID,
+    WANG_2001_SOURCE_ID as _WANG_2001_SOURCE_ID,
 )
 from simulator.battery.enums import (
     QUANTITY_UNITS,
@@ -19206,16 +19207,30 @@ def _langmuir_residue_prediction(
     from simulator.battery.residue import (
         ResidueEngineNonconvergence,
         ResidueInventoryRefusal,
+        _is_wang_imp_residue_series,
+        _langmuir_residue_row_id,
         predict_langmuir_residue_composition,
     )
 
     experiment = context.experiments.get(reference.experiment_id)
     channel = ENGINE_CHANNELS[engine]
     sources = ENGINE_COEFFICIENT_SOURCES[engine]
-    cache_source_id = (
-        f"langmuir:{reference.source_id}:{reference.experiment_id}:"
+    formula = reference.identity.species.formula
+    cache_locator = (
         f"{getattr(reference.locator, 'table', None)}:"
         f"{getattr(reference.locator, 'note', None)}"
+    )
+    if reference.source_id == _WANG_2001_SOURCE_ID:
+        run_row = _langmuir_residue_row_id(reference.locator)
+        if run_row is not None:
+            # Composition inputs are shared by run row; IMP notices are not.
+            cache_locator = f"run-row:{run_row}"
+            if _is_wang_imp_residue_series(reference):
+                # IMP carries a series-specific closure notice; do not reuse
+                # the EMP/REE cached notice tuple for its residuals.
+                cache_locator += ":wang-imp"
+    cache_source_id = (
+        f"langmuir:{reference.source_id}:{reference.experiment_id}:{cache_locator}"
     )
     try:
         result = (
@@ -19230,9 +19245,18 @@ def _langmuir_residue_prediction(
                 _residue_prediction_cache_entry(
                     cache, cache_source_id, engine, value=result
                 )
-        formula = reference.identity.species.formula
         value = result["composition_wt_pct"].get(formula)
         if value is None:
+            subtype = reference.identity.subtype
+            if (
+                reference.source_id == _WANG_2001_SOURCE_ID
+                and subtype is not None
+                and subtype.is_value
+                and subtype.value == "element_ppm_by_mass"
+            ):
+                raise ResidueInventoryRefusal(
+                    "awaits_ree_channels_sossipar"
+                )
             raise ResidueInventoryRefusal("channel_missing", formula)
         provenance = {key: item for key, item in result.items() if key != "notices"}
         return EnginePrediction(
@@ -19257,6 +19281,26 @@ def _langmuir_residue_prediction(
             refusal_detail=provenance,
         )
     except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
+        notices = getattr(exc, "notices", ())
+        if (
+            isinstance(exc, ResidueInventoryRefusal)
+            and exc.reason == "awaits_ree_channels_sossipar"
+            and formula in {"Ce", "Eu"}
+        ):
+            notices = (
+                *notices,
+                Notice(
+                    kind=NoticeKind.INPUT_OMITTED,
+                    affected_quantities=(
+                        Quantity.RESIDUE_COMPONENT_COMPOSITION,
+                    ),
+                    reason=(
+                        "ree_channels_absent_no_valence_selected: the REE "
+                        "vapor channel is absent; no oxide valence was selected"
+                    ),
+                    origin=reference.observation_id,
+                ),
+            )
         return EnginePrediction(
             engine=engine,
             channel=channel,
@@ -19268,7 +19312,7 @@ def _langmuir_residue_prediction(
                 )
             ),
             coefficient_sources=sources,
-            notices=getattr(exc, "notices", ()),
+            notices=notices,
             lineage_complete=False,
             refusal_reason=(
                 RefusalReason.ATTEMPTED_UNAVAILABLE
@@ -19302,7 +19346,10 @@ def _extent_residue_method(reference, experiment, quantity) -> MethodToken | Non
     if (
         experiment.method.value is MethodToken.LANGMUIR_FREE_EVAPORATION
         and quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
-        and reference.source_id == "mendybaev-2013-fun-cai-evaporation"
+        and reference.source_id in {
+            "mendybaev-2013-fun-cai-evaporation",
+            _WANG_2001_SOURCE_ID,
+        }
         and _declared_residue_predictor(reference.source_id) is None
     ):
         return MethodToken.LANGMUIR_FREE_EVAPORATION

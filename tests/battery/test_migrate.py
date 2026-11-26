@@ -20484,13 +20484,35 @@ def test_wang_wo3_residue_cell_migrates_with_temperature_and_conditions(
     tmp_path: Path,
 ) -> None:
     # Wang et al. (2001), Table 1, SC12 ion-microprobe WO3 cell: 0.010 wt%.
-    _migrate_wang_residue_cell(
-        tmp_path,
-        field="WO3_wt_pct",
-        formula="WO3",
-        value=Decimal("0.010"),
-        observation_id="wang_2001_table1_ion_microprobe_residue_compositions",
+    source_id = "wang-2001-solar-melt-evaporation-residues"
+    result = _migrate_real_extract(
+        tmp_path / "wang-wo3-condition",
+        f"{source_id}.yaml",
     )
+    observation_prefix = (
+        f"{source_id}::wang_2001_table1_ion_microprobe_wo3_conditions::"
+    )
+    observations = [
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.startswith(observation_prefix)
+    ]
+    assert len(observations) == 16
+    observation = next(
+        row for row in observations if "row=SC12" in (row.locator.note or "")
+    )
+    assert observation.identity.species.formula == "WO3"
+    assert observation.value.point == Decimal("0.010")
+    assert observation.admission.status.value == "rejected"
+    assert observation.identity.temperature_K.value == Decimal("1673.15")
+    assert observation.point_conditions is not None
+    for key in ("temperature_K", "time_min"):
+        condition = observation.point_conditions[key]
+        assert condition.state.is_value
+        assert condition.locator is not None
+        assert condition.locator.page == 6
+        assert condition.locator.table == "2"
+    assert observation.point_conditions["time_min"].state.value == Decimal("0")
 
 
 def test_residue_series_keeps_legacy_no_temperature_point_ids(

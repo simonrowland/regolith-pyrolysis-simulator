@@ -114,6 +114,12 @@ def assert_table1_grid_matches_render(extract: dict, rendered: dict[str, list[st
         row for row in table1
         if row["values"]["analytical_method"] == "ion microprobe"
     )
+    wo3_conditions = next(
+        row
+        for row in extract["species"]["W"]["observations"]
+        if row["observation_id"]
+        == "wang_2001_table1_ion_microprobe_wo3_conditions"
+    )
     assert len(electron_probe["values"]["series"]) == 16
     assert electron_probe["uncertainty"]["confidence_level"] == "one_sigma"
     assert electron_probe["uncertainty"]["locator"]["page"] == 5
@@ -142,6 +148,10 @@ def assert_table1_grid_matches_render(extract: dict, rendered: dict[str, list[st
         (cell["sample"], cell["formula"]): cell["sigma"]
         for cell in ion_probe["uncertainty"]["zero_width_cells"]
     }
+    ion_zero_widths.update({
+        (cell["sample"], cell["formula"]): cell["sigma"]
+        for cell in wo3_conditions["uncertainty"]["zero_width_cells"]
+    })
     expected_ion_zero_widths = {
         (sample, formula): error
         for label, expected_cells in rendered.items()
@@ -164,6 +174,9 @@ def assert_table1_grid_matches_render(extract: dict, rendered: dict[str, list[st
         elif group == "AGG":
             points = next(row["values"]["rows_as_printed"] for row in extract["species"]["SiO2"]["context"] if row["observation_id"] == "wang_2001_table1_ln2o3_aggregate_no_formula")
             value_field, error_field = "SigmaLn2O3_wt_pct", "standard_error_wt_pct"
+        elif group == "IM" and formula == "WO3":
+            points = wo3_conditions["values"]["series"]
+            value_field, error_field = "WO3_wt_pct", None
         else:
             method = {"EM": "electron microprobe", "IM": "ion microprobe"}[group]
             points = composition[method]
@@ -183,12 +196,6 @@ def assert_table1_grid_matches_render(extract: dict, rendered: dict[str, list[st
                 assert point.get("standard_errors", {}).get(
                     formula, zero_widths.get((sample, formula))
                 ) == expected_error, (label, sample)
-                page = 4 if TABLE1_SAMPLES.index(sample) < 8 else 5
-                assert point["locator"]["page"] == page, (label, sample)
-                assert point["locator"]["published_page"] == page + 478, (label, sample)
-                assert point["locator"]["pdf_page_index"] == page - 1, (label, sample)
-                assert point["locator"]["table"] == "1", (label, sample)
-                assert point["locator"]["row"] == sample, (label, sample)
             elif error_field is not None:
                 assert point.get(error_field) == expected_error, (label, sample)
             else:
@@ -197,6 +204,22 @@ def assert_table1_grid_matches_render(extract: dict, rendered: dict[str, list[st
                 ) == expected_error, (label, sample)
                 if group == "IM":
                     assert "sigma" not in point, (label, sample)
+            if group in {"EM", "IM"}:
+                page = 4 if TABLE1_SAMPLES.index(sample) < 8 else 5
+                assert point["locator"]["page"] == page, (label, sample)
+                assert point["locator"]["published_page"] == page + 478, (label, sample)
+                assert point["locator"]["pdf_page_index"] == page - 1, (label, sample)
+                assert point["locator"]["table"] == "1", (label, sample)
+                assert point["locator"]["row"] == sample, (label, sample)
+                # Major-oxide composition series are formula-keyed; the separate
+                # WO3 condition series must carry the explicit printed column.
+                if group in {"EM", "IM"} and formula != "WO3":
+                    assert point["locator"].get("column", formula) == formula, (
+                        label,
+                        sample,
+                    )
+                else:
+                    assert point["locator"]["column"] == formula, (label, sample)
 
 
 def test_rendered_table_grids_and_cell_mutations() -> None:
@@ -234,6 +257,50 @@ def test_rendered_table_grids_and_cell_mutations() -> None:
     missing_error_point["sigma"] = "0.0"
     with pytest.raises(AssertionError):
         assert_table1_grid_matches_render(changed_extract, rendered)
+
+    for field, value in (
+        ("WO3_wt_pct", "999"),
+        ("column", "FeO"),
+        ("standard_error", "9.9"),
+    ):
+        changed_extract = deepcopy(extract)
+        wo3 = changed_extract["species"]["W"]["observations"][0]
+        point = next(
+            item for item in wo3["values"]["series"]
+            if item["sample"] == "SC12"
+        )
+        if field == "column":
+            point["locator"][field] = value
+        elif field == "standard_error":
+            point["standard_errors"]["WO3"] = value
+        else:
+            point[field] = value
+        with pytest.raises(AssertionError):
+            assert_table1_grid_matches_render(changed_extract, rendered)
+
+
+def test_wo3_condition_series_uses_the_paper_tungsten_attribution() -> None:
+    extract = yaml.safe_load(EXTRACT.read_text())
+    observation = extract["species"]["W"]["observations"][0]
+    paper_sentence = (
+        "The presence of tungsten in the residues (Table 1), derived from either "
+        "the heating element in the furnace or the heat shields surrounding the "
+        "sample and heating element, shows that reprecipitation of evaporated "
+        "material occurs."
+    )
+
+    assert observation["observation_id"] == (
+        "wang_2001_table1_ion_microprobe_wo3_conditions"
+    )
+    assert observation["admission_status"] == "typed_refusal"
+    assert "container_contamination_not_evaporation_observable" not in (
+        observation["refusal_reason"]
+    )
+    assert observation["refusal_reason"].startswith(
+        "tungsten_attributed_to_heating_element_or_heat_shields:"
+    )
+    assert paper_sentence in observation["locator"]["note"]
+    assert paper_sentence in observation["refusal_reason"]
 
 
 def test_table2_and_table4_rendered_rows_are_bound_to_samples() -> None:
@@ -398,6 +465,9 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
     ion_probe_prefix = (
         f"{extract['source_id']}::wang_2001_table1_ion_microprobe_residue_compositions::"
     )
+    wo3_conditions_prefix = (
+        f"{extract['source_id']}::wang_2001_table1_ion_microprobe_wo3_conditions::"
+    )
     temperature_c = {
         "SC1": "1800", "SC2": "1800", "SC3": "1800", "SC4": "1800",
         "SC5": "1800", "SC6": "2000", "SC7": "2000", "SC8": "2000",
@@ -432,15 +502,44 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
                 assert row.uncertainty.verbatim["sigma"] == expected_sigma
                 assert row.uncertainty.verbatim["confidence_level"] == "one_sigma"
             migrated_ion_probe_cells.add((sample, formula))
+        elif row.observation_id.startswith(wo3_conditions_prefix):
+            expected_value, expected_sigma = expected_ion_probe_cells[(sample, formula)]
+            assert formula == "WO3"
+            assert row.admission.status.value == "rejected"
+            assert row.value.point == Decimal(expected_value)
+            if expected_sigma is None:
+                assert row.uncertainty.kind is UncertaintyKind.NONE
+            else:
+                assert row.uncertainty.kind is UncertaintyKind.PRINTED
+                assert isinstance(row.uncertainty.verbatim, dict)
+                assert row.uncertainty.verbatim["sigma"] == expected_sigma
+                assert row.uncertainty.verbatim["confidence_level"] == "one_sigma"
+            assert row.locator.page in {4, 5}
+            assert row.locator.published_page == row.locator.page + 478
+            assert row.locator.table == "1"
+            assert f"row={sample}" in (row.locator.note or "")
+            migrated_ion_probe_cells.add((sample, formula))
 
         expected_temperature = Decimal(temperature_c[sample]) + Decimal("273.15")
         assert row.identity.temperature_K.value == expected_temperature, (quantity, sample, formula)
         assert row.locator.page == row.locator.pdf_page_index + 1
         conditions = row.point_conditions or {}
+        is_wo3_condition_row = row.observation_id.startswith(wo3_conditions_prefix)
+        # The rejected WO3 series has no printed total-pressure point condition.
         required_conditions = (
             ("temperature_K", "time_min", "total_pressure_Pa", "printed_composition")
             if quantity is Quantity.MASS_LOSS_FRACTION
-            else ("temperature_K", "time_min", "VF_wt_pct", "composition", "total_pressure_Pa")
+            else (
+                ("temperature_K", "time_min", "VF_wt_pct", "composition")
+                if is_wo3_condition_row
+                else (
+                    "temperature_K",
+                    "time_min",
+                    "VF_wt_pct",
+                    "composition",
+                    "total_pressure_Pa",
+                )
+            )
         )
         for name in required_conditions:
             assert name in conditions and conditions[name].locator is not None, (quantity, sample, formula, name)
@@ -458,12 +557,13 @@ def test_migrated_species_temperature_and_point_conditions() -> None:
                 "TiO2": "0.097",
                 "FeO": "35.5",
             }
-        pressure = conditions["total_pressure_Pa"]
-        assert pressure.state.is_value
-        assert pressure.state.value.kind is ValueKind.POINT
-        assert pressure.state.value.point == Decimal("0.00013332236842105")
-        assert pressure.state.value.approximate is True
-        assert pressure.locator.page == 3
+        if not is_wo3_condition_row:
+            pressure = conditions["total_pressure_Pa"]
+            assert pressure.state.is_value
+            assert pressure.state.value.kind is ValueKind.POINT
+            assert pressure.state.value.point == Decimal("0.00013332236842105")
+            assert pressure.state.value.approximate is True
+            assert pressure.locator.page == 3
         if quantity is Quantity.MASS_LOSS_FRACTION:
             assert formula == "unknown"
             assert row.identity.species.phase.value == "l"
@@ -528,8 +628,30 @@ def test_residue_component_errors_without_parent_convention_keep_green_behavior(
         f"{extract['source_id']}::wang_2001_table1_ion_microprobe_residue_compositions::"
     )
     ion_records = [row for row in observations if row.observation_id.startswith(ion_prefix)]
-    assert len(ion_records) == 112
+    assert len(ion_records) == 96
     assert all(row.uncertainty.kind is UncertaintyKind.NONE for row in ion_records)
+
+    wo3_prefix = (
+        f"{extract['source_id']}::wang_2001_table1_ion_microprobe_wo3_conditions::"
+    )
+    wo3_records = [row for row in observations if row.observation_id.startswith(wo3_prefix)]
+    expected_wo3_errors = {
+        (sample, "WO3"): split_value_and_error(raw_cell)[1]
+        for label, cells in cells_by_label(TABLE1_RENDER).items()
+        if label == "IM.WO3"
+        for sample, raw_cell in zip(TABLE1_SAMPLES, cells, strict=True)
+    }
+    assert len(wo3_records) == 16
+    for row in wo3_records:
+        assert row.admission.status.value == "rejected"
+        assert row.identity.species.formula == "WO3"
+        assert row.uncertainty.kind is UncertaintyKind.PRINTED
+        assert row.uncertainty.verbatim is not None
+        match = re.search(r"row=(SC\d+)(?!\d)", row.locator.note or "")
+        assert match is not None
+        expected_sigma = expected_wo3_errors[(match.group(1), "WO3")]
+        if expected_sigma is not None:
+            assert row.uncertainty.verbatim["sigma"] == expected_sigma
 
     electron_prefix = (
         f"{extract['source_id']}::wang_2001_table1_electron_microprobe_residue_compositions::"
@@ -635,10 +757,17 @@ def test_residue_component_parent_convention_controls_width_lookup(
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
 
+    ion_probe_prefix = (
+        f"{extract['source_id']}::wang_2001_table1_ion_microprobe_residue_compositions::"
+    )
+    # The content-derived child ID changes when this test mutates its parent uncertainty.
     row = next(
         observation
         for observation in migrator.result.observations.values()
-        if observation.observation_id.endswith("122b3beaa55d")
+        if observation.observation_id.startswith(ion_probe_prefix)
+        and observation.identity.species.formula == "MgO"
+        and observation.locator is not None
+        and re.search(r"row=SC12(?!\d)", observation.locator.note or "")
     )
     if expected_token == "conflict":
         assert any(

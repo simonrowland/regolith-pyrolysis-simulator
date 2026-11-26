@@ -36,6 +36,7 @@ from simulator.battery.records import as_decimal, nominal_pressure_pa
 from simulator.source_ids import (
     HASHIMOTO_SOURCE_ID,
     SOSSI_SOURCE_ID as _SOSSI_SOURCE_ID,
+    WANG_2001_SOURCE_ID,
 )
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.fe_redox import _engine_fe_speciation
@@ -54,6 +55,9 @@ _KNUDSEN_MAX_LINEAR_RHS_EVALUATIONS = 512
 _KNUDSEN_EXTENT_EVALUATION_LIMIT = "knudsen_extent_evaluation_limit"
 TRACE_TAIL_BELOW_LOADER_CUTOFF = "trace_tail_below_loader_cutoff"
 _OXIDE_WT_PERCENT_REFERENCE_MASS_KG = 1.0
+_WANG_IMP_RESIDUE_SERIES_ID = (
+    "wang_2001_table1_ion_microprobe_residue_compositions"
+)
 _HASHIMOTO_PRIMARY_ALPHA_ARM = "alpha_common_unity_sensitivity"
 _HASHIMOTO_PRIMARY_GEOMETRY = "sphere_shrinking"
 _HASHIMOTO_GEOMETRIES = (
@@ -61,6 +65,19 @@ _HASHIMOTO_GEOMETRIES = (
     "sphere_shrinking",
     "disk_4mm_constant",
 )
+
+
+def _is_wang_imp_residue_series(reference: Any) -> bool:
+    """Identify the Wang IMP series whose closure notice differs by assay."""
+    if reference.source_id != WANG_2001_SOURCE_ID:
+        return False
+    observation_id_parts = reference.observation_id.split("::", maxsplit=2)
+    return (
+        len(observation_id_parts) > 1
+        and observation_id_parts[1] == _WANG_IMP_RESIDUE_SERIES_ID
+    )
+
+
 _HASHIMOTO_DENSITY_KG_M3 = 2_700.0
 _HASHIMOTO_N_CAP = 256
 _HASHIMOTO_REFINEMENT_TOLERANCE_WT_PCT = 0.05
@@ -3481,6 +3498,18 @@ def _trace_tail_precision_threshold(
     return float(printed_quantum) / 10.0
 
 
+def _langmuir_residue_row_id(locator) -> str | None:
+    """Read the normalized printed sample-row ID from a residue locator."""
+    # The locator schema retains source row coordinates in note as ``row=...``.
+    note = locator if isinstance(locator, str) else getattr(locator, "note", None)
+    for item in (note or "").split(";"):
+        key, separator, value = item.partition("=")
+        if separator and key.strip().casefold() == "row":
+            row_id = value.strip().rstrip(".,").casefold()
+            return row_id or None
+    return None
+
+
 def predict_langmuir_residue_composition(
     engine: str, reference, experiment, observations,
 ) -> dict[str, object]:
@@ -3508,6 +3537,12 @@ def predict_langmuir_residue_composition(
     locator = reference.locator
     if locator is None or not locator.table or not locator.note:
         raise ResidueInventoryRefusal("measured_mass_loss_fraction_missing_or_invalid")
+
+    wang_run_row = (
+        _langmuir_residue_row_id(locator)
+        if reference.source_id == WANG_2001_SOURCE_ID
+        else None
+    )
     anchors = [
         row for row in observations
         if row.experiment_id == reference.experiment_id
@@ -3516,8 +3551,16 @@ def predict_langmuir_residue_composition(
         and row.admission.status is AdmissionStatus.ADMITTED
         and quantity_token(row.identity) is Quantity.MASS_LOSS_FRACTION
         and row.locator is not None
-        and row.locator.table == locator.table
-        and row.locator.note == locator.note
+        and (
+            (
+                row.locator.table == locator.table
+                and row.locator.note == locator.note
+            )
+            or (
+                wang_run_row is not None
+                and _langmuir_residue_row_id(row.locator) == wang_run_row
+            )
+        )
         and row.evidence.class_.is_value
         and row.evidence.class_.value in MEASURED_EVIDENCE
         and row.value.kind is ValueKind.POINT
@@ -3667,8 +3710,8 @@ def predict_langmuir_residue_composition(
             reason=(
                 "melt_well_mixed_assumed: R^2/D is about 1e3–4e4 s for a mm-scale "
                 "bead and D of order 1e-10 to 1e-9 m2/s (order-of-magnitude "
-                "premise, not sourced here); the printed 2.5 mm loop is not the "
-                "bead radius, which is unprinted."
+                "premise, not sourced here); the reported pellet/loop geometry "
+                "does not give the melted bead radius, which is unprinted."
             ),
             origin="Langmuir residue extent",
         ),
@@ -3696,6 +3739,41 @@ def predict_langmuir_residue_composition(
                 affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
                 reason=sample_mass_default_reason,
                 origin="Langmuir starting inventory",
+            )
+        )
+    if _is_wang_imp_residue_series(reference):
+        notices.append(
+            Notice(
+                kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+                reason=(
+                    "wang_imp_closure_basis: model basis is six-oxide wt% "
+                    "summing to 100; printed basis is total ion-microprobe "
+                    "wt% including ΣLn2O3 and WO3. Printed values are compared "
+                    "as reported without renormalization."
+                ),
+                origin=reference.observation_id,
+            )
+        )
+    if reference.source_id == WANG_2001_SOURCE_ID:
+        aggregate_ln2o3 = (experiment.conditions or {}).get(
+            "starting_aggregate_ln2o3_wt_pct"
+        )
+        aggregate_text = (
+            f"ΣLn2O3={aggregate_ln2o3.state.value} wt%"
+            if aggregate_ln2o3 is not None and aggregate_ln2o3.state.is_value
+            else "ΣLn2O3 aggregate unavailable"
+        )
+        notices.append(
+            Notice(
+                kind=NoticeKind.INPUT_OMITTED,
+                affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+                reason=(
+                    "starting inventory uses the six named major oxides; the printed "
+                    f"{aggregate_text} and La–Lu ppm are not oxide-speciated, and WO3 "
+                    "is blank, so these components are omitted rather than assigned zero."
+                ),
+                origin="Wang 2001 starting composition",
             )
         )
     fallback_row = replace(
@@ -3750,6 +3828,8 @@ def predict_langmuir_residue_composition(
 
         def pressure_model(inventory, logp, _temperature_K):
             return base_pressure_model(inventory, logp)
+
+        _inherit_residue_pressure_contract(pressure_model, base_pressure_model)
 
         result = integrate_knudsen_residue_inventory(
             initial,
