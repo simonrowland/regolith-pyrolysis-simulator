@@ -9759,12 +9759,15 @@ def _score_pressure_state(
     ):
         located_pressure = experiment.pressure_environment.total_pressure_Pa
         if located_pressure.inference is None:
-            identity_pressure = identity_pressure_state(located_pressure.state)
-            return (
-                located_pressure.state
-                if identity_pressure is None
-                else identity_pressure
-            )
+            state = located_pressure.state
+            if not state.is_value:
+                return state
+            raw = state.value
+            if isinstance(raw, Value) and raw.kind is ValueKind.INTERVAL:
+                return state
+            identity_pressure = identity_pressure_state(state)
+            if identity_pressure is not None:
+                return identity_pressure
     if (
         missing
         and observation is not None
@@ -9805,9 +9808,21 @@ def _original_pressure_reason(
         if isinstance(located, Located) and located.state.reason:
             return located.state.reason
     if experiment is not None:
-        state = experiment.pressure_environment.total_pressure_Pa.state
+        located_pressure = experiment.pressure_environment.total_pressure_Pa
+        state = located_pressure.state
         if state.reason:
             return state.reason
+        raw = state.value if state.is_value else None
+        if (
+            isinstance(raw, Value)
+            and raw.kind is ValueKind.BOUND
+            and raw.bound_operator is not None
+            and raw.bound_value is not None
+        ):
+            return (
+                f"located pressure bound {raw.bound_operator} "
+                f"{raw.bound_value} Pa"
+            )
     return "no printed total_pressure_Pa is available"
 
 
