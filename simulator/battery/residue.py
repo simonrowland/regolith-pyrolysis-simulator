@@ -1927,6 +1927,9 @@ def integrate_knudsen_residue_inventory(
     """Integrate molecular effusion on the measured *total* mass-loss extent.
 
     Each path pair is (cumulative kg/kg loss, printed step temperature K).
+    A printed extent of exactly 0 is the starting inventory: the integrator
+    does not step. A negative extent, a non-finite point, or a missing path
+    is printed_temperature_path_missing_or_invalid.
     Near saturation, q_i = P_i/sqrt(M_i); the common orifice, Clausing and
     sqrt(2*pi*R*T) factors cancel. All escaping gases, INCLUDING O and O2,
     contribute to D = sum(M_i*q_i). Then dn_i = m0*q_i/D * dxi, so
@@ -1960,7 +1963,7 @@ def integrate_knudsen_residue_inventory(
     if (
         not path or len(path) != len(source_fO2_log_by_interval)
         or any(not math.isfinite(x) or not math.isfinite(t) or t <= 0.0
-               or x <= 0.0 or x >= 1.0 for x, t in path)
+               or x < 0.0 or x >= 1.0 for x, t in path)
         or any(b[0] <= a[0] or b[1] < a[1] for a, b in zip(path, path[1:]))
         or path[-1][0] < target
     ):
