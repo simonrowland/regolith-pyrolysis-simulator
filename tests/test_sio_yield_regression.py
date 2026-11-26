@@ -662,11 +662,29 @@ def test_sio_yield_restored_capture_keeps_provenance_and_closure(feedstock):
             "terminal_offgas_escape",
         }
     )
+    # Production closure counts wall Si atoms (_sio_wall_terminal_mol).
+    # The fume map does not. Receipt 559dd172: both restored-capture
+    # closures pass once this term is added, and fail on mars without it
+    # (add74280: fume-equivalent 9.85420158521e-06 kg versus evolved
+    # 1.18288804958e-05 kg). The oxide-Fe debit (f187184015) leaves
+    # oxygen in the melt, and that oxygen books the oxidative SiO wall
+    # leg. kg / (M_g_per_mol / 1000) = mol. mol * M_SiO / 1000 = kg SiO.
+    # Only-SiO limit: the two molar-mass factors cancel.
+    wall_kg = report["wall_deposit_kg"]
+    wall_mol = {
+        species: float(wall_kg.get(species, 0.0) or 0.0)
+        / (MOLAR_MASS[species] / 1000.0)
+        for species in ("SiO", "Si", "SiO2", "FeSi")
+    }
+    wall_sio_equivalent_kg = (
+        _sio_wall_terminal_mol(wall_mol) * MOLAR_MASS["SiO"] / 1000.0
+    )
     reported_sio_equivalent_kg = (
         captured_sio2_kg * sio2_to_sio_equivalent
         + placement["condensation_train_silicon_coproduct"]
         * si_to_sio_equivalent
         + placement["terminal_offgas_escape"]
+        + wall_sio_equivalent_kg
     )
     assert reported_sio_equivalent_kg == pytest.approx(
         report["sio_evolved_kg"], rel=1.0e-8
