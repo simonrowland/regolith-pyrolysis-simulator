@@ -649,6 +649,12 @@ def test_unstarted_finite_driver_iterator_does_not_write_stop_state():
     assert session._last_drive_stop is None
 
 
+def test_zero_hour_drive_on_unstarted_session_yields_nothing():
+    session = SimSession()
+
+    assert list(drive_session(session, 0, DecisionPolicy.AUTO_APPLY)) == []
+
+
 def test_hour_budget_flag_stops_before_repeated_c2a_after_decision():
     run = _run(campaign="C2A", hours=1)
     session = _started_internal_session(run)
@@ -1025,9 +1031,11 @@ def test_live_document_remerges_raw_legacy_run_flags_once(legacy_flags):
     batch_payload = run._build_output(execution)
     batch_flags = batch_payload["run_metadata"]["run_flags"]
     live_flag = next(
-        flag for flag in batch_flags
+        flag for flag in execution.run_flags
         if flag["code"] == "run_hour_budget_exhausted_mid_campaign"
     )
+    expected_flags = [legacy_flags, live_flag]
+    assert batch_flags == expected_flags
     assert batch_flags[0] == legacy_flags
     assert batch_flags[1] == live_flag
     assert batch_flags[1]["code"] == "run_hour_budget_exhausted_mid_campaign"
@@ -1035,6 +1043,7 @@ def test_live_document_remerges_raw_legacy_run_flags_once(legacy_flags):
     session._set_result_document(batch_payload)
 
     result_flags = session.result_document()["run_metadata"]["run_flags"]
+    assert result_flags == expected_flags
     assert result_flags[0] == legacy_flags
     assert result_flags[1] == live_flag
     assert result_flags[1]["code"] == "run_hour_budget_exhausted_mid_campaign"
@@ -1071,6 +1080,34 @@ def test_live_document_replaces_stale_non_list_budget_flag():
     session._set_result_document(batch_payload)
 
     assert session.result_document()["run_metadata"]["run_flags"] == live_flag
+
+
+def test_failure_envelope_survives_campaign_stop_projection_failure(monkeypatch):
+    run = _run(campaign="C2A", hours=1)
+    session = _started_internal_session(run)
+    execution = RunExecutor().execute_session(session, hours=1)
+    execution = replace(
+        execution,
+        status="failed",
+        reason="primary_failure",
+        error_message="primary execution failure",
+        envelope_detail_unavailable="diagnostic envelope unavailable",
+    )
+
+    def raise_campaign_stop_projection(_session):
+        raise RuntimeError("campaign stop projection failed")
+
+    monkeypatch.setattr(
+        "simulator.session._campaign_stops_for_trace",
+        raise_campaign_stop_projection,
+    )
+
+    payload = run._build_output(execution)
+
+    assert payload["status"] == "failed"
+    assert payload["reason"] == "primary_failure"
+    assert "primary execution failure" in payload["error_message"]
+    assert "diagnostic envelope unavailable" in payload["error_message"]
 
 
 def test_live_result_document_recomputes_budget_flag_when_chain_completes():

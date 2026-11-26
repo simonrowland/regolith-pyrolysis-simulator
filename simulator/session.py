@@ -1204,6 +1204,8 @@ def drive_session(
     config = getattr(session, "_config", None)
     if finite_budget is None:
         finite_budget = int(getattr(config, "hours", 0) or 0) > 0
+    if not until_campaign_complete and int(hours) <= 0:
+        return
     step_index = 0
     advanced = False
 

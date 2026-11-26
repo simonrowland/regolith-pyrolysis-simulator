@@ -1370,8 +1370,9 @@ class PyrolysisRun:
                 )
         run_metadata = output.get("run_metadata")
         if isinstance(run_metadata, dict):
-            session = getattr(execution, "session", None)
+            session = None
             try:
+                session = getattr(execution, "session", None)
                 remember_raw_flags = getattr(
                     session,
                     "_remember_result_document_run_flags_source",
@@ -1382,7 +1383,18 @@ class PyrolysisRun:
             except Exception:
                 # Diagnostic bookkeeping must not mask the primary envelope.
                 pass
-            _attach_execution_diagnostics(run_metadata, session)
+            if output.get("status") in {"failed", "refused"}:
+                attached_metadata = dict(run_metadata)
+                try:
+                    _attach_execution_diagnostics(attached_metadata, session)
+                except Exception:
+                    # Preserve the complete primary failure envelope if an
+                    # optional diagnostic projection cannot be built.
+                    pass
+                else:
+                    run_metadata.update(attached_metadata)
+            else:
+                _attach_execution_diagnostics(run_metadata, session)
         return output
 
     def _minimal_failure_output(
