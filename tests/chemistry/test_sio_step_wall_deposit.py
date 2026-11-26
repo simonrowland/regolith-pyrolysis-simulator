@@ -352,11 +352,19 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
         # With c679673f5/85fedcb8e band-integrated capture across collector
         # and saturation thresholds, the unavailable-MAGEMin run measured
         # 5.12945178146e-06 kg at 1050 C under the Psat = 0 backstop.
-        # b-1188 removes the Psat = 0 backstop. Re-running this unavailable-
-        # MAGEMin report deposits 0 kg of wall Si+SiO2 at 1050 C. The trace
-        # was not a supersaturated wall-law capture.
+        # b-1188 removes the Psat = 0 backstop. The unavailable-MAGEMin
+        # report then deposited 0 kg: driving = max(0, p_local - Psat), and
+        # the 1050 C wall was not supersaturated.
+        # 2026-11-26 b274, receipt 760753a1 at b7a91af39c. The same law now
+        # deposits 1.3825809621333287e-05 kg of Si+SiO2 at 1050 C. The
+        # ledger melt-fO2 publish (a95942989e) and the d-469 native-Fe floor
+        # (8f174cc807) hold the analytical melt on the Fe line, so p_SiO
+        # rises (SiO equilibrium scales as pO2^-0.5) and the cold wall is
+        # supersaturated. The hour-path oxygen clip (60a659627a) equals the
+        # inventory at dt_h = 1, which is this report's step, so it is not
+        # the move. 1400 C and 1500 C stay the hot-wall zeros.
         assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
-            0.0, abs=1e-24
+            1.3825809621333287e-05, rel=1e-9
         )
         assert _sio_wall_product_deposit_kg(1400.0) == pytest.approx(
             0.0, rel=1e-9
