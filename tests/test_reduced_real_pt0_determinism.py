@@ -8662,19 +8662,27 @@ def _real_producer_diagnostic_mutation_sources(
         {},
     )
     assert composition
+    equilibrium_result = payload["equilibrium_result"]
+    captured_temperature_C = float(equilibrium_result["temperature_C"])
+    captured_pressure_bar = float(equilibrium_result["pressure_bar"])
+    captured_fO2_log = float(equilibrium_result["fO2_log"])
+    captured_transport_pO2_bar = float(
+        key["controls"]["vapor_transport_pO2_bar"]
+    )
+    account_view = ProviderAccountView(
+        accounts={"process.cleaned_melt": dict(composition)},
+        species_formula_registry={},
+    )
     provider = BuiltinVaporPressureProvider(_load_yaml("vapor_pressures.yaml"))
     builtin_result = provider.dispatch(
         IntentRequest(
             intent=ChemistryIntent.VAPOR_PRESSURE,
-            account_view=ProviderAccountView(
-                accounts={"process.cleaned_melt": dict(composition)},
-                species_formula_registry={},
-            ),
-            temperature_C=1800.0 - CELSIUS_TO_KELVIN_OFFSET,
-            pressure_bar=1.0e-6,
+            account_view=account_view,
+            temperature_C=captured_temperature_C,
+            pressure_bar=captured_pressure_bar,
             control_inputs={
-                "pO2_bar": 1.0e-9,
-                "intrinsic_fO2_log": -9.0,
+                "pO2_bar": captured_transport_pO2_bar,
+                "intrinsic_fO2_log": captured_fO2_log,
                 "high_t_melt_activity": "openimcc",
             },
         )
@@ -8713,14 +8721,11 @@ def _real_producer_diagnostic_mutation_sources(
     vaporock_result = vaporock_provider.dispatch(
         IntentRequest(
             intent=ChemistryIntent.VAPOR_PRESSURE,
-            account_view=ProviderAccountView(
-                accounts={"process.cleaned_melt": {"Na2O": 1.0}},
-                species_formula_registry={},
-            ),
-            temperature_C=1800.0 - CELSIUS_TO_KELVIN_OFFSET,
-            pressure_bar=1.0e-6,
-            fO2_log=-9.0,
-            control_inputs={"pO2_bar": 1.0e-9},
+            account_view=account_view,
+            temperature_C=captured_temperature_C,
+            pressure_bar=captured_pressure_bar,
+            fO2_log=captured_fO2_log,
+            control_inputs={"pO2_bar": captured_transport_pO2_bar},
         )
     )
     vaporock_diagnostic = copy.deepcopy(dict(vaporock_result.diagnostic))
@@ -8734,10 +8739,7 @@ def _real_producer_diagnostic_mutation_sources(
     )
 
     sources = []
-    result_temperature_K = (
-        float(payload["equilibrium_result"]["temperature_C"])
-        + CELSIUS_TO_KELVIN_OFFSET
-    )
+    result_temperature_K = captured_temperature_C + CELSIUS_TO_KELVIN_OFFSET
     for source_name, diagnostic in (
         ("builtin-provider-full-diagnostic", builtin_diagnostic),
         ("vaporock-provider-full-diagnostic", vaporock_diagnostic),
