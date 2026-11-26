@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import sys
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
@@ -44,6 +43,7 @@ def test_scored_knudsen_residue_uses_the_cache_off_cold_and_warm(
     tmp_path: Path, monkeypatch
 ) -> None:
     import simulator.diagnostic_helpers.binary_pot_battery as battery
+    from simulator.melt_backend import openimcc_bridge
 
     composition = Composition(
         "synthetic",
@@ -109,10 +109,10 @@ def test_scored_knudsen_residue_uses_the_cache_off_cold_and_warm(
         },
         root=ROOT,
     )
-    monkeypatch.setitem(
-        sys.modules,
-        "openimcc",
-        SimpleNamespace(load_gas_datapack=lambda: object()),
+    monkeypatch.setattr(
+        openimcc_bridge,
+        "_load_gas_pack",
+        lambda *_args, **_kwargs: object(),
     )
     monkeypatch.setattr(
         battery,

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import os
 import signal
-import sys
 from dataclasses import dataclass
 from pathlib import Path
 from types import SimpleNamespace
@@ -2738,8 +2737,8 @@ def test_non_default_openimcc_gas_pack_is_not_cached(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    from types import ModuleType
-
+    openimcc_package = pytest.importorskip("openimcc")
+    gas_module = pytest.importorskip("openimcc.gas")
     from simulator import engine_cache
     from simulator.melt_backend.openimcc_bridge import evaluate_gas
 
@@ -2758,19 +2757,17 @@ def test_non_default_openimcc_gas_pack_is_not_cached(
         calls += 1
         return {"CO(g)": float(gas_pack.value)}
 
-    fake_openimcc = SimpleNamespace(evaluate_gas=fake_evaluate_gas)
-    unavailable_error = type("FakeGasDataUnavailableError", (Exception,), {})
-    gas_module = ModuleType("openimcc.gas")
-    gas_module.ImccGasDataUnavailableError = unavailable_error
-    gas_module._packaged_pressure_signatures = lambda: (
-        "packaged-gas",
-        "packaged-condensate",
-        frozenset(),
-        frozenset(),
+    monkeypatch.setattr(openimcc_package, "evaluate_gas", fake_evaluate_gas)
+    monkeypatch.setattr(
+        gas_module,
+        "_packaged_pressure_signatures",
+        lambda: (
+            "packaged-gas",
+            "packaged-condensate",
+            frozenset(),
+            frozenset(),
+        ),
     )
-    fake_openimcc.gas = gas_module
-    monkeypatch.setitem(sys.modules, "openimcc", fake_openimcc)
-    monkeypatch.setitem(sys.modules, "openimcc.gas", gas_module)
     default_pack = SimpleNamespace(
         value=1.0,
         gas_table_digest="packaged-gas",

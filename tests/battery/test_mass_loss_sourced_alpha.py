@@ -1023,15 +1023,14 @@ def test_r11_hand_computed_hkl_and_shrinking_area(fig3_source, r11_inputs):
 
 @pytest.fixture(params=[None, ""], ids=["none-parent", "openimcc-empty-parent"])
 def prescribed_pressure_engine(monkeypatch, fig3_source, request):
-    import sys
-    from types import ModuleType
     import simulator.battery.residue as residue
     from simulator.diagnostic_helpers import binary_pot_battery
+    from simulator.melt_backend import openimcc_bridge
 
     state = {"unsourced_ca": False, "ca_coefficient": 0.000001, "pressures": []}
-    package = ModuleType("openimcc")
-    package.load_gas_datapack = lambda: object()
-    monkeypatch.setitem(sys.modules, "openimcc", package)
+    monkeypatch.setattr(
+        openimcc_bridge, "_load_gas_pack", lambda *_args, **_kwargs: object()
+    )
 
     def gas_channels(*_):
         channels = [("Mg", ("MgO", 1.0, -0.5)), ("O2", (request.param, 0.0, 1.0))]
@@ -1682,18 +1681,16 @@ def test_mass_loss_keeps_provider_recorded_omission_on_produced_and_refused_pred
     monkeypatch, fig3_source, r11_inputs,
 ):
     """A proved below-threshold channel stays on the mass-loss result and refusal."""
-    import sys
-    from types import ModuleType
-
     import simulator.battery.residue as residue
     from simulator.battery.enums import NoticeKind
     from simulator.diagnostic_helpers import binary_pot_battery
+    from simulator.melt_backend import openimcc_bridge
 
     row, experiment = r11_inputs
     temperature_K = float(score_module.temperature_of(row.identity))
-    package = ModuleType("openimcc")
-    package.load_gas_datapack = lambda: object()
-    monkeypatch.setitem(sys.modules, "openimcc", package)
+    monkeypatch.setattr(
+        openimcc_bridge, "_load_gas_pack", lambda *_args, **_kwargs: object()
+    )
     original_yaml = score_module.load_yaml
     monkeypatch.setattr(score_module, "load_yaml", lambda path: (
         deepcopy(fig3_source) if path.name == "kems-010-richter-2007.yaml" else original_yaml(path)

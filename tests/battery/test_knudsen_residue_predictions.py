@@ -424,6 +424,7 @@ def test_source_condition_cannot_supply_unweighed_oxygen():
 def extent_point(monkeypatch):
     import simulator.battery.residue as residue
     from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.melt_backend import openimcc_bridge
 
     composition = Composition("synthetic", (("FeO", Decimal("0.5")), ("MgO", Decimal("0.5"))), AmountBasis.MOLE_FRACTION)
     locator = Locator(table="2", published_page=510)
@@ -451,13 +452,41 @@ def extent_point(monkeypatch):
         ),
         thermal_schedule=ThermalSchedule(method=Located(State.of("70 K steps, 15 minutes each"), locator)),
     )
-    monkeypatch.setitem(sys.modules, "openimcc", SimpleNamespace(load_gas_datapack=lambda: object()))
+    monkeypatch.setattr(
+        openimcc_bridge, "_load_gas_pack", lambda *_args, **_kwargs: object()
+    )
     monkeypatch.setattr(battery, "_openimcc_gas_channels_and_omission_notices",
                         lambda *a: ([("Fe", ("FeO", 1, 0.5)), ("O2", (None, 1, -1))], ()))
     # Synthetic law, exact oxygen-balanced packets at every temperature.
     monkeypatch.setattr(residue, "_make_residue_pressure_model", lambda *a, **k:
                         lambda n, p: {"Fe": 1e-8 * 10**(-p / 2), "O2": 1e5 * 10**p})
     return reference, experiment, rows
+
+
+def test_sys_modules_openimcc_shadow_mutation_reproduces_gas_pack_failure(
+    monkeypatch,
+):
+    import sys
+
+    pytest.importorskip("openimcc")
+    from simulator.melt_backend import openimcc_bridge
+
+    monkeypatch.delitem(sys.modules, "openimcc.gas", raising=False)
+    original_load = openimcc_bridge._load_gas_pack
+
+    def shadowed_loader(selection):
+        monkeypatch.setitem(
+            sys.modules,
+            "openimcc",
+            SimpleNamespace(load_gas_datapack=lambda: object()),
+        )
+        return original_load(selection)
+
+    monkeypatch.setattr(openimcc_bridge, "_load_gas_pack", shadowed_loader)
+    with pytest.raises(ImportError):
+        openimcc_bridge._load_gas_pack(
+            openimcc_bridge.DEFAULT_GAS_PACK_SELECTION
+        )
 
 
 # engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
