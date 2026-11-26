@@ -28,7 +28,11 @@ from engines.alphamelts.thermoengine import (
     thermoengine_refusal_cause_from_exception,
     thermoengine_timeout_cause_from_exception,
 )
-from simulator.engine_pool import EngineWorkerTimeout
+from simulator.engine_pool import (
+    EngineWorkerDied,
+    EngineWorkerTimeout,
+    EngineWorkerUnavailable,
+)
 from simulator.config import resolve_grid_engine_model
 from simulator.melt_backend.alphamelts import (
     VaporPressureActivityRefusal,
@@ -664,16 +668,20 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                 # The pure-phase API raises the isolation and validation
                 # errors directly, retypes remote unknown-symbol/access errors
                 # as PurePhaseUnknownSymbolError/PurePhaseAccessError, and
-                # propagates worker timeouts as EngineWorkerTimeout or
-                # TimeoutError. Those are disclosure gaps. A missing CaSiO3
-                # liquid component was handled by skipping this block above.
-                # Programming and import errors must propagate instead of
-                # looking like a physical-model caveat.
+                # propagates worker death, unavailability, and timeouts as
+                # EngineWorkerDied, EngineWorkerUnavailable,
+                # EngineWorkerTimeout, or TimeoutError. Because this query
+                # follows a successful equilibrium, those mean only the
+                # disclosure is unavailable. A missing CaSiO3 liquid
+                # component was skipped above. Programming and import errors
+                # must propagate instead of looking like a model caveat.
                 except (
                     ThermoEngineIsolationError,
                     ValueError,
                     PurePhaseUnknownSymbolError,
                     PurePhaseAccessError,
+                    EngineWorkerDied,
+                    EngineWorkerUnavailable,
                     EngineWorkerTimeout,
                     TimeoutError,
                 ) as exc:

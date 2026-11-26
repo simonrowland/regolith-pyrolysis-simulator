@@ -12,6 +12,8 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     EquilibrateCell,
     Po2Request,
 )
+from simulator.engine_pool import EngineWorkerDied
+from simulator.melt_backend.pure_phase import PurePhaseAccessError
 from simulator.melt_backend.pure_phase_janaf_score import (
     ELEMENT_REFERENCE_TABLES,
     MELTS_CASIO3_HHR_SOLID_RESIDUAL_AT_1400_J_MOL,
@@ -528,6 +530,10 @@ def test_thermoengine_ca_free_liquid_omits_fusion_disclosure() -> None:
         assert result.status == 'ok', result.warnings
         components = result.chem_potentials['Liquid']['components']
         assert 'CaSiO3' not in components
+        raw_mu = result.diagnostics.get(
+            'mu_CaO_J_per_mol_melts_berman_apparent'
+        )
+        assert isinstance(raw_mu, (int, float)) and math.isfinite(raw_mu)
         notices = result.diagnostics.get('imcc_notices') or ()
         assert not any(
             'CaSiO3(l)-pWo fusion residual' in notice.get('reason', '')
@@ -541,13 +547,25 @@ def test_thermoengine_ca_free_liquid_omits_fusion_disclosure() -> None:
     not thermoengine_package_available(),
     reason='ThermoEngine runtime is not installed',
 )
+@pytest.mark.parametrize(
+    'fusion_failure',
+    [
+        pytest.param(
+            PurePhaseAccessError('forced pWo fusion query failure'),
+            id='pure-phase-access',
+        ),
+        pytest.param(
+            EngineWorkerDied('call', 'forced pWo worker death'),
+            id='worker-died',
+        ),
+    ],
+)
 def test_thermoengine_fusion_failure_is_disclosed_on_cao_activity(
-    monkeypatch,
+    monkeypatch, fusion_failure,
 ) -> None:
     from simulator.battery.enums import Engine, Quantity
     from simulator.battery.score import _cell_notices_scoped_to_cao_activity
     from simulator.melt_backend.thermoengine import ThermoEngineBackend
-    from simulator.melt_backend.pure_phase import PurePhaseAccessError
 
     temperature_K = 1933.0
     backend = ThermoEngineBackend()
@@ -568,7 +586,7 @@ def test_thermoengine_fusion_failure_is_disclosed_on_cao_activity(
 
         def fail_pwo_fusion_query(symbol, *, temperature_K, pressure_bar):
             if symbol == 'pWo':
-                raise PurePhaseAccessError('forced pWo fusion query failure')
+                raise fusion_failure
             return backend.transport.pure_phase_properties(
                 symbol,
                 temperature_K=temperature_K,
@@ -603,7 +621,10 @@ def test_thermoengine_fusion_failure_is_disclosed_on_cao_activity(
         )
         assert gap.affected_quantities == (Quantity.ACTIVITY,)
         assert gap.band is None
-        assert 'PurePhaseAccessError: forced pWo fusion query failure' in gap.reason
+        assert (
+            f'{type(fusion_failure).__name__}: {fusion_failure}'
+            in gap.reason
+        )
 
         def fail_with_name_error(symbol, *, temperature_K, pressure_bar):
             raise NameError('forced fusion implementation error')
