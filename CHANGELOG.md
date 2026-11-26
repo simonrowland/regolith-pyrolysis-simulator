@@ -4,6 +4,13 @@ Notable changes to the regolith-pyrolysis-simulator. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); the project is research-stage (pre-1.0),
 so minor versions may carry significant changes.
 
+## Unreleased
+
+- d-476 aligns the ThermoEngine CaSiO3 exchange potential to the named-phase
+  HHR solid reference and flags its measured CaSiO3 fusion residual per row.
+  The residual is reported as a model systematic and is not applied as a
+  correction.
+
 ## [0.6.8] — 2026-11-12
 
 - Every campaign-scoped C6 refusal is priced unavailable. The executor

@@ -134,6 +134,56 @@ AL2SIO5_MULLITE_ABOVE_K = 1473.0
 # the constant, so per-phase rows are unaffected.
 MELTS_QUARTZ_ADJUSTMENT_KJ_MOL = -1.291
 
+# HHR (1982), pp. 49–50, reports CaSiO3(cr) with its phase named. At 1400 K,
+# the Berman pWo apparent G is 3151.241 J/mol above the HHR value after adding
+# the same Ca-001, Si-001 and O-029 element terms. Apply that independently
+# measured solid-component basis offset to the MELTS CaSiO3−SiO2 exchange
+# before comparing it with JANAF CaO. The 1000 K wollastonite check leaves
+# −0.204 kJ/mol, within HHR's stated ±0.608 kJ/mol formation-G uncertainty.
+MELTS_CASIO3_HHR_BASIS_OFFSET_J_MOL = 3151.241323
+
+
+def casio3_fusion_delta_g_kJ_mol(temperature_K: float) -> float:
+    """Adamkovičová et al. (1980) CaSiO3 fusion ΔG at temperature T.
+
+    Eq. (8), p. 197, gives ΔH_fus(1817 K)=57.3 kJ/mol and Eq. (6)/(7)
+    give Cp(s)=0.06358+5.724e−5*T and Cp(l)=0.14985 kJ/(mol K). Integrating
+    ΔCp from the fusion point supplies the final two terms.
+    """
+
+    temperature = float(temperature_K)
+    if not math.isfinite(temperature) or temperature <= 0.0:
+        raise ValueError('temperature_K must be finite and positive')
+    fusion_temperature = 1817.0
+    delta_temperature = temperature - fusion_temperature
+    delta_cp_intercept = 0.14985 - 0.06358
+    delta_cp_slope = 5.724e-5
+    return (
+        57.3 * (1.0 - temperature / fusion_temperature)
+        + delta_cp_intercept
+        * (
+            delta_temperature
+            - temperature * math.log(temperature / fusion_temperature)
+        )
+        + 0.5 * delta_cp_slope * delta_temperature**2
+    )
+
+
+def casio3_fusion_model_systematic_dex(
+    melts_delta_g_J_mol: float,
+    temperature_K: float,
+) -> float:
+    """Signed MELTS-minus-calorimetry fusion residual, expressed in dex."""
+
+    temperature = float(temperature_K)
+    model_delta_g = float(melts_delta_g_J_mol)
+    if not math.isfinite(model_delta_g):
+        raise ValueError('MELTS fusion Gibbs energy must be finite')
+    source_delta_g = casio3_fusion_delta_g_kJ_mol(temperature) * 1000.0
+    return (model_delta_g - source_delta_g) / (
+        GAS_CONSTANT * temperature * math.log(10.0)
+    )
+
 # JANAF formation-reaction reference state for each element.  The ``ref``
 # table already switches crystal -> liquid -> gas at the printed markers
 # and keeps H-H(298.15) on the 298.15 K element zero.  The separate cr and
@@ -262,11 +312,13 @@ def cao_activity_from_melts_exchange_mu(
     """Convert the MELTS exchange potential to the row's CaO standard state.
 
     Premise: the worker returns μ_CaO = μ(CaSiO3) − μ(SiO2) on MELTS's
-    apparent Berman basis; the row prints pure solid or liquid CaO. The
-    JANAF G0 reference is shifted onto that same basis using Ca-001 and O-029.
-    Algebra: μ_CaO = G0_ref + RT ln(a), hence ln(a)=(μ_CaO−G0_ref)/(RT).
-    Units: J/mol divided by J/(mol K)·K is dimensionless. Sanity: when
-    μ_CaO equals G0_ref, ln(a)=0 and the returned activity is exactly 1.
+    apparent Berman basis; the row prints pure solid or liquid CaO. The named-
+    phase HHR solid anchor measures a +3151.241 J/mol CaSiO3-component offset,
+    so subtract it before comparing with JANAF's CaO G0, shifted to the same
+    basis using Ca-001 and O-029. Algebra: μ_CaO,aligned=μ_CaO−ΔG_basis and
+    ln(a)=(μ_CaO,aligned−G0_ref)/(RT). Units: J/mol divided by
+    J/(mol K)·K is dimensionless. Sanity: when aligned μ_CaO equals G0_ref,
+    ln(a)=0 and the returned activity is exactly 1.
     """
 
     temperature = float(temperature_K)
@@ -278,7 +330,10 @@ def cao_activity_from_melts_exchange_mu(
     g0_kJ_mol, extrapolated = melts_reference_g0_cao_kJ_mol(
         temperature, phase,
     )
-    ln_activity = (mu - g0_kJ_mol * 1000.0) / (GAS_CONSTANT * temperature)
+    aligned_mu = mu - MELTS_CASIO3_HHR_BASIS_OFFSET_J_MOL
+    ln_activity = (aligned_mu - g0_kJ_mol * 1000.0) / (
+        GAS_CONSTANT * temperature
+    )
     try:
         activity = math.exp(ln_activity)
     except OverflowError as exc:

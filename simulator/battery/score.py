@@ -8246,6 +8246,7 @@ def cell_notices(
                     affected_quantities=(quantity,),
                     reason=str(row.get("reason") or kind),
                     origin=f"engine:{engine.value}",
+                    band=None if row.get("band") is None else str(row["band"]),
                 )
             )
         elif kind == NoticeKind.INPUT_OMITTED.value:

@@ -41,6 +41,10 @@ from simulator.melt_backend.base import (
     fo2_gas_only_diagnostic,
 )
 from simulator.melt_backend.pure_phase import PurePhaseProperties
+from simulator.melt_backend.pure_phase_janaf_score import (
+    casio3_fusion_model_systematic_dex,
+)
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET, GAS_CONSTANT
 from simulator.melt_backend.vaporock import VapoRockBackend
 from simulator.scalar_boundary import is_declared_real_scalar
 
@@ -580,6 +584,66 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                         base_source='thermoengine',
                     )
                 )
+            cao_model_systematic_notice = None
+            cao_exchange_mu = (
+                payload.mu_CaO_J_per_mol_melts_berman_apparent
+            )
+            if cao_exchange_mu is not None:
+                # Premise: μ(CaSiO3)=G0(CaSiO3,l)+RT ln(a), and both the
+                # liquid component and named pWo standard state use the same
+                # apparent Berman basis. Remove the activity term, then compare
+                # G0(l)−G0(pWo) with calorimetric fusion. The signed residual is
+                # a model caveat, never a correction to μ_CaO. J/mol divided by
+                # RT ln(10) is dimensionless dex.
+                try:
+                    liquid = payload.chem_potentials.get('Liquid') or {}
+                    components = liquid.get('components') or {}
+                    mu_casio3 = float(components['CaSiO3'])
+                    activity_casio3 = float(
+                        payload.activity_coefficients['CaSiO3']
+                    )
+                    temperature_K = (
+                        float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET
+                    )
+                    if (
+                        not math.isfinite(activity_casio3)
+                        or activity_casio3 <= 0.0
+                    ):
+                        raise ValueError('CaSiO3 activity is not positive')
+                    pwo = self.pure_phase_properties(
+                        'pWo',
+                        temperature_K=temperature_K,
+                        pressure_bar=solved_pressure_bar,
+                    )
+                    if pwo.G_J_mol is None:
+                        raise ValueError('ThermoEngine pWo G is absent')
+                    g0_casio3_liquid = (
+                        mu_casio3
+                        - GAS_CONSTANT * temperature_K
+                        * math.log(activity_casio3)
+                    )
+                    fusion_residual_dex = casio3_fusion_model_systematic_dex(
+                        g0_casio3_liquid - float(pwo.G_J_mol),
+                        temperature_K,
+                    )
+                    cao_model_systematic_notice = {
+                        'kind': 'engine_model_caveat',
+                        'reason': (
+                            'ThermoEngine CaSiO3(l)-pWo fusion residual '
+                            'against Adamkovičová et al. (1980), Eq. (8)'
+                        ),
+                        'band': (
+                            f'{fusion_residual_dex:+.8g} dex at '
+                            f'{temperature_K:g} K'
+                        ),
+                    }
+                except Exception:
+                    # Without the phase-named fusion diagnostic, omit the
+                    # exchange potential so CaO stays a typed refusal.
+                    cao_exchange_mu = None
+            emitted_imcc_notices = []
+            if cao_model_systematic_notice is not None:
+                emitted_imcc_notices.append(cao_model_systematic_notice)
             eq = self._emit_equilibrium_result(
                 temperature_C=temperature_C,
                 pressure_bar=solved_pressure_bar,
@@ -613,10 +677,14 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                         **(
                             {
                                 MELTS_CAO_EXCHANGE_MU_FIELD:
-                                    payload.mu_CaO_J_per_mol_melts_berman_apparent
+                                    cao_exchange_mu
                             }
-                            if payload.mu_CaO_J_per_mol_melts_berman_apparent
-                            is not None
+                            if cao_exchange_mu is not None
+                            else {}
+                        ),
+                        **(
+                            {'imcc_notices': emitted_imcc_notices}
+                            if emitted_imcc_notices
                             else {}
                         ),
                         'thermodynamic_basis': dict(
