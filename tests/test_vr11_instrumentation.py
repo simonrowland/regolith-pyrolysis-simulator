@@ -1191,6 +1191,7 @@ def test_unclosed_surface_requires_nonpositive_capped_drive_for_empty_flux(
     else:
         flux = EvaporationMixin._calculate_evaporation(model, equilibrium)
         assert flux.species_kg_hr == {}
+        assert flux.total_kg_hr == 0.0
         assert model._last_evaporation_flux_diagnostic["batch_channel_states"] == {
             "Fe": "zero_by_physics",
         }
