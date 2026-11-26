@@ -587,12 +587,28 @@ def test_richter07_table1_residue_uses_langmuir_extent_owner(monkeypatch):
     assert prediction is not None
     assert prediction.value is not None, prediction.refusal_detail
     assert prediction.refusal_reason is None
-    expected_inventory = residue._oxide_wt_percent_to_mol_inventory(
+    reference_inventory = residue._oxide_wt_percent_to_mol_inventory(
         residue._initial_oxide_wt_percent(
             context.experiments[reference.experiment_id].sample
         )
     )
-    assert starting_inventories == [expected_inventory]
+    # Table 1 prints R3-12 initial weight 25.4 mg. The Langmuir owner scales
+    # the 1 kg oxide inventory by that located mass (Mendybaev sample-mass scale).
+    printed_mass_kg = float(Decimal("25.4") / Decimal("1000000"))
+    scale = printed_mass_kg / residue._OXIDE_WT_PERCENT_REFERENCE_MASS_KG
+    expected_inventory = {
+        oxide: amount * scale for oxide, amount in reference_inventory.items()
+    }
+    assert len(starting_inventories) == 1
+    captured = starting_inventories[0]
+    assert captured.keys() == expected_inventory.keys()
+    for oxide, amount in expected_inventory.items():
+        assert captured[oxide] == pytest.approx(amount, rel=1.0e-12, abs=0.0)
+    reconstructed_mass_kg = sum(
+        amount * residue._formula_terms(oxide)[1]
+        for oxide, amount in captured.items()
+    )
+    assert reconstructed_mass_kg == pytest.approx(printed_mass_kg, rel=1.0e-12, abs=0.0)
 
 
 def test_score_store_caches_langmuir_extent_per_bead_and_rechecks_anchors(monkeypatch):
