@@ -37,6 +37,9 @@ def _put_cache_row(
     tag: str,
     artifact: str = "freeze_gate_curve",
 ) -> dict:
+    from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
+
+    builtin_provider_id = BuiltinVaporPressureProvider.name
     key = {
         "artifact": artifact,
         "code_version": "test",
@@ -46,9 +49,9 @@ def _put_cache_row(
         "tag": tag,
     }
     vapor_pressure_provider = {
-        "resolved_provider_id": "builtin-vapor-pressure",
+        "resolved_provider_id": builtin_provider_id,
         "resolved_role": "authoritative",
-        "authoritative_provider_id": "builtin-vapor-pressure",
+        "authoritative_provider_id": builtin_provider_id,
         "fallback_provider_id": None,
         "fallback_allowed": False,
     }
