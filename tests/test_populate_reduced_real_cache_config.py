@@ -428,6 +428,32 @@ def test_populate_merge_refreshes_stale_stamp_for_identical_row(tmp_path):
     assert stored_version == rrd.PT0_GATE_CURVE_CODEC_VERSION
 
 
+def test_populate_superseded_row_with_unreadable_key_is_not_decoded(tmp_path):
+    driver = _load_driver()
+    shard_db = tmp_path / "unreadable-stale-shard.db"
+    target_db = tmp_path / "unreadable-stale-target.db"
+    key = _pt1_key("unreadable-stale-key")
+    key["artifact"] = "freeze_gate_curve"
+    key["namespace_id"] = "magemin:stale-fixture"
+    key_hash = _write_pt1_row(shard_db, key)
+    with sqlite3.connect(shard_db) as conn:
+        conn.execute(
+            f"UPDATE {driver.PT1_EQUILIBRIUM_TABLE} "
+            "SET key_bytes = ?, payload_codec_version = ? WHERE key_hash = ?",
+            (
+                sqlite3.Binary(b"not-json"),
+                rrd.PT0_GATE_CURVE_CODEC_VERSION - 1,
+                key_hash,
+            ),
+        )
+
+    summary = driver._merge_cache_shard(shard_db, target_db)
+
+    assert summary["superseded_rows"] == 1
+    assert summary["magemin_unique_keys"] == 0
+    assert driver._cache_payload_rows(target_db) == []
+
+
 @pytest.mark.parametrize(
     ("codec_version", "superseded"),
     (

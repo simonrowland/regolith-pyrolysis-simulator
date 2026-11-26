@@ -812,6 +812,7 @@ def _magemin_key_hashes(db_path: Path) -> set[str]:
 def _merge_cache_shard(shard_path: Path, target_path: Path) -> dict[str, Any]:
     rows = _cache_payload_rows(shard_path)
     admitted_key_hashes: set[str] = set()
+    magemin_key_hashes: set[str] = set()
     superseded_rows = 0
     for row in rows:
         artifact = str(row["artifact"])
@@ -823,8 +824,13 @@ def _merge_cache_shard(shard_path: Path, target_path: Path) -> dict[str, Any]:
         if codec_stamp_is_current is False:
             superseded_rows += 1
             continue
-        _validated_cache_payload_row(row)
-        admitted_key_hashes.add(str(row["key_hash"]))
+        validated_row = _validated_cache_payload_row(row)
+        key_hash = str(row["key_hash"])
+        admitted_key_hashes.add(key_hash)
+        if str(validated_row["key"].get("namespace_id") or "").startswith(
+            "magemin:"
+        ):
+            magemin_key_hashes.add(key_hash)
     result = _copy_pt1_equilibrium_rows(
         [shard_path],
         target_path,
@@ -837,9 +843,7 @@ def _merge_cache_shard(shard_path: Path, target_path: Path) -> dict[str, Any]:
         "rows": len(rows),
         "superseded_rows": superseded_rows,
         "inserted_rows": int(result["inserted_rows"]),
-        "magemin_unique_keys": len(
-            _magemin_key_hashes(shard_path) & admitted_key_hashes
-        ),
+        "magemin_unique_keys": len(magemin_key_hashes),
     }
 
 

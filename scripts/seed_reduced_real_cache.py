@@ -350,16 +350,15 @@ def seed_cache(target: Path, sources: Iterable[Path]) -> dict[str, Any]:
     }
     before = payload_count(target)
     source_summaries: list[dict[str, Any]] = []
-    admitted_key_hashes = {
-        str(row["key_hash"])
-        for _source, rows in validated_sources
-        for row in rows
+    admitted_key_hashes_by_source = {
+        source.resolve(): {str(row["key_hash"]) for row in rows}
+        for source, rows in validated_sources
     }
     merged = _copy_pt1_equilibrium_rows(
         [source for source, _rows in validated_sources],
         target,
         require_capture_epoch_match=True,
-        key_hashes=admitted_key_hashes,
+        key_hashes_by_source=admitted_key_hashes_by_source,
     )
     merge_by_source = {
         Path(summary["source"]).resolve(): summary

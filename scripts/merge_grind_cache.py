@@ -36,16 +36,15 @@ def main(argv: list[str]) -> int:
             rows = validate_cache_source_rows(src)
             source_rows.append((src, rows))
         # Validate source content before the shared helper migrates the target.
-        admitted_key_hashes = {
-            str(row["key_hash"])
-            for _source, rows in source_rows
-            for row in rows
+        admitted_key_hashes_by_source = {
+            source.resolve(): {str(row["key_hash"]) for row in rows}
+            for source, rows in source_rows
         }
         result = _copy_pt1_equilibrium_rows(
             sources,
             target,
             require_capture_epoch_match=False,
-            key_hashes=admitted_key_hashes,
+            key_hashes_by_source=admitted_key_hashes_by_source,
         )
     except (OSError, RuntimeError, sqlite3.Error, ValueError) as exc:
         print(f"error: {exc}", file=sys.stderr)

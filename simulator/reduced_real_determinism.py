@@ -3152,8 +3152,9 @@ def _copy_pt1_equilibrium_rows(
     *,
     require_capture_epoch_match: bool,
     key_hashes: Iterable[str] | None = None,
+    key_hashes_by_source: Mapping[Path, Iterable[str]] | None = None,
 ) -> dict[str, Any]:
-    """Migrate the target, then atomically merge source rows by column name."""
+    """Migrate the target, then atomically merge admitted rows by source."""
 
     target_path = Path(target_path).expanduser()
     target_resolved = target_path.resolve()
@@ -3191,6 +3192,12 @@ def _copy_pt1_equilibrium_rows(
         source_summaries: list[dict[str, Any]] = []
 
         for source_path in sources:
+            source_hashes = selected_hashes
+            if key_hashes_by_source is not None:
+                source_hashes = {
+                    str(item)
+                    for item in key_hashes_by_source.get(source_path.resolve(), ())
+                }
             source_uri = f"{source_path.resolve().as_uri()}?mode=ro"
             source_conn = sqlite3.connect(source_uri, uri=True)
             source_conn.row_factory = sqlite3.Row
@@ -3201,15 +3208,15 @@ def _copy_pt1_equilibrium_rows(
                         f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})"
                     )
                 }
-                if selected_hashes is None:
+                if source_hashes is None:
                     source_rows = source_conn.execute(
                         f"SELECT * FROM {PT1_EQUILIBRIUM_TABLE}"
                     ).fetchall()
-                elif not selected_hashes:
+                elif not source_hashes:
                     source_rows = []
                 else:
                     source_rows = []
-                    selected_list = sorted(selected_hashes)
+                    selected_list = sorted(source_hashes)
                     for start in range(0, len(selected_list), 900):
                         batch = selected_list[start : start + 900]
                         placeholders = ",".join("?" for _ in batch)

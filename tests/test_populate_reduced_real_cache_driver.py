@@ -226,6 +226,7 @@ def _write_equilibrium_post_record_row_raw(
                 artifact,
                 store_schema_version,
                 request_schema_version,
+                payload_codec_version,
                 key_sha256,
                 payload_sha256,
                 key_bytes,
@@ -236,13 +237,14 @@ def _write_equilibrium_post_record_row_raw(
                 data_digests_json,
                 created_at,
                 git_dirty
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 hashlib.sha256(key_bytes).hexdigest(),
                 "equilibrium_post_record",
                 rrd.PT1_STORE_SCHEMA_VERSION,
                 key["schema_version"],
+                rrd._payload_codec_version("equilibrium_post_record"),
                 hashlib.sha256(key_bytes).hexdigest(),
                 hashlib.sha256(payload_bytes).hexdigest(),
                 sqlite3.Binary(key_bytes),

@@ -33,7 +33,12 @@ from simulator.reduced_real_determinism import (
 )
 
 
-def _put_cache_row(db_path: Path, *, tag: str) -> None:
+def _put_cache_row(
+    db_path: Path,
+    *,
+    tag: str,
+    with_vapor_authority: bool = False,
+) -> None:
     key = {
         "artifact": "freeze_gate_curve",
         "code_version": "test",
@@ -55,6 +60,17 @@ def _put_cache_row(db_path: Path, *, tag: str) -> None:
             "tag": tag,
         },
     }
+    if with_vapor_authority:
+        key["vapor_pressure_provider_selection"] = "builtin-vapor-pressure"
+        payload["authority"] = {
+            "vapor_pressure": {
+                "resolved_provider_id": "builtin-vapor-pressure",
+                "resolved_role": "authoritative",
+                "authoritative_provider_id": "builtin-vapor-pressure",
+                "fallback_provider_id": None,
+                "fallback_allowed": False,
+            },
+        }
     key_bytes = canonical_json_bytes(key)
     payload_bytes = canonical_json_bytes(payload)
     PT1PersistentEquilibriumStore(db_path).put(
@@ -68,23 +84,34 @@ def _put_cache_row(db_path: Path, *, tag: str) -> None:
     )
 
 
-def _mark_authorityless_v3_gate_row(db_path: Path) -> None:
+def _mark_authorityless_v3_gate_row(
+    db_path: Path,
+    *,
+    preserve_key: bool = False,
+) -> None:
     with sqlite3.connect(db_path) as conn:
-        old_key_hash, key_bytes = conn.execute(
-            f"SELECT key_hash, key_bytes FROM {PT1_EQUILIBRIUM_TABLE}"
+        old_key_hash, key_bytes, payload_bytes = conn.execute(
+            f"SELECT key_hash, key_bytes, payload_bytes FROM {PT1_EQUILIBRIUM_TABLE}"
         ).fetchone()
         key = json.loads(bytes(key_bytes).decode("utf-8"))
-        key["vapor_pressure_provider_selection"] = "builtin-vapor-pressure"
+        payload = json.loads(bytes(payload_bytes).decode("utf-8"))
+        payload.pop("authority", None)
+        if not preserve_key:
+            key["vapor_pressure_provider_selection"] = "builtin-vapor-pressure"
         current_key_bytes = canonical_json_bytes(key)
         current_key_hash = hashlib.sha256(current_key_bytes).hexdigest()
+        current_payload_bytes = canonical_json_bytes(payload)
         conn.execute(
             f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
             "SET key_hash = ?, key_bytes = ?, key_sha256 = ?, "
-            "payload_codec_version = ? WHERE key_hash = ?",
+            "payload_bytes = ?, payload_sha256 = ?, payload_codec_version = ? "
+            "WHERE key_hash = ?",
             (
                 current_key_hash,
                 sqlite3.Binary(current_key_bytes),
                 current_key_hash,
+                sqlite3.Binary(current_payload_bytes),
+                hashlib.sha256(current_payload_bytes).hexdigest(),
                 rrd.PT0_GATE_CURVE_CODEC_VERSION - 1,
                 old_key_hash,
             ),
@@ -186,16 +213,18 @@ def _put_internal_analytical_cache_row(db_path: Path) -> None:
             f"""
             INSERT INTO {PT1_EQUILIBRIUM_TABLE} (
                 key_hash, artifact, store_schema_version,
-                request_schema_version, key_sha256, payload_sha256,
+                request_schema_version, payload_codec_version,
+                key_sha256, payload_sha256,
                 key_bytes, payload_bytes, code_version, corpus_version,
                 engine_version, data_digests_json, created_at, git_dirty
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 key_hash,
                 "equilibrium_post_record",
                 PT1_STORE_SCHEMA_VERSION,
                 SCHEMA_VERSION,
+                rrd._payload_codec_version("equilibrium_post_record"),
                 key_hash,
                 payload_hash,
                 sqlite3.Binary(key_bytes),
@@ -232,7 +261,7 @@ def test_seed_cache_merges_sources_idempotently(tmp_path: Path) -> None:
     ],
     ids=("current-stamp", "legacy-unmigrated"),
 )
-def test_seed_cache_preserves_or_carries_missing_payload_codec_version(
+def test_seed_cache_skips_legacy_and_preserves_current_payload_codec_version(
     tmp_path: Path,
     drop_codec_column: bool,
     expected_version: int | None,
@@ -247,7 +276,14 @@ def test_seed_cache_preserves_or_carries_missing_payload_codec_version(
                 "DROP COLUMN payload_codec_version"
             )
 
-    seed_cache(target, [source])
+    summary = seed_cache(target, [source])
+
+    if drop_codec_column:
+        assert summary["sources"][0]["source_rows"] == 1
+        assert summary["sources"][0]["superseded_rows"] == 1
+        assert summary["sources"][0]["inserted_rows"] == 0
+        assert payload_count(target) == 0
+        return
 
     with sqlite3.connect(target) as conn:
         (stored_version,) = conn.execute(
@@ -547,6 +583,62 @@ def test_cache_merge_skips_and_reports_superseded_gate_source_rows(
         assert "source_rows=1 superseded_rows=1 inserted=0" in capsys.readouterr().out
 
     assert payload_count(target) == 0
+
+
+@pytest.mark.parametrize("transport", ("seed", "merge"))
+def test_cache_merge_admission_and_counts_are_per_source_for_shared_key(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    transport: str,
+) -> None:
+    stale_source = tmp_path / "a-stale-source.db"
+    current_source = tmp_path / "b-current-source.db"
+    target = tmp_path / f"{transport}-target.db"
+    _put_cache_row(
+        current_source,
+        tag="shared-key",
+        with_vapor_authority=True,
+    )
+    shutil.copyfile(current_source, stale_source)
+    _mark_authorityless_v3_gate_row(stale_source, preserve_key=True)
+
+    with sqlite3.connect(stale_source) as stale_conn, sqlite3.connect(
+        current_source
+    ) as current_conn:
+        stale_key_hash = stale_conn.execute(
+            f"SELECT key_hash FROM {PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()[0]
+        current_key_hash = current_conn.execute(
+            f"SELECT key_hash FROM {PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()[0]
+        current_payload = current_conn.execute(
+            f"SELECT payload_bytes FROM {PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()[0]
+    assert stale_key_hash == current_key_hash
+
+    if transport == "seed":
+        result = seed_cache(target, [stale_source, current_source])
+        stale_summary, current_summary = result["sources"]
+        assert stale_summary["superseded_rows"] == 1
+        assert stale_summary["inserted_rows"] == 0
+        assert current_summary["superseded_rows"] == 0
+        assert current_summary["inserted_rows"] == 1
+    else:
+        assert merge_grind_cache.main(
+            [str(target), str(stale_source), str(current_source)]
+        ) == 0
+        output = capsys.readouterr().out
+        assert "a-stale-source.db: source_rows=1 superseded_rows=1 inserted=0" in output
+        assert "b-current-source.db: source_rows=1 superseded_rows=0 inserted=1" in output
+
+    with sqlite3.connect(target) as conn:
+        stored_key_hash, stored_payload, stored_codec_version = conn.execute(
+            f"SELECT key_hash, payload_bytes, payload_codec_version "
+            f"FROM {PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+    assert stored_key_hash == current_key_hash
+    assert bytes(stored_payload) == bytes(current_payload)
+    assert stored_codec_version == rrd.PT0_GATE_CURVE_CODEC_VERSION
 
 
 def test_seed_cache_refuses_mixed_epoch_collision_without_mutating_target(
