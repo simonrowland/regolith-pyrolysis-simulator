@@ -22,7 +22,6 @@ from simulator.battery.enums import (
 )
 from simulator.battery.identity import Identity
 from simulator.battery.records import Execution, Residual, Species
-from simulator.source_ids import HASHIMOTO_SOURCE_ID
 
 from . import factories as F
 
@@ -105,7 +104,6 @@ def test_species_filter_keeps_element_retention_row_once(
     retention = replace(
         mn,
         observation_id="mn-retention",
-        source_id=HASHIMOTO_SOURCE_ID,
         identity=replace(
             mn.identity,
             quantity=Quantity.ELEMENT_RETENTION_RATIO,
