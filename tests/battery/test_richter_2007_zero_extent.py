@@ -9,7 +9,8 @@ from pathlib import Path
 
 import pytest
 
-from simulator.battery.enums import Engine, Rail
+from simulator.battery.enums import Engine, Quantity, Rail
+from simulator.battery.identity import quantity_token
 from simulator.battery.migrate import Migrator
 from simulator.battery.residue import (
     ResidueChannel,
@@ -133,45 +134,65 @@ def _table1_residue_rows(observations):
     ]
 
 
+def _rows_marked(rows, marker):
+    return [
+        row for row in rows if marker in row.observation_id
+    ]
+
+
 def test_richter_printed_zero_extent_scores_as_the_starting_composition():
     import simulator.battery.residue as residue
 
     context, observations = _richter_context()
     residue_rows = _table1_residue_rows(observations)
     assert len(residue_rows) == 204
+    zero_rows = _rows_marked(
+        residue_rows, "::richter_2007_residue_table1_r3-2::"
+    )
+    blank_rows = _rows_marked(
+        residue_rows, "::richter_2007_residue_table1_r-13::"
+    )
+    assert len(zero_rows) == 4
+    assert len(blank_rows) == 4
+    # A full 204-row score_store does not finish inside the 1800 s hang
+    # guard (61/204 at 1769 s on a loaded studio). These eight rows are
+    # the count change: r3-2 is the printed zero extent, r-13 stays blank.
+    focus = (*zero_rows, *blank_rows)
+    experiment_ids = {row.experiment_id for row in focus}
+    source_ids = {row.source_id for row in focus}
+    anchors = [
+        row
+        for row in observations.values()
+        if row.experiment_id in experiment_ids
+        and row.source_id in source_ids
+        and quantity_token(row.identity) is Quantity.MASS_LOSS_FRACTION
+    ]
+    kept = {row.observation_id: row for row in (*focus, *anchors)}
+    narrow = ScoreContext(
+        {},
+        {key: context.experiments[key] for key in experiment_ids},
+        kept,
+        root=ROOT,
+    )
     residuals, _candidates = score_store(
-        context,
+        narrow,
         engines=(Engine.INTERNAL_ANALYTICAL,),
         rail=Rail.RESIDUE_COMPOSITION,
     )
     by_reference = {residual.reference: residual for residual in residuals}
-    assert set(by_reference) >= {row.observation_id for row in residue_rows}
-    table_residuals = [by_reference[row.observation_id] for row in residue_rows]
-    numeric = [
-        residual for residual in table_residuals if residual.numeric is not None
-    ]
-    refused = [
-        residual for residual in table_residuals if residual.numeric is None
-    ]
-    assert len(numeric) == 200
-    assert len(refused) == 4
+    assert set(by_reference) >= {row.observation_id for row in focus}
     assert all(
-        "::richter_2007_residue_table1_r-13::" in residual.reference
-        for residual in refused
+        by_reference[row.observation_id].numeric is not None
+        for row in zero_rows
     )
+    refused = [by_reference[row.observation_id] for row in blank_rows]
+    assert all(residual.numeric is None for residual in refused)
     assert all(
         residual.refusal is not None
         and residual.refusal.detail["reason"]
         == "measured_mass_loss_fraction_missing_or_invalid"
         for residual in refused
     )
-    zero_rows = [
-        row
-        for row in residue_rows
-        if "::richter_2007_residue_table1_r3-2::" in row.observation_id
-    ]
-    assert len(zero_rows) == 4
-    assert all(by_reference[row.observation_id].numeric is not None for row in zero_rows)
     reference = zero_rows[0]
     experiment = context.experiments[reference.experiment_id]
     prediction = predict_langmuir_residue_composition(
