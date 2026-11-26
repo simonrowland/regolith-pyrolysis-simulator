@@ -36,8 +36,16 @@ def main(argv: list[str]) -> int:
             rows = validate_cache_source_rows(src)
             source_rows.append((src, rows))
         # Validate source content before the shared helper migrates the target.
+        admitted_key_hashes = {
+            str(row["key_hash"])
+            for _source, rows in source_rows
+            for row in rows
+        }
         result = _copy_pt1_equilibrium_rows(
-            sources, target, require_capture_epoch_match=False
+            sources,
+            target,
+            require_capture_epoch_match=False,
+            key_hashes=admitted_key_hashes,
         )
     except (OSError, RuntimeError, sqlite3.Error, ValueError) as exc:
         print(f"error: {exc}", file=sys.stderr)
@@ -47,9 +55,11 @@ def main(argv: list[str]) -> int:
     source_by_path = {source.resolve(): rows for source, rows in source_rows}
     for source_result in result["sources"]:
         src = Path(source_result["source"])
-        source_count = len(source_by_path[src.resolve()])
+        admitted_rows = source_by_path[src.resolve()]
+        source_count = payload_count(src)
         print(
             f"merged {src.name}: source_rows={source_count} "
+            f"superseded_rows={source_count - len(admitted_rows)} "
             f"inserted={source_result['inserted_rows']}"
         )
     final = payload_count(target)

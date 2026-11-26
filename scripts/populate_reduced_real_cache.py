@@ -48,6 +48,7 @@ from simulator.reduced_real_determinism import (
     PT1_SUPPORTED_STORE_SCHEMA_VERSIONS,
     PT1PersistentEquilibriumStore,
     _physics_ladder_values_from_replay_key,
+    _payload_codec_stamp_is_current,
     canonical_json_bytes,
     canonical_physics_bucket_key_from_replay_key,
     _copy_pt1_equilibrium_rows,
@@ -810,17 +811,35 @@ def _magemin_key_hashes(db_path: Path) -> set[str]:
 
 def _merge_cache_shard(shard_path: Path, target_path: Path) -> dict[str, Any]:
     rows = _cache_payload_rows(shard_path)
+    admitted_key_hashes: set[str] = set()
+    superseded_rows = 0
     for row in rows:
+        artifact = str(row["artifact"])
+        codec_version = row.get("payload_codec_version")
+        codec_stamp_is_current = _payload_codec_stamp_is_current(
+            artifact,
+            codec_version,
+        )
+        if codec_stamp_is_current is False:
+            superseded_rows += 1
+            continue
         _validated_cache_payload_row(row)
+        admitted_key_hashes.add(str(row["key_hash"]))
     result = _copy_pt1_equilibrium_rows(
-        [shard_path], target_path, require_capture_epoch_match=False
+        [shard_path],
+        target_path,
+        require_capture_epoch_match=False,
+        key_hashes=admitted_key_hashes,
     )
     return {
         "merged": True,
         "source": "temporary_shard",
         "rows": len(rows),
+        "superseded_rows": superseded_rows,
         "inserted_rows": int(result["inserted_rows"]),
-        "magemin_unique_keys": len(_magemin_key_hashes(shard_path)),
+        "magemin_unique_keys": len(
+            _magemin_key_hashes(shard_path) & admitted_key_hashes
+        ),
     }
 
 
@@ -836,10 +855,21 @@ def _discarded_cache_shard_summary(shard_path: Path, reason: str) -> dict[str, A
     }
 
 
-def _prepare_replay_cache(target_path: Path, replay_path: Path) -> None:
+def _prepare_replay_cache(
+    target_path: Path,
+    replay_path: Path,
+) -> dict[str, Any] | None:
     PT1PersistentEquilibriumStore(replay_path)
     if target_path.exists():
-        _merge_cache_shard(target_path, replay_path)
+        merge_summary = _merge_cache_shard(target_path, replay_path)
+        return {
+            **merge_summary,
+            "source": "existing_cache",
+            "target": "temporary_replay_cache",
+            "phase": "preparation",
+            "path": str(replay_path),
+        }
+    return None
 
 
 def _replay_cache_merge_summary(shard_path: Path, replay_path: Path) -> dict[str, Any]:
@@ -1003,6 +1033,7 @@ def main(argv: list[str]) -> int:
     args.db.parent.mkdir(parents=True, exist_ok=True)
     live_results = []
     cache_merges: list[dict[str, Any]] = []
+    replay_preparation_summary: dict[str, Any] | None = None
     run_magemin_key_hashes: set[str] = set()
     pending_shards: list[tuple[dict[str, Any], Path]] = []
     captured_cases: list[tuple[str, str]] = []
@@ -1016,7 +1047,12 @@ def main(argv: list[str]) -> int:
         replay_db_path = args.db
         if args.validate_replay:
             replay_db_path = work_path / "replay-validation.db"
-            _prepare_replay_cache(args.db, replay_db_path)
+            replay_preparation_summary = _prepare_replay_cache(
+                args.db,
+                replay_db_path,
+            )
+            if replay_preparation_summary is not None:
+                cache_merges.append(replay_preparation_summary)
 
         case_index = 0
         for feedstock in feedstocks:
@@ -1198,7 +1234,11 @@ def main(argv: list[str]) -> int:
             validation is not None and not validation["cached_exact_confirmed"]
         )
         if args.validate_replay:
-            cache_merges = []
+            cache_merges = (
+                [replay_preparation_summary]
+                if replay_preparation_summary is not None
+                else []
+            )
             if validation_failed:
                 for case_result, shard_db in pending_shards:
                     discard_summary = _discarded_cache_shard_summary(

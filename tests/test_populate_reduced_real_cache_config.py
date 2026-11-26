@@ -346,7 +346,7 @@ def test_merge_cache_shard_recomputes_identity_contract(tmp_path):
     ],
     ids=("current-stamp", "legacy-unmigrated"),
 )
-def test_populate_merge_preserves_or_carries_missing_payload_codec_version(
+def test_populate_merge_skips_missing_codec_for_versioned_artifacts(
     tmp_path,
     drop_codec_column,
     expected_version,
@@ -368,7 +368,12 @@ def test_populate_merge_preserves_or_carries_missing_payload_codec_version(
     assert source_row["payload_codec_version"] == expected_version
     validated = driver._validated_cache_payload_row(source_row)
     assert validated["payload_codec_version"] == expected_version
-    driver._merge_cache_shard(shard_db, target_db)
+    summary = driver._merge_cache_shard(shard_db, target_db)
+
+    if drop_codec_column:
+        assert summary["superseded_rows"] == 1
+        assert driver._cache_payload_rows(target_db) == []
+        return
 
     with sqlite3.connect(target_db) as conn:
         (stored_version,) = conn.execute(
@@ -421,6 +426,78 @@ def test_populate_merge_refreshes_stale_stamp_for_identical_row(tmp_path):
             (key_hash,),
         ).fetchone()
     assert stored_version == rrd.PT0_GATE_CURVE_CODEC_VERSION
+
+
+@pytest.mark.parametrize(
+    ("codec_version", "superseded"),
+    (
+        (None, True),
+        (rrd.PT0_GATE_CURVE_CODEC_VERSION - 1, True),
+        (rrd.PT0_GATE_CURVE_CODEC_VERSION, False),
+    ),
+    ids=("missing-stamp", "old-stamp", "current-stamp"),
+)
+def test_replay_preparation_supersedes_old_gate_rows_before_strict_validation(
+    tmp_path: Path,
+    codec_version: int | None,
+    superseded: bool,
+) -> None:
+    driver = _load_driver()
+    existing_db = tmp_path / "existing-cache.db"
+    replay_db = tmp_path / "replay-cache.db"
+    key = _pt1_key(f"gate-replay-{codec_version}")
+    key["artifact"] = "freeze_gate_curve"
+    payload = {
+        "authority": {
+            "vapor_pressure": _pt1_payload("gate-replay")["authority"][
+                "vapor_pressure"
+            ]
+        },
+        "curve": {
+            "source": "unit-test:gate-replay",
+            "solidus_T_C": 1200.0,
+            "liquidus_T_C": 1300.0,
+            "path": [
+                {"temperature_C": 1200.0, "liquid_fraction": 0.0},
+                {"temperature_C": 1300.0, "liquid_fraction": 1.0},
+            ],
+            "is_liquidus_floor": False,
+        },
+    }
+    key_hash = _write_pt1_row(existing_db, key, payload)
+    legacy_payload = {"curve": payload["curve"]}
+    legacy_bytes = _canonical_bytes(legacy_payload)
+    with sqlite3.connect(existing_db) as conn:
+        conn.execute(
+            f"UPDATE {driver.PT1_EQUILIBRIUM_TABLE} "
+            "SET payload_bytes = ?, payload_sha256 = ?, "
+            "payload_codec_version = ? WHERE key_hash = ?",
+            (
+                sqlite3.Binary(legacy_bytes),
+                hashlib.sha256(legacy_bytes).hexdigest(),
+                codec_version,
+                key_hash,
+            ),
+        )
+
+    if not superseded:
+        with pytest.raises(
+            driver.GrindSourceGateError,
+            match="vapor_pressure_provider must identify a live source",
+        ):
+            driver._prepare_replay_cache(existing_db, replay_db)
+        assert driver._cache_payload_rows(replay_db) == []
+        return
+
+    summary = driver._prepare_replay_cache(existing_db, replay_db)
+
+    assert summary is not None
+    assert summary["phase"] == "preparation"
+    assert summary["rows"] == 1
+    assert summary["superseded_rows"] == 1
+    assert summary["inserted_rows"] == 0
+    assert driver._cache_payload_rows(replay_db) == []
+    assert len(driver._cache_payload_rows(existing_db)) == 1
 
 
 @pytest.mark.parametrize(

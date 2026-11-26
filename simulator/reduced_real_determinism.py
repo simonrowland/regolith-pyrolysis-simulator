@@ -186,6 +186,21 @@ def _payload_codec_version(artifact: str) -> int | None:
     return None
 
 
+def _payload_codec_stamp_is_current(
+    artifact: str,
+    payload_codec_version: int | None,
+) -> bool | None:
+    """Classify a codec stamp; ``None`` means the artifact is unversioned."""
+
+    expected_version = _payload_codec_version(artifact)
+    if expected_version is None:
+        return None
+    return (
+        type(payload_codec_version) is int
+        and payload_codec_version == expected_version
+    )
+
+
 def _decode_payload_for_admission(
     artifact: str,
     payload: Any,
@@ -193,13 +208,13 @@ def _decode_payload_for_admission(
     payload_codec_version: int | None = None,
     keys: Sequence[Mapping[str, Any]] = (),
 ) -> Any | None:
-    expected_version = _payload_codec_version(artifact)
-    if expected_version is None:
+    codec_stamp_is_current = _payload_codec_stamp_is_current(
+        artifact,
+        payload_codec_version,
+    )
+    if codec_stamp_is_current is None:
         return payload
-    if (
-        type(payload_codec_version) is not int
-        or payload_codec_version != expected_version
-    ):
+    if not codec_stamp_is_current:
         return None
     if not isinstance(payload, Mapping):
         return None

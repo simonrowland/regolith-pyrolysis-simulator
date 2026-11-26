@@ -68,6 +68,29 @@ def _put_cache_row(db_path: Path, *, tag: str) -> None:
     )
 
 
+def _mark_authorityless_v3_gate_row(db_path: Path) -> None:
+    with sqlite3.connect(db_path) as conn:
+        old_key_hash, key_bytes = conn.execute(
+            f"SELECT key_hash, key_bytes FROM {PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+        key = json.loads(bytes(key_bytes).decode("utf-8"))
+        key["vapor_pressure_provider_selection"] = "builtin-vapor-pressure"
+        current_key_bytes = canonical_json_bytes(key)
+        current_key_hash = hashlib.sha256(current_key_bytes).hexdigest()
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+            "SET key_hash = ?, key_bytes = ?, key_sha256 = ?, "
+            "payload_codec_version = ? WHERE key_hash = ?",
+            (
+                current_key_hash,
+                sqlite3.Binary(current_key_bytes),
+                current_key_hash,
+                rrd.PT0_GATE_CURVE_CODEC_VERSION - 1,
+                old_key_hash,
+            ),
+        )
+
+
 def _put_real_equilibrium_cache_row(db_path: Path) -> None:
     key = {
         "schema_version": SCHEMA_VERSION,
@@ -501,6 +524,29 @@ def test_seed_cache_refuses_invalid_later_source_without_mutating_target(
 
     assert target.read_bytes() == before
     assert payload_count(target) == 1
+
+
+@pytest.mark.parametrize("transport", ("seed", "merge"))
+def test_cache_merge_skips_and_reports_superseded_gate_source_rows(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    transport: str,
+) -> None:
+    source = tmp_path / f"{transport}-codec-v3-source.db"
+    target = tmp_path / f"{transport}-codec-v3-target.db"
+    _put_cache_row(source, tag=f"{transport}-codec-v3")
+    _mark_authorityless_v3_gate_row(source)
+
+    if transport == "seed":
+        result = seed_cache(target, [source])
+        assert result["sources"][0]["source_rows"] == 1
+        assert result["sources"][0]["superseded_rows"] == 1
+        assert result["sources"][0]["inserted_rows"] == 0
+    else:
+        assert merge_grind_cache.main([str(target), str(source)]) == 0
+        assert "source_rows=1 superseded_rows=1 inserted=0" in capsys.readouterr().out
+
+    assert payload_count(target) == 0
 
 
 def test_seed_cache_refuses_mixed_epoch_collision_without_mutating_target(

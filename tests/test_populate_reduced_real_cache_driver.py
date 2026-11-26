@@ -837,6 +837,13 @@ def test_validate_replay_publishes_only_after_success(tmp_path, monkeypatch):
     assert emitted[-1]["replay"][0]["store_summary"]["cache_state_counts"][
         "cached_exact"
     ] == 1
+    preparation = next(
+        item
+        for item in emitted[-1]["cache_merges"]
+        if item.get("phase") == "preparation"
+    )
+    assert preparation["source"] == "existing_cache"
+    assert preparation["superseded_rows"] == 0
     assert driver._cache_row_summary(target_db)["rows"] == 1
 
 

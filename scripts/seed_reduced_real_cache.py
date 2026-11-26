@@ -23,6 +23,7 @@ from simulator.reduced_real_determinism import (  # noqa: E402
     PT1_STORE_SCHEMA_VERSION,
     PT1_SUPPORTED_STORE_SCHEMA_VERSIONS,
     _PT1CacheMergeCollision,
+    _payload_codec_stamp_is_current,
     canonical_json_bytes,
     _copy_pt1_equilibrium_rows,
     validate_reduced_real_equilibrium_record_key,
@@ -163,8 +164,15 @@ def _source_payload_rows(source: Path) -> list[dict[str, Any]]:
 
 def validate_cache_source_rows(source: Path) -> list[dict[str, Any]]:
     validate_source_schema(source)
-    rows = _source_payload_rows(source)
-    for row in rows:
+    source_rows = _source_payload_rows(source)
+    validated_rows: list[dict[str, Any]] = []
+    for row in source_rows:
+        artifact = str(row["artifact"])
+        if _payload_codec_stamp_is_current(
+            artifact,
+            row.get("payload_codec_version"),
+        ) is False:
+            continue
         invalid_types = [
             field for field in _REQUIRED_TEXT_FIELDS if not isinstance(row[field], str)
         ]
@@ -197,7 +205,6 @@ def validate_cache_source_rows(source: Path) -> list[dict[str, Any]]:
                 "PT-1 cache source row has invalid repair notices: "
                 f"{source}:{row['key_hash']}"
             ) from exc
-        artifact = str(row["artifact"])
         key_hash = str(row["key_hash"])
         key_bytes = bytes(row["key_bytes"])
         payload_bytes = bytes(row["payload_bytes"])
@@ -260,7 +267,8 @@ def validate_cache_source_rows(source: Path) -> list[dict[str, Any]]:
         row["store_schema_version"] = PT1_STORE_SCHEMA_VERSION
         row["validated_key"] = key
         row["validated_payload"] = payload
-    return rows
+        validated_rows.append(row)
+    return validated_rows
 
 
 def merge_cache_source(
@@ -274,21 +282,28 @@ def merge_cache_source(
         if validated_rows is not None
         else validate_cache_source_rows(source)
     )
+    source_rows = payload_count(source)
+    superseded_rows = source_rows - len(rows)
     if source.resolve() == target.resolve():
         return {
             "merged": True,
             "source": str(source),
-            "rows": len(rows),
+            "rows": source_rows,
+            "superseded_rows": superseded_rows,
             "inserted_rows": 0,
         }
     result = _copy_pt1_equilibrium_rows(
-        [source], target, require_capture_epoch_match=True
+        [source],
+        target,
+        require_capture_epoch_match=True,
+        key_hashes={str(row["key_hash"]) for row in rows},
     )
     source_result = result["sources"][0]
     return {
         "merged": True,
         "source": str(source),
-        "rows": len(rows),
+        "rows": source_rows,
+        "superseded_rows": superseded_rows,
         "inserted_rows": int(source_result["inserted_rows"]),
     }
 
@@ -335,10 +350,16 @@ def seed_cache(target: Path, sources: Iterable[Path]) -> dict[str, Any]:
     }
     before = payload_count(target)
     source_summaries: list[dict[str, Any]] = []
+    admitted_key_hashes = {
+        str(row["key_hash"])
+        for _source, rows in validated_sources
+        for row in rows
+    }
     merged = _copy_pt1_equilibrium_rows(
         [source for source, _rows in validated_sources],
         target,
         require_capture_epoch_match=True,
+        key_hashes=admitted_key_hashes,
     )
     merge_by_source = {
         Path(summary["source"]).resolve(): summary
@@ -356,12 +377,13 @@ def seed_cache(target: Path, sources: Iterable[Path]) -> dict[str, Any]:
             )
             continue
         rows = validated_by_source[source.resolve()]
-        source_rows = len(rows)
+        source_rows = payload_count(source)
         result = merge_by_source[source.resolve()]
         source_summaries.append(
             {
                 "source": str(source),
                 "source_rows": source_rows,
+                "superseded_rows": source_rows - len(rows),
                 "inserted_rows": int(result["inserted_rows"]),
             }
         )
@@ -410,7 +432,9 @@ def main(argv: list[str] | None = None) -> int:
         skipped = f" skipped={source['skipped']}" if "skipped" in source else ""
         print(
             f"source {source['source']}: "
-            f"rows={source['source_rows']} inserted={source['inserted_rows']}"
+            f"rows={source['source_rows']} "
+            f"superseded_rows={source.get('superseded_rows', 0)} "
+            f"inserted={source['inserted_rows']}"
             f"{skipped}"
         )
     print(

@@ -563,13 +563,12 @@ class _CountingSilicateEquilibriumProvider(ChemistryProvider):
         return self.engine_version
 
 
-def _run_authoritative_alphamelts_equilibrium(
-    store: PT0DeterminismStore | None,
+def _configure_authoritative_alphamelts_equilibrium(
+    sim,
     provider: _CountingSilicateEquilibriumProvider,
     *,
     allow_internal_analytical_fallback: bool = True,
 ):
-    sim = _build_pt0_sim(store)
     class AlphaMELTSBackend(RealBackendAuthority):
         real_backend_family = RealBackendFamily.ALPHAMELTS
 
@@ -592,6 +591,20 @@ def _run_authoritative_alphamelts_equilibrium(
     sim._chem_registry.register(
         provider,
         [ChemistryIntent.SILICATE_EQUILIBRIUM],
+    )
+    return sim
+
+
+def _run_authoritative_alphamelts_equilibrium(
+    store: PT0DeterminismStore | None,
+    provider: _CountingSilicateEquilibriumProvider,
+    *,
+    allow_internal_analytical_fallback: bool = True,
+):
+    sim = _configure_authoritative_alphamelts_equilibrium(
+        _build_pt0_sim(store),
+        provider,
+        allow_internal_analytical_fallback=allow_internal_analytical_fallback,
     )
     return sim._get_equilibrium()
 
@@ -4050,6 +4063,29 @@ def test_pt1_persistent_store_round_trips_exact_payload(
         provider_role="fallback",
     )
 
+    # This independent payload pin is built from the literal curve and the
+    # production resolver's declared vapor identity, before capture runs.
+    expected_payload = {
+        "curve": {
+            "source": "gate_liquid_fraction:fallback:magemin-shadow",
+            "solidus_T_C": 1210.0,
+            "liquidus_T_C": 1320.0,
+            "path": [
+                {"temperature_C": 1210.0, "liquid_fraction": 0.0},
+                {"temperature_C": 1320.0, "liquid_fraction": 1.0},
+            ],
+            "is_liquidus_floor": False,
+        },
+        "authority": {
+            "vapor_pressure": rrd._provider_identity(
+                sim,
+                ChemistryIntent.VAPOR_PRESSURE,
+            ),
+        },
+    }
+    expected_bytes = canonical_json_bytes(expected_payload)
+    expected_digest = hashlib.sha256(expected_bytes).hexdigest()
+
     runtime_record = seed_gate_curve_memo_record(sim, curve)
     assert set(runtime_record) == {
         "curve",
@@ -4099,16 +4135,9 @@ def test_pt1_persistent_store_round_trips_exact_payload(
     assert not any("interpolation" in column for column in columns)
     assert row[0] == "freeze_gate_curve"
     assert row[1]
-    assert row[2]
-    # Gate payload bytes intentionally include authority.vapor_pressure now;
-    # pin the exact PT1 round trip against the production capture serializer.
-    expected_payload = capture._entries[_key_hash(key)]["payload"]
-    assert expected_payload["authority"]["vapor_pressure"] == (
-        rrd._provider_identity(sim, ChemistryIntent.VAPOR_PRESSURE)
-    )
-    expected_bytes = canonical_json_bytes(expected_payload)
+    # Gate payload bytes intentionally include authority.vapor_pressure.
     assert bytes(row[3]) == expected_bytes
-    assert row[2] == hashlib.sha256(expected_bytes).hexdigest()
+    assert row[2] == expected_digest
     payload = json.loads(bytes(row[3]))
     assert payload == expected_payload
     assert b"producer_pid" not in row[3]
@@ -7112,6 +7141,12 @@ def test_stub_engine_hour_captures_strict_gate_row_and_merges(
     sim = _build_pt0_sim_with_strict_vapor_default(capture)
     assert len(sim._chem_registry.gate_provider_order) == 1
     stub_engine = _install_magemin_subprocess_gate(sim, monkeypatch)
+    equilibrium_provider = _CountingSilicateEquilibriumProvider()
+    _configure_authoritative_alphamelts_equilibrium(
+        sim,
+        equilibrium_provider,
+        allow_internal_analytical_fallback=False,
+    )
     sim.start_campaign(CampaignPhase.C2A_STAGED)
 
     sim.step()
