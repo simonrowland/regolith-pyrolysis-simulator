@@ -9732,9 +9732,6 @@ def _score_pressure_state(
         point_pressure = _printed_condition_decimal(observation, "total_pressure_Pa")
         if point_pressure is not None:
             return State.of(point_pressure)
-        if observation.source_id == "borisov-2018-compilation":
-            # The source identifies this compilation as a 1 atm dataset.
-            return State.of(ATM_PA_DECIMAL)
     if missing and experiment is not None:
         from simulator.battery.waypoints import (
             _prediction_pressure_waypoint,
@@ -9768,6 +9765,14 @@ def _score_pressure_state(
                 if identity_pressure is None
                 else identity_pressure
             )
+    if (
+        missing
+        and observation is not None
+        and observation.source_id == "borisov-2018-compilation"
+    ):
+        # Use the compilation's 1 atm premise only when the row and run
+        # provide no usable total pressure.
+        return State.of(ATM_PA_DECIMAL)
     return pressure
 
 
