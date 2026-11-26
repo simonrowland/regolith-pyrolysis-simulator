@@ -2031,6 +2031,7 @@ def test_first_snapshot_volatile_throttle_ignores_downstream_partials() -> None:
         turbine_utilization_pct=0.0,
         composition={"Na": 1.0e9, "K": 1.0e9},
     )
+    sim.process_timestep = simulator_core.ONE_HOUR
     sim._volatiles_train_spec = SimpleNamespace(max_throughput_kg_hr=1.0)
     sim.record = SimpleNamespace(snapshots=[])
 
