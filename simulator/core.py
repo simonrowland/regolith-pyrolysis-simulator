@@ -16587,6 +16587,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         threshold = termination[
                             'na_endpoint_threshold_atom_mol'
                         ]
+                        for value in (residual_na_kg, threshold):
+                            if isinstance(value, bool) or not isinstance(
+                                value,
+                                (int, float),
+                            ):
+                                raise TypeError(
+                                    'C4 endpoint diagnostics must be numeric'
+                                )
+                            if not math.isfinite(value):
+                                raise ValueError(
+                                    'C4 endpoint diagnostics must be finite'
+                                )
                         flags.append({
                             'kind': 'campaign_stop',
                             'code': 'c4_time_capped_without_na_endpoint',

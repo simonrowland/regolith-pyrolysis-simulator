@@ -71,6 +71,14 @@ def _live_budget_flag(session: SimSession) -> dict:
     )
 
 
+def _diagnostic_unresolved_flag(session: SimSession) -> dict:
+    session._last_drive_stop = "hour_budget"
+    return next(
+        flag for flag in _run_flags_for_export(session)
+        if flag["code"] == "diagnostic_unresolved"
+    )
+
+
 def test_run_executor_returns_structured_execution():
     execution = RunExecutor().execute(_run()._session_config())
 
@@ -927,12 +935,14 @@ def test_run_flag_export_preserves_legacy_entries_when_eligibility_fails(monkeyp
 
     _attach_execution_diagnostics(metadata, session)
 
-    assert metadata["run_flags"][0] == "legacy notice"
-    assert metadata["run_flags"][1] == {
-        "kind": "run_diagnostic",
-        "code": "run_hour_budget_exhausted_mid_campaign",
-        "detail": {"unresolved": True, "error_type": "RuntimeError"},
-    }
+    assert metadata["run_flags"] == [
+        "legacy notice",
+        {
+            "kind": "run_diagnostic",
+            "code": "diagnostic_unresolved",
+            "error_type": "RuntimeError",
+        },
+    ]
 
 
 @pytest.mark.parametrize(
@@ -1271,7 +1281,7 @@ def test_malformed_c4_residual_diagnostic_does_not_abort_hour(monkeypatch):
         summary = capture_summary(campaign_name)
         if campaign_name == "C4":
             sim.campaign_mgr.last_c4_termination["residual_melt"] = (
-                "malformed residual"
+                {"Na_kg": "malformed residual"}
             )
         return summary
 
@@ -1305,6 +1315,7 @@ def test_malformed_c4_residual_diagnostic_does_not_abort_hour(monkeypatch):
         "unresolved": True,
         "error_type": "TypeError",
     }
+    assert "residual_Na_kg" not in malformed_flag["detail"]
     assert {
         "kind": "run_diagnostic",
         "code": "diagnostic_unresolved",
@@ -1391,6 +1402,70 @@ def test_result_document_getter_returns_original_if_metadata_enumeration_fails()
     session._set_result_document(document)
 
     assert session.result_document() is document
+
+
+@pytest.mark.parametrize(
+    "document",
+    [
+        {"status": "ok"},
+        {"status": "ok", "run_metadata": None},
+    ],
+)
+def test_live_result_document_creates_missing_run_metadata(document):
+    session = _started_internal_session(_run(campaign="C2A", hours=1))
+    session._last_drive_stop = "hour_budget"
+    session._set_result_document(document)
+
+    exported = session.result_document()
+
+    assert exported["run_metadata"]["run_flags"] == [
+        _live_budget_flag(session)
+    ]
+
+
+def test_campaign_stop_flag_copy_failure_does_not_abort_executor(monkeypatch):
+    import simulator.session as session_module
+
+    run = _run(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C4",
+        hours=1,
+        additives_kg={},
+    )
+    session = _started_internal_session(run)
+    sim = session.simulator
+    sim.record.branch = "two"
+    sim.campaign_mgr.campaigns["C4"]["max_target_acquisition_hr"] = 1.0
+    real_deepcopy = session_module.copy.deepcopy
+
+    def fail_stop_flag_copy(value, memo=None):
+        if (
+            isinstance(value, dict)
+            and value.get("code") == "campaign_time_cap_unconverged"
+        ):
+            raise RuntimeError("stop flag copy failed")
+        return real_deepcopy(value, memo)
+
+    monkeypatch.setattr(session_module.copy, "deepcopy", fail_stop_flag_copy)
+
+    execution = RunExecutor().execute_session(session, hours=1)
+    output = run._build_output(execution)
+
+    assert execution.status == "ok"
+    assert sim.melt.hour == 1
+    assert sim.melt.campaign is CampaignPhase.C2A
+    c4_stop = next(
+        stop for stop in execution.campaign_stops
+        if stop["campaign"] == "C4"
+    )
+    assert "flags" not in c4_stop
+    assert {
+        "kind": "run_diagnostic",
+        "code": "diagnostic_unresolved",
+        "error_type": "RuntimeError",
+    } in output["run_metadata"]["run_flags"]
+
+
 def test_live_result_document_recomputes_budget_flag_when_chain_completes():
     run = _run(
         feedstock_id="lunar_mare_low_ti",
@@ -1684,17 +1759,18 @@ def test_budget_flag_contains_json_safe_unresolved_cyclic_limit():
         session.simulator.melt.campaign
     )["max_hold_hr"] = cyclic_limit
 
-    flag = _live_budget_flag(session)
+    flag = _diagnostic_unresolved_flag(session)
 
-    assert flag["detail"] == {
-        "unresolved": True,
+    assert flag == {
+        "kind": "run_diagnostic",
+        "code": "diagnostic_unresolved",
         "error_type": "RecursionError",
     }
     from simulator.runner import _attach_execution_diagnostics
 
     metadata = {"run_flags": [flag]}
     _attach_execution_diagnostics(metadata, session)
-    assert metadata["run_flags"][0]["detail"] == flag["detail"]
+    assert metadata["run_flags"] == [flag]
 
 
 def test_resumed_execution_campaign_stops_include_only_new_stops():
@@ -1842,7 +1918,7 @@ def test_budget_flag_exception_is_typed_without_exception_text(monkeypatch):
 
     monkeypatch.setattr(session_module, "_configured_campaign_walk", fail_walk)
 
-    flag = _live_budget_flag(session)
+    flag = _diagnostic_unresolved_flag(session)
 
     assert flag == {
         "kind": "run_diagnostic",
@@ -1877,7 +1953,7 @@ def test_budget_flag_reports_configured_campaign_cycle_as_unresolved(monkeypatch
         lambda current, _record: current,
     )
 
-    flag = _live_budget_flag(session)
+    flag = _diagnostic_unresolved_flag(session)
 
     assert flag == {
         "kind": "run_diagnostic",
@@ -1902,11 +1978,12 @@ def test_budget_flag_bounds_nonrepeating_configured_walk(monkeypatch):
         keep_routing,
     )
 
-    flag = _live_budget_flag(session)
+    flag = _diagnostic_unresolved_flag(session)
 
     assert calls == len(CampaignPhase) * 2
-    assert flag["detail"] == {
-        "unresolved": True,
+    assert flag == {
+        "kind": "run_diagnostic",
+        "code": "diagnostic_unresolved",
         "error_type": "_ConfiguredCampaignWalkCycle",
     }
 
