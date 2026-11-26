@@ -7,8 +7,10 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import MethodToken, Quantity
+from simulator.battery import score as battery_score
+from simulator.battery.enums import MethodToken, Quantity, Rail
 from simulator.battery.migrate import Migrator, wt_pct_to_mole_fraction
+from tools.validate_literature_extracts import validate_extract_document
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/jakobsson-tangstad-2015-ca-mg-activities.yaml"
@@ -73,9 +75,86 @@ RENDER_OUTLIERS = {
     ("CMS20", "Ca"): "873",
 }
 
+TABLE_FOOTNOTE_MARKERS = {
+    ("I", "CS6"): "*",
+    ("I", "CS7"): "*",
+    ("I", "CS8"): "*",
+    ("I", "CS11"): "*",
+    ("I", "CS12"): "**",
+    ("II", "MS6"): "*",
+    ("II", "MS7"): "**",
+    ("III", "CMS8"): "Mg*",
+    ("III", "CMS17"): "Mg*",
+    ("III", "CMS20"): "Ca*",
+}
+
+TABLE_LINE_RANGES = {
+    ("I", "CS1"): "66-66", ("I", "CS2"): "67-67", ("I", "CS3"): "68-68",
+    ("I", "CS4"): "69-69", ("I", "CS5"): "70-70", ("I", "CS6"): "71-71",
+    ("I", "CS7"): "72-72", ("I", "CS8"): "73-73", ("I", "CS9"): "74-74",
+    ("I", "CS10"): "75-75", ("I", "CS11"): "76-76", ("I", "CS12"): "77-77",
+    ("I", "CS13"): "78-78", ("I", "FS5"): "79-79",
+    **{("II", f"MS{i}"): f"{181 + i}-{181 + i}" for i in range(1, 9)},
+    **{("III", f"CMS{i}"): f"{199 + i}-{199 + i}" for i in range(1, 21)},
+}
+
+FIGURE9_READS = {
+    "MgO": [
+        ("rein_chipman", "Rein and Chipman", "quoted_attributed", "prior_source_replot_not_held_out", ["0.15", "0.13", "0.12"]),
+        ("morita", "Morita et al.", "quoted_attributed", "prior_source_replot_not_held_out", ["0.18", "0.15", "0.13"]),
+        ("kambayashi_kato", "Kambayashi and Kato", "quoted_attributed", "prior_source_replot_not_held_out", ["0.17", "0.14", "0.12"]),
+        ("jung", "Jung et al.", "quoted_attributed", "prior_source_replot_not_held_out", ["0.18", "0.14", "0.12"]),
+        ("zaitsev", "Zaitsev et al.", "quoted_attributed", "prior_source_replot_not_held_out", ["0.17", "0.14", "0.12"]),
+        ("present_work", "Present work", "model_derived", "held_out_present_work", ["0.16", "0.13", "0.13"]),
+    ],
+    "SiO2": [
+        ("rein_chipman", "Rein and Chipman", "quoted_attributed", "prior_source_replot_not_held_out", ["0.70", "0.86", "0.95"]),
+        ("morita", "Morita et al.", "quoted_attributed", "prior_source_replot_not_held_out", ["0.73", "0.90", "0.97"]),
+        ("kambayashi_kato", "Kambayashi and Kato", "quoted_attributed", "prior_source_replot_not_held_out", ["0.72", "0.88", "0.96"]),
+        ("jung", "Jung et al.", "quoted_attributed", "prior_source_replot_not_held_out", ["0.70", "0.89", "0.98"]),
+        ("zaitsev", "Zaitsev et al.", "quoted_attributed", "prior_source_replot_not_held_out", ["0.71", "0.88", "0.97"]),
+        ("present_work", "Present work", "model_derived", "held_out_present_work", ["0.84", "0.97", "0.995"]),
+    ],
+}
+FIGURE9_X = ["0.49", "0.53", "0.55"]
+
+FIGURE10C_READS = [
+    ("present_work", "Present work", "0.05", "0.246", "0.139", "0.615", "model_derived", "held_out_present_work"),
+    ("present_work", "Present work", "0.1", "0.105", "0.291", "0.604", "model_derived", "held_out_present_work"),
+    ("present_work", "Present work", "0.15", "0.000", "0.499", "0.501", "model_derived", "held_out_present_work"),
+    ("present_work", "Present work", "0.2", "0.047", "0.503", "0.450", "model_derived", "held_out_present_work"),
+    ("present_work", "Present work", "0.3", "0.196", "0.387", "0.417", "model_derived", "held_out_present_work"),
+    ("present_work", "Present work", "0.5", "0.591", "0.216", "0.193", "model_derived", "held_out_present_work"),
+    ("rein_chipman", "Rein and Chipman", "0.06", "0.584", "0.037", "0.379", "quoted_attributed", "prior_source_replot_not_held_out"),
+    ("rein_chipman", "Rein and Chipman", "0.1", "0.692", "0.039", "0.269", "quoted_attributed", "prior_source_replot_not_held_out"),
+    ("rein_chipman", "Rein and Chipman", "0.2", "0.843", "0.028", "0.129", "quoted_attributed", "prior_source_replot_not_held_out"),
+    ("rein_chipman", "Rein and Chipman", "0.5", "0.634", "0.188", "0.178", "quoted_attributed", "prior_source_replot_not_held_out"),
+    ("morita", "Morita et al.", "0.1", "0.549", "0.113", "0.338", "quoted_attributed", "prior_source_replot_not_held_out"),
+    ("morita", "Morita et al.", "0.2", "0.269", "0.294", "0.437", "quoted_attributed", "prior_source_replot_not_held_out"),
+    ("morita", "Morita et al.", "0.3", "0.197", "0.378", "0.425", "quoted_attributed", "prior_source_replot_not_held_out"),
+    ("morita", "Morita et al.", "0.5", "0.278", "0.386", "0.336", "quoted_attributed", "prior_source_replot_not_held_out"),
+    ("jung", "Jung et al.", "0.05", "0.257", "0.110", "0.633", "quoted_attributed", "prior_source_replot_not_held_out"),
+    ("jung", "Jung et al.", "0.17", "0.055", "0.329", "0.616", "quoted_attributed", "prior_source_replot_not_held_out"),
+    ("jung", "Jung et al.", "0.15", "0.000", "0.483", "0.517", "quoted_attributed", "prior_source_replot_not_held_out"),
+    ("jung", "Jung et al.", "0.2", "0.005", "0.525", "0.470", "quoted_attributed", "prior_source_replot_not_held_out"),
+    ("jung", "Jung et al.", "0.3", "0.213", "0.394", "0.393", "quoted_attributed", "prior_source_replot_not_held_out"),
+    ("jung", "Jung et al.", "0.5", "0.265", "0.415", "0.320", "quoted_attributed", "prior_source_replot_not_held_out"),
+]
+
 
 def _document():
     return yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+
+
+def _assert_all_locators_have_text_ranges(value):
+    if isinstance(value, dict):
+        for key, child in value.items():
+            if key == "locator" and isinstance(child, dict):
+                assert "line_range" in child
+            _assert_all_locators_have_text_ranges(child)
+    elif isinstance(value, list):
+        for child in value:
+            _assert_all_locators_have_text_ranges(child)
 
 
 def _assert_render_grid_matches(document, grid):
@@ -113,17 +192,26 @@ def _assert_render_grid_matches(document, grid):
                 assert values["component_as_published"] == element
                 assert values["T_K"] == "1873" and values["T_C"] == "1600"
                 assert row["uncertainty"]["value"] == int(uncertainty)
+                assert values["table_footnote_marker"] == TABLE_FOOTNOTE_MARKERS.get((table, sample))
                 assert row["locator"] == {
                     "page": page,
                     "published_page": folio,
                     "pdf_page_index": pdf_index,
                     "table": table,
                     "row": sample,
+                    "line_range": TABLE_LINE_RANGES[(table, sample)],
                     "column": f"{element} (mg/kg)",
                 }
                 conditions = row["point_conditions"]
                 assert conditions["sample_id"]["state"]["value"] == sample
                 assert conditions["temperature_K"]["state"]["value"] == "1873"
+                assert conditions["temperature_K"]["locator"] == {
+                    "page": 1,
+                    "published_page": 595,
+                    "pdf_page_index": 0,
+                    "section": "Experimental",
+                    "line_range": "48-50",
+                }
                 assert conditions["composition"]["state"]["value"] == {
                     "amount_basis": "mass_percent",
                     "components": compositions,
@@ -160,7 +248,7 @@ def test_all_typed_rows_migrate_with_species_temperature_and_conditions():
     migrator.finalize()
 
     records = list(migrator.result.observations.values())
-    assert len(records) == 68
+    assert len(records) == 124
     assert not migrator.result.validation.hard_issues
     assert not migrator.result.registry_issues
     migrated = {record.observation_id.split("::", 1)[1]: record for record in records}
@@ -177,16 +265,25 @@ def test_all_typed_rows_migrate_with_species_temperature_and_conditions():
         assert formula == value["component_as_published"]
         record = migrated[row["observation_id"]]
         assert record.identity.species.formula == formula
-        assert migrator.result.experiments[record.experiment_id].method.value is MethodToken.QUENCH_EQUILIBRATION
+        method = migrator.result.experiments[record.experiment_id].method.value
+        expected_method = (
+            MethodToken.UNSPECIFIED
+            if "figure9_" in row["observation_id"] or "figure10c_" in row["observation_id"]
+            else MethodToken.QUENCH_EQUILIBRATION
+        )
+        assert method is expected_method
         assert record.identity.temperature_K is not None and record.identity.temperature_K.is_value
         assert record.identity.temperature_K.value == Decimal("1873")
         assert record.point_conditions is not None
+        assert all(condition.locator is not None for condition in record.point_conditions.values())
         if value["quantity"] == "equilibrium_phase_composition":
             for key in ("temperature_K", "composition", "sample_id"):
                 assert key in record.point_conditions
             temperature = record.point_conditions["temperature_K"]
             assert temperature.state.is_value and temperature.state.value == Decimal("1873")
-            assert temperature.locator is not None and temperature.locator.pdf_page_index in {1, 3}
+            assert temperature.locator is not None
+            assert temperature.locator.pdf_page_index == 0
+            assert temperature.locator.line_range == "48-50"
             composition = record.point_conditions["composition"]
             assert composition.state.is_value and composition.locator is not None
             assert record.point_conditions["sample_id"].state.value is not None
@@ -195,6 +292,13 @@ def test_all_typed_rows_migrate_with_species_temperature_and_conditions():
             assert record.identity.quantity.value is Quantity.ACTIVITY
             assert record.identity.reference_state is not None and record.identity.reference_state.is_value
             assert record.identity.per is not None and record.identity.per.is_value
+            temperature = record.point_conditions["temperature_K"]
+            assert temperature.state.is_value and temperature.state.value == Decimal("1873")
+            assert temperature.locator is not None and temperature.locator.pdf_page_index in {5, 6, 8, 9}
+            composition = record.point_conditions["composition"]
+            assert composition.locator is not None
+            if "figure9_" in row["observation_id"] or "figure10c_" in row["observation_id"]:
+                assert composition.state.is_value
 
     outlier_rows = {
         (row["values"]["sample_id"], row["values"]["formula"]): row
@@ -211,7 +315,14 @@ def test_all_typed_rows_migrate_with_species_temperature_and_conditions():
     for species, body in document["species"].items():
         figures = [item for item in body["context"] if item["type"] == "figure_record"]
         for figure in figures:
-            assert figure["values"]["digitisation"] == "deferred to a figure pass"
+            obs_id = figure["observation_id"]
+            digitisation = figure["values"]["digitisation"]
+            if "figure_9_" in obs_id or obs_id == "jakobsson_2015_figure_10_panel_c_mgo_activity":
+                assert digitisation.startswith("figure-read")
+            elif obs_id == "jakobsson_2015_figure_10_panel_a_sio2_activity":
+                assert "no printed numerical" in digitisation
+            else:
+                assert digitisation == "deferred to a figure pass"
             assert "points" not in figure["values"]
             assert figure["values"]["species"]
             assert figure["values"]["phase"]
@@ -254,29 +365,169 @@ def test_explicit_activity_values_remain_printed_and_have_the_stated_reference()
         for row in body["observations"]
         if row["values"]["quantity"] == "activity"
     }
-    assert len(activities) == 3
-    assert activities["jakobsson_2015_text_sio2_activity_at_ca2sio4_saturation"]["values"]["activity_as_published"] == "0.0724"
-    assert activities["jakobsson_2015_text_cao_activity_at_ca2sio4_saturation"]["values"]["activity_as_published"] == "3.55e-2"
-    assert activities["jakobsson_2015_text_cao_activity_at_sio2_saturation"]["values"]["activity_as_published"] == "0.00260"
-    assert activities["jakobsson_2015_text_sio2_activity_at_ca2sio4_saturation"]["locator"]["page"] == 6
-    assert activities["jakobsson_2015_text_cao_activity_at_ca2sio4_saturation"]["locator"]["page"] == 7
-    assert activities["jakobsson_2015_text_cao_activity_at_sio2_saturation"]["locator"]["page"] == 7
+    text_activities = {key: value for key, value in activities.items() if "_text_" in key}
+    assert len(text_activities) == 3
+    assert text_activities["jakobsson_2015_text_sio2_activity_at_ca2sio4_saturation"]["values"]["activity_as_published"] == "0.0724"
+    assert text_activities["jakobsson_2015_text_cao_activity_at_ca2sio4_saturation"]["values"]["activity_as_published"] == "3.55e-2"
+    assert text_activities["jakobsson_2015_text_cao_activity_at_sio2_saturation"]["values"]["activity_as_published"] == "0.00260"
+    assert text_activities["jakobsson_2015_text_sio2_activity_at_ca2sio4_saturation"]["locator"]["page"] == 6
+    assert text_activities["jakobsson_2015_text_cao_activity_at_ca2sio4_saturation"]["locator"]["page"] == 7
+    assert text_activities["jakobsson_2015_text_cao_activity_at_sio2_saturation"]["locator"]["page"] == 7
 
     context = [item for body in document["species"].values() for item in body["context"]]
     ca_gamma = next(item for item in context if item["observation_id"] == "jakobsson_2015_text_ln_henrian_gamma_ca_schema_gap")
     mg_gamma = next(item for item in context if item["observation_id"] == "jakobsson_2015_text_ln_henrian_gamma_mg_schema_gap")
-    assert ca_gamma["locator"]["page"] == 8
+    assert ca_gamma["locator"]["page"] == 7
+    assert ca_gamma["locator"]["line_range"] == "427-437"
     assert mg_gamma["locator"]["page"] == 9
+    assert mg_gamma["locator"]["line_range"] == "563-569"
 
     figure_records = {
         item["observation_id"]: item
         for item in context
         if item["type"] == "figure_record"
     }
-    for figure, page in [(1, 3), (2, 3), (3, 3), (4, 3), (5, 5), (6, 7), (7, 7), (8, 8), (9, 9), (10, 10)]:
+    figure_pages_and_lines = [
+        (1, 3, "142-144"),
+        (2, 3, "160-163"),
+        (3, 3, "171-174"),
+        (4, 3, "172-174"),
+        (5, 5, "288-294"),
+        (6, 7, "387-389"),
+        (7, 7, "385-386"),
+        (8, 8, "542-543"),
+        (9, 9, "555-609"),
+        (10, 10, "611-615"),
+    ]
+    for figure, page, line_range in figure_pages_and_lines:
         matching = [item for obs_id, item in figure_records.items() if f"figure_{figure}_" in obs_id]
         assert matching
         assert all(item["locator"]["page"] == page for item in matching)
+        assert all(item["locator"]["line_range"] == line_range for item in matching)
     for figure in (2, 3, 6, 7):
         matching = [item for obs_id, item in figure_records.items() if f"figure_{figure}_" in obs_id]
         assert all("series-specific temperatures" in item["values"]["temperature_as_printed"] for item in matching)
+
+
+def test_figure_activity_reads_pin_every_series_label_and_standard_state():
+    document = _document()
+    rows = {
+        row["observation_id"]: row
+        for body in document["species"].values()
+        for row in body["observations"]
+    }
+
+    figure9_count = 0
+    for species, series_rows in FIGURE9_READS.items():
+        panel = "upper" if species == "SiO2" else "lower"
+        axis = f"a_{species}(s)"
+        for slug, name, evidence, source_relation, activities in series_rows:
+            for x, activity in zip(FIGURE9_X, activities, strict=True):
+                observation_id = (
+                    f"jakobsson_2015_figure9_{species.lower()}_{slug}_x{x.replace('.', '')}"
+                )
+                row = rows[observation_id]
+                figure9_count += 1
+                assert row["locator"] == {
+                    "page": 9,
+                    "published_page": 603,
+                    "pdf_page_index": 8,
+                    "figure": "9",
+                    "panel": panel,
+                    "row": f"{name} at x_SiO2={x}",
+                    "column": axis,
+                    "line_range": "555-609",
+                }
+                assert row["values"]["activity_as_published"] == activity
+                assert row["values"]["digitisation"] == "figure-read"
+                assert row["values"]["digitisation_uncertainty"] == {
+                    "activity": "±0.01 dimensionless activity units",
+                    "x_SiO2": "±0.001 mole fraction",
+                }
+                assert row["values"]["method_class"] == evidence
+                assert row["values"]["source_relation"] == source_relation
+                assert "Raoultian pure solid" in row["values"]["standard_state_as_printed"]
+                assert row["uncertainty"]["value"] == 0.01
+                components = row["point_conditions"]["composition"]["state"]["value"]["components"]
+                assert dict(components) == {
+                    "SiO2": x,
+                    "MgO": format(1 - float(x), ".2f"),
+                }
+                method_state = row["measurement_method"]["state"]
+                assert method_state["tag"] == ("unknown" if slug == "morita" else "value")
+    assert figure9_count == 36
+
+    figure10c_count = 0
+    for slug, name, activity, cao, mgo, sio2, evidence, source_relation in FIGURE10C_READS:
+        observation_id = f"jakobsson_2015_figure10c_mgo_{slug}_{activity.replace('.', '')}"
+        row = rows[observation_id]
+        figure10c_count += 1
+        label = {
+            "present_work": activity,
+            "rein_chipman": f"[{activity}]",
+            "morita": f"({activity})",
+            "jung": f"<{activity}>",
+        }[slug]
+        assert row["locator"] == {
+            "page": 10,
+            "published_page": 604,
+            "pdf_page_index": 9,
+            "figure": "10",
+            "panel": "c",
+            "row": f"{name} contour label {label}",
+            "column": "a_MgO(s) contour and ternary composition axes",
+            "line_range": "611-660",
+        }
+        assert row["values"]["activity_as_published"] == activity
+        assert row["values"]["series_label_as_printed"] == label
+        assert row["values"]["digitisation"] == "figure-read"
+        assert row["values"]["digitisation_uncertainty"]["composition"] == (
+            "±0.02 mole fraction on each ternary component"
+        )
+        assert row["values"]["method_class"] == evidence
+        assert row["values"]["source_relation"] == source_relation
+        assert "Raoultian pure solid MgO(s)" in row["values"]["standard_state_as_printed"]
+        components = row["point_conditions"]["composition"]["state"]["value"]["components"]
+        assert dict(components) == {"CaO": cao, "MgO": mgo, "SiO2": sio2}
+        method_state = row["measurement_method"]["state"]
+        assert method_state["tag"] == ("value" if slug == "present_work" else "unknown")
+    assert figure10c_count == 20
+
+
+def test_figure_activity_observations_reach_melt_activity_rail_and_mutation_fails(monkeypatch):
+    migrator = Migrator(root=ROOT, index={}, aliases={})
+    migrator._migrate_extract(EXTRACT)
+    migrator.finalize()
+    figure_rows = [
+        record
+        for record in migrator.result.observations.values()
+        if "figure9_" in record.observation_id or "figure10c_" in record.observation_id
+    ]
+    assert len(figure_rows) == 56
+
+    def assert_activity_rail(records):
+        for record in records:
+            assert record.identity.quantity.is_value
+            assert record.identity.quantity.value is Quantity.ACTIVITY
+            assert battery_score.rail_for_quantity(record.identity.quantity.value) is Rail.MELT_ACTIVITY
+
+    assert_activity_rail(figure_rows)
+    with pytest.raises(AssertionError):
+        with monkeypatch.context() as mutation:
+            mutation.setattr(battery_score, "rail_for_quantity", lambda *_args, **_kwargs: None)
+            assert_activity_rail(figure_rows)
+
+
+def test_extract_validator_covers_every_scored_leaf_and_reports_no_uncovered_observation():
+    document = _document()
+    _assert_all_locators_have_text_ranges(document)
+    fidelity_warnings = []
+    assert validate_extract_document(
+        document,
+        path=EXTRACT,
+        expected_source_id=EXTRACT.stem,
+        pre_policy_ids=set(),
+        fidelity_warnings=fidelity_warnings,
+        check_fidelity_match=True,
+    ) == []
+    assert not [warning for warning in fidelity_warnings if warning.kind == "uncovered_observation"]
