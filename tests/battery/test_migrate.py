@@ -23116,6 +23116,7 @@ def test_exploded_rows_keep_parent_evidence_outside_author_estimates(
         } == {expected_attribution}
 
 
+@pytest.mark.cpu_budget(1800)
 def test_t1795_fold2_store_probe() -> None:
     """Temporary matched-pair store regeneration receipt for the mass gate."""
 
