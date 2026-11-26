@@ -635,9 +635,16 @@ def test_lunar_payload_preserves_extrapolated_mg_wall_pressure(
     pareto = payload["run_metadata"]["pressure_coating_pareto_diagnostic"]
     magnesium = pareto["by_species"]["Mg"]
     assert magnesium["status"] == "unavailable"
-    # Mg is present in the latest vapor-series diagnostic, but this run has no
-    # current committed wall-deposition quantity.
-    assert magnesium["reason"] == "current_wall_deposition_quantity_unavailable"
+    # Receipt c7d76a95. Mg is a computed zero net flux (P_eq <= P_bulk),
+    # so the series writer records zero_net and emits no series row.
+    # p_Mg from MgO falls as pO2^-0.5. Ledger fO2 (a95942989e) and the
+    # d-469 floor (8f174cc807) put the melt on the Fe line, and the net
+    # Mg flux is that zero. The pareto's missing-series branch reports
+    # the species absent. The saturation extrapolation is attached after
+    # that branch.
+    assert magnesium["reason"] == (
+        "species_absent_from_latest_evaporation_series_diagnostic"
+    )
     assert magnesium["authority_level"] == "extrapolated"
     records = magnesium["wall_saturation_pressure_extrapolations"]
     assert records
