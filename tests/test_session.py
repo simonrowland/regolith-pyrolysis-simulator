@@ -453,6 +453,59 @@ def test_start_queries_and_result_document_factory():
     assert session.result_document() == {"hour": 0, "campaign": "C0"}
 
 
+def test_live_result_document_keeps_factory_bytes_when_no_stops_or_flags():
+    document = {"hour": 0, "campaign": "C0"}
+    session = _fake_session(_FakeSim())
+    session._config = _config(result_document_factory=lambda _active: document)
+    document_bytes = json.dumps(
+        document,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+
+    result = session.result_document()
+
+    result_bytes = json.dumps(
+        result,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    assert result_bytes == document_bytes
+
+
+def test_live_result_document_attaches_campaign_stops_from_step_history():
+    session = _fake_session(_FakeSim())
+    session._config = _config(
+        result_document_factory=lambda active: {
+            "hour": active.snapshot().hour,
+            "campaign": active.snapshot().campaign.name,
+        }
+    )
+    session._step_results.append(
+        SimpleNamespace(
+            campaign_summary={
+                "campaign": "C0",
+                "stop_reason": "time_cap",
+                "duration_h": 1.0,
+            }
+        )
+    )
+
+    assert session.result_document() == {
+        "hour": 0,
+        "campaign": "C0",
+        "run_metadata": {
+            "campaign_stops": [
+                {
+                    "campaign": "C0",
+                    "stop_reason": "time_cap",
+                    "duration_h": 1.0,
+                }
+            ]
+        },
+    }
+
+
 def test_start_refuses_status_blocked_feedstock_selection():
     feedstocks = _load_yaml("feedstocks.yaml")
     blocked_key, blocked_entry = next(

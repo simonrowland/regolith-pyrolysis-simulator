@@ -854,7 +854,8 @@ class SimSession:
                     ],
                 )
             _attach_execution_diagnostics(attached_metadata, self)
-            payload["run_metadata"] = attached_metadata
+            if isinstance(run_metadata, Mapping) or attached_metadata:
+                payload["run_metadata"] = attached_metadata
         except Exception:
             # Diagnostic staging must preserve the recorded green document.
             return document
@@ -1302,9 +1303,10 @@ def _attach_execution_diagnostics(
         return
 
     stored_run_flags = _MISSING_RESULT_DOCUMENT_RUN_FLAGS
+    campaign_stops: list[dict[str, Any]] | None = None
     campaign_stop_errors: list[str] = []
     try:
-        run_metadata["campaign_stops"] = _json_safe(
+        campaign_stops = _json_safe(
             list(
                 _campaign_stops_for_trace(
                     session,
@@ -1395,6 +1397,25 @@ def _attach_execution_diagnostics(
             ),
         )
 
+    if (
+        campaign_stops is not None
+        and (campaign_stops or run_metadata.get("run_flags"))
+    ):
+        try:
+            run_metadata["campaign_stops"] = campaign_stops
+        except Exception as exc:
+            run_metadata.pop("campaign_stops", None)
+            current_run_flags = run_metadata.get(
+                "run_flags",
+                _MISSING_RESULT_DOCUMENT_RUN_FLAGS,
+            )
+            _write_run_flags_to_metadata(
+                run_metadata,
+                _run_flags_with_unresolved(
+                    current_run_flags,
+                    type(exc).__name__,
+                ),
+            )
 
 def drive_auto_apply(
     session: SimSession,
