@@ -282,6 +282,55 @@ def test_britt_registry_sample_map_stays_owned_after_method_split(tmp_path):
     _assert_britt_registry_map_is_not_repeated(result)
 
 
+def _britt_method_field_split_extract():
+    """The CI row names knudsen; the declared technique is electron microprobe.
+
+    Regime no longer mints an experiment id, so the post-split sample-map
+    key has to be proved on a method field. The declared token is the home.
+    Knudsen leaves, and the registry map must stay off that row's point.
+    """
+
+    extract = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts" / BRITT_FILENAME).read_text(
+            encoding="utf-8"
+        )
+    )
+    for experiment in extract["experiments"]:
+        if experiment.get("experiment_id") == "xrf-ci":
+            experiment["method"] = MethodToken.ELECTRON_MICROPROBE.value
+    for block in extract["species"].values():
+        observations = block.get("observations") or []
+        for row in observations:
+            if row.get("observation_id") == BRITT_CI_ROW:
+                row["method"] = MethodToken.KNUDSEN_EFFUSION.value
+                row.pop("regime", None)
+    return extract
+
+
+def _assert_method_field_split_keeps_registry_map(result):
+    rows = _rows_for_local_id(result, BRITT_SOURCE, BRITT_CI_ROW)
+    assert rows
+    assert any(
+        row.experiment_id.endswith(
+            f"::method:{MethodToken.KNUDSEN_EFFUSION.value}"
+        )
+        for row in rows
+    )
+    assert all(
+        "printed_composition" not in (row.point_conditions or {})
+        for row in rows
+    )
+
+
+def test_method_field_split_keeps_declared_sample_map_off_the_point(tmp_path):
+    result = _migrate_real_extract(
+        tmp_path,
+        BRITT_FILENAME,
+        extract_doc=_britt_method_field_split_extract(),
+    )
+    _assert_method_field_split_keeps_registry_map(result)
+
+
 def test_britt_registry_repeat_mutation_restores_post_split_key_bug(
     tmp_path, monkeypatch
 ):
@@ -300,11 +349,13 @@ def test_britt_registry_repeat_mutation_restores_post_split_key_bug(
             Migrator, "_repeats_declared_sample_map", legacy_post_split_key
         )
         result = _migrate_real_extract(
-            tmp_path / "mutated", BRITT_FILENAME
+            tmp_path / "mutated",
+            BRITT_FILENAME,
+            extract_doc=_britt_method_field_split_extract(),
         )
 
     with pytest.raises(AssertionError):
-        _assert_britt_registry_map_is_not_repeated(result)
+        _assert_method_field_split_keeps_registry_map(result)
 
 
 def _fixture_with_unstated_method():
