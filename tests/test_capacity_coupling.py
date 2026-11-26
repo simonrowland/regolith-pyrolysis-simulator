@@ -19,6 +19,7 @@ from engines.builtin.overhead_bleed import (
     compressible_pressure_capacity_fraction,
 )
 from simulator.accounting import resolve_species_formula
+from simulator.accounting.lots import EMPTY_KG_TOLERANCE
 from simulator.alpha_kinetics import ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
 from simulator.capacity_coupling import (
     CapacityCouplingRefusalError,
@@ -1132,6 +1133,7 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         "alkali cartridge accumulates this hour of condensate",
         "melt-out returns liquid alkali to the train",
         "evaporate_AlO",
+        "condense_AlO",
         "evaporate_Ca",
         "condense_Ca",
         "evaporate_CaO_gas",
@@ -1155,14 +1157,25 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         "fe_redox_respeciation",
         "overhead_bleed",
     )
-    # d-402 adds accounted wall holdup for reactive vapours. The established
-    # evaporation/condensation order remains intact around those transitions.
+    # d-402 retains a reactive vapour while a coupled baffle product is
+    # at or below 1e-12 kg. AlO disproportionates as 3 AlO -> Al + Al2O3.
+    # AlO reads the melt oxygen at one-quarter power, the same channel as
+    # Na, so this hour's ledger fO2 raises the vapour. The Al leg then
+    # clears the floor and the route books condense_AlO. At the old -9
+    # seed that leg stayed under the floor and the parcel was holdup.
     actual_order = iter(transition_reasons)
     assert all(
         any(actual == expected for actual in actual_order)
         for expected in expected_transition_order
     )
-    assert "retain_condensation_holdup_AlO" in transition_reasons
+    alo_metal_kg = 0.0
+    for transition in sim.atom_ledger.transitions:
+        if transition.reason != "condense_AlO":
+            continue
+        for lot in transition.credits:
+            alo_metal_kg += float(lot.species_kg.get("Al", 0.0))
+    assert alo_metal_kg > EMPTY_KG_TOLERANCE
+    assert "retain_condensation_holdup_AlO" not in transition_reasons
     assert sim.atom_ledger.project_account_kg("terminal.offgas").get(
         "Ca", 0.0
     ) > 0.0
