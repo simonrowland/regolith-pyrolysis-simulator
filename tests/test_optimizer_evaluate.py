@@ -8632,6 +8632,39 @@ def test_campaign_stop_trace_reconstructs_session_history_exactly() -> None:
     },)
 
 
+def test_ranking_trace_reconstructs_history_without_local_stop_carrier() -> None:
+    session = SimpleNamespace(
+        _sim=None,
+        _step_results=(SimpleNamespace(
+            campaign_summary={
+                "campaign": "C4",
+                "stop_reason": "time_cap",
+                "duration_h": 62.0,
+                "stop_detail": "max_hold_no_signal",
+            },
+        ),),
+    )
+    execution = _execution()
+    execution.session = session
+    assert not hasattr(execution, "campaign_stops")
+
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=copy.deepcopy(PROFILE),
+        executor=FakeExecutor(execution),
+    )
+
+    assert result.run_reference is not None
+    assert result.run_reference.trace["campaign_stops"] == ({
+        "campaign": "C4",
+        "stop_reason": "time_cap",
+        "duration_h": 62.0,
+        "detail": "max_hold_no_signal",
+    },)
+
+
 def _stop_reasons(stops) -> list[str]:
     return [str(stop["stop_reason"]) for stop in stops]
 

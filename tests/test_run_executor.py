@@ -475,14 +475,20 @@ def test_c4_time_cap_and_exact_boundary_flags_reach_batch_artifact():
     c4_stop = next(
         stop for stop in execution.campaign_stops if stop["campaign"] == "C4"
     )
+    assert "flags" not in c4_stop
+    payload = run._build_output(execution)
+    c4_payload_stop = next(
+        stop for stop in payload["run_metadata"]["campaign_stops"]
+        if stop["campaign"] == "C4"
+    )
     generic_flag = next(
-        flag for flag in c4_stop["flags"]
+        flag for flag in c4_payload_stop["flags"]
         if flag["code"] == "campaign_time_cap_unconverged"
     )
     assert generic_flag["kind"] == "campaign_stop"
     assert generic_flag["detail"]["successor"] == "C2A"
     c4_flag = next(
-        flag for flag in c4_stop["flags"]
+        flag for flag in c4_payload_stop["flags"]
         if flag["code"] == "c4_time_capped_without_na_endpoint"
     )
     termination = sim.campaign_mgr.last_c4_termination
@@ -510,13 +516,7 @@ def test_c4_time_cap_and_exact_boundary_flags_reach_batch_artifact():
     assert "max_hold_hr" not in detail
     assert "cap" not in detail
 
-    payload = run._build_output(execution)
     assert payload["run_metadata"]["run_flags"] == list(execution.run_flags)
-    c4_payload_stop = next(
-        stop for stop in payload["run_metadata"]["campaign_stops"]
-        if stop["campaign"] == "C4"
-    )
-    assert c4_payload_stop["flags"] == c4_stop["flags"]
     artifact = build_run_artifact(payload, run_id="b1310-exact-boundary")
     assert artifact["terminal"]["run_metadata"]["run_flags"] == list(
         execution.run_flags
@@ -525,7 +525,8 @@ def test_c4_time_cap_and_exact_boundary_flags_reach_batch_artifact():
 
 
 def test_campaign_time_cap_flag_identifies_pending_successor_decision():
-    session = _started_internal_session(_run(campaign="C2A", hours=1))
+    run = _run(campaign="C2A", hours=1)
+    session = _started_internal_session(run)
     sim = session.simulator
     sim.record.path = "A_post_mg_boiloff"
     sim.record.branch = "two"
@@ -535,11 +536,16 @@ def test_campaign_time_cap_flag_identifies_pending_successor_decision():
 
     assert sim.pending_decision is not None
     assert sim.pending_decision.decision_type is DecisionType.C6_PROCEED
-    stop = next(
+    execution_stop = next(
         stop for stop in execution.campaign_stops if stop["campaign"] == "C2A"
     )
+    assert "flags" not in execution_stop
+    output_stop = next(
+        stop for stop in run._build_output(execution)["run_metadata"]["campaign_stops"]
+        if stop["campaign"] == "C2A"
+    )
     cap_flag = next(
-        flag for flag in stop["flags"]
+        flag for flag in output_stop["flags"]
         if flag["code"] == "campaign_time_cap_unconverged"
     )
     assert cap_flag["detail"]["successor"] is None
@@ -754,9 +760,14 @@ def test_terminal_campaign_completion_does_not_emit_hour_budget_flag():
         if stop["campaign"] == "C7_CA_ALUMINOTHERMIC"
     )
     assert c7_stop["stop_reason"] == "time_cap"
+    assert "flags" not in c7_stop
+    output_stop = next(
+        stop for stop in run._build_output(execution)["run_metadata"]["campaign_stops"]
+        if stop["campaign"] == "C7_CA_ALUMINOTHERMIC"
+    )
     assert any(
         flag["code"] == "campaign_time_cap_unconverged"
-        for flag in c7_stop["flags"]
+        for flag in output_stop["flags"]
     )
 
 
@@ -1197,6 +1208,87 @@ def test_cached_failure_document_survives_campaign_stop_projection_failure(
     assert exported["reason"] == "primary_failure"
 
 
+def test_result_document_returns_original_if_mapping_enumeration_fails():
+    from collections.abc import Mapping
+
+    class BrokenDocument(Mapping):
+        def __getitem__(self, key):
+            raise KeyError(key)
+
+        def __iter__(self):
+            raise RuntimeError("document enumeration failed")
+
+        def __len__(self):
+            return 0
+
+    session = _started_internal_session(_run(campaign="C2A", hours=1))
+    document = BrokenDocument()
+    session._set_result_document(document)
+
+    assert session.result_document() is document
+
+
+def test_campaign_flag_copy_failure_does_not_fail_execution(monkeypatch):
+    import simulator.run_executor as run_executor_module
+
+    class UncopyableValue:
+        def __deepcopy__(self, memo):
+            raise RuntimeError("campaign flag copy failed")
+
+    run = _run(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C4",
+        hours=1,
+        additives_kg={},
+    )
+    session = _started_internal_session(run)
+    sim = session.simulator
+    sim.record.branch = "two"
+    sim.campaign_mgr.campaigns["C4"]["max_target_acquisition_hr"] = 1.0
+
+    real_driver = run_executor_module.drive_session
+
+    def driver_with_uncopyable_flag(active_session, *args, **kwargs):
+        for result in real_driver(active_session, *args, **kwargs):
+            summary = result.campaign_summary
+            if isinstance(summary, dict):
+                summary_with_uncopyable_flag = dict(summary)
+                summary_with_uncopyable_flag["flags"] = [{
+                    "kind": "campaign_stop",
+                    "code": "injected_copy_failure",
+                    "detail": UncopyableValue(),
+                }]
+                result = replace(
+                    result,
+                    campaign_summary=summary_with_uncopyable_flag,
+                )
+                active_session._step_results[-1] = result
+            yield result
+
+    monkeypatch.setattr(
+        run_executor_module,
+        "drive_session",
+        driver_with_uncopyable_flag,
+    )
+
+    execution = RunExecutor().execute_session(session, hours=1)
+
+    assert execution.status == "ok"
+    assert sim.melt.campaign is CampaignPhase.C2A
+    assert any(
+        stop["campaign"] == "C4" for stop in execution.campaign_stops
+    )
+    assert any(
+        flag["code"] == "injected_copy_failure"
+        and isinstance(flag["detail"], UncopyableValue)
+        for result in session._step_results
+        for flag in result.campaign_summary.get("flags", ())
+    )
+    payload = run._build_output(execution)
+    assert payload["status"] == "ok"
+    assert "campaign_stops" not in payload["run_metadata"]
+
+
 def test_live_result_document_recomputes_budget_flag_when_chain_completes():
     run = _run(
         feedstock_id="lunar_mare_low_ti",
@@ -1510,7 +1602,12 @@ def test_resumed_optimizer_ranking_trace_excludes_prior_c4_stop():
 
     sim.record.path = "A_post_mg_boiloff"
     sim.record.branch = "two"
-    sim.campaign_mgr.campaigns["C2A_continuous"]["max_hold_hr"] = 1
+    session.adjust(
+        "campaign_override",
+        1,
+        campaign="C2A",
+        field="max_hours",
+    )
     resumed_execution = RunExecutor().execute_session(session, hours=1)
     assert any(
         stop["campaign"] == "C2A"

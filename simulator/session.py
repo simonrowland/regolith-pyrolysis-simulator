@@ -828,20 +828,25 @@ class SimSession:
             raise RuntimeError("no result document has been recorded")
         if self._sim is None or not isinstance(document, Mapping):
             return document
-        payload = dict(document)
-        run_metadata = payload.get("run_metadata")
-        if isinstance(run_metadata, Mapping):
-            attached_metadata = dict(run_metadata)
-            if has_cached_document:
-                # The cached builder output already includes one attachment;
-                # every live read must start from the original stored value.
-                raw_run_flags = self._result_document_raw_run_flags
-                if raw_run_flags is _MISSING_RESULT_DOCUMENT_RUN_FLAGS:
-                    attached_metadata.pop("run_flags", None)
-                else:
-                    attached_metadata["run_flags"] = raw_run_flags
-            _attach_execution_diagnostics(attached_metadata, self)
-            payload["run_metadata"] = attached_metadata
+        try:
+            payload = dict(document)
+            run_metadata = payload.get("run_metadata")
+            if isinstance(run_metadata, Mapping):
+                attached_metadata = dict(run_metadata)
+                if has_cached_document:
+                    # The cached builder output already includes one attachment;
+                    # every live read must start from the original stored value.
+                    raw_run_flags = self._result_document_raw_run_flags
+                    if raw_run_flags is _MISSING_RESULT_DOCUMENT_RUN_FLAGS:
+                        attached_metadata.pop("run_flags", None)
+                    else:
+                        attached_metadata["run_flags"] = raw_run_flags
+                if not _attach_execution_diagnostics(attached_metadata, self):
+                    return document
+                payload["run_metadata"] = attached_metadata
+        except Exception:
+            # Diagnostic staging must preserve the recorded green document.
+            return document
         return payload
 
     def per_hour_summaries(self) -> list[dict[str, Any]]:
@@ -1056,12 +1061,25 @@ def _write_run_flags_to_metadata(
         run_metadata["run_flags"] = run_flags
 
 
-def campaign_stop_record(summary: Mapping[str, Any] | None) -> dict[str, Any] | None:
+def campaign_stop_record(
+    summary: Mapping[str, Any] | None,
+) -> dict[str, Any] | None:
+    """Compact a campaign summary for ranking and canonical output."""
+
+    return _campaign_stop_record(summary, include_flags=True)
+
+
+def _campaign_stop_record(
+    summary: Mapping[str, Any] | None,
+    *,
+    include_flags: bool,
+) -> dict[str, Any] | None:
     """Compact ranking record for one completed campaign.
 
     Accepts a campaign summary (``stop_detail``) or an already compact
     record (``detail``). A summary with no stop token returns None. It is
-    not stored as ``endpoint_met``.
+    not stored as ``endpoint_met``. Canonical diagnostics include flags;
+    ranking projections omit them.
     """
 
     if not isinstance(summary, Mapping):
@@ -1077,11 +1095,14 @@ def campaign_stop_record(summary: Mapping[str, Any] | None) -> dict[str, Any] | 
     detail = summary.get("stop_detail", summary.get("detail"))
     if detail:
         record["detail"] = str(detail)
-    flags = summary.get("flags")
-    if isinstance(flags, (list, tuple)):
-        record["flags"] = [
-            copy.deepcopy(dict(flag)) for flag in flags if isinstance(flag, Mapping)
-        ]
+    if include_flags:
+        flags = summary.get("flags")
+        if isinstance(flags, (list, tuple)):
+            record["flags"] = [
+                copy.deepcopy(dict(flag))
+                for flag in flags
+                if isinstance(flag, Mapping)
+            ]
     return record
 
 
@@ -1090,28 +1111,34 @@ def _campaign_stops_for_trace(
     *,
     execution_local: bool = False,
 ) -> tuple[dict[str, Any], ...]:
-    """Project full live history or one execution's recorded stop records."""
+    """Project supplied execution stops or reconstruct the session history."""
 
     session = getattr(run_execution, "session", run_execution)
-    if execution_local:
-        stored = getattr(run_execution, "campaign_stops", ()) or ()
+    local_stops = (
+        getattr(run_execution, "campaign_stops", None)
+        if execution_local
+        else None
+    )
+    has_execution_local_stops = isinstance(local_stops, (list, tuple))
+    if has_execution_local_stops:
+        stored = local_stops
     else:
         has_live_session = getattr(session, "_sim", None) is not None
-        if has_live_session:
+        if has_live_session or execution_local:
             stored = None
         else:
             stored = getattr(run_execution, "campaign_stops", None)
         if stored is None or not stored:
-            stored = []
-            for result in getattr(session, "_step_results", ()) or ():
-                record = campaign_stop_record(
-                    getattr(result, "campaign_summary", None)
-                )
-                if record is not None:
-                    stored.append(record)
+            stored = [
+                getattr(result, "campaign_summary", None)
+                for result in getattr(session, "_step_results", ()) or ()
+            ]
     records: list[dict[str, Any]] = []
     for item in stored:
-        record = campaign_stop_record(item)
+        record = _campaign_stop_record(
+            item,
+            include_flags=not execution_local,
+        )
         if record is not None:
             records.append(record)
     return tuple(records)
@@ -1120,12 +1147,12 @@ def _campaign_stops_for_trace(
 def _attach_execution_diagnostics(
     run_metadata: dict[str, Any],
     session: Any,
-) -> None:
+) -> bool:
     """Attach diagnostics atomically; diagnostic failures leave output untouched."""
 
     try:
         if getattr(session, "_sim", None) is None:
-            return
+            return True
         attached_metadata = dict(run_metadata)
         stored_run_flags = attached_metadata.get("run_flags", [])
         live_flags = _run_flags_for_export(session)
@@ -1141,9 +1168,10 @@ def _attach_execution_diagnostics(
         )
     except Exception:
         # A secondary projection must never mask or partially rewrite its result.
-        return
+        return False
     run_metadata.clear()
     run_metadata.update(attached_metadata)
+    return True
 
 
 def drive_auto_apply(

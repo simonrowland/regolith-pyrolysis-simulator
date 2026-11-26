@@ -37,10 +37,11 @@ from simulator.session import (
     DecisionPolicy,
     SimSession,
     SimSessionConfig,
+    _campaign_stop_record as _session_campaign_stop_record,
     _at_stage0_exit as _session_at_stage0_exit,
     _drive_session_with_budget_intent,
     _run_flags_for_export,
-    campaign_stop_record,
+    campaign_stop_record as campaign_stop_record,
     drive_session,
 )
 from simulator.scalar_boundary import is_declared_real_scalar
@@ -127,8 +128,8 @@ class RunExecution:
     failure_exception: BaseException | None = field(
         default=None, compare=False, repr=False
     )
-    # One record per completed campaign: campaign, stop_reason, duration_h,
-    # detail, and typed flags when the endpoint recorded them.
+    # One compact record per completed campaign. Full typed stop flags are
+    # projected into canonical diagnostics under the attachment guard.
     campaign_stops: tuple[Mapping[str, Any], ...] = ()
 
     @property
@@ -361,7 +362,10 @@ class RunExecutor:
                     failure_exc = RuntimeError(reason)
                     break
                 campaign_summary = result.campaign_summary
-                recorded_stop = campaign_stop_record(campaign_summary)
+                recorded_stop = _session_campaign_stop_record(
+                    campaign_summary,
+                    include_flags=False,
+                )
                 if recorded_stop is not None:
                     campaign_stops.append(recorded_stop)
                 c4_refusal = (
