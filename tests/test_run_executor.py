@@ -28,6 +28,7 @@ from simulator.session import (
     SimSession,
     SimSessionConfig,
     StepResult,
+    _configured_campaign_walk,
     _merge_run_flags,
     _run_flags_for_export,
     drive_auto_apply,
@@ -998,6 +999,46 @@ def test_result_document_replaces_stale_budget_flags_with_live_flag():
     assert exported_flags is not stored_flags
 
 
+@pytest.mark.parametrize(
+    "legacy_flags",
+    [
+        {
+            "kind": "run_diagnostic",
+            "code": "run_hour_budget_exhausted_mid_campaign",
+            "detail": {"campaign": "recorded", "hours_run_in_campaign": 9},
+        },
+        "legacy notice",
+    ],
+)
+def test_live_document_remerges_raw_legacy_run_flags_once(legacy_flags):
+    run = _run(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C2A",
+        hours=1,
+        additives_kg={},
+        run_metadata_overrides={"run_flags": legacy_flags},
+    )
+    session = _started_internal_session(run)
+    sim = session.simulator
+    sim.record.path = "A_post_mg_boiloff"
+    sim.record.branch = "two"
+    sim.campaign_mgr.campaigns["C2A_continuous"]["max_hold_hr"] = 1
+
+    execution = RunExecutor().execute_session(session, hours=1)
+    batch_payload = run._build_output(execution)
+    batch_flags = batch_payload["run_metadata"]["run_flags"]
+    live_flag = next(
+        flag for flag in batch_flags
+        if flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+    )
+    expected = [legacy_flags, live_flag]
+    assert batch_flags == expected
+
+    session._set_result_document(batch_payload)
+
+    assert session.result_document()["run_metadata"]["run_flags"] == expected
+
+
 def test_live_result_document_recomputes_budget_flag_when_chain_completes():
     run = _run(
         feedstock_id="lunar_mare_low_ti",
@@ -1027,6 +1068,33 @@ def test_live_result_document_recomputes_budget_flag_when_chain_completes():
     assert not any(
         flag["code"] == "run_hour_budget_exhausted_mid_campaign"
         for flag in completed["run_metadata"].get("run_flags", ())
+    )
+
+
+def test_budget_flag_successor_walk_does_not_copy_batch_history():
+    class UncopyableHistoryEntry:
+        def __deepcopy__(self, memo):
+            raise AssertionError("campaign history must not be copied for routing")
+
+    session = _started_internal_session(_run(campaign="C4", hours=1))
+    sim = session.simulator
+    sim.record.path = "A"
+    sim.record.branch = "two"
+    sim.record.snapshots.append(UncopyableHistoryEntry())
+    original_pending_overrides = sim.campaign_mgr._pending_post_mg_c2a_overrides
+
+    phases, decision_dependent = _configured_campaign_walk(
+        sim.campaign_mgr,
+        CampaignPhase.C4,
+        sim.record,
+    )
+
+    assert [phase.name for phase in phases] == ["C4", "C2A"]
+    assert decision_dependent is not None
+    assert sim.record.path == "A"
+    assert (
+        sim.campaign_mgr._pending_post_mg_c2a_overrides
+        is original_pending_overrides
     )
 
 

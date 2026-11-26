@@ -5,6 +5,7 @@ from __future__ import annotations
 import copy
 from dataclasses import dataclass, field
 from enum import Enum
+from types import SimpleNamespace
 from typing import Any, Callable, Iterable, Mapping
 
 from simulator.backend_names import (
@@ -42,6 +43,7 @@ from simulator.state import (
 
 _ALLOWED_SESSION_TRACKS = frozenset({"pyrolysis", "mre_baseline"})
 _RUN_HOUR_BUDGET_FLAG_CODE = "run_hour_budget_exhausted_mid_campaign"
+_MISSING_RESULT_DOCUMENT_RUN_FLAGS = object()
 _CAMPAIGN_STOP_REASONS = frozenset({
     "endpoint_met",
     "time_cap",
@@ -292,6 +294,10 @@ class SimSession:
         self._operator_decisions: list[dict[str, Any]] = []
         self._last_drive_stop: str | None = None
         self._result_document: Mapping[str, Any] | None = None
+        self._result_document_raw_run_flags: Any = (
+            _MISSING_RESULT_DOCUMENT_RUN_FLAGS
+        )
+        self._pending_result_document_run_flags: tuple[int, Any] | None = None
         self._poisoned_error: RuntimeError | None = None
 
     @property
@@ -524,6 +530,10 @@ class SimSession:
         self._operator_decisions = []
         self._last_drive_stop = None
         self._result_document = None
+        self._result_document_raw_run_flags = (
+            _MISSING_RESULT_DOCUMENT_RUN_FLAGS
+        )
+        self._pending_result_document_run_flags = None
         self._poisoned_error = None
 
         sim.start_campaign(campaign_phase)
@@ -809,7 +819,8 @@ class SimSession:
         return self._require_sim()._make_snapshot()
 
     def result_document(self) -> Mapping[str, Any]:
-        if self._result_document is not None:
+        has_cached_document = self._result_document is not None
+        if has_cached_document:
             document = self._result_document
         elif self._config and self._config.result_document_factory is not None:
             document = self._config.result_document_factory(self)
@@ -821,6 +832,14 @@ class SimSession:
         run_metadata = payload.get("run_metadata")
         if isinstance(run_metadata, Mapping):
             attached_metadata = dict(run_metadata)
+            if has_cached_document:
+                # The cached builder output already includes one attachment;
+                # every live read must start from the original stored value.
+                raw_run_flags = self._result_document_raw_run_flags
+                if raw_run_flags is _MISSING_RESULT_DOCUMENT_RUN_FLAGS:
+                    attached_metadata.pop("run_flags", None)
+                else:
+                    attached_metadata["run_flags"] = raw_run_flags
             _attach_execution_diagnostics(attached_metadata, self)
             payload["run_metadata"] = attached_metadata
         return payload
@@ -834,7 +853,33 @@ class SimSession:
     def _record_operator_decision(self, event: dict[str, Any]) -> None:
         self._operator_decisions.append(event)
 
+    def _remember_result_document_run_flags_source(
+        self,
+        run_metadata: Mapping[str, Any],
+    ) -> None:
+        """Pair raw flags with the output metadata about to be cached."""
+
+        self._pending_result_document_run_flags = (
+            id(run_metadata),
+            run_metadata.get("run_flags", _MISSING_RESULT_DOCUMENT_RUN_FLAGS),
+        )
+
     def _set_result_document(self, document: Mapping[str, Any]) -> None:
+        metadata = document.get("run_metadata")
+        pending_source = self._pending_result_document_run_flags
+        self._pending_result_document_run_flags = None
+        if isinstance(metadata, Mapping):
+            if pending_source is not None and pending_source[0] == id(metadata):
+                self._result_document_raw_run_flags = pending_source[1]
+            else:
+                self._result_document_raw_run_flags = metadata.get(
+                    "run_flags",
+                    _MISSING_RESULT_DOCUMENT_RUN_FLAGS,
+                )
+        else:
+            self._result_document_raw_run_flags = (
+                _MISSING_RESULT_DOCUMENT_RUN_FLAGS
+            )
         self._result_document = document
 
     def _require_sim(self) -> PyrolysisSimulator:
@@ -1037,8 +1082,6 @@ def campaign_stop_record(summary: Mapping[str, Any] | None) -> dict[str, Any] | 
 
 def _campaign_stops_for_trace(
     run_execution: Any,
-    *,
-    recorded_campaign_stops: Any = None,
 ) -> tuple[dict[str, Any], ...]:
     """Project stop records from live session history or its recorded artifact."""
 
@@ -1046,11 +1089,9 @@ def _campaign_stops_for_trace(
     has_live_session = getattr(session, "_sim", None) is not None
     if has_live_session:
         stored = None
-    elif recorded_campaign_stops is not None:
-        stored = recorded_campaign_stops
     else:
         stored = getattr(run_execution, "campaign_stops", None)
-    if stored is None or (recorded_campaign_stops is None and not stored):
+    if stored is None or not stored:
         stored = []
         for result in getattr(session, "_step_results", ()) or ():
             record = campaign_stop_record(getattr(result, "campaign_summary", None))
@@ -1279,8 +1320,16 @@ def _configured_campaign_walk(
             "recommendation": live_pending_decision.recommendation,
         }
 
-    manager = copy.deepcopy(campaign_manager)
-    walk_record = copy.deepcopy(record)
+    # The routing methods assign top-level pending overrides and record fields;
+    # isolate those writes without copying setpoints or hourly history.
+    manager = copy.copy(campaign_manager)
+    walk_record = SimpleNamespace(
+        track=record.track,
+        path=record.path,
+        branch=record.branch,
+        feedstock_key=record.feedstock_key,
+        decisions=[],
+    )
     phases: list[CampaignPhase] = []
     decision_dependent: dict[str, Any] | None = None
     seen: set[tuple[CampaignPhase, str, str, str]] = set()

@@ -275,3 +275,39 @@ def test_legacy_run_flag_and_live_flag_render_as_separate_rows() -> None:
         'run_hour_budget_exhausted_mid_campaign: {"campaign":"C2A"}'
     )
     assert rendered["itemChildCounts"] == [0, 0]
+
+
+def test_unknown_run_and_campaign_flags_render_full_content() -> None:
+    artifact = _minimal_artifact()
+    artifact["terminal"]["run_metadata"] = {
+        "run_flags": [
+            {
+                "kind": "run_diagnostic",
+                "code": "legacy_notice",
+                "message": "operator note",
+            },
+            {
+                "kind": "legacy_kind",
+                "code": "run_hour_budget_exhausted_mid_campaign",
+                "detail": {"campaign": "C2A"},
+            },
+        ],
+        "campaign_stops": [{
+            "campaign": "C4",
+            "flags": [{
+                "kind": "campaign_stop",
+                "code": "legacy_stop_notice",
+                "message": "operator stop note",
+            }],
+        }],
+    }
+
+    rendered = _render_diagnostics(artifact)
+
+    assert rendered["lines"] == [
+        '{"kind":"run_diagnostic","code":"legacy_notice",'
+        '"message":"operator note"}',
+        'run_hour_budget_exhausted_mid_campaign: {"campaign":"C2A"}',
+        'C4 · {"kind":"campaign_stop","code":"legacy_stop_notice",'
+        '"message":"operator stop note"}',
+    ]

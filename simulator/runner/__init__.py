@@ -1370,6 +1370,9 @@ class PyrolysisRun:
                 )
         run_metadata = output.get("run_metadata")
         if isinstance(run_metadata, dict):
+            execution.session._remember_result_document_run_flags_source(
+                run_metadata
+            )
             _attach_execution_diagnostics(run_metadata, execution.session)
         return output
 

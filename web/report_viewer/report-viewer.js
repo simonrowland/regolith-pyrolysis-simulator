@@ -717,6 +717,20 @@ function panelRegistry() {
 
 function appendRunDiagnostics(container, artifact) {
   const metadata = artifact?.terminal?.run_metadata || {};
+  const recognizedFlagCodes = new Set([
+    "run_hour_budget_exhausted_mid_campaign",
+    "campaign_time_cap_unconverged",
+    "c4_time_capped_without_na_endpoint",
+  ]);
+  const isRecognizedFlag = (flag) => flag !== null &&
+    typeof flag === "object" &&
+    !Array.isArray(flag) &&
+    typeof flag.code === "string" &&
+    recognizedFlagCodes.has(flag.code);
+  const textForUnrecognizedEntry = (entry) => {
+    const serialized = typeof entry === "string" ? entry : JSON.stringify(entry);
+    return serialized === undefined ? String(entry) : serialized;
+  };
   const runFlags = Array.isArray(metadata.run_flags)
     ? metadata.run_flags
     : metadata.run_flags === undefined ? [] : [metadata.run_flags];
@@ -738,30 +752,28 @@ function appendRunDiagnostics(container, artifact) {
   const list = document.createElement("ul");
   for (const flag of runFlags) {
     const item = document.createElement("li");
-    const recognizedFlag = flag !== null &&
-      typeof flag === "object" &&
-      !Array.isArray(flag) &&
-      typeof flag.code === "string" &&
-      (flag.kind === "run_diagnostic" || flag.kind === "campaign_stop");
-    if (!recognizedFlag) {
-      const serialized = typeof flag === "string" ? flag : JSON.stringify(flag);
-      item.textContent = serialized === undefined ? String(flag) : serialized;
+    if (!isRecognizedFlag(flag)) {
+      item.textContent = textForUnrecognizedEntry(flag);
       list.appendChild(item);
       continue;
     }
-    const code = String(flag?.code || "run_diagnostic");
-    const detail = flag?.detail === undefined ? "" : `: ${JSON.stringify(flag.detail)}`;
+    const code = flag.code;
+    const detail = flag.detail === undefined ? "" : `: ${JSON.stringify(flag.detail)}`;
     item.textContent = `${code}${detail}`;
     list.appendChild(item);
   }
   for (const entry of campaignFlags) {
     const item = document.createElement("li");
     const campaign = String(entry.campaign || "campaign");
-    const code = String(entry.flag?.code || "campaign_stop");
-    const detail = entry.flag?.detail === undefined
-      ? ""
-      : `: ${JSON.stringify(entry.flag.detail)}`;
-    item.textContent = `${campaign} · ${code}${detail}`;
+    if (!isRecognizedFlag(entry.flag)) {
+      item.textContent = `${campaign} · ${textForUnrecognizedEntry(entry.flag)}`;
+    } else {
+      const code = entry.flag.code;
+      const detail = entry.flag.detail === undefined
+        ? ""
+        : `: ${JSON.stringify(entry.flag.detail)}`;
+      item.textContent = `${campaign} · ${code}${detail}`;
+    }
     list.appendChild(item);
   }
   sectionElement.appendChild(list);
