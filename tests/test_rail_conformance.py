@@ -1145,12 +1145,11 @@ def test_harness_ledgers_guard_rejects_battery_import_mutation(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     files = _project_files(ROOT)
-    module = "simulator.runner.__main__"
-    relpath, source = files[module]
-    assert relpath == "simulator/runner/__main__.py"
-    files[module] = (
-        relpath,
-        f"{source}\nfrom simulator.battery.score import flagged_strata\n",
+    files["simulator.diagnostic_helpers.hashimoto_1983"] = (
+        "simulator/diagnostic_helpers/hashimoto_1983.py",
+        "from simulator.battery.score import flagged_strata\n"
+        "if __name__ == '__main__':\n"
+        "    pass\n",
     )
     monkeypatch.setitem(globals(), "_project_files", lambda _root: files)
 
