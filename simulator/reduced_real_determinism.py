@@ -186,6 +186,17 @@ def _payload_codec_version(artifact: str) -> int | None:
     return _PAYLOAD_CODEC_VERSION_BY_ARTIFACT.get(artifact)
 
 
+def _payload_codec_stamp_is_current(
+    artifact: str,
+    payload_codec_version: Any,
+) -> bool:
+    expected_version = _payload_codec_version(artifact)
+    return expected_version is None or (
+        type(payload_codec_version) is int
+        and payload_codec_version == expected_version
+    )
+
+
 def _vacuum_pt1_cache(connection: sqlite3.Connection) -> None:
     connection.execute("VACUUM")
 
@@ -201,8 +212,15 @@ def _prune_pt1_payload_codec_rows(
     if not path.is_file():
         raise FileNotFoundError(str(path))
 
+    connection_path = str(path)
+    connect_options: dict[str, Any] = {}
+    if not apply:
+        connection_path = f"{path.resolve().as_uri()}?mode=ro"
+        connect_options["uri"] = True
     connection = sqlite3.connect(
-        str(path), timeout=DEFAULT_SHARD_BUSY_TIMEOUT_MS / 1000
+        connection_path,
+        timeout=DEFAULT_SHARD_BUSY_TIMEOUT_MS / 1000,
+        **connect_options,
     )
     try:
         connection.execute("BEGIN IMMEDIATE" if apply else "BEGIN")
@@ -237,28 +255,39 @@ def _prune_pt1_payload_codec_rows(
 
             if current_version is None:
                 continue
-            predicate = (
-                "payload_codec_version IS NULL OR payload_codec_version != ?"
-                if has_codec_column
-                else "1"
-            )
-            params = (artifact, current_version) if has_codec_column else (artifact,)
-            matched = int(
-                connection.execute(
-                    f"SELECT count(*) FROM {PT1_EQUILIBRIUM_TABLE} "
-                    f"WHERE artifact = ? AND ({predicate})",
-                    params,
-                ).fetchone()[0]
-            )
+            if has_codec_column:
+                candidate_rows = connection.execute(
+                    f"SELECT rowid, payload_codec_version "
+                    f"FROM {PT1_EQUILIBRIUM_TABLE} WHERE artifact = ? "
+                    "AND (payload_codec_version IS NULL "
+                    "OR typeof(payload_codec_version) != 'integer' "
+                    "OR payload_codec_version != ?)",
+                    (artifact, current_version),
+                ).fetchall()
+            else:
+                candidate_rows = connection.execute(
+                    f"SELECT rowid, NULL FROM {PT1_EQUILIBRIUM_TABLE} "
+                    "WHERE artifact = ?",
+                    (artifact,),
+                ).fetchall()
+
+            # SQL supplies a candidate superset. Admission's exact stamp rule
+            # decides which candidates are actually stale.
+            stale_rowids = [
+                int(row[0])
+                for row in candidate_rows
+                if not _payload_codec_stamp_is_current(artifact, row[1])
+            ]
+            matched = len(stale_rowids)
             matched_by_artifact[artifact] = matched
             if apply and matched:
-                connection.execute(
-                    f"DELETE FROM {PT1_EQUILIBRIUM_TABLE} "
-                    f"WHERE artifact = ? AND ({predicate})",
-                    params,
+                changes_before = connection.total_changes
+                connection.executemany(
+                    f"DELETE FROM {PT1_EQUILIBRIUM_TABLE} WHERE rowid = ?",
+                    [(rowid,) for rowid in stale_rowids],
                 )
-                deleted_by_artifact[artifact] = int(
-                    connection.execute("SELECT changes()").fetchone()[0]
+                deleted_by_artifact[artifact] = (
+                    connection.total_changes - changes_before
                 )
 
         if apply:
@@ -294,16 +323,10 @@ def _decode_payload_for_admission(
     artifact: str,
     payload: Any,
     *,
-    payload_codec_version: int | None = None,
+    payload_codec_version: Any = None,
     keys: Sequence[Mapping[str, Any]] = (),
 ) -> Any | None:
-    expected_version = _payload_codec_version(artifact)
-    if expected_version is None:
-        return payload
-    if (
-        type(payload_codec_version) is not int
-        or payload_codec_version != expected_version
-    ):
+    if not _payload_codec_stamp_is_current(artifact, payload_codec_version):
         return None
     if not isinstance(payload, Mapping):
         return None

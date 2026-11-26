@@ -71,7 +71,58 @@ def _put_cache_row(db_path: Path, *, tag: str) -> str:
     return key_hash
 
 
-def _put_real_equilibrium_cache_row(
+def _put_real_equilibrium_cache_row(db_path: Path) -> None:
+    key = {
+        "schema_version": SCHEMA_VERSION,
+        "namespace_id": "alphamelts:equilibrium-composite",
+        "artifact": "equilibrium_post_record",
+        "intent": "EQUILIBRIUM",
+        "vapor_pressure_provider_selection": "builtin-vapor-pressure",
+        "code_version": "test",
+        "data_digests": {},
+    }
+    payload = {
+        "authority": {
+            "schema": "reduced-real-authority-v1",
+            "evidence_class": "melts",
+            "backend_family": "alphamelts",
+            "backend": {
+                "backend_name": "AlphaMELTSBackend",
+                "backend_class": (
+                    "simulator.melt_backend.alphamelts.AlphaMELTSBackend"
+                ),
+            },
+            "provider": {
+                "resolved_provider_id": "alphamelts-diagnostic",
+                "resolved_role": "authoritative",
+                "authoritative_provider_id": "alphamelts-diagnostic",
+                "fallback_provider_id": None,
+            },
+            "vapor_pressure": {
+                "resolved_provider_id": "builtin-vapor-pressure",
+                "resolved_role": "authoritative",
+                "authoritative_provider_id": "builtin-vapor-pressure",
+                "fallback_provider_id": None,
+                "fallback_allowed": False,
+            },
+        },
+        "equilibrium_result": {"status": "ok"},
+        "last_vapor_pressures_source": {"Na": "builtin_authoritative"},
+    }
+    key_bytes = canonical_json_bytes(key)
+    payload_bytes = canonical_json_bytes(payload)
+    PT1PersistentEquilibriumStore(db_path).put(
+        artifact="equilibrium_post_record",
+        key=key,
+        key_bytes=key_bytes,
+        key_hash=hashlib.sha256(key_bytes).hexdigest(),
+        payload=payload,
+        payload_bytes=payload_bytes,
+        payload_hash=hashlib.sha256(payload_bytes).hexdigest(),
+    )
+
+
+def _put_replayable_equilibrium_cache_row(
     db_path: Path,
     *,
     tag: str | None = None,
@@ -137,7 +188,7 @@ def test_reduced_real_prune_is_dry_by_default_and_deletes_only_stale_codecs(
         if artifact == "freeze_gate_curve":
             row_hashes[(artifact, tag)] = _put_cache_row(db_path, tag=tag)
         else:
-            row_hashes[(artifact, tag)] = _put_real_equilibrium_cache_row(
+            row_hashes[(artifact, tag)] = _put_replayable_equilibrium_cache_row(
                 db_path, tag=tag
             )
 
@@ -305,6 +356,80 @@ def test_reduced_real_prune_dry_run_reads_one_snapshot(
     assert result["dry_run"] is True
     assert read_transaction_states
     assert all(read_transaction_states)
+
+
+def test_reduced_real_prune_dry_run_does_not_checkpoint_leftover_wal(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "reduced-real-leftover-wal.sqlite"
+    _put_cache_row(db_path, tag="leftover-wal")
+
+    connection = sqlite3.connect(db_path)
+    assert connection.execute("PRAGMA journal_mode=WAL").fetchone()[0] == "wal"
+    connection.execute("PRAGMA wal_autocheckpoint=0")
+    connection.execute(
+        f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+        "SET payload_codec_version = NULL"
+    )
+    connection.commit()
+
+    wal_path = Path(f"{db_path}-wal")
+    shm_path = Path(f"{db_path}-shm")
+    database_before = db_path.read_bytes()
+    wal_before = wal_path.read_bytes()
+    shm_before = shm_path.read_bytes()
+    connection.close()
+
+    # Recreate a committed WAL state after the last connection closes, so the
+    # dry-run tool is the only connection that opens this database.
+    db_path.write_bytes(database_before)
+    wal_path.write_bytes(wal_before)
+    shm_path.write_bytes(shm_before)
+    assert wal_path.exists()
+
+    result = rrd._prune_pt1_payload_codec_rows(db_path)
+
+    assert result["matched_by_artifact"]["freeze_gate_curve"] == 1
+    assert db_path.read_bytes() == database_before
+    assert wal_path.read_bytes() == wal_before
+
+
+def test_reduced_real_prune_matches_admission_for_real_codec_stamp(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "reduced-real-real-codec-stamp.sqlite"
+    artifact = "equilibrium_post_record"
+    current_version = rrd._payload_codec_version(artifact)
+    assert current_version is not None
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"CREATE TABLE {PT1_EQUILIBRIUM_TABLE} "
+            "(artifact TEXT, payload_codec_version REAL)"
+        )
+        conn.execute(
+            f"INSERT INTO {PT1_EQUILIBRIUM_TABLE} VALUES (?, ?)",
+            (artifact, float(current_version)),
+        )
+        storage_type = conn.execute(
+            f"SELECT typeof(payload_codec_version) "
+            f"FROM {PT1_EQUILIBRIUM_TABLE} WHERE artifact = ?",
+            (artifact,),
+        ).fetchone()[0]
+    assert storage_type == "real"
+    assert rrd._decode_payload_for_admission(
+        artifact, {}, payload_codec_version=float(current_version)
+    ) is None
+
+    dry_run = rrd._prune_pt1_payload_codec_rows(db_path)
+    assert dry_run["matched_by_artifact"][artifact] == 1
+
+    applied = rrd._prune_pt1_payload_codec_rows(db_path, apply=True)
+    assert applied["deleted_by_artifact"][artifact] == 1
+    with sqlite3.connect(db_path) as conn:
+        assert conn.execute(
+            f"SELECT count(*) FROM {PT1_EQUILIBRIUM_TABLE} WHERE artifact = ?",
+            (artifact,),
+        ).fetchone()[0] == 0
 
 
 def _put_internal_analytical_cache_row(db_path: Path) -> None:
