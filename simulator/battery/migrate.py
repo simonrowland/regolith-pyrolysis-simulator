@@ -26351,12 +26351,17 @@ class Migrator:
         if method_was_unspecified:
             # A tagged-unknown experiment method carries the printed sentence.
             # The row starts as the placeholder "source does not state method",
-            # and that placeholder must not erase the sentence when DP-106
-            # stores UNSPECIFIED. A row that stated its own method keeps that
-            # text. The two lift placeholders are not a published sentence.
+            # and a regime label is not that sentence. The placeholder must
+            # not erase it when DP-106 stores UNSPECIFIED. A row that stated
+            # its own method keeps that text. The two lift placeholders are
+            # not a published sentence.
+            row_stated_method = any(
+                _method_text_value(candidate) is not None
+                for candidate in method_raw_candidates
+            )
             published_experiment_reason = None
             if (
-                method_raw is None
+                not row_stated_method
                 and declared_experiment_method is not None
                 and declared_experiment_method.is_unknown
                 and declared_experiment_method.reason
