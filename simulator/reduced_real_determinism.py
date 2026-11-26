@@ -555,6 +555,17 @@ def _admission_rejection(
                 return "equilibrium.authority.provider_shape"
         elif "authority" in payload and not isinstance(authority, Mapping):
             return "equilibrium.authority.type"
+        if not interpolation_synthesized and keys:
+            try:
+                validate_reduced_real_equilibrium_record_key(
+                    artifact,
+                    keys[0],
+                    payload,
+                )
+            except RuntimeError:
+                # The writer-facing validator raises for invalid authority,
+                # but a bad stored row is an admission miss.
+                return "equilibrium.authority.identity"
         try:
             decoded = _decode_equilibrium_replay_payload(payload)
         except Exception as exc:
@@ -2432,11 +2443,6 @@ class PT0DeterminismStore:
         )
         if decoded is None:
             return None
-        validate_reduced_real_equilibrium_record_key(
-            artifact,
-            key,
-            entry.get("payload"),
-        )
         return decoded
 
     def _drift_fields_for_latest_replay(self) -> list[str]:
@@ -3524,11 +3530,6 @@ class PT1PersistentEquilibriumStore:
         if admission is None:
             admitted_payload = copy.deepcopy(row_payload)
         else:
-            validate_reduced_real_equilibrium_record_key(
-                artifact,
-                row_key,
-                row_payload,
-            )
             admitted_payload = copy.deepcopy(dict(row_payload))
         repair_notices_json = _row_repair_notices(row)
         validate_repair_notices_json(repair_notices_json)
