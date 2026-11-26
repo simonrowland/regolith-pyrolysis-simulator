@@ -3,7 +3,12 @@
 if (!globalThis.ReportLabels) {
   throw new Error("report-viewer.js requires labels.js (globalThis.ReportLabels) to be loaded first");
 }
-const { scalarText, stageMassQualifier, esc } = globalThis.ReportLabels;
+const {
+  scalarText,
+  stageMassQualifier,
+  unresolvedVapourNoticeSummary,
+  esc
+} = globalThis.ReportLabels;
 const RUN_ID = new URLSearchParams(window.location.search).get("run");
 const RUN_QUERY = RUN_ID ? `?run=${encodeURIComponent(RUN_ID)}` : "";
 const ARTIFACT_URL = RUN_ID
@@ -448,21 +453,10 @@ function vapourRailSection(terminal) {
     ? overlay.catalog_pa_shadow_equal
     : null;
   const catalogOutcome = overlay.catalog_pa_shadow_outcome ?? "not emitted";
-  const hasUnresolvedNotices = Array.isArray(overlay.notices);
-  const unresolvedNotices = hasUnresolvedNotices
-    ? overlay.notices
-        .filter((notice) => notice && notice.kind === "vapour_batch_unresolved")
-        .map((notice) => {
-          const species = notice.species || "unknown species";
-          const hour = notice.hour === null || notice.hour === undefined
-            ? "unknown hour"
-            : `hour ${notice.hour}`;
-          return `${species}, ${hour}: ${notice.reason || "unresolved"}`;
-        })
-    : [];
-  const unresolvedNoticeSummary = unresolvedNotices.length
-    ? unresolvedNotices.join("; ")
-    : (hasUnresolvedNotices ? "none" : "not reported");
+  const unresolvedNoticeSummary = unresolvedVapourNoticeSummary(
+    overlay.notices,
+    "not reported"
+  );
   const vrCard = instrumentation
     ? `<div class="card"><div class="ct">Vapour batch · channel authority</div>` +
       `<div class="cbig">${esc(String(batch.n_flux_active ?? "n/a"))} <small>flux-active</small></div>` +

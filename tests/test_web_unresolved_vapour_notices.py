@@ -14,7 +14,7 @@ NOTICE = {
 }
 
 
-def _render_notice_summaries() -> tuple[str, str]:
+def _render_notice_summaries(shared_summary: str | None = None) -> tuple[str, str]:
     payload = {
         "status": "ok",
         "tick_view": "full",
@@ -28,6 +28,7 @@ def _render_notice_summaries() -> tuple[str, str]:
             "flux_overlay": {"notices": [NOTICE]},
         },
         "condensation_refusals_by_species": {},
+        "shared_summary_mutation": shared_summary,
     }
     harness = r"""
 const fs = require("fs");
@@ -61,6 +62,12 @@ const context = {
 context.globalThis = context;
 vm.createContext(context);
 vm.runInContext(fs.readFileSync(`${root}/labels.js`, "utf8"), context);
+if (payload.shared_summary_mutation !== null) {
+  context.ReportLabels = Object.freeze({
+    ...context.ReportLabels,
+    unresolvedVapourNoticeSummary: () => payload.shared_summary_mutation
+  });
+}
 vm.runInContext(fs.readFileSync(`${root}/report-viewer.js`, "utf8"), context);
 context.__terminal = payload.vapour_rail_instrumentation
   ? { vapour_rail_instrumentation: payload.vapour_rail_instrumentation,
@@ -98,3 +105,17 @@ def test_unresolved_vapour_notice_summary_is_pinned_across_surfaces() -> None:
     expected = "Fe, hour 4: surface closure refusal"
 
     assert _render_notice_summaries() == (expected, expected)
+
+
+def test_live_and_frozen_consumers_use_the_shared_notice_formatter() -> None:
+    marker = "shared formatter test mutation"
+
+    assert _render_notice_summaries(marker) == (marker, marker)
+
+
+def test_simulator_template_loads_shared_labels_before_advisory() -> None:
+    template = (ROOT / "web" / "templates" / "simulator.html").read_text()
+
+    labels_at = template.index("url_for('web.report_viewer', asset='labels.js'")
+    advisory_at = template.index("js/simulator-advisory.js")
+    assert labels_at < advisory_at

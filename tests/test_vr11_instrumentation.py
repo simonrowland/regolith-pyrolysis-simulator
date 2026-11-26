@@ -1933,12 +1933,16 @@ def test_vapour_rail_instrumentation_diagnostic_shape() -> None:
     advisory_js = (
         ROOT / "web/static/js/simulator-advisory.js"
     ).read_text(encoding="utf-8")
-    assert "vapour_batch_unresolved" in advisory_js
+    assert "unresolvedVapourNoticeSummary" in advisory_js
     assert "available in full records" in advisory_js
     report_viewer_js = (
         ROOT / "web/report_viewer/report-viewer.js"
     ).read_text(encoding="utf-8")
-    assert "vapour_batch_unresolved" in report_viewer_js
+    assert "unresolvedVapourNoticeSummary" in report_viewer_js
+    report_labels_js = (
+        ROOT / "web/report_viewer/labels.js"
+    ).read_text(encoding="utf-8")
+    assert 'notice.kind === "vapour_batch_unresolved"' in report_labels_js
 
 
 def test_absent_overlay_does_not_default_shadow_equal_true() -> None:

@@ -890,25 +890,13 @@ function renderVapourRailInstrumentationPanel(payload) {
         'Catalog Pa shadow outcome',
         overlay.catalog_pa_shadow_outcome || 'absent'
     );
-    const hasUnresolvedNotices = Array.isArray(overlay.notices);
-    const unresolved = hasUnresolvedNotices
-        ? overlay.notices
-            .filter((notice) => notice && notice.kind === 'vapour_batch_unresolved')
-            .map((notice) => {
-                const species = notice.species || 'unknown species';
-                const hour = notice.hour === null || notice.hour === undefined
-                    ? 'unknown hour'
-                    : `hour ${notice.hour}`;
-                return `${species}, ${hour}: ${notice.reason || 'unresolved'}`;
-            })
-        : [];
-    const unresolvedNoticeSummary = unresolved.length
-        ? unresolved.join('; ')
-        : (hasUnresolvedNotices
-            ? 'none'
-            : (payload.tick_view === 'compact'
+    const unresolvedNoticeSummary = globalThis.ReportLabels
+        .unresolvedVapourNoticeSummary(
+            overlay.notices,
+            payload.tick_view === 'compact'
                 ? 'available in full records'
-                : 'not reported'));
+                : 'not reported'
+        );
     appendCeramicLine(
         content,
         'Unavailable vapour flux',

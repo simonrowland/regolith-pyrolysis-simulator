@@ -161,6 +161,20 @@
     return scalarText(text, "").replace(/\b(?:[A-Z][a-z]?\d*)+\b/g, (token) => prettySpecies(token));
   }
 
+  function unresolvedVapourNoticeSummary(notices, missing = "not reported") {
+    if (!Array.isArray(notices)) return missing;
+    const unresolved = notices
+      .filter((notice) => notice && notice.kind === "vapour_batch_unresolved")
+      .map((notice) => {
+        const species = notice.species || "unknown species";
+        const hour = notice.hour === null || notice.hour === undefined
+          ? "unknown hour"
+          : `hour ${notice.hour}`;
+        return `${species}, ${hour}: ${notice.reason || "unresolved"}`;
+      });
+    return unresolved.length ? unresolved.join("; ") : "none";
+  }
+
   // One stable species colour grammar for every panel (bars, ribbons, chips, stage fills).
   // Keyed by the token's LEAD element so a family shares a hue (Fe/FeO/FeSi, Si/SiO/SiO2, Na/Na2O…);
   // mid-lightness hues chosen to stay legible on both themes. Unlisted species get a deterministic
@@ -195,6 +209,7 @@
   root.ReportLabels = Object.freeze({
     scalarText, fmtNum, fmtRunId, prettySpecies, accountLabel, prettyFeedstock,
     prettyChemText, speciesColor, hasNumber, exactValue, isHashLike,
-    priceAuthority, priceAuthorityNote, stageMassQualifier, esc
+    priceAuthority, priceAuthorityNote, stageMassQualifier,
+    unresolvedVapourNoticeSummary, esc
   });
 }(globalThis));
