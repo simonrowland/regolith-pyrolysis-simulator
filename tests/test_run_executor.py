@@ -475,7 +475,10 @@ def test_c4_time_cap_and_exact_boundary_flags_reach_batch_artifact():
     c4_stop = next(
         stop for stop in execution.campaign_stops if stop["campaign"] == "C4"
     )
-    assert "flags" not in c4_stop
+    assert {flag["code"] for flag in c4_stop["flags"]} == {
+        "campaign_time_cap_unconverged",
+        "c4_time_capped_without_na_endpoint",
+    }
     payload = run._build_output(execution)
     c4_payload_stop = next(
         stop for stop in payload["run_metadata"]["campaign_stops"]
@@ -539,7 +542,10 @@ def test_campaign_time_cap_flag_identifies_pending_successor_decision():
     execution_stop = next(
         stop for stop in execution.campaign_stops if stop["campaign"] == "C2A"
     )
-    assert "flags" not in execution_stop
+    assert any(
+        flag["code"] == "campaign_time_cap_unconverged"
+        for flag in execution_stop["flags"]
+    )
     output_stop = next(
         stop for stop in run._build_output(execution)["run_metadata"]["campaign_stops"]
         if stop["campaign"] == "C2A"
@@ -1157,6 +1163,11 @@ def test_failure_envelope_survives_campaign_stop_projection_failure(monkeypatch)
     assert "diagnostic envelope unavailable" in payload["error_message"]
     assert payload["run_metadata"]["run_flags"]
     assert "campaign_stops" not in payload["run_metadata"]
+    assert {
+        "kind": "run_diagnostic",
+        "code": "diagnostic_unresolved",
+        "error_type": "RuntimeError",
+    } in payload["run_metadata"]["run_flags"]
 
 
 def test_successful_output_survives_campaign_stop_projection_failure(monkeypatch):
@@ -1178,11 +1189,11 @@ def test_successful_output_survives_campaign_stop_projection_failure(monkeypatch
     assert payload["status"] == base_payload["status"]
     assert payload["run_metadata"]["run_flags"]
     assert "campaign_stops" not in payload["run_metadata"]
-    assert session._diagnostic_failures[-1] == {
-        "kind": "diagnostic_unresolved",
-        "site": "campaign_stop_projection",
+    assert {
+        "kind": "run_diagnostic",
+        "code": "diagnostic_unresolved",
         "error_type": "RuntimeError",
-    }
+    } in payload["run_metadata"]["run_flags"]
 
 
 def test_cached_failure_document_survives_campaign_stop_projection_failure(
@@ -1215,6 +1226,11 @@ def test_cached_failure_document_survives_campaign_stop_projection_failure(
     assert exported["reason"] == "primary_failure"
     assert exported["run_metadata"]["run_flags"]
     assert "campaign_stops" not in exported["run_metadata"]
+    assert {
+        "kind": "run_diagnostic",
+        "code": "diagnostic_unresolved",
+        "error_type": "RuntimeError",
+    } in exported["run_metadata"]["run_flags"]
 
 
 def test_result_document_returns_original_if_mapping_enumeration_fails():
@@ -1235,43 +1251,9 @@ def test_result_document_returns_original_if_mapping_enumeration_fails():
     session._set_result_document(document)
 
     assert session.result_document() is document
-    assert session._diagnostic_failures[-1] == {
-        "kind": "diagnostic_unresolved",
-        "site": "result_document_getter_metadata",
-        "error_type": "RuntimeError",
-    }
 
 
-@pytest.mark.parametrize(
-    ("raising_key", "failed_code", "surviving_code"),
-    [
-        (
-            "stop_detail",
-            "campaign_time_cap_unconverged",
-            "c4_time_capped_without_na_endpoint",
-        ),
-        (
-            "c4_termination",
-            "c4_time_capped_without_na_endpoint",
-            "campaign_time_cap_unconverged",
-        ),
-    ],
-)
-def test_c4_stop_flag_build_failure_does_not_abort_hour_or_other_flag(
-    monkeypatch,
-    raising_key,
-    failed_code,
-    surviving_code,
-):
-    class RaisingSummary(dict):
-        raised = False
-
-        def get(self, key, default=None):
-            if key == raising_key and not self.raised:
-                self.raised = True
-                raise RuntimeError("injected stop diagnostic read failure")
-            return super().get(key, default)
-
+def test_malformed_c4_residual_diagnostic_does_not_abort_hour(monkeypatch):
     run = _run(
         feedstock_id="lunar_mare_low_ti",
         campaign="C4",
@@ -1282,43 +1264,52 @@ def test_c4_stop_flag_build_failure_does_not_abort_hour_or_other_flag(
     sim = session.simulator
     sim.record.branch = "two"
     sim.campaign_mgr.campaigns["C4"]["max_target_acquisition_hr"] = 1.0
+    snapshots_before = len(sim.record.snapshots)
     capture_summary = sim._capture_campaign_summary
 
-    def capture_with_raising_diagnostic(campaign_name):
+    def capture_with_malformed_residual(campaign_name):
         summary = capture_summary(campaign_name)
         if campaign_name == "C4":
-            return RaisingSummary(summary)
+            sim.campaign_mgr.last_c4_termination["residual_melt"] = (
+                "malformed residual"
+            )
         return summary
 
     monkeypatch.setattr(
         sim,
         "_capture_campaign_summary",
-        capture_with_raising_diagnostic,
+        capture_with_malformed_residual,
     )
 
     execution = RunExecutor().execute_session(session, hours=1)
 
     assert execution.status == "ok"
     assert sim.melt.hour == 1
+    assert len(sim.record.snapshots) == snapshots_before + 1
     assert sim.melt.campaign is CampaignPhase.C2A
     output = run._build_output(execution)
     c4_stop = next(
         stop for stop in output["run_metadata"]["campaign_stops"]
         if stop["campaign"] == "C4"
     )
-    failed_flag = next(
+    generic_flag = next(
         flag for flag in c4_stop["flags"]
-        if flag["code"] == failed_code
+        if flag["code"] == "campaign_time_cap_unconverged"
     )
-    surviving_flag = next(
+    malformed_flag = next(
         flag for flag in c4_stop["flags"]
-        if flag["code"] == surviving_code
+        if flag["code"] == "c4_time_capped_without_na_endpoint"
     )
-    assert failed_flag["detail"] == {
+    assert generic_flag["detail"]["successor"] == "C2A"
+    assert malformed_flag["detail"] == {
         "unresolved": True,
-        "error_type": "RuntimeError",
+        "error_type": "TypeError",
     }
-    assert surviving_flag["detail"].get("unresolved") is not True
+    assert {
+        "kind": "run_diagnostic",
+        "code": "diagnostic_unresolved",
+        "error_type": "TypeError",
+    } in output["run_metadata"]["run_flags"]
     assert any(
         flag["code"] == "run_hour_budget_exhausted_mid_campaign"
         and flag["detail"]["campaign"] == "C2A"
@@ -1355,14 +1346,20 @@ def test_budget_flag_build_failure_keeps_campaign_stop_flags(monkeypatch):
     assert execution.status == "ok"
     assert sim.melt.hour == 1
     assert sim.melt.campaign is CampaignPhase.C2A
-    budget_flag = next(
+    unresolved_flag = next(
         flag for flag in output["run_metadata"]["run_flags"]
-        if flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+        if flag["code"] == "diagnostic_unresolved"
     )
-    assert budget_flag["detail"] == {
-        "unresolved": True,
+    assert unresolved_flag == {
+        "kind": "run_diagnostic",
+        "code": "diagnostic_unresolved",
         "error_type": "RuntimeError",
     }
+    assert all(
+        flag["code"] != "run_hour_budget_exhausted_mid_campaign"
+        for flag in output["run_metadata"]["run_flags"]
+    )
+    assert output["run_metadata"]["run_flags"] == [unresolved_flag]
     c4_stop = next(
         stop for stop in output["run_metadata"]["campaign_stops"]
         if stop["campaign"] == "C4"
@@ -1370,27 +1367,6 @@ def test_budget_flag_build_failure_keeps_campaign_stop_flags(monkeypatch):
     assert {flag["code"] for flag in c4_stop["flags"]} == {
         "campaign_time_cap_unconverged",
         "c4_time_capped_without_na_endpoint",
-    }
-
-
-def test_result_document_setter_stores_document_if_metadata_lookup_fails():
-    class BrokenMetadataLookup(dict):
-        def get(self, key, default=None):
-            if key == "run_metadata":
-                raise RuntimeError("metadata lookup failed")
-            return super().get(key, default)
-
-    session = _started_internal_session(_run(campaign="C2A", hours=1))
-    document = BrokenMetadataLookup(status="ok", run_metadata={"run_flags": []})
-
-    session._set_result_document(document)
-
-    assert session._result_document is document
-    failure = session._diagnostic_failures[-1]
-    assert failure == {
-        "kind": "diagnostic_unresolved",
-        "site": "result_document_setter_metadata",
-        "error_type": "RuntimeError",
     }
 
 
@@ -1415,92 +1391,6 @@ def test_result_document_getter_returns_original_if_metadata_enumeration_fails()
     session._set_result_document(document)
 
     assert session.result_document() is document
-    failure = session._diagnostic_failures[-1]
-    assert failure == {
-        "kind": "diagnostic_unresolved",
-        "site": "result_document_getter_metadata",
-        "error_type": "RuntimeError",
-    }
-
-
-def test_campaign_flag_copy_failure_does_not_fail_execution(monkeypatch):
-    import simulator.run_executor as run_executor_module
-
-    class UncopyableValue:
-        def __deepcopy__(self, memo):
-            raise RuntimeError("campaign flag copy failed")
-
-    run = _run(
-        feedstock_id="lunar_mare_low_ti",
-        campaign="C4",
-        hours=1,
-        additives_kg={},
-    )
-    session = _started_internal_session(run)
-    sim = session.simulator
-    sim.record.branch = "two"
-    sim.campaign_mgr.campaigns["C4"]["max_target_acquisition_hr"] = 1.0
-
-    real_driver = run_executor_module.drive_session
-
-    def driver_with_uncopyable_flag(active_session, *args, **kwargs):
-        for result in real_driver(active_session, *args, **kwargs):
-            summary = result.campaign_summary
-            if isinstance(summary, dict):
-                summary_with_uncopyable_flag = dict(summary)
-                summary_with_uncopyable_flag["flags"] = [{
-                    "kind": "campaign_stop",
-                    "code": "injected_copy_failure",
-                    "detail": UncopyableValue(),
-                }]
-                result = replace(
-                    result,
-                    campaign_summary=summary_with_uncopyable_flag,
-                )
-                active_session._step_results[-1] = result
-            yield result
-
-    monkeypatch.setattr(
-        run_executor_module,
-        "drive_session",
-        driver_with_uncopyable_flag,
-    )
-
-    execution = RunExecutor().execute_session(session, hours=1)
-
-    assert execution.status == "ok"
-    assert sim.melt.campaign is CampaignPhase.C2A
-    assert any(
-        stop["campaign"] == "C4" for stop in execution.campaign_stops
-    )
-    assert any(
-        flag["code"] == "injected_copy_failure"
-        and isinstance(flag["detail"], UncopyableValue)
-        for result in session._step_results
-        for flag in result.campaign_summary.get("flags", ())
-    )
-    payload = run._build_output(execution)
-    assert payload["status"] == "ok"
-    assert payload["run_metadata"]["run_flags"] == list(execution.run_flags)
-    budget_flag = next(
-        flag for flag in payload["run_metadata"]["run_flags"]
-        if flag["code"] == "run_hour_budget_exhausted_mid_campaign"
-    )
-    assert budget_flag["detail"]["campaign"] == "C2A"
-    c4_stop = next(
-        stop for stop in payload["run_metadata"]["campaign_stops"]
-        if stop["campaign"] == "C4"
-    )
-    unresolved_copy = next(
-        flag for flag in c4_stop["flags"]
-        if flag["code"] == "injected_copy_failure"
-    )
-    assert unresolved_copy["detail"] == {
-        "unresolved": True,
-        "error_type": "RuntimeError",
-    }
-
-
 def test_live_result_document_recomputes_budget_flag_when_chain_completes():
     run = _run(
         feedstock_id="lunar_mare_low_ti",
@@ -1531,6 +1421,51 @@ def test_live_result_document_recomputes_budget_flag_when_chain_completes():
         flag["code"] == "run_hour_budget_exhausted_mid_campaign"
         for flag in completed["run_metadata"].get("run_flags", ())
     )
+
+
+def test_failed_live_flag_merge_drops_stale_budget_flags_after_no_decision(
+    monkeypatch,
+):
+    import simulator.session as session_module
+
+    session = _started_internal_session(_run(campaign="C2A", hours=1))
+    sim = session.simulator
+    sim.record.path = "A_post_mg_boiloff"
+    sim.record.branch = "two"
+    sim.campaign_mgr.campaigns["C2A_continuous"]["max_hold_hr"] = 1
+    RunExecutor().execute_session(session, hours=1)
+    assert sim.pending_decision is not None
+
+    stale_budget_flag = {
+        "kind": "run_diagnostic",
+        "code": "run_hour_budget_exhausted_mid_campaign",
+        "detail": {"stale": True},
+    }
+    session._set_result_document({
+        "status": "ok",
+        "run_metadata": {
+            "run_flags": ["legacy notice", stale_budget_flag, "keep me"],
+        },
+    })
+    session.decide("no")
+    assert session.is_complete()
+
+    def fail_live_merge(*args, **kwargs):
+        raise RuntimeError("run flag merge failed")
+
+    monkeypatch.setattr(session_module, "_merge_run_flags", fail_live_merge)
+
+    exported_flags = session.result_document()["run_metadata"]["run_flags"]
+
+    assert exported_flags == [
+        "legacy notice",
+        "keep me",
+        {
+            "kind": "run_diagnostic",
+            "code": "diagnostic_unresolved",
+            "error_type": "RuntimeError",
+        },
+    ]
 
 
 def test_budget_flag_successor_walk_does_not_copy_batch_history():
@@ -1909,16 +1844,10 @@ def test_budget_flag_exception_is_typed_without_exception_text(monkeypatch):
 
     flag = _live_budget_flag(session)
 
-    assert flag["code"] == "run_hour_budget_exhausted_mid_campaign"
-    assert flag["detail"] == {
-        "unresolved": True,
+    assert flag == {
+        "kind": "run_diagnostic",
+        "code": "diagnostic_unresolved",
         "error_type": "RuntimeError",
-        "pending_decision": {
-            "type": "PATH_AB",
-            "options": ["A_staged"],
-            "recommendation": "A_staged",
-            "context": "pending path choice",
-        },
     }
     assert "do not serialize this message" not in repr(flag)
 
@@ -1950,8 +1879,9 @@ def test_budget_flag_reports_configured_campaign_cycle_as_unresolved(monkeypatch
 
     flag = _live_budget_flag(session)
 
-    assert flag["detail"] == {
-        "unresolved": True,
+    assert flag == {
+        "kind": "run_diagnostic",
+        "code": "diagnostic_unresolved",
         "error_type": "_ConfiguredCampaignWalkCycle",
     }
 

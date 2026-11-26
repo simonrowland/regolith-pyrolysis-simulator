@@ -15653,8 +15653,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             summary['c7_product_report'] = dict(
                 getattr(self, '_c7_product_report', {}) or {})
         elif campaign_name == 'C4':
-            summary['c4_termination'] = dict(
-                getattr(self.campaign_mgr, 'last_c4_termination', {}) or {})
             c4_refusal = dict(
                 getattr(self, '_last_c4_refusal_diagnostic', {}) or {})
             if c4_refusal:
@@ -16571,40 +16569,47 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
 
             try:
-                if (
-                    finishing_campaign == CampaignPhase.C4.name
-                    and self._last_campaign_summary.get('stop_reason')
-                    == 'time_cap'
-                ):
-                    termination = self._last_campaign_summary.get(
-                        'c4_termination'
+                if finishing_campaign == CampaignPhase.C4.name:
+                    termination = getattr(
+                        self.campaign_mgr,
+                        'last_c4_termination',
+                        None,
                     )
-                    termination = (
-                        termination if isinstance(termination, Mapping) else {}
-                    )
-                    residual = termination.get('residual_melt')
-                    residual = residual if isinstance(residual, Mapping) else {}
-                    flags.append({
-                        'kind': 'campaign_stop',
-                        'code': 'c4_time_capped_without_na_endpoint',
-                        'detail': {
-                            'residual_Na_kg': residual.get('Na_kg'),
-                            'na_endpoint_threshold_atom_mol': termination.get(
-                                'na_endpoint_threshold_atom_mol'
-                            ),
-                            'ruling': 'd-471',
-                        },
-                    })
+                    if termination is None:
+                        termination = {}
+                    if not isinstance(termination, Mapping):
+                        raise TypeError('invalid C4 termination metadata')
+                    termination = dict(termination)
+                    self._last_campaign_summary['c4_termination'] = termination
+                    if self._last_campaign_summary.get('stop_reason') == 'time_cap':
+                        residual = termination['residual_melt']
+                        residual_na_kg = residual['Na_kg']
+                        threshold = termination[
+                            'na_endpoint_threshold_atom_mol'
+                        ]
+                        flags.append({
+                            'kind': 'campaign_stop',
+                            'code': 'c4_time_capped_without_na_endpoint',
+                            'detail': {
+                                'residual_Na_kg': residual_na_kg,
+                                'na_endpoint_threshold_atom_mol': threshold,
+                                'ruling': 'd-471',
+                            },
+                        })
             except Exception as exc:
-                flags.append(
-                    unresolved_stop_flag(
-                        'c4_time_capped_without_na_endpoint',
-                        exc,
+                if self._last_campaign_summary.get('stop_reason') == 'time_cap':
+                    flags.append(
+                        unresolved_stop_flag(
+                            'c4_time_capped_without_na_endpoint',
+                            exc,
+                        )
                     )
-                )
 
             if flags:
-                self._last_campaign_summary['flags'] = flags
+                try:
+                    self._last_campaign_summary['flags'] = flags
+                except Exception:
+                    pass
 
         backend_transition = getattr(equilibrium, 'ledger_transition', None)
         backend_controls_metal_phase = (

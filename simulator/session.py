@@ -298,7 +298,6 @@ class SimSession:
             _MISSING_RESULT_DOCUMENT_RUN_FLAGS
         )
         self._pending_result_document_run_flags: tuple[int, Any] | None = None
-        self._diagnostic_failures: list[dict[str, str]] = []
         self._poisoned_error: RuntimeError | None = None
 
     @property
@@ -535,7 +534,6 @@ class SimSession:
             _MISSING_RESULT_DOCUMENT_RUN_FLAGS
         )
         self._pending_result_document_run_flags = None
-        self._diagnostic_failures = []
         self._poisoned_error = None
 
         sim.start_campaign(campaign_phase)
@@ -845,12 +843,8 @@ class SimSession:
                         attached_metadata["run_flags"] = raw_run_flags
                 _attach_execution_diagnostics(attached_metadata, self)
                 payload["run_metadata"] = attached_metadata
-        except Exception as exc:
+        except Exception:
             # Diagnostic staging must preserve the recorded green document.
-            self._record_diagnostic_failure(
-                "result_document_getter_metadata",
-                exc,
-            )
             return document
         return payload
 
@@ -875,41 +869,22 @@ class SimSession:
         )
 
     def _set_result_document(self, document: Mapping[str, Any]) -> None:
-        self._result_document = document
-        self._result_document_raw_run_flags = (
-            _MISSING_RESULT_DOCUMENT_RUN_FLAGS
-        )
+        metadata = document.get("run_metadata")
         pending_source = self._pending_result_document_run_flags
         self._pending_result_document_run_flags = None
-        try:
-            metadata = document.get("run_metadata")
-            if isinstance(metadata, Mapping):
-                if (
-                    pending_source is not None
-                    and pending_source[0] == id(metadata)
-                ):
-                    self._result_document_raw_run_flags = pending_source[1]
-                else:
-                    self._result_document_raw_run_flags = metadata.get(
-                        "run_flags",
-                        _MISSING_RESULT_DOCUMENT_RUN_FLAGS,
-                    )
-        except Exception as exc:
-            self._record_diagnostic_failure(
-                "result_document_setter_metadata",
-                exc,
+        if isinstance(metadata, Mapping):
+            if pending_source is not None and pending_source[0] == id(metadata):
+                self._result_document_raw_run_flags = pending_source[1]
+            else:
+                self._result_document_raw_run_flags = metadata.get(
+                    "run_flags",
+                    _MISSING_RESULT_DOCUMENT_RUN_FLAGS,
+                )
+        else:
+            self._result_document_raw_run_flags = (
+                _MISSING_RESULT_DOCUMENT_RUN_FLAGS
             )
-
-    def _record_diagnostic_failure(
-        self,
-        site: str,
-        error: Exception,
-    ) -> None:
-        self._diagnostic_failures.append({
-            "kind": "diagnostic_unresolved",
-            "site": site,
-            "error_type": type(error).__name__,
-        })
+        self._result_document = document
 
     def _require_sim(self) -> PyrolysisSimulator:
         if self._sim is None:
@@ -949,44 +924,108 @@ class SimSession:
 
 def _merge_run_flags(
     stored_flags: Any,
-    live_budget_flag: Mapping[str, Any] | None,
+    live_flag: Mapping[str, Any] | None,
 ) -> Any:
-    """Merge the derived d-473 flag without rewriting unrelated stored data."""
-
-    def is_budget_flag(value: Any) -> bool:
-        return (
-            isinstance(value, Mapping)
-            and value.get("code") == _RUN_HOUR_BUDGET_FLAG_CODE
-        )
+    """Replace recorded d-473 data while preserving unrelated stored flags."""
 
     if not isinstance(stored_flags, list):
-        if is_budget_flag(stored_flags):
-            return live_budget_flag
-        if live_budget_flag is None:
+        if _is_run_hour_budget_flag(stored_flags):
+            return live_flag
+        if live_flag is None:
             return stored_flags
-        return [stored_flags, live_budget_flag]
+        return [stored_flags, live_flag]
 
     merged: list[Any] = []
     saw_budget_flag = False
     for flag in stored_flags:
-        if is_budget_flag(flag):
+        if _is_run_hour_budget_flag(flag):
             if not saw_budget_flag:
-                if live_budget_flag is not None:
-                    merged.append(live_budget_flag)
+                if live_flag is not None:
+                    merged.append(live_flag)
                 saw_budget_flag = True
             continue
         merged.append(flag)
-    if not saw_budget_flag and live_budget_flag is not None:
-        merged.append(live_budget_flag)
+    if not saw_budget_flag and live_flag is not None:
+        merged.append(live_flag)
     if merged == stored_flags:
         return stored_flags
     return merged
 
 
+def _is_run_hour_budget_flag(value: Any) -> bool:
+    return (
+        isinstance(value, Mapping)
+        and value.get("code") == _RUN_HOUR_BUDGET_FLAG_CODE
+    )
+
+
+def _without_run_hour_budget_flags(stored_flags: Any) -> Any:
+    if stored_flags is _MISSING_RESULT_DOCUMENT_RUN_FLAGS:
+        return stored_flags
+    if not isinstance(stored_flags, list):
+        return (
+            _MISSING_RESULT_DOCUMENT_RUN_FLAGS
+            if _is_run_hour_budget_flag(stored_flags)
+            else stored_flags
+        )
+    filtered = [
+        flag for flag in stored_flags
+        if not _is_run_hour_budget_flag(flag)
+    ]
+    return stored_flags if len(filtered) == len(stored_flags) else filtered
+
+
+def _diagnostic_unresolved_run_flag(error_type: str) -> dict[str, str]:
+    return {
+        "kind": "run_diagnostic",
+        "code": "diagnostic_unresolved",
+        "error_type": error_type,
+    }
+
+
+def _has_diagnostic_unresolved_flag(
+    stored_flags: Any,
+    error_type: str,
+) -> bool:
+    candidates = stored_flags if isinstance(stored_flags, list) else [stored_flags]
+    return any(
+        isinstance(flag, Mapping)
+        and flag.get("code") == "diagnostic_unresolved"
+        and flag.get("error_type") == error_type
+        for flag in candidates
+    )
+
+
+def _run_flags_with_unresolved(
+    stored_flags: Any,
+    error_type: str,
+    *,
+    remove_budget_flags: bool = False,
+) -> list[Any]:
+    if remove_budget_flags:
+        stored_flags = _without_run_hour_budget_flags(stored_flags)
+    unresolved = _diagnostic_unresolved_run_flag(error_type)
+    if stored_flags is _MISSING_RESULT_DOCUMENT_RUN_FLAGS:
+        return [unresolved]
+    if isinstance(stored_flags, list):
+        if _has_diagnostic_unresolved_flag(
+            stored_flags,
+            unresolved["error_type"],
+        ):
+            return stored_flags
+        return [*stored_flags, unresolved]
+    if _has_diagnostic_unresolved_flag(
+        stored_flags,
+        unresolved["error_type"],
+    ):
+        return [stored_flags]
+    return [stored_flags, unresolved]
+
+
 def _run_flags_for_export(
     session: Any,
 ) -> list[dict[str, Any]]:
-    """Return the live d-473 fact without merging recorded metadata."""
+    """Return live run diagnostics without merging recorded metadata."""
 
     sim = getattr(session, "_sim", None)
     pending_decision: dict[str, Any] | None = None
@@ -1061,18 +1100,28 @@ def _run_flags_for_export(
                 }
     except Exception as exc:
         if should_add_budget_flag:
-            unresolved_detail: dict[str, Any] = {
-                "unresolved": True,
-                "error_type": type(exc).__name__,
-            }
-            if pending_decision is not None:
-                unresolved_detail["pending_decision"] = pending_decision
-            budget_flag = {
-                "kind": "run_diagnostic",
-                "code": _RUN_HOUR_BUDGET_FLAG_CODE,
-                "detail": unresolved_detail,
-            }
-    return [budget_flag] if budget_flag is not None else []
+            budget_flag = _diagnostic_unresolved_run_flag(
+                type(exc).__name__
+            )
+
+    flags = [budget_flag] if budget_flag is not None else []
+    summary = getattr(sim, "_last_campaign_summary", None)
+    summary_flags = summary.get("flags", ()) if isinstance(summary, Mapping) else ()
+    for flag in summary_flags:
+        if not isinstance(flag, Mapping):
+            continue
+        detail = flag.get("detail")
+        error_type = (
+            detail.get("error_type")
+            if isinstance(detail, Mapping) and detail.get("unresolved") is True
+            else None
+        )
+        if (
+            isinstance(error_type, str)
+            and not _has_diagnostic_unresolved_flag(flags, error_type)
+        ):
+            flags.append(_diagnostic_unresolved_run_flag(error_type))
+    return flags
 
 
 def _write_run_flags_to_metadata(
@@ -1122,23 +1171,11 @@ def _campaign_stop_record(
     if include_flags:
         flags = summary.get("flags")
         if isinstance(flags, (list, tuple)):
-            projected_flags: list[dict[str, Any]] = []
-            for flag in flags:
-                if not isinstance(flag, Mapping):
-                    continue
-                flag_record = dict(flag)
-                try:
-                    projected_flags.append(copy.deepcopy(flag_record))
-                except Exception as exc:
-                    projected_flags.append({
-                        "kind": flag_record.get("kind", "campaign_stop"),
-                        "code": flag_record.get("code"),
-                        "detail": {
-                            "unresolved": True,
-                            "error_type": type(exc).__name__,
-                        },
-                    })
-            record["flags"] = projected_flags
+            record["flags"] = [
+                copy.deepcopy(dict(flag))
+                for flag in flags
+                if isinstance(flag, Mapping)
+            ]
     return record
 
 
@@ -1188,18 +1225,61 @@ def _attach_execution_diagnostics(
 
     if getattr(session, "_sim", None) is None:
         return
+    stored_run_flags = _MISSING_RESULT_DOCUMENT_RUN_FLAGS
     try:
-        stored_run_flags = run_metadata.get("run_flags", [])
+        stored_run_flags = run_metadata.get(
+            "run_flags",
+            _MISSING_RESULT_DOCUMENT_RUN_FLAGS,
+        )
         live_flags = _run_flags_for_export(session)
-        live_budget_flag = live_flags[0] if live_flags else None
-        run_flags = _merge_run_flags(stored_run_flags, live_budget_flag)
-        if run_flags is not stored_run_flags:
+        live_budget_flag = next(
+            (
+                flag for flag in live_flags
+                if flag.get("code") == _RUN_HOUR_BUDGET_FLAG_CODE
+            ),
+            None,
+        )
+        stored_for_merge = (
+            []
+            if stored_run_flags is _MISSING_RESULT_DOCUMENT_RUN_FLAGS
+            else stored_run_flags
+        )
+        run_flags = _merge_run_flags(stored_for_merge, live_budget_flag)
+        if stored_run_flags is _MISSING_RESULT_DOCUMENT_RUN_FLAGS:
+            if run_flags:
+                _write_run_flags_to_metadata(run_metadata, run_flags)
+        elif run_flags is not stored_run_flags:
             if run_flags is None:
                 run_metadata.pop("run_flags", None)
             else:
                 _write_run_flags_to_metadata(run_metadata, run_flags)
+        for flag in live_flags:
+            if flag.get("code") != "diagnostic_unresolved":
+                continue
+            current_run_flags = run_metadata.get(
+                "run_flags",
+                _MISSING_RESULT_DOCUMENT_RUN_FLAGS,
+            )
+            if not _has_diagnostic_unresolved_flag(
+                current_run_flags,
+                flag["error_type"],
+            ):
+                _write_run_flags_to_metadata(
+                    run_metadata,
+                    _run_flags_with_unresolved(
+                        current_run_flags,
+                        flag["error_type"],
+                    ),
+                )
     except Exception as exc:
-        session._record_diagnostic_failure("run_flags_attachment", exc)
+        _write_run_flags_to_metadata(
+            run_metadata,
+            _run_flags_with_unresolved(
+                stored_run_flags,
+                type(exc).__name__,
+                remove_budget_flags=True,
+            ),
+        )
 
     try:
         run_metadata["campaign_stops"] = _json_safe(
@@ -1208,7 +1288,17 @@ def _attach_execution_diagnostics(
     except Exception as exc:
         # A failed live projection must not revive a recorded stale list.
         run_metadata.pop("campaign_stops", None)
-        session._record_diagnostic_failure("campaign_stop_projection", exc)
+        current_run_flags = run_metadata.get(
+            "run_flags",
+            _MISSING_RESULT_DOCUMENT_RUN_FLAGS,
+        )
+        _write_run_flags_to_metadata(
+            run_metadata,
+            _run_flags_with_unresolved(
+                current_run_flags,
+                type(exc).__name__,
+            ),
+        )
 
 
 def drive_auto_apply(

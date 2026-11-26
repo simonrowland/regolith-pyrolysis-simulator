@@ -37,7 +37,6 @@ from simulator.session import (
     DecisionPolicy,
     SimSession,
     SimSessionConfig,
-    _campaign_stop_record as _session_campaign_stop_record,
     _at_stage0_exit as _session_at_stage0_exit,
     _drive_session_with_budget_intent,
     _run_flags_for_export,
@@ -362,10 +361,7 @@ class RunExecutor:
                     failure_exc = RuntimeError(reason)
                     break
                 campaign_summary = result.campaign_summary
-                recorded_stop = _session_campaign_stop_record(
-                    campaign_summary,
-                    include_flags=False,
-                )
+                recorded_stop = campaign_stop_record(campaign_summary)
                 if recorded_stop is not None:
                     campaign_stops.append(recorded_stop)
                 c4_refusal = (
