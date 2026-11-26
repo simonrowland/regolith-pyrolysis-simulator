@@ -766,7 +766,15 @@ def _validated_cache_payload_row(row: Mapping[str, Any]) -> dict[str, Any]:
 def _cache_row_summary(db_path: Path) -> dict[str, Any]:
     payload_rows = _cache_payload_rows(db_path)
     rows: list[dict[str, Any]] = []
+    superseded_rows = 0
     for row in payload_rows:
+        codec_stamp_is_current = _payload_codec_stamp_is_current(
+            str(row["artifact"]),
+            row.get("payload_codec_version"),
+        )
+        if codec_stamp_is_current is False:
+            superseded_rows += 1
+            continue
         key = json.loads(bytes(row["key_bytes"]).decode("utf-8"))
         payload = json.loads(bytes(row["payload_bytes"]).decode("utf-8"))
         authority = payload.get("authority") or {}
@@ -793,6 +801,7 @@ def _cache_row_summary(db_path: Path) -> dict[str, Any]:
     }
     return {
         "rows": len(rows),
+        "superseded_rows": superseded_rows,
         "by_artifact": dict(sorted(by_artifact.items())),
         "by_provider": dict(sorted(by_provider.items())),
         "unique_keys": len({row["key_hash"] for row in rows}),

@@ -4063,8 +4063,22 @@ def test_pt1_persistent_store_round_trips_exact_payload(
         provider_role="fallback",
     )
 
-    # This independent payload pin is built from the literal curve and the
-    # production resolver's declared vapor identity, before capture runs.
+    expected_vapor_authority = {
+        "resolved_provider_id": "builtin-vapor-pressure",
+        "resolved_role": "authoritative",
+        "authoritative_provider_id": "builtin-vapor-pressure",
+        "fallback_provider_id": None,
+        "fallback_allowed": True,
+        "model": "builtin-vapor-pressure",
+        "mode": "BuiltinVaporPressureProvider",
+    }
+    assert rrd._provider_identity(
+        sim,
+        ChemistryIntent.VAPOR_PRESSURE,
+    ) == expected_vapor_authority
+    # This independent payload pin uses the literal curve and resolver
+    # identity before capture. Literal bytes and digest prevent serializer
+    # changes from moving both sides together.
     expected_payload = {
         "curve": {
             "source": "gate_liquid_fraction:fallback:magemin-shadow",
@@ -4077,14 +4091,20 @@ def test_pt1_persistent_store_round_trips_exact_payload(
             "is_liquidus_floor": False,
         },
         "authority": {
-            "vapor_pressure": rrd._provider_identity(
-                sim,
-                ChemistryIntent.VAPOR_PRESSURE,
-            ),
+            "vapor_pressure": expected_vapor_authority,
         },
     }
-    expected_bytes = canonical_json_bytes(expected_payload)
-    expected_digest = hashlib.sha256(expected_bytes).hexdigest()
+    expected_bytes = (
+        b'{"authority":{"vapor_pressure":{"authoritative_provider_id":"builtin-vapor-pressure",'
+        b'"fallback_allowed":true,"fallback_provider_id":null,"mode":"BuiltinVaporPressureProvider",'
+        b'"model":"builtin-vapor-pressure","resolved_provider_id":"builtin-vapor-pressure",'
+        b'"resolved_role":"authoritative"}},"curve":{"is_liquidus_floor":false,'
+        b'"liquidus_T_C":1320.0,"path":[{"liquid_fraction":0.0,"temperature_C":1210.0},'
+        b'{"liquid_fraction":1.0,"temperature_C":1320.0}],"solidus_T_C":1210.0,'
+        b'"source":"gate_liquid_fraction:fallback:magemin-shadow"}}'
+    )
+    expected_digest = "18caad6ce53865029b5ee185cc5550b163d8c423f0d5b01929f675f51e8edea7"
+    assert json.loads(expected_bytes) == expected_payload
 
     runtime_record = seed_gate_curve_memo_record(sim, curve)
     assert set(runtime_record) == {
@@ -7157,12 +7177,23 @@ def test_stub_engine_hour_captures_strict_gate_row_and_merges(
     )
     sim.start_campaign(CampaignPhase.C2A_STAGED)
 
+    target_C, _ramp_rate = sim.campaign_mgr.get_temp_target(
+        sim.melt.campaign,
+        sim.melt.campaign_hour,
+        sim.melt,
+    )
+    assert target_C is not None
+    # The active first stage holds at a temperature with alkali flux. The
+    # evaporation path requests a gate curve only when its flux map is nonempty.
+    sim.melt.temperature_C = float(target_C)
+
     sim.step()
 
+    assert capture.summary()["capture_calls_by_artifact"].get(
+        "freeze_gate_curve",
+        0,
+    ) >= 1
     assert stub_engine["evaluated_compositions"]
-    assert capture.summary()["capture_calls_by_artifact"][
-        "freeze_gate_curve"
-    ] >= 1
     with sqlite3.connect(shard_db) as conn:
         rows = conn.execute(
             f"SELECT key_bytes, payload_bytes FROM {PT1_EQUILIBRIUM_TABLE} "

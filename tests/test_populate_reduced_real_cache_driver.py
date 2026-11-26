@@ -259,6 +259,52 @@ def _write_equilibrium_post_record_row_raw(
         )
 
 
+def _write_superseded_gate_rows(db_path):
+    driver.PT1PersistentEquilibriumStore(db_path)
+    payload_bytes = _canonical_bytes({"curve": {"source": "legacy-codec-v3"}})
+    payload_hash = hashlib.sha256(payload_bytes).hexdigest()
+    rows = []
+    for key_bytes in (
+        _canonical_bytes(
+            {"namespace_id": "magemin:stale", "suffix": "readable"}
+        ),
+        b"not-json",
+    ):
+        key_hash = hashlib.sha256(key_bytes).hexdigest()
+        rows.append(
+            (
+                key_hash,
+                "freeze_gate_curve",
+                rrd.PT1_STORE_SCHEMA_VERSION,
+                rrd.SCHEMA_VERSION,
+                key_hash,
+                payload_hash,
+                rrd.PT0_GATE_CURVE_CODEC_VERSION - 1,
+                sqlite3.Binary(key_bytes),
+                sqlite3.Binary(payload_bytes),
+                "test",
+                current_corpus_version(),
+                "test",
+                "{}",
+                "2026-11-26T00:00:00Z",
+                0,
+            )
+        )
+    with sqlite3.connect(db_path) as conn:
+        conn.executemany(
+            f"""
+            INSERT INTO {driver.PT1_EQUILIBRIUM_TABLE} (
+                key_hash, artifact, store_schema_version,
+                request_schema_version, key_sha256, payload_sha256,
+                payload_codec_version, key_bytes, payload_bytes,
+                code_version, corpus_version, engine_version,
+                data_digests_json, created_at, git_dirty
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            rows,
+        )
+
+
 def _result(*, status="complete", marker="same", row_mass=0.0, trace_mass=None, mode="capture"):
     if trace_mass is None:
         trace_mass = row_mass
@@ -847,6 +893,69 @@ def test_validate_replay_publishes_only_after_success(tmp_path, monkeypatch):
     assert preparation["source"] == "existing_cache"
     assert preparation["superseded_rows"] == 0
     assert driver._cache_row_summary(target_db)["rows"] == 1
+
+
+def test_validate_replay_final_report_skips_superseded_gate_rows(
+    tmp_path,
+    monkeypatch,
+):
+    emitted = []
+    _patch_common(monkeypatch, emitted)
+    target_db = tmp_path / "target.db"
+    _write_superseded_gate_rows(target_db)
+    replay_summaries = []
+    run_modes = []
+
+    def fake_run_case(*, db_path, mode, **kwargs):
+        run_modes.append(mode)
+        if mode == "capture":
+            driver.PT1PersistentEquilibriumStore(db_path)
+        else:
+            assert Path(db_path) != target_db
+            replay_summaries.append(driver._cache_row_summary(Path(db_path)))
+        return _result(mode=mode)
+
+    monkeypatch.setattr(driver, "_run_case", fake_run_case)
+
+    rc = driver.main(
+        [
+            "--profile",
+            "unused",
+            "--db",
+            str(target_db),
+            "--hours",
+            "1",
+            "--validate-replay",
+        ]
+    )
+
+    assert rc == 0
+    assert run_modes == ["capture", "replay"]
+    assert emitted[-1]["status"] == "complete"
+    assert emitted[-1]["validation"]["cached_exact_confirmed"] is True
+    assert replay_summaries == [
+        {
+            "rows": 0,
+            "superseded_rows": 0,
+            "by_artifact": {},
+            "by_provider": {},
+            "unique_keys": 0,
+            "magemin_unique_keys": 0,
+        }
+    ]
+    preparation = next(
+        item
+        for item in emitted[-1]["cache_merges"]
+        if item.get("phase") == "preparation"
+    )
+    assert preparation["superseded_rows"] == 2
+    assert emitted[-1]["cache"]["rows"] == 0
+    assert emitted[-1]["cache"]["superseded_rows"] == 2
+    assert emitted[-1]["cache"]["magemin_unique_keys"] == 0
+    with sqlite3.connect(target_db) as conn:
+        assert conn.execute(
+            f"SELECT COUNT(*) FROM {driver.PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()[0] == 2
 
 
 def test_merge_cache_shard_rolls_back_mid_merge_error(tmp_path):
