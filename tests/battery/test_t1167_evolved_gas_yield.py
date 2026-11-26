@@ -2,7 +2,7 @@
 
 from decimal import Decimal
 
-from simulator.battery.enums import Phase, Quantity, ValueKind
+from simulator.battery.enums import MethodToken, NoticeKind, Phase, Quantity, ValueKind
 from simulator.battery.migrate import REPO_ROOT, select_declared_source
 from tests.battery.factories import migrate_one_extract
 
@@ -140,14 +140,25 @@ def test_printed_degassing_methods_are_located_on_named_measurements() -> None:
             for migrated_id, experiment in migrator.result.experiments.items()
             if migrated_id.endswith(f"::{experiment_id}")
         )
-        assert experiment.method.is_unknown
-        assert printed_phrase in (experiment.method.reason or "")
-        assert "газовом хроматографе “Кристал-Люкс 4000М”" in (
-            experiment.method.reason or ""
-        )
-        assert "no existing MethodToken represents" in (
-            experiment.method.reason or ""
-        )
+        # DP-106 stores the untokenized published method as UNSPECIFIED.
+        # The printed text stays on the measurement's method_unstated notice.
+        assert experiment.method.is_value
+        assert experiment.method.value is MethodToken.UNSPECIFIED
+        located = [
+            observation
+            for observation in migrator.result.observations.values()
+            if observation.experiment_id == experiment.experiment_id
+            and any(
+                notice.kind is NoticeKind.METHOD_UNSTATED
+                and printed_phrase in (notice.reason or "")
+                and "газовом хроматографе “Кристал-Люкс 4000М”" in (
+                    notice.reason or ""
+                )
+                and "no existing MethodToken represents" in (notice.reason or "")
+                for notice in observation.notices
+            )
+        ]
+        assert located
         assert experiment.locator is not None
         assert experiment.locator.published_page == 574
         assert experiment.locator.pdf_page_index == 4
@@ -171,7 +182,15 @@ def test_printed_degassing_methods_are_located_on_named_measurements() -> None:
         assert observation.identity.species.formula == formula
         assert observation.identity.temperature_K is not None
         assert observation.identity.temperature_K.value == temperature_K
-        assert migrator.result.experiments[observation.experiment_id].method.is_unknown
+        assert (
+            migrator.result.experiments[observation.experiment_id].method.value
+            is MethodToken.UNSPECIFIED
+        )
+        assert any(
+            notice.kind is NoticeKind.METHOD_UNSTATED
+            and expected_method_phrases[experiment_id] in (notice.reason or "")
+            for notice in observation.notices
+        )
 
     boudouard = migrator.result.observations[
         "murchison-degassing-2023-springer::voropaev_2023_boudouard_kp_model_derived"
