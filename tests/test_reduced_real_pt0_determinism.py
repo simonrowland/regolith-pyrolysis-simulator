@@ -8860,6 +8860,13 @@ def test_real_cache_payload_recursive_mutations_miss_or_replay_identically(
         tmp_path=tmp_path,
         persistent=persistent,
     )
+    if artifact == "equilibrium_post_record":
+        assert rrd._decode_payload_for_admission(
+            artifact,
+            baseline,
+            payload_codec_version=rrd._payload_codec_version(artifact),
+            keys=(key,),
+        ) is not None
     key_hash = _key_hash(key)
     reader = _recursive_cache_reader(
         capture,
@@ -9255,6 +9262,15 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
             f"weight_info={weight_info}"
         )
     baseline = copy.deepcopy(attempt["payload"])
+    assert rrd._decode_payload_for_admission(
+        "equilibrium_post_record",
+        baseline,
+        payload_codec_version=rrd._payload_codec_version(
+            "equilibrium_post_record"
+        ),
+        keys=(query_key,),
+        interpolation_synthesized=True,
+    ) is not None
 
     if not persistent:
         capture.persistent_store = _MemoryInterpolationCandidates(capture)
@@ -9290,6 +9306,18 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
     def reject_live_recompute(*_args: Any, **_kwargs: Any) -> Any:
         raise _CacheMissRecomputed
 
+    def exercise_base_interpolation_consumer_path(
+        result: EquilibriumResult,
+    ) -> None:
+        _exercise_equilibrium_consumers_from_result(
+            query_sim,
+            result,
+            allow_typed_batch_failure=True,
+        )
+        batch_error = query_sim._last_vapour_batch_resolve_error
+        assert batch_error.get("status") == "unavailable"
+        assert batch_error.get("reason") == "vapour_batch_resolve_failed"
+
     baseline_result = query_sim._get_equilibrium()
     assert capture.hits == 1
     assert capture.last_cache_state == "cached_interpolated"
@@ -9299,7 +9327,7 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
         and canonical_json_bytes(keys[0]) == canonical_json_bytes(query_key)
         for keys in interpolation_admission_keys
     )
-    _exercise_equilibrium_consumers_from_result(query_sim, baseline_result)
+    exercise_base_interpolation_consumer_path(baseline_result)
     _exercise_sio_yield_report_diagnostic(query_sim)
 
     failures: list[str] = []
@@ -9403,10 +9431,7 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
                             f"{path_name} {mutation}: recaptured interpolation "
                             f"recorded {capture.hits - before_hits} hits"
                         )
-                    _exercise_equilibrium_consumers_from_result(
-                        query_sim,
-                        result,
-                    )
+                    exercise_base_interpolation_consumer_path(result)
                     if _is_sio_report_diagnostic_path(path):
                         _exercise_sio_yield_report_diagnostic(query_sim)
                 except Exception as exc:

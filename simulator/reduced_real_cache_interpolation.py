@@ -9,7 +9,6 @@ from typing import Any
 
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.reduced_real_determinism import (
-    _EQUILIBRIUM_REPLAY_SIDE_FIELDS,
     _composition_items,
     _physics_bucket_consumes_log_fO2,
     _physics_bucket_consumes_pO2_bar,
@@ -437,36 +436,16 @@ def interpolate_equilibrium_payload(
         interpolated_result["diagnostics"] = diagnostics
         interpolated_result["status"] = "out_of_domain"
 
-    payload = {"equilibrium_result": interpolated_result}
-    payload[_EQUILIBRIUM_REPLAY_SIDE_FIELDS[0]] = dict(
-        interpolated_result.get("vapor_pressures_source") or {}
-    )
-    reference_diagnostic = reference.get(_EQUILIBRIUM_REPLAY_SIDE_FIELDS[1])
-    interpolated_diagnostic = (
-        copy.deepcopy(dict(reference_diagnostic))
-        if isinstance(reference_diagnostic, Mapping)
-        else {}
-    )
-    interpolated_diagnostic.update({
-        "source": "cached_interpolated",
-        "interpolation_mode": "linear",
-    })
-    interpolated_activities = interpolated_result.get("activity_coefficients")
-    reference_activities = (
-        reference_diagnostic.get("activities")
-        if isinstance(reference_diagnostic, Mapping)
-        else None
-    )
-    if (
-        isinstance(reference_activities, Mapping)
-        and reference_activities
-        and isinstance(interpolated_activities, Mapping)
-        and interpolated_activities
-    ):
-        interpolated_diagnostic["activities"] = copy.deepcopy(
-            dict(interpolated_activities)
-        )
-    payload[_EQUILIBRIUM_REPLAY_SIDE_FIELDS[1]] = interpolated_diagnostic
+    payload = {
+        "equilibrium_result": interpolated_result,
+        "last_vapor_pressures_source": dict(
+            interpolated_result.get("vapor_pressures_source") or {}
+        ),
+        "last_vapor_pressure_diagnostic": {
+            "source": "cached_interpolated",
+            "interpolation_mode": "linear",
+        },
+    }
     return payload
 
 
