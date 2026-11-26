@@ -241,9 +241,11 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
         "carries_disclosure": False,
         "how": 'Memoizes diagnostic engine identity metadata. It does not cache chemistry outputs or skip a law execution.',
     },
+    # b274 bd2f310773 removed the environment lookup/import, moving this
+    # decorator and function up one line.
     'lru:simulator/policy/default_policy.py:_load_policy_table': {
         "path": 'simulator/policy/default_policy.py',
-        "line": 70,
+        "line": 69,
         "kind": 'lru',
         "name": '_load_policy_table',
         "carries_disclosure": False,
@@ -267,7 +269,9 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/score.py:residue_prediction_cache': {
         "path": 'simulator/battery/score.py',
-        "line": 17340,
+        # b274 dd823c2a42 folded row-specific method-resolution fixes into
+        # score.py, moving this cache accessor up from line 17340.
+        "line": 17227,
         "kind": 'store',
         "name": 'residue_prediction_cache',
         "carries_disclosure": True,

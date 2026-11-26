@@ -136,14 +136,22 @@ def test_kress_fe_redox_output_is_bit_identical():
         identity=replace(rows["row4"].identity, fO2_Pa=None),
     )
     missing_prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, missing)
-    assert missing_prediction.value is None
-    assert missing_prediction.authority is Authority.REFUSED
-    assert missing_prediction.execution.state is ExecutionState.NOT_PROBED
-    assert missing_prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
-    assert missing_prediction.refusal_detail == {
-        "reason": "missing_input",
-        "input": "printed_fO2",
-    }
+    # b274 dd5f6b7a0c routes IA Kress redox through the shared fO2 ladder.
+    # With no point-level fO2, the shared ladder supplies a typed source or
+    # borrowed-default notice; the old pre-ladder refusal pin is stale.
+    assert isinstance(missing_prediction.value, Decimal)
+    assert missing_prediction.value > 0
+    assert missing_prediction.authority is Authority.BRIDGE
+    assert missing_prediction.execution.state is ExecutionState.PRODUCED
+    assert missing_prediction.refusal_reason is None
+    oxygen_notices = [
+        notice
+        for notice in missing_prediction.notices
+        if notice.origin == "fo2_ladder"
+        or (notice.policy is not None and notice.policy.id == "DP-010")
+    ]
+    assert len(oxygen_notices) == 1
+    assert "kress_inverse" not in oxygen_notices[0].reason
     assert missing_prediction.coefficient_sources == _KRESS_SOURCES
 
 
