@@ -762,7 +762,15 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # objective).
     # 2026-11-19 C2A staged-pressure runtime results changed; recomputed from
     # cache_key(spec) for the new analytical corpus epoch.
-    assert cache_key(spec) == "bfa65ea9105b78b35ca7e46ec47dbdfa50c9f5c5488c468696e0900ac2813d29"
+    # 2026-11-26 b274: corpus_version is the only changed leaf. Green was
+    # analytical-corpus-2026-11-19-c2a-staged-pressure-v1. a95942989e
+    # published ledger fO2 (636308c53e) and the coupled evaporative
+    # balance (e410a64d8c). e0e3e9aace then set
+    # analytical-corpus-2026-11-23-furnace-langmuir-fe-obar-v1 (1442ca7fc0,
+    # b-1293): open-gate Langmuir Fe uses o_bar = 1 + q/2, so those rows
+    # are not reusable. Putting the green corpus string back into this
+    # tree's canonical payload restores bfa65ea9.... Receipt ab6a568b.
+    assert cache_key(spec) == "e9b330a8b89806094f2592e51bb95f3b4e7efbcf04e9cb0c713485a5e84077fb"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:
