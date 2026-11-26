@@ -143,7 +143,11 @@ def test_denial_that_uncertainty_is_not_printed_is_not_a_width() -> None:
 
     assert resolved.band is None
     assert resolved.refusal is None
-    assert resolved.notice is None
+    assert resolved.notice is not None
+    assert resolved.notice.reason == "printed_uncertainty_not_stated"
+    assert "Row-specific uncertainties are not printed" in resolved.notice.band
+    assert "0.8" in resolved.notice.band
+    assert "default=none" in resolved.notice.band
 
 
 def test_confidence_metadata_does_not_hide_an_unmapped_printed_unit() -> None:

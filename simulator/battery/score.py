@@ -3924,6 +3924,52 @@ def _janaf_fusion_energy_for_scored_reference(
     )
 
 
+def _oxide_formula_for_fusion_band(
+    source_reference: Observation,
+    comparison_reference: Observation,
+) -> str | None:
+    """Oxide the fusion conversion named, from the stored row or the liquid copy."""
+
+    for observation in (source_reference, comparison_reference):
+        identity = observation.identity
+        if not isinstance(identity, Identity):
+            continue
+        state = identity.reference_state
+        if (
+            state is not None
+            and state.is_value
+            and isinstance(state.value, StandardState)
+            and state.value.endmember.formula
+        ):
+            return state.value.endmember.formula
+        if identity.species is not None and identity.species.formula:
+            return identity.species.formula
+    return None
+
+
+def _located_fusion_energy_for_band(
+    source_reference: Observation,
+    comparison_reference: Observation,
+    temperature_K: Decimal,
+):
+    """Located ΔG_fus when JANAF does not cover this oxide at T.
+
+    None means JANAF covers the phase, or no located pair does. The band
+    then keeps the JANAF sigma path, including its missing-sigma refusal.
+    """
+
+    from simulator.reference_data.solid_liquid_fusion import (
+        located_fusion_when_janaf_does_not_cover,
+    )
+
+    formula = _oxide_formula_for_fusion_band(
+        source_reference, comparison_reference
+    )
+    if not formula:
+        return None
+    return located_fusion_when_janaf_does_not_cover(formula, temperature_K)
+
+
 def _score_eligibility_notices(notices: Sequence[Notice]) -> tuple[Notice, ...]:
     """Remove diagnostic engine band flags; authority gates eligibility."""
 
@@ -5349,9 +5395,16 @@ def fusion_comparison_reference(
                 raise
             fallback = None
             if engine is not Engine.MAGEMIN:
-                fallback = located_fusion_when_janaf_does_not_cover(
-                    formula, temperature_K
-                )
+                # The located lookup re-raises a JANAF ValueError that is not
+                # a phase or temperature gap (a missing table node, a
+                # non-unique crossing). That is not a located energy. The
+                # missing-input notice above is the result.
+                try:
+                    fallback = located_fusion_when_janaf_does_not_cover(
+                        formula, temperature_K
+                    )
+                except ValueError:
+                    fallback = None
             if fallback is None:
                 return replace(
                     reference, notices=union_notices(reference.notices, (notice,))
@@ -6483,10 +6536,33 @@ def _decision_band_kind(
 _UNCERTAINTY_NUMBER = r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?"
 # "Row-specific uncertainties are not printed" is a denial, not a width.
 # Up to six words may sit between the noun and "not printed".
+# A hyphenated token ("per-cell") is one word. The denial is prose, not a width.
+_UNCERTAINTY_WORD = r"\w+(?:-\w+)*"
+# "uncertainties are not printed" (Kress). This form is a denial even when the
+# same sentence names a spread (0.8 and 8.0%). The other alternatives are
+# denials only when they do not sit beside a ± or percent width: Shornkov's
+# "error not exceeding 8% ... no per-cell uncertainty is printed" keeps the 8%.
 _UNCERTAINTY_NOT_PRINTED_RE = re.compile(
-    r"\buncertaint(?:y|ies)\b(?:\s+\w+){0,6}\s+not\s+printed\b",
+    rf"\buncertaint(?:y|ies)\b(?:\s+{_UNCERTAINTY_WORD}){{0,6}}\s+not\s+printed\b",
     re.IGNORECASE,
 )
+_UNCERTAINTY_DENIAL_RE = re.compile(
+    rf"(?:"
+    rf"{_UNCERTAINTY_NOT_PRINTED_RE.pattern}"
+    rf"|"
+    rf"\bno\b(?:\s+{_UNCERTAINTY_WORD}){{0,8}}\s+uncertaint(?:y|ies)\b"
+    rf"(?:\s+{_UNCERTAINTY_WORD}){{0,6}}\s+printed\b"
+    rf"|"
+    rf"\bno\s+invented\s+per-cell\b"
+    rf"|"
+    rf"\bno\s+numeric\s+uncertainty\b"
+    rf")",
+    re.IGNORECASE,
+)
+_UNPARSED_PRINTED_UNCERTAINTY_REASONS = frozenset({
+    "printed_uncertainty_not_stated",
+    "printed_uncertainty_unparsed",
+})
 _UNCERTAINTY_RANGE_RE = re.compile(
     rf"[\[(]\s*({_UNCERTAINTY_NUMBER})\s*[,;–—]\s*({_UNCERTAINTY_NUMBER})\s*[\])]"
 )
@@ -7158,16 +7234,108 @@ def _has_printed_plus_minus(uncertainty: Uncertainty) -> bool:
     return re.search(r"(?:±|\+/-|\\pm)", _uncertainty_original(uncertainty)) is not None
 
 
-def _verbatim_denies_printed_uncertainty(uncertainty: Uncertainty) -> bool:
-    """True when the verbatim text says no uncertainty was printed.
-
-    A denial is not a width. Parsing the first number in that sentence
-    (``0.8`` in ``between 0.8 and 8.0%``) invents a unit the paper did not
-    print for the cell.
-    """
+def _printed_uncertainty_prose(uncertainty: Uncertainty) -> str:
+    """String fields of a printed uncertainty, including a mapping note and quote."""
 
     raw = uncertainty.verbatim
-    return isinstance(raw, str) and _UNCERTAINTY_NOT_PRINTED_RE.search(raw) is not None
+    if isinstance(raw, str):
+        return raw
+    if not isinstance(raw, Mapping):
+        return ""
+    parts: list[str] = []
+
+    def walk(value: object) -> None:
+        if isinstance(value, str):
+            parts.append(value)
+        elif isinstance(value, Mapping):
+            for item in value.values():
+                walk(item)
+        elif isinstance(value, (list, tuple)):
+            for item in value:
+                walk(item)
+
+    walk(raw)
+    return "\n".join(parts)
+
+
+def _verbatim_denies_printed_uncertainty(uncertainty: Uncertainty) -> bool:
+    """True when the verbatim text says no cell uncertainty was printed.
+
+    A denial is not a width. Parsing the first number in that sentence
+    (``0.8`` in ``between 0.8 and 8.0%``, or Hashimoto's ``±0.1 mg``
+    microbalance accuracy, or Markova's column total ``100.05``) invents a
+    unit the paper did not print for the cell. Mapping notes are denials
+    too: the old string-only check missed "No per-cell uncertainty printed"
+    and "no invented per-cell". A ± or percent token beside the denial is a
+    real width and is kept (Shornkov's 8%).
+    """
+
+    prose = _printed_uncertainty_prose(uncertainty)
+    return bool(prose) and _UNCERTAINTY_DENIAL_RE.search(prose) is not None
+
+
+def _percent_or_plus_minus_width(raw: str, source_value: object) -> bool:
+    """True when the parsed number is a ± or percent width, not a bare total."""
+
+    if re.search(r"(?:±|\+/-|\\pm)", raw):
+        return True
+    if isinstance(source_value, tuple):
+        return False
+    try:
+        target = abs(as_decimal(source_value))
+    except (TypeError, ValueError, ArithmeticError, InvalidOperation):
+        return False
+    for match in re.finditer(
+        rf"({_UNCERTAINTY_NUMBER})\s*(?:%|percent)(?![A-Za-z])",
+        raw,
+        re.IGNORECASE,
+    ):
+        try:
+            if abs(as_decimal(match.group(1))) == target:
+                return True
+        except (TypeError, ValueError, ArithmeticError, InvalidOperation):
+            continue
+    return False
+
+
+def _unparsed_printed_uncertainty_resolution(
+    quantity: Quantity,
+    original: str,
+    *,
+    denied: bool,
+) -> _PrintedBandResolution:
+    """Score the value. An unparsed uncertainty is a flag, not a refusal.
+
+    No method-class width is invented here. d-443 may still attach an assumed
+    band as additive metadata when a located class exists.
+    """
+
+    clipped = original if len(original) <= 500 else original[:500]
+    return _PrintedBandResolution(
+        notice=Notice(
+            kind=NoticeKind.INPUT_OMITTED,
+            affected_quantities=(quantity,),
+            reason=(
+                "printed_uncertainty_not_stated"
+                if denied
+                else "printed_uncertainty_unparsed"
+            ),
+            origin="decision-band",
+            band=(
+                f"original={clipped}; default=none; "
+                "no located method-class width"
+            ),
+        )
+    )
+
+
+def _measurement_uncertainty_unparsed(printed: _PrintedBandResolution) -> bool:
+    return (
+        printed.band is None
+        and printed.refusal is None
+        and printed.notice is not None
+        and printed.notice.reason in _UNPARSED_PRINTED_UNCERTAINTY_REASONS
+    )
 
 
 def _is_standard_pressure_ambiguity_uncertainty(
@@ -7386,8 +7554,16 @@ def _printed_uncertainty_band(
         )
     if uncertainty.kind is not UncertaintyKind.PRINTED:
         return _PrintedBandResolution()
-    if _verbatim_denies_printed_uncertainty(uncertainty):
-        return _PrintedBandResolution()
+    # "uncertainties are not printed" is a denial before any number in that
+    # sentence (Kress 0.8 and 8.0%). A mapping is parsed first: a structured
+    # width beside a denial note stays a width. Hashimoto's 0.1 mg is not a
+    # structured composition field. A later ± or percent (Shornkov 8%) is kept.
+    if isinstance(uncertainty.verbatim, str) and _UNCERTAINTY_NOT_PRINTED_RE.search(
+        uncertainty.verbatim
+    ):
+        return _unparsed_printed_uncertainty_resolution(
+            quantity, uncertainty.verbatim, denied=True
+        )
     if not _uncertainty_scope_covers_cell(uncertainty, source_observation):
         return _PrintedBandResolution()
     raw_declaration = uncertainty.verbatim
@@ -7464,18 +7640,30 @@ def _printed_uncertainty_band(
         _temperature_envelope_value(uncertainty, source_observation)
     )
     if envelope_refusal is not None:
+        if envelope_refusal.get("reason") == "unparseable_printed_uncertainty":
+            return _unparsed_printed_uncertainty_resolution(
+                quantity, raw_text, denied=False
+            )
         return _PrintedBandResolution(refusal=envelope_refusal)
     if is_temperature_envelope:
         source_value = envelope_value
         shape = "scalar"
         mapped_unit = "dex"
     if source_value is None:
-        return _PrintedBandResolution(
-            refusal={
-                "reason": "unparseable_printed_uncertainty",
-                "quantity": quantity.value,
-                "original": raw_text,
-            }
+        return _unparsed_printed_uncertainty_resolution(
+            quantity,
+            raw_text,
+            denied=_verbatim_denies_printed_uncertainty(uncertainty),
+        )
+    if (
+        isinstance(uncertainty.verbatim, str)
+        and _verbatim_denies_printed_uncertainty(uncertainty)
+        and not _percent_or_plus_minus_width(uncertainty.verbatim, source_value)
+    ):
+        # "No per-cell uncertainty printed ... (100.05, 99.9, ...)". The
+        # column totals are not a ± or percent width.
+        return _unparsed_printed_uncertainty_resolution(
+            quantity, raw_text, denied=True
         )
     operation = _residual_metric_operation(quantity, source_observation)
     if operation is None:
@@ -22019,81 +22207,112 @@ def _compile_residual_with_lineage(
             }
         elif fusion_conversion:
             assert T is not None
-            fusion_energy = _janaf_fusion_energy_for_scored_reference(
+            located_energy = _located_fusion_energy_for_band(
                 source_reference, reference, T
             )
-            if fusion_energy.sigma_delta_g_fus_kJ_per_mol is None:
-                fusion_band_refusal = {
-                    "reason": "conversion_uncertainty_unprinted",
-                    "crystal_table": fusion_energy.crystal_table,
-                }
-            elif printed.refusal is not None:
-                fusion_band_refusal = dict(printed.refusal)
-            elif printed.standard_uncertainty_dex is None:
-                fusion_band_refusal = {
-                    "reason": "fusion_measurement_uncertainty_unprinted_or_not_1sigma"
-                }
-            else:
-                sigma_delta_g = fusion_energy.sigma_delta_g_fus_kJ_per_mol
-                assert sigma_delta_g is not None
-                # Treat the printed row/method sigma and JANAF conversion sigma
-                # as independent standard uncertainties (GUM quadrature).
-                # From dG_fus = R*T*ln(10)*delta(log10(a)),
-                # sigma_conv = sigma_dG_fus/(R*T*ln(10)); J/mol divided by
-                # J/(mol K)*K is dimensionless dex. This code consumes sigma_dG_fus.
-                # If sigma_dH_fus is 10% of 9.6 kJ/mol, then
-                # sigma_dG_fus = sigma_dH_fus*(1 - 1703/1996) ~= 0.14 kJ/mol,
-                # giving 0.14*1000 J/kJ / (8.31441 J/(mol K)*1703 K*ln(10))
-                # ~= 0.004 dex. Taking 10% of dH_fus directly would instead
-                # give sigma_dG_fus=0.96 kJ/mol and ~= 0.029 dex.
-                sigma_conversion_dex = (
-                    sigma_delta_g
-                    * Decimal(1000)
-                    / _rt_ln_10_j_per_mol_K(T)
-                )
-                sigma_total_dex = _combine_independent_standard_uncertainties(
-                    printed.standard_uncertainty_dex,
-                    sigma_conversion_dex,
-                )
-                combined_basis = (
-                    "fusion_combined_source_method"
-                    if band_basis == "source_method"
-                    else "fusion_combined_row_printed"
-                )
-                two_sigma_band = printed.two_sigma_band
-                if two_sigma_band is not None:
-                    two_sigma_measurement_dex = standard_uncertainty_width(
-                        two_sigma_band.value, NORMAL_95_TICKET_MULTIPLIER
-                    )
-                    two_sigma_total_dex = (
-                        _combine_independent_standard_uncertainties(
-                            two_sigma_measurement_dex,
-                            sigma_conversion_dex,
-                        )
-                    )
-                    two_sigma_band = DecisionBand(
-                        NORMAL_95_TICKET_MULTIPLIER * two_sigma_total_dex,
-                        "dimensionless",
-                        (
-                            "printed_2sigma_reading: independent printed reading "
-                            "and JANAF conversion uncertainties; GUM quadrature"
+            if located_energy is not None:
+                # Barin (and the other located pairs) print no conversion
+                # sigma. The activity shift already used that ΔG. Do not ask
+                # JANAF for a polymorph the source did not name, and do not
+                # invent a numeric conversion uncertainty.
+                notices = union_notices(
+                    notices,
+                    (
+                        Notice(
+                            kind=NoticeKind.INPUT_OMITTED,
+                            affected_quantities=(quantity,),
+                            reason="conversion_uncertainty_unprinted",
+                            origin="decision-band",
+                            band=(
+                                f"source={located_energy.source_name}; "
+                                f"crystal_table={located_energy.crystal_table}; "
+                                "sigma unprinted; no numeric conversion "
+                                "uncertainty invented"
+                            ),
                         ),
-                        band_basis=combined_basis,
-                    )
-                printed = replace(
-                    printed,
-                    band=DecisionBand(
-                        NORMAL_95_TICKET_MULTIPLIER * sigma_total_dex,
-                        "dimensionless",
-                        (
-                            "fusion_combined_1sigma: independent printed reading "
-                            "and JANAF conversion uncertainties; GUM quadrature"
-                        ),
-                        band_basis=combined_basis,
                     ),
-                    standard_uncertainty_dex=sigma_total_dex,
-                    two_sigma_band=two_sigma_band,
                 )
+            else:
+                fusion_energy = _janaf_fusion_energy_for_scored_reference(
+                    source_reference, reference, T
+                )
+                if fusion_energy.sigma_delta_g_fus_kJ_per_mol is None:
+                    fusion_band_refusal = {
+                        "reason": "conversion_uncertainty_unprinted",
+                        "crystal_table": fusion_energy.crystal_table,
+                    }
+                elif printed.refusal is not None:
+                    fusion_band_refusal = dict(printed.refusal)
+                elif printed.standard_uncertainty_dex is None:
+                    # An unparsed measurement uncertainty must not refuse the
+                    # value. A printed width that is not 1-sigma still does.
+                    if not _measurement_uncertainty_unparsed(printed):
+                        fusion_band_refusal = {
+                            "reason": (
+                                "fusion_measurement_uncertainty_unprinted_or_not_1sigma"
+                            )
+                        }
+                else:
+                    sigma_delta_g = fusion_energy.sigma_delta_g_fus_kJ_per_mol
+                    assert sigma_delta_g is not None
+                    # Treat the printed row/method sigma and JANAF conversion sigma
+                    # as independent standard uncertainties (GUM quadrature).
+                    # From dG_fus = R*T*ln(10)*delta(log10(a)),
+                    # sigma_conv = sigma_dG_fus/(R*T*ln(10)); J/mol divided by
+                    # J/(mol K)*K is dimensionless dex. This code consumes sigma_dG_fus.
+                    # If sigma_dH_fus is 10% of 9.6 kJ/mol, then
+                    # sigma_dG_fus = sigma_dH_fus*(1 - 1703/1996) ~= 0.14 kJ/mol,
+                    # giving 0.14*1000 J/kJ / (8.31441 J/(mol K)*1703 K*ln(10))
+                    # ~= 0.004 dex. Taking 10% of dH_fus directly would instead
+                    # give sigma_dG_fus=0.96 kJ/mol and ~= 0.029 dex.
+                    sigma_conversion_dex = (
+                        sigma_delta_g
+                        * Decimal(1000)
+                        / _rt_ln_10_j_per_mol_K(T)
+                    )
+                    sigma_total_dex = _combine_independent_standard_uncertainties(
+                        printed.standard_uncertainty_dex,
+                        sigma_conversion_dex,
+                    )
+                    combined_basis = (
+                        "fusion_combined_source_method"
+                        if band_basis == "source_method"
+                        else "fusion_combined_row_printed"
+                    )
+                    two_sigma_band = printed.two_sigma_band
+                    if two_sigma_band is not None:
+                        two_sigma_measurement_dex = standard_uncertainty_width(
+                            two_sigma_band.value, NORMAL_95_TICKET_MULTIPLIER
+                        )
+                        two_sigma_total_dex = (
+                            _combine_independent_standard_uncertainties(
+                                two_sigma_measurement_dex,
+                                sigma_conversion_dex,
+                            )
+                        )
+                        two_sigma_band = DecisionBand(
+                            NORMAL_95_TICKET_MULTIPLIER * two_sigma_total_dex,
+                            "dimensionless",
+                            (
+                                "printed_2sigma_reading: independent printed reading "
+                                "and JANAF conversion uncertainties; GUM quadrature"
+                            ),
+                            band_basis=combined_basis,
+                        )
+                    printed = replace(
+                        printed,
+                        band=DecisionBand(
+                            NORMAL_95_TICKET_MULTIPLIER * sigma_total_dex,
+                            "dimensionless",
+                            (
+                                "fusion_combined_1sigma: independent printed reading "
+                                "and JANAF conversion uncertainties; GUM quadrature"
+                            ),
+                            band_basis=combined_basis,
+                        ),
+                        standard_uncertainty_dex=sigma_total_dex,
+                        two_sigma_band=two_sigma_band,
+                    )
         measurement_printed_refusal = printed.refusal
         if fusion_band_refusal is not None:
             reason = str(fusion_band_refusal["reason"])
@@ -22344,6 +22563,7 @@ def _compile_residual_with_lineage(
         and (
             source_reference.uncertainty.kind is UncertaintyKind.NONE
             or _verbatim_denies_printed_uncertainty(source_reference.uncertainty)
+            or _measurement_uncertainty_unparsed(printed)
         )
     ):
         assumed_details = _assumed_method_class_band(

@@ -390,8 +390,12 @@ def test_markova_openimcc_scores_printed_cells_and_keeps_card_blocked(
         assert residual.numeric.operation is MetricOperation.ABSOLUTE
         assert residual.numeric.decision_band is None
         assert not residual.score_eligible
-        assert residual.refusal is not None
-        assert residual.refusal.detail["reason"] == "unparseable_printed_uncertainty"
+        assert residual.refusal is None
+        assert any(
+            notice.reason == "printed_uncertainty_not_stated"
+            and "No per-cell uncertainty printed" in (notice.band or "")
+            for notice in residual.notices
+        )
         assert {
             NoticeKind.OUT_OF_CERTIFIED_BAND,
             NoticeKind.UNVERIFIED_APPARATUS,

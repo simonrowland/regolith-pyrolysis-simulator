@@ -613,11 +613,11 @@ def test_every_iron_saturated_feo_row_is_scored_or_named(migration) -> None:
     # on each FeO row (AD 10 at 1677 K is -10.31). The bare-log converter stamps
     # identity.fO2_Pa as 1e5 Pa times 10 to that power. Those 57 rows now
     # match the stub's copied identity, so they carry a dex residual. Table 2
-    # prints no per-row gamma uncertainty, so the decision rule stays missing.
-    # Composition remains unknown on 15 rows. Distin's tabulated activity is
-    # the same iron-saturated oxygen ratio, so it takes the same gas-line
-    # factor; its missing independent fO2 is still the refusal. Neither
-    # refusal is the reference state.
+    # prints no per-row gamma uncertainty; that is a flag on the scored value,
+    # not a refusal. Composition remains unknown on 15 rows. Distin's tabulated
+    # activity is the same iron-saturated oxygen ratio, so it takes the same
+    # gas-line factor; its missing independent fO2 is still the refusal. Neither
+    # path refuses on the reference state.
     refusal_fields: dict[tuple[str, ...], int] = {}
     scored = 0
     extrapolated = 0
@@ -671,10 +671,6 @@ def test_every_iron_saturated_feo_row_is_scored_or_named(migration) -> None:
         else:
             assert band == []
             assert composition.authority is Authority.DERIVED
-        assert residual.refusal is not None
-        assert "reference_state_mismatch" not in json.dumps(
-            residual.refusal.detail, default=str
-        )
         located_log = (observation.point_conditions or {}).get("fO2_log")
         printed_log = (
             located_log.state.value
@@ -694,9 +690,15 @@ def test_every_iron_saturated_feo_row_is_scored_or_named(migration) -> None:
                 ad10_scored += 1
         if residual.numeric is not None:
             assert residual.numeric.operation is MetricOperation.DEX
-            assert residual.refusal.reason is RefusalReason.DECISION_RULE_MISSING
-            assert residual.refusal.detail["reason"] == "unparseable_printed_uncertainty"
-            assert "FeO uncertainty" in str(residual.refusal.detail.get("original"))
+            assert residual.refusal is None
+            assert any(
+                item.reason in {
+                    "printed_uncertainty_not_stated",
+                    "printed_uncertainty_unparsed",
+                }
+                and "FeO uncertainty" in (item.band or "")
+                for item in residual.notices
+            )
             if observation.source_id == _HOLZHEID:
                 # Mutation: restoring an extra /N0 shifts these source-grounded
                 # green residuals even though JANAF already fixes the standard.
@@ -712,6 +714,10 @@ def test_every_iron_saturated_feo_row_is_scored_or_named(migration) -> None:
                 holzheid_scored += 1
             scored += 1
         else:
+            assert residual.refusal is not None
+            assert "reference_state_mismatch" not in json.dumps(
+                residual.refusal.detail, default=str
+            )
             assert residual.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
             fields = tuple(residual.refusal.detail.get("fields") or ())
             assert "reference_state" not in fields

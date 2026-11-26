@@ -8,6 +8,7 @@ the one scorer formula. Chen residuals are printed; magnitudes are not pinned.
 from __future__ import annotations
 
 from collections import Counter
+from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
 
@@ -25,7 +26,7 @@ from simulator.battery.enums import (
 from simulator.battery.generators.janaf import JANAF_R_J_PER_MOL_K
 from simulator.battery.identity import Identity, quantity_token
 from simulator.battery.migrate import Migrator
-from simulator.battery.records import Execution, phase_token
+from simulator.battery.records import Execution, State, phase_token
 from simulator.battery.score import (
     FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
     ENGINE_CHANNELS,
@@ -342,3 +343,85 @@ def test_chen_mno_rows_leave_the_janaf_fusion_refusal(capfd) -> None:
     # The remote profile refuses pytest -s. Disable capture for this receipt only.
     with capfd.disabled():
         print("\n".join(lines), flush=True)
+
+
+def test_chen_ia_barin_band_scores_when_the_liquid_identity_matches(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The band uses Barin. Restoring the JANAF polymorph call raises.
+
+    ``fusion_comparison_reference`` already shifts a(MnO, crystal) onto the
+    liquid with Barin 1995. The band used to call
+    ``_janaf_fusion_energy_for_scored_reference`` and raise
+    ``JANAFFusionPolymorphUnavailable`` because the source names no polymorph.
+    This installs that raise. The row scores only when the band does not call it.
+
+    Published page 1342 states no absolute fO2 and no total pressure. The
+    identity gate returns ``identity_unknown`` on those axes before the band.
+    The two ``State.of`` values are fixtures so this comparison is EQUAL.
+    They are not written into the extract.
+    """
+
+    from simulator.battery.generators.janaf import JANAFFusionPolymorphUnavailable
+
+    def restored_janaf_call(*_args, **_kwargs):
+        raise JANAFFusionPolymorphUnavailable(
+            "source reference polymorph is not stated"
+        )
+
+    monkeypatch.setattr(
+        "simulator.battery.score._janaf_fusion_energy_for_scored_reference",
+        restored_janaf_call,
+    )
+    context, rows = _chen_rows()
+    row = replace(
+        rows[0],
+        identity=replace(
+            rows[0].identity,
+            fO2_Pa=State.of(Decimal("1")),
+            total_pressure_Pa=State.of(Decimal("101325")),
+        ),
+    )
+    context = replace(
+        context,
+        observations={**context.observations, row.observation_id: row},
+    )
+    converted = fusion_comparison_reference(
+        row, engine=Engine.INTERNAL_ANALYTICAL
+    )
+    residual, _candidate = compile_residual(
+        row,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        prediction=EnginePrediction(
+            engine=Engine.INTERNAL_ANALYTICAL,
+            channel=ENGINE_CHANNELS[Engine.INTERNAL_ANALYTICAL],
+            execution=Execution(
+                state=ExecutionState.PRODUCED,
+                call_evidence="chen-mno-barin-band",
+            ),
+            value=converted.value.point,
+            unit=QUANTITY_UNITS[Quantity.ACTIVITY],
+            authority=Authority.CERTIFIED,
+            lineage_complete=True,
+            identity=converted.identity,
+            coefficient_sources=("chen-mno-barin-band",),
+        ),
+    )
+    assert residual.refusal is None
+    assert residual.numeric is not None
+    assert residual.numeric.value is not None
+    sigma = next(
+        notice
+        for notice in residual.notices
+        if notice.reason == "conversion_uncertainty_unprinted"
+        and notice.origin == "decision-band"
+    )
+    assert "Barin 1995" in (sigma.band or "")
+    assert "barin-1995" in (sigma.band or "")
+    assert "sigma unprinted" in (sigma.band or "")
+    assert any(
+        notice.reason.startswith(f"{FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION};")
+        and "Barin 1995" in notice.reason
+        for notice in residual.notices
+    )

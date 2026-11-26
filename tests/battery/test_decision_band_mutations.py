@@ -200,8 +200,11 @@ def test_printed_uncertainty_kinds_precede_derived_and_unparseable_refuses() -> 
 
     unparseable = resolve("uncertainty not quantified", include_value=False)
     assert unparseable.band is None
-    assert unparseable.refusal is not None
-    assert unparseable.refusal["reason"] == "unparseable_printed_uncertainty"
+    assert unparseable.refusal is None
+    assert unparseable.notice is not None
+    assert unparseable.notice.reason == "printed_uncertainty_unparsed"
+    assert "uncertainty not quantified" in unparseable.notice.band
+    assert "default=none" in unparseable.notice.band
 
     derived = DecisionBand(Decimal("10"), "kJ_per_declared_mol_basis", "derived_scatter: source-only")
     assert decision_band_for(
@@ -210,12 +213,156 @@ def test_printed_uncertainty_kinds_precede_derived_and_unparseable_refuses() -> 
         printed_band=two_sigma.band,
         derived_band=derived,
     ) == two_sigma.band
+    # The unparsed notice is not a refusal, so a caller-supplied derived band applies.
     assert decision_band_for(
         Quantity.DELTA_FG,
         SourceRelation.UNKNOWN,
-        printed_refusal=unparseable.refusal,
+        printed_refusal=None,
+        derived_band=derived,
+    ) == derived
+    # An explicit refusal dict still blocks derived-band fallthrough.
+    assert decision_band_for(
+        Quantity.DELTA_FG,
+        SourceRelation.UNKNOWN,
+        printed_refusal={"reason": "unparseable_printed_uncertainty"},
         derived_band=derived,
     ) is None
+
+
+def test_markova_and_hashimoto_denials_score_without_inventing_a_width() -> None:
+    """Printed denials are flags. They are not refusals and not cell widths.
+
+    Markova 1984 Table 2 (the owner's benchmark) and Hashimoto 1983 Table 3
+    print these notes on the admitted residue rows. Hashimoto's ±0.1 mg is
+    the microbalance accuracy on published page 114, not a wt% band.
+    """
+
+    markova_notes = (
+        "No per-cell uncertainty printed. Damaged-glyph corrections are in the correction ledger.",
+        "No per-cell uncertainty printed. Column totals are printed under the table (100.05, 99.9, 99.25, 96.30, 100.10, 95.9, 97.17) and are not recomputed here.",
+        "No per-cell uncertainty printed.",
+    )
+    for note in markova_notes:
+        resolved = _printed_uncertainty_band(
+            Quantity.RESIDUE_COMPONENT_COMPOSITION,
+            Uncertainty(
+                kind=UncertaintyKind.PRINTED,
+                verbatim={"note": note},
+            ),
+            Decimal("7.05"),
+        )
+        assert resolved.band is None
+        assert resolved.refusal is None
+        assert resolved.notice is not None
+        assert resolved.notice.reason == "printed_uncertainty_not_stated"
+        assert note.split(".", 1)[0] in resolved.notice.band
+        assert "default=none" in resolved.notice.band
+        assert "100.05" not in str(resolved.band)
+    column_totals = _printed_uncertainty_band(
+        Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim=markova_notes[1],
+        ),
+        Decimal("7.05"),
+    )
+    assert column_totals.band is None
+    assert column_totals.refusal is None
+    assert column_totals.notice is not None
+    assert column_totals.notice.reason == "printed_uncertainty_not_stated"
+
+    hashimoto = {
+        "weighing_accuracy_mg": 0.1,
+        "locator": {
+            "published_page": 114,
+            "section": "Analytical procedures",
+            "quote": (
+                "They were weighed by a microbalance with an accuracy of "
+                "±0.1 mg in order to determine the vaporized mass"
+            ),
+        },
+        "note": (
+            "Instrument accuracy as printed; no invented per-cell "
+            "composition error."
+        ),
+    }
+    for _copy in range(3):
+        resolved = _printed_uncertainty_band(
+            Quantity.RESIDUE_COMPONENT_COMPOSITION,
+            Uncertainty(kind=UncertaintyKind.PRINTED, verbatim=hashimoto),
+            Decimal("3.59"),
+        )
+        assert resolved.band is None
+        assert resolved.refusal is None
+        assert resolved.notice is not None
+        assert resolved.notice.reason == "printed_uncertainty_not_stated"
+        assert "no invented per-cell" in resolved.notice.band
+        assert "±0.1 mg" in resolved.notice.band
+        assert "default=none" in resolved.notice.band
+
+    percent = _printed_uncertainty_band(
+        Quantity.DELTA_FG,
+        Uncertainty(kind=UncertaintyKind.PRINTED, verbatim="± 5 %"),
+        Decimal("40"),
+    )
+    assert percent.refusal is None
+    assert percent.band is not None
+
+    # Shornkov 2019 prints "error not exceeding 8%" and also says no per-cell
+    # uncertainty is printed. The 8% stays a width. Dropping it moves the
+    # full-store band census. Markova's bare column totals above do not.
+    shornikov = _printed_uncertainty_band(
+        Quantity.P_PARTIAL,
+        Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim=(
+                "The author reports error not exceeding 8% for the "
+                "partial-pressure values calculated using equations (22) and "
+                "(23); no per-cell uncertainty is printed."
+            ),
+        ),
+        Decimal("0.000210756"),
+    )
+    assert shornikov.refusal is None
+    assert shornikov.band is not None
+
+
+def test_hashimoto_milligrams_stay_unparsed_when_the_denial_is_missed(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Mutation: ignoring the denial must not read 0.1 mg as a wt% band.
+
+    Restoring the old unparseable refusal fails ``refusal is None``. Parsing
+    ``weighing_accuracy_mg`` or the ±0.1 mg quote as the cell width fails
+    ``band is None``.
+    """
+
+    monkeypatch.setattr(
+        "simulator.battery.score._verbatim_denies_printed_uncertainty",
+        lambda _uncertainty: False,
+    )
+    resolved = _printed_uncertainty_band(
+        Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim={
+                "weighing_accuracy_mg": 0.1,
+                "quote": (
+                    "They were weighed by a microbalance with an accuracy of "
+                    "±0.1 mg in order to determine the vaporized mass"
+                ),
+                "note": (
+                    "Instrument accuracy as printed; no invented per-cell "
+                    "composition error."
+                ),
+            },
+        ),
+        Decimal("3.59"),
+    )
+    assert resolved.band is None
+    assert resolved.refusal is None
+    assert resolved.notice is not None
+    assert resolved.notice.reason == "printed_uncertainty_unparsed"
 
 
 def test_unstated_plus_minus_defaults_to_one_sigma_with_two_sigma_alternative() -> None:
