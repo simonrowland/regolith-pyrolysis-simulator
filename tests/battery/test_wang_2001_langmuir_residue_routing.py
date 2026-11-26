@@ -511,7 +511,9 @@ def test_wang_starting_aggregate_notice_tracks_located_extract_cell(monkeypatch)
         4,
         482,
         "1",
-        "Table 1 starting ΣLn2O3 aggregate in column b.",
+        # The extract note is the Wang sentence. The condition has no
+        # as_printed string, so the printed-cell owner appends a located absence.
+        "Table 1 starting ΣLn2O3 aggregate in column b.; printed_cell=[null, null]",
     )
     changed_aggregate = replace(
         located_aggregate, state=State.of(Decimal("0.143"))
