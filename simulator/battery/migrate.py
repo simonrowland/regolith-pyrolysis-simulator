@@ -26180,17 +26180,56 @@ class Migrator:
             experiment_id
         )
         # A regime label is not a second technique when the source already
-        # named a printed method on the experiment. Callers still pass it.
+        # named a printed method. Callers still pass it. A method field that
+        # exact-maps wins. An exact regime alias that names that same method
+        # resolves the row, so the prose is not re-inferred (Tyurnina
+        # kems_effusion on a knudsen experiment). A regime that names a
+        # different method does not override the declared one.
         declared_method_is_printed = (
             declared_experiment_method is not None
             and declared_experiment_method.is_value
             and declared_experiment_method.value is not MethodToken.UNSPECIFIED
         )
-        active_method_candidates = (
-            method_raw_candidates
-            if declared_method_is_printed
-            else (*regime_candidates, *method_raw_candidates)
+        method_field_text = next(
+            (
+                text
+                for candidate in method_raw_candidates
+                if (text := _method_text_value(candidate)) is not None
+            ),
+            None,
         )
+        method_field_state = (
+            map_method(method_field_text) if method_field_text is not None else None
+        )
+        method_field_is_printed = (
+            method_field_state is not None
+            and method_field_state.is_value
+            and method_field_state.value is not MethodToken.UNSPECIFIED
+        )
+        regime_text = next(
+            (
+                text
+                for candidate in regime_candidates
+                if (text := _method_text_value(candidate)) is not None
+            ),
+            None,
+        )
+        regime_state = map_method(regime_text) if regime_text is not None else None
+        regime_agrees_with_declared = (
+            declared_method_is_printed
+            and regime_state is not None
+            and regime_state.is_value
+            and regime_state.value is declared_experiment_method.value
+        )
+        if not declared_method_is_printed or (
+            regime_agrees_with_declared and not method_field_is_printed
+        ):
+            active_method_candidates = (
+                *regime_candidates,
+                *method_raw_candidates,
+            )
+        else:
+            active_method_candidates = method_raw_candidates
         claim_raw = next(
             (
                 text

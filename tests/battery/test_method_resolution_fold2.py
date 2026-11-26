@@ -456,6 +456,69 @@ def test_assay_prose_stays_on_the_named_run(tmp_path):
     _assert_assay_stays_on_named_run(result, extract["source_id"])
 
 
+def _agreeing_regime_on_named_run_extract():
+    """Knudsen run. The regime is the exact alias; the method sentence is not."""
+
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    row["experiment"] = "named-knudsen"
+    row["observation_id"] = "agreeing-regime-row"
+    row["regime"] = "kems_effusion"
+    row["method"] = (
+        "Knudsen effusion with high-temperature mass-spectral analysis of the vapor"
+    )
+    extract["experiments"] = [
+        {"experiment_id": "named-knudsen", "method": "knudsen_effusion"}
+    ]
+    return extract
+
+
+def _assert_agreeing_regime_has_no_method_notice(result, source_id):
+    rows = _rows_for_local_id(result, source_id, "agreeing-regime-row")
+    assert rows
+    assert all(
+        row.experiment_id.endswith("::experiment::named-knudsen") for row in rows
+    )
+    assert all("::method:" not in row.experiment_id for row in rows)
+    assert all(
+        result.experiments[row.experiment_id].method.is_value
+        and result.experiments[row.experiment_id].method.value
+        is MethodToken.KNUDSEN_EFFUSION
+        for row in rows
+    )
+    assert all(
+        not any(
+            notice.kind in {NoticeKind.METHOD_UNSTATED, NoticeKind.METHOD_INFERRED}
+            for notice in row.notices
+        )
+        for row in rows
+    )
+
+
+def test_agreeing_regime_resolves_without_a_method_notice(tmp_path):
+    extract = _agreeing_regime_on_named_run_extract()
+    result = _migrate_real_extract(
+        tmp_path, "zhang-2021-acsesc-si.yaml", extract_doc=extract
+    )
+    _assert_agreeing_regime_has_no_method_notice(result, extract["source_id"])
+
+
+def test_dropping_an_agreeing_regime_emits_a_method_notice(tmp_path, monkeypatch):
+    extract = _agreeing_regime_on_named_run_extract()
+    original = Migrator._resolve_method_for_observation
+
+    def drop_regime(self, *args, **kwargs):
+        kwargs["regime_candidates"] = ()
+        return original(self, *args, **kwargs)
+
+    monkeypatch.setattr(Migrator, "_resolve_method_for_observation", drop_regime)
+    result = _migrate_real_extract(
+        tmp_path, "zhang-2021-acsesc-si.yaml", extract_doc=extract
+    )
+    with pytest.raises(AssertionError):
+        _assert_agreeing_regime_has_no_method_notice(result, extract["source_id"])
+
+
 def test_treating_assay_prose_as_a_method_field_mints_a_second_id(
     tmp_path, monkeypatch
 ):
