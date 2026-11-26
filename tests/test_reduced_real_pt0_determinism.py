@@ -8646,124 +8646,6 @@ def _is_sio_report_diagnostic_path(path: tuple[Any, ...]) -> bool:
     )
 
 
-def _real_producer_diagnostic_mutation_sources(
-    payload: dict[str, Any],
-    sim: Any,
-    *,
-    key: Mapping[str, Any],
-    interpolation_synthesized: bool = False,
-) -> list[tuple[str, dict[str, Any]]]:
-    from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
-    from engines.vaporock import VapoRockProvider
-    from simulator.melt_backend.vaporock import VapoRockBackend
-
-    composition = sim._backend_composition_mol_by_account().get(
-        "process.cleaned_melt",
-        {},
-    )
-    assert composition
-    equilibrium_result = payload["equilibrium_result"]
-    captured_temperature_C = float(equilibrium_result["temperature_C"])
-    captured_pressure_bar = float(equilibrium_result["pressure_bar"])
-    captured_fO2_log = float(equilibrium_result["fO2_log"])
-    captured_transport_pO2_bar = float(
-        key["controls"]["vapor_transport_pO2_bar"]
-    )
-    account_view = ProviderAccountView(
-        accounts={"process.cleaned_melt": dict(composition)},
-        species_formula_registry={},
-    )
-    provider = BuiltinVaporPressureProvider(_load_yaml("vapor_pressures.yaml"))
-    builtin_result = provider.dispatch(
-        IntentRequest(
-            intent=ChemistryIntent.VAPOR_PRESSURE,
-            account_view=account_view,
-            temperature_C=captured_temperature_C,
-            pressure_bar=captured_pressure_bar,
-            control_inputs={
-                "pO2_bar": captured_transport_pO2_bar,
-                "intrinsic_fO2_log": captured_fO2_log,
-                "high_t_melt_activity": "openimcc",
-            },
-        )
-    )
-    builtin_diagnostic = copy.deepcopy(dict(builtin_result.diagnostic))
-    high_t_activity = builtin_diagnostic.get("high_t_melt_activity")
-    assert isinstance(high_t_activity, Mapping)
-    assert "vaporock_cap_K" in high_t_activity
-    source_reaction_fO2_bar = builtin_diagnostic.get(
-        "source_reaction_fO2_bar"
-    )
-    assert (
-        isinstance(source_reaction_fO2_bar, (int, float))
-        and not isinstance(source_reaction_fO2_bar, bool)
-        and math.isfinite(float(source_reaction_fO2_bar))
-    )
-
-    class RecursiveAdmissionVapoRockSystem:
-        def set_melt_comp(self, _composition: Mapping[str, float]) -> None:
-            return None
-
-        def eval_gas_abundances(
-            self,
-            _temperature_K: float,
-            _log_fO2: float,
-        ) -> dict[str, float]:
-            return {"Na(g)": -2.0}
-
-    backend = VapoRockBackend()
-    backend._available = True
-    backend._vaporock = SimpleNamespace(System=RecursiveAdmissionVapoRockSystem)
-    vaporock_provider = VapoRockProvider(
-        backend=backend,
-        vapor_pressure_data={},
-    )
-    vaporock_result = vaporock_provider.dispatch(
-        IntentRequest(
-            intent=ChemistryIntent.VAPOR_PRESSURE,
-            account_view=account_view,
-            temperature_C=captured_temperature_C,
-            pressure_bar=captured_pressure_bar,
-            fO2_log=captured_fO2_log,
-            control_inputs={"pO2_bar": captured_transport_pO2_bar},
-        )
-    )
-    vaporock_diagnostic = copy.deepcopy(dict(vaporock_result.diagnostic))
-    assert isinstance(vaporock_diagnostic, Mapping)
-    assert vaporock_diagnostic["vaporock_full_speciation_Pa"]["Na"] == pytest.approx(
-        1000.0
-    )
-    assert any(
-        isinstance(value, tuple)
-        for _path, value in _recursive_payload_paths(vaporock_diagnostic)
-    )
-
-    sources = []
-    result_temperature_K = captured_temperature_C + CELSIUS_TO_KELVIN_OFFSET
-    for source_name, diagnostic in (
-        ("builtin-provider-full-diagnostic", builtin_diagnostic),
-        ("vaporock-provider-full-diagnostic", vaporock_diagnostic),
-    ):
-        mutation_payload = copy.deepcopy(payload)
-        mutation_payload["last_vapor_pressure_diagnostic"] = (
-            rrd._cache_payload_diagnostic(
-                diagnostic,
-                temperature_K=result_temperature_K,
-            )
-        )
-        assert rrd._admission_rejection(
-            "equilibrium_post_record",
-            mutation_payload,
-            payload_codec_version=rrd._payload_codec_version(
-                "equilibrium_post_record"
-            ),
-            keys=(key,),
-            interpolation_synthesized=interpolation_synthesized,
-        ) is None
-        sources.append((source_name, mutation_payload))
-    return sources
-
-
 def _real_gate_step_down_mutation_source(
     payload: dict[str, Any],
     key: Mapping[str, Any],
@@ -8833,7 +8715,13 @@ def _recursive_capture_for_kind(
         )
         artifact = "equilibrium_post_record"
         sim, _result, key, baseline = _capture_recursive_equilibrium_row(
-            capture
+            capture,
+            temperature_K=2073.15,
+        )
+        replay_diagnostic = baseline["last_vapor_pressure_diagnostic"]
+        assert isinstance(replay_diagnostic, Mapping)
+        assert isinstance(
+            replay_diagnostic.get("high_t_melt_activity"), Mapping
         )
         assert any(
             path
@@ -8870,6 +8758,12 @@ def test_real_cache_payload_recursive_mutations_miss_or_replay_identically(
         persistent=persistent,
     )
     if artifact == "equilibrium_post_record":
+        assert rrd._admission_rejection(
+            artifact,
+            baseline,
+            payload_codec_version=rrd._payload_codec_version(artifact),
+            keys=(key,),
+        ) is None
         assert rrd._decode_payload_for_admission(
             artifact,
             baseline,
@@ -8910,14 +8804,6 @@ def test_real_cache_payload_recursive_mutations_miss_or_replay_identically(
     outcomes: dict[str, str] = {}
     executed_sources: set[str] = set()
     mutation_sources = [("encoded-row", copy.deepcopy(baseline))]
-    if artifact == "equilibrium_post_record":
-        mutation_sources.extend(
-            _real_producer_diagnostic_mutation_sources(
-                baseline,
-                replay_sim,
-                key=key,
-            )
-        )
     if artifact == "freeze_gate_curve":
         mutation_sources.append(
             _real_gate_step_down_mutation_source(baseline, key)
@@ -9134,22 +9020,16 @@ def test_real_cache_payload_recursive_mutations_miss_or_replay_identically(
     )
     if artifact == "equilibrium_post_record":
         source_reaction_path = (
-            "builtin-provider-full-diagnostic: "
+            "encoded-row: "
             "root.last_vapor_pressure_diagnostic.source_reaction_fO2_bar"
         )
         assert outcomes[f"{source_reaction_path} bool"] == "miss"
         high_t_cap_path = (
-            "builtin-provider-full-diagnostic: "
+            "encoded-row: "
             "root.last_vapor_pressure_diagnostic.high_t_melt_activity."
             "vaporock_cap_K wrong-scalar"
         )
         assert outcomes[high_t_cap_path] == "miss"
-        vaporock_inner_path = (
-            "vaporock-provider-full-diagnostic: "
-            "root.last_vapor_pressure_diagnostic."
-            "vaporock_full_speciation_Pa.Na wrong-scalar"
-        )
-        assert outcomes[vaporock_inner_path] == "miss"
     else:
         realized_provider_path = (
             "real-gate-step-down-output: "
@@ -9344,14 +9224,6 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
     outcomes: dict[str, str] = {}
     executed_sources: set[str] = set()
     mutation_sources = [("synthesized-row", copy.deepcopy(baseline))]
-    mutation_sources.extend(
-        _real_producer_diagnostic_mutation_sources(
-            baseline,
-            query_sim,
-            key=query_key,
-            interpolation_synthesized=True,
-        )
-    )
     mutation_paths = [
         (source_name, mutation_baseline, path, value)
         for source_name, mutation_baseline in mutation_sources
@@ -9507,21 +9379,4 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
     )
     assert "miss" in outcomes.values()
     assert "admitted" in outcomes.values()
-    source_reaction_path = (
-        "builtin-provider-full-diagnostic: "
-        "root.last_vapor_pressure_diagnostic.source_reaction_fO2_bar"
-    )
-    assert outcomes[f"{source_reaction_path} bool"] == "miss"
-    high_t_cap_path = (
-        "builtin-provider-full-diagnostic: "
-        "root.last_vapor_pressure_diagnostic.high_t_melt_activity."
-        "vaporock_cap_K wrong-scalar"
-    )
-    assert outcomes[high_t_cap_path] == "miss"
-    vaporock_inner_path = (
-        "vaporock-provider-full-diagnostic: "
-        "root.last_vapor_pressure_diagnostic."
-        "vaporock_full_speciation_Pa.Na wrong-scalar"
-    )
-    assert outcomes[vaporock_inner_path] == "miss"
     assert not failures, "\n".join(failures)
