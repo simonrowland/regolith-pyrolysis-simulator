@@ -250,9 +250,22 @@ class EngineWorkerTimeout(TimeoutError):
         self._diagnostic_message = self._message_for_context(
             self.worker_name,
             self.phase,
-            self.timeout_s,
+            self.diagnostic_timeout_s,
         )
         super().__init__(self._diagnostic_message)
+
+    def _set_configured_diagnostic_timeout(
+        self,
+        timeout_s: float,
+    ) -> None:
+        self.diagnostic_timeout_s = float(timeout_s)
+        context = self.worker_name
+        self._diagnostic_message = self._message_for_context(
+            context,
+            self.phase,
+            self.diagnostic_timeout_s,
+        )
+        self.args = (self._diagnostic_message,)
 
     @staticmethod
     def _message_for_context(
@@ -832,6 +845,20 @@ class WarmEngineWorker:
             if self._pool_call_abort_event is abort_event:
                 self._pool_call_abort_event = None
 
+    def _startup_timeout(
+        self,
+        effective_timeout_s: float,
+        *,
+        worker_name: str | None = None,
+    ) -> EngineWorkerTimeout:
+        timeout = EngineWorkerTimeout(
+            self.name if worker_name is None else worker_name,
+            effective_timeout_s,
+            phase='initialization',
+        )
+        timeout._set_configured_diagnostic_timeout(self.startup_timeout_s)
+        return timeout
+
     def _finish_frame_reader(self, connection: Any) -> None:
         connection_id = id(connection)
         with self._state_lock:
@@ -1098,11 +1125,9 @@ class WarmEngineWorker:
                 expected_process=process,
                 expected_connection=connection,
             )
-            raise EngineWorkerTimeout(
-                self.name,
-                timeout_s,
-                phase=phase,
-            )
+            if phase == 'initialization':
+                raise self._startup_timeout(timeout_s)
+            raise EngineWorkerTimeout(self.name, timeout_s, phase=phase)
         finally:
             if receiver.is_alive():
                 self._discard_current(
@@ -1461,11 +1486,7 @@ class WarmEngineWorker:
                 startup_timeout + ENGINE_WORKER_SPAWN_SLACK_S
             )
             if not launch.started.wait(timeout=spawn_wait_timeout_s):
-                raise EngineWorkerTimeout(
-                    self.name,
-                    spawn_wait_timeout_s,
-                    phase='initialization',
-                )
+                raise self._startup_timeout(spawn_wait_timeout_s)
             if launch.start_error is not None:
                 raise launch.start_error
             with self._state_lock:
@@ -1514,11 +1535,7 @@ class WarmEngineWorker:
                     raise RuntimeError(f'{self.name} worker is disabled')
                 remaining = deadline - time.monotonic()
                 if remaining <= 0.0:
-                    raise EngineWorkerTimeout(
-                        self.name,
-                        startup_timeout,
-                        phase='initialization',
-                    )
+                    raise self._startup_timeout(startup_timeout)
                 if parent.poll(min(ENGINE_WORKER_CANCEL_POLL_S, remaining)):
                     break
             message = self._receive_frame_with_deadline(
@@ -1562,11 +1579,12 @@ class WarmEngineWorker:
                 expected_connection=parent,
             )
             _tag, worker_name, timeout_s, phase = message
-            raise EngineWorkerTimeout(
-                worker_name,
-                timeout_s,
-                phase=phase,
-            )
+            if phase == 'initialization':
+                raise self._startup_timeout(
+                    timeout_s,
+                    worker_name=worker_name,
+                )
+            raise EngineWorkerTimeout(worker_name, timeout_s, phase=phase)
         if message[0] != 'ready':
             self._discard_current(
                 diagnostic=False,
@@ -1812,11 +1830,12 @@ class WarmEngineWorker:
                 expected_process=process,
                 expected_connection=connection,
             )
-            raise EngineWorkerTimeout(
-                worker_name,
-                timeout_s,
-                phase=phase,
-            )
+            if phase == 'initialization':
+                raise self._startup_timeout(
+                    timeout_s,
+                    worker_name=worker_name,
+                )
+            raise EngineWorkerTimeout(worker_name, timeout_s, phase=phase)
         _tag, exc_name, detail, remote_traceback, *metadata = message
         failure_disposition = metadata[0] if metadata else None
         _pool_debug(

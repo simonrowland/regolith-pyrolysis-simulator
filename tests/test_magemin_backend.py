@@ -1238,60 +1238,6 @@ def test_magemin_request_detail_preserves_restart_startup_timeout_context():
     assert 'restart-timeout' in timeout.diagnostic_detail
 
 
-def test_magemin_restart_timeout_detail_keeps_effective_spawn_wait():
-    configured_startup_timeout_s = 30.0
-    effective_startup_wait_s = (
-        configured_startup_timeout_s + engine_pool.ENGINE_WORKER_SPAWN_SLACK_S
-    )
-    timeout = EngineWorkerTimeout(
-        'MAGEMin subprocess pool slot 5',
-        effective_startup_wait_s,
-        phase='initialization',
-    )
-    startup_pool = object.__new__(engine_pool.EngineWorkerPool)
-    startup_pool._workers = [types.SimpleNamespace(
-        name='MAGEMin subprocess pool slot 5',
-    )]
-    startup_pool._normalize_startup_timeout(
-        timeout,
-        failed_slots=(0,),
-        configured_timeout_s=configured_startup_timeout_s,
-    )
-
-    backend = _make_pooled_subprocess_backend(timeout)
-    backend._config = {
-        'warm_call_timeout_s': 15.0,
-        'worker_startup_timeout_s': configured_startup_timeout_s,
-    }
-    projection = backend._build_db_bulk_projection({
-        'SiO2': 60.0,
-        'MgO': 40.0,
-    })
-    with pytest.raises(EngineWorkerTimeout):
-        backend._call_magemin(
-            projection,
-            temperature_C=1200.0,
-            pressure_bar=1.0,
-            fO2_log=-8.0,
-        )
-
-    diagnostic = timeout.serialized_diagnostic_fields()
-    request_detail = json.loads(
-        timeout.diagnostic_detail.rsplit('; MAGEMin request: ', 1)[1]
-    )
-    assert timeout.timeout_s == pytest.approx(effective_startup_wait_s)
-    assert diagnostic['timeout_s'] == pytest.approx(30.0)
-    assert diagnostic['exception_message'] == (
-        'MAGEMin startup initialization exceeded hard timeout of 30s'
-    )
-    assert request_detail['pool_timeout'] == {
-        'configured_per_job_timeout_s': 15.0,
-        'effective_wait_timeout_s': effective_startup_wait_s,
-        'wait_state': 'running',
-        'worker_phase': 'initialization',
-    }
-
-
 @pytest.mark.parametrize(
     'startup_timeout_s',
     [

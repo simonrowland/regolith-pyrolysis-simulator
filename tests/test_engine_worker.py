@@ -1076,9 +1076,6 @@ def _deadline_race_start_worker(
         event_index = event_count % 7
         event_count += 1
         if event_index < 6:
-            if spawn_start_stall and event_index == 3:
-                worker._spawn_stall_event = _DeadlineRaceSpawnStallEvent()
-                return worker._spawn_stall_event
             return threading.Event()
         return _DeadlineRaceEvent(clock)
 
@@ -1115,6 +1112,19 @@ def _deadline_race_start_worker(
         Lock=threading.Lock,
         Thread=make_reader,
     ))
+    if spawn_start_stall:
+        real_launch_init = _EngineWorkerLaunch.__init__
+
+        def stall_launch_start_event(launch, *args, **kwargs):
+            real_launch_init(launch, *args, **kwargs)
+            worker._spawn_stall_event = _DeadlineRaceSpawnStallEvent()
+            launch.started = worker._spawn_stall_event
+
+        monkeypatch.setattr(
+            engine_pool_module._EngineWorkerLaunch,
+            '__init__',
+            stall_launch_start_event,
+        )
     return worker, clock, discarded, processes, connections, readers
 
 
@@ -1426,7 +1436,7 @@ def test_start_receipt_abort_uses_configured_call_timeout(monkeypatch):
     assert caught.value.timeout_s == pytest.approx(30.0)
 
 
-def test_dead_worker_spawn_stall_reports_full_restart_wait(monkeypatch):
+def _dead_worker_with_spawn_stall(monkeypatch, *, name):
     startup_timeout_s = 30.0
     worker, _clock, _discarded, _processes, _connections, _readers = (
         _deadline_race_start_worker(
@@ -1442,18 +1452,22 @@ def test_dead_worker_spawn_stall_reports_full_restart_wait(monkeypatch):
             spawn_start_stall=True,
         )
     )
-    worker.name = 'MAGEMin subprocess pool slot 5'
+    worker.name = name
     worker.process = SimpleNamespace(
         alive=False,
         exitcode=-9,
         is_alive=lambda: False,
     )
     worker.connection = SimpleNamespace(closed=False)
-    startup_logs = []
-    monkeypatch.setattr(
-        engine_pool_module,
-        '_pool_debug',
-        startup_logs.append,
+    return worker, startup_timeout_s
+
+
+def test_standalone_dead_worker_spawn_stall_keeps_configured_diagnostic(
+    monkeypatch,
+):
+    worker, startup_timeout_s = _dead_worker_with_spawn_stall(
+        monkeypatch,
+        name='PetThermoTools native operation',
     )
 
     with pytest.raises(EngineWorkerTimeout) as caught:
@@ -1464,14 +1478,85 @@ def test_dead_worker_spawn_stall_reports_full_restart_wait(monkeypatch):
     assert worker._spawn_stall_event.wait_timeouts == [effective_wait_s]
     assert timeout.phase == 'initialization'
     assert timeout.timeout_s == pytest.approx(effective_wait_s)
-
-    pool = object.__new__(EngineWorkerPool)
-    pool._workers = [worker]
-    pool._normalize_startup_timeout(
-        timeout,
-        failed_slots=(0,),
-        configured_timeout_s=startup_timeout_s,
+    diagnostic = timeout.serialized_diagnostic_fields()
+    assert diagnostic['timeout_s'] == pytest.approx(startup_timeout_s)
+    assert diagnostic['exception_message'] == (
+        'PetThermoTools native operation initialization exceeded hard '
+        'timeout of 30s'
     )
+    launch = worker._launch_owner
+    if launch is not None:
+        launch.thread.join(timeout=1.0)
+        assert not launch.thread.is_alive()
+
+
+def test_pool_restart_spawn_stall_uses_configured_serialized_timeout(
+    monkeypatch,
+):
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    worker, startup_timeout_s = _dead_worker_with_spawn_stall(
+        monkeypatch,
+        name='MAGEMin subprocess pool slot 5',
+    )
+    startup_logs = []
+    monkeypatch.setattr(
+        engine_pool_module,
+        '_pool_debug',
+        startup_logs.append,
+    )
+    pool = object.__new__(EngineWorkerPool)
+    pool._queue = queue.Queue()
+    pool._workers = [worker]
+    pool._active_requests = {}
+    pool._request_workers = {}
+    pool._diagnostic_written_futures = set()
+    pool._active_requests_lock = threading.Lock()
+    pool._cancel_pending = threading.Event()
+    pool._lifecycle_lock = threading.Lock()
+    pool._closed = False
+    consumer = threading.Thread(
+        target=pool._consume,
+        args=(0, worker),
+    )
+    pool._threads = [consumer]
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = 'subprocess'
+    backend._binary_path = Path('/fake/MAGEMin')
+    backend._database = 'ig'
+    backend._config = {
+        'warm_call_timeout_s': 15.0,
+        'worker_startup_timeout_s': startup_timeout_s,
+    }
+    worker._bootstrap_args = (
+        str(backend._binary_path),
+        backend._database,
+        backend._config,
+    )
+    backend._subprocess_pool = pool
+    projection = backend._build_db_bulk_projection({
+        'SiO2': 60.0,
+        'MgO': 40.0,
+    })
+    consumer.start()
+    try:
+        with pytest.raises(EngineWorkerTimeout) as caught:
+            backend._call_magemin(
+                projection,
+                temperature_C=1200.0,
+                pressure_bar=1.0,
+                fO2_log=-8.0,
+            )
+    finally:
+        pool._queue.put(None)
+        consumer.join(timeout=1.0)
+        assert not consumer.is_alive()
+    timeout = caught.value
+    effective_wait_s = startup_timeout_s + ENGINE_WORKER_SPAWN_SLACK_S
+    assert worker._spawn_stall_event.wait_timeouts == [effective_wait_s]
+    assert timeout.phase == 'initialization'
+    assert timeout.timeout_s == pytest.approx(effective_wait_s)
 
     diagnostic = timeout.serialized_diagnostic_fields()
     assert diagnostic['timeout_s'] == pytest.approx(startup_timeout_s)
@@ -1485,6 +1570,13 @@ def test_dead_worker_spawn_stall_reports_full_restart_wait(monkeypatch):
     ]
     assert len(startup_detail_logs) == 1
     assert 'slot 5' in startup_detail_logs[0]
+    request_detail = json.loads(
+        timeout.diagnostic_detail.rsplit('; MAGEMin request: ', 1)[1]
+    )
+    assert request_detail['pool_timeout']['effective_wait_timeout_s'] == (
+        effective_wait_s
+    )
+    assert request_detail['pool_timeout']['worker_phase'] == 'initialization'
     launch = worker._launch_owner
     if launch is not None:
         launch.thread.join(timeout=1.0)
