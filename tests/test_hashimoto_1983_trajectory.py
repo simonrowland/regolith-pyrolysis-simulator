@@ -10,6 +10,7 @@ from simulator.battery.default_policy import (
     load_policy_table,
 )
 from simulator.battery.enums import NoticeKind
+from simulator.battery.score import flagged_strata
 from simulator.diagnostic_helpers.hashimoto_1983 import (
     DEFAULT_OBSERVATIONS_PATH,
     DEFAULT_PRESET_PATH,
@@ -202,6 +203,7 @@ def test_synthetic_runtime_equal_to_printed_values_has_zero_residual() -> None:
     records = score_hashimoto_1983(
         observations=observations,
         runtime_outputs=runtime,
+        flagged_strata_classifier=flagged_strata,
     )
     assert len(records) == 120
     assert all(record.sim_wt_pct == record.published_wt_pct for record in records)
@@ -239,6 +241,7 @@ def test_synthetic_runtime_equal_to_printed_values_has_zero_residual() -> None:
     changed = score_hashimoto_1983(
         observations=observations,
         runtime_outputs=changed_runtime,
+        flagged_strata_classifier=flagged_strata,
     )
     assert changed[0].residual == pytest.approx(1.0)
 
@@ -248,6 +251,7 @@ def test_default_flag_mutation_fails_the_clean_headline_invariant() -> None:
     records = score_hashimoto_1983(
         observations=observations,
         runtime_outputs=_runtime_outputs(observations),
+        flagged_strata_classifier=flagged_strata,
     )
     assert records[0].policy_notice is not None
     mutant = replace(
@@ -271,6 +275,7 @@ def test_runtime_area_default_without_policy_metadata_cannot_enter_headline() ->
     records = score_hashimoto_1983(
         observations=observations,
         runtime_outputs=runtime,
+        flagged_strata_classifier=flagged_strata,
     )
 
     assert records[0].refusal_reason == "runtime_area_default_notice_missing"
@@ -288,6 +293,7 @@ def test_missing_runtime_output_refuses_for_each_observation() -> None:
     records = score_hashimoto_1983(
         observations=observations,
         runtime_outputs=runtime,
+        flagged_strata_classifier=flagged_strata,
     )
     assert len(records) == 120
     assert all(record.sim_wt_pct is None for record in records)
@@ -310,6 +316,7 @@ def test_invalid_runtime_output_has_no_numeric_prediction_or_residual(
     records = score_hashimoto_1983(
         observations=observations,
         runtime_outputs=runtime,
+        flagged_strata_classifier=flagged_strata,
     )
     assert records[0].refusal_reason == "invalid_runtime_output"
     assert records[0].sim_wt_pct is None

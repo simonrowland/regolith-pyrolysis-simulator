@@ -498,6 +498,7 @@ METHOD_TOKEN_ALIASES = MappingProxyType(
         "Cr K-edge XANES silicate glass redox": MethodToken.XANES_SPECTROSCOPY,
         "Cr K-edge XANES at 1400 °C; high-temperature redox ratio preserved on quench": MethodToken.XANES_SPECTROSCOPY,
         "Cr K-edge XANES end-member mixture fit": MethodToken.XANES_SPECTROSCOPY,
+        "Fe K-edge XANES": MethodToken.XANES_SPECTROSCOPY,
         "mossbauer_room_temperature": MethodToken.MOSSBAUER_SPECTROSCOPY,
         "high_pressure_anhydrous_piston_cylinder": MethodToken.PISTON_CYLINDER,
         "piston_cylinder_equilibration_quench": MethodToken.PISTON_CYLINDER,
