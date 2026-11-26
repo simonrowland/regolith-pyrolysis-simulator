@@ -6984,7 +6984,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # The buffer stays. The batch settle runs the Fe split
             # against it and books only the O2 that split did not take.
             # A positive source does not clear the ferric lock.
-            pass
+            # A couple at the noop has no uptake to defer. An empty
+            # skip_reason records the term as applied, which says the
+            # oxygen was integrated. It was not. p_total = 0 uses the
+            # 1e-9 bar vacuum floor, so this bound is -9, the log the
+            # no-capacity refusal plants. That refusal stays a skip.
+            if C_m <= OXYGEN_RESERVOIR_NOOP_MOL:
+                skip_reason = 'no_melt_redox_capacity'
         elif reducing_books:
             # Premise: bookable O2 is 1/2 mol per mol Fe2O3
             # (``ferric_couple_o2_mol``). Algebra: release =
