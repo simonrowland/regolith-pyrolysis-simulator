@@ -113,14 +113,32 @@ def test_knudsen_extent_limits_rhs_evaluations(monkeypatch):
     from simulator.battery import residue
 
     monkeypatch.setattr(residue, "_KNUDSEN_MAX_RHS_EVALUATIONS", 1)
-    with pytest.raises(ResidueInventoryRefusal, match="RHS evaluation limit in 2000 K") as exc:
+    with pytest.raises(
+        ResidueInventoryRefusal,
+        match=r"RHS evaluation budget \(1\) exceeded in 2000 K",
+    ) as exc:
         integrate_knudsen_residue_inventory(
             {"FeO": 1.0}, _channels(),
             lambda n, p, t: {"FeO": 1.0, "O2": 0.0},
             temperature_path=((0.25, 2000.0),), measured_mass_loss_fraction=0.25,
             near_saturated=True, source_fO2_log_by_interval=(-10.0,),
         )
-    assert exc.value.reason == "knudsen_extent_evaluation_limit"
+    assert exc.value.reason == "residue_integration_budget_exceeded"
+
+
+def test_knudsen_pressure_state_key_preserves_full_precision_inputs():
+    from simulator.battery.residue import _knudsen_pressure_state_key
+
+    base = _knudsen_pressure_state_key({"MgO": 0.5}, -4.0, 2173.15)
+    assert _knudsen_pressure_state_key(
+        {"MgO": math.nextafter(0.5, 1.0)}, -4.0, 2173.15
+    ) != base
+    assert _knudsen_pressure_state_key(
+        {"MgO": 0.5}, math.nextafter(-4.0, -3.0), 2173.15
+    ) != base
+    assert _knudsen_pressure_state_key(
+        {"MgO": 0.5}, -4.0, math.nextafter(2173.15, 2174.0)
+    ) != base
 
 
 def test_oxygen_only_loss_advances_xi_without_debiting_cations():

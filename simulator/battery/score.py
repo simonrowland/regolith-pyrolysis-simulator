@@ -17659,7 +17659,7 @@ def _knudsen_residue_prediction(
     reported_quantity = quantity or Quantity.RESIDUE_COMPONENT_COMPOSITION
     from simulator.battery.residue import (
         ResidueEngineNonconvergence, ResidueInventoryRefusal,
-        _KNUDSEN_EXTENT_EVALUATION_LIMIT,
+        _KNUDSEN_BUDGET_EXCEEDED,
         _element_retention_ratio_from_inventories,
         _knudsen_trace_tail_notices,
         _printed_fm_definition,
@@ -17784,7 +17784,7 @@ def _knudsen_residue_prediction(
     except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
         attempted = (
             isinstance(exc, ResidueEngineNonconvergence)
-            or exc.reason == _KNUDSEN_EXTENT_EVALUATION_LIMIT
+            or exc.reason == _KNUDSEN_BUDGET_EXCEEDED
         )
         return EnginePrediction(
             engine=engine, channel=ENGINE_CHANNELS[engine],
@@ -17808,6 +17808,7 @@ def _langmuir_residue_prediction(
     from simulator.battery.residue import (
         ResidueEngineNonconvergence,
         ResidueInventoryRefusal,
+        _KNUDSEN_BUDGET_EXCEEDED,
         predict_langmuir_residue_composition,
     )
 
@@ -17853,13 +17854,17 @@ def _langmuir_residue_prediction(
             refusal_detail=provenance,
         )
     except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
+        attempted = (
+            isinstance(exc, ResidueEngineNonconvergence)
+            or exc.reason == _KNUDSEN_BUDGET_EXCEEDED
+        )
         return EnginePrediction(
             engine=engine,
             channel=channel,
             execution=Execution(
                 state=(
                     ExecutionState.ATTEMPTED_UNAVAILABLE
-                    if isinstance(exc, ResidueEngineNonconvergence)
+                    if attempted
                     else ExecutionState.NOT_PROBED
                 )
             ),
@@ -17868,7 +17873,7 @@ def _langmuir_residue_prediction(
             lineage_complete=False,
             refusal_reason=(
                 RefusalReason.ATTEMPTED_UNAVAILABLE
-                if isinstance(exc, ResidueEngineNonconvergence)
+                if attempted
                 else RefusalReason.UNSUPPORTED
             ),
             refusal_detail={

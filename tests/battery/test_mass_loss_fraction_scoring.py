@@ -421,7 +421,7 @@ def test_markova_openimcc_scores_printed_cells_and_keeps_card_blocked(
         assert silica.value.point == Decimal(0)
         assert (
             silica.provenance["linear_temperature_diagnostic"]["refusal"]
-            == "knudsen_extent_evaluation_limit"
+            == "residue_integration_budget_exceeded"
         )
 
     manifest_path = LITERATURE / "reproduction-cards" / "kems-026-markova-1984.yaml"
@@ -477,7 +477,7 @@ def test_markova_partial_residue_score_carries_redox_diagnostic(
     assert float(residual.numeric.value) == pytest.approx(24.2682015273, abs=1e-5)
     assert (
         candidate.provenance["linear_temperature_diagnostic"]["refusal"]
-        == "knudsen_extent_evaluation_limit"
+        == "residue_integration_budget_exceeded"
     )
     fe_diagnostics = []
     for notice in residual.notices:
@@ -578,7 +578,7 @@ def test_markova_analytical_vi_2207_scores_after_exhaustion(fresh_mass_loss_extr
     assert provenance["composition_wt_pct"]["Al2O3"] == pytest.approx(82.3847957590, abs=1e-4)
     assert provenance["escaped_mass_fraction"] == pytest.approx(0.9551, abs=1e-10)
     assert max(map(abs, provenance["atom_closure_mol"].values())) < 1e-10
-    assert provenance["linear_temperature_diagnostic"]["refusal"] == "knudsen_extent_evaluation_limit"
+    assert provenance["linear_temperature_diagnostic"]["refusal"] == "residue_integration_budget_exceeded"
 
 
 def test_markova_vi_budget_exit_is_attempted_unavailable(
@@ -596,9 +596,9 @@ def test_markova_vi_budget_exit_is_attempted_unavailable(
     assert residual.execution.state is ExecutionState.ATTEMPTED_UNAVAILABLE
     assert residual.refusal is not None
     assert residual.refusal.reason is RefusalReason.ATTEMPTED_UNAVAILABLE
-    assert residual.refusal.detail["reason"] == "knudsen_extent_evaluation_limit"
+    assert residual.refusal.detail["reason"] == "residue_integration_budget_exceeded"
     assert residual.refusal.detail["detail"] == (
-        "RHS evaluation limit in 1748.15 K interval ending at mass-loss fraction 0.0146"
+        "RHS evaluation budget (1) exceeded in 1748.15 K interval ending at mass-loss fraction 0.0146"
     )
 
 

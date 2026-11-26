@@ -51,7 +51,7 @@ _KRESS91_UNAVAILABLE_STOICHIOMETRIC_FEO_SOURCE = (
 )
 _KNUDSEN_MAX_RHS_EVALUATIONS = 1024
 _KNUDSEN_MAX_LINEAR_RHS_EVALUATIONS = 512
-_KNUDSEN_EXTENT_EVALUATION_LIMIT = "knudsen_extent_evaluation_limit"
+_KNUDSEN_BUDGET_EXCEEDED = "residue_integration_budget_exceeded"
 TRACE_TAIL_BELOW_LOADER_CUTOFF = "trace_tail_below_loader_cutoff"
 _OXIDE_WT_PERCENT_REFERENCE_MASS_KG = 1.0
 _HASHIMOTO_PRIMARY_ALPHA_ARM = "alpha_common_unity_sensitivity"
@@ -130,6 +130,20 @@ class ResidueEngineNonconvergence(RuntimeError):
             "message": self.detail,
             "retry": self.retry,
         }
+
+
+def _knudsen_pressure_state_key(
+    inventory: Mapping[str, float], logp: float, temperature: float
+) -> tuple[tuple[tuple[str, str], ...], str, str]:
+    """Identify the exact dynamic inputs to one Knudsen pressure evaluation."""
+
+    composition = tuple(
+        sorted(
+            (str(species), float(amount).hex())
+            for species, amount in inventory.items()
+        )
+    )
+    return composition, float(logp).hex(), float(temperature).hex()
 
 
 class IsolatedOpenImccWorkerError(RuntimeError):
@@ -1412,21 +1426,22 @@ def integrate_knudsen_residue_inventory(
         _KNUDSEN_MAX_LINEAR_RHS_EVALUATIONS if linear_temperature else _KNUDSEN_MAX_RHS_EVALUATIONS
     )
     evaluations = 0
+    # The pressure closure and channels are fixed during this integration;
+    # these exact dynamic inputs fully identify each pressure evaluation.
+    pressure_state_cache: dict[
+        tuple[tuple[tuple[str, str], ...], str, str], Mapping[str, float]
+    ] = {}
     for (endpoint, temperature), logp in zip(path, source_fO2_log_by_interval):
         if logp is not None and (not math.isfinite(logp) or logp > 0.0):
             raise ResidueInventoryRefusal("oxygen_condition_invalid")
         stop = min(target, endpoint)
-        # The supplementary linear path shares one budget across its ramp.
-        # A slow sensitivity solve must not withhold a step-hold prediction.
-        if not linear_temperature:
-            evaluations = 0
-
         def derivative(extent, amounts):
             nonlocal evaluations
             if evaluations >= evaluation_limit:
                 raise ResidueInventoryRefusal(
-                    _KNUDSEN_EXTENT_EVALUATION_LIMIT,
-                    f"RHS evaluation limit in {temperature:g} K interval "
+                    _KNUDSEN_BUDGET_EXCEEDED,
+                    f"RHS evaluation budget ({evaluation_limit}) exceeded in "
+                    f"{temperature:g} K interval "
                     f"ending at mass-loss fraction {stop:g}",
                 )
             evaluations += 1
@@ -1443,7 +1458,12 @@ def integrate_knudsen_residue_inventory(
                 current_temperature = previous_temperature + fraction * (temperature - previous_temperature)
 
             def pressure_at(p):
-                pressures = pressure_model(current, p, current_temperature)
+                key = _knudsen_pressure_state_key(current, p, current_temperature)
+                try:
+                    pressures = pressure_state_cache[key]
+                except KeyError:
+                    pressures = pressure_model(current, p, current_temperature)
+                    pressure_state_cache[key] = pressures
                 _inherit_residue_pressure_contract(pressure_at, pressure_model)
                 return pressures
 
@@ -3131,6 +3151,7 @@ def predict_langmuir_residue_composition(
             total_pressure_Pa=p_bulk_Pa,
             engine_metadata=metadata,
             engine_flags=flags,
+            starting_inventory=initial,
             missing_channels_reason="residue_pressure_channels_missing",
             caller="Langmuir residue prediction",
         )
