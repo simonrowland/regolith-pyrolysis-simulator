@@ -1160,7 +1160,7 @@ def test_failure_envelope_survives_campaign_stop_projection_failure(monkeypatch)
         envelope_detail_unavailable="diagnostic envelope unavailable",
     )
 
-    def raise_campaign_stop_projection(_session):
+    def raise_campaign_stop_projection(_session, *, unresolved_errors=None):
         raise RuntimeError("campaign stop projection failed")
 
     monkeypatch.setattr(
@@ -1189,7 +1189,7 @@ def test_successful_output_survives_campaign_stop_projection_failure(monkeypatch
     execution = RunExecutor().execute_session(session, hours=1)
     base_payload = run._build_output_detail(execution)
 
-    def raise_campaign_stop_projection(_session):
+    def raise_campaign_stop_projection(_session, *, unresolved_errors=None):
         raise RuntimeError("campaign stop projection failed")
 
     monkeypatch.setattr(
@@ -1225,7 +1225,7 @@ def test_cached_failure_document_survives_campaign_stop_projection_failure(
     base_document = run._minimal_failure_output(execution)
     session._set_result_document(base_document)
 
-    def raise_campaign_stop_projection(_session):
+    def raise_campaign_stop_projection(_session, *, unresolved_errors=None):
         raise RuntimeError("campaign stop projection failed")
 
     monkeypatch.setattr(
