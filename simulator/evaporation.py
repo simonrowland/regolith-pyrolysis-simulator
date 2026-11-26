@@ -351,6 +351,51 @@ def evaporation_flux_refusal_from_configuration_error(
     )
 
 
+def oxide_fe_transport_ceiling_kg_hr(
+    partition: Mapping[str, Any] | None,
+    *,
+    molar_mass_kg_mol: float,
+) -> float | None:
+    """Pure-Fe Langmuir ceiling for the oxide Fe debit, or None.
+
+    The native pool books ``n_vapor = min(n_pool, C)`` on its own leg.
+    The leftover ``C - n_vapor/dt`` is 0 once that leg fills the hour.
+    The oxide debit is the series flux on the equilibrium Fe pressure.
+    The wiring helper recomputes that flux with no pool operand, so a
+    leftover of 0 must not replace it.
+
+    Premise: both legs already sit under the pure-Fe rate. The pool's
+    Antoine pressure is the a=1 reference, and the oxide pressure is
+    lower, so the oxide flux is below C when the two evaluations share
+    a transport law. Measured on the lunar short run at 1376 C: pool
+    C = 0.3377095204024725 mol/h = 0.018859388166876077 kg/h, oxide
+    flux = 0.0015862602556631648 kg/h.
+
+    Algebra: ceiling = C [mol/h] * M_Fe [kg/mol], in kg/h. The debit
+    is min(raw, ceiling) only when C > 0.
+
+    Limits: no partition, a non-finite C, or C = 0 (suppressed pool
+    capacity, and therefore no pool vapor) leaves the oxide flux
+    unchanged. C greater than the oxide rate leaves that rate unchanged.
+    The legs are not subtracted: a pool that already booked C plus this
+    oxide debit exceeds C by the oxide rate.
+    """
+
+    if not isinstance(partition, Mapping):
+        return None
+    raw = partition.get("native_fe_vapor_capacity_mol_hr")
+    try:
+        capacity_mol_hr = float(raw)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(capacity_mol_hr) or capacity_mol_hr <= 0.0:
+        return None
+    molar_mass = float(molar_mass_kg_mol)
+    if not math.isfinite(molar_mass) or molar_mass <= 0.0:
+        return None
+    return capacity_mol_hr * molar_mass
+
+
 def _vapour_debit_floor_kg_hr() -> float:
     """Publisher nontrivial-flux threshold, the melt-debit floor.
 
@@ -2844,36 +2889,25 @@ class EvaporationMixin:
             raw_below = below_payload.get('fluxes_kg_hr')
             if isinstance(raw_below, Mapping):
                 below_fluxes = raw_below
-        # Fe in either publisher bucket shares the residual cap. The
-        # allocation record stays on the published bucket only, which is
-        # what project_publisher_vapour_rates records.
+        # Fe in either publisher bucket is limited by the pure-Fe
+        # Langmuir ceiling, not by the pool's leftover. The allocation
+        # record stays on the published bucket only.
         fe_in_publisher = (
             (isinstance(flux_kg_hr, Mapping) and 'Fe' in flux_kg_hr)
             or 'Fe' in below_fluxes
         )
-        fe_residual_kg_hr = None
+        fe_ceiling_kg_hr = None
         if fe_in_publisher:
-            residual_capacity_mol = getattr(
-                self,
-                '_native_fe_vapor_residual_capacity_mol_this_hr',
-                None,
+            fe_ceiling_kg_hr = oxide_fe_transport_ceiling_kg_hr(
+                getattr(self, '_last_native_fe_partition_diagnostic', None),
+                molar_mass_kg_mol=float(
+                    molar_masses_kg_mol.get('Fe', 0.0) or 0.0
+                ),
             )
-            if residual_capacity_mol is not None:
-                fe_molar_mass = float(molar_masses_kg_mol.get('Fe', 0.0) or 0.0)
-                # Explicit scheduling policy, not an activity calculation:
-                # native-pool Fe claims the shared transport capacity first,
-                # then melt-derived Fe is capped at the residual molar
-                # capacity times M_Fe [kg/mol], yielding kg/h. No pool or
-                # melt activity is an operand here. Limiting cases: zero
-                # residual gives zero melt-derived Fe; residual >= raw
-                # rate/M_Fe leaves the raw melt-derived rate unchanged.
-                fe_residual_kg_hr = (
-                    max(0.0, float(residual_capacity_mol)) * fe_molar_mass
-                )
         projected = project_publisher_vapour_rates(
             diagnostic,
             liquid_fraction_factor=liquid_fraction_factor,
-            fe_residual_kg_hr=fe_residual_kg_hr,
+            fe_residual_kg_hr=fe_ceiling_kg_hr,
         )
         if projected.fe_allocation is not None:
             diagnostic['native_fe_capacity_allocation'] = projected.fe_allocation
