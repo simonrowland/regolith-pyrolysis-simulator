@@ -380,20 +380,6 @@ def _grid_floor_index(
     return floor_index
 
 
-def _warm_window_indices(grid: Tuple[float, ...], floor_index: int) -> range:
-    """Scan cell that held the previous bound, plus one cell each side.
-
-    ``floor_index`` is the greatest grid point at or below that bound.
-    Indices ``i-1 .. i+2`` are four grid points. A bound that landed on a
-    grid point makes the neighbouring cell ambiguous, and this span covers
-    both neighbours. A move of one scan step stays inside; a larger move
-    fails the bracket check and the caller scans the full grid.
-    """
-    start = max(0, floor_index - 1)
-    end = min(len(grid) - 1, floor_index + 2)
-    return range(start, end + 1)
-
-
 def find_liquidus_solidus_by_fraction(
     sample_fraction: Callable[..., float],
     *,
@@ -578,53 +564,71 @@ def find_liquidus_solidus_by_fraction(
         check_budget()
         return point
 
-    def _window_bracket(
-        indices: range,
+    def _already_sampled(temperature_C: float) -> Optional[MeltFractionSample]:
+        matched = [
+            point for point in samples
+            if point.temperature_C == temperature_C
+        ]
+        if len(matched) != 1:
+            return None
+        return matched[0]
+
+    def _sample_grid_point(index: int) -> MeltFractionSample:
+        existing = _already_sampled(grid[index])
+        if existing is not None:
+            return existing
+        return sample(grid[index])
+
+    def _unmelted(point: MeltFractionSample, *, liquid: bool) -> bool:
+        if liquid:
+            return point.frac_M < liquid_threshold
+        return point.frac_M <= solid_threshold
+
+    def _crossed(
+        low: MeltFractionSample,
+        high: MeltFractionSample,
+        *,
+        liquid: bool,
+    ) -> bool:
+        if liquid:
+            return (
+                low.frac_M < liquid_threshold
+                and high.frac_M >= liquid_threshold
+            )
+        return low.frac_M <= solid_threshold and high.frac_M > solid_threshold
+
+    def _lazy_bound_bracket(
+        floor_index: int,
         *,
         liquid: bool,
     ) -> Optional[tuple[MeltFractionSample, MeltFractionSample]]:
-        points: list[MeltFractionSample] = []
-        for index in indices:
-            matched = [
-                point for point in samples
-                if point.temperature_C == grid[index]
-            ]
-            if len(matched) != 1:
-                return None
-            points.append(matched[0])
-        if len(points) < 2:
+        # i is the greatest grid point at or below the previous bound.
+        # Sample that point first. The same cell is [i, i+1] when i is
+        # still unmelted. One cell up is [i+1, i+2]. One cell down is
+        # [i-1, i] when i is already melted. Anything farther full-scans.
+        if floor_index < 0 or floor_index >= len(grid):
             return None
-        if liquid:
-            if not points[0].frac_M < liquid_threshold:
-                return None
-        elif not points[0].frac_M <= solid_threshold:
+        floor_point = _sample_grid_point(floor_index)
+        if _unmelted(floor_point, liquid=liquid):
+            lower_point = floor_point
+            for step in (1, 2):
+                upper_index = floor_index + step
+                if upper_index >= len(grid):
+                    return None
+                upper_point = _sample_grid_point(upper_index)
+                if _crossed(lower_point, upper_point, liquid=liquid):
+                    return (lower_point, upper_point)
+                if not _unmelted(upper_point, liquid=liquid):
+                    return None
+                lower_point = upper_point
             return None
-        previous = points[0]
-        bracket = None
-        for current in points[1:]:
-            if liquid:
-                crossed = (
-                    previous.frac_M < liquid_threshold
-                    and current.frac_M >= liquid_threshold
-                )
-            else:
-                crossed = (
-                    previous.frac_M <= solid_threshold
-                    and current.frac_M > solid_threshold
-                )
-            if crossed:
-                bracket = (previous, current)
-                break
-            previous = current
-        if bracket is None:
+        lower_index = floor_index - 1
+        if lower_index < 0:
             return None
-        last = points[-1]
-        if liquid:
-            if last.frac_M < liquid_threshold:
-                return None
-        elif last.frac_M <= solid_threshold:
-            return None
-        return bracket
+        lower_point = _sample_grid_point(lower_index)
+        if _crossed(lower_point, floor_point, liquid=liquid):
+            return (lower_point, floor_point)
+        return None
 
     try:
         solidus_bracket = None
@@ -638,52 +642,46 @@ def find_liquidus_solidus_by_fraction(
         # the FeO quantum stays at 0.0001. 6.25 C is one bisection
         # dyadic of the 50 C grid, not noise.
         #
-        # Algebra: grid[i] = min(max_T, min_T + i * scan_step). The
-        # published solidus is the low side of its crossing cell and the
-        # published liquidus is the high side, so i = max {i : grid[i]
-        # <= T_prev} is that cell's lower edge, or the upper edge when
-        # the liquidus landed on a grid point. The window i-1 .. i+2 is
-        # the cell below, the cell that held T_prev, and the cell above.
-        # Both windows are sampled in increasing temperature before any
-        # bisection, and the crossing is accepted only when the first
-        # window sample is still on the unmelted side and the last is
-        # on the melted side.
+        # Algebra: grid[i] = min(max_T, min_T + i * scan_step). i = max
+        # {i : grid[i] <= T_prev}. When grid[i] is still unmelted the
+        # same cell is [i, i+1] and only those two points are sampled
+        # before _bisect_solidus / _bisect_liquidus. One cell up samples
+        # i+2 as well. One cell down, when grid[i] is already melted,
+        # samples i-1. A wider move samples at most those points, does
+        # not bisect, and falls through to the full grid.
         #
         # Unit check: halving a 50 C cell until the width is <= 2 C
         # lands on the same dyadic from either search, because both
-        # start _bisect_solidus / _bisect_liquidus on the same two grid
-        # neighbours. 50/2^3 = 6.25 C, then 3.125 C, then 1.5625 C,
-        # which is inside the 2 C tolerance.
+        # start from the same two grid neighbours. 50/2^3 = 6.25 C,
+        # then 3.125 C, then 1.5625 C, which is inside the 2 C
+        # tolerance. A same-cell hour is 2 grid points plus 5
+        # halvings per bound. 50/2^4 = 3.125 C is still above 2 C, so
+        # the fifth halving is required.
         #
         # Limiting cases. No previous curve, a non-finite hint, a hint
-        # outside the grid, or a crossing outside the window: the window
-        # samples are a subset of the grid, no bisection has run, and
-        # the search falls through to the full grid. Unique evaluations
-        # stay at one grid plus two bisections, inside the sample cap.
+        # outside the grid, or a crossing more than one cell away: the
+        # points already sampled are a subset of the grid, no bisection
+        # has run, and the search falls through to the full grid.
+        # Unique evaluations stay at one grid plus two bisections,
+        # inside the sample cap.
         #
         # Residual: a warm hit does not observe a temperature-specific
-        # refusal or a non-monotone dip strictly between the two windows.
-        # The grid endpoints are sampled before bisection, so a refusal
-        # there still fails the search. A composition-level refusal does
-        # not depend on temperature, so the first window sample still
-        # raises it. A move of more than one cell misses the window and
-        # full-scans.
+        # refusal outside the sampled cell, including the grid
+        # endpoints. A composition-level refusal does not depend on
+        # temperature, so the first sampled point still raises it. A
+        # move of more than one cell full-scans.
         warm_solidus = _finite_warm_hint(warm_solidus_T_C)
         warm_liquidus = _finite_warm_hint(warm_liquidus_T_C)
         if warm_solidus is not None and warm_liquidus is not None:
             solidus_floor = _grid_floor_index(grid, warm_solidus)
             liquidus_floor = _grid_floor_index(grid, warm_liquidus)
             if solidus_floor is not None and liquidus_floor is not None:
-                solidus_window = _warm_window_indices(grid, solidus_floor)
-                liquidus_window = _warm_window_indices(grid, liquidus_floor)
-                for index in sorted(set(solidus_window) | set(liquidus_window)):
-                    sample(grid[index])
-                solidus_bracket = _window_bracket(
-                    solidus_window,
+                solidus_bracket = _lazy_bound_bracket(
+                    solidus_floor,
                     liquid=False,
                 )
-                liquidus_bracket = _window_bracket(
-                    liquidus_window,
+                liquidus_bracket = _lazy_bound_bracket(
+                    liquidus_floor,
                     liquid=True,
                 )
                 if solidus_bracket is None or liquidus_bracket is None:
@@ -705,12 +703,6 @@ def find_liquidus_solidus_by_fraction(
                         tolerance,
                         closure_notices,
                     )
-                    for endpoint in (grid[0], grid[-1]):
-                        if not any(
-                            point.temperature_C == endpoint
-                            for point in samples
-                        ):
-                            sample(endpoint)
 
         if solidus_bracket is None:
             grid_points = [sample(T) for T in grid]

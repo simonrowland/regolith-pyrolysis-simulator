@@ -1087,6 +1087,7 @@ def test_warm_start_same_cell_matches_full_scan_with_fewer_samples():
         assert warm.solidus_T_C == reference.solidus_T_C
         assert warm.liquidus_T_C == reference.liquidus_T_C
         assert len(warm_calls) < len(reference_calls)
+        assert len(warm_calls) <= 16
         assert len(warm_calls) < len(cold_calls)
 
 
@@ -1128,7 +1129,7 @@ def test_unusable_warm_hint_runs_the_full_scan():
     assert calls == reference_calls
 
 
-def test_warm_start_still_refuses_a_grid_endpoint():
+def test_warm_start_refuses_when_the_bracket_cell_refuses():
     clean, _calls = _counting_sampler(_linear_melt(1000.0))
     cold = find_liquidus_solidus_by_fraction(clean, **_WARM_GRID)
     seen: list[float] = []
@@ -1136,11 +1137,11 @@ def test_warm_start_still_refuses_a_grid_endpoint():
     def sample(temperature_C: float) -> float:
         temperature = float(temperature_C)
         seen.append(temperature)
-        if temperature == _WARM_GRID['min_T_C']:
+        if temperature == 1000.0:
             raise LiquidusSampleError(
                 'out_of_domain',
-                ('cold grid end refused',),
-                {'reason': 'cold_end'},
+                ('bracket cell refused',),
+                {'reason': 'bracket_cell'},
             )
         return _linear_melt(1000.0)(temperature)
 
@@ -1151,5 +1152,6 @@ def test_warm_start_still_refuses_a_grid_endpoint():
         **_WARM_GRID,
     )
     assert result.status == 'out_of_domain'
-    assert _WARM_GRID['min_T_C'] in seen
-    assert len(seen) < 17
+    assert 1000.0 in seen
+    assert _WARM_GRID['min_T_C'] not in seen
+    assert len(seen) < 8
