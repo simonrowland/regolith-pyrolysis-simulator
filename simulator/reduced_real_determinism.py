@@ -2449,6 +2449,33 @@ def _paths_refer_to_same_file(left: Path, right: Path) -> bool:
     )
 
 
+def _pt1_row_bytes(value: Any, *, field: str, key_hash: str) -> bytes:
+    try:
+        return _sqlite_bytes(value)
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise PT1PersistentStoreCorrupt(
+            f"PT-1 row contains invalid {field} bytes: {key_hash}"
+        ) from exc
+
+
+def _pt1_row_json(raw: bytes, *, field: str, key_hash: str) -> Any:
+    try:
+        return json.loads(raw.decode("utf-8"))
+    except (ValueError, UnicodeDecodeError, RecursionError) as exc:
+        raise PT1PersistentStoreCorrupt(
+            f"PT-1 row contains invalid {field} JSON bytes: {key_hash}"
+        ) from exc
+
+
+def _pt1_row_key(raw: bytes, *, key_hash: str) -> Mapping[str, Any]:
+    value = _pt1_row_json(raw, field="key", key_hash=key_hash)
+    if not isinstance(value, Mapping):
+        raise PT1PersistentStoreCorrupt(
+            f"PT-1 row request key is not a mapping: {key_hash}"
+        )
+    return value
+
+
 class PT1PersistentEquilibriumStore:
     """Content-addressed SQLite store for PT-0 exact reduced-real payloads."""
 
@@ -2901,8 +2928,16 @@ class PT1PersistentEquilibriumStore:
                     if row_hash in seen_hashes:
                         continue
                     seen_hashes.add(row_hash)
-                    row_key_bytes = _sqlite_bytes(row["key_bytes"])
-                    row_key = json.loads(row_key_bytes.decode("utf-8"))
+                    if row["replay_scope_sha256"] != replay_scope_sha256:
+                        raise PT1PersistentStoreCorrupt(
+                            f"PT-1 row replay scope hash mismatch: {row_hash}"
+                        )
+                    row_key_bytes = _pt1_row_bytes(
+                        row["key_bytes"],
+                        field="key",
+                        key_hash=row_hash,
+                    )
+                    row_key = _pt1_row_key(row_key_bytes, key_hash=row_hash)
                     entry, decoded = self._entry_from_row(
                         row,
                         artifact=artifact,
@@ -2911,6 +2946,7 @@ class PT1PersistentEquilibriumStore:
                         key_hash=row_hash,
                         return_decoded=True,
                         expected_replay_scope_sha256=replay_scope_sha256,
+                        decoded_row_key=row_key,
                         admission_keys=(
                             (row_key, query_key)
                             if query_key is not None
@@ -3368,9 +3404,18 @@ class PT1PersistentEquilibriumStore:
         return_decoded: bool = False,
         admission_keys: Sequence[Mapping[str, Any]] | None = None,
         expected_replay_scope_sha256: str | None = None,
+        decoded_row_key: Mapping[str, Any] | None = None,
     ) -> Any:
-        row_key_bytes = _sqlite_bytes(row["key_bytes"])
-        row_payload_bytes = _sqlite_bytes(row["payload_bytes"])
+        row_key_bytes = _pt1_row_bytes(
+            row["key_bytes"],
+            field="key",
+            key_hash=key_hash,
+        )
+        row_payload_bytes = _pt1_row_bytes(
+            row["payload_bytes"],
+            field="payload",
+            key_hash=key_hash,
+        )
         payload_codec_version = (
             row["payload_codec_version"]
             if "payload_codec_version" in row.keys()
@@ -3401,34 +3446,60 @@ class PT1PersistentEquilibriumStore:
             raise PT1PersistentStoreCorrupt(
                 f"PT-1 row payload bytes mismatch: {key_hash}"
             )
+        row_key = (
+            decoded_row_key
+            if decoded_row_key is not None
+            else _pt1_row_key(row_key_bytes, key_hash=key_hash)
+        )
         try:
-            row_key = json.loads(row_key_bytes.decode("utf-8"))
-            row_payload = json.loads(row_payload_bytes.decode("utf-8"))
-        except (json.JSONDecodeError, UnicodeDecodeError) as exc:
+            canonical_key_bytes = canonical_json_bytes(row_key)
+        except (TypeError, ValueError, OverflowError, RecursionError) as exc:
             raise PT1PersistentStoreCorrupt(
-                f"PT-1 row contains invalid JSON bytes: {key_hash}"
+                f"PT-1 row request key cannot be canonicalized: {key_hash}"
             ) from exc
-        if canonical_json_bytes(row_key) != row_key_bytes:
+        if canonical_key_bytes != row_key_bytes:
             raise PT1PersistentStoreCorrupt(
                 f"PT-1 row non-canonical request bytes: {key_hash}"
-            )
-        canonical_payload_bytes = _payload_integrity_bytes(row_payload)
-        if canonical_payload_bytes != row_payload_bytes:
-            raise PT1PersistentStoreCorrupt(
-                f"PT-1 row non-canonical payload bytes: {key_hash}"
             )
         if row_key != _json_ready(key):
             raise PT1PersistentStoreCorrupt(
                 f"PT-1 row canonical request mismatch: {key_hash}"
             )
         if expected_replay_scope_sha256 is not None:
-            row_replay_scope = _replay_scope_hash(
-                canonical_physics_bucket_key_from_replay_key(row_key)
-            )
+            try:
+                row_replay_scope = _replay_scope_hash(
+                    canonical_physics_bucket_key_from_replay_key(row_key)
+                )
+            except (
+                AttributeError,
+                KeyError,
+                TypeError,
+                ValueError,
+                OverflowError,
+                RecursionError,
+            ) as exc:
+                raise PT1PersistentStoreCorrupt(
+                    f"PT-1 row exact key replay scope is invalid: {key_hash}"
+                ) from exc
             if row_replay_scope != expected_replay_scope_sha256:
                 raise PT1PersistentStoreCorrupt(
                     f"PT-1 row exact key replay scope mismatch: {key_hash}"
                 )
+        row_payload = _pt1_row_json(
+            row_payload_bytes,
+            field="payload",
+            key_hash=key_hash,
+        )
+        try:
+            canonical_payload_bytes = _payload_integrity_bytes(row_payload)
+        except (TypeError, ValueError, OverflowError, RecursionError) as exc:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row payload cannot be canonicalized: {key_hash}"
+            ) from exc
+        if canonical_payload_bytes != row_payload_bytes:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row non-canonical payload bytes: {key_hash}"
+            )
         admission = _decode_payload_for_admission(
             artifact,
             row_payload,
@@ -3474,9 +3545,11 @@ class PT1PersistentEquilibriumStore:
         physics_bucket_hash: str,
         query_key: Mapping[str, Any] | None = None,
     ) -> tuple[dict[str, Any], Any]:
-        row_key_bytes = _sqlite_bytes(row["key_bytes"])
-        row_key = json.loads(row_key_bytes.decode("utf-8"))
-        row_physics_bytes = _sqlite_bytes(row["physics_key_bytes"])
+        row_physics_bytes = _pt1_row_bytes(
+            row["physics_key_bytes"],
+            field="physics bucket key",
+            key_hash=str(row["key_hash"]),
+        )
         if row["physics_bucket_schema_version"] != PHYSICS_BUCKET_SCHEMA_VERSION:
             raise PT1PersistentStoreCorrupt(
                 "PT-1 row physics bucket schema drift: "
@@ -3495,8 +3568,30 @@ class PT1PersistentEquilibriumStore:
             raise PT1PersistentStoreCorrupt(
                 f"PT-1 row physics bucket bytes mismatch: {physics_bucket_hash}"
             )
-        exact_physics_key = canonical_physics_bucket_key_from_replay_key(row_key)
-        exact_physics_bytes = canonical_json_bytes(exact_physics_key)
+        row_key_hash = str(row["key_hash"])
+        row_key_bytes = _pt1_row_bytes(
+            row["key_bytes"],
+            field="key",
+            key_hash=row_key_hash,
+        )
+        row_key = _pt1_row_key(row_key_bytes, key_hash=row_key_hash)
+        try:
+            exact_physics_key = canonical_physics_bucket_key_from_replay_key(
+                row_key
+            )
+            exact_physics_bytes = canonical_json_bytes(exact_physics_key)
+        except (
+            AttributeError,
+            KeyError,
+            TypeError,
+            ValueError,
+            OverflowError,
+            RecursionError,
+        ) as exc:
+            raise PT1PersistentStoreCorrupt(
+                "PT-1 row exact key cannot reproduce physics bucket: "
+                f"{physics_bucket_hash}"
+            ) from exc
         if (
             exact_physics_bytes != physics_bucket_bytes
             or _sha256(exact_physics_bytes) != physics_bucket_hash
@@ -3512,6 +3607,7 @@ class PT1PersistentEquilibriumStore:
             key_bytes=row_key_bytes,
             key_hash=str(row["key_hash"]),
             return_decoded=True,
+            decoded_row_key=row_key,
             admission_keys=(
                 (row_key, query_key)
                 if query_key is not None
@@ -3530,8 +3626,6 @@ class PT1PersistentEquilibriumStore:
         rung_hash: str,
         query_key: Mapping[str, Any] | None = None,
     ) -> tuple[dict[str, Any], Any]:
-        row_key_bytes = _sqlite_bytes(row["key_bytes"])
-        row_key = json.loads(row_key_bytes.decode("utf-8"))
         row_hash = row[_physics_ladder_hash_column(rung_tag)]
         if row_hash != rung_hash:
             raise PT1PersistentStoreCorrupt(
@@ -3546,19 +3640,49 @@ class PT1PersistentEquilibriumStore:
             raise PT1PersistentStoreCorrupt(
                 f"PT-1 row {rung_tag} distance is missing: {rung_hash}"
             )
-        row_rung_key = canonical_physics_ladder_bucket_key_from_replay_key(
-            row_key,
-            rung_tag,
+        try:
+            indexed_distance = float(row_distance)
+        except (TypeError, ValueError, OverflowError) as exc:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row {rung_tag} distance is invalid: {rung_hash}"
+            ) from exc
+        if not math.isfinite(indexed_distance):
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row {rung_tag} distance is invalid: {rung_hash}"
+            )
+        row_key_hash = str(row["key_hash"])
+        row_key_bytes = _pt1_row_bytes(
+            row["key_bytes"],
+            field="key",
+            key_hash=row_key_hash,
         )
-        if _sha256(canonical_json_bytes(row_rung_key)) != rung_hash:
+        row_key = _pt1_row_key(row_key_bytes, key_hash=row_key_hash)
+        try:
+            row_rung_key = canonical_physics_ladder_bucket_key_from_replay_key(
+                row_key,
+                rung_tag,
+            )
+            row_rung_hash = _sha256(canonical_json_bytes(row_rung_key))
+            expected_distance = physics_ladder_bucket_distance_from_replay_key(
+                row_key,
+                rung_tag,
+            )
+        except (
+            AttributeError,
+            KeyError,
+            TypeError,
+            ValueError,
+            OverflowError,
+            RecursionError,
+        ) as exc:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row exact key cannot reproduce {rung_tag} index: {rung_hash}"
+            ) from exc
+        if row_rung_hash != rung_hash:
             raise PT1PersistentStoreCorrupt(
                 f"PT-1 row exact key does not reproduce {rung_tag} hash: {rung_hash}"
             )
-        expected_distance = physics_ladder_bucket_distance_from_replay_key(
-            row_key,
-            rung_tag,
-        )
-        if float(row_distance) != expected_distance:
+        if indexed_distance != expected_distance:
             raise PT1PersistentStoreCorrupt(
                 f"PT-1 row {rung_tag} distance mismatch: {rung_hash}"
             )
@@ -3569,6 +3693,7 @@ class PT1PersistentEquilibriumStore:
             key_bytes=row_key_bytes,
             key_hash=str(row["key_hash"]),
             return_decoded=True,
+            decoded_row_key=row_key,
             admission_keys=(
                 (row_key, query_key)
                 if query_key is not None
