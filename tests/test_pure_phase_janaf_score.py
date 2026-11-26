@@ -924,6 +924,7 @@ def test_catalogue_magemin_endmembers_resolve_in_the_verb1_table():
 
 # Element counts in the JANAF formation reaction. Oxygen is O2, not O.
 _ELEMENT_COUNTS = {
+    'CaO': {'Ca': 1.0, 'O2': 0.5},
     'MgO': {'Mg': 1.0, 'O2': 0.5},
     'SiO2': {'Si': 1.0, 'O2': 1.0},
     'Al2O3': {'Al': 2.0, 'O2': 1.5},
@@ -1009,6 +1010,7 @@ def test_ref_tables_reproduce_printed_dfG_across_element_phase_changes():
     """1000 K is liquid Mg and Al; 1500 K is Mg gas. Separate liquid tables are not the reference."""
 
     cases = (
+        ('Ca-027', 'CaO', 1000.0),
         ('Mg-008', 'MgO', 1000.0),
         ('Mg-008', 'MgO', 1500.0),
         ('Al-096', 'Al2O3', 1000.0),

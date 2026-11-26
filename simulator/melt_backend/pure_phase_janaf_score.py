@@ -132,6 +132,7 @@ MELTS_QUARTZ_ADJUSTMENT_KJ_MOL = -1.291
 # l tables do not share that zero (Mg boils at 1366.104 K, so the 1500 K
 # reference is the gas row of Mg-001, not Mg-003 liquid).
 ELEMENT_REFERENCE_TABLES: Mapping[str, str] = {
+    'Ca': 'Ca-001',
     'Mg': 'Mg-001',
     'Al': 'Al-001',
     'Si': 'Si-001',
