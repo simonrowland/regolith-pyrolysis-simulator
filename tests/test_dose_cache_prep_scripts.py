@@ -84,6 +84,7 @@ def _put_real_equilibrium_cache_row(
 
     capture = rrd.PT0DeterminismStore("capture")
     sim, result = _pt0_equilibrium_capture_context(capture)
+    sim._last_vapor_pressures_source = {"Na": "builtin_authoritative"}
     key = capture._equilibrium_key(sim)
     if tag is not None:
         key["code_version"] = f"test:{tag}"
@@ -277,6 +278,33 @@ def test_reduced_real_prune_reports_delete_when_vacuum_fails_and_retries(
         "equilibrium_post_record": 0,
     }
     assert retry_summary["vacuumed"] is True
+
+
+def test_reduced_real_prune_dry_run_reads_one_snapshot(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    db_path = tmp_path / "reduced-real-read-snapshot.sqlite"
+    _put_cache_row(db_path, tag="read-snapshot")
+    real_connect = sqlite3.connect
+    read_transaction_states: list[bool] = []
+
+    class TrackingConnection(sqlite3.Connection):
+        def execute(self, sql, parameters=()):
+            if sql.lstrip().upper().startswith(("SELECT", "PRAGMA")):
+                read_transaction_states.append(self.in_transaction)
+            return super().execute(sql, parameters)
+
+    def tracking_connect(*args, **kwargs):
+        return real_connect(*args, factory=TrackingConnection, **kwargs)
+
+    monkeypatch.setattr(rrd.sqlite3, "connect", tracking_connect)
+
+    result = rrd._prune_pt1_payload_codec_rows(db_path)
+
+    assert result["dry_run"] is True
+    assert read_transaction_states
+    assert all(read_transaction_states)
 
 
 def _put_internal_analytical_cache_row(db_path: Path) -> None:

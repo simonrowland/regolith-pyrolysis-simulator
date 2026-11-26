@@ -205,8 +205,7 @@ def _prune_pt1_payload_codec_rows(
         str(path), timeout=DEFAULT_SHARD_BUSY_TIMEOUT_MS / 1000
     )
     try:
-        if apply:
-            connection.execute("BEGIN IMMEDIATE")
+        connection.execute("BEGIN IMMEDIATE" if apply else "BEGIN")
 
         table_exists = connection.execute(
             "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?",
@@ -271,6 +270,8 @@ def _prune_pt1_payload_codec_rows(
                 _vacuum_pt1_cache(connection)
             except sqlite3.Error as exc:
                 vacuum_error = f"{type(exc).__name__}: {exc}"
+        else:
+            connection.commit()
     except BaseException:
         if connection.in_transaction:
             connection.rollback()
