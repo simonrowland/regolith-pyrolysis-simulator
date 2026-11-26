@@ -12,6 +12,7 @@ import yaml
 import simulator.capacity_coupling as capacity_coupling
 import simulator.chemistry.melt_activity as melt_activity
 from engines.builtin.evaporation_flux import _NONTRIVIAL_FLUX_KG_HR
+from engines.builtin.evaporation_transition import _NUMERICAL_FLOOR_KG
 from engines.builtin.overhead_bleed import (
     BuiltinOverheadBleedProvider,
     OXYGEN_SPECIES,
@@ -1225,14 +1226,45 @@ def test_default_off_c0_pipe_cap_preserves_hot_fe_redox_split_head_result(monkey
         for species, rate in snapshot.evap_flux.species_kg_hr.items()
         if float(rate) > 0.0
     }
-    # The transition provider refuses the whole carrier when its O2
-    # coproduct is at or below 1e-12 kg, even if the parent debit
-    # clears that floor. That keeps a small coproduct from accumulating
-    # an oxygen deficit across carriers. After this scale the refused
-    # tail (TiO's oxygen leg, plus the smaller carriers) is
-    # 1.4066932839916502e-12 kg/h and stays in the melt. The closure
-    # bound is that tail. At the old -9 seed the tail fit in 1e-12.
-    assert abs(released_kg_hr - capacity_kg_hr) <= 1.4066932839916502e-12
+    # The pipe scale is capacity/demand, so the scaled carrier rates sum
+    # to capacity. The transition provider then refuses a carrier before
+    # booking it. Premise: the floor is 1e-12 kg on the tick mass
+    # (engines/builtin/evaporation_transition.py), and dt_hr is this step.
+    # Algebra: leg_kg = rate_kg_hr * dt_hr * stoich_kg_per_kg. The parent
+    # debit at or below the floor returns no transition. A parent that
+    # clears it still returns none when the O2 coproduct is positive and
+    # at or below the floor, so a small coproduct cannot accumulate an
+    # oxygen deficit across carriers. The refused tail is those vapor
+    # rates in kg/h. Unit check: both stoich ratios are kg/kg, so the
+    # legs are kg and the tail stays kg/h. Limiting case: no refused
+    # carrier leaves the tail at 0 and requires released == capacity.
+    # TiO is the carrier whose parent clears the floor and whose O2 leg
+    # does not. Oxide vapor with a zero O2 coproduct fails on the parent
+    # debit instead. The closure uses the existing flux floor because
+    # the tail is that sum, not a measured gap.
+    scale = capacity_kg_hr / demand_kg_hr
+    dt_hr = float(sim.process_dt_hr())
+    refused_terms: list[float] = []
+    for species, demand_i in demand_species.items():
+        scaled_kg_hr = float(demand_i) * scale
+        if scaled_kg_hr <= 0.0:
+            continue
+        sp_data = sim.vapor_pressures.get("metals", {}).get(species) or (
+            sim.vapor_pressures.get("oxide_vapors", {}).get(species) or {}
+        )
+        stoich = sim._evaporation_stoich(species, sp_data)
+        oxide_kg = scaled_kg_hr * dt_hr * float(stoich["oxide_per_product_kg"])
+        o2_kg = scaled_kg_hr * dt_hr * float(stoich["O2_per_product_kg"])
+        if (
+            oxide_kg <= _NUMERICAL_FLOOR_KG
+            or 0.0 < abs(o2_kg) <= _NUMERICAL_FLOOR_KG
+        ):
+            refused_terms.append(scaled_kg_hr)
+    refused_tail_kg_hr = math.fsum(refused_terms)
+    assert refused_tail_kg_hr > 0.0
+    assert abs(
+        released_kg_hr + refused_tail_kg_hr - capacity_kg_hr
+    ) <= _NONTRIVIAL_FLUX_KG_HR
     assert demand_kg_hr - capacity_kg_hr > _NONTRIVIAL_FLUX_KG_HR
 
     def _committed_vapor_kg(species: str) -> float:
