@@ -253,6 +253,7 @@ def test_scoring_modes_keep_distinct_keys_notices_and_store_outputs() -> None:
         Engine.INTERNAL_ANALYTICAL,
         context=context,
         prediction=prediction,
+        fo2_mode=Fo2Mode.SHARED_LADDER,
     )
     intrinsic, _candidate = compile_residual(
         observation,
@@ -266,7 +267,7 @@ def test_scoring_modes_keep_distinct_keys_notices_and_store_outputs() -> None:
     assert shared.fo2_mode is Fo2Mode.SHARED_LADDER
     assert intrinsic.fo2_mode is Fo2Mode.ENGINE_INTRINSIC
     assert shared.key != intrinsic.key
-    assert any(
+    assert not any(
         notice.fo2_mode is Fo2Mode.SHARED_LADDER for notice in shared.notices
     )
     assert any(
@@ -275,7 +276,7 @@ def test_scoring_modes_keep_distinct_keys_notices_and_store_outputs() -> None:
     )
     assert residual_to_plain(shared)["fo2_mode"] == "shared_ladder"
     assert residual_to_plain(intrinsic)["fo2_mode"] == "engine_intrinsic"
-    assert any(
+    assert not any(
         notice.get("fo2_mode") == "shared_ladder"
         for notice in residual_to_plain(shared)["notices"]
     )
@@ -617,6 +618,7 @@ def test_named_buffer_notice_uses_the_inclusive_frost_temperature_band() -> None
         )
         experiment = replace(
             experiment,
+            method=State.of(MethodToken.LANGMUIR_FREE_EVAPORATION),
             fO2_control=FO2Control(
                 channel=State.of(FO2Channel.BUFFER),
                 buffer=F.located("IW"),

@@ -59,12 +59,14 @@ def test_vapour_pin_changes_the_binding_to_the_owner_decision() -> None:
         temperature_K=temperature_K,
         controls={},
         quantity_class="vapour",
+        phase_basis="solid_bearing",
     )
     controls = {"role_engine_override": {"vapour": "internal-analytical"}}
     pinned = openimcc_binding_selected_by_inputs(
         temperature_K=temperature_K,
         controls=controls,
         quantity_class="vapour",
+        phase_basis="solid_bearing",
     )
     owner = _resolve(
         temperature_K=temperature_K,
@@ -131,7 +133,12 @@ def _stub_pressure_branches(monkeypatch, ia_response: object) -> list[str]:
     return calls
 
 
-def _pressure_model(engine: str, temperature_K: float, role_override):
+def _pressure_model(
+    engine: str,
+    temperature_K: float,
+    role_override,
+    starting_inventory: dict[str, float],
+):
     return _make_residue_pressure_model(
         engine,
         (("SiO", ("SiO2", 1.0, 0.0)),),
@@ -140,6 +147,7 @@ def _pressure_model(engine: str, temperature_K: float, role_override):
         total_pressure_Pa=1.0,
         engine_metadata={},
         engine_flags=set(),
+        starting_inventory=starting_inventory,
         missing_channels_reason="residue_pressure_channels_missing",
         caller="role pin test",
         role_override=role_override,
@@ -157,16 +165,18 @@ def test_dropping_the_override_restores_the_unpinned_binding(monkeypatch) -> Non
     calls = _stub_pressure_branches(monkeypatch, ia_response)
     above = BUILTIN_VAPOUR_CHANNEL_SWITCH_K + 10.0
     inventory = {"SiO2": 1.0}
-    pinned = _pressure_model("openimcc", above, {"vapour": "internal-analytical"})
-    pinned_pressures = pinned(dict(inventory), -8.0)
-    assert pinned_pressures == {"SiO": 12.5}
+    pinned = _pressure_model(
+        "openimcc", above, {"vapour": "internal-analytical"}, inventory
+    )
+    pinned_pressures = pinned(dict(inventory), 0.0)
+    assert pinned_pressures.pressures_Pa == {"SiO": 12.5}
     assert pinned.role_engine_decision["vapour"] == "internal-analytical"
     assert calls == ["internal-analytical"]
 
     calls.clear()
     below = BUILTIN_VAPOUR_CHANNEL_SWITCH_K - 10.0
-    unpinned = _pressure_model("openimcc", below, None)
-    unpinned_pressures = unpinned(dict(inventory), -8.0)
+    unpinned = _pressure_model("openimcc", below, None, inventory)
+    unpinned_pressures = unpinned(dict(inventory), 0.0)
     # Below the switch the gate would select internal-analytical. The unpinned
     # closure still runs the engine argument, so these pressures are OpenIMCC's.
     assert unpinned_pressures == {"SiO": 2.0 * PA_PER_BAR}
@@ -194,11 +204,12 @@ def test_residue_consumer_uses_the_owner_override(monkeypatch) -> None:
             "role_engine_override": pin,
         },
         quantity_class="vapour",
+        phase_basis="missing",
     )
     assert (decision.vapour == "openimcc") is binding
     inventory = {"NotAnOxide": 1.0}
-    model = _pressure_model("internal-analytical", temperature_K, pin)
-    pressures = model(inventory, -8.0)
+    model = _pressure_model("internal-analytical", temperature_K, pin, inventory)
+    pressures = model(inventory, 0.0)
     assert pressures == {"SiO": 2.0 * PA_PER_BAR}
     assert inventory == {"NotAnOxide": 1.0}
     assert model.role_engine_decision["vapour"] == "openimcc"
@@ -225,6 +236,7 @@ def test_vapour_and_constant_gamma_do_not_load_the_activity_domain(monkeypatch) 
         temperature_K=BUILTIN_VAPOUR_CHANNEL_SWITCH_K,
         controls={},
         quantity_class="vapour",
+        phase_basis="solid_bearing",
     ) is False
     assert openimcc_binding_selected_by_inputs(
         temperature_K=BUILTIN_VAPOUR_CHANNEL_SWITCH_K + 10.0,
@@ -244,11 +256,13 @@ def test_consumer_follows_the_vapour_switch_constant(monkeypatch) -> None:
         temperature_K=shifted - 10.0,
         controls={},
         quantity_class="vapour",
+        phase_basis="solid_bearing",
     )
     above = openimcc_binding_selected_by_inputs(
         temperature_K=shifted + 10.0,
         controls={},
         quantity_class="vapour",
+        phase_basis="solid_bearing",
     )
     assert below is (_resolve(
         temperature_K=shifted - 10.0,
@@ -313,6 +327,7 @@ def test_residue_without_a_vapour_pin_stores_the_gate(monkeypatch) -> None:
         temperature_K=above,
         controls={"high_t_melt_activity": "openimcc", "role_engine_override": pin},
         quantity_class="vapour",
+        phase_basis="missing",
     )
     assert decision.phase_equilibrium == "magemin"
     assert decision.redox == "source_oxygen"
@@ -346,8 +361,8 @@ def test_residue_without_a_vapour_pin_stores_the_gate(monkeypatch) -> None:
         fake_core,
     )
     below = BUILTIN_VAPOUR_CHANNEL_SWITCH_K - 10.0
-    model = _pressure_model("internal-analytical", below, pin)
-    assert model({"SiO2": 1.0}, -8.0) == {"SiO": 12.5}
+    model = _pressure_model("internal-analytical", below, pin, {"SiO2": 1.0})
+    assert model({"SiO2": 1.0}, 0.0).pressures_Pa == {"SiO": 12.5}
     assert model.role_engine_decision["vapour"] == "internal-analytical"
     assert not hasattr(cores[-1], "_role_engine_override")
     assert not hasattr(cores[-1], "_high_t_melt_activity")
@@ -531,9 +546,10 @@ def test_analytical_handoff_fires_on_the_response_crossing(monkeypatch) -> None:
         "internal-analytical",
         1800.0,
         {"vapour": "internal-analytical", "phase_equilibrium": "magemin"},
+        inventory,
     )
-    pressures = model(inventory, -8.0)
-    assert pressures == {"SiO": 12.5}
+    pressures = model(inventory, 0.0)
+    assert pressures.pressures_Pa == {"SiO": 12.5}
     assert inventory == {"NotAnOxide": 1.0}
     codes = _notice_codes(model.handoff_notices)
     assert "handoff_activity_standard_state_mismatch" in codes

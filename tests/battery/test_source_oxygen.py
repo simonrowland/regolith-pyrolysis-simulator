@@ -232,7 +232,7 @@ def test_linked_oxygen_replaces_stale_derived_identity_in_prediction_and_compari
 def test_linked_oxygen_is_below_printed_controls_in_the_scorer(
     source_context, monkeypatch, printed_control
 ):
-    from simulator.battery.fo2_ladder import resolve_row_fo2
+    from simulator.battery.fo2_ladder import fo2_tier_notice, resolve_row_fo2
 
     original = _row(source_context, "shornikov-1994-mullite-kems")
     temperature = Decimal("1200")
@@ -323,13 +323,9 @@ def test_linked_oxygen_is_below_printed_controls_in_the_scorer(
     assert len(requests) == 1
     assert requests[0].mode == battery.PO2_COMMANDED
     assert requests[0].po2_bar == pytest.approx(expected_bar)
-    assert any(
-        notice.reason == (
-            f"fo2_tier={resolved.tier}; "
-            f"physics_rung=1:printed_fO2_or_buffer; route={resolved.route}"
-        )
-        for notice in prediction.notices
-    )
+    expected_tier_notice = fo2_tier_notice(Quantity.P_PARTIAL, resolved)
+    assert expected_tier_notice is not None
+    assert expected_tier_notice in prediction.notices
     assert not any(
         notice.origin == "source oxygen selection"
         and notice.reason.startswith("measured condition: same-cell source-linked oxygen;")
@@ -366,10 +362,7 @@ def test_linked_oxygen_is_below_printed_controls_in_the_scorer(
     assert selected["fo2_tier"] == resolved.tier
     assert selected["physics_rung"] == 1
     assert selected["route"] == resolved.route
-    assert _single_physics_rung(residual.notices) == (
-        f"fo2_tier={resolved.tier}; physics_rung=1:printed_fO2_or_buffer; "
-        f"route={resolved.route}"
-    )
+    assert _single_physics_rung(residual.notices) == expected_tier_notice.reason
 
 
 def test_conditioning_cell_gases_remain_visible_but_are_not_scored(source_context):

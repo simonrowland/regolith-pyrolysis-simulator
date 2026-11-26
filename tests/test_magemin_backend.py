@@ -3734,10 +3734,6 @@ def test_magemin_remote_builtin_with_multi_argument_constructor_is_preserved():
     ('override', 'exception_type', 'message'),
     (
         pytest.param(
-            {'fO2_log': None},
-            'TypeError', 'declared scalar must be numeric', id='none-fo2',
-        ),
-        pytest.param(
             {'pressure_bar': 'oops'},
             'TypeError', 'declared scalar must be numeric', id='bad-pressure',
         ),
@@ -3822,6 +3818,36 @@ def test_magemin_equilibrate_invalid_declared_scalar_is_typed_refusal(
         or isinstance(override.get('fO2_log'), np.bool_)
     ):
         assert calls == []
+
+
+def test_magemin_omitted_fo2_uses_flagged_nominal_transport_control():
+    calls = []
+
+    def fake_minimize(**kwargs):
+        calls.append(kwargs)
+        return {'phases': {'liq': {'mass_kg': 1.0}}}
+
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = 'pymagemin'
+    backend._magemin_module = types.SimpleNamespace(minimize=fake_minimize)
+
+    result = backend.equilibrate(
+        temperature_C=1500.0,
+        composition_mol={'SiO2': 1.0},
+        pressure_bar=1.0,
+        fO2_log=None,
+    )
+
+    nominal = magemin_module.MAGEMIN_NOMINAL_FO2_LOG
+    omission = result.diagnostics[
+        magemin_module.MAGEMIN_OMITTED_OXYGEN_DEFAULT_DIAGNOSTIC
+    ]
+    assert result.status == 'ok'
+    assert calls[0]['log_fO2'] == nominal
+    assert omission['value'] == nominal
+    assert 'oxygen input omitted' in omission['reason']
+    assert any('used nominal fO2_log=' in warning for warning in result.warnings)
 
 
 # engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.

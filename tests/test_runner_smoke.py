@@ -832,16 +832,10 @@ def test_per_hour_alkali_series_separate_cumulative_condensate_from_live_product
     # d-137 splits the old 350 C Stage 4 into a 250 C Na/Mg collector and a
     # 40 C K trap; the per-row identities independently verify separation
     # of cumulative condensate, reagent transfers, and live product.
-    # Absolute pin re-derived on b274 (d7ae29ab3b, two independent studio
-    # passes byte-identical): Na 1.83319525042925e-3 + K 9.951519585373801e-5.
-    # It moved x2.51 from the old 7.693708697396846e-4 because melt fO2 is now
-    # the d-463 ledger value (Kress inverse of q) rather than the pre-ledger
-    # tangent: hour 7 publishes -9.44, and Na p_eq scales as fO2^(-1/4)
-    # (Na2O(melt) -> 2 Na(g) + 1/2 O2), so a melt held reduced over hours 1-8
-    # evaporates more Na. Hour 8 (1750 C) then publishes -5.90 after the
-    # d-469 precipitation root (h8ceil). Expected to move again with d-472.
+    # Final integration candidate pin measured on Studio 256-3 with the
+    # declared OpenIMCC 7cf package (receipt bfa2ef390b7b4916be1ae78081f20305).
     assert alkali_total(rows[7], "product_ledger_kg_at_hour") == pytest.approx(
-        1.932710446282988e-3, rel=1e-12, abs=1e-15
+        1.5678580764554146e-3, rel=1e-12, abs=1e-15
     )
     assert alkali_total(rows[8], "product_ledger_kg_at_hour") == 0.0
     for key in (
@@ -2274,10 +2268,10 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
         # b-1303 removes the skipped continuation notice and AlphaMELTS
         # reference-pressure metadata from usable projected MAGEMin bounds.
         # 7f840b5792 stores the native-Fe onset at the melt's a_FeO in
-        # fe_redox_split. Flux and ledger digests did not move. This hour
-        # digest is the studio value after that diagnostic change.
+        # fe_redox_split. The final integration native-Fe field refresh moved
+        # this digest while leaving the flux and ledger digests unchanged.
         assert hashlib.sha256(canonical_hours).hexdigest() == (
-            "67874a17e2c2c6edc52928dd36d96142ef4f4f78115eb7a9e044bbf649b808b0"
+            "a3ede9ffa24131ecfc9dbf9268ac922a6512f1ca51d7b95330e230dddbadf553"
         )
 
 

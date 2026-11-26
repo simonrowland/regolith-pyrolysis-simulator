@@ -435,7 +435,7 @@ def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
     ).encode()
     # Regenerated at OpenIMCC chemistry v4 on the final integration stack.
     assert hashlib.sha256(encoded).hexdigest() == (
-        "a3f1a432d953ba786e7cad4e212ce60e194f1d51e298bb8dffd5bbd270dbc292"
+        "d8fb776f58802ff84a651473d6b466a839148e3ed9ae4f0446e71b2a3f0abd8d"
     )
     for backlog in (
         score_module.notice_backlog(residuals),
@@ -444,7 +444,7 @@ def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
         ),
     ):
         assert backlog.get(NoticeKind.SOURCE_DISAGREEMENT.value, 0) == 0
-        assert backlog["engine_model_caveat"] == 142
+        assert backlog["engine_model_caveat"] == 178
         assert backlog["admission_defaulted"] == 18
         assert backlog["total_iron_reported_as_feo"] == 18
     assert all(
@@ -2377,6 +2377,7 @@ def _borisov_score_context(*, vacuum=False, named_valence=False):
         "method": State.of(MethodToken.LANGMUIR_FREE_EVAPORATION),
     }
     if vacuum:
+        changes["apparatus"] = None
         changes["pressure_environment"] = replace(
             experiment.pressure_environment,
             total_pressure_Pa=F.located(
@@ -2689,8 +2690,12 @@ def test_redox_dispatcher_types_named_valence_and_vacuum_substitution():
         )
     )
     assert bound_invalid is None
-    assert bound_bar == pytest.approx(1e-9)
-    assert bound_pressure.value == Decimal("0.0001")
+    assert bound_bar == pytest.approx(1.01325)
+    assert bound_pressure.value == Decimal("101325")
+    assert _bound_notice is not None
+    assert _bound_notice.policy is not None
+    assert _bound_notice.policy.id == "DP-001"
+    assert "located pressure bound <= 0.0001 Pa" in _bound_notice.reason
     bound_oxygen = oxygen_condition(bound_experiment, vacuum_bench, vacuum_row)
     assert any(
         route.route == "vacuum_total_pressure_upper_bound"
@@ -2711,8 +2716,12 @@ def test_redox_dispatcher_types_named_valence_and_vacuum_substitution():
         )
     )
     assert knudsen_invalid is None
-    assert knudsen_bar == pytest.approx(1e-9)
-    assert knudsen_pressure.value == Decimal("0.0001")
+    assert knudsen_bar is None
+    assert knudsen_pressure is None
+    assert _knudsen_notice is not None
+    assert _knudsen_notice.policy is not None
+    assert _knudsen_notice.policy.id == "DP-004"
+    assert "in-cell total pressure is not available" in _knudsen_notice.reason
 
     gauge = replace(
         vacuum_experiment,
@@ -2758,7 +2767,7 @@ def test_shared_ladder_vacuum_notice_keeps_its_route():
             po2_bar=1e-9,
         ),
     )
-    assert "original_reason=" not in notice.reason
+    assert "original_reason=source does not print fO2 for this run" in notice.reason
     assert "Dalton pO2 <= Ptotal" in notice.reason
     assert "selected_fO2_Pa=0.0001" in notice.reason
     assert notice.origin == "fo2_ladder"

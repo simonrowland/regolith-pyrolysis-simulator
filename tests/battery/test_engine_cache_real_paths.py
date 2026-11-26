@@ -2167,6 +2167,15 @@ def test_all_cacheable_real_cell_paths_preserve_scorer_fields_through_sqlite(
             "temperature_K": 1700.0, "po2": Po2Request(mode="commanded", po2_bar=1e-8),
             "timeout_s": 90.0, "isolated": False,
         }
+    elif engine is Engine.MAGEMIN:
+        pot = next(pot for pot in pots if pot.pot_id == "mgo_sio2_40_60")
+        common = {
+            "temperature_K": 1700.0,
+            "po2": Po2Request(mode="engine_default", po2_bar=None),
+            "timeout_s": 90.0,
+            "isolated": False,
+            "physical_pressure_bar": DIAGNOSTIC_ARM_BOUNDARY_PRESSURE_BAR,
+        }
     else:
         pot = next(pot for pot in pots if pot.pot_id == "mgo_sio2_40_60")
         common = {

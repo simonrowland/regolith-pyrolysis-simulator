@@ -293,6 +293,13 @@ def fo2_tier_notice(
         if resolved.closure or not math.isfinite(selected_bar)
         else Decimal(str(selected_bar * PA_PER_BAR))
     )
+    if (
+        resolved.route == VACUUM_PRESSURE_UPPER_BOUND_ROUTE
+        and original_reason is None
+    ):
+        original_reason = (
+            resolved.original_reason or "source does not print fO2 for this run"
+        )
     if original_reason is not None:
         reason = f"{reason}; original_reason={original_reason}"
     notice = Notice(
@@ -756,6 +763,10 @@ def resolve_row_fo2(
     if (
         notice is None
         or notice in resolved.notices
+        or (
+            resolved.policy is not None
+            and resolved.policy.id in {"DP-010", "DP-019"}
+        )
         or any(
             item.policy is not None and item.policy.id in {"DP-003", "DP-010"}
             for item in resolved.notices
