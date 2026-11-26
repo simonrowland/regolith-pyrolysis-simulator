@@ -512,21 +512,63 @@ def test_thermoengine_cao_activity_uses_the_printed_solid_reference(
     not thermoengine_package_available(),
     reason='ThermoEngine runtime is not installed',
 )
+def test_thermoengine_ca_free_liquid_omits_fusion_disclosure() -> None:
+    from simulator.melt_backend.thermoengine import ThermoEngineBackend
+
+    backend = ThermoEngineBackend()
+    if not backend.initialize({}):
+        pytest.skip(backend.unavailable_reason())
+    try:
+        result = backend.equilibrate(
+            temperature_C=1700.0 - CELSIUS_TO_KELVIN_OFFSET,
+            composition_kg={'FeO': 40.0, 'SiO2': 60.0},
+            fO2_log=-8.0,
+            pressure_bar=1.0,
+        )
+        assert result.status == 'ok', result.warnings
+        components = result.chem_potentials['Liquid']['components']
+        assert 'CaSiO3' not in components
+        notices = result.diagnostics.get('imcc_notices') or ()
+        assert not any(
+            'CaSiO3(l)-pWo fusion residual' in notice.get('reason', '')
+            for notice in notices
+        )
+    finally:
+        backend.close()
+
+
+@pytest.mark.skipif(
+    not thermoengine_package_available(),
+    reason='ThermoEngine runtime is not installed',
+)
 def test_thermoengine_fusion_failure_is_disclosed_on_cao_activity(
     monkeypatch,
 ) -> None:
     from simulator.battery.enums import Engine, Quantity
     from simulator.battery.score import _cell_notices_scoped_to_cao_activity
     from simulator.melt_backend.thermoengine import ThermoEngineBackend
+    from simulator.melt_backend.pure_phase import PurePhaseAccessError
 
     temperature_K = 1933.0
     backend = ThermoEngineBackend()
     if not backend.initialize({}):
         pytest.skip(backend.unavailable_reason())
     try:
+        transport_equilibrate = backend.transport.equilibrate
+        cached_payload = []
+
+        def equilibrate_once(**kwargs):
+            if not cached_payload:
+                cached_payload.append(transport_equilibrate(**kwargs))
+            return cached_payload[0]
+
+        monkeypatch.setattr(
+            backend.transport, 'equilibrate', equilibrate_once,
+        )
+
         def fail_pwo_fusion_query(symbol, *, temperature_K, pressure_bar):
             if symbol == 'pWo':
-                raise RuntimeError('forced pWo fusion query failure')
+                raise PurePhaseAccessError('forced pWo fusion query failure')
             return backend.transport.pure_phase_properties(
                 symbol,
                 temperature_K=temperature_K,
@@ -543,6 +585,7 @@ def test_thermoengine_fusion_failure_is_disclosed_on_cao_activity(
             pressure_bar=1.0,
         )
         assert result.status == 'ok', result.warnings
+        assert 'CaSiO3' in result.chem_potentials['Liquid']['components']
         raw_mu = result.diagnostics['mu_CaO_J_per_mol_melts_berman_apparent']
         activity, _ = cao_activity_from_melts_exchange_mu(
             float(raw_mu), temperature_K, phase='cr',
@@ -560,7 +603,25 @@ def test_thermoengine_fusion_failure_is_disclosed_on_cao_activity(
         )
         assert gap.affected_quantities == (Quantity.ACTIVITY,)
         assert gap.band is None
-        assert 'RuntimeError: forced pWo fusion query failure' in gap.reason
+        assert 'PurePhaseAccessError: forced pWo fusion query failure' in gap.reason
+
+        def fail_with_name_error(symbol, *, temperature_K, pressure_bar):
+            raise NameError('forced fusion implementation error')
+
+        monkeypatch.setattr(
+            backend, 'pure_phase_properties', fail_with_name_error,
+        )
+        with pytest.raises(
+            RuntimeError,
+            match='NameError: forced fusion implementation error',
+        ) as error:
+            backend.equilibrate(
+                temperature_C=temperature_K - CELSIUS_TO_KELVIN_OFFSET,
+                composition_kg={'CaO': 56.077, 'SiO2': 60.0843},
+                fO2_log=-10.0,
+                pressure_bar=1.0,
+            )
+        assert isinstance(error.value.__cause__, NameError)
     finally:
         backend.close()
 

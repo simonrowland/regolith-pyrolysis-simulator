@@ -48,6 +48,8 @@ _MELTS_OXIDE_SET = frozenset(MELTS_OXIDE_BASIS)
 MELTS_CAO_EXCHANGE_MU_FIELD = (
     'mu_CaO_J_per_mol_melts_berman_apparent'
 )
+MELTS_CASIO3_FUSION_CAVEAT_PHRASE = 'CaSiO3(l)-pWo fusion residual'
+MELTS_CASIO3_HHR_CAVEAT_PHRASE = 'Berman-vs-HHR CaSiO3(cr) reassessment'
 MELTS_ACTIVITY_BRIDGE_REFERENCES = {
     'CaO': ('raoultian_pure_endmember', 'cr', 'CaO'),
 }

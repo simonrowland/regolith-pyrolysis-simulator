@@ -12,9 +12,12 @@ so minor versions may carry significant changes.
   band on CaO; ThermoEngine also reports its live pWo fusion residual on CaO.
   If that ThermoEngine fusion calculation fails, the CaO activity carries a
   typed gap caveat with the exception detail. Both CaSiO3 caveats stay off
-  Fe3+/Fe2+ while unrelated cell notices remain. These notice-routing changes
-  leave the ThermoEngine v5 numeric probe digest unchanged at
+  Fe3+/Fe2+ while unrelated cell notices remain. The Ca-free FeO-SiO2
+  ThermoEngine probe pot has no CaSiO3 component and emits no fusion-gap
+  caveat, returning the v5 digest to
   `985e3fdc1738dec493b1d32c16aa2fc9ae684b891dd941a4421105970ba1bc8e`.
+  Chemistry versions stay at 5 here; the train assigns max(target)+1 at
+  landing. The pin needs controller remeasurement.
   AlphaMELTS does not expose liquid/pWo pure-phase G0 for that fusion band, so
   its CaO activity carries a caveat and uses ThermoEngine's same-temperature
   band as the reference. Neither residual is applied as a correction.

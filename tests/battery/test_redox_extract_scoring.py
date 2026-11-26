@@ -2237,6 +2237,11 @@ def test_melts_fe_redox_keeps_unrelated_cell_notice_without_cao_caveats(
                     "from": "vaporock",
                     "to": "antoine_fallback",
                 },
+                {
+                    "kind": "engine_model_caveat",
+                    "reason": "unrelated Fe redox calibration caveat",
+                    "band": "+0.02 dex at 1502 K",
+                },
             ],
         ),
     )
@@ -2252,6 +2257,11 @@ def test_melts_fe_redox_keeps_unrelated_cell_notice_without_cao_caveats(
     assert any(
         notice.kind is NoticeKind.FALLBACK
         and notice.reason == "unrelated redox cell fallback"
+        for notice in prediction.notices
+    )
+    assert any(
+        notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        and notice.reason == "unrelated Fe redox calibration caveat"
         for notice in prediction.notices
     )
     assert not any(

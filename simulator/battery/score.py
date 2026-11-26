@@ -8322,6 +8322,10 @@ def _cell_notices_scoped_to_cao_activity(
     species_formula: str,
 ) -> tuple[Notice, ...]:
     """Keep CaSiO3 model caveats on the CaO activity derived from that cell."""
+    from engines.alphamelts.domain import (
+        MELTS_CASIO3_FUSION_CAVEAT_PHRASE,
+        MELTS_CASIO3_HHR_CAVEAT_PHRASE,
+    )
 
     notices = cell_notices(quantity, engine, cell)
     if (
@@ -8330,8 +8334,8 @@ def _cell_notices_scoped_to_cao_activity(
     ):
         return notices
     cao_model_reasons = (
-        "CaSiO3(l)-pWo fusion residual",
-        "Berman-vs-HHR CaSiO3(cr) reassessment",
+        MELTS_CASIO3_FUSION_CAVEAT_PHRASE,
+        MELTS_CASIO3_HHR_CAVEAT_PHRASE,
     )
     return tuple(
         notice
@@ -16982,6 +16986,7 @@ def _predict_with_engine(
         # CaSiO3/SiO2 pair. The converter returns a(SiO2) from SiO2_Liq and
         # a(H2O) from H2O or H2O_Liq; element labels are not oxide activities.
         from engines.alphamelts.domain import (
+            MELTS_CASIO3_HHR_CAVEAT_PHRASE,
             MELTS_ACTIVITY_BRIDGE_REFERENCES,
             MELTS_CAO_EXCHANGE_MU_FIELD,
             _canonical_oxide_activity_map_with_notices,
@@ -17078,8 +17083,9 @@ def _predict_with_engine(
                                 kind=NoticeKind.ENGINE_MODEL_CAVEAT,
                                 affected_quantities=(Quantity.ACTIVITY,),
                                 reason=(
-                                    'Phase-specific Berman-vs-HHR CaSiO3(cr) '
-                                    'reassessment: raw residual +3.151 kJ/mol '
+                                    'Phase-specific '
+                                    f'{MELTS_CASIO3_HHR_CAVEAT_PHRASE}: '
+                                    'raw residual +3.151 kJ/mol '
                                     'at 1400 K for cyclowollastonite (HHR table '
                                     'through 1800 K), and +2.947 kJ/mol at '
                                     '1000 K for wollastonite (through 1398 K). '
