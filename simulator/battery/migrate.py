@@ -29277,14 +29277,24 @@ class Migrator:
         )
         # Split on a method field only. Regime may still be the row method
         # (the call above), and it must not move the row off the named
-        # experiment. commit=False so this pass does not write that choice
-        # onto the experiment.
+        # experiment. method_as_printed is the assay of a run whose technique
+        # the source already named, so it does not mint a second id either.
+        # commit=False so this pass does not write that choice onto the
+        # experiment.
+        declared_method = self._declared_experiment_methods.get(experiment_id)
+        assay_stays_on_named_run = (
+            declared_method is not None
+            and declared_method.is_value
+            and declared_method.value is not MethodToken.UNSPECIFIED
+        )
         _split_method, _split_notice = self._resolve_method_for_observation(
             observation_id=obs_id,
             experiment_id=experiment_id,
             method=State.unknown("source does not state method"),
             method_raw_candidates=method_raw_candidates,
-            printed_method_candidates=printed_method_candidates,
+            printed_method_candidates=(
+                () if assay_stays_on_named_run else printed_method_candidates
+            ),
             method_evidence_candidates=method_evidence_candidates,
             evidence_candidates=evidence_candidates,
             quantity=quantity_for_notice,

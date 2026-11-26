@@ -415,3 +415,62 @@ def test_legacy_unspecified_split_mints_a_second_experiment(tmp_path, monkeypatc
         assert not any(
             experiment_id.endswith(":unspecified") for experiment_id in experiment_ids
         )
+
+
+def _assay_on_named_run_extract():
+    """Piston-cylinder run; the row prose is the electron-microprobe assay."""
+
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    row.pop("regime", None)
+    row["experiment"] = "named-run"
+    row["observation_id"] = "assay-row"
+    row["regime"] = "quench_equilibration"
+    row["values"]["method_as_printed"] = (
+        "Electron microprobe WDS for the sulfur concentration"
+    )
+    extract["experiments"] = [
+        {
+            "experiment_id": "named-run",
+            "method": "piston_cylinder_equilibration_quench",
+        }
+    ]
+    return extract
+
+
+def _assert_assay_stays_on_named_run(result, source_id):
+    rows = _rows_for_local_id(result, source_id, "assay-row")
+    assert rows
+    assert len({row.experiment_id for row in rows}) == 1
+    assert all("::method:" not in row.experiment_id for row in rows)
+    assert all(
+        row.experiment_id.endswith("::experiment::named-run") for row in rows
+    )
+
+
+def test_assay_prose_stays_on_the_named_run(tmp_path):
+    extract = _assay_on_named_run_extract()
+    result = _migrate_real_extract(
+        tmp_path, "zhang-2021-acsesc-si.yaml", extract_doc=extract
+    )
+    _assert_assay_stays_on_named_run(result, extract["source_id"])
+
+
+def test_treating_assay_prose_as_a_method_field_mints_a_second_id(
+    tmp_path, monkeypatch
+):
+    import simulator.battery.migrate as migrate_module
+
+    extract = _assay_on_named_run_extract()
+    original = migrate_module._method_claim_fields
+
+    def assay_as_method_field(obs, values):
+        regime, raw, printed, evidence, notice_evidence = original(obs, values)
+        return regime, (*raw, *printed), (), evidence, notice_evidence
+
+    monkeypatch.setattr(migrate_module, "_method_claim_fields", assay_as_method_field)
+    result = _migrate_real_extract(
+        tmp_path, "zhang-2021-acsesc-si.yaml", extract_doc=extract
+    )
+    with pytest.raises(AssertionError):
+        _assert_assay_stays_on_named_run(result, extract["source_id"])
