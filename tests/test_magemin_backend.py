@@ -1107,9 +1107,6 @@ def test_magemin_worker_and_future_timeouts_serialize_configured_deadline():
         def result(self, timeout=None):
             raise self.outcome
 
-        def running(self):
-            return self.is_running
-
         def cancel(self):
             self.cancelled = True
             return not self.is_running
@@ -1119,10 +1116,11 @@ def test_magemin_worker_and_future_timeouts_serialize_configured_deadline():
     )
     running_future = ScriptedFuture(worker_timeout, running=True)
     queued_future = ScriptedFuture(FutureTimeoutError(), running=False)
+    capped_future = ScriptedFuture(FutureTimeoutError(), running=True)
 
     class ScriptedPool:
         def __init__(self):
-            self.futures = iter((running_future, queued_future))
+            self.futures = iter((running_future, queued_future, capped_future))
             self.abort_details = []
 
         def submit(self, *_args, **_kwargs):
@@ -1143,22 +1141,29 @@ def test_magemin_worker_and_future_timeouts_serialize_configured_deadline():
     projection = backend._build_db_bulk_projection({'SiO2': 60.0, 'MgO': 40.0})
     timeouts = []
 
-    for _ in range(2):
+    for call_timeout_s in (None, None, 5.0):
         with pytest.raises(EngineWorkerTimeout) as caught:
+            call_kwargs = (
+                {} if call_timeout_s is None
+                else {'call_timeout_s': call_timeout_s}
+            )
             backend._call_magemin(
                 projection,
                 temperature_C=1200.0,
                 pressure_bar=1.0,
                 fO2_log=-8.0,
+                **call_kwargs,
             )
         timeouts.append(caught.value)
 
-    running, queued = timeouts
+    running, queued, capped = timeouts
     assert running.timeout_s == pytest.approx(15.0)
     assert queued.timeout_s == pytest.approx(47.4)
+    assert capped.timeout_s == pytest.approx(5.0)
     running_fields = running.serialized_diagnostic_fields()
     queued_fields = queued.serialized_diagnostic_fields()
-    assert running_fields == queued_fields
+    capped_fields = capped.serialized_diagnostic_fields()
+    assert running_fields == queued_fields == capped_fields
     assert running_fields['reason'] == EngineWorkerTimeout.reason_code
     assert running_fields['backend'] == 'MAGEMin'
     assert running_fields['timeout_s'] == pytest.approx(15.0)
@@ -1175,6 +1180,10 @@ def test_magemin_worker_and_future_timeouts_serialize_configured_deadline():
     assert queued_detail['pool_timeout']['wait_state'] == 'queued'
     assert queued_detail['pool_timeout']['effective_wait_timeout_s'] == 47.4
     assert 'worker_phase' not in queued_detail['pool_timeout']
+    capped_detail = json.loads(capped.diagnostic_detail)
+    assert capped_detail['pool_timeout']['configured_per_job_timeout_s'] == 15.0
+    assert capped_detail['pool_timeout']['effective_wait_timeout_s'] == 5.0
+    assert capped_detail['pool_timeout']['wait_state'] == 'running'
     assert all(pool.abort_details)
 
 

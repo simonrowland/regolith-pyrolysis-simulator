@@ -2135,7 +2135,7 @@ def test_constructor_refuses_when_worker_thread_never_reports_ready(monkeypatch)
     assert isinstance(exc, EngineWorkerTimeout)
     assert exc.phase == 'initialization'
     assert tuple(getattr(exc, 'failed_slots', ())) == (0,)
-    assert exc.timeout_s == pytest.approx(startup_timeout_s)
+    assert exc.timeout_s == pytest.approx(ready_wait_s)
     diagnostic = exc.serialized_diagnostic_fields()
     assert diagnostic['reason'] == 'engine_worker_timeout'
     assert diagnostic['backend'] == 'silent-ready-test'
@@ -2144,8 +2144,9 @@ def test_constructor_refuses_when_worker_thread_never_reports_ready(monkeypatch)
     assert diagnostic['timeout_s'] == pytest.approx(startup_timeout_s)
     assert 'slot 0' not in diagnostic['exception_message']
     assert '[0]' not in diagnostic['exception_message']
-    assert 'slot 0' in exc.diagnostic_detail
-    assert '[0' in exc.diagnostic_detail
+    assert '0: silent-ready-test slot 0' in exc.diagnostic_detail
+    assert f'pool ready wait budget {ready_wait_s:g}s' in exc.diagnostic_detail
+    assert 'ready wait budget' not in diagnostic['exception_message']
     assert any('slot 0' in entry for entry in startup_logs)
     assert elapsed <= ready_wait_s + ENGINE_POOL_AUTOMATIC_PER_POOL_BUDGET_S + 1.0
     assert spawned_pids, 'worker thread never spawned a child to reap'

@@ -2832,6 +2832,7 @@ class EngineWorkerPool:
         *,
         failed_slots: tuple[int, ...] | list[int],
         ready_wait_s: float | None = None,
+        configured_timeout_s: float | None = None,
     ) -> None:
         """Keep startup timeout payloads stable and put slot detail in logs."""
         if timeout.phase != 'initialization' or not failed_slots:
@@ -2858,6 +2859,7 @@ class EngineWorkerPool:
         timeout._set_diagnostic_context(
             backend=backend,
             operation='startup',
+            configured_timeout_s=configured_timeout_s,
         )
         _pool_debug(f'pool[{backend}]: startup timeout {detail}')
 
@@ -2973,7 +2975,7 @@ class EngineWorkerPool:
             )
             refusal = EngineWorkerTimeout(
                 str(self._workers[missing[0]].name),
-                configured_startup_timeout_s,
+                ready_wait_s,
                 phase='initialization',
                 failed_slots=missing,
             )
@@ -2981,6 +2983,7 @@ class EngineWorkerPool:
                 refusal,
                 failed_slots=missing,
                 ready_wait_s=ready_wait_s,
+                configured_timeout_s=configured_startup_timeout_s,
             )
             if close_error is not None:
                 raise refusal from close_error

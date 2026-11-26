@@ -3286,19 +3286,14 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
 
         if self._bridge == 'subprocess' or capture_native_activities:
             if self._subprocess_pool is not None:
+                configured_timeout_s = float(self._config.get(
+                    'warm_call_timeout_s',
+                    MAGEMIN_WARM_CALL_TIMEOUT_S,
+                ))
                 timeout_s = (
-                    float(self._config.get(
-                        'warm_call_timeout_s',
-                        MAGEMIN_WARM_CALL_TIMEOUT_S,
-                    ))
+                    configured_timeout_s
                     if call_timeout_s is None
-                    else min(
-                        float(self._config.get(
-                            'warm_call_timeout_s',
-                            MAGEMIN_WARM_CALL_TIMEOUT_S,
-                        )),
-                        float(call_timeout_s),
-                    )
+                    else min(configured_timeout_s, float(call_timeout_s))
                 )
                 startup_timeout_s = float(self._config.get(
                     'worker_startup_timeout_s', 30.0
@@ -3337,7 +3332,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                                 pressure_kbar=pressure_kbar,
                                 fO2_log=fO2_log,
                                 timeout_context={
-                                    'configured_per_job_timeout_s': timeout_s,
+                                    'configured_per_job_timeout_s': (
+                                        configured_timeout_s
+                                    ),
                                     'effective_wait_timeout_s': timeout.timeout_s,
                                     'wait_state': 'running',
                                     'worker_phase': timeout.phase,
@@ -3351,16 +3348,12 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         self._attach_magemin_timeout_diagnostic(
                             timeout,
                             diagnostic_detail,
-                            configured_timeout_s=timeout_s,
+                            configured_timeout_s=configured_timeout_s,
                         )
                         raise
                     except FutureTimeoutError as exc:
-                        running = getattr(future, 'running', None)
-                        wait_state = (
-                            'running' if callable(running) and running()
-                            else 'queued'
-                        )
-                        future.cancel()
+                        cancelled = future.cancel()
+                        wait_state = 'queued' if cancelled else 'running'
                         diagnostic_detail = (
                             self._magemin_timeout_diagnostic_detail_safely(
                                 bulk_projection=bulk_projection,
@@ -3370,7 +3363,9 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                                 pressure_kbar=pressure_kbar,
                                 fO2_log=fO2_log,
                                 timeout_context={
-                                    'configured_per_job_timeout_s': timeout_s,
+                                    'configured_per_job_timeout_s': (
+                                        configured_timeout_s
+                                    ),
                                     'effective_wait_timeout_s': future_timeout_s,
                                     'wait_state': wait_state,
                                 },
@@ -3388,7 +3383,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         self._attach_magemin_timeout_diagnostic(
                             timeout,
                             diagnostic_detail,
-                            configured_timeout_s=timeout_s,
+                            configured_timeout_s=configured_timeout_s,
                         )
                         raise timeout from exc
                     except (
