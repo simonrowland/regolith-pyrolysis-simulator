@@ -16,8 +16,10 @@ from tests.battery.test_redox_extract_scoring import (
 )
 
 # Studio table, internal-analytical only. sossi_2020_per_f_o2_1_xanes is
-# the printed 1 bar pure-O2 end member. The other seventeen rows are the
-# unaffected numeric, provenance, and eligibility pins.
+# the printed 1 bar pure-O2 end member. The twelve Sossi rows carry DP-106:
+# analytical_method "Fe K-edge XANES" is a method claim and not a closed
+# token, so it does not inherit the printed aerodynamic-levitation method.
+# The six Aithala rows do not. Numerics are the unaffected pins.
 _EXCLUSIONS = (
     "source_relation_independent_complete_ancestry",
     "no_blocking_qualification",
@@ -55,63 +57,63 @@ PINS: dict[str, tuple[str, str, bool, tuple[str, ...], tuple[str, ...], str]] = 
         "none",
     ),
     "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_10_xanes": (
-        "-0.015048906919944335", "match", False, (),
-        ("total_iron_reported_as_feo", "fo2_frame_from_printed_atmosphere", "admission_defaulted", "engine_model_caveat", "input_omitted", "composition_projected", "out_of_certified_band"),
+        "-0.015048906919944335", "match", False, ("DP-106",),
+        ("method_unstated", "total_iron_reported_as_feo", "fo2_frame_from_printed_atmosphere", "admission_defaulted", "engine_model_caveat", "input_omitted", "composition_projected", "out_of_certified_band"),
         "none",
     ),
     "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_11_xanes": (
-        "0.10013889718897892", "match", False, (),
-        ("total_iron_reported_as_feo", "fo2_frame_from_printed_atmosphere", "admission_defaulted", "engine_model_caveat", "input_omitted", "out_of_certified_band"),
+        "0.10013889718897892", "match", False, ("DP-106",),
+        ("method_unstated", "total_iron_reported_as_feo", "fo2_frame_from_printed_atmosphere", "admission_defaulted", "engine_model_caveat", "input_omitted", "out_of_certified_band"),
         "none",
     ),
     "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_12_xanes": (
-        "0.0697125628667097", "match", False, (),
-        ("total_iron_reported_as_feo", "fo2_frame_from_printed_atmosphere", "admission_defaulted", "engine_model_caveat", "input_omitted", "out_of_certified_band"),
+        "0.0697125628667097", "match", False, ("DP-106",),
+        ("method_unstated", "total_iron_reported_as_feo", "fo2_frame_from_printed_atmosphere", "admission_defaulted", "engine_model_caveat", "input_omitted", "out_of_certified_band"),
         "none",
     ),
     "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_1_xanes": (
-        "-0.19443092435728185", "mismatch", False, (),
-        ("total_iron_reported_as_feo", "fo2_frame_from_printed_atmosphere", "admission_defaulted", "engine_model_caveat", "input_omitted", "out_of_certified_band"),
+        "-0.19443092435728185", "mismatch", False, ("DP-106",),
+        ("method_unstated", "total_iron_reported_as_feo", "fo2_frame_from_printed_atmosphere", "admission_defaulted", "engine_model_caveat", "input_omitted", "out_of_certified_band"),
         "none",
     ),
     "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_2_xanes": (
-        "-0.36461222518009667", "mismatch", False, (),
-        ("total_iron_reported_as_feo", "input_omitted", "admission_defaulted", "engine_model_caveat", "input_omitted", "composition_projected", "out_of_certified_band"),
+        "-0.36461222518009667", "mismatch", False, ("DP-106",),
+        ("method_unstated", "total_iron_reported_as_feo", "input_omitted", "admission_defaulted", "engine_model_caveat", "input_omitted", "composition_projected", "out_of_certified_band"),
         "none",
     ),
     "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_3_xanes": (
-        "-0.32575700722591505", "mismatch", False, (),
-        ("total_iron_reported_as_feo", "fo2_frame_from_printed_atmosphere", "admission_defaulted", "engine_model_caveat", "input_omitted", "out_of_certified_band"),
+        "-0.32575700722591505", "mismatch", False, ("DP-106",),
+        ("method_unstated", "total_iron_reported_as_feo", "fo2_frame_from_printed_atmosphere", "admission_defaulted", "engine_model_caveat", "input_omitted", "out_of_certified_band"),
         "none",
     ),
     "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_6_xanes": (
-        "-0.2506658792245533", "mismatch", False, (),
-        ("total_iron_reported_as_feo", "fo2_frame_from_printed_atmosphere", "admission_defaulted", "engine_model_caveat", "input_omitted", "composition_projected", "out_of_certified_band"),
+        "-0.2506658792245533", "mismatch", False, ("DP-106",),
+        ("method_unstated", "total_iron_reported_as_feo", "fo2_frame_from_printed_atmosphere", "admission_defaulted", "engine_model_caveat", "input_omitted", "composition_projected", "out_of_certified_band"),
         "none",
     ),
     "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_7_xanes": (
-        "-0.30186470025058215", "mismatch", False, (),
-        ("total_iron_reported_as_feo", "fo2_frame_from_printed_atmosphere", "admission_defaulted", "engine_model_caveat", "input_omitted", "out_of_certified_band"),
+        "-0.30186470025058215", "mismatch", False, ("DP-106",),
+        ("method_unstated", "total_iron_reported_as_feo", "fo2_frame_from_printed_atmosphere", "admission_defaulted", "engine_model_caveat", "input_omitted", "out_of_certified_band"),
         "none",
     ),
     "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_8_xanes": (
-        "-0.22725532524443506", "mismatch", False, (),
-        ("total_iron_reported_as_feo", "fo2_frame_from_printed_atmosphere", "admission_defaulted", "engine_model_caveat", "input_omitted", "out_of_certified_band"),
+        "-0.22725532524443506", "mismatch", False, ("DP-106",),
+        ("method_unstated", "total_iron_reported_as_feo", "fo2_frame_from_printed_atmosphere", "admission_defaulted", "engine_model_caveat", "input_omitted", "out_of_certified_band"),
         "none",
     ),
     "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_9_xanes": (
-        "-0.22012641445601028", "mismatch", False, (),
-        ("total_iron_reported_as_feo", "fo2_frame_from_printed_atmosphere", "admission_defaulted", "engine_model_caveat", "input_omitted", "out_of_certified_band"),
+        "-0.22012641445601028", "mismatch", False, ("DP-106",),
+        ("method_unstated", "total_iron_reported_as_feo", "fo2_frame_from_printed_atmosphere", "admission_defaulted", "engine_model_caveat", "input_omitted", "out_of_certified_band"),
         "none",
     ),
     "sossi-2020-magma-ocean-redox::sossi_2020_per_ts1_xanes": (
-        "-0.3506159515474627", "mismatch", False, (),
-        ("total_iron_reported_as_feo", "fo2_frame_from_printed_atmosphere", "admission_defaulted", "engine_model_caveat", "input_omitted", "composition_projected", "out_of_certified_band"),
+        "-0.3506159515474627", "mismatch", False, ("DP-106",),
+        ("method_unstated", "total_iron_reported_as_feo", "fo2_frame_from_printed_atmosphere", "admission_defaulted", "engine_model_caveat", "input_omitted", "composition_projected", "out_of_certified_band"),
         "none",
     ),
     "sossi-2020-magma-ocean-redox::sossi_2020_per_ts2_xanes": (
-        "-0.2525386811839257", "mismatch", False, (),
-        ("total_iron_reported_as_feo", "fo2_frame_from_printed_atmosphere", "admission_defaulted", "engine_model_caveat", "input_omitted", "composition_projected", "out_of_certified_band"),
+        "-0.2525386811839257", "mismatch", False, ("DP-106",),
+        ("method_unstated", "total_iron_reported_as_feo", "fo2_frame_from_printed_atmosphere", "admission_defaulted", "engine_model_caveat", "input_omitted", "composition_projected", "out_of_certified_band"),
         "none",
     ),
 }
