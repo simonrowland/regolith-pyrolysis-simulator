@@ -2091,33 +2091,22 @@ class PT1PersistentEquilibriumStore:
             insert_source = None
             effective_notices_json = repair_notices_json
             if existing is not None:
-                # Classify current bytes before _entry_from_row parses JSON.
-                if _payload_codec_stamp_is_current(
-                    artifact,
-                    existing["payload_codec_version"],
-                ) is True:
-                    _pt1_row_admission(dict(existing))
-                entry = self._entry_from_row(
-                    existing,
-                    artifact=artifact,
-                    key=key,
-                    key_bytes=key_bytes,
-                    key_hash=key_hash,
-                )
-                stale_payload = _pt1_existing_payload_is_superseded(
-                    artifact,
-                    entry.get("payload"),
-                    payload_codec_version=entry.get("payload_codec_version"),
-                    keys=(entry.get("key", {}), key),
-                    key_hash=key_hash,
-                )
-                if not stale_payload and (
-                    entry["payload_hash"] != payload_hash
-                    or canonical_json_bytes(entry["payload"]) != payload_bytes
-                ):
-                    raise PT1PersistentStoreCorrupt(
-                        f"PT-1 payload collision for {artifact}: {key_hash}"
+                stale_payload = not _pt1_row_admission(dict(existing))
+                if not stale_payload:
+                    entry = self._entry_from_row(
+                        existing,
+                        artifact=artifact,
+                        key=key,
+                        key_bytes=key_bytes,
+                        key_hash=key_hash,
                     )
+                    if (
+                        entry["payload_hash"] != payload_hash
+                        or canonical_json_bytes(entry["payload"]) != payload_bytes
+                    ):
+                        raise PT1PersistentStoreCorrupt(
+                            f"PT-1 payload collision for {artifact}: {key_hash}"
+                        )
                 existing_notices_json = _row_repair_notices(existing)
                 effective_notices_json = monotonic_repair_notices_json(
                     existing_notices_json,
@@ -3140,7 +3129,7 @@ class PT1PersistentEquilibriumStore:
 def _pt1_row_admission(
     row: Mapping[str, Any],
 ) -> bool:
-    """Return whether a stored PT-1 row passes current codec admission."""
+    """Classify a PT-1 row by codec stamp, bytes, hashes, and payload schema."""
 
     artifact = str(row["artifact"])
     codec_stamp_is_current = _payload_codec_stamp_is_current(
@@ -3154,6 +3143,28 @@ def _pt1_row_admission(
         key_hash = str(row["key_hash"])
         key_bytes = _sqlite_bytes(row["key_bytes"])
         payload_bytes = _sqlite_bytes(row["payload_bytes"])
+    except (KeyError, TypeError, ValueError, OverflowError) as exc:
+        if codec_stamp_is_current is not False:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 current payload fails codec admission for {artifact}: "
+                f"{row.get('key_hash', '<unknown>')}"
+            ) from exc
+        return False
+
+    if _sha256(payload_bytes) != row.get("payload_sha256"):
+        if codec_stamp_is_current is not False:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 current payload hash mismatch for {artifact}: {key_hash}"
+            )
+        return False
+    if _sha256(key_bytes) != key_hash or row.get("key_sha256") != key_hash:
+        if codec_stamp_is_current is not False:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 current key hash mismatch for {artifact}: {key_hash}"
+            )
+        return False
+
+    try:
         key = json.loads(key_bytes.decode("utf-8"))
         payload = json.loads(payload_bytes.decode("utf-8"))
         canonical_key_bytes = canonical_json_bytes(key)
@@ -3164,8 +3175,9 @@ def _pt1_row_admission(
         ValueError,
         UnicodeDecodeError,
         OverflowError,
+        RecursionError,
     ) as exc:
-        if codec_stamp_is_current is True:
+        if codec_stamp_is_current is not False:
             raise PT1PersistentStoreCorrupt(
                 f"PT-1 current payload fails codec admission for {artifact}: "
                 f"{row.get('key_hash', '<unknown>')}"
@@ -3176,12 +3188,9 @@ def _pt1_row_admission(
         and isinstance(payload, Mapping)
         and canonical_key_bytes == key_bytes
         and canonical_payload_bytes == payload_bytes
-        and _sha256(key_bytes) == key_hash
-        and row.get("key_sha256") == key_hash
-        and _sha256(payload_bytes) == row.get("payload_sha256")
     )
     if not integrity_is_valid:
-        if codec_stamp_is_current is True:
+        if codec_stamp_is_current is not False:
             raise PT1PersistentStoreCorrupt(
                 f"PT-1 current payload fails codec admission for {artifact}: "
                 f"{key_hash}"
@@ -3301,6 +3310,8 @@ def _copy_pt1_equilibrium_rows(
                 }
                 incoming_row["store_schema_version"] = PT1_STORE_SCHEMA_VERSION
                 incoming_admitted = _pt1_row_admission(incoming_row)
+                if not incoming_admitted:
+                    continue
                 existing_row = planned_rows.get(key_hash)
                 if existing_row is None:
                     planned_rows[key_hash] = incoming_row

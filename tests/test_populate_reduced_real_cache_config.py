@@ -368,7 +368,7 @@ def test_populate_merge_skips_missing_codec_for_versioned_artifacts(
 
     source_row = driver._cache_payload_rows(shard_db)[0]
     assert source_row["payload_codec_version"] == expected_version
-    validated = driver._validated_cache_payload_row(source_row)
+    validated = driver._decoded_cache_payload_row(source_row)
     assert validated["payload_codec_version"] == expected_version
     summary = driver._merge_cache_shard(shard_db, target_db)
 
@@ -551,7 +551,7 @@ def test_populate_merge_preserves_repair_notice_values(
         )
 
     source_row = driver._cache_payload_rows(shard_db)[0]
-    validated = driver._validated_cache_payload_row(source_row)
+    validated = driver._decoded_cache_payload_row(source_row)
     assert validated["repair_notices_json"] == repair_notices_json
     driver._merge_cache_shard(shard_db, target_db)
 
@@ -684,8 +684,12 @@ def test_magemin_accounting_reads_new_namespace_schema(tmp_path):
 
 def test_new_schema_pt1_gate_rejects_fallback_authority(tmp_path):
     driver = _load_driver()
-    db_path = tmp_path / "fallback-authority.db"
+    shard_db = tmp_path / "fallback-authority-shard.db"
+    target_db = tmp_path / "fallback-authority-target.db"
+    key = _pt1_key("fallback")
+    key["artifact"] = "equilibrium_post_record"
     payload = _pt1_payload("fallback")
+    payload["equilibrium_result"] = {"status": "ok", "liquid_fraction": 1.0}
     payload["authority"]["vapor_pressure"].update(
         {
             "resolved_provider_id": "builtin-fallback",
@@ -694,11 +698,10 @@ def test_new_schema_pt1_gate_rejects_fallback_authority(tmp_path):
             "fallback_allowed": True,
         }
     )
-    _write_pt1_row(db_path, _pt1_key("fallback"), payload)
+    _write_pt1_row(shard_db, key, payload)
 
-    row = driver._cache_payload_rows(db_path)[0]
     with pytest.raises(driver.GrindSourceGateError, match="builtin-fallback"):
-        driver._validated_cache_payload_row(row)
+        driver._merge_cache_shard(shard_db, target_db)
 
 
 def test_physics_bucket_hit_recomputes_bucket_from_exact_key(tmp_path):

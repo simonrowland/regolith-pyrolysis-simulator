@@ -5315,6 +5315,13 @@ def test_pt0_gate_curve_codec_misses_floor_rows_without_magemin_source(
         rrd.canonical_json_bytes(alternate_key)
     )
 
+    # The markerless floor row missed replay while current-stamped; only the
+    # legacy stamp lets recapture replace that row after the replay assertions.
+    _set_pt1_payload_codec_version(
+        db_path,
+        _key_hash(key),
+        rrd.PT0_GATE_CURVE_CODEC_VERSION - 1,
+    )
     store._store('freeze_gate_curve', key, valid_payload)
     recapture = PT0DeterminismStore('replay', db_path=db_path)
     assert recapture._lookup('freeze_gate_curve', key) == valid_payload
@@ -5370,6 +5377,123 @@ def test_markerless_gate_curve_row_is_a_miss_and_can_be_replaced(
     )
 
     assert replay._lookup("freeze_gate_curve", key) == current_payload
+
+
+def test_pt1_recapture_supersedes_stale_row_without_decoding_payload(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "stale-invalid-gate-payload.sqlite"
+    store = PT0DeterminismStore("capture", db_path=db_path)
+    key = _freeze_gate_key()
+    legacy_payload = {
+        "curve": {
+            "source": "gate_liquid_fraction",
+            "solidus_T_C": 1200.0,
+            "liquidus_T_C": 1300.0,
+            "path": [
+                {"temperature_C": 1200.0, "liquid_fraction": 0.0},
+                {"temperature_C": 1300.0, "liquid_fraction": 1.0},
+            ],
+            "is_liquidus_floor": False,
+        },
+    }
+    _store_raw_replay_payload(
+        store,
+        "freeze_gate_curve",
+        key,
+        legacy_payload,
+        law_disclosures=[],
+    )
+    key_hash = _key_hash(key)
+    with sqlite3.connect(db_path) as conn:
+        codec_version, stored_key_bytes = conn.execute(
+            f"SELECT payload_codec_version, key_bytes "
+            f"FROM {PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()
+    assert codec_version == rrd.PT0_GATE_CURVE_CODEC_VERSION - 1 == 3
+    assert bytes(stored_key_bytes) == rrd.canonical_json_bytes(key)
+    invalid_old_payload = b"{invalid json"
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+            "SET payload_bytes = ?, payload_sha256 = ? WHERE key_hash = ?",
+            (
+                sqlite3.Binary(invalid_old_payload),
+                hashlib.sha256(invalid_old_payload).hexdigest(),
+                key_hash,
+            ),
+        )
+
+    current_payload = {
+        "curve": {
+            **legacy_payload["curve"],
+            "is_liquidus_floor": False,
+        },
+    }
+    recapture = PT0DeterminismStore("capture", db_path=db_path)
+    recapture._store(
+        "freeze_gate_curve",
+        key,
+        current_payload,
+        law_disclosures=[],
+    )
+
+    replay = PT0DeterminismStore("replay", db_path=db_path)
+    assert replay._lookup("freeze_gate_curve", key) == current_payload
+
+
+def test_pt1_copy_skips_stale_invalid_source_payload_without_parsing(
+    tmp_path: Path,
+) -> None:
+    source_path = tmp_path / "stale-invalid-source.sqlite"
+    target_path = tmp_path / "stale-invalid-target.sqlite"
+    source = PT0DeterminismStore("capture", db_path=source_path)
+    key = _freeze_gate_key()
+    payload = {
+        "curve": {
+            "source": "gate_liquid_fraction",
+            "solidus_T_C": 1200.0,
+            "liquidus_T_C": 1300.0,
+            "path": [
+                {"temperature_C": 1200.0, "liquid_fraction": 0.0},
+                {"temperature_C": 1300.0, "liquid_fraction": 1.0},
+            ],
+            "is_liquidus_floor": False,
+        },
+    }
+    _store_raw_replay_payload(
+        source,
+        "freeze_gate_curve",
+        key,
+        payload,
+        law_disclosures=[],
+    )
+    key_hash = _key_hash(key)
+    invalid_payload_bytes = b"{invalid json"
+    with sqlite3.connect(source_path) as conn:
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+            "SET payload_bytes = ?, payload_sha256 = ? WHERE key_hash = ?",
+            (
+                sqlite3.Binary(invalid_payload_bytes),
+                hashlib.sha256(invalid_payload_bytes).hexdigest(),
+                key_hash,
+            ),
+        )
+
+    result = rrd._copy_pt1_equilibrium_rows(
+        (source_path,),
+        target_path,
+        require_capture_epoch_match=False,
+    )
+
+    assert result["inserted_rows"] == 0
+    assert result["sources"][0]["inserted_rows"] == 0
+    with sqlite3.connect(target_path) as conn:
+        assert conn.execute(
+            f"SELECT COUNT(*) FROM {PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()[0] == 0
 
 
 @pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))

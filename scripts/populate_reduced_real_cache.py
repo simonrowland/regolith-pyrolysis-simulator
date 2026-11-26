@@ -48,7 +48,6 @@ from simulator.reduced_real_determinism import (
     PT1_SUPPORTED_STORE_SCHEMA_VERSIONS,
     PT1PersistentEquilibriumStore,
     _physics_ladder_values_from_replay_key,
-    _payload_codec_stamp_is_current,
     _pt1_row_admission,
     canonical_json_bytes,
     canonical_physics_bucket_key_from_replay_key,
@@ -683,12 +682,6 @@ def _decoded_cache_payload_row(row: Mapping[str, Any]) -> dict[str, Any]:
     payload_bytes = bytes(row["payload_bytes"])
     key_hash = hashlib.sha256(key_bytes).hexdigest()
     payload_hash = hashlib.sha256(payload_bytes).hexdigest()
-    if str(row["key_hash"]) != key_hash or str(row["key_sha256"]) != key_hash:
-        raise RuntimeError(f"PT-1 cache shard row key hash mismatch: {row['key_hash']}")
-    if str(row["payload_sha256"]) != payload_hash:
-        raise RuntimeError(
-            f"PT-1 cache shard row payload hash mismatch: {row['key_hash']}"
-        )
     try:
         key = json.loads(key_bytes.decode("utf-8"))
     except (json.JSONDecodeError, UnicodeDecodeError) as exc:
@@ -708,14 +701,6 @@ def _decoded_cache_payload_row(row: Mapping[str, Any]) -> dict[str, Any]:
     if not isinstance(payload, Mapping):
         raise RuntimeError(
             f"PT-1 cache shard row payload must be a mapping: {row['key_hash']}"
-        )
-    if canonical_json_bytes(key) != key_bytes:
-        raise RuntimeError(
-            f"PT-1 cache shard row has non-canonical key bytes: {row['key_hash']}"
-        )
-    if canonical_json_bytes(payload) != payload_bytes:
-        raise RuntimeError(
-            f"PT-1 cache shard row has non-canonical payload bytes: {row['key_hash']}"
         )
     if str(row["store_schema_version"]) not in PT1_SUPPORTED_STORE_SCHEMA_VERSIONS:
         raise RuntimeError(
@@ -765,18 +750,9 @@ def _admitted_cache_payload_rows(
     rows: list[dict[str, Any]] = []
     superseded_rows = 0
     for row in payload_rows:
-        codec_stamp_is_current = _payload_codec_stamp_is_current(
-            str(row["artifact"]),
-            row.get("payload_codec_version"),
-        )
-        if codec_stamp_is_current is False:
+        if not _pt1_row_admission(row):
             superseded_rows += 1
             continue
-        if not _pt1_row_admission(row):
-            raise RuntimeError(
-                "PT-1 cache row failed current payload admission: "
-                f"{row['key_hash']}"
-            )
         rows.append(_decoded_cache_payload_row(row))
     magemin_key_hashes = {
         str(row["key_hash"])

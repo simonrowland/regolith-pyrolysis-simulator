@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import sqlite3
 import sys
@@ -23,8 +22,7 @@ from simulator.reduced_real_determinism import (  # noqa: E402
     PT1_STORE_SCHEMA_VERSION,
     PT1_SUPPORTED_STORE_SCHEMA_VERSIONS,
     _PT1CacheMergeCollision,
-    _payload_codec_stamp_is_current,
-    canonical_json_bytes,
+    _pt1_row_admission,
     _copy_pt1_equilibrium_rows,
     validate_reduced_real_equilibrium_record_key,
     validate_repair_notices_json,
@@ -168,10 +166,7 @@ def validate_cache_source_rows(source: Path) -> list[dict[str, Any]]:
     validated_rows: list[dict[str, Any]] = []
     for row in source_rows:
         artifact = str(row["artifact"])
-        if _payload_codec_stamp_is_current(
-            artifact,
-            row.get("payload_codec_version"),
-        ) is False:
+        if not _pt1_row_admission(row):
             continue
         invalid_types = [
             field for field in _REQUIRED_TEXT_FIELDS if not isinstance(row[field], str)
@@ -228,23 +223,9 @@ def validate_cache_source_rows(source: Path) -> list[dict[str, Any]]:
             raise CacheSourceRowInvalid(
                 f"PT-1 cache source row payload must be a mapping: {source}:{key_hash}"
             )
-        canonical_key_bytes = canonical_json_bytes(key)
-        canonical_payload_bytes = canonical_json_bytes(payload)
-        key_digest = hashlib.sha256(canonical_key_bytes).hexdigest()
-        payload_digest = hashlib.sha256(canonical_payload_bytes).hexdigest()
         mismatches: list[str] = []
         if "artifact" in key and key["artifact"] != artifact:
             mismatches.append("artifact")
-        if key_bytes != canonical_key_bytes:
-            mismatches.append("key_bytes")
-        if payload_bytes != canonical_payload_bytes:
-            mismatches.append("payload_bytes")
-        if key_hash != key_digest:
-            mismatches.append("key_hash")
-        if str(row["key_sha256"]) != key_digest:
-            mismatches.append("key_sha256")
-        if str(row["payload_sha256"]) != payload_digest:
-            mismatches.append("payload_sha256")
         try:
             datetime.fromisoformat(str(row["created_at"]).replace("Z", "+00:00"))
         except ValueError:

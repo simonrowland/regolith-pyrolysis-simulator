@@ -213,7 +213,7 @@ def _write_equilibrium_post_record_row_raw(
                 "resolved_role": "authoritative",
             },
         },
-        "equilibrium_result": {"status": "ok"},
+        "equilibrium_result": {"status": "ok", "liquid_fraction": 1.0},
     }
     key_bytes = _canonical_bytes(key)
     payload_bytes = _canonical_bytes(payload)

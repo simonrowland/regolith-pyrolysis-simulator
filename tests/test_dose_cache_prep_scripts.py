@@ -84,6 +84,20 @@ def _put_cache_row(
     )
 
 
+def _write_invalid_current_payload_bytes(db_path: Path) -> None:
+    payload_bytes = b"{invalid json"
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+            "SET payload_bytes = ?, payload_sha256 = ?, payload_codec_version = ?",
+            (
+                sqlite3.Binary(payload_bytes),
+                hashlib.sha256(payload_bytes).hexdigest(),
+                rrd._payload_codec_version("freeze_gate_curve"),
+            ),
+        )
+
+
 def _mark_authorityless_v3_gate_row(
     db_path: Path,
     *,
@@ -657,8 +671,44 @@ def test_seed_cache_refuses_late_source_hash_drift_without_mutating_target(
         )
     before = target.read_bytes()
 
-    with pytest.raises(CacheSourceRowInvalid, match="payload_sha256"):
+    with pytest.raises(rrd.PT1PersistentStoreCorrupt, match="payload hash mismatch"):
         seed_cache(target, [valid, invalid])
+
+    assert target.read_bytes() == before
+
+
+@pytest.mark.parametrize("transport", ("seed", "merge"))
+def test_current_invalid_source_payload_uses_shared_pt1_integrity_classifier(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    transport: str,
+) -> None:
+    target = tmp_path / f"{transport}-target.db"
+    source = tmp_path / f"{transport}-invalid-current-source.db"
+    _put_cache_row(target, tag=f"{transport}-existing")
+    _put_cache_row(source, tag=f"{transport}-invalid")
+    _write_invalid_current_payload_bytes(source)
+    before = target.read_bytes()
+
+    if transport == "seed":
+        with pytest.raises(
+            rrd.PT1PersistentStoreCorrupt,
+            match="current payload fails codec admission",
+        ) as caught:
+            seed_cache(target, [source])
+        assert isinstance(caught.value.__cause__, json.JSONDecodeError)
+    else:
+        with pytest.raises(
+            rrd.PT1PersistentStoreCorrupt,
+            match="current payload fails codec admission",
+        ) as caught:
+            merge_grind_cache.validate_cache_source_rows(source)
+        assert isinstance(caught.value.__cause__, json.JSONDecodeError)
+
+        rc = merge_grind_cache.main([str(target), str(source)])
+        captured = capsys.readouterr()
+        assert rc == 2
+        assert "current payload fails codec admission" in captured.err
 
     assert target.read_bytes() == before
 
