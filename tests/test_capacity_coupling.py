@@ -1700,7 +1700,8 @@ def test_loop3_renders_live_binding_cause(
         turbine_limited=False,
     )
     sim.campaign_mgr = SimpleNamespace(
-        get_temp_target=lambda *_args: (1600.0, 100.0)
+        get_temp_target=lambda *_args: (1600.0, 100.0),
+        _lab_schedule=lambda *_args: None,
     )
 
     sim._update_temperature()

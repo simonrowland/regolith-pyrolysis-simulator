@@ -875,7 +875,7 @@ def test_a_solid_start_minute_root_includes_the_sink():
     )
     bare = _solve()
     coupled = _solve(species_rate_kg_hr_at_K=rates)
-    cold = rates(500.0 + 273.15)
+    cold = rates(500.0 + 273.15, coupled["node_1_area_m2"])
 
     assert equilibrium.liquid_fraction == 0.0
     assert cold == {}
@@ -918,6 +918,8 @@ def test_a_molten_minute_books_the_root_rate_times_dt():
     record = {
         "temperature_C": coupled["temperature_C"],
         "temperature_K": coupled["temperature_K"],
+        "nodes": coupled["nodes"],
+        "node_1_area_m2": coupled["node_1_area_m2"],
         "notices": (),
     }
     host.campaign_mgr = SimpleNamespace()

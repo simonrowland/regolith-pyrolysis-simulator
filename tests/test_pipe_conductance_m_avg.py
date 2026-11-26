@@ -978,7 +978,8 @@ def test_loop3_vacuum_overcapacity_exceeds_100_and_throttles_ramp():
     sim.melt.campaign_hour = 0.0
     sim.overhead = gas
     sim.campaign_mgr = SimpleNamespace(
-        get_temp_target=lambda *_args: (1600.0, 100.0)
+        get_temp_target=lambda *_args: (1600.0, 100.0),
+        _lab_schedule=lambda *_args: None,
     )
     sim._update_temperature()
 
