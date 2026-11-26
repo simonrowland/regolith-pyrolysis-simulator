@@ -5577,8 +5577,14 @@ def test_extrapolated_gate_admission_uses_query_identity_at_each_reader(
             }
         }
 
-    def row_for(payload: Mapping[str, Any]) -> dict[str, Any]:
-        key_bytes = canonical_json_bytes(key)
+    def row_for(
+        payload: Mapping[str, Any],
+        *,
+        replay_key: Mapping[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        key_bytes = canonical_json_bytes(
+            key if replay_key is None else replay_key
+        )
         payload_bytes = canonical_json_bytes(payload)
         key_hash = rrd._sha256(key_bytes)
         return {
@@ -5595,6 +5601,21 @@ def test_extrapolated_gate_admission_uses_query_identity_at_each_reader(
     valid_payload = payload_for([30.0, 80.0])
     assert not rrd._pt1_row_admission(row_for(stale_payload))
     assert rrd._pt1_row_admission(row_for(valid_payload))
+    reversed_band_key = copy.deepcopy(rrd._json_ready(key))
+    reversed_band_key["freeze_gate_cache_key"][7]["certified_band"] = [
+        80.0,
+        30.0,
+    ]
+    reversed_identity = rrd._magemin_identity_from_replay_key(reversed_band_key)
+    assert reversed_identity is not None
+    assert reversed_identity.silica_verdict == "extrapolated"
+    assert reversed_identity.certified_band == (80.0, 30.0)
+    assert not rrd._pt1_row_admission(
+        row_for(
+            payload_for([80.0, 30.0]),
+            replay_key=reversed_band_key,
+        )
+    )
 
     store = PT0DeterminismStore(
         "capture",
@@ -7452,6 +7473,84 @@ def test_pt1_verify_on_hit_fails_loudly(
             replay_sim,
             fO2_log=replay_sim._compute_intrinsic_melt_fO2(),
         )
+
+
+@pytest.mark.parametrize(
+    ("index_kind", "distance_corruption"),
+    (
+        ("bucket", None),
+        ("ladder", "missing"),
+        ("ladder", "incorrect"),
+    ),
+    ids=("bucket-key-bytes", "ladder-distance-missing", "ladder-distance-wrong"),
+)
+def test_pt1_bucket_and_ladder_integrity_precedes_stale_codec_admission(
+    tmp_path: Path,
+    index_kind: str,
+    distance_corruption: str | None,
+) -> None:
+    db_path = tmp_path / f"pt1-{index_kind}-{distance_corruption}.sqlite"
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    key = _freeze_gate_key()
+    payload = _valid_test_gate_payload()
+    capture._store("freeze_gate_curve", key, payload, law_disclosures=[])
+
+    bucket_key = canonical_physics_bucket_key_from_replay_key(key)
+    bucket_bytes = canonical_json_bytes(bucket_key)
+    bucket_hash = rrd._sha256(bucket_bytes)
+    rung_tag = rrd.PHYSICS_BUCKET_LADDER_RUNGS[0][0]
+    rung_key = rrd.canonical_physics_ladder_bucket_key_from_replay_key(
+        key,
+        rung_tag,
+    )
+    rung_hash = rrd._sha256(canonical_json_bytes(rung_key))
+    key_hash = _key_hash(key)
+
+    with sqlite3.connect(db_path) as conn:
+        if index_kind == "bucket":
+            conn.execute(
+                f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+                "SET payload_codec_version = ?, physics_key_bytes = ? "
+                "WHERE key_hash = ?",
+                (0, b"{}", key_hash),
+            )
+        else:
+            distance_column = rrd._physics_ladder_distance_column(rung_tag)
+            if distance_corruption == "missing":
+                corrupted_distance = None
+            else:
+                corrupted_distance = (
+                    rrd.physics_ladder_bucket_distance_from_replay_key(
+                        key,
+                        rung_tag,
+                    )
+                    + 0.01
+                )
+            conn.execute(
+                f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+                f"SET payload_codec_version = ?, {distance_column} = ? "
+                "WHERE key_hash = ?",
+                (0, corrupted_distance, key_hash),
+            )
+
+    persistent = PT1PersistentEquilibriumStore(db_path)
+    with pytest.raises(PT1PersistentStoreCorrupt):
+        if index_kind == "bucket":
+            persistent._get_by_physics_bucket(
+                artifact="freeze_gate_curve",
+                physics_bucket_key=bucket_key,
+                physics_bucket_bytes=bucket_bytes,
+                physics_bucket_hash=bucket_hash,
+                query_key=key,
+            )
+        else:
+            persistent._get_by_physics_ladder_bucket(
+                artifact="freeze_gate_curve",
+                rung_tag=rung_tag,
+                rung_key=rung_key,
+                rung_hash=rung_hash,
+                query_key=key,
+            )
 
 
 @pytest.mark.skipif(
