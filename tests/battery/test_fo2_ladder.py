@@ -42,6 +42,7 @@ from simulator.battery.records import (
     BandBasis,
     Composition,
     FO2Control,
+    Notice,
     State,
     Value,
 )
@@ -63,6 +64,7 @@ from simulator.battery.score import (
 )
 from simulator.battery.waypoints import (
     GapReason,
+    ROUTE_EXPERIMENT_FO2_PA,
     ReadinessStatus,
     Waypoint,
     WaypointAuthority,
@@ -172,6 +174,15 @@ def test_comparison_path_shares_the_effusion_closure_condition() -> None:
 def test_tier1_printed_log_is_bit_identical_on_every_engine() -> None:
     experiment, bench, observation = _feo_case(oxygen=Decimal("-9"))
     payload = _assert_same_fo2(_melt(experiment, bench, observation))
+    resolved = resolve_row_fo2(
+        experiment, bench, observation, quantity=Quantity.ACTIVITY
+    )
+    assert resolved is not None
+    assert fo2_tier_notice(Quantity.ACTIVITY, resolved) is None
+    assert not any(
+        notice.origin == "fo2_ladder" and notice.reason.startswith("fo2_tier=")
+        for notice in resolved.notices
+    )
     selected = oxygen_condition(experiment, bench, observation).selected
     assert selected is not None
     assert selected.route == "observation_fO2_log"
@@ -179,6 +190,29 @@ def test_tier1_printed_log_is_bit_identical_on_every_engine() -> None:
     assert payload["fO2_log"] == float(Decimal("-9"))
     assert payload["fO2_tier"] == 1
     assert payload["fO2_borrowed"] is False
+
+
+def test_unclassified_derived_tier_keeps_its_existing_notice() -> None:
+    notice = fo2_tier_notice(
+        Quantity.ACTIVITY,
+        ResolvedFo2(
+            -9.0,
+            3,
+            "source_linked_oxygen_condition",
+            False,
+            physics_rung=3,
+        ),
+    )
+    assert notice is not None
+    assert notice.kind is NoticeKind.SOURCE_DISAGREEMENT
+    assert "fo2_tier=3; physics_rung=3:congruent_effusion_balance" in notice.reason
+
+
+def test_printed_experiment_absolute_fo2_has_no_tier_notice() -> None:
+    assert fo2_tier_notice(
+        Quantity.ACTIVITY,
+        ResolvedFo2(-9.0, 1, ROUTE_EXPERIMENT_FO2_PA, False),
+    ) is None
 
 
 def test_scoring_modes_keep_distinct_keys_notices_and_store_outputs() -> None:
@@ -284,6 +318,7 @@ def test_tier1_printed_identity_pascal_stays_pa_over_1e5() -> None:
     )
     assert resolved is not None
     assert resolved.po2_bar == bar
+    assert fo2_tier_notice(Quantity.ACTIVITY, resolved) is None
 
 
 def test_tier2_printed_ferric_fraction_is_the_kress_inverse() -> None:
@@ -551,6 +586,64 @@ def test_tier3_buffer_matches_the_oxygen_condition_point() -> None:
     assert payload["fO2_route"] == "buffer_relation"
     assert payload["fO2_borrowed"] is False
     assert payload["fO2_log"] == float(selected.value.point)
+
+
+def test_named_buffer_notice_uses_the_inclusive_frost_temperature_band() -> None:
+    for temperature, expected_kind, expected_authority in (
+        (
+            Decimal("1473.15"),
+            NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED,
+            WaypointAuthority.DERIVED,
+        ),
+        (
+            Decimal("1473.150001"),
+            NoticeKind.OUT_OF_CERTIFIED_BAND,
+            WaypointAuthority.EXTRAPOLATED,
+        ),
+    ):
+        experiment, bench, observation = _feo_case(
+            temperature=temperature,
+            pressure=Value.point_of(Decimal("101325")),
+        )
+        buffer_offset = Notice(
+            kind=NoticeKind.BUFFER_RELATIVE_FO2_CONVERTED,
+            affected_quantities=(Quantity.ACTIVITY,),
+            reason="printed delta-IW converted to absolute fO2",
+            origin="test-source",
+        )
+        observation = replace(
+            observation,
+            notices=(*observation.notices, buffer_offset),
+        )
+        experiment = replace(
+            experiment,
+            fO2_control=FO2Control(
+                channel=State.of(FO2Channel.BUFFER),
+                buffer=F.located("IW"),
+            ),
+        )
+
+        oxygen = oxygen_condition(experiment, bench, observation)
+        assert oxygen.selected is not None
+        assert oxygen.selected.route == "buffer_relation"
+        assert oxygen.selected.authority is expected_authority
+        resolved = resolve_row_fo2(
+            experiment, bench, observation, quantity=Quantity.ACTIVITY
+        )
+        assert resolved is not None
+        notice = next(
+            item for item in resolved.notices if item.origin == "fo2_ladder"
+        )
+        assert notice.kind is expected_kind
+        assert "Frost (1991) IW calibration T range [838.15, 1473.15] K" in (
+            notice.reason
+        )
+        assert notice.band == (
+            "Frost (1991) IW calibration T range [838.15, 1473.15] K"
+            if expected_kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+            else None
+        )
+        assert buffer_offset in resolved.notices
 
 
 def test_basu_metal_saturation_activity_targets_are_refused() -> None:
@@ -1584,6 +1677,11 @@ def test_knudsen_source_oxygen_follows_printed_controls_then_balance() -> None:
     assert linked is not None
     assert linked.route == "source_linked_oxygen_condition"
     assert linked.po2_bar == linked_bar
+    assert any(
+        notice.origin == "fo2_ladder"
+        and notice.kind is NoticeKind.SOURCE_DISAGREEMENT
+        for notice in linked.notices
+    )
     changed_linked = resolve_row_fo2(
         experiment,
         bench,

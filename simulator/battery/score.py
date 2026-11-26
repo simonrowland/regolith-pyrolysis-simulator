@@ -10404,6 +10404,7 @@ def _predict_distin_closed_feo_activity(
             False,
         ),
     )
+    tier_notices = () if oxygen_notice is None else (oxygen_notice,)
     prediction_identity = replace(
         identity,
         fO2_Pa=State.of(log10_fo2_to_pa(Decimal(str(fo2_log)))),
@@ -10428,7 +10429,7 @@ def _predict_distin_closed_feo_activity(
         value=as_decimal(str(activity)),
         unit="dimensionless",
         authority=authority,
-        notices=(*notices, oxygen_notice),
+        notices=(*notices, *tier_notices),
         coefficient_sources=tuple(coefficient_sources),
         lineage_complete=False,
         certified_band={"temperature_K": band},
@@ -10639,7 +10640,8 @@ def _predict_redox(
                 )
             fo2_log, commanded_fo2_pa, oxygen_notice = selected
             identity = replace(identity, fO2_Pa=commanded_fo2_pa)
-            material_notices.append(oxygen_notice)
+            if oxygen_notice is not None:
+                material_notices.append(oxygen_notice)
     elif fo2_log is None:
         selected = _unprinted_redox_oxygen(
             experiment, bench, observation, material, prediction_pressure
@@ -10651,7 +10653,8 @@ def _predict_redox(
             )
         fo2_log, commanded_fo2_pa, oxygen_notice = selected
         identity = replace(identity, fO2_Pa=commanded_fo2_pa)
-        material_notices.append(oxygen_notice)
+        if oxygen_notice is not None:
+            material_notices.append(oxygen_notice)
 
     prediction_oxygen = identity.fO2_Pa
 
@@ -11468,10 +11471,7 @@ def _oxygen_input_request(
             notices=tuple(input_notices),
         )
 
-    from simulator.battery.fo2_ladder import (
-        fo2_tier_notice,
-        resolve_row_fo2,
-    )
+    from simulator.battery.fo2_ladder import resolve_row_fo2
 
     fo2_observation = replace(observation, identity=identity)
     oxygen = None
@@ -11497,14 +11497,15 @@ def _oxygen_input_request(
     ):
         input_notices.append(source_oxygen_condition_notice(quantity, observation))
     if resolved is not None and resolved.closure:
+        for extra in resolved.notices:
+            if extra not in input_notices:
+                input_notices.append(extra)
         gap_notice = _unsupported_oxygen_gap_notice(
             experiment, bench, fo2_observation, quantity,
             resolved.policy.id if resolved.policy is not None else None,
         )
         if gap_notice is not None:
             input_notices.append(gap_notice)
-        if engine in OXYGEN_BALANCE_EFFUSION_ENGINES:
-            input_notices.append(fo2_tier_notice(quantity, resolved))
         return Po2Request(
             mode=PO2_OXYGEN_BALANCE_EFFUSION,
             po2_bar=None,
@@ -11530,13 +11531,6 @@ def _oxygen_input_request(
         for extra in resolved.notices:
             if extra not in input_notices:
                 input_notices.append(extra)
-        # DP-003 and DP-010 already carry the tier text. Another tier notice
-        # would be a second receipt for the same command.
-        if not any(
-            notice.policy is not None and notice.policy.id in {"DP-003", "DP-010"}
-            for notice in resolved.notices
-        ):
-            input_notices.append(fo2_tier_notice(quantity, resolved))
         if commanded_pa is not None:
             commanded_pa.append(resolved.pressure_pa)
         gap_notice = _unsupported_oxygen_gap_notice(
@@ -11634,19 +11628,19 @@ def _borrow_internal_analytical_effusion(
             },
             notices=tuple(notices),
         )
-    notices.append(
-        fo2_tier_notice(
-            quantity,
-            ResolvedFo2(
-                math.log10(bar),
-                3,
-                "effusion_oxygen_balance; effusion closure borrowed from internal-analytical",
-                True,
-                po2_bar=bar,
-                physics_rung=3,
-            ),
-        )
+    tier_notice = fo2_tier_notice(
+        quantity,
+        ResolvedFo2(
+            math.log10(bar),
+            3,
+            "effusion_oxygen_balance; effusion closure borrowed from internal-analytical",
+            True,
+            po2_bar=bar,
+            physics_rung=3,
+        ),
     )
+    if tier_notice is not None:
+        notices.append(tier_notice)
     return Po2Request(mode=PO2_COMMANDED, po2_bar=bar)
 
 
@@ -12621,10 +12615,10 @@ def _unprinted_redox_oxygen(
     observation: Observation,
     material: _FeRedoxMaterial,
     prediction_pressure: PredictionPressure | None = None,
-) -> tuple[float, State[Decimal], Notice] | None:
+) -> tuple[float, State[Decimal], Notice | None] | None:
     """Use the row ladder when the redox target has no independent printed fO2."""
 
-    from simulator.battery.fo2_ladder import fo2_tier_notice, resolve_row_fo2
+    from simulator.battery.fo2_ladder import resolve_row_fo2
 
     quantity = quantity_token(observation.identity)
     if quantity is None:
@@ -12651,10 +12645,14 @@ def _unprinted_redox_oxygen(
         if not math.isfinite(pressure_bar) or pressure_bar <= 0:
             return None
         oxygen_pa = Decimal(str(pressure_bar)) * PA_PER_BAR_DEC
-    notice = fo2_tier_notice(
-        quantity,
-        resolved,
-        original_reason="source does not print fO2 for this run",
+    notice = next(
+        (
+            item
+            for item in reversed(resolved.notices)
+            if item.origin == "fo2_ladder"
+            and item.fo2_mode is Fo2Mode.SHARED_LADDER
+        ),
+        None,
     )
     return fo2_log, State.of(oxygen_pa), notice
 
@@ -13737,10 +13735,7 @@ def _predict_phase_row(
             if engine is Engine.MAGEMIN:
                 exclusion_notices += (_magemin_oxygen_transport_notice(quantity),)
     if oxygen_required and fo2_log is None:
-        from simulator.battery.fo2_ladder import (
-            fo2_tier_notice,
-            resolve_row_fo2,
-        )
+        from simulator.battery.fo2_ladder import resolve_row_fo2
 
         fo2_observation = replace(observation, identity=identity)
         resolved = resolve_row_fo2(
@@ -13760,9 +13755,9 @@ def _predict_phase_row(
                 notices=exclusion_notices,
             )
         fo2_log = resolved.log10_fO2_bar
-        exclusion_notices = exclusion_notices + (
-            fo2_tier_notice(quantity, resolved),
-        )
+        for notice in resolved.notices:
+            if notice not in exclusion_notices:
+                exclusion_notices += (notice,)
         gap_notice = _unsupported_oxygen_gap_notice(
             experiment, bench, fo2_observation, quantity,
             resolved.policy.id if resolved.policy is not None else None,
@@ -15684,7 +15679,7 @@ def _recover_fugacity_from_shared_oxygen(
         or identity.species.formula != "O2"
     ):
         return prediction
-    from simulator.battery.fo2_ladder import fo2_tier_notice, resolve_row_fo2
+    from simulator.battery.fo2_ladder import resolve_row_fo2
 
     fo2_observation, filtered, exclusion_notices = _redox_input_view(
         observation, quantity, experiment,
@@ -15707,7 +15702,12 @@ def _recover_fugacity_from_shared_oxygen(
         execution=Execution(state=ExecutionState.PRODUCED, call_evidence=resolved.route),
         value=value,
         unit="Pa",
-        notices=(fo2_tier_notice(quantity, resolved), *exclusion_notices),
+        notices=resolved.notices
+        + tuple(
+            notice
+            for notice in exclusion_notices
+            if notice not in resolved.notices
+        ),
         coefficient_sources=prediction.coefficient_sources,
         identity=identity_out,
     )

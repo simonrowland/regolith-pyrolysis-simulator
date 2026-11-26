@@ -2610,15 +2610,24 @@ def oxygen_condition(
                 temperature = thermal.value
                 if temperature.kind is ValueKind.SERIES and len({t for _, t in temperature.series}) == 1:
                     temperature = Value.point_of(temperature.series[0][1])
-                if (temperature.kind is ValueKind.POINT and pressure.value.kind is ValueKind.POINT
-                        and buffer.T_min_K <= temperature.point <= buffer.T_max_K):
+                if (
+                    temperature.kind is ValueKind.POINT
+                    and pressure.value.kind is ValueKind.POINT
+                    and temperature.point is not None
+                    and temperature.point.is_finite()
+                    and temperature.point > 0
+                ):
                     T = temperature.point
                     nominal_pa = nominal_pressure_pa(pressure.value)
                     if nominal_pa is not None:
                         P = nominal_pa / BAR_PA_DECIMAL
+                        T_min = as_decimal(buffer.T_min_K)
+                        T_max = as_decimal(buffer.T_max_K)
+                        in_temperature_band = T_min <= T <= T_max
                         # Premise: Frost (1991) Table 1's condensed buffer line is
-                        # within its published T domain; its equation is in
-                        # simulator.oxygen_buffers.
+                        # evaluated by its published equation. An evaluation
+                        # outside the table's T domain remains a point with an
+                        # explicit extrapolation authority.
                         value = frost_condensed_buffer_log10_fO2_bar(
                             as_decimal(buffer.A_K),
                             as_decimal(buffer.B),
@@ -2628,9 +2637,18 @@ def oxygen_condition(
                         )
                         routes.append(Waypoint("oxygen_condition", Value.point_of(value),
                             "container_buffer_relation" if inferred_container else "buffer_relation",
-                            WaypointAuthority.DERIVED,
+                            (
+                                WaypointAuthority.DERIVED
+                                if in_temperature_band
+                                else WaypointAuthority.EXTRAPOLATED
+                            ),
                             (("experiment.sample.container",) if inferred_container else ("experiment.fO2_control.buffer",))
-                            + (*thermal.inputs, *pressure.inputs)))
+                            + (*thermal.inputs, *pressure.inputs),
+                            notice=(
+                                f"Frost (1991) {buffer.name} calibration T range "
+                                f"[{T_min}, {T_max}] K"
+                            ),
+                        ))
     # Held until after the unsupported-buffer and container checks. An earlier
     # return would hide an apparatus that cannot state an oxygen condition.
     vacuum_waypoint: Waypoint | None = None

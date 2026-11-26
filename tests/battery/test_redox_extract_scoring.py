@@ -2419,11 +2419,11 @@ def _eligible_oxide_composition() -> Composition:
 
 
 def _in_domain_buffer_context(*, named_valence=False):
-    """Borisov row held at an in-domain IW control, with no other caveat.
+    """Synthetic Borisov row held at the inclusive IW upper edge.
 
-    The printed row is 1349 °C, outside IW, so both bench states fell through
-    to intrinsic fO2. This row is otherwise eligible: clean oxide weights, no
-    observation notices, and a point temperature inside both domains.
+    The source's printed temperature is not the temperature used by this
+    fixture; this test supplies 1473.15 K and a located IW control. The row is
+    otherwise eligible: clean oxide weights and no observation notices.
     """
 
     context, row, experiment, bench = _borisov_score_context(
@@ -2479,7 +2479,10 @@ def _assert_flagged_default(residual, context):
         notice for notice in residual.notices if notice.origin != "fo2_ladder"
     )
     assert score_module.flagged_strata(others) == ()
-    assert "out_of_certified_band" in score_module.flagged_strata(residual.notices)
+    assert (
+        NoticeKind.FO2_DEFAULT_AMBIENT_AIR_UNPRINTED_ATMOSPHERE.value
+        in score_module.flagged_strata(residual.notices)
+    )
     headline = headline_payload_records(
         [residual_to_plain(residual)],
         engines=(Engine.INTERNAL_ANALYTICAL,),
@@ -2501,10 +2504,13 @@ def _assert_buffer_control(context, row, experiment, bench, quantity):
     assert selected.route == "buffer_relation"
     assert residual.numeric is not None and residual.numeric.value.is_finite()
     assert notice.affected_quantities == (quantity,)
-    assert notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    assert notice.kind is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
     assert "route=buffer_relation" in notice.reason
-    assert "selected_fO2_Pa=" in notice.reason
-    assert "source does not print fO2 for this run" in notice.reason
+    assert "canonical Frost calibration used" in notice.reason
+    assert "[838.15, 1473.15] K" in notice.reason
+    assert NoticeKind.OUT_OF_CERTIFIED_BAND not in {
+        item.kind for item in residual.notices
+    }
     assert _command_log(candidate) == pytest.approx(float(selected.value.point))
     condition = candidate.provenance["selected_oxygen_condition"]
     assert condition["route"] == "buffer_relation"
@@ -2512,7 +2518,6 @@ def _assert_buffer_control(context, row, experiment, bench, quantity):
     assert "selected_fO2_Pa" not in condition["route"]
     assert "original_reason" not in condition["route"]
     assert "borrowed" not in condition["route"]
-    _assert_flagged_default(residual, context)
     return residual, candidate
 
 
@@ -2527,13 +2532,12 @@ def test_redox_dispatcher_uses_reachable_control_and_preserves_bench():
     fallback, fallback_notice, fallback_candidate = _redox_score(without_bench, row)
     assert fallback.numeric is not None and fallback.numeric.value.is_finite()
     assert fallback_notice.affected_quantities == (Quantity.FE3_FE2_RATIO,)
-    assert fallback_notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
-    assert "route=intrinsic_melt_fO2" in fallback_notice.reason
+    assert fallback_notice.kind is NoticeKind.FO2_DEFAULT_AMBIENT_AIR_UNPRINTED_ATMOSPHERE
+    assert "route=dp010_ambient_air_unprinted_atmosphere" in fallback_notice.reason
     assert "route=buffer_relation" not in fallback_notice.reason
-    assert "selected_fO2_Pa=" in fallback_notice.reason
     assert (
         fallback_candidate.provenance["selected_oxygen_condition"]["route"]
-        == "intrinsic_melt_fO2"
+        == "dp010_ambient_air_unprinted_atmosphere"
     )
     assert fallback.numeric.value != with_bench.numeric.value
     assert _command_log(fallback_candidate) != pytest.approx(
@@ -2548,24 +2552,24 @@ def test_redox_dispatcher_types_named_valence_and_vacuum_substitution():
         context, row, experiment, bench, Quantity.VALENCE_RATIO
     )
 
-    borrowed_context = replace(context, benches={})
-    borrowed, borrowed_notice, borrowed_candidate = _redox_score(
-        borrowed_context, row
+    without_bench_context = replace(context, benches={})
+    without_bench, fallback_notice, fallback_candidate = _redox_score(
+        without_bench_context, row
     )
-    assert borrowed.numeric is not None and borrowed.numeric.value.is_finite()
-    assert borrowed_notice.affected_quantities == (Quantity.VALENCE_RATIO,)
-    assert borrowed_notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
-    assert "route=intrinsic_melt_fO2" in borrowed_notice.reason
-    assert "route=buffer_relation" not in borrowed_notice.reason
+    assert without_bench.numeric is not None and without_bench.numeric.value.is_finite()
+    assert fallback_notice.affected_quantities == (Quantity.VALENCE_RATIO,)
+    assert fallback_notice.kind is NoticeKind.FO2_DEFAULT_AMBIENT_AIR_UNPRINTED_ATMOSPHERE
+    assert "route=dp010_ambient_air_unprinted_atmosphere" in fallback_notice.reason
+    assert "route=buffer_relation" not in fallback_notice.reason
     assert (
-        borrowed_candidate.provenance["selected_oxygen_condition"]["route"]
-        == "intrinsic_melt_fO2"
+        fallback_candidate.provenance["selected_oxygen_condition"]["route"]
+        == "dp010_ambient_air_unprinted_atmosphere"
     )
-    assert borrowed.numeric.value != with_bench.numeric.value
-    assert _command_log(borrowed_candidate) != pytest.approx(
+    assert without_bench.numeric.value != with_bench.numeric.value
+    assert _command_log(fallback_candidate) != pytest.approx(
         _command_log(with_candidate)
     )
-    _assert_flagged_default(borrowed, borrowed_context)
+    _assert_flagged_default(without_bench, without_bench_context)
 
     vacuum_context, vacuum_row, vacuum_experiment, vacuum_bench = (
         _borisov_score_context(vacuum=True)

@@ -71,6 +71,7 @@ from simulator.battery.waypoints import (
     GapReason,
     EXPERIMENT_RUN_OXYGEN_ROUTES,
     PredictionPressure,
+    ROUTE_EXPERIMENT_FO2_PA,
     TYPED_RUN_OXYGEN_ROUTES,
     VACUUM_PRESSURE_UPPER_BOUND_ROUTE,
     Waypoint,
@@ -144,7 +145,7 @@ def fo2_tier_notice(
     resolved: ResolvedFo2,
     *,
     original_reason: str | None = None,
-) -> Notice:
+) -> Notice | None:
     reason = f"fo2_tier={resolved.tier}"
     policy = None
     policy_flag = None
@@ -154,6 +155,11 @@ def fo2_tier_notice(
     container_buffer = resolved.route.startswith("container_")
     method_implied_gas_mix = (
         resolved.route == "observation_gas_composition_method_implied_pressure"
+    )
+    buffer_relation = resolved.route == "buffer_relation"
+    out_of_band_buffer = (
+        resolved.route in {"buffer_relation", "container_buffer_relation"}
+        and resolved.temperature_band_status == "extrapolation"
     )
     if resolved.physics_rung is not None:
         reason += (
@@ -179,6 +185,17 @@ def fo2_tier_notice(
             f"log10(fO2/bar)={resolved.log10_fO2_bar:.12g}; {reason}"
         )
         kind = NoticeKind.FO2_BUFFER_FROM_CONTAINER
+    elif buffer_relation and not resolved.borrowed:
+        reason = (
+            "buffer_relation; canonical Frost calibration used; "
+            f"{resolved.temperature_band_source or 'calibration T range unavailable'}; "
+            f"{reason}"
+        )
+        kind = (
+            NoticeKind.OUT_OF_CERTIFIED_BAND
+            if out_of_band_buffer
+            else NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+        )
     elif method_implied_gas_mix:
         po2_bar = resolved.po2_bar
         if po2_bar is None:
@@ -229,7 +246,7 @@ def fo2_tier_notice(
             f"{reason}"
         )
         if resolved.po2_bar is not None:
-            policy = resolved.policy
+            policy = policy or resolved.policy
             if policy is None:
                 raise ValueError("ambient-air fO2 is missing its DP-003 policy")
             policy_flag = NoticeKind.METHOD_IMPLIED
@@ -244,7 +261,16 @@ def fo2_tier_notice(
             kind = NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
         elif resolved.borrowed:
             kind = NoticeKind.OUT_OF_CERTIFIED_BAND
-        else:
+        elif not (
+            resolved.tier == 1
+            and resolved.route
+            in {
+                "identity_fO2_Pa",
+                "observation_fO2_log",
+                "observation_fO2_Pa_to_log_fO2",
+                ROUTE_EXPERIMENT_FO2_PA,
+            }
+        ):
             kind = NoticeKind.SOURCE_DISAGREEMENT
     out_of_band_kress = (
         ferric_ratio
@@ -253,6 +279,10 @@ def fo2_tier_notice(
     )
     if out_of_band_kress:
         kind = NoticeKind.OUT_OF_CERTIFIED_BAND
+    if out_of_band_buffer:
+        kind = NoticeKind.OUT_OF_CERTIFIED_BAND
+    if kind is None:
+        return None
     selected_bar = (
         resolved.po2_bar
         if resolved.po2_bar is not None
@@ -273,13 +303,15 @@ def fo2_tier_notice(
         band=(
             f"Kress91 temperature band: {resolved.temperature_band_status}"
             if out_of_band_kress
+            else resolved.temperature_band_source
+            if out_of_band_buffer
             else f"borrowed fO2: {resolved.route}"
             if resolved.borrowed
             else None
         ),
         authority=(
             Authority.EXTRAPOLATED
-            if out_of_band_kress
+            if out_of_band_kress or out_of_band_buffer
             else Authority.BRIDGE
             if resolved.borrowed
             else None
@@ -307,6 +339,8 @@ def _with_policy_notice(quantity: Quantity, resolved: ResolvedFo2) -> ResolvedFo
     if resolved.policy is None:
         raise ValueError("policy fO2 resolution is missing its policy")
     notice = fo2_tier_notice(quantity, resolved)
+    if notice is None:
+        raise ValueError("policy fO2 resolution is missing its tier notice")
     return replace(resolved, notices=(*resolved.notices, notice))
 
 
@@ -373,7 +407,7 @@ def has_printed_fo2(observation: Observation, identity: Identity) -> bool:
     return printed_source_pressure(observation) is not None
 
 
-def resolve_row_fo2(
+def _resolve_row_fo2(
     experiment: Experiment | None,
     bench: object | None,
     observation: Observation | None,
@@ -670,6 +704,67 @@ def resolve_row_fo2(
     )
 
 
+def resolve_row_fo2(
+    experiment: Experiment | None,
+    bench: object | None,
+    observation: Observation | None,
+    *,
+    composition: Composition | None = None,
+    composition_moles: Mapping[str, object] | None = None,
+    composition_wt: Mapping[str, float] | None = None,
+    temperature_K: float | None | object = _TEMPERATURE_UNSET,
+    oxygen: WaypointResult | None = None,
+    source_oxygen_bar: float | None = None,
+    quantity: Quantity | None = None,
+    prediction_pressure: PredictionPressure | None = None,
+) -> ResolvedFo2 | None:
+    """Resolve fO2 and attach its truthful tier notice when one applies."""
+
+    resolved = _resolve_row_fo2(
+        experiment,
+        bench,
+        observation,
+        composition=composition,
+        composition_moles=composition_moles,
+        composition_wt=composition_wt,
+        temperature_K=temperature_K,
+        oxygen=oxygen,
+        source_oxygen_bar=source_oxygen_bar,
+        quantity=quantity,
+        prediction_pressure=prediction_pressure,
+    )
+    if resolved is None:
+        return None
+    if observation is not None:
+        buffer_offsets = tuple(
+            notice
+            for notice in observation.notices
+            if notice.kind is NoticeKind.BUFFER_RELATIVE_FO2_CONVERTED
+            and notice not in resolved.notices
+        )
+        if buffer_offsets:
+            resolved = replace(
+                resolved, notices=(*resolved.notices, *buffer_offsets)
+            )
+    identity = _identity(observation)
+    resolved_quantity = quantity or (
+        None if identity is None else quantity_token(identity)
+    )
+    if resolved_quantity is None:
+        return resolved
+    notice = fo2_tier_notice(resolved_quantity, resolved)
+    if (
+        notice is None
+        or notice in resolved.notices
+        or any(
+            item.policy is not None and item.policy.id in {"DP-003", "DP-010"}
+            for item in resolved.notices
+        )
+    ):
+        return resolved
+    return replace(resolved, notices=(*resolved.notices, notice))
+
+
 def _metal_saturation_declared(experiment: Experiment | None) -> bool:
     if experiment is None or experiment.sample.form is None:
         return False
@@ -890,6 +985,8 @@ class AdmittedOxygen:
     borrowed: bool
     notices: tuple[Notice, ...] = ()
     physics_rung: int | None = None
+    temperature_band_status: str | None = None
+    temperature_band_source: str | None = None
 
     def command_bar(self) -> float:
         return float(self.pressure_pa / BAR_PA_DECIMAL)
@@ -1005,6 +1102,8 @@ def resolved_from_admitted(admitted: AdmittedOxygen) -> ResolvedFo2:
         pressure_pa=admitted.pressure_pa,
         notices=admitted.notices,
         policy=policy,
+        temperature_band_status=admitted.temperature_band_status,
+        temperature_band_source=admitted.temperature_band_source,
     )
 
 
@@ -1088,11 +1187,22 @@ def admit_waypoint_oxygen(
             physics_rung=physics_rung,
         )
     if route.route in _LOG_DEFINED_OXYGEN_ROUTES:
-        return _admit_log_defined(
+        admitted = _admit_log_defined(
             route,
             tier=tier,
             observation=observation,
             physics_rung=physics_rung,
+        )
+        if admitted is None or route.route not in _BUFFER_ROUTES:
+            return admitted
+        return replace(
+            admitted,
+            temperature_band_status=(
+                "extrapolation"
+                if route.authority is WaypointAuthority.EXTRAPOLATED
+                else "authoritative"
+            ),
+            temperature_band_source=route.notice,
         )
     return None
 
@@ -1228,7 +1338,13 @@ def admitted_score_oxygen(
     for route in oxygen.routes:
         if (
             route.route in _TIER3_ATMOSPHERE_ROUTES
-            and route.authority is WaypointAuthority.DERIVED
+            and (
+                route.authority is WaypointAuthority.DERIVED
+                or (
+                    route.route in _BUFFER_ROUTES
+                    and route.authority is WaypointAuthority.EXTRAPOLATED
+                )
+            )
             and _log_point(route.value) is not None
             and not (
                 route.route == "buffer_relation"
