@@ -48,31 +48,36 @@ def _forbidden(hard_issues) -> tuple[int, dict[str, int]]:
 
 
 def test_b274_fold_store_census() -> None:
+    """Fail with the census text. The remote profile refuses pytest -s."""
+
     committed_works, committed_experiments, committed_observations = load_migrated_store()
     fresh = migrate(write=False)
-    committed_validation = validate_migrated_store()
+    try:
+        committed_validation = validate_migrated_store()
+    except Exception as exc:  # noqa: BLE001 — the receipt is the message
+        committed_validation = f"{type(exc).__name__}: {exc}"
     fresh_hard = () if fresh.validation is None else fresh.validation.hard_issues
     fresh_forbidden, fresh_by_kind = _forbidden(fresh_hard)
-    print("CENSUS committed_experiments", len(committed_experiments))
-    print("CENSUS committed_observations", len(committed_observations))
-    print("CENSUS committed_works", len(committed_works))
-    print("CENSUS committed_method_ids", _method_split_count(committed_experiments))
-    print("CENSUS fresh_experiments", len(fresh.experiments))
-    print("CENSUS fresh_observations", len(fresh.observations))
-    print("CENSUS fresh_works", len(fresh.works))
-    print("CENSUS fresh_method_ids", _method_split_count(fresh.experiments))
-    print("CENSUS fresh_hard", len(fresh_hard))
-    print("CENSUS fresh_forbidden", fresh_forbidden)
-    print("CENSUS fresh_by_kind", fresh_by_kind)
-    print("CENSUS committed_store_validation", committed_validation)
     committed_by_source = _source_experiment_counts(committed_observations)
     fresh_by_source = _source_experiment_counts(fresh.observations)
+    lines = [
+        f"CENSUS committed_experiments {len(committed_experiments)}",
+        f"CENSUS committed_observations {len(committed_observations)}",
+        f"CENSUS committed_works {len(committed_works)}",
+        f"CENSUS committed_method_ids {_method_split_count(committed_experiments)}",
+        f"CENSUS fresh_experiments {len(fresh.experiments)}",
+        f"CENSUS fresh_observations {len(fresh.observations)}",
+        f"CENSUS fresh_works {len(fresh.works)}",
+        f"CENSUS fresh_method_ids {_method_split_count(fresh.experiments)}",
+        f"CENSUS fresh_hard {len(fresh_hard)}",
+        f"CENSUS fresh_forbidden {fresh_forbidden}",
+        f"CENSUS fresh_by_kind {fresh_by_kind}",
+        f"CENSUS committed_store_validation {committed_validation}",
+    ]
     for source_id in _SOURCES:
-        print(
-            "CENSUS source",
-            source_id,
-            "committed",
-            committed_by_source[source_id],
-            "fresh",
-            fresh_by_source[source_id],
+        lines.append(
+            "CENSUS source "
+            f"{source_id} committed {committed_by_source[source_id]} "
+            f"fresh {fresh_by_source[source_id]}"
         )
+    raise AssertionError("\n".join(lines))
