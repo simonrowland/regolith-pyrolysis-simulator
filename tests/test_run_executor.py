@@ -181,6 +181,30 @@ def test_run_executor_uses_campaigns_elapsed_override_without_history():
     assert execution.campaigns_elapsed == pytest.approx(4.0)
 
 
+def test_batch_output_replaces_stale_campaign_stops_with_empty_history():
+    run = _run(
+        hours=0,
+        run_metadata_overrides={
+            "started_at_utc": "2026-05-30T00:00:00Z",
+            "kernel_commit_sha": "run-executor-fixture",
+            "campaign_stops": [
+                {
+                    "campaign": "C4",
+                    "stop_reason": "time_cap",
+                    "flags": [
+                        {"code": "campaign_time_cap_unconverged"}
+                    ],
+                }
+            ],
+        },
+    )
+    execution = RunExecutor().execute(run._session_config())
+
+    payload = run._build_output(execution)
+
+    assert payload["run_metadata"]["campaign_stops"] == []
+
+
 def test_campaign_transition_history_overrides_campaign_count_fallback():
     session = SimpleNamespace(
         _step_results=[

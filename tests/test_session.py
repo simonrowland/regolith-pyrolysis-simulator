@@ -506,6 +506,29 @@ def test_live_result_document_attaches_campaign_stops_from_step_history():
     }
 
 
+def test_live_result_document_replaces_recorded_stops_with_empty_history():
+    session = _fake_session(_FakeSim())
+    session._config = _config(
+        result_document_factory=lambda _active: {
+            "run_metadata": {
+                "campaign_stops": [
+                    {
+                        "campaign": "C4",
+                        "stop_reason": "time_cap",
+                        "flags": [
+                            {"code": "campaign_time_cap_unconverged"}
+                        ],
+                    }
+                ]
+            }
+        }
+    )
+
+    result = session.result_document()
+
+    assert result["run_metadata"]["campaign_stops"] == []
+
+
 def test_start_refuses_status_blocked_feedstock_selection():
     feedstocks = _load_yaml("feedstocks.yaml")
     blocked_key, blocked_entry = next(

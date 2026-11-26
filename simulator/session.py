@@ -1303,6 +1303,7 @@ def _attach_execution_diagnostics(
         return
 
     stored_run_flags = _MISSING_RESULT_DOCUMENT_RUN_FLAGS
+    had_recorded_campaign_stops = "campaign_stops" in run_metadata
     campaign_stops: list[dict[str, Any]] | None = None
     campaign_stop_errors: list[str] = []
     try:
@@ -1399,7 +1400,11 @@ def _attach_execution_diagnostics(
 
     if (
         campaign_stops is not None
-        and (campaign_stops or run_metadata.get("run_flags"))
+        and (
+            campaign_stops
+            or had_recorded_campaign_stops
+            or run_metadata.get("run_flags")
+        )
     ):
         try:
             run_metadata["campaign_stops"] = campaign_stops
