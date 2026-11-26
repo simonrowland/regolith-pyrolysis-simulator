@@ -5715,7 +5715,7 @@ def decode_repair_notices_json(raw: str | None) -> list[dict[str, Any]] | None:
         )
     try:
         notices = json.loads(raw)
-    except json.JSONDecodeError as exc:
+    except ValueError as exc:
         raise PT1PersistentStoreCorrupt(
             "PT-1 repair_notices_json is invalid JSON"
         ) from exc

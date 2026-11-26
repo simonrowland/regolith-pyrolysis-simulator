@@ -4228,6 +4228,45 @@ def test_pt1_repair_notices_are_outside_payload_and_reemit_on_exact_replay(
     assert replay_sim._last_reduced_real_replay_notices == notices
 
 
+def test_pt1_repair_notices_4301_digit_integer_is_typed_corruption(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "oversized-repair-notices.db"
+    _store_repair_notice_test_record(
+        PT0DeterminismStore("capture", db_path=db_path),
+        notices=[],
+    )
+    key, _payload = _repair_notice_test_record()
+    key_hash = rrd._sha256(canonical_json_bytes(key))
+    # A valid JSON integer above Python's default conversion limit.
+    oversized_integer = "9" * 4301
+    corrupt_notices = (
+        '[{"kind":"repair","value":' + oversized_integer + '}]'
+    )
+    with sqlite3.connect(db_path) as conn:
+        checksums = conn.execute(
+            f"SELECT key_sha256, payload_sha256, key_bytes, payload_bytes "
+            f"FROM {PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+            "SET repair_notices_json = ? WHERE key_hash = ?",
+            (corrupt_notices, key_hash),
+        )
+
+    assert checksums is not None
+    assert checksums[0] == rrd._sha256(checksums[2])
+    assert checksums[1] == rrd._sha256(checksums[3])
+    with pytest.raises(
+        PT1PersistentStoreCorrupt,
+        match="PT-1 repair_notices_json is invalid JSON",
+    ):
+        _replay_repair_notice_test_record(
+            PT0DeterminismStore("replay", db_path=db_path)
+        )
+
+
 def test_pt1_legacy_null_repair_notices_emit_typed_unavailable_notice(
     tmp_path: Path,
 ) -> None:
@@ -8175,11 +8214,11 @@ def _curated_recursive_mutations(
                 "none",
                 None,
             ),
-            # The provider shape must reject this wrong scalar before replay.
+            # Keep a string-shaped bad id so identity admission must reject it.
             (
                 ("authority", "provider", "fallback_provider_id"),
-                "wrong-scalar",
-                0,
+                "wrong-type",
+                "wrong-type",
             ),
             (
                 ("last_vapor_pressure_diagnostic", "source_reaction_fO2_bar"),
@@ -9330,7 +9369,7 @@ def _run_real_cache_payload_recursive_mutations(
         assert outcomes[authoritative_provider_path] == "miss"
         fallback_provider_path = (
             "encoded-row: root.authority.provider.fallback_provider_id "
-            "wrong-scalar"
+            "wrong-type"
         )
         assert outcomes[fallback_provider_path] == "miss"
     else:
