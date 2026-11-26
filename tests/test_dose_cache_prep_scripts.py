@@ -122,13 +122,7 @@ def _put_real_equilibrium_cache_row(db_path: Path) -> None:
     )
 
 
-def _put_replayable_equilibrium_cache_row(
-    db_path: Path,
-    *,
-    tag: str | None = None,
-) -> str:
-    """Persist a production-serialized equilibrium replay payload."""
-
+def _replayable_equilibrium_payload(*, tag: str | None = None):
     from tests.test_reduced_real_pt0_determinism import (
         _pt0_equilibrium_capture_context,
     )
@@ -140,6 +134,17 @@ def _put_replayable_equilibrium_cache_row(
     if tag is not None:
         key["code_version"] = f"test:{tag}"
     payload = rrd.equilibrium_payload(sim, result)
+    return key, payload
+
+
+def _put_replayable_equilibrium_cache_row(
+    db_path: Path,
+    *,
+    tag: str | None = None,
+) -> str:
+    """Persist a production-serialized equilibrium replay payload."""
+
+    key, payload = _replayable_equilibrium_payload(tag=tag)
     key_bytes = canonical_json_bytes(key)
     payload_bytes = canonical_json_bytes(payload)
     key_hash = hashlib.sha256(key_bytes).hexdigest()
@@ -441,6 +446,7 @@ def test_reduced_real_prune_matches_admission_for_real_codec_stamp(
     artifact = "equilibrium_post_record"
     current_version = rrd._payload_codec_version(artifact)
     assert current_version is not None
+    replay_key, replay_payload = _replayable_equilibrium_payload()
     with sqlite3.connect(db_path) as conn:
         conn.execute(
             f"CREATE TABLE {PT1_EQUILIBRIUM_TABLE} "
@@ -457,7 +463,16 @@ def test_reduced_real_prune_matches_admission_for_real_codec_stamp(
         ).fetchone()[0]
     assert storage_type == "real"
     assert rrd._decode_payload_for_admission(
-        artifact, {}, payload_codec_version=float(current_version)
+        artifact,
+        replay_payload,
+        payload_codec_version=current_version,
+        keys=(replay_key,),
+    ) is not None
+    assert rrd._decode_payload_for_admission(
+        artifact,
+        replay_payload,
+        payload_codec_version=float(current_version),
+        keys=(replay_key,),
     ) is None
 
     dry_run = rrd._prune_pt1_payload_codec_rows(db_path)

@@ -23,6 +23,7 @@ from simulator.reduced_real_determinism import (  # noqa: E402
     PT1_STORE_SCHEMA_VERSION,
     PT1_SUPPORTED_STORE_SCHEMA_VERSIONS,
     _PT1CacheMergeCollision,
+    _sqlite_readonly_uri,
     canonical_json_bytes,
     _copy_pt1_equilibrium_rows,
     validate_reduced_real_equilibrium_record_key,
@@ -67,7 +68,7 @@ def open_cache_source_readonly(source: Path) -> sqlite3.Connection:
     source = source.expanduser()
     if not source.exists():
         raise FileNotFoundError(f"cache source does not exist: {source}")
-    con = sqlite3.connect(source.resolve().as_uri() + "?mode=ro", uri=True)
+    con = sqlite3.connect(_sqlite_readonly_uri(source), uri=True)
     con.row_factory = sqlite3.Row
     con.execute("PRAGMA query_only=ON")
     return con

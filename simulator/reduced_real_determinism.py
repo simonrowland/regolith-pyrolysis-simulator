@@ -3288,7 +3288,7 @@ def _copy_pt1_equilibrium_rows(
         source_summaries: list[dict[str, Any]] = []
 
         for source_path in sources:
-            source_uri = f"{source_path.resolve().as_uri()}?mode=ro"
+            source_uri = _sqlite_readonly_uri(source_path)
             source_conn = sqlite3.connect(source_uri, uri=True)
             source_conn.row_factory = sqlite3.Row
             try:
