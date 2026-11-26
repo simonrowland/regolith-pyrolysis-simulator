@@ -126,6 +126,31 @@ def _build_pt0_sim(store: PT0DeterminismStore | None, *, real_provider=False):
     return sim
 
 
+def _build_pt0_sim_with_strict_vapor_default(
+    store: PT0DeterminismStore | None,
+):
+    setpoints = _pt0_setpoints()
+    kernel_config = dict(setpoints.get("chemistry_kernel", {}) or {})
+    kernel_config["allow_fallback_vapor"] = False
+    # Keep the unrelated test alpha policy explicit; the vapor fallback setting
+    # still matches production's strict default.
+    kernel_config["allow_unmeasured_alpha_fallback"] = True
+    setpoints["chemistry_kernel"] = kernel_config
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        _load_yaml("vapor_pressures.yaml"),
+        _load_yaml("feedstocks.yaml"),
+        setpoints,
+        additives_kg={"K": 26.0, "Na": 12.0},
+        builtin_vapor_pressure=False,
+    )
+    sim.configure_pt0_determinism_store(store)
+    sim._register_freeze_gate_liquid_fraction_providers()
+    provider = sim._chem_registry.fallback_for(ChemistryIntent.GATE_LIQUID_FRACTION)
+    provider._ensure_backend = lambda: SimpleNamespace(is_available=lambda: True)
+    return sim
+
+
 def _capture_pt0_gate_curve(
     db_path: Path,
     *,
@@ -133,7 +158,7 @@ def _capture_pt0_gate_curve(
     law_disclosures: Any = (),
 ) -> tuple[PT0DeterminismStore, Any, float, dict[str, Any]]:
     store = PT0DeterminismStore("capture")
-    sim = _build_pt0_sim(store)
+    sim = _build_pt0_sim_with_strict_vapor_default(store)
     sim.start_campaign(CampaignPhase.C2A_STAGED)
     register_synthetic_gate_curve_producer(sim)
     fO2_log = sim._compute_intrinsic_melt_fO2()
@@ -157,9 +182,10 @@ def _capture_pt0_gate_curve(
     assert entry["key"].get("vapor_pressure_provider_selection") == (
         "builtin-vapor-pressure"
     )
-    payload["authority"] = {
-        "vapor_pressure": _alphamelts_record_authority()["vapor_pressure"]
-    }
+    assert payload["authority"]["vapor_pressure"] == rrd._provider_identity(
+        sim,
+        ChemistryIntent.VAPOR_PRESSURE,
+    )
     payload_bytes = canonical_json_bytes(payload)
     PT1PersistentEquilibriumStore(db_path).put(
         artifact="freeze_gate_curve",
@@ -4032,7 +4058,7 @@ def test_pt1_persistent_store_round_trips_exact_payload(
         "disposition",
         "provider_outcome",
         # Measured empty. The fixture records that no flagged law ran.
-        # The payload bytes below stay the curve alone.
+        # The serialized PT1 payload separately carries vapor authority.
         "law_disclosures",
     }
     assert runtime_record["provider_outcome"] is rrd.GateCurveProviderOutcome.PRODUCED
@@ -4074,25 +4100,16 @@ def test_pt1_persistent_store_round_trips_exact_payload(
     assert row[0] == "freeze_gate_curve"
     assert row[1]
     assert row[2]
-    expected_payload = {
-        "curve": {
-            "source": "gate_liquid_fraction:fallback:magemin-shadow",
-            "solidus_T_C": 1210.0,
-            "liquidus_T_C": 1320.0,
-            "is_liquidus_floor": False,
-            "path": [
-                {"temperature_C": 1210.0, "liquid_fraction": 0.0},
-                {"temperature_C": 1320.0, "liquid_fraction": 1.0},
-            ],
-        },
-    }
-    expected_bytes = canonical_json_bytes(expected_payload)
-    assert row[3] == expected_bytes
-    assert len(row[3]) == 239
-    assert hashlib.sha256(row[3]).hexdigest() == (
-        "0f8c8858ed0f6ccdd103f7c0141a9666f2adff2b47f69e7797d08e8dcf2fe538"
+    # Gate payload bytes intentionally include authority.vapor_pressure now;
+    # pin the exact PT1 round trip against the production capture serializer.
+    expected_payload = capture._entries[_key_hash(key)]["payload"]
+    assert expected_payload["authority"]["vapor_pressure"] == (
+        rrd._provider_identity(sim, ChemistryIntent.VAPOR_PRESSURE)
     )
-    payload = json.loads(row[3])
+    expected_bytes = canonical_json_bytes(expected_payload)
+    assert bytes(row[3]) == expected_bytes
+    assert row[2] == hashlib.sha256(expected_bytes).hexdigest()
+    payload = json.loads(bytes(row[3]))
     assert payload == expected_payload
     assert b"producer_pid" not in row[3]
     assert b"producer_configuration" not in row[3]
@@ -5121,7 +5138,7 @@ def test_pt0_gate_curve_codec_misses_floor_rows_without_magemin_source(
     store = PT0DeterminismStore('capture', db_path=db_path)
     key = _freeze_gate_key()
     assert 'gate_curve_codec_version' not in key
-    assert rrd.PT0_GATE_CURVE_CODEC_VERSION == 3
+    assert rrd.PT0_GATE_CURVE_CODEC_VERSION == 4
     assert rrd._curve_payload({
         'source': 'gate_liquid_fraction',
         'solidus_T_C': 950.0,
@@ -5584,9 +5601,20 @@ def test_projected_magemin_step_down_replay_keeps_d447_feo_flag(
         fe_redox_policy="intrinsic",
         provider_role="fallback",
     )
-    payload = {"curve": rrd._curve_payload(live_curve)}
+    # This top-level authority is an intentional payload addition sourced
+    # from the production resolver; the numeric curve remains byte-exact.
+    payload = {
+        "curve": rrd._curve_payload(live_curve),
+        "authority": {
+            "vapor_pressure": rrd._provider_identity(
+                live_sim,
+                ChemistryIntent.VAPOR_PRESSURE,
+            ),
+        },
+    }
     key_hash = rrd._sha256(rrd.canonical_json_bytes(key))
     captured_entry = live_store._entries[key_hash]
+    assert captured_entry["payload"]["curve"] == rrd._curve_payload(live_curve)
     assert captured_entry["payload"] == payload
     store = PT0DeterminismStore("capture", db_path=db_path)
     legacy_payload = copy.deepcopy(captured_entry["payload"])
@@ -5887,6 +5915,80 @@ def test_gate_codec_stale_row_with_different_payload_bytes_is_replaceable(
     replay = PT0DeterminismStore("replay", db_path=db_path) if persistent else store
     assert replay._lookup("freeze_gate_curve", key) == current_payload
     assert replay.hits == 1
+
+
+def test_pt1_gate_capture_replaces_pre_authority_codec_v3_row(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "gate-authority-codec-recapture.sqlite"
+    original, sim, fO2_log, curve = _capture_pt0_gate_curve(
+        db_path,
+        solidus_T_C=1200.0,
+    )
+    key_hash = str(original.capture_sequence[-1]["hash"])
+    current_entry = original._entries[key_hash]
+    legacy_payload = {"curve": copy.deepcopy(current_entry["payload"]["curve"])}
+    legacy_bytes = canonical_json_bytes(legacy_payload)
+    legacy_version = rrd.PT0_GATE_CURVE_CODEC_VERSION - 1
+    assert legacy_version == 3
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+            "SET payload_bytes = ?, payload_sha256 = ?, "
+            "payload_codec_version = ? WHERE key_hash = ?",
+            (
+                sqlite3.Binary(legacy_bytes),
+                hashlib.sha256(legacy_bytes).hexdigest(),
+                legacy_version,
+                key_hash,
+            ),
+        )
+
+    recapture = PT0DeterminismStore("capture", db_path=db_path)
+    recapture.capture_gate_curve(sim, fO2_log=fO2_log, curve=curve)
+
+    assert recapture.capture_sequence[-1]["hash"] == key_hash
+    expected_payload = recapture._entries[key_hash]["payload"]
+    assert expected_payload["authority"]["vapor_pressure"] == (
+        rrd._provider_identity(sim, ChemistryIntent.VAPOR_PRESSURE)
+    )
+    with sqlite3.connect(db_path) as conn:
+        payload_bytes, codec_version = conn.execute(
+            f"SELECT payload_bytes, payload_codec_version "
+            f"FROM {PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()
+    assert bytes(payload_bytes) == canonical_json_bytes(expected_payload)
+    assert codec_version == rrd.PT0_GATE_CURVE_CODEC_VERSION
+
+
+def test_pt1_same_codec_gate_payload_collision_stays_corrupt(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "gate-authority-codec-collision.sqlite"
+    capture, _sim, _fO2_log, _curve = _capture_pt0_gate_curve(
+        db_path,
+        solidus_T_C=1200.0,
+    )
+    key_hash = str(capture.capture_sequence[-1]["hash"])
+    entry = capture._entries[key_hash]
+    changed_payload = copy.deepcopy(entry["payload"])
+    changed_payload["curve"]["solidus_T_C"] = 1190.0
+    changed_payload["curve"]["path"][0]["temperature_C"] = 1190.0
+    changed_bytes = canonical_json_bytes(changed_payload)
+
+    with pytest.raises(PT1PersistentStoreCorrupt, match="payload collision"):
+        PT1PersistentEquilibriumStore(db_path).put(
+            artifact="freeze_gate_curve",
+            key=entry["key"],
+            key_bytes=entry["key_bytes"].encode("utf-8"),
+            key_hash=key_hash,
+            payload=changed_payload,
+            payload_bytes=changed_bytes,
+            payload_hash=hashlib.sha256(changed_bytes).hexdigest(),
+            repair_notices_json=entry["repair_notices_json"],
+            law_disclosures=entry["law_disclosures"],
+        )
 
 
 @pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))
@@ -6998,7 +7100,17 @@ def test_stub_engine_hour_captures_strict_gate_row_and_merges(
         db_path=shard_db,
         strict_vapor_gate=True,
     )
-    sim = _build_pt0_sim(capture, real_provider=True)
+    from simulator.chemistry.kernel import config as chemistry_config
+
+    provider_order = dict(chemistry_config.LIQUID_FRACTION_PROVIDER_ORDER)
+    provider_order["magemin"] = ("magemin",)
+    monkeypatch.setattr(
+        chemistry_config,
+        "LIQUID_FRACTION_PROVIDER_ORDER",
+        provider_order,
+    )
+    sim = _build_pt0_sim_with_strict_vapor_default(capture)
+    assert len(sim._chem_registry.gate_provider_order) == 1
     stub_engine = _install_magemin_subprocess_gate(sim, monkeypatch)
     sim.start_campaign(CampaignPhase.C2A_STAGED)
 
@@ -7020,6 +7132,7 @@ def test_stub_engine_hour_captures_strict_gate_row_and_merges(
         sim,
         ChemistryIntent.VAPOR_PRESSURE,
     )
+    assert resolved_vapor_authority["fallback_allowed"] is False
     assert payload["authority"]["vapor_pressure"] == resolved_vapor_authority
     assert key["vapor_pressure_provider_selection"] == "builtin-vapor-pressure"
     assert key["vapor_pressure_provider_selection"] == (
@@ -7029,6 +7142,51 @@ def test_stub_engine_hour_captures_strict_gate_row_and_merges(
     merge_result = merge_cache_source(shard_db, merged_db)
     assert merge_result["inserted_rows"] == merge_result["rows"]
     assert _persistent_artifact_count(merged_db, "freeze_gate_curve") == len(rows)
+
+    # A prior codec-v3 target row has the same key but lacks authority. The
+    # current-version source supersedes that stale row during shard merge.
+    stale_target_db = tmp_path / "merged-v3-target.sqlite"
+    with sqlite3.connect(shard_db) as source_conn, sqlite3.connect(
+        stale_target_db
+    ) as target_conn:
+        source_conn.backup(target_conn)
+        for key_hash, raw_payload in target_conn.execute(
+            f"SELECT key_hash, payload_bytes FROM {PT1_EQUILIBRIUM_TABLE} "
+            "WHERE artifact = 'freeze_gate_curve'"
+        ).fetchall():
+            legacy_payload = json.loads(bytes(raw_payload))
+            legacy_payload.pop("authority")
+            legacy_bytes = canonical_json_bytes(legacy_payload)
+            target_conn.execute(
+                f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+                "SET payload_bytes = ?, payload_sha256 = ?, "
+                "payload_codec_version = ? WHERE key_hash = ?",
+                (
+                    sqlite3.Binary(legacy_bytes),
+                    hashlib.sha256(legacy_bytes).hexdigest(),
+                    rrd.PT0_GATE_CURVE_CODEC_VERSION - 1,
+                    key_hash,
+                ),
+            )
+    stale_merge_result = merge_cache_source(shard_db, stale_target_db)
+    assert stale_merge_result["inserted_rows"] == 0
+    with sqlite3.connect(stale_target_db) as conn:
+        merged_rows = conn.execute(
+            f"SELECT key_bytes, payload_bytes, payload_codec_version "
+            f"FROM {PT1_EQUILIBRIUM_TABLE} "
+            "WHERE artifact = 'freeze_gate_curve'"
+        ).fetchall()
+    assert {
+        (bytes(key_bytes), bytes(payload_bytes))
+        for key_bytes, payload_bytes in rows
+    } == {
+        (bytes(key_bytes), bytes(payload_bytes))
+        for key_bytes, payload_bytes, _version in merged_rows
+    }
+    assert all(
+        version == rrd.PT0_GATE_CURVE_CODEC_VERSION
+        for _key_bytes, _payload_bytes, version in merged_rows
+    )
 
 
 def test_tier_ceiling_default_preserves_pre_c5_lookup_behavior(tmp_path: Path) -> None:
