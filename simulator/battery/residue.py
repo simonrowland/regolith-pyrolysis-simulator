@@ -3131,7 +3131,6 @@ def predict_langmuir_residue_composition(
             total_pressure_Pa=p_bulk_Pa,
             engine_metadata=metadata,
             engine_flags=flags,
-            starting_inventory=initial,
             missing_channels_reason="residue_pressure_channels_missing",
             caller="Langmuir residue prediction",
         )
