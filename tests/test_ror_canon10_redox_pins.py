@@ -56,9 +56,13 @@ _FULL_PAYLOAD_PINS = {
         "aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2000_120_xanes": "5bbd9d5eb1c8b3edcaa734888e7910e649a4b782702f8dffc3ee302a9f90215a",
         "aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2000_30_xanes": "cff37f189f885060ffdc2ebf13a78b2c25f789b065562fd19d16fc1f45ecd291",
         "aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2100_30_xanes": "eb1e195c143036653c7f0485b1002d731bb2eed32f2a6c9b9af4013d96cf5fe8",
-        # Receipt 5abafffc. aithala rows still matched. This is the first
-        # sossi row that moved (evaporation stack a95942989e). Later rows
-        # were not reached.
+        # Receipt 5abafffc matched this payload hash. a95942989e is already
+        # an ancestor of f560b42a41, which pinned the previous hash
+        # 0750fcf07f41..., so that merge is not the mover. The Sossi
+        # extract regenerated at 397cdd443f attaches method_unstated
+        # (DP-106): the printed method "Fe K-edge XANES" is not a mapped
+        # method token. The hash follows that notice. The other Sossi
+        # rows moved the same way and stay unpinned.
         "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_10_xanes": "97bdbeaa6cbf73ba2cdd6c52e5c2a3d82fa12383e4a2f7047aab0f1b0fe8dd6a",
         "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_11_xanes": "5cbd5a7c95425a27d1665d3408dfaffc24a15ce292f83e6111602a56122e7c00",
         "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_12_xanes": "190cedb86b480e71c0074befcd78589dd72fa3da4b04794ecc6d932c487831a4",
@@ -79,8 +83,11 @@ _FULL_PAYLOAD_PINS = {
         "aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2000_120_xanes": "d041168a30a9bd2bdac046aee542a66d6123a9a781ce272e8380564b17c861fd",
         "aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2000_30_xanes": "08de328245b0e82404e44e98b00506d62244f0a6475b0b8d49f2d9a856ed2896",
         "aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2100_30_xanes": "5ffed3e52fa9e9dcad06d73f93d66e2c561ead694d7804fb42832fbcf5dea86f",
-        # Receipt 5abafffc, openimcc arm. Same first-moved row as the
-        # analytical table. Later rows were not reached.
+        # Same receipt and same store regen as the analytical row.
+        # OpenIMCC's 18-row numeric digest is still
+        # c79971dce81ac423bf34a04525b3da956a437f83e6dbe1fa601d24c1627b8f44,
+        # so this arm's float set did not move. The payload hash did,
+        # because residual_to_plain includes the new method notice.
         "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_10_xanes": "95e36cecb79fab0d769fe3bbc07833b71e623cea273844a0b466b0ea41bd0a2a",
         "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_11_xanes": "3a4c4d7d0c3c706e800eb9bbd3b2b608714f6a6a15692fcb6e25258234301f0c",
         "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_12_xanes": "99d9c9ac67a7ca800c33c2a9929ca3fd37b6ed0dbedb1425243a4dcf50cee062",
