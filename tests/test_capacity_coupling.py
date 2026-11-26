@@ -1040,14 +1040,23 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     pins = capacity_pin_values(snapshot)
     # 5a7121241, brought in by bef9af1e7 (last old first-parent: 4b6555249),
     # executes flagged broad-proxy alphas instead of the unmeasured fallback
-    # of 1. At this 1400 C step CrO and AlO equilibrium pressure, activity,
-    # and pO2 are unchanged. The executed alphas are the declared proxies:
-    # CrO 0.9 and AlO 0.3. Series flux is J = dP / (r_interface + r_gas),
-    # with r_interface = 1/(alpha * k_HK) and r_gas independent of alpha
+    # of 1. The executed alphas are the declared proxies: CrO 0.9 and
+    # AlO 0.3. Series flux is J = dP / (r_interface + r_gas), with
+    # r_interface = 1/(alpha * k_HK) and r_gas independent of alpha
     # (engines/builtin/evaporation_flux.py), so the rates do not scale by
-    # those alpha ratios. Saturation and melt mass move with the two rates.
+    # those alpha ratios.
+    #
+    # The hour publishes the Kress inverse of the loaded Fe3+/ΣFe,
+    # log10(fO2/bar) = -10.95393128857757. The condensed-metal floor
+    # does not bind. Na and K read that melt oxygen (NaO0.5 → Na(g) +
+    # 0.25 O2, ν = -1/4, reference 1 bar). Against the old -9 seed the
+    # pressure ratio is 10^(0.25 × 1.95393128857757) = 3.079518533436423.
+    # Na is 0.18138877088440097 kg/h of this total. Transport pO2 stays
+    # 1e-9 bar, so SiO does not follow the melt oxygen. The 1 mbar Ar
+    # film is unchanged, and saturation moves with the flux. At the -9
+    # seed the ratio is 1.
     assert pins["non_phosphorus_kg_hr"] == pytest.approx(
-        0.06423669542196676, rel=1e-12, abs=1e-12
+        0.19308943834122952, rel=1e-12, abs=1e-12
     )
     assert ceiling_flux_species <= set(
         snapshot.evap_flux.alpha_authority_status_by_species
@@ -1075,14 +1084,17 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
             "melt_mass_kg",
         )
     ) == pytest.approx(
-        # Same proxy-alpha step as the non-phosphorus pin above. Hour and
+        # Same melt-oxygen step as the non-phosphorus pin above. Hour and
         # temperature stay on the d-252 1 mbar Ar, 200 C/h ramp.
+        # Melt mass is the executed residue, not old mass minus the
+        # extra vapour: the Fe split and the overhead bleed move mass
+        # the vapour total does not include.
         (
             1,
             1400.0,
-            0.06423669542196676,
-            2.4701307118784706,
-            998.7072055627636,
+            0.19308943834122952,
+            7.44196736902761,
+            998.578352542956,
         ),
         rel=1.0e-12,
         abs=1.0e-12,
