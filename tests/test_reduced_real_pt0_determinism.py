@@ -8145,76 +8145,141 @@ def _recursive_payload_paths(payload: Any):
     yield from walk(payload, ())
 
 
-def _bounded_recursive_payload_paths(payload: Any):
-    """Cover cache fields while sampling entries in large uniform maps/lists."""
-    paths: list[tuple[tuple[Any, ...], Any]] = []
-
-    def value_shape(value: Any) -> Any:
-        if isinstance(value, Mapping):
-            return (
-                "mapping",
-                tuple(sorted((type(key).__name__, repr(key)) for key in value)),
+def _curated_recursive_mutations(
+    payload: Mapping[str, Any],
+    artifact: str,
+    source_name: str,
+) -> list[tuple[tuple[str, ...], str, Any]]:
+    """Return representative admission mutations for a single captured row."""
+    if artifact == "equilibrium_post_record":
+        diagnostic = payload["last_vapor_pressure_diagnostic"]
+        provenance = diagnostic.get("vapor_pressure_numerator_provenance")
+        assert isinstance(provenance, Mapping) and provenance
+        species = sorted(provenance)[0]
+        mutations = [
+            (("equilibrium_result", "temperature_C"), "delete", None),
+            (
+                ("equilibrium_result", "status"),
+                "wrong-scalar",
+                0,
+            ),
+            (("equilibrium_result", "pressure_bar"), "none", None),
+            (
+                ("last_vapor_pressure_diagnostic", "source_reaction_fO2_bar"),
+                "bool",
+                True,
+            ),
+            (
+                ("last_vapor_pressure_diagnostic", "source_reaction_fO2_bar"),
+                "non-finite",
+                math.inf,
+            ),
+            (
+                ("last_vapor_pressure_diagnostic", "high_t_melt_activity"),
+                "empty-map",
+                {},
+            ),
+            (
+                (
+                    "last_vapor_pressure_diagnostic",
+                    "high_t_melt_activity",
+                    "vaporock_cap_K",
+                ),
+                "wrong-scalar",
+                "wrong-type",
+            ),
+            (
+                (
+                    "last_vapor_pressure_diagnostic",
+                    "vapor_pressure_numerator_provenance",
+                    species,
+                ),
+                "malformed-provenance",
+                [],
+            ),
+            (("last_vapor_pressures_source",), "wrong-scalar", []),
+            (("last_vapor_pressure_diagnostic",), "none", None),
+        ]
+        equilibrium_result = payload["equilibrium_result"]
+        result_diagnostics = equilibrium_result.get("diagnostics")
+        diagnostic_sources = [
+            (("last_vapor_pressure_diagnostic",), diagnostic)
+        ]
+        if isinstance(result_diagnostics, Mapping):
+            diagnostic_sources.append(
+                (("equilibrium_result", "diagnostics"), result_diagnostics)
             )
-        if isinstance(value, (list, tuple)):
-            return (type(value), len(value))
-        if isinstance(value, bool):
-            return bool
-        if isinstance(value, (int, float)):
-            return "number"
-        return type(value)
+        for field_name in ("vaporock_full_speciation_Pa", "activities"):
+            for prefix, diagnostic_source in diagnostic_sources:
+                values = diagnostic_source.get(field_name)
+                if isinstance(values, Mapping) and values:
+                    species = sorted(values)[0]
+                    mutations.append(
+                        (
+                            (*prefix, field_name, species),
+                            "wrong-scalar",
+                            "wrong-type",
+                        )
+                    )
+                    break
+        return [
+            (path, mutation, replacement)
+            for path, mutation, replacement in mutations
+            if _payload_path_exists(payload, path)
+        ]
 
-    def sample_indices(length: int) -> tuple[int, ...]:
-        return tuple(sorted({0, length // 2, length - 1}))
+    if artifact != "freeze_gate_curve":
+        raise AssertionError(f"unexpected recursive payload artifact: {artifact}")
+    if source_name == "real-gate-step-down-output":
+        return [
+            (
+                ("curve", "gate_provider_step_down", "realized_provider"),
+                "delete",
+                None,
+            )
+        ]
+    curve = payload["curve"]
+    mutations = [
+        (("curve", "solidus_T_C"), "delete", None),
+        (("curve", "source"), "wrong-scalar", 0),
+        (("curve", "liquidus_T_C"), "none", None),
+        (("curve", "solidus_T_C"), "bool", True),
+        (("curve", "liquidus_T_C"), "non-finite", math.inf),
+        (("curve",), "empty-map", {}),
+    ]
+    projected_notice = curve.get("composition_projected_notice")
+    if isinstance(projected_notice, Mapping):
+        for path, _value in _recursive_payload_paths(projected_notice):
+            if path and path[-1] == "mass_fraction":
+                mutations.append(
+                    (
+                        ("curve", "composition_projected_notice", *path),
+                        "wrong-scalar",
+                        "wrong-type",
+                    )
+                )
+                break
+    return [
+        (path, mutation, replacement)
+        for path, mutation, replacement in mutations
+        if _payload_path_exists(payload, path)
+    ]
 
-    def walk_nested(
-        value: Any,
-        path: tuple[Any, ...],
-        *,
-        all_fields: bool = False,
-    ) -> None:
-        paths.append((path, value))
+
+def _payload_path_exists(payload: Any, path: tuple[Any, ...]) -> bool:
+    value = payload
+    for part in path:
         if isinstance(value, Mapping):
-            items = list(value.items())
-            shapes = {value_shape(child) for _key, child in items}
-            if (
-                not all_fields
-                and len(items) > 8
-                and len(shapes) == 1
-            ):
-                ordered_keys = sorted(
-                    (key for key, _child in items),
-                    key=lambda key: (type(key).__name__, repr(key)),
-                )
-                selected = set(sample_indices(len(ordered_keys)))
-                items = [
-                    (key, value[key])
-                    for index, key in enumerate(ordered_keys)
-                    if index in selected
-                ]
-            for key, child in items:
-                paths.append(((*path, _RecursiveMappingKey(key)), key))
-                child_path = (*path, str(key))
-                walk_nested(
-                    child,
-                    child_path,
-                    all_fields=(
-                        child_path
-                        == (rrd._EQUILIBRIUM_REPLAY_SIDE_FIELDS[1],)
-                    ),
-                )
-        elif isinstance(value, (list, tuple)):
-            items = list(enumerate(value))
-            if (
-                len(items) > 8
-                and len({value_shape(child) for _index, child in items}) == 1
-            ):
-                selected = set(sample_indices(len(items)))
-                items = [item for item in items if item[0] in selected]
-            for index, child in items:
-                walk_nested(child, (*path, index))
-
-    walk_nested(payload, (), all_fields=True)
-    return paths
+            if part not in value:
+                return False
+            value = value[part]
+        elif isinstance(value, (list, tuple)) and isinstance(part, int):
+            if part < 0 or part >= len(value):
+                return False
+            value = value[part]
+        else:
+            return False
+    return True
 
 
 def _recursive_mutation_value(value: Any) -> Any:
@@ -8815,6 +8880,18 @@ def test_real_cache_payload_recursive_mutations_miss_or_replay_identically(
     payload_kind: str,
     persistent: bool,
 ) -> None:
+    """Replay a compact representative admission matrix through both stores.
+
+    The equilibrium cases delete a required temperature, use an invalid
+    status scalar, set pressure to None, use bool and infinity for a numeric
+    diagnostic, empty the required high-temperature map, corrupt its numeric
+    cap, replace a nested provenance species mapping, sample one VapoRock and
+    activity species value, and corrupt replay-side fields. Gate cases delete
+    a required bound, use an invalid source scalar, set a bound to None, bool,
+    or infinity, empty the curve, corrupt one projected mass fraction, and
+    remove step-down provenance. Each keeps real recapture or replay while
+    leaving repetitive leaves to nightly.
+    """
     _run_real_cache_payload_recursive_mutations(
         tmp_path,
         payload_kind,
@@ -8824,6 +8901,7 @@ def test_real_cache_payload_recursive_mutations_miss_or_replay_identically(
 
 
 @pytest.mark.nightly
+@pytest.mark.timeout(21600)
 @pytest.mark.parametrize(
     "payload_kind",
     ("equilibrium", "gate"),
@@ -8915,16 +8993,30 @@ def _run_real_cache_payload_recursive_mutations(
         mutation_sources.append(
             _real_gate_step_down_mutation_source(baseline, key)
         )
-    path_selector = (
-        _recursive_payload_paths
-        if exhaustive_sweep
-        else _bounded_recursive_payload_paths
-    )
-    mutation_paths = [
-        (source_name, mutation_baseline, path, value)
-        for source_name, mutation_baseline in mutation_sources
-        for path, value in path_selector(mutation_baseline)
-    ]
+    if exhaustive_sweep:
+        mutation_paths = [
+            (source_name, mutation_baseline, path, value, None, None)
+            for source_name, mutation_baseline in mutation_sources
+            for path, value in _recursive_payload_paths(mutation_baseline)
+        ]
+    else:
+        mutation_paths = [
+            (
+                source_name,
+                mutation_baseline,
+                path,
+                None,
+                mutation,
+                replacement,
+            )
+            for source_name, mutation_baseline in mutation_sources
+            for path, mutation, replacement in _curated_recursive_mutations(
+                mutation_baseline,
+                artifact,
+                source_name,
+            )
+        ]
+        assert len(mutation_paths) <= 30
 
     def reset_reader_for_next_row() -> None:
         reader.hits = 0
@@ -8935,22 +9027,32 @@ def _run_real_cache_payload_recursive_mutations(
         reader.last_cache_state = None
         reader._accepted_hit_disclosures = None
 
-    for source_name, mutation_baseline, path, value in mutation_paths:
+    for (
+        source_name,
+        mutation_baseline,
+        path,
+        value,
+        selected_mutation,
+        selected_replacement,
+    ) in mutation_paths:
         executed_sources.add(source_name)
         paths_seen += 1
         mutations: list[tuple[str, Any]] = []
-        if path:
-            mutations.append(("delete", None))
-        mutations.extend(
-            (
-                ("wrong-scalar", _recursive_mutation_value(value)),
-                ("none", None),
+        if selected_mutation is not None:
+            mutations.append((selected_mutation, selected_replacement))
+        else:
+            if path:
+                mutations.append(("delete", None))
+            mutations.extend(
+                (
+                    ("wrong-scalar", _recursive_mutation_value(value)),
+                    ("none", None),
+                )
             )
-        )
-        if path[-1:] == ("source_reaction_fO2_bar",):
-            mutations.append(("bool", True))
-        if len(path) == 2 and _is_sio_report_diagnostic_path(path):
-            mutations.append(("scalar-map", 7))
+            if path[-1:] == ("source_reaction_fO2_bar",):
+                mutations.append(("bool", True))
+            if len(path) == 2 and _is_sio_report_diagnostic_path(path):
+                mutations.append(("scalar-map", 7))
         for mutation, replacement in mutations:
             cases_expected += 1
             path_name = f"{source_name}: {_recursive_path_label(path)}"
