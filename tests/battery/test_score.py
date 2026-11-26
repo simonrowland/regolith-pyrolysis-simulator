@@ -4724,7 +4724,8 @@ def test_species_formula_parser_requires_liquid_axis_for_melt_suffix() -> None:
 def test_species_formula_parser_accepts_bullet_hydrates_and_unicode_phase() -> None:
     copper_oxide = dict(score_mod.formula_composition("CuO"))
     copper_sulfate = dict(score_mod.formula_composition("CuSO4"))
-    assert parse_species_formula("CuO•CuSO₄") == tuple(
+    bullet_adduct = parse_species_formula("CuO•CuSO₄")
+    assert bullet_adduct == tuple(
         sorted(
             (
                 symbol,
@@ -4733,6 +4734,7 @@ def test_species_formula_parser_accepts_bullet_hydrates_and_unicode_phase() -> N
             for symbol in copper_oxide.keys() | copper_sulfate.keys()
         )
     )
+    assert bullet_adduct == parse_species_formula("CuO·CuSO4")
     assert parse_species_formula(
         "H2SO4·6.5H2O(l)", species=Species("H2SO4", Phase.L)
     ) == (("H", 15.0), ("O", 10.5), ("S", 1.0))
