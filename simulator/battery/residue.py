@@ -1193,6 +1193,220 @@ def _residue_atom_closure(initial_totals, final_totals, buffer_oxygen_exchange_m
     return closure
 
 
+@dataclass(frozen=True)
+class ResidueGasFilm:
+    """Spherical gas film for one residue step.
+
+    ``overhead_pressure_Pa`` is the printed total pressure used for
+    diffusivity and the Knudsen number. It is not a species backpressure.
+    ``bead_diameter_m`` is the diffusion length ``d`` in ``k_c = Sh*D/d``.
+    ``sherwood`` is the sphere Sherwood number. Notices are typed defaults
+    for inputs the source did not print.
+    """
+
+    overhead_pressure_Pa: float
+    bead_diameter_m: float
+    sherwood: float
+    carrier_gas: str
+    carrier_mole_fractions: tuple[tuple[str, float], ...] | None = None
+    molecular_diameter_m: float | None = None
+    notices: tuple[tuple[str, str], ...] = ()
+    flow_sccm: float | None = None
+    free_stream_diameter_m: float | None = None
+    reynolds: float | None = None
+    schmidt: float | None = None
+
+    def as_record(self) -> dict[str, Any]:
+        record: dict[str, Any] = {
+            "law": "series_resistance",
+            "geometry": "sphere",
+            "k_c": "Sh*D/d",
+            "sherwood": self.sherwood,
+            "bead_diameter_m": self.bead_diameter_m,
+            "overhead_pressure_Pa": self.overhead_pressure_Pa,
+            "carrier_gas": self.carrier_gas,
+            "notices": {reason: band for reason, band in self.notices},
+        }
+        if self.carrier_mole_fractions:
+            record["carrier_mole_fractions"] = dict(self.carrier_mole_fractions)
+        if self.molecular_diameter_m is not None:
+            record["molecular_diameter_m"] = self.molecular_diameter_m
+        if self.flow_sccm is not None:
+            record["flow_sccm"] = self.flow_sccm
+        if self.free_stream_diameter_m is not None:
+            record["free_stream_diameter_m"] = self.free_stream_diameter_m
+        if self.reynolds is not None:
+            record["reynolds"] = self.reynolds
+        if self.schmidt is not None:
+            record["schmidt"] = self.schmidt
+        return record
+
+
+def _residue_gas_film_controls(gas_film: ResidueGasFilm) -> dict[str, Any]:
+    """Provider controls for a bead film. The furnace domain gate stays off.
+
+    The gate is the pipe Poiseuille domain. On a bead the series owner's
+    Kn step is the only regime rule: viscous flow keeps the film, and
+    free-molecular flow sets the gas weight to zero.
+    """
+
+    controls: dict[str, Any] = {
+        "pipe_diameter_m": gas_film.bead_diameter_m,
+        "sherwood_number": gas_film.sherwood,
+        "carrier_gas": gas_film.carrier_gas,
+        "apply_viscous_p_bulk_domain_gate": False,
+    }
+    if gas_film.carrier_mole_fractions:
+        controls["carrier_mole_fractions"] = dict(gas_film.carrier_mole_fractions)
+    if gas_film.molecular_diameter_m is not None:
+        controls["molecular_diameter_m"] = gas_film.molecular_diameter_m
+    return controls
+
+
+# sccm is defined at 0 C and 1 atm. The furnace flow is that volume
+# expanded to the printed T and P.
+_SCCM_STANDARD_TEMPERATURE_K = 273.15
+
+
+def _sphere_equivalent_diameter_m(mass_kg: float, density_kg_m3: float) -> float:
+    """Diameter of the sphere with this mass and density.
+
+    The printed mass and the labelled density fallback are the bead.
+    ``d = 2*(3m/(4*pi*rho))**(1/3)``. The series length is this
+    diameter, so Sh = 2 is ``k_c = D/r``.
+    """
+
+    if (
+        not math.isfinite(mass_kg)
+        or mass_kg <= 0.0
+        or not math.isfinite(density_kg_m3)
+        or density_kg_m3 <= 0.0
+    ):
+        raise ResidueInventoryRefusal("bead_diameter_invalid")
+    volume_m3 = mass_kg / density_kg_m3
+    radius_m = (3.0 * volume_m3 / (4.0 * math.pi)) ** (1.0 / 3.0)
+    return 2.0 * radius_m
+
+
+def _sphere_diameter_from_area_m(area_m2: float) -> float:
+    """Sphere diameter whose surface is the printed area.
+
+    ``A = 4*pi*r^2``, so ``d = 2*sqrt(A/(4*pi))``.
+    """
+
+    if not math.isfinite(area_m2) or area_m2 <= 0.0:
+        raise ResidueInventoryRefusal("bead_diameter_invalid")
+    return 2.0 * math.sqrt(area_m2 / (4.0 * math.pi))
+
+
+def _stagnant_sphere_sherwood() -> float:
+    """Sh for Re = 0. The sphere owner returns 2; Sc does not enter."""
+
+    from simulator.condensation import _sphere_ranz_marshall_sherwood
+
+    return _sphere_ranz_marshall_sherwood(0.0, 1.0)
+
+
+def _bead_sherwood_at_flow(
+    *,
+    temperature_K: float,
+    overhead_pressure_Pa: float,
+    bead_diameter_m: float,
+    flow_sccm: float,
+    free_stream_diameter_m: float,
+    mole_fractions: Mapping[str, float],
+) -> tuple[float, float, float]:
+    """Sphere Sherwood number at a printed furnace flow.
+
+    The metered sccm is expanded from 0 C and 1 atm to the printed T
+    and P, then divided by the free-stream tube area. Re uses the bead
+    diameter. Viscosity and the self-diffusion coefficient are the
+    majority carrier's Chapman–Enskog values, so the small convection
+    term does not invent a mixture viscosity. Returns Sh, Re and Sc.
+
+    Correct Sc = nu/D_AB = mu/(rho*D_AB), dimensionless because
+    (kg m^-1 s^-1)/(kg m^-3 * m^2 s^-1) = 1. TODO(t-1993): use
+    species D_AB and species-specific Sh; currently Sc uses carrier
+    self-diffusion and one Sh is shared across species.
+    """
+
+    from simulator.condensation import (
+        GAS_CONSTANT_J_MOL_K,
+        STANDARD_ATMOSPHERE_PA,
+        _LENNARD_JONES_PARAMS,
+        _chapman_enskog_d_ab_m2_s,
+        _chapman_enskog_viscosity_pa_s,
+        _sphere_ranz_marshall_sherwood,
+    )
+
+    majority = max(mole_fractions, key=lambda name: float(mole_fractions[name]))
+    _sigma, _epsilon, molar_mass_g_mol = _LENNARD_JONES_PARAMS[majority]
+    density_kg_m3 = (
+        overhead_pressure_Pa
+        * (molar_mass_g_mol / 1000.0)
+        / (GAS_CONSTANT_J_MOL_K * temperature_K)
+    )
+    viscosity_pa_s = _chapman_enskog_viscosity_pa_s(majority, temperature_K)
+    diffusivity_m2_s = _chapman_enskog_d_ab_m2_s(
+        majority,
+        temperature_K,
+        overhead_pressure_Pa,
+        carrier=majority,
+    )
+    if (
+        diffusivity_m2_s <= 0.0
+        or viscosity_pa_s <= 0.0
+        or density_kg_m3 <= 0.0
+        or free_stream_diameter_m <= 0.0
+    ):
+        raise ResidueInventoryRefusal(
+            "gas_film_transport_unavailable", majority
+        )
+    schmidt = viscosity_pa_s / (density_kg_m3 * diffusivity_m2_s)
+    tube_area_m2 = math.pi * (free_stream_diameter_m / 2.0) ** 2
+    flow_m3_s = (
+        flow_sccm
+        * 1.0e-6
+        / 60.0
+        * (temperature_K / _SCCM_STANDARD_TEMPERATURE_K)
+        * (STANDARD_ATMOSPHERE_PA / overhead_pressure_Pa)
+    )
+    velocity_m_s = flow_m3_s / tube_area_m2
+    reynolds = density_kg_m3 * velocity_m_s * bead_diameter_m / viscosity_pa_s
+    return (
+        _sphere_ranz_marshall_sherwood(reynolds, schmidt),
+        reynolds,
+        schmidt,
+    )
+
+
+def _unprinted_stagnant_gas_film(
+    *,
+    overhead_pressure_Pa: float,
+    bead_diameter_m: float,
+    bead_notice: str,
+) -> ResidueGasFilm:
+    """N2 film at Sh = 2 when the source did not print carrier or flow.
+
+    Both defaults are typed notices. The series owner still drops
+    ``R_gas`` when Kn is free-molecular, so a vacuum overhead does not
+    become a continuum film.
+    """
+
+    return ResidueGasFilm(
+        overhead_pressure_Pa=overhead_pressure_Pa,
+        bead_diameter_m=bead_diameter_m,
+        sherwood=_stagnant_sphere_sherwood(),
+        carrier_gas="N2",
+        notices=(
+            (bead_notice, "stated_default"),
+            ("carrier_gas_not_printed", "stated_default"),
+            ("gas_flow_unprinted_stagnant_sherwood", "stated_default"),
+        ),
+        reynolds=0.0,
+    )
+
+
 def _finite_step_fluxes(
     terms: Sequence[_ChannelTerms],
     inventory_mol: Mapping[str, float],
@@ -1202,8 +1416,15 @@ def _finite_step_fluxes(
     pressures_Pa: Mapping[str, float],
     background_pressure_Pa: float = 0.0,
     include_below_threshold: bool = False,
+    gas_film: ResidueGasFilm | None = None,
 ) -> dict[str, float]:
-    """Run the authoritative HKL provider at the solved channel pressures."""
+    """Run series-resistance flux at the solved channel pressures.
+
+    Without a film the request is the historical vacuum Hertz–Knudsen
+    call (gas resistance off). A film turns the same series owner on
+    and passes the bead diameter, sphere Sherwood number and printed
+    total pressure. Species backpressure stays ``background_pressure_Pa``.
+    """
     parent_channels = [term for term in terms if term.parent_moles_per_product]
     if not parent_channels:
         return {}
@@ -1262,12 +1483,21 @@ def _finite_step_fluxes(
                 term.source.species: float(term.source.alpha) for term in parent_channels
             },
             "evaporation_series_resistance": {
-                "gas_resistance_enabled": False,
+                "gas_resistance_enabled": gas_film is not None,
                 "melt_resistance_enabled": False,
             },
-            "overhead_pressure_pa": background_pressure_Pa,
-            "commanded_pressure_pa": background_pressure_Pa,
+            "overhead_pressure_pa": (
+                gas_film.overhead_pressure_Pa
+                if gas_film is not None
+                else background_pressure_Pa
+            ),
+            "commanded_pressure_pa": (
+                gas_film.overhead_pressure_Pa
+                if gas_film is not None
+                else background_pressure_Pa
+            ),
             "stir_factor": 0.0,
+            **({} if gas_film is None else _residue_gas_film_controls(gas_film)),
         },
     )
     result = provider.dispatch(request)
@@ -1327,6 +1557,7 @@ def integrate_residue_inventory(
     area_evolution_m2: Sequence[float] | None = None,
     buffered_fO2_log: float | None = None,
     background_pressure_Pa: float = 0.0,
+    gas_film: ResidueGasFilm | None = None,
 ) -> ResidueInventoryResult:
     """Integrate free evaporation with an engine-specific pressure callback.
 
@@ -1334,12 +1565,16 @@ def integrate_residue_inventory(
     declared oxide reactants, which supply the product's non-oxygen atoms. At the start of every finite
     sub-step the callback evaluates that engine's pressure laws at trial
     ``log10(pO2 / bar)`` and the shared R1a balance selects the congruent root.
-    The builtin HKL provider then evaluates
-    ``J_i = alpha_i * (p_i - p_bulk,i) / sqrt(2*pi*M_i*R*T)`` in mol m^-2 s^-1;
-    the explicit background ceiling is subtracted once in the shared root and
-    HKL driver (zero for existing vacuum callers). The provider receives
-    net driving pressures and the declared area, so its
-    returned kg h^-1 is converted at the boundary back to mol s^-1.
+    The builtin series-resistance provider then evaluates the flux.
+    Without ``gas_film`` the gas resistance is off, which is the
+    Hertz–Knudsen interface term. With a film the same owner adds
+    ``R_gas`` at the printed total pressure; free-molecular Kn sets
+    that resistance to zero inside the owner. The explicit background
+    ceiling is subtracted once in the shared root and the species
+    driver (zero for existing vacuum callers) and is not the film
+    pressure. The provider receives net driving pressures and the
+    declared area, so its returned kg h^-1 is converted at the
+    boundary back to mol s^-1.
 
     For a parent with inventory ``N`` mol and requested parent draw ``r`` mol
     s^-1, analytic depletion debits ``N * (1 - exp(-r*dt/N))`` mol during the
@@ -1483,6 +1718,7 @@ def integrate_residue_inventory(
             area_m2=area_m2,
             pressures_Pa=pressures,
             background_pressure_Pa=background_pressure_Pa,
+            gas_film=gas_film,
         )
         requested_product_mol_s = {
             species: rate_kg_s / term_by_species[species].molar_mass_kg_mol
@@ -4802,6 +5038,13 @@ def predict_mass_loss_fraction(
             if segment_area_start_m2 is None
             else segment_area_start_m2
         )
+        gas_film = _unprinted_stagnant_gas_film(
+            overhead_pressure_Pa=total_pressure_Pa,
+            bead_diameter_m=_sphere_diameter_from_area_m(area_m2),
+            bead_notice="bead_diameter_sphere_from_printed_area",
+        )
+        for reason, _band in gas_film.notices:
+            flags.add(reason)
         try:
             result = _hashimoto_integrate_geometry(
                 inventory, channels, pressures_at, temperature_K=at_K,
@@ -4815,6 +5058,7 @@ def predict_mass_loss_fraction(
                 final_area_m2=segment_area_end_m2,
                 initial_sample_mass_kg=sample_mass_kg,
                 background_pressure_Pa=0.0 if unsourced_unity else total_pressure_Pa,
+                gas_film=gas_film,
                 **({"on_step": measure} if rectangle or (not unsourced_unity and unsourced) else {}),
             )
             if result.refusal is not None:
@@ -5333,6 +5577,7 @@ def _hashimoto_integrate_geometry(
     final_area_m2: float | None = None,
     initial_sample_mass_kg: float | None = None,
     background_pressure_Pa: float = 0.0,
+    gas_film: ResidueGasFilm | None = None,
     on_step: Callable[[Mapping[str, float], Sequence[ResidueChannel], float, float], None] | None = None,
 ) -> _HashimotoGeometryIntegration:
     inventory = {str(oxide): float(amount) for oxide, amount in initial_inventory_mol.items()}
@@ -5433,6 +5678,7 @@ def _hashimoto_integrate_geometry(
             area_evolution_m2=(area_m2,),
             **({"background_pressure_Pa": background_pressure_Pa}
                if background_pressure_Pa else {}),
+            gas_film=gas_film,
         )
         _retain_residue_pressure_notices(step, pressure_notices)
         if on_step is not None:
@@ -5843,6 +6089,13 @@ def _predict_hashimoto_residue_cohort(
         run_initial_mol = setup.initial_inventory_mol
         initial_steps = setup.steps
         geometry_areas = setup.geometry_areas
+        gas_film = _unprinted_stagnant_gas_film(
+            overhead_pressure_Pa=total_pressure_Pa,
+            bead_diameter_m=_sphere_equivalent_diameter_m(
+                sample_mass_kg, _HASHIMOTO_DENSITY_KG_M3
+            ),
+            bead_notice="bead_diameter_not_printed",
+        )
         gas_channels = setup.gas_channels
         row_by_channel = {str(row["channel"]): dict(row) for row in setup.liquid_rows}
         common_channels = setup.common_channels
@@ -6011,6 +6264,7 @@ def _predict_hashimoto_residue_cohort(
                         steps=steps,
                         geometry_policy_id=geometry,
                         initial_area_m2=geometry_areas[geometry],
+                        gas_film=gas_film,
                     )
                     geometry_pressure_law_diagnostics[geometry] = (
                         integration_result.pressure_law_diagnostics
@@ -6139,6 +6393,7 @@ def _predict_hashimoto_residue_cohort(
                 "density_fallback_2700_kg_m3": True,
                 "oxygen_unbuffered_vacuum": True,
                 "pressure_on_throw_ignored_for_bc": True,
+                **{reason: True for reason, _band in gas_film.notices},
                 "feo_melt_redox_stack2_pending": True,
                 "d060_pending": True,
                 "openimcc_liquid_row_extrapolated": bool(extrapolated_liquids),
@@ -6167,6 +6422,7 @@ def _predict_hashimoto_residue_cohort(
                 "area_evolution": geometry_provenance[primary_geometry]["area_evolution"],
                 "density_kg_m3": _HASHIMOTO_DENSITY_KG_M3,
                 "density_source": _HASHIMOTO_DENSITY_SOURCE,
+                "gas_film": gas_film.as_record(),
                 "alpha_arm": alpha_arm,
                 "alpha_source": (
                     "declared_common_unity_sensitivity"
@@ -6323,10 +6579,154 @@ _SOSSI_GEOMETRIES = (
     "pt_loop_bead_disk_equivalent_volume",
 )
 _SOSSI_PRIMARY_GEOMETRY = _SOSSI_GEOMETRIES[0]
+# Frozen radius: sphere r ∝ m^(1/3), so k_film ∝ 1/r changes by ~⅓ of fractional mass loss (~1.7% for 5%).
 _SOSSI_DENSITY_SOURCE = (
     "labelled 2700 kg/m3 fallback for the Sossi bead geometry sensitivity; "
     "density is not printed by Sossi"
 )
+# Printed GERO tube ID (methods). Free-stream area for the metered flow
+# only. The diffusion length is the bead diameter, so Sh = 2 is k_c = D/r.
+# The wall factor R/(R-r) is taken as 1.
+_SOSSI_FREE_STREAM_DIAMETER_M = 0.042
+# 10^(-0.68) bar is 0.209 bar O2. Ar is omitted; N2 takes the balance.
+_SOSSI_DRY_AIR = (("N2", 0.79), ("O2", 0.21))
+# Table 2 CO and CO2, sccm, keyed by extract experiment_id. None is a
+# printed dash. A printed 0 stays 0. Both dashes are air: the methods
+# sentence that says about 200 sccm excludes air, so that flow is unprinted.
+# 2M-15-07-16f is in the PDF and not in the extract.
+_SOSSI_TABLE2_CO_CO2_SCCM: dict[str, tuple[float | None, float | None]] = {
+    "sossi-2019-run-2m-15-07-16c": (None, None),
+    "sossi-2019-run-2m-15-07-16d": (None, 200.0),
+    "sossi-2019-run-2m-15-07-16g": (1.8, 200.0),
+    "sossi-2019-run-2m-15-07-16h": (24.0, 175.0),
+    "sossi-2019-run-p11-06-18a": (None, 200.0),
+    "sossi-2019-run-1m-15-07-16a": (None, 200.0),
+    "sossi-2019-run-1m-15-07-16b": (1.9, 200.0),
+    "sossi-2019-run-1m-ps6": (25.0, 180.0),
+    "sossi-2019-run-3m-18-07-16b": (None, None),
+    "sossi-2019-run-2m-18-07-16a": (None, 200.0),
+    "sossi-2019-run-2m-18-07-16c": (12.0, 188.0),
+    "sossi-2019-run-1m-ps3": (None, 180.0),
+    "sossi-2019-run-1m-ps2": (5.0, 180.0),
+    "sossi-2019-run-1m-ps4": (66.0, 133.0),
+    "sossi-2019-run-p09-06-18b": (130.0, 65.0),
+    "sossi-2019-run-p09-06-18a": (130.0, 65.0),
+    "sossi-2019-run-1m-ps5": (167.0, 33.0),
+    "sossi-2019-run-p08-02-17b": (None, None),
+    "sossi-2019-run-3m-29-2-16": (None, None),
+    "sossi-2019-run-1m-2-3-16": (None, 200.0),
+    "sossi-2019-run-c18-12-15": (0.0, 27.0),
+    "sossi-2019-run-1m-ps1": (5.0, 180.0),
+    "sossi-2019-run-p09-06-18c": (5.5, 195.0),
+    "sossi-2019-run-c17-12-15a": (13.0, 27.0),
+    "sossi-2019-run-1m-1-3-16": (167.0, 33.0),
+    "sossi-2019-run-3m-1-3-16": (None, None),
+    "sossi-2019-run-c17-12-15b": (13.0, 27.0),
+    "sossi-2019-run-1m-1-3-16b": (167.0, 33.0),
+    "sossi-2019-run-3m-29-2-16b": (None, None),
+    "sossi-2019-run-c17-12-15c": (13.0, 27.0),
+    "sossi-2019-run-2m-16-07-16e": (None, None),
+    "sossi-2019-run-2m-16-07-16a": (None, 200.0),
+    "sossi-2019-run-2m-16-07-16b": (16.0, 184.0),
+    "sossi-2019-run-2m-16-07-16c": (120.0, 80.0),
+    "sossi-2019-run-3m-2-3-16": (None, None),
+    "sossi-2019-run-2m-17-07-16a": (None, 200.0),
+    "sossi-2019-run-2m-17-07-16b": (16.0, 184.0),
+    "sossi-2019-run-2m-17-07-16c": (120.0, 80.0),
+    "sossi-2019-run-2m-16-07-16f": (None, None),
+    "sossi-2019-run-2m-16-07-16g": (None, 200.0),
+    "sossi-2019-run-p11-06-18b": (25.0, 175.0),
+    "sossi-2019-run-2m-16-07-16h": (42.0, 158.0),
+    "sossi-2019-run-2m-16-07-16d": (188.0, 12.0),
+}
+
+
+def _sossi_carrier(
+    experiment_id: str,
+) -> tuple[tuple[tuple[str, float], ...], float | None, tuple[tuple[str, str], ...]]:
+    """Mole fractions, printed flow sccm or None, and typed notices."""
+
+    try:
+        co_sccm, co2_sccm = _SOSSI_TABLE2_CO_CO2_SCCM[experiment_id]
+    except KeyError:
+        return (
+            (("N2", 1.0),),
+            None,
+            (
+                ("carrier_gas_not_printed", "stated_default"),
+                ("gas_flow_unprinted_stagnant_sherwood", "stated_default"),
+            ),
+        )
+    if co_sccm is None and co2_sccm is None:
+        return (
+            _SOSSI_DRY_AIR,
+            None,
+            (("gas_flow_unprinted_stagnant_sherwood", "stated_default"),),
+        )
+    flows = {
+        "CO": 0.0 if co_sccm is None else float(co_sccm),
+        "CO2": 0.0 if co2_sccm is None else float(co2_sccm),
+    }
+    total = math.fsum(flows.values())
+    if total <= 0.0:
+        raise ResidueInventoryRefusal("sossi_carrier_flow_invalid", experiment_id)
+    fractions = tuple(
+        (name, amount / total) for name, amount in flows.items() if amount > 0.0
+    )
+    return fractions, total, ()
+
+
+def _sossi_gas_film(
+    experiment_id: str,
+    *,
+    temperature_K: float,
+    overhead_pressure_Pa: float,
+    sample_mass_kg: float,
+) -> ResidueGasFilm:
+    """Bead film for one Sossi run. The series owner still applies Kn."""
+
+    from simulator.condensation import _mixture_collision_diameter_m
+
+    diameter_m = _sphere_equivalent_diameter_m(
+        sample_mass_kg, _HASHIMOTO_DENSITY_KG_M3
+    )
+    fractions, flow_sccm, flow_notices = _sossi_carrier(experiment_id)
+    fraction_map = dict(fractions)
+    majority = max(fraction_map, key=fraction_map.get)
+    if flow_sccm is None:
+        sherwood = _stagnant_sphere_sherwood()
+        reynolds = 0.0
+        schmidt = None
+    else:
+        sherwood, reynolds, schmidt = _bead_sherwood_at_flow(
+            temperature_K=temperature_K,
+            overhead_pressure_Pa=overhead_pressure_Pa,
+            bead_diameter_m=diameter_m,
+            flow_sccm=flow_sccm,
+            free_stream_diameter_m=_SOSSI_FREE_STREAM_DIAMETER_M,
+            mole_fractions=fraction_map,
+        )
+    notices = (("bead_diameter_not_printed", "stated_default"), *flow_notices)
+    if flow_sccm is not None and sherwood > 2.0:
+        notices += (
+            (
+                "sherwood_shared_scalar_sc",
+                "Sc from carrier self-diffusion, Sh shared across species, until t-1993",
+            ),
+        )
+    return ResidueGasFilm(
+        overhead_pressure_Pa=overhead_pressure_Pa,
+        bead_diameter_m=diameter_m,
+        sherwood=sherwood,
+        carrier_gas=majority,
+        carrier_mole_fractions=fractions,
+        molecular_diameter_m=_mixture_collision_diameter_m(fraction_map),
+        notices=notices,
+        flow_sccm=flow_sccm,
+        free_stream_diameter_m=_SOSSI_FREE_STREAM_DIAMETER_M,
+        reynolds=reynolds,
+        schmidt=schmidt,
+    )
 
 
 def _sossi_initial_inventory(
@@ -7167,6 +7567,12 @@ def _predict_sossi_residue_cohort(
         )
 
         areas = _sossi_geometry_areas(sample_mass_kg)
+        gas_film = _sossi_gas_film(
+            experiment_id,
+            temperature_K=temperature_K,
+            overhead_pressure_Pa=total_pressure_Pa,
+            sample_mass_kg=sample_mass_kg,
+        )
         steps = min(_HASHIMOTO_N_CAP, max(8, math.ceil(duration_s / 60.0)))
         geometry_predictions: dict[str, dict[str, float]] = {}
         geometry_inventory_mol: dict[str, dict[str, float]] = {}
@@ -7205,6 +7611,7 @@ def _predict_sossi_residue_cohort(
                             duration_s=dt,
                             area_evolution_m2=(area,),
                             buffered_fO2_log=buffered_logp,
+                            gas_film=gas_film,
                         )
                     except ResidueEngineNonconvergence as exc:
                         run_refusal = exc
@@ -7275,6 +7682,20 @@ def _predict_sossi_residue_cohort(
             for element in supported_elements
         }
         primary_inventory = geometry_inventory_mol[_SOSSI_PRIMARY_GEOMETRY]
+        primary_buffer_exchange = geometry_buffer_exchange[_SOSSI_PRIMARY_GEOMETRY]
+        primary_mass_kg, _ = _inventory_bulk_and_element_masses_kg(
+            primary_inventory, primary_buffer_exchange, ()
+        )
+        integrated_mass_loss_fraction = 1.0 - primary_mass_kg / initial_melt_mass_kg
+        gas_film_record = gas_film.as_record()
+        gas_film_notices = dict(gas_film_record["notices"])
+        if integrated_mass_loss_fraction > 0.2:
+            gas_film_notices["frozen_bead_diameter_mass_loss_over_20_percent"] = (
+                f"integrated_mass_loss_fraction={integrated_mass_loss_fraction:.6g}; "
+                "frozen-radius coefficient error exceeds about 7%; "
+                "radius should be updated per step"
+            )
+        gas_film_record["notices"] = gas_film_notices
         printed_composition = sample.get("printed_composition", {})
         prediction_rows.append(
             _SossiResiduePrediction(
@@ -7294,6 +7715,7 @@ def _predict_sossi_residue_cohort(
                     "buffered_fO2_log": buffered_logp,
                     "buffered_boundary": "printed log10 fO2; reservoir oxygen exchange included",
                     "buffer_oxygen_exchange_mol_by_geometry": geometry_buffer_exchange,
+                    "integrated_mass_loss_fraction": integrated_mass_loss_fraction,
                     "host_composition_wt_pct": dict(
                         printed_composition.get("state", {}).get("value", {})
                     ),
@@ -7322,6 +7744,7 @@ def _predict_sossi_residue_cohort(
                     },
                     "density_kg_m3": _HASHIMOTO_DENSITY_KG_M3,
                     "density_source": _SOSSI_DENSITY_SOURCE,
+                    "gas_film": gas_film_record,
                     "alpha_arm": alpha_arm,
                     "alpha_by_channel": [
                         {
@@ -7373,7 +7796,7 @@ def _predict_sossi_residue_cohort(
                         ),
                         "pt_wire_loop_bead_geometry_assumed": True,
                         "density_fallback_2700_kg_m3": True,
-                        "bc_open_furnace_langmuir_limit_diagnostic": True,
+                        **{reason: True for reason in gas_film_notices},
                     },
                     **_pin_provenance(handoff_bucket),
                 },

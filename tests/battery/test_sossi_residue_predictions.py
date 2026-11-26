@@ -217,6 +217,10 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
             expected_activity.thermodynamic_parent_activity()
         )
     assert ideal_parents <= set(gas_activity_inputs[0])
+    assert prediction.provenance["integrated_mass_loss_fraction"] == 0.0
+    assert "frozen_bead_diameter_mass_loss_over_20_percent" not in (
+        prediction.provenance["gas_film"]["notices"]
+    )
 
     missing_activity_calls: list[str] = []
 
@@ -295,6 +299,32 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
     ]
     assert "Gd2O3" not in gas_activity_inputs[-1]
     assert "Gd2O3" not in gas_parent_oxide_inputs[-1]
+
+    def lose_three_percent_per_step(inventory, *_args, **_kwargs):
+        return SimpleNamespace(
+            residue_mol={oxide: amount * 0.97 for oxide, amount in inventory.items()},
+            buffer_oxygen_exchange_mol=0.0,
+        )
+
+    monkeypatch.setattr(residue, "_HASHIMOTO_N_CAP", 8)
+    monkeypatch.setattr(
+        residue, "integrate_residue_inventory", lose_three_percent_per_step
+    )
+    large_loss = residue._predict_sossi_residue_cohort(
+        [experiment],
+        catalog,
+        starting_trace_ppm_by_experiment={experiment_id: starting_trace},
+        buffered_fO2_log_by_experiment={experiment_id: -10.0},
+        engine="openimcc",
+    )[0]
+    assert large_loss.provenance["integrated_mass_loss_fraction"] > 0.2
+    assert "frozen_bead_diameter_mass_loss_over_20_percent" in (
+        large_loss.provenance["gas_film"]["notices"]
+    )
+    assert large_loss.provenance["assumption_flags"][
+        "frozen_bead_diameter_mass_loss_over_20_percent"
+    ] is True
+
 
 # engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
 @pytest.mark.engine_cache_off
@@ -684,6 +714,17 @@ def test_sossi_scorer_projects_trace_species_and_flags_ideal_activity(monkeypatc
                     "assumption_flags": {
                         "alpha_assumed_unity_ratio_not_measured_alpha": True,
                     },
+                    "gas_film": {
+                        "notices": {
+                            "bead_diameter_not_printed": "stated_default",
+                            "sherwood_shared_scalar_sc": (
+                                "Sc from carrier self-diffusion, Sh shared across species, until t-1993"
+                            ),
+                            "frozen_bead_diameter_mass_loss_over_20_percent": (
+                                "integrated_mass_loss_fraction=0.25; frozen-radius coefficient error exceeds about 7%"
+                            ),
+                        },
+                    },
                     "melt_activity_extensions": {
                         "MnO": {
                             "reason": "MnO is outside the IMCC-SF04 melt-activity domain",
@@ -731,7 +772,11 @@ def test_sossi_scorer_projects_trace_species_and_flags_ideal_activity(monkeypatc
     assert prediction.version is None
     assert "code_revision" not in prediction.refusal_detail
     assert any(
-        notice.reason == "bc_open_furnace_langmuir_limit_diagnostic"
+        notice.reason == "bead_diameter_not_printed"
+        for notice in prediction.notices
+    )
+    assert all(
+        notice.reason != "bc_open_furnace_langmuir_limit_diagnostic"
         for notice in prediction.notices
     )
     assert any(
@@ -740,6 +785,24 @@ def test_sossi_scorer_projects_trace_species_and_flags_ideal_activity(monkeypatc
         and "authority_level=UNCERTIFIED" in notice.band
         and "certified_band_K=none" in notice.band
         for notice in prediction.notices
+    )
+    convention_caveats = {
+        notice.reason: notice
+        for notice in prediction.notices
+        if notice.reason
+        in {
+            "sherwood_shared_scalar_sc",
+            "frozen_bead_diameter_mass_loss_over_20_percent",
+        }
+    }
+    assert set(convention_caveats) == {
+        "sherwood_shared_scalar_sc",
+        "frozen_bead_diameter_mass_loss_over_20_percent",
+    }
+    assert all(
+        notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        and notice.authority is Authority.CONVENTION
+        for notice in convention_caveats.values()
     )
     assert metric_operation_for_identity(manganese.identity) is MetricOperation.DEX
     ideal_notices = [
