@@ -172,11 +172,14 @@ def test_rein_chipman_quote_keeps_unknown_method_refusal(tmp_path: Path) -> None
         context, rail=Rail.MELT_ACTIVITY, engines=(Engine.INTERNAL_ANALYTICAL,)
     )
     residual = next(row for row in residuals if row.reference == observation.observation_id)
-    assert residual.status is ResidualStatus.REFUSED
+    # A fusion-phase gap and a flagged method default both void the measured
+    # band. The scorer keeps the prediction as NO_BAND. The gap is
+    # DECISION_RULE_MISSING, not a hard identity refusal.
+    assert residual.status is ResidualStatus.NO_BAND
     assert residual.refusal is not None
     # d-460 predicts with a flagged method default. d-338 still infers the
     # polymorph, and that inference is not re-attached as a secondary refusal.
-    assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert residual.refusal.reason is RefusalReason.DECISION_RULE_MISSING
     assert residual.refusal.detail["reason"] == "fusion_source_reference_phase_unprinted"
     assert "fusion_source_reference_phase_unprinted" not in (
         residual.refusal.detail.get("secondary_reasons") or ()
