@@ -8660,7 +8660,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         from simulator.chemistry.kernel.dto import IntentRequest
         from simulator.evaporation import (
             EvaporationFluxRefusal,
-            oxide_fe_transport_ceiling_kg_hr,
+            shared_fe_hkl_residual_kg_hr,
         )
         from simulator.thermal_train import (
             FiniteCapacity,
@@ -8745,12 +8745,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
 
         rates_cache = {}
-        # Same pure-Fe ceiling as _calculate_evaporation. The pool
-        # leftover is not a second operand.
-        fe_ceiling_kg_hr = oxide_fe_transport_ceiling_kg_hr(
-            getattr(self, '_last_native_fe_partition_diagnostic', None),
-            molar_mass_kg_mol=float(molar_masses.get('Fe', 0.0) or 0.0),
-        )
 
         def flux_at_partials(partials_Pa):
             cache_key = tuple(sorted(
@@ -8811,8 +8805,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     ) or {}
                 ).items()
             }
-            if fe_ceiling_kg_hr is not None and 'Fe' in rates:
-                rates['Fe'] = min(rates['Fe'], fe_ceiling_kg_hr)
+            # Same leftover as _calculate_evaporation. The native split
+            # stored it before this shadow. One p_Fe, so one ceiling.
+            fe_residual_kg_hr = shared_fe_hkl_residual_kg_hr(
+                getattr(
+                    self,
+                    '_native_fe_vapor_residual_capacity_mol_this_hr',
+                    None,
+                ),
+                molar_mass_kg_mol=float(molar_masses.get('Fe', 0.0) or 0.0),
+            )
+            if fe_residual_kg_hr is not None and 'Fe' in rates:
+                rates['Fe'] = min(rates['Fe'], fe_residual_kg_hr)
             rates = self._analytic_evaporation_depletion_rates(
                 rates,
                 dt_hr=self.process_dt_hr(),
