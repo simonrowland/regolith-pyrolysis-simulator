@@ -1315,6 +1315,9 @@ def test_inventory_cap_reserves_finite_shared_parent_channel(
     from simulator.diagnostic_helpers import binary_pot_battery
 
     row, experiment = r11_inputs
+    # Richter leaves missing coefficients out of the unsourced set.
+    # The shared-parent cap is scored on Markova, as the ceiling test is.
+    row = replace(row, source_id="kems-026-markova-1984")
     ceiling = float(parse_formula("SiO2").molar_mass_kg_per_mol())
     mass = replace(
         experiment.sample.mass_kg,
@@ -1415,6 +1418,9 @@ def test_inventory_cap_records_actual_mixed_parent_debit_when_other_parent_is_ti
     from simulator.diagnostic_helpers import binary_pot_battery
 
     row, experiment = r11_inputs
+    # Richter leaves missing coefficients out of the unsourced set.
+    # The mixed-parent debit is scored on Markova, as the ceiling test is.
+    row = replace(row, source_id="kems-026-markova-1984")
     alumina_molar_mass = float(parse_formula("Al2O3").molar_mass_kg_per_mol())
     silica_molar_mass = float(parse_formula("SiO2").molar_mass_kg_per_mol())
     alumina_inventory_kg = alumina_molar_mass
