@@ -303,8 +303,10 @@ def test_score_decimal_subscripts_use_accounting_parser_owner(
     assert score_parse(hydrate) == expected_hydrate
     assert composition_parse(hydrate) == expected_hydrate
     # CuSO4.5H2O has no Si, Al, or P, so NBO/T is unavailable. The mutation
-    # needs a network former the accounting parser accepts as an adduct.
-    silicate = "Al2O3.2SiO2"
+    # needs an adduct the accounting parser splits and the JANAF tokenizer
+    # does not. Al2O3.2SiO2 parses, and its NBO/T is -1/2, which the hero
+    # refuses. Na2O.2SiO2 is Na2Si2O5: T = 2, O = 5, NBO/T = 1.
+    silicate = "Na2O.2SiO2"
     nbo_composition = {
         "amount_basis": AmountBasis.MOLE_FRACTION.value,
         "components": ((silicate, Decimal(1)),),
