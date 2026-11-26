@@ -245,6 +245,15 @@ def _payload_codec_version(artifact: str) -> int | None:
     return None
 
 
+def _is_finite_cache_number(value: Any) -> bool:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return False
+    try:
+        return math.isfinite(float(value))
+    except (OverflowError, TypeError, ValueError):
+        return False
+
+
 def _decode_payload_for_admission(
     artifact: str,
     payload: Any,
@@ -264,14 +273,6 @@ def _decode_payload_for_admission(
     if not isinstance(payload, Mapping):
         return None
 
-    def is_finite_number(value: Any) -> bool:
-        if isinstance(value, bool) or not isinstance(value, (int, float)):
-            return False
-        try:
-            return math.isfinite(float(value))
-        except (OverflowError, TypeError, ValueError):
-            return False
-
     def has_finite_json_numbers(value: Any) -> bool:
         if isinstance(value, Mapping):
             return all(
@@ -283,7 +284,7 @@ def _decode_payload_for_admission(
         if isinstance(value, bool) or value is None or isinstance(value, str):
             return True
         if isinstance(value, (int, float)):
-            return is_finite_number(value)
+            return _is_finite_cache_number(value)
         return False
 
     def valid_string_sequence(value: Any) -> bool:
@@ -338,7 +339,7 @@ def _decode_payload_for_admission(
                 return False
             if (
                 not all(
-                    is_finite_number(certified_band[field_name])
+                    _is_finite_cache_number(certified_band[field_name])
                     for field_name in ("min_T_C", "max_T_C")
                 )
                 or not isinstance(certified_band["source"], str)
@@ -363,7 +364,7 @@ def _decode_payload_for_admission(
                 or "mass_fraction" not in row
                 or not isinstance(row["component"], str)
                 or not row["component"]
-                or not is_finite_number(row["mass_fraction"])
+                or not _is_finite_cache_number(row["mass_fraction"])
             ):
                 return False
         if "bounds_source" in value and not isinstance(
@@ -378,10 +379,15 @@ def _decode_payload_for_admission(
                 not isinstance(projected_bounds, (list, tuple))
                 or isinstance(projected_bounds, (str, bytes))
                 or len(projected_bounds) != 2
-                or not all(is_finite_number(bound) for bound in projected_bounds)
+                or not all(
+                    _is_finite_cache_number(bound)
+                    for bound in projected_bounds
+                )
             ):
                 return False
-        if "floor_T_C" in value and not is_finite_number(value["floor_T_C"]):
+        if "floor_T_C" in value and not _is_finite_cache_number(
+            value["floor_T_C"]
+        ):
             return False
         for field_name in (
             "temperature_band_case",
@@ -486,7 +492,10 @@ def _decode_payload_for_admission(
                 not isinstance(silica_bounds, (list, tuple))
                 or isinstance(silica_bounds, (str, bytes))
                 or len(silica_bounds) != 2
-                or not all(is_finite_number(bound) for bound in silica_bounds)
+                or not all(
+                    _is_finite_cache_number(bound)
+                    for bound in silica_bounds
+                )
                 or stored_or_query_identity.certified_band is None
                 or curve.get("authority") != "extrapolated"
                 or tuple(float(bound) for bound in silica_bounds)
@@ -598,30 +607,21 @@ def _decode_payload_for_admission(
                 return False
             pressure = value["reference_pressure_bar"]
             temperature = value["reference_temperature_K"]
-            if (
-                not isinstance(pressure, (int, float))
-                or isinstance(pressure, bool)
-                or (
-                    temperature is not None
-                    and (
-                        not isinstance(temperature, (int, float))
-                        or isinstance(temperature, bool)
-                    )
-                )
-            ):
-                return False
-            try:
-                return math.isfinite(float(pressure)) and (
-                    temperature is None or math.isfinite(float(temperature))
-                )
-            except (OverflowError, TypeError, ValueError):
-                return False
+            return _is_finite_cache_number(pressure) and (
+                temperature is None
+                or _is_finite_cache_number(temperature)
+            )
 
         for diagnostic in provenance_diagnostics:
             high_t_activity = diagnostic.get("high_t_melt_activity")
             if "high_t_melt_activity" in diagnostic and (
                 not isinstance(high_t_activity, Mapping)
-                or not is_finite_number(high_t_activity.get("temperature_K"))
+                or not _is_finite_cache_number(
+                    high_t_activity.get("temperature_K")
+                )
+                or not _is_finite_cache_number(
+                    high_t_activity.get("vaporock_cap_K")
+                )
             ):
                 return None
             # VapoRock writes this field as species-to-pressure data; the
@@ -632,7 +632,7 @@ def _decode_payload_for_admission(
             if "vaporock_full_speciation_Pa" in diagnostic and (
                 not isinstance(vaporock_speciation, Mapping)
                 or any(
-                    not is_finite_number(pressure)
+                    not _is_finite_cache_number(pressure)
                     for pressure in vaporock_speciation.values()
                 )
             ):
@@ -641,7 +641,7 @@ def _decode_payload_for_admission(
             if "backend_vapor_pressures_Pa" in diagnostic and (
                 not isinstance(backend_pressures, Mapping)
                 or any(
-                    not is_finite_number(pressure)
+                    not _is_finite_cache_number(pressure)
                     for pressure in backend_pressures.values()
                 )
             ):
@@ -652,7 +652,7 @@ def _decode_payload_for_admission(
                 not isinstance(activities, Mapping)
                 or any(
                     not isinstance(species, str)
-                    or not is_finite_number(activity)
+                    or not _is_finite_cache_number(activity)
                     for species, activity in activities.items()
                 )
             ):
@@ -671,6 +671,15 @@ def _decode_payload_for_admission(
                 )
             ):
                 return None
+            if "source_reaction_fO2_bar" in diagnostic:
+                source_reaction_fO2_bar = diagnostic[
+                    "source_reaction_fO2_bar"
+                ]
+                if (
+                    source_reaction_fO2_bar is not None
+                    and not _is_finite_cache_number(source_reaction_fO2_bar)
+                ):
+                    return None
             if "vapor_pressure_numerator_provenance" not in diagnostic:
                 continue
             provenance = diagnostic["vapor_pressure_numerator_provenance"]
@@ -706,16 +715,7 @@ def _decode_payload_for_admission(
                 for field_name in finite_number_fields:
                     value = species_provenance.get(field_name)
                     if field_name in species_provenance and value is not None:
-                        if (
-                            not isinstance(value, (int, float))
-                            or isinstance(value, bool)
-                        ):
-                            return None
-                        try:
-                            finite = math.isfinite(float(value))
-                        except (OverflowError, TypeError, ValueError):
-                            finite = False
-                        if not finite:
+                        if not _is_finite_cache_number(value):
                             return None
                 if "melt_oxide_gamma_valid_range_K" in species_provenance:
                     valid_range = species_provenance[
@@ -727,18 +727,11 @@ def _decode_payload_for_admission(
                         or len(valid_range) != 2
                     ):
                         return None
-                    for bound in valid_range:
-                        if (
-                            not isinstance(bound, (int, float))
-                            or isinstance(bound, bool)
-                        ):
-                            return None
-                        try:
-                            finite = math.isfinite(float(bound))
-                        except (OverflowError, TypeError, ValueError):
-                            finite = False
-                        if not finite:
-                            return None
+                    if not all(
+                        _is_finite_cache_number(bound)
+                        for bound in valid_range
+                    ):
+                        return None
                 if (
                     "melt_activity_fallback" in species_provenance
                     and type(species_provenance["melt_activity_fallback"]) is not bool
@@ -5434,12 +5427,7 @@ def _decode_equilibrium_replay_payload(
                 for key, item in value.items()
             )
         if annotation is float:
-            if not isinstance(value, (int, float)) or isinstance(value, bool):
-                return False
-            try:
-                return math.isfinite(float(value))
-            except (OverflowError, TypeError, ValueError):
-                return False
+            return _is_finite_cache_number(value)
         if annotation is int:
             return type(value) is int
         if annotation is bool:
@@ -5750,24 +5738,19 @@ def _curve_from_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
     ):
         raise TypeError("measured gate-curve path must be a non-empty sequence")
 
-    def finite_number(value: Any) -> bool:
-        if isinstance(value, bool) or not isinstance(value, (int, float)):
-            return False
-        try:
-            return math.isfinite(float(value))
-        except (OverflowError, TypeError, ValueError):
-            return False
-
     solidus = payload.get("solidus_T_C")
     liquidus = payload.get("liquidus_T_C")
-    if not finite_number(solidus) or not finite_number(liquidus):
+    if (
+        not _is_finite_cache_number(solidus)
+        or not _is_finite_cache_number(liquidus)
+    ):
         raise TypeError("gate-curve bounds must be finite numbers")
     path = []
     for point in path_payload:
         if (
             not isinstance(point, Mapping)
-            or not finite_number(point.get("temperature_C"))
-            or not finite_number(point.get("liquid_fraction"))
+            or not _is_finite_cache_number(point.get("temperature_C"))
+            or not _is_finite_cache_number(point.get("liquid_fraction"))
         ):
             raise TypeError("gate-curve path points must contain finite numbers")
         path.append(
@@ -5798,6 +5781,7 @@ def _curve_from_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
             not isinstance(failed_providers, (list, tuple))
             or isinstance(failed_providers, (str, bytes))
             or any(not isinstance(item, Mapping) for item in failed_providers)
+            or "realized_provider" not in step_down
             or (
                 realized_provider is not None
                 and not isinstance(realized_provider, str)
