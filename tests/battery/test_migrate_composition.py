@@ -1606,7 +1606,13 @@ def test_masuda_identity_mass_regression_detects_blind_point_mass_promotion(
     original_add_observation = Migrator._add_observation
 
     def promote_unknown_point_mass(
-        self, observation, source_key, *, source_row_index=None
+        self,
+        observation,
+        source_key,
+        *,
+        source_row_index=None,
+        oxygen_kind=None,
+        pressure_source=None,
     ):
         condition = (observation.point_conditions or {}).get("sample_mass_kg")
         if (
@@ -1630,6 +1636,8 @@ def test_masuda_identity_mass_regression_detects_blind_point_mass_promotion(
             observation,
             source_key,
             source_row_index=source_row_index,
+            oxygen_kind=oxygen_kind,
+            pressure_source=pressure_source,
         )
 
     monkeypatch.setattr(
