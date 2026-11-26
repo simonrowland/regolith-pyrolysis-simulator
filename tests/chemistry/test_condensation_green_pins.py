@@ -585,10 +585,14 @@ def _without_engine_versions(value):
 @pytest.mark.nightly
 @pytest.mark.xdist_group("magemin_fullrun_a")
 @pytest.mark.timeout(5400)
-# Receipt b5022121: the capture maps matched the pin and the call then
-# failed the unmarked 300 s worker budget at 370.9 s. Sibling MAGEMin
-# full runs already declare the same 5400 s budget as this wall guard.
-@pytest.mark.cpu_budget(5400)
+# Receipt b5022121: the maps matched, then unmarked worker process_time
+# failed at 370.948 s of the 300 s default. 500 s is one third over that
+# one sample. process_time excludes child MAGEMin, and the campaign
+# finished, so the overage is worker Python on the same C0->C6 loop:
+# the Fe-line root (8f174cc807), ledger fO2 (a95942989e), and the
+# oxide-Fe debit's wall booking (f187184015). The warm-start hint is
+# unchanged. 5400 s would copy a different test's ceiling.
+@pytest.mark.cpu_budget(500)
 def test_green_full_lunar_capture_pin(route_totals, tmp_path):
     # Current full_lunar pins: studio-2 actuals at a2299343eb, equal to the
     # d-441 owner card (b265 values). History of the earlier pins follows.
