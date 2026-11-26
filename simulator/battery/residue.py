@@ -4150,9 +4150,11 @@ def wang_ree_full_retention_prediction(
     predicted_ppm = _wang_ree_retained_ppm(reference, result)
     if predicted_ppm is None:
         return None
-    from simulator.battery.enums import NoticeKind, Quantity
-    from simulator.battery.records import Notice
+    from simulator.battery.default_policy import resolve as resolve_default_policy
+    from simulator.battery.enums import Quantity
+    from simulator.battery.records import Notice, NoticePolicy
 
+    resolved = resolve_default_policy("DP-117")
     start_ppm = Decimal(
         str(reference.point_conditions["starting_component_ppm"].state.value)
     )
@@ -4170,7 +4172,7 @@ def wang_ree_full_retention_prediction(
     return {
         "predicted_ppm": predicted_ppm,
         "notice": Notice(
-            kind=NoticeKind.INPUT_OMITTED,
+            kind=resolved.flag,
             affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
             reason=(
                 "ree_vapour_channel_missing_default_retained: "
@@ -4178,6 +4180,7 @@ def wang_ree_full_retention_prediction(
                 f"missing vapour channel {formula}"
             ),
             origin=reference.observation_id,
+            policy=NoticePolicy(**resolved.payload["policy"]),
         ),
         "provenance": provenance,
     }

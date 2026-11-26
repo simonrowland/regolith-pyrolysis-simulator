@@ -111,6 +111,7 @@ def test_every_entry_loads_with_closed_flags_and_trace_fields() -> None:
         "DP-112",
         "DP-114",
         "DP-116",
+        "DP-117",
     }
 
     required = {
@@ -197,6 +198,15 @@ def test_every_entry_loads_with_closed_flags_and_trace_fields() -> None:
             assert entry["flag"] == "knob_defaulted"
             assert entry["canonized_by"] is None
             assert entry["canonized_at"] is None
+        elif policy_id == "DP-117":
+            assert entry["status"] == "proposed"
+            assert entry["proposed_by"] == "w1126tsf5"
+            assert entry["value"] == 1
+            assert entry["units"] == "dimensionless"
+            assert entry["flag"] == "knob_defaulted"
+            assert "no vapour channel" in entry["condition"]
+            assert entry["canonized_by"] is None
+            assert entry["canonized_at"] is None
         else:
             assert entry["status"] == "canonical"
             assert entry["canonized_by"] in {"owner", "controller"}
@@ -226,6 +236,17 @@ def test_dp116_resolves_owner_geometry_as_a_proposed_convention() -> None:
     assert resolved.flag is NoticeKind.KNOB_DEFAULTED
     assert resolved.payload["policy_status"] == "proposed"
     assert resolved.payload["policy"]["id"] == "DP-116"
+
+
+def test_dp117_resolves_full_retention_as_a_proposed_knob() -> None:
+    resolved = resolve("DP-117")
+    assert resolved.value == Decimal("1")
+    assert resolved.units == "dimensionless"
+    assert resolved.flag is NoticeKind.KNOB_DEFAULTED
+    assert resolved.payload["policy_status"] == "proposed"
+    assert resolved.payload["policy"]["id"] == "DP-117"
+    assert resolved.payload["policy"]["value"] == "1"
+    assert resolved.payload["policy"]["status"] == "proposed"
 
 
 def test_notice_policy_requires_a_normalized_string_value() -> None:

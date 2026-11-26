@@ -465,3 +465,19 @@ policies:
     canonized_by: null
     canonized_at: null
     history: []
+  - id: DP-117
+    condition: "Wang element-ppm residue row has no vapour channel for that element"
+    value: 1
+    units: dimensionless
+    physical_basis: "The element stays in the bead. Measured mass loss concentrates it: predicted_ppm = starting_ppm / (1 - mass_loss_fraction). Retention 1 is proposed until an owner ruling."
+    bias: "Ce and Eu residuals widen where the missing vapour channel would have removed them."
+    flag: knob_defaulted
+    ruling: "w1126tsf5 controller ruling, 2026-11-26; proposed pending owner physics ruling"
+    version: 1
+    status: proposed
+    proposed_by: w1126tsf5
+    proposed_at: "2026-11-26"
+    evidence: "Wang 2001 Table 1 REE ppm rows have no REE vapour channel in the residue gas set."
+    canonized_by: null
+    canonized_at: null
+    history: []

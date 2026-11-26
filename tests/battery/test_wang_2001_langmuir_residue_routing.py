@@ -1,6 +1,7 @@
 """Route Wang's measured Langmuir residues through the shared scorer owner."""
 
 from collections import Counter, defaultdict
+from dataclasses import replace
 from decimal import Decimal
 from math import sqrt
 import json
@@ -427,12 +428,16 @@ def test_wang_residue_cells_emit_one_production_score_event_each(monkeypatch):
         assert residual.numeric.operation is MetricOperation.DEX
         default_notices = [
             notice for notice in residual.notices
-            if notice.kind is NoticeKind.INPUT_OMITTED
+            if notice.kind is NoticeKind.KNOB_DEFAULTED
             and notice.reason.startswith(
                 "ree_vapour_channel_missing_default_retained:"
             )
         ]
         assert len(default_notices) == 1
+        assert default_notices[0].policy is not None
+        assert default_notices[0].policy.id == "DP-117"
+        assert default_notices[0].policy.status == "proposed"
+        assert default_notices[0].policy.value == "1"
         assert "default=retention 1" in default_notices[0].reason
         assert f"missing vapour channel {formula}" in default_notices[0].reason
         assert not any(
@@ -487,6 +492,52 @@ def test_wang_residue_cells_emit_one_production_score_event_each(monkeypatch):
         )
         assert is_imp or is_emp
         _assert_wang_imp_basis_notice(residual.notices, expected=is_imp)
+
+    def without_langmuir_ramp(residual):
+        return replace(
+            residual,
+            notices=tuple(
+                notice
+                for notice in residual.notices
+                if not (
+                    notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+                    and notice.origin == "Langmuir residue extent"
+                )
+            ),
+        )
+
+    stripped = [without_langmuir_ramp(residual) for residual in ree_scored]
+    for residual in stripped:
+        strata = score_module.flagged_strata(residual.notices)
+        assert "proposed-policy" in strata
+        assert "knob_defaulted" in strata
+    assert score_module._measured_residuals(
+        stripped, context, include_engine_out_of_band=True
+    ) == []
+    headlines = score_module.headline_rows(stripped, context=context)
+    assert headlines
+    assert all(int(row["n_candidates"]) == 0 for row in headlines)
+
+    def without_retention_notice(residual):
+        return replace(
+            residual,
+            notices=tuple(
+                notice
+                for notice in residual.notices
+                if not notice.reason.startswith(
+                    "ree_vapour_channel_missing_default_retained:"
+                )
+            ),
+        )
+
+    admitted = score_module._measured_residuals(
+        [without_retention_notice(residual) for residual in stripped],
+        context,
+        include_engine_out_of_band=True,
+    )
+    assert {residual.reference for residual in admitted} == {
+        residual.reference for residual in ree_scored
+    }
 
 
 def test_wang_imp_closure_notice_preserves_printed_wt_percent(monkeypatch):
