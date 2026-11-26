@@ -93,8 +93,8 @@ def _capture_comparison_identities(monkeypatch):
     compared = []
     original = score._comparison_identity
 
-    def capture(identity, reference, prediction):
-        result = original(identity, reference, prediction)
+    def capture(identity, reference, prediction, method=None):
+        result = original(identity, reference, prediction, method=method)
         compared.append(result)
         return result
 
