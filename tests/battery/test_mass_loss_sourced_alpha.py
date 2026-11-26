@@ -1041,6 +1041,10 @@ def prescribed_pressure_engine(monkeypatch, fig3_source, request):
     package = ModuleType("openimcc")
     package.load_gas_datapack = lambda: object()
     monkeypatch.setitem(sys.modules, "openimcc", package)
+    # Mass-loss loads the pack through the bridge. The real loader's lazy
+    # gas import would see this sys.modules stub and fail.
+    from simulator.melt_backend import openimcc_bridge
+    monkeypatch.setattr(openimcc_bridge, "_load_gas_pack", lambda _selection: object())
 
     def gas_channels(*_):
         channels = [("Mg", ("MgO", 1.0, -0.5)), ("O2", (request.param, 0.0, 1.0))]
@@ -1253,7 +1257,11 @@ def test_inventory_ceiling_is_shared_across_steps_segments_preheat_and_gases(
                 for name in gases] + [("O2", (None, 0.0, 1.0))]
     monkeypatch.setattr(binary_pot_battery, "_openimcc_gas_channels_and_omission_notices",
                         lambda *_: (channels, ()))
-    monkeypatch.setattr(residue, "_initial_oxide_wt_percent", lambda _: {"CaO": 100.0})
+    monkeypatch.setattr(
+        residue,
+        "_initial_oxide_wt_percent",
+        lambda _sample, initial_composition=None: {"CaO": 100.0},
+    )
     monkeypatch.setattr(residue, "_mass_loss_thermal_segments", lambda *_: (
         1173.15, 120.0, ((2073.15, 120.0), (2073.15, 120.0)),
     ))
@@ -1324,7 +1332,9 @@ def test_inventory_cap_reserves_finite_shared_parent_channel(
         lambda *_: (channels, ()),
     )
     monkeypatch.setattr(
-        residue, "_initial_oxide_wt_percent", lambda _: {"SiO2": 100.0}
+        residue,
+        "_initial_oxide_wt_percent",
+        lambda _sample, initial_composition=None: {"SiO2": 100.0},
     )
     monkeypatch.setattr(
         residue,
@@ -1428,7 +1438,7 @@ def test_inventory_cap_records_actual_mixed_parent_debit_when_other_parent_is_ti
     monkeypatch.setattr(
         residue,
         "_initial_oxide_wt_percent",
-        lambda _: {
+        lambda _sample, initial_composition=None: {
             "Al2O3": 100.0 * alumina_inventory_kg / sample_mass_kg,
             "SiO2": 100.0 * silica_inventory_kg / sample_mass_kg,
         },
@@ -1723,6 +1733,8 @@ def test_mass_loss_keeps_provider_recorded_omission_on_produced_and_refused_pred
     package = ModuleType("openimcc")
     package.load_gas_datapack = lambda: object()
     monkeypatch.setitem(sys.modules, "openimcc", package)
+    from simulator.melt_backend import openimcc_bridge
+    monkeypatch.setattr(openimcc_bridge, "_load_gas_pack", lambda _selection: object())
     original_yaml = score_module.load_yaml
     monkeypatch.setattr(score_module, "load_yaml", lambda path: (
         deepcopy(fig3_source) if path.name == "kems-010-richter-2007.yaml" else original_yaml(path)
