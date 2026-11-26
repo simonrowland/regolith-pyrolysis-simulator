@@ -2150,7 +2150,7 @@ def test_bonnand_gorojovsky_printed_domain_ids_match_green() -> None:
 
 
 @pytest.mark.nightly
-@pytest.mark.timeout(300)
+@pytest.mark.timeout(300, func_only=True)
 @pytest.mark.xdist_group("t1745-parsed-store")
 def test_full_store_printed_width_band_census_matches_green(
     parsed_store_cache_root: Path,
