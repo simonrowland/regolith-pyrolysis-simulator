@@ -1140,7 +1140,6 @@ def test_failure_envelope_survives_campaign_stop_projection_failure(monkeypatch)
         error_message="primary execution failure",
         envelope_detail_unavailable="diagnostic envelope unavailable",
     )
-    base_payload = run._minimal_failure_output(execution)
 
     def raise_campaign_stop_projection(_session):
         raise RuntimeError("campaign stop projection failed")
@@ -1152,11 +1151,12 @@ def test_failure_envelope_survives_campaign_stop_projection_failure(monkeypatch)
 
     payload = run._build_output(execution)
 
-    assert payload == base_payload
     assert payload["status"] == "failed"
     assert payload["reason"] == "primary_failure"
     assert "primary execution failure" in payload["error_message"]
     assert "diagnostic envelope unavailable" in payload["error_message"]
+    assert payload["run_metadata"]["run_flags"]
+    assert "campaign_stops" not in payload["run_metadata"]
 
 
 def test_successful_output_survives_campaign_stop_projection_failure(monkeypatch):
@@ -1175,7 +1175,14 @@ def test_successful_output_survives_campaign_stop_projection_failure(monkeypatch
 
     payload = run._build_output(execution)
 
-    assert payload == base_payload
+    assert payload["status"] == base_payload["status"]
+    assert payload["run_metadata"]["run_flags"]
+    assert "campaign_stops" not in payload["run_metadata"]
+    assert session._diagnostic_failures[-1] == {
+        "kind": "diagnostic_unresolved",
+        "site": "campaign_stop_projection",
+        "error_type": "RuntimeError",
+    }
 
 
 def test_cached_failure_document_survives_campaign_stop_projection_failure(
@@ -1204,8 +1211,10 @@ def test_cached_failure_document_survives_campaign_stop_projection_failure(
 
     exported = session.result_document()
 
-    assert exported == base_document
+    assert exported["status"] == base_document["status"]
     assert exported["reason"] == "primary_failure"
+    assert exported["run_metadata"]["run_flags"]
+    assert "campaign_stops" not in exported["run_metadata"]
 
 
 def test_result_document_returns_original_if_mapping_enumeration_fails():
@@ -1226,6 +1235,192 @@ def test_result_document_returns_original_if_mapping_enumeration_fails():
     session._set_result_document(document)
 
     assert session.result_document() is document
+    assert session._diagnostic_failures[-1] == {
+        "kind": "diagnostic_unresolved",
+        "site": "result_document_getter_metadata",
+        "error_type": "RuntimeError",
+    }
+
+
+@pytest.mark.parametrize(
+    ("raising_key", "failed_code", "surviving_code"),
+    [
+        (
+            "stop_detail",
+            "campaign_time_cap_unconverged",
+            "c4_time_capped_without_na_endpoint",
+        ),
+        (
+            "c4_termination",
+            "c4_time_capped_without_na_endpoint",
+            "campaign_time_cap_unconverged",
+        ),
+    ],
+)
+def test_c4_stop_flag_build_failure_does_not_abort_hour_or_other_flag(
+    monkeypatch,
+    raising_key,
+    failed_code,
+    surviving_code,
+):
+    class RaisingSummary(dict):
+        raised = False
+
+        def get(self, key, default=None):
+            if key == raising_key and not self.raised:
+                self.raised = True
+                raise RuntimeError("injected stop diagnostic read failure")
+            return super().get(key, default)
+
+    run = _run(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C4",
+        hours=1,
+        additives_kg={},
+    )
+    session = _started_internal_session(run)
+    sim = session.simulator
+    sim.record.branch = "two"
+    sim.campaign_mgr.campaigns["C4"]["max_target_acquisition_hr"] = 1.0
+    capture_summary = sim._capture_campaign_summary
+
+    def capture_with_raising_diagnostic(campaign_name):
+        summary = capture_summary(campaign_name)
+        if campaign_name == "C4":
+            return RaisingSummary(summary)
+        return summary
+
+    monkeypatch.setattr(
+        sim,
+        "_capture_campaign_summary",
+        capture_with_raising_diagnostic,
+    )
+
+    execution = RunExecutor().execute_session(session, hours=1)
+
+    assert execution.status == "ok"
+    assert sim.melt.hour == 1
+    assert sim.melt.campaign is CampaignPhase.C2A
+    output = run._build_output(execution)
+    c4_stop = next(
+        stop for stop in output["run_metadata"]["campaign_stops"]
+        if stop["campaign"] == "C4"
+    )
+    failed_flag = next(
+        flag for flag in c4_stop["flags"]
+        if flag["code"] == failed_code
+    )
+    surviving_flag = next(
+        flag for flag in c4_stop["flags"]
+        if flag["code"] == surviving_code
+    )
+    assert failed_flag["detail"] == {
+        "unresolved": True,
+        "error_type": "RuntimeError",
+    }
+    assert surviving_flag["detail"].get("unresolved") is not True
+    assert any(
+        flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+        and flag["detail"]["campaign"] == "C2A"
+        for flag in output["run_metadata"]["run_flags"]
+    )
+
+
+def test_budget_flag_build_failure_keeps_campaign_stop_flags(monkeypatch):
+    import simulator.session as session_module
+
+    run = _run(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C4",
+        hours=1,
+        additives_kg={},
+    )
+    session = _started_internal_session(run)
+    sim = session.simulator
+    sim.record.branch = "two"
+    sim.campaign_mgr.campaigns["C4"]["max_target_acquisition_hr"] = 1.0
+
+    def fail_budget_flag_build(*args, **kwargs):
+        raise RuntimeError("injected budget flag build failure")
+
+    monkeypatch.setattr(
+        session_module,
+        "_configured_campaign_walk",
+        fail_budget_flag_build,
+    )
+
+    execution = RunExecutor().execute_session(session, hours=1)
+    output = run._build_output(execution)
+
+    assert execution.status == "ok"
+    assert sim.melt.hour == 1
+    assert sim.melt.campaign is CampaignPhase.C2A
+    budget_flag = next(
+        flag for flag in output["run_metadata"]["run_flags"]
+        if flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+    )
+    assert budget_flag["detail"] == {
+        "unresolved": True,
+        "error_type": "RuntimeError",
+    }
+    c4_stop = next(
+        stop for stop in output["run_metadata"]["campaign_stops"]
+        if stop["campaign"] == "C4"
+    )
+    assert {flag["code"] for flag in c4_stop["flags"]} == {
+        "campaign_time_cap_unconverged",
+        "c4_time_capped_without_na_endpoint",
+    }
+
+
+def test_result_document_setter_stores_document_if_metadata_lookup_fails():
+    class BrokenMetadataLookup(dict):
+        def get(self, key, default=None):
+            if key == "run_metadata":
+                raise RuntimeError("metadata lookup failed")
+            return super().get(key, default)
+
+    session = _started_internal_session(_run(campaign="C2A", hours=1))
+    document = BrokenMetadataLookup(status="ok", run_metadata={"run_flags": []})
+
+    session._set_result_document(document)
+
+    assert session._result_document is document
+    failure = session._diagnostic_failures[-1]
+    assert failure == {
+        "kind": "diagnostic_unresolved",
+        "site": "result_document_setter_metadata",
+        "error_type": "RuntimeError",
+    }
+
+
+def test_result_document_getter_returns_original_if_metadata_enumeration_fails():
+    from collections.abc import Mapping
+
+    class BrokenRunMetadata(Mapping):
+        def __getitem__(self, key):
+            raise KeyError(key)
+
+        def __iter__(self):
+            raise RuntimeError("run metadata enumeration failed")
+
+        def __len__(self):
+            return 0
+
+        def get(self, key, default=None):
+            return default
+
+    session = _started_internal_session(_run(campaign="C2A", hours=1))
+    document = {"status": "ok", "run_metadata": BrokenRunMetadata()}
+    session._set_result_document(document)
+
+    assert session.result_document() is document
+    failure = session._diagnostic_failures[-1]
+    assert failure == {
+        "kind": "diagnostic_unresolved",
+        "site": "result_document_getter_metadata",
+        "error_type": "RuntimeError",
+    }
 
 
 def test_campaign_flag_copy_failure_does_not_fail_execution(monkeypatch):
@@ -1286,7 +1481,24 @@ def test_campaign_flag_copy_failure_does_not_fail_execution(monkeypatch):
     )
     payload = run._build_output(execution)
     assert payload["status"] == "ok"
-    assert "campaign_stops" not in payload["run_metadata"]
+    assert payload["run_metadata"]["run_flags"] == list(execution.run_flags)
+    budget_flag = next(
+        flag for flag in payload["run_metadata"]["run_flags"]
+        if flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+    )
+    assert budget_flag["detail"]["campaign"] == "C2A"
+    c4_stop = next(
+        stop for stop in payload["run_metadata"]["campaign_stops"]
+        if stop["campaign"] == "C4"
+    )
+    unresolved_copy = next(
+        flag for flag in c4_stop["flags"]
+        if flag["code"] == "injected_copy_failure"
+    )
+    assert unresolved_copy["detail"] == {
+        "unresolved": True,
+        "error_type": "RuntimeError",
+    }
 
 
 def test_live_result_document_recomputes_budget_flag_when_chain_completes():

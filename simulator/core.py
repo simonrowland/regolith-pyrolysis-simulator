@@ -16526,30 +16526,56 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     pending_decision = self.campaign_mgr.get_decision(
                         self.melt.campaign, self.record)
 
-            if self._last_campaign_summary.get('stop_reason') == 'time_cap':
-                successor = (
-                    next_campaign.name
-                    if next_campaign is not None
-                    else None
-                )
-                stop_flag_detail = {
-                    'campaign': finishing_campaign,
-                    'stop_detail': self._last_campaign_summary.get(
-                        'stop_detail'
-                    ),
-                    'successor': successor,
-                    'ruling': 'd-471',
-                }
-                if pending_decision is not None:
-                    stop_flag_detail['pending_decision'] = (
-                        pending_decision.decision_type.name
-                    )
-                flags: list[dict[str, object]] = [{
+            flags: list[dict[str, object]] = []
+
+            def unresolved_stop_flag(
+                code: str,
+                error: Exception,
+            ) -> dict[str, object]:
+                return {
                     'kind': 'campaign_stop',
-                    'code': 'campaign_time_cap_unconverged',
-                    'detail': stop_flag_detail,
-                }]
-                if finishing_campaign == CampaignPhase.C4.name:
+                    'code': code,
+                    'detail': {
+                        'unresolved': True,
+                        'error_type': type(error).__name__,
+                    },
+                }
+
+            try:
+                if self._last_campaign_summary.get('stop_reason') == 'time_cap':
+                    successor = (
+                        next_campaign.name
+                        if next_campaign is not None
+                        else None
+                    )
+                    stop_flag_detail = {
+                        'campaign': finishing_campaign,
+                        'stop_detail': self._last_campaign_summary.get(
+                            'stop_detail'
+                        ),
+                        'successor': successor,
+                        'ruling': 'd-471',
+                    }
+                    if pending_decision is not None:
+                        stop_flag_detail['pending_decision'] = (
+                            pending_decision.decision_type.name
+                        )
+                    flags.append({
+                        'kind': 'campaign_stop',
+                        'code': 'campaign_time_cap_unconverged',
+                        'detail': stop_flag_detail,
+                    })
+            except Exception as exc:
+                flags.append(
+                    unresolved_stop_flag('campaign_time_cap_unconverged', exc)
+                )
+
+            try:
+                if (
+                    finishing_campaign == CampaignPhase.C4.name
+                    and self._last_campaign_summary.get('stop_reason')
+                    == 'time_cap'
+                ):
                     termination = self._last_campaign_summary.get(
                         'c4_termination'
                     )
@@ -16569,6 +16595,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                             'ruling': 'd-471',
                         },
                     })
+            except Exception as exc:
+                flags.append(
+                    unresolved_stop_flag(
+                        'c4_time_capped_without_na_endpoint',
+                        exc,
+                    )
+                )
+
+            if flags:
                 self._last_campaign_summary['flags'] = flags
 
         backend_transition = getattr(equilibrium, 'ledger_transition', None)

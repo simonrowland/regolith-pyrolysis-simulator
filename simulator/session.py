@@ -298,6 +298,7 @@ class SimSession:
             _MISSING_RESULT_DOCUMENT_RUN_FLAGS
         )
         self._pending_result_document_run_flags: tuple[int, Any] | None = None
+        self._diagnostic_failures: list[dict[str, str]] = []
         self._poisoned_error: RuntimeError | None = None
 
     @property
@@ -534,6 +535,7 @@ class SimSession:
             _MISSING_RESULT_DOCUMENT_RUN_FLAGS
         )
         self._pending_result_document_run_flags = None
+        self._diagnostic_failures = []
         self._poisoned_error = None
 
         sim.start_campaign(campaign_phase)
@@ -841,11 +843,14 @@ class SimSession:
                         attached_metadata.pop("run_flags", None)
                     else:
                         attached_metadata["run_flags"] = raw_run_flags
-                if not _attach_execution_diagnostics(attached_metadata, self):
-                    return document
+                _attach_execution_diagnostics(attached_metadata, self)
                 payload["run_metadata"] = attached_metadata
-        except Exception:
+        except Exception as exc:
             # Diagnostic staging must preserve the recorded green document.
+            self._record_diagnostic_failure(
+                "result_document_getter_metadata",
+                exc,
+            )
             return document
         return payload
 
@@ -870,22 +875,41 @@ class SimSession:
         )
 
     def _set_result_document(self, document: Mapping[str, Any]) -> None:
-        metadata = document.get("run_metadata")
+        self._result_document = document
+        self._result_document_raw_run_flags = (
+            _MISSING_RESULT_DOCUMENT_RUN_FLAGS
+        )
         pending_source = self._pending_result_document_run_flags
         self._pending_result_document_run_flags = None
-        if isinstance(metadata, Mapping):
-            if pending_source is not None and pending_source[0] == id(metadata):
-                self._result_document_raw_run_flags = pending_source[1]
-            else:
-                self._result_document_raw_run_flags = metadata.get(
-                    "run_flags",
-                    _MISSING_RESULT_DOCUMENT_RUN_FLAGS,
-                )
-        else:
-            self._result_document_raw_run_flags = (
-                _MISSING_RESULT_DOCUMENT_RUN_FLAGS
+        try:
+            metadata = document.get("run_metadata")
+            if isinstance(metadata, Mapping):
+                if (
+                    pending_source is not None
+                    and pending_source[0] == id(metadata)
+                ):
+                    self._result_document_raw_run_flags = pending_source[1]
+                else:
+                    self._result_document_raw_run_flags = metadata.get(
+                        "run_flags",
+                        _MISSING_RESULT_DOCUMENT_RUN_FLAGS,
+                    )
+        except Exception as exc:
+            self._record_diagnostic_failure(
+                "result_document_setter_metadata",
+                exc,
             )
-        self._result_document = document
+
+    def _record_diagnostic_failure(
+        self,
+        site: str,
+        error: Exception,
+    ) -> None:
+        self._diagnostic_failures.append({
+            "kind": "diagnostic_unresolved",
+            "site": site,
+            "error_type": type(error).__name__,
+        })
 
     def _require_sim(self) -> PyrolysisSimulator:
         if self._sim is None:
@@ -1098,11 +1122,23 @@ def _campaign_stop_record(
     if include_flags:
         flags = summary.get("flags")
         if isinstance(flags, (list, tuple)):
-            record["flags"] = [
-                copy.deepcopy(dict(flag))
-                for flag in flags
-                if isinstance(flag, Mapping)
-            ]
+            projected_flags: list[dict[str, Any]] = []
+            for flag in flags:
+                if not isinstance(flag, Mapping):
+                    continue
+                flag_record = dict(flag)
+                try:
+                    projected_flags.append(copy.deepcopy(flag_record))
+                except Exception as exc:
+                    projected_flags.append({
+                        "kind": flag_record.get("kind", "campaign_stop"),
+                        "code": flag_record.get("code"),
+                        "detail": {
+                            "unresolved": True,
+                            "error_type": type(exc).__name__,
+                        },
+                    })
+            record["flags"] = projected_flags
     return record
 
 
@@ -1147,31 +1183,32 @@ def _campaign_stops_for_trace(
 def _attach_execution_diagnostics(
     run_metadata: dict[str, Any],
     session: Any,
-) -> bool:
-    """Attach diagnostics atomically; diagnostic failures leave output untouched."""
+) -> None:
+    """Attach flag and stop diagnostics independently under local guards."""
 
+    if getattr(session, "_sim", None) is None:
+        return
     try:
-        if getattr(session, "_sim", None) is None:
-            return True
-        attached_metadata = dict(run_metadata)
-        stored_run_flags = attached_metadata.get("run_flags", [])
+        stored_run_flags = run_metadata.get("run_flags", [])
         live_flags = _run_flags_for_export(session)
         live_budget_flag = live_flags[0] if live_flags else None
         run_flags = _merge_run_flags(stored_run_flags, live_budget_flag)
         if run_flags is not stored_run_flags:
             if run_flags is None:
-                attached_metadata.pop("run_flags", None)
+                run_metadata.pop("run_flags", None)
             else:
-                _write_run_flags_to_metadata(attached_metadata, run_flags)
-        attached_metadata["campaign_stops"] = _json_safe(
+                _write_run_flags_to_metadata(run_metadata, run_flags)
+    except Exception as exc:
+        session._record_diagnostic_failure("run_flags_attachment", exc)
+
+    try:
+        run_metadata["campaign_stops"] = _json_safe(
             list(_campaign_stops_for_trace(session))
         )
-    except Exception:
-        # A secondary projection must never mask or partially rewrite its result.
-        return False
-    run_metadata.clear()
-    run_metadata.update(attached_metadata)
-    return True
+    except Exception as exc:
+        # A failed live projection must not revive a recorded stale list.
+        run_metadata.pop("campaign_stops", None)
+        session._record_diagnostic_failure("campaign_stop_projection", exc)
 
 
 def drive_auto_apply(
