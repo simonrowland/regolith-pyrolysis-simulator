@@ -804,6 +804,58 @@ def test_in_domain_effective_pressure_set_mismatch_fails_closed() -> None:
     assert report["catalog_continuation_flux_species"] == []
 
 
+def test_evaporation_effective_pressure_mismatch_publishes_notice(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    batch = _toy_batch({"Na"}, pressures={"Na": 1.0})
+    model = SimpleNamespace(
+        melt=SimpleNamespace(hour=4),
+        vapor_pressures={},
+        _last_vapor_pressure_diagnostic={},
+        _last_vapour_batch_resolve_error={},
+        _resolve_evaporation_vapour_batch=lambda _equilibrium, **_kwargs: batch,
+    )
+    model._resolve_evaporation_batch_flux_state = MethodType(
+        EvaporationMixin._resolve_evaporation_batch_flux_state,
+        model,
+    )
+    monkeypatch.setattr(
+        EvaporationMixin,
+        "_langmuir_headspace_partials_Pa",
+        lambda _self, _pressures: {},
+    )
+    monkeypatch.setattr(
+        EvaporationMixin,
+        "_langmuir_film",
+        lambda _self, partials: (dict(partials), 0.0),
+    )
+    monkeypatch.setattr(
+        EvaporationMixin,
+        "_closed_langmuir_pressures_for_partials",
+        lambda _self, _pressures, **_kwargs: SimpleNamespace(
+            applied=False,
+            surface_pO2_bar=None,
+            pressures_Pa={},
+        ),
+    )
+
+    pressures, overlay, *_ = model._resolve_evaporation_batch_flux_state(
+        SimpleNamespace(temperature_C=1600.0, vapor_pressures_Pa={}),
+        temperature_K=1873.15,
+    )
+
+    assert pressures == {}
+    assert overlay["missing_effective_pressure_species"] == ["Na"]
+    assert overlay["notices"] == [
+        {
+            "kind": "vapour_batch_unresolved",
+            "species": "Na",
+            "hour": 4,
+            "reason": "typed_failure_effective_pressure_species_set_mismatch",
+        },
+    ]
+
+
 def test_flux_pressures_proved_when_legacy_and_batch_agree() -> None:
     live = {"Na": 12.5, "SiO": 3.0}
     batch = _toy_batch(
@@ -905,7 +957,7 @@ def test_evaporation_resolver_failure_at_900c_is_typed_refusal() -> None:
     """Null: the inherited sub-1050 C shortcut converts resolver failure to zero."""
 
     model = SimpleNamespace(
-        melt=SimpleNamespace(temperature_C=900.0),
+        melt=SimpleNamespace(temperature_C=900.0, hour=0),
         setpoints={},
         vapor_pressures={},
     )
@@ -940,6 +992,14 @@ def test_evaporation_resolver_failure_at_900c_is_typed_refusal() -> None:
         exc_info.value.diagnostic["vapour_batch_flux_overlay"]["shadow_outcome"]
         == SHADOW_RESOLUTION_ERROR
     )
+    assert exc_info.value.diagnostic["vapour_batch_flux_overlay"]["notices"] == [
+        {
+            "kind": "vapour_batch_unresolved",
+            "species": "Na",
+            "hour": 0,
+            "reason": "vapour_batch_resolve_failed",
+        },
+    ]
 
 
 @pytest.mark.parametrize("headspace_pressure", [0.5, 1.0, 2.0])
@@ -1678,6 +1738,12 @@ def test_vapour_rail_instrumentation_diagnostic_shape() -> None:
         _last_vapour_batch_flux_overlay={
             "shadow_equal": True,
             "shadow_outcome": SHADOW_PROVED,
+            "notices": [{
+                "kind": "vapour_batch_unresolved",
+                "species": "K",
+                "hour": 3,
+                "reason": "test_refusal",
+            }],
         },
         _last_vapour_batch_resolve_error={},
         condensation_model=SimpleNamespace(
@@ -1712,6 +1778,31 @@ def test_vapour_rail_instrumentation_diagnostic_shape() -> None:
     assert panel["n_requested"] == 1
     assert "Na" in panel["channels_by_species"]
     assert panel["channels_by_species"]["Na"]["is_flux_active"] is True
+    assert panel["flux_overlay"]["notices"][0]["kind"] == (
+        "vapour_batch_unresolved"
+    )
+    from web.advisory import sc50_vr_socket_panel_detail
+
+    detail = sc50_vr_socket_panel_detail(sim, "vapour_rail_instrumentation_panel")
+    assert detail["flux_overlay"]["notices"] == panel["flux_overlay"]["notices"]
+    from web.events import _browser_socket_payload
+
+    tick = _browser_socket_payload(
+        "simulation_tick",
+        {"vapour_rail_instrumentation_panel": panel},
+    )
+    assert "notices" not in tick["vapour_rail_instrumentation_panel"][
+        "flux_overlay"
+    ]
+    advisory_js = (
+        ROOT / "web/static/js/simulator-advisory.js"
+    ).read_text(encoding="utf-8")
+    assert "vapour_batch_unresolved" in advisory_js
+    assert "available in full records" in advisory_js
+    report_viewer_js = (
+        ROOT / "web/report_viewer/report-viewer.js"
+    ).read_text(encoding="utf-8")
+    assert "vapour_batch_unresolved" in report_viewer_js
 
 
 def test_absent_overlay_does_not_default_shadow_equal_true() -> None:

@@ -12,7 +12,7 @@ import threading
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Any, Mapping
+from typing import Any, Mapping, Sequence
 
 import pytest
 import yaml
@@ -7950,6 +7950,148 @@ def test_pt0_real_magemin_capped_replay_contract(tmp_path: Path) -> None:
     ] >= 1
 
 
+def test_interpolated_equilibrium_cache_miss_keeps_campaign_flux_and_ledger(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """An available interpolation candidate must still run the live engine."""
+    import simulator.reduced_real_cache_interpolation as interpolation
+
+    def run_one_hour(
+        store: PT0DeterminismStore,
+        *,
+        interpolation_source: Mapping[str, Any] | None = None,
+    ) -> tuple[Any, Any, int]:
+        sim = _build_pt0_sim(store)
+        store._cached_real_binding_eligible = (
+            lambda *_args, **_kwargs: True
+        )
+        sim.start_campaign(CampaignPhase.C2A_STAGED)
+        sim.melt.temperature_C = 1500.0
+        original_equilibrate = sim.backend.equilibrate
+        calls = 0
+
+        def counted_equilibrate(*args: Any, **kwargs: Any) -> Any:
+            nonlocal calls
+            calls += 1
+            return original_equilibrate(*args, **kwargs)
+
+        sim.backend.equilibrate = counted_equilibrate
+        if interpolation_source is not None:
+            def candidates(**kwargs: Any) -> list[dict[str, Any]]:
+                query_key = kwargs["query_key"]
+                result = []
+                for offset in (-1.0, 1.0):
+                    key = copy.deepcopy(query_key)
+                    key["controls"]["T_K"] = (
+                        float(query_key["controls"]["T_K"]) + offset
+                    )
+                    payload = copy.deepcopy(
+                        interpolation_source["payload"]
+                    )
+                    payload["equilibrium_result"]["temperature_C"] = (
+                        float(key["controls"]["T_K"])
+                        - CELSIUS_TO_KELVIN_OFFSET
+                    )
+                    key_hash = rrd._sha256(canonical_json_bytes(key))
+                    result.append({
+                        **copy.deepcopy(dict(interpolation_source)),
+                        "key": key,
+                        "key_hash": key_hash,
+                        "payload": payload,
+                    })
+                return result
+
+            assert store.persistent_store is not None
+            store.persistent_store._list_interpolation_candidates = candidates
+        snapshot = sim.step()
+        return sim, snapshot, calls
+
+    cold_store = PT0DeterminismStore(
+        "capture",
+        db_path=tmp_path / "interpolation-class-cold.sqlite",
+    )
+    cold_sim, cold_snapshot, cold_calls = run_one_hour(cold_store)
+    assert cold_calls > 0
+    cold_rows = [
+        entry
+        for entry in cold_store._entries.values()
+        if entry.get("artifact") == "equilibrium_post_record"
+    ]
+    assert cold_rows
+
+    attempted_interpolations: list[Mapping[str, Any]] = []
+    production_attempt = interpolation.attempt_cached_interpolation
+
+    def record_interpolation_attempt(
+        query_key: Mapping[str, Any],
+        neighbors: Sequence[Mapping[str, Any]],
+    ) -> dict[str, Any] | None:
+        attempt = production_attempt(query_key, neighbors)
+        if attempt is not None:
+            attempted_interpolations.append(attempt)
+        return attempt
+
+    admitted_interpolations: list[EquilibriumResult] = []
+    production_admission = rrd._decode_payload_for_admission
+
+    def record_interpolation_admission(
+        artifact: str,
+        payload: Any,
+        **kwargs: Any,
+    ) -> Any:
+        decoded = production_admission(artifact, payload, **kwargs)
+        if kwargs.get("interpolation_synthesized") and isinstance(
+            decoded, EquilibriumResult
+        ):
+            admitted_interpolations.append(decoded)
+        return decoded
+
+    monkeypatch.setattr(
+        interpolation,
+        "attempt_cached_interpolation",
+        record_interpolation_attempt,
+    )
+    monkeypatch.setattr(
+        rrd,
+        "_decode_payload_for_admission",
+        record_interpolation_admission,
+    )
+    warm_store = PT0DeterminismStore(
+        "capture",
+        db_path=tmp_path / "interpolation-class-warm.sqlite",
+    )
+    warm_sim, warm_snapshot, warm_calls = run_one_hour(
+        warm_store,
+        interpolation_source=cold_rows[0],
+    )
+
+    assert attempted_interpolations
+    assert admitted_interpolations
+    assert warm_calls > 0
+    assert not any(
+        event.get("cache_state") == "cached_interpolated"
+        for event in warm_store.replay_sequence
+    )
+    assert cold_snapshot.evap_flux.species_kg_hr
+    assert warm_snapshot.evap_flux.species_kg_hr == pytest.approx(
+        cold_snapshot.evap_flux.species_kg_hr,
+        rel=1.0e-12,
+        abs=1.0e-15,
+    )
+    cold_ledger = cold_sim.atom_ledger.kg_by_account()
+    warm_ledger = warm_sim.atom_ledger.kg_by_account()
+    assert set(warm_ledger) == set(cold_ledger)
+    for account, cold_species in cold_ledger.items():
+        warm_species = warm_ledger[account]
+        assert set(warm_species) == set(cold_species)
+        assert warm_species == pytest.approx(
+            cold_species,
+            rel=1.0e-12,
+            abs=1.0e-12,
+        )
+
+
 def test_tier_ceiling_cached_exact_refuses_physics_bucket_hit(tmp_path: Path) -> None:
     query_key = _c3a_ladder_key(
         "query",
@@ -9315,13 +9457,13 @@ class _MemoryInterpolationCandidates:
 
 
 @pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))
-def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
+def test_real_interpolated_payload_recursive_mutations_use_nonflux_admission(
     tmp_path: Path,
     persistent: bool,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    """Non-flux consumers retain recursive admission checks for interpolation."""
     import simulator.reduced_real_cache_interpolation as interpolation
-    from simulator.evaporation import EvaporationFluxRefusal
 
     db_path = tmp_path / "recursive-interpolation.sqlite"
     capture = PT0DeterminismStore(
@@ -9370,14 +9512,8 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
         )
     attempt = production_attempt(query_key, candidates)
     if attempt is None:
-        neighbors = interpolation.greedy_nearest_neighbors(
-            query_key,
-            candidates,
-        )
-        gate = interpolation.interpolation_validity_gate(
-            query_key,
-            neighbors,
-        )
+        neighbors = interpolation.greedy_nearest_neighbors(query_key, candidates)
+        gate = interpolation.interpolation_validity_gate(query_key, neighbors)
         weight_info = interpolation.barycentric_interpolation_weights(
             query_key,
             neighbors,
@@ -9412,7 +9548,6 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
         "_entry_for_physics_ladder_bucket",
         lambda *_a, **_k: None,
     )
-    production_live = query_sim._get_equilibrium_live
     production_admission = rrd._decode_payload_for_admission
     interpolation_admission_keys: list[tuple[Mapping[str, Any], ...]] = []
 
@@ -9431,46 +9566,33 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
         observe_interpolation_admission_keys,
     )
 
-    class _CacheMissRecomputed(Exception):
-        pass
-
-    def reject_live_recompute(*_args: Any, **_kwargs: Any) -> Any:
-        raise _CacheMissRecomputed
-
-    def exercise_base_interpolation_consumer_path(
-        result: EquilibriumResult,
-    ) -> None:
-        _exercise_equilibrium_consumers_from_result(
-            query_sim,
-            result,
-            allow_typed_batch_failure=True,
+    def lookup_nonflux() -> EquilibriumResult | None:
+        return capture._lookup_optional(
+            "equilibrium_post_record",
+            query_key,
+            physics_bucket_key=canonical_physics_bucket_key_from_replay_key(
+                query_key
+            ),
+            sim=query_sim,
+            return_decoded=True,
+            flux_consumer=False,
         )
-        batch_error = query_sim._last_vapour_batch_resolve_error
-        assert batch_error.get("status") == "unavailable"
-        assert batch_error.get("reason") == "vapour_batch_resolve_failed"
 
-    baseline_result = query_sim._get_equilibrium()
+    baseline_result = lookup_nonflux()
+    assert isinstance(baseline_result, EquilibriumResult)
     assert capture.hits == 1
     assert capture.last_cache_state == "cached_interpolated"
-    assert interpolation_admission_keys
-    assert all(
-        len(keys) == 1
-        and canonical_json_bytes(keys[0]) == canonical_json_bytes(query_key)
-        for keys in interpolation_admission_keys
-    )
-    exercise_base_interpolation_consumer_path(baseline_result)
     _exercise_sio_yield_report_diagnostic(query_sim)
-
-    failures: list[str] = []
-    cases_expected = 0
-    outcomes: dict[str, str] = {}
-    executed_sources: set[str] = set()
     mutation_sources = [("synthesized-row", copy.deepcopy(baseline))]
     mutation_paths = [
         (source_name, mutation_baseline, path, value)
         for source_name, mutation_baseline in mutation_sources
         for path, value in _recursive_payload_paths(mutation_baseline)
     ]
+    outcomes: dict[str, str] = {}
+    failures: list[str] = []
+    cases_expected = 0
+    executed_sources: set[str] = set()
     for source_name, mutation_baseline, path, value in mutation_paths:
         executed_sources.add(source_name)
         mutations: list[tuple[str, Any]] = []
@@ -9488,17 +9610,16 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
             mutations.append(("scalar-map", 7))
         for mutation, replacement in mutations:
             cases_expected += 1
-            path_name = f"{source_name}: {_recursive_path_label(path)}"
-            case_name = f"{path_name} {mutation}"
-            outcomes[case_name] = "error"
-            mutated = _mutate_recursive_payload(
+            case_name = (
+                f"{source_name}: {_recursive_path_label(path)} {mutation}"
+            )
+            mutated_attempt = copy.deepcopy(attempt)
+            mutated_attempt["payload"] = _mutate_recursive_payload(
                 mutation_baseline,
                 path,
                 mutation,
                 replacement,
             )
-            mutated_attempt = copy.deepcopy(attempt)
-            mutated_attempt["payload"] = mutated
             monkeypatch.setattr(
                 interpolation,
                 "attempt_cached_interpolation",
@@ -9513,112 +9634,82 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
             capture.cache_events.clear()
             capture.last_cache_state = None
             capture._accepted_hit_disclosures = None
-            before_hits = capture.hits
             before_disclosures = _accepted_hit_disclosures_for_test(capture)
-            monkeypatch.setattr(
-                query_sim,
-                "_get_equilibrium_live",
-                reject_live_recompute,
-            )
-            try:
-                result = query_sim._get_equilibrium()
-            except _CacheMissRecomputed:
+            result = lookup_nonflux()
+            if result is None:
                 outcomes[case_name] = "miss"
-                if capture.hits != before_hits:
+                if capture.hits != 0:
                     failures.append(
-                        f"{path_name} {mutation}: interpolation miss changed hits"
+                        f"{case_name}: rejected interpolation changed hits"
+                    )
+                if capture.last_cache_state is not None:
+                    failures.append(
+                        f"{case_name}: rejected interpolation changed cache state"
+                    )
+                if capture.replay_sequence or capture.cache_events:
+                    failures.append(
+                        f"{case_name}: rejected interpolation emitted replay events"
                     )
                 if _accepted_hit_disclosures_for_test(capture) != before_disclosures:
-                    failures.append(
-                        f"{path_name} {mutation}: interpolation miss changed disclosure state"
-                    )
-                monkeypatch.setattr(
-                    interpolation,
-                    "attempt_cached_interpolation",
-                    production_attempt,
-                )
-                monkeypatch.setattr(
-                    query_sim,
-                    "_get_equilibrium_live",
-                    production_live,
-                )
-                try:
-                    result = query_sim._get_equilibrium()
-                    if capture.last_cache_state != "cached_interpolated":
-                        failures.append(
-                            f"{path_name} {mutation}: restored source captures "
-                            "did not hit interpolation"
-                        )
-                    if capture.hits != before_hits + 1:
-                        failures.append(
-                            f"{path_name} {mutation}: recaptured interpolation "
-                            f"recorded {capture.hits - before_hits} hits"
-                        )
-                    exercise_base_interpolation_consumer_path(result)
-                    if _is_sio_report_diagnostic_path(path):
-                        _exercise_sio_yield_report_diagnostic(query_sim)
-                except Exception as exc:
-                    failures.append(
-                        f"{path_name} {mutation}: restored interpolation replay "
-                        f"raised {type(exc).__name__}: {exc}"
-                    )
-                    continue
-            except Exception as exc:
-                failures.append(
-                    f"{path_name} {mutation}: interpolation replay raised "
-                    f"{type(exc).__name__}: {exc}"
-                )
-                continue
+                    failures.append(f"{case_name}: rejected interpolation changed disclosures")
             else:
                 outcomes[case_name] = "admitted"
-                if capture.hits != before_hits + 1:
+                if not isinstance(result, EquilibriumResult):
+                    failures.append(f"{case_name}: admitted result has wrong type")
+                if capture.hits != 1:
                     failures.append(
-                        f"{path_name} {mutation}: admitted interpolation "
-                        f"recorded {capture.hits - before_hits} hits"
+                        f"{case_name}: admitted interpolation recorded "
+                        f"{capture.hits} hits"
                     )
+                if capture.last_cache_state != "cached_interpolated":
+                    failures.append(
+                        f"{case_name}: admitted interpolation did not record its tier"
+                    )
+                if len(capture.replay_sequence) != 1 or len(capture.cache_events) != 1:
+                    failures.append(
+                        f"{case_name}: admitted interpolation omitted replay events"
+                    )
+            monkeypatch.setattr(
+                interpolation,
+                "attempt_cached_interpolation",
+                production_attempt,
+            )
+            capture.hits = 0
+            capture.misses.clear()
+            capture.replay_sequence.clear()
+            capture.capture_sequence.clear()
+            capture.cache_events.clear()
+            capture.last_cache_state = None
+            capture._accepted_hit_disclosures = None
+            restored_result = lookup_nonflux()
+            if not isinstance(restored_result, EquilibriumResult):
+                failures.append(f"{case_name}: restored interpolation missed")
+            if capture.hits != 1:
+                failures.append(f"{case_name}: restored interpolation hit {capture.hits} times")
+            if capture.last_cache_state != "cached_interpolated":
+                failures.append(f"{case_name}: restored interpolation used the wrong tier")
+            if (
+                len(path) == 2
+                and _is_sio_report_diagnostic_path(path)
+            ):
                 try:
-                    if capture.last_cache_state != "cached_interpolated":
-                        failures.append(
-                            f"{path_name} {mutation}: interpolation consumer "
-                            "did not use a cache hit"
-                        )
-                    _exercise_equilibrium_consumers_from_result(
-                        query_sim,
-                        result,
-                        allow_typed_batch_failure=True,
-                    )
-                    if _is_sio_report_diagnostic_path(path):
-                        _exercise_sio_yield_report_diagnostic(query_sim)
-                except EvaporationFluxRefusal:
-                    outcomes[case_name] = "typed-outcome"
-                    if _is_sio_report_diagnostic_path(path):
-                        try:
-                            _exercise_sio_yield_report_diagnostic(query_sim)
-                        except Exception as exc:
-                            failures.append(
-                                f"{path_name} {mutation}: SiO report consumer "
-                                f"raised {type(exc).__name__}: {exc}"
-                            )
-                    continue
+                    _exercise_sio_yield_report_diagnostic(query_sim)
                 except Exception as exc:
                     failures.append(
-                        f"{path_name} {mutation}: interpolation consumer raised "
+                        f"{case_name}: SiO report consumer raised "
                         f"{type(exc).__name__}: {exc}"
                     )
-                    continue
 
     assert len(outcomes) == cases_expected
     assert executed_sources == {name for name, _source in mutation_sources}
-    assert all(
-        outcome in {"miss", "admitted", "typed-outcome"}
-        for outcome in outcomes.values()
-    ), (
-        "interpolation mutation cases did not each take exactly one admission "
-        "branch: "
-        + "; ".join(
-            f"{case}={outcome}" for case, outcome in outcomes.items()
-        )
-    )
+    assert outcomes
+    assert set(outcomes.values()).issubset({"miss", "admitted"})
     assert "miss" in outcomes.values()
     assert "admitted" in outcomes.values()
     assert not failures, "\n".join(failures)
+    assert interpolation_admission_keys
+    assert all(
+        len(keys) == 1
+        and canonical_json_bytes(keys[0]) == canonical_json_bytes(query_key)
+        for keys in interpolation_admission_keys
+    )

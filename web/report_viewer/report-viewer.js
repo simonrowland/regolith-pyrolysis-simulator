@@ -448,6 +448,21 @@ function vapourRailSection(terminal) {
     ? overlay.catalog_pa_shadow_equal
     : null;
   const catalogOutcome = overlay.catalog_pa_shadow_outcome ?? "not emitted";
+  const hasUnresolvedNotices = Array.isArray(overlay.notices);
+  const unresolvedNotices = hasUnresolvedNotices
+    ? overlay.notices
+        .filter((notice) => notice && notice.kind === "vapour_batch_unresolved")
+        .map((notice) => {
+          const species = notice.species || "unknown species";
+          const hour = notice.hour === null || notice.hour === undefined
+            ? "unknown hour"
+            : `hour ${notice.hour}`;
+          return `${species}, ${hour}: ${notice.reason || "unresolved"}`;
+        })
+    : [];
+  const unresolvedNoticeSummary = unresolvedNotices.length
+    ? unresolvedNotices.join("; ")
+    : (hasUnresolvedNotices ? "none" : "not reported");
   const vrCard = instrumentation
     ? `<div class="card"><div class="ct">Vapour batch · channel authority</div>` +
       `<div class="cbig">${esc(String(batch.n_flux_active ?? "n/a"))} <small>flux-active</small></div>` +
@@ -457,6 +472,7 @@ function vapourRailSection(terminal) {
       `<div class="kv"><span>Shadow outcome</span><b class="mono">${esc(String(shadowOutcome))}</b></div>` +
       `<div class="kv"><span>Catalog Pa vs live equal</span><b>${esc(catalogEqual === null || catalogEqual === undefined ? "absent" : String(catalogEqual))}</b></div>` +
       `<div class="kv"><span>Catalog Pa shadow outcome</span><b class="mono">${esc(String(catalogOutcome))}</b></div>` +
+      `<div class="kv"><span>Unavailable vapour flux</span><b>${esc(unresolvedNoticeSummary)}</b></div>` +
       `</div>`
     : pending("VR-11", "terminal.vapour_rail_instrumentation was not emitted.");
   let refusalBody;

@@ -1321,6 +1321,7 @@ class PT0DeterminismStore:
             physics_bucket_key=canonical_physics_bucket_key_from_replay_key(key),
             sim=sim,
             return_decoded=True,
+            flux_consumer=True,
         )
         if payload is None:
             return None
@@ -1970,6 +1971,7 @@ class PT0DeterminismStore:
         physics_bucket_key: Mapping[str, Any] | None = None,
         sim: Any | None = None,
         return_decoded: bool = False,
+        flux_consumer: bool = False,
     ) -> Any | None:
         tier_ceiling = str(
             getattr(self, "cache_tier_ceiling", "cached_interpolated")
@@ -2066,6 +2068,7 @@ class PT0DeterminismStore:
                     candidate_key,
                     sim=sim,
                     return_decoded=return_decoded,
+                    flux_consumer=flux_consumer,
                 )
                 if interpolated is not None:
                     return interpolated
@@ -2294,6 +2297,7 @@ class PT0DeterminismStore:
         *,
         sim: Any | None = None,
         return_decoded: bool = False,
+        flux_consumer: bool = False,
     ) -> Any | None:
         from simulator.reduced_real_cache_interpolation import (
             attempt_cached_interpolation,
@@ -2330,6 +2334,11 @@ class PT0DeterminismStore:
             return None
         merged = self._merged_neighbor_disclosures(attempt["neighbors"])
         if merged is None:
+            return None
+        # Interpolation is useful as a disclosed estimate for non-flux
+        # consumers. The equilibrium artifact's activities cannot enter the
+        # pre-RG VAPOUR flux seam, so that caller treats this as a cache miss.
+        if flux_consumer and artifact == "equilibrium_post_record":
             return None
         replay_event = {
             "artifact": artifact,

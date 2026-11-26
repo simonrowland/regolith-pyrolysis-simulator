@@ -291,7 +291,7 @@ def test_evaporation_partial_channel_refusal_notes_survive_dispatch(
         doctrine_category=CATEGORY_PROVEN_ZERO,
     )
     sim = SimpleNamespace(
-        melt=SimpleNamespace(temperature_C=1600.0),
+        melt=SimpleNamespace(temperature_C=1600.0, hour=0),
         setpoints={},
         vapor_pressures={"metals": {"Na": {"evaporation_alpha": {"value": 0.13}}}},
         _last_vapor_pressure_diagnostic={},
@@ -358,6 +358,17 @@ def test_evaporation_partial_channel_refusal_notes_survive_dispatch(
     assert refusal["site"] == "evaporation.partial_channel_refusal"
     assert refusal["species"] == "K"
     assert refusal["field"] == "batch_channel_state"
+    assert "species unavailable in the flux map, not measured as zero" in (
+        refusal["detail"]
+    )
+    assert diagnostic["vapour_batch_flux_overlay"]["notices"] == [
+        {
+            "kind": "vapour_batch_unresolved",
+            "species": "K",
+            "hour": 0,
+            "reason": "test_refusal",
+        },
+    ]
 
     # Host list carries the refusal note as well.
     assert any(

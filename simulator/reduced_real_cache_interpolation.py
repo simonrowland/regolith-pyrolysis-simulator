@@ -290,6 +290,9 @@ def interpolate_equilibrium_payload(
         raise ValueError("interpolation neighbor equilibrium_result missing")
 
     interpolated_result = copy.deepcopy(dict(reference_result))
+    # Weighted values describe the query. Neighbor diagnostics and warnings
+    # describe another state point and must not be inherited as query evidence.
+    interpolated_result["diagnostics"] = {}
     controls = query_key.get("controls", {})
     if not isinstance(controls, Mapping):
         controls = {}
@@ -398,8 +401,7 @@ def interpolate_equilibrium_payload(
         species: "cached_interpolated"
         for species in interpolated_result.get("vapor_pressures_Pa", {})
     }
-    interpolated_result["warnings"] = list(reference_result.get("warnings") or [])
-    interpolated_result["warnings"].append("cached_interpolated_linear_estimate")
+    interpolated_result["warnings"] = ["cached_interpolated_linear_estimate"]
     operating_point_clamped = (
         _operating_point_differs(requested_temperature_C, solved_temperature_C)
         or _operating_point_differs(requested_pressure_bar, solved_pressure_bar)
@@ -442,8 +444,15 @@ def interpolate_equilibrium_payload(
             interpolated_result.get("vapor_pressures_source") or {}
         ),
         "last_vapor_pressure_diagnostic": {
-            "source": "cached_interpolated",
-            "interpolation_mode": "linear",
+            "source": "served_not_executed",
+            "served_from": {
+                "source": "cached_interpolated",
+                "interpolation_mode": "linear",
+                "interpolation_neighbor_key_hashes": [
+                    str(neighbor.get("key_hash", ""))
+                    for neighbor in neighbors
+                ],
+            },
         },
     }
     return payload

@@ -496,6 +496,8 @@ def test_cached_interpolation_uses_query_fo2_and_drops_neighbor_echo(
         diagnostics={
             "requested_fO2_log": -9.0001,
             "printed_fO2_echo_log": -9.0,
+            "source_reaction_fO2_bar": 1.0e-6,
+            "activities_provider": "neighbor-engine",
         },
     )
     high_payload = _interpolation_payload(liquid_fraction=0.71, sio_pa=7.05)
@@ -505,6 +507,8 @@ def test_cached_interpolation_uses_query_fo2_and_drops_neighbor_echo(
         diagnostics={
             "requested_fO2_log": -8.9999,
             "printed_fO2_echo_log": -9.0,
+            "source_reaction_fO2_bar": 1.0e-6,
+            "activities_provider": "neighbor-engine",
         },
     )
 
@@ -521,6 +525,19 @@ def test_cached_interpolation_uses_query_fo2_and_drops_neighbor_echo(
     assert interpolated_result["printed_fO2_echo_log"] is None
     assert interpolated_result["diagnostics"]["requested_fO2_log"] == pytest.approx(-9.0)
     assert interpolated_result["diagnostics"]["printed_fO2_echo_log"] is None
+    assert "source_reaction_fO2_bar" not in interpolated_result["diagnostics"]
+    assert "activities_provider" not in interpolated_result["diagnostics"]
+    assert attempt["payload"]["last_vapor_pressure_diagnostic"] == {
+        "source": "served_not_executed",
+        "served_from": {
+            "source": "cached_interpolated",
+            "interpolation_mode": "linear",
+            "interpolation_neighbor_key_hashes": [
+                str(neighbor.get("key_hash", ""))
+                for neighbor in attempt["neighbors"]
+            ],
+        },
+    }
 
     store = PT0DeterminismStore(
         "capture",
@@ -598,6 +615,7 @@ def test_cached_interpolation_preserves_legacy_engine_fo2_diagnostics(
         payload["authority"]["backend"] = copy.deepcopy(backend)
         payload["authority"]["evidence_class"] = evidence_class
         result = payload["equilibrium_result"]
+        result["warnings"] = [f"neighbor-only:{requested_fO2_log}"]
         result["temperature_C"] = key["controls"]["T_K"] - 273.15
         result["fO2_log"] = -9.0000000005
         result["diagnostics"] = {
@@ -616,9 +634,14 @@ def test_cached_interpolation_preserves_legacy_engine_fo2_diagnostics(
     assert interpolated_result["fO2_log"] == -9.0000000005
     assert "requested_fO2_log" not in interpolated_result
     assert "printed_fO2_echo_log" not in interpolated_result
-    assert interpolated_result["diagnostics"] == attempt["neighbors"][0]["payload"][
-        "equilibrium_result"
-    ]["diagnostics"]
+    assert interpolated_result["diagnostics"] == {
+        "requested_fO2_log": -9.0,
+        "printed_fO2_echo_log": None,
+    }
+    assert "applied_fO2_buffer" not in interpolated_result["diagnostics"]
+    assert interpolated_result["warnings"] == [
+        "cached_interpolated_linear_estimate",
+    ]
 
     store = PT0DeterminismStore(
         "capture",

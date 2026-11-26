@@ -89,6 +89,9 @@ from simulator.vapour_rail.instrumentation import (
 PRE_RG_EFFECTIVE_PRESSURE_SOURCE_ID = (
     'equilibrium_backend_effective_pressure_pre_rg'
 )
+_TYPED_NON_DEBIT_VAPOUR_CHANNEL_STATES = frozenset(
+    {'zero_by_physics', 'upper_bound', 'dormant_by_epoch'}
+)
 
 
 def production_vapor_molar_mass_g_per_mol(
@@ -1356,6 +1359,30 @@ def _pre_rg_effective_pressure_source(
     )
 
 
+def _append_vapour_batch_unresolved_notice(
+    host: Any,
+    overlay: dict[str, Any],
+    *,
+    species: str | None,
+    reason: str,
+) -> None:
+    """Publish an unresolved species as unavailable on the flux overlay."""
+    raw_hour = getattr(getattr(host, "melt", None), "hour", None)
+    try:
+        hour = int(raw_hour)
+    except (TypeError, ValueError, OverflowError):
+        hour = None
+    notices = overlay.setdefault("notices", [])
+    notice = {
+        "kind": "vapour_batch_unresolved",
+        "species": str(species) if species is not None else None,
+        "hour": hour,
+        "reason": str(reason),
+    }
+    if notice not in notices:
+        notices.append(notice)
+
+
 def _load_evaporation_alpha_envelope_by_species(
     vapor_pressure_data: dict,
 ) -> dict[str, tuple[float, float]]:
@@ -1876,6 +1903,70 @@ class EvaporationMixin:
                 resolution_error=resolve_error or None,
             )
         )
+        if resolve_error:
+            unresolved_species = sorted(effective_pressure_source.species_ids)
+            for species in unresolved_species or [None]:
+                _append_vapour_batch_unresolved_notice(
+                    self,
+                    flux_overlay_report,
+                    species=species,
+                    reason=str(
+                        resolve_error.get("reason")
+                        or "vapour_batch_resolution_error"
+                    ),
+                )
+        else:
+            missing_source_species = set(
+                flux_overlay_report.get("missing_effective_pressure_species", ())
+                or ()
+            )
+            catalog_fallback_species = set(
+                flux_overlay_report.get("catalog_continuation_flux_species", ())
+                or ()
+            )
+            for species in sorted(
+                missing_source_species - catalog_fallback_species
+            ):
+                _append_vapour_batch_unresolved_notice(
+                    self,
+                    flux_overlay_report,
+                    species=str(species),
+                    reason=str(
+                        flux_overlay_report.get("selection_source")
+                        or "vapour_batch_no_debiting_pressure_outcome"
+                    ),
+                )
+            channel_states = flux_overlay_report.get(
+                "batch_channel_states", {}
+            )
+            if isinstance(channel_states, Mapping):
+                for species, state in sorted(channel_states.items()):
+                    state_name = str(state)
+                    if (
+                        state_name in _TYPED_NON_DEBIT_VAPOUR_CHANNEL_STATES
+                        or state_name == "eligible"
+                    ):
+                        continue
+                    answer = (
+                        vapour_batch.channels_by_species.get(str(species))
+                        if vapour_batch is not None
+                        else None
+                    )
+                    reason = state_name
+                    if answer is not None:
+                        reason = str(
+                            getattr(getattr(answer, "flux", None), "code", None)
+                            or getattr(
+                                getattr(answer, "pressure", None), "code", None
+                            )
+                            or reason
+                        )
+                    _append_vapour_batch_unresolved_notice(
+                        self,
+                        flux_overlay_report,
+                        species=str(species),
+                        reason=reason,
+                    )
         # Shadow equality is the unadjusted provider seam. The surface
         # balance below is the flux boundary both consumers must share.
         if hasattr(self, "_last_langmuir_surface_oxygen"):
@@ -2414,17 +2505,11 @@ class EvaporationMixin:
             # When every channel is a typed non-debit outcome (genuine bound,
             # zero, dormant) and none is refused / eligible / missing-seam,
             # empty flux is authorized, not an empty-provider false zero.
-            _typed_non_debit = frozenset(
-                {
-                    'zero_by_physics',
-                    'upper_bound',
-                    'dormant_by_epoch',
-                }
-            )
             if (
                 channel_states
                 and all(
-                    state in _typed_non_debit for state in channel_states.values()
+                    state in _TYPED_NON_DEBIT_VAPOUR_CHANNEL_STATES
+                    for state in channel_states.values()
                 )
             ):
                 self._last_evaporation_flux_diagnostic = {
@@ -2471,9 +2556,8 @@ class EvaporationMixin:
             return flux
         # b-149 instance 4: partial channel refusals. When some channels debit
         # and others are typed refusals, refused species drop out of
-        # vapor_pressures and surface as flux 0 with no raise (all-non-debit
-        # already refuses above). Record each refused species so incomplete
-        # extraction is visible while the catalog can still subtract.
+        # vapor_pressures. Their unresolved overlay notice keeps that absence
+        # typed as unavailable while eligible peer species can proceed.
         _channel_states_partial = dict(
             flux_overlay_report.get('batch_channel_states', {}) or {}
         )
@@ -2498,8 +2582,8 @@ class EvaporationMixin:
                     field='batch_channel_state',
                     detail=(
                         f'channel state=refusal while peer channels still '
-                        f'debit; species omitted from flux (silent zero residual '
-                        f'of b-126 F3). Counted as category-1 missing input; '
+                        f'debit; species unavailable in the flux map, not '
+                        f'measured as zero. Counted as category-1 missing input; '
                         f'hard raise deferred pending blast-radius rebaseline.'
                     ),
                     doctrine_category=CATEGORY_REFUSE,

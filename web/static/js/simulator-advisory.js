@@ -890,6 +890,30 @@ function renderVapourRailInstrumentationPanel(payload) {
         'Catalog Pa shadow outcome',
         overlay.catalog_pa_shadow_outcome || 'absent'
     );
+    const hasUnresolvedNotices = Array.isArray(overlay.notices);
+    const unresolved = hasUnresolvedNotices
+        ? overlay.notices
+            .filter((notice) => notice && notice.kind === 'vapour_batch_unresolved')
+            .map((notice) => {
+                const species = notice.species || 'unknown species';
+                const hour = notice.hour === null || notice.hour === undefined
+                    ? 'unknown hour'
+                    : `hour ${notice.hour}`;
+                return `${species}, ${hour}: ${notice.reason || 'unresolved'}`;
+            })
+        : [];
+    const unresolvedNoticeSummary = unresolved.length
+        ? unresolved.join('; ')
+        : (hasUnresolvedNotices
+            ? 'none'
+            : (payload.tick_view === 'compact'
+                ? 'available in full records'
+                : 'not reported'));
+    appendCeramicLine(
+        content,
+        'Unavailable vapour flux',
+        unresolvedNoticeSummary
+    );
     if (Object.prototype.hasOwnProperty.call(payload, 'refusals_by_species')) {
         const refused = advisoryObject(payload.refusals_by_species) || {};
         const refusedNames = Object.keys(refused).sort();
