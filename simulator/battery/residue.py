@@ -9,7 +9,7 @@ import multiprocessing
 from collections import defaultdict
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field, replace
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from multiprocessing.util import Finalize
 from pathlib import Path
 from typing import Any
@@ -4089,6 +4089,98 @@ def _langmuir_residue_row_id(locator) -> str | None:
             row_id = value.strip().rstrip(".,").casefold()
             return row_id or None
     return None
+
+
+def _wang_ree_retained_ppm(
+    reference: Any, result: Mapping[str, Any],
+) -> Decimal | None:
+    """Located mass-retention of 1 when Wang has no REE vapour channel.
+
+    The row is element ppm, so retention 1 is not the number 1. Element mass
+    stays in the bead and the located mass-loss fraction concentrates it:
+    predicted_ppm = starting_ppm / (1 - measured_mass_loss_fraction).
+    Missing or non-physical located inputs return None; the caller refuses
+    instead of inventing a starting abundance or an extent.
+    """
+
+    if getattr(reference, "source_id", None) != WANG_2001_SOURCE_ID:
+        return None
+    identity = getattr(reference, "identity", None)
+    subtype = None if identity is None else identity.subtype
+    if (
+        subtype is None
+        or not subtype.is_value
+        or subtype.value != "element_ppm_by_mass"
+    ):
+        return None
+    point_conditions = reference.point_conditions or {}
+    start = point_conditions.get("starting_component_ppm")
+    start_state = getattr(start, "state", None)
+    if start_state is None or not start_state.is_value:
+        return None
+    try:
+        start_ppm = Decimal(str(start_state.value))
+        mass_loss = Decimal(str(result.get("measured_mass_loss_fraction")))
+    except (InvalidOperation, ValueError, TypeError, ArithmeticError):
+        return None
+    if (
+        not start_ppm.is_finite()
+        or start_ppm <= 0
+        or not mass_loss.is_finite()
+        or mass_loss < 0
+        or mass_loss >= 1
+    ):
+        return None
+    remaining = Decimal(1) - mass_loss
+    if remaining <= 0:
+        return None
+    return start_ppm / remaining
+
+
+def wang_ree_full_retention_prediction(
+    reference: Any,
+    result: Mapping[str, Any],
+    formula: str,
+) -> Mapping[str, Any] | None:
+    """Predicted ppm and the retention notice, or None when inputs are unusable.
+
+    score.py routes this result. It does not recompute the ppm or the notice.
+    """
+
+    predicted_ppm = _wang_ree_retained_ppm(reference, result)
+    if predicted_ppm is None:
+        return None
+    from simulator.battery.enums import NoticeKind, Quantity
+    from simulator.battery.records import Notice
+
+    start_ppm = Decimal(
+        str(reference.point_conditions["starting_component_ppm"].state.value)
+    )
+    mass_loss = Decimal(str(result["measured_mass_loss_fraction"]))
+    provenance = {
+        key: item for key, item in result.items() if key != "notices"
+    }
+    provenance["ree_retention_default"] = {
+        "retention": "1",
+        "missing_channel": formula,
+        "starting_component_ppm": format(start_ppm, "f"),
+        "measured_mass_loss_fraction": format(mass_loss, "f"),
+        "predicted_ppm": format(predicted_ppm, "f"),
+    }
+    return {
+        "predicted_ppm": predicted_ppm,
+        "notice": Notice(
+            kind=NoticeKind.INPUT_OMITTED,
+            affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+            reason=(
+                "ree_vapour_channel_missing_default_retained: "
+                "default=retention 1; "
+                f"missing vapour channel {formula}"
+            ),
+            origin=reference.observation_id,
+        ),
+        "provenance": provenance,
+    }
 
 
 def predict_langmuir_residue_composition(

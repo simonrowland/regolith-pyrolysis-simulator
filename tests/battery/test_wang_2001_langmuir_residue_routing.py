@@ -627,6 +627,7 @@ def test_wang_starting_aggregate_notice_tracks_located_extract_cell(monkeypatch)
 def test_removing_the_ree_retention_default_restores_the_channel_refusal(
     monkeypatch,
 ):
+    import simulator.battery.residue as residue_module
     import simulator.battery.score as score_module
 
     context, observations = wang_context()
@@ -649,7 +650,9 @@ def test_removing_the_ree_retention_default_restores_the_channel_refusal(
         return None
 
     monkeypatch.setattr(
-        score_module, "_wang_ree_full_retention_ppm", no_retention_default
+        residue_module,
+        "wang_ree_full_retention_prediction",
+        no_retention_default,
     )
     isolated = ScoreContext(
         {},
