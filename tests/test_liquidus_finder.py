@@ -1031,3 +1031,125 @@ def test_renormalised_threshold_flags_a_zero_slope_bracket():
     )
     assert notice['renormalisation_may_shift_bracket'] is True
     assert notice['delta_T_bound'] is None
+
+
+_WARM_GRID = {
+    'min_T_C': 800.0,
+    'max_T_C': 1600.0,
+    'scan_step_C': 50.0,
+    'tolerance_C': 2.0,
+}
+
+
+def _linear_melt(offset_C: float):
+    def fraction(temperature_C: float) -> float:
+        return max(0.0, min(1.0, (float(temperature_C) - offset_C) / 300.0))
+
+    return fraction
+
+
+def _counting_sampler(fraction):
+    calls: list[float] = []
+
+    def sample(temperature_C: float) -> float:
+        calls.append(float(temperature_C))
+        return fraction(temperature_C)
+
+    return sample, calls
+
+
+def test_warm_start_same_cell_matches_full_scan_with_fewer_samples():
+    """A one-cell move bisects the same grid neighbours as the full scan.
+
+    6.25 C is one dyadic of the 50 C step (50/2^3). The landing temperature
+    is the temperature the full scan of that cell would publish.
+    """
+    cold_sample, cold_calls = _counting_sampler(_linear_melt(1000.0))
+    cold = find_liquidus_solidus_by_fraction(cold_sample, **_WARM_GRID)
+    assert cold.status == 'ok'
+
+    for offset_C in (1000.0, 1006.25, 1050.0):
+        warm_sample, warm_calls = _counting_sampler(_linear_melt(offset_C))
+        reference_sample, reference_calls = _counting_sampler(
+            _linear_melt(offset_C),
+        )
+        warm = find_liquidus_solidus_by_fraction(
+            warm_sample,
+            warm_solidus_T_C=cold.solidus_T_C,
+            warm_liquidus_T_C=cold.liquidus_T_C,
+            **_WARM_GRID,
+        )
+        reference = find_liquidus_solidus_by_fraction(
+            reference_sample,
+            **_WARM_GRID,
+        )
+        assert warm.status == 'ok'
+        assert warm.solidus_T_C == reference.solidus_T_C
+        assert warm.liquidus_T_C == reference.liquidus_T_C
+        assert len(warm_calls) < len(reference_calls)
+        assert len(warm_calls) < len(cold_calls)
+
+
+def test_warm_start_outside_the_window_matches_the_full_scan():
+    """A 200 C move is three scan cells. The window misses and the call set matches."""
+    cold_sample, _cold_calls = _counting_sampler(_linear_melt(1000.0))
+    cold = find_liquidus_solidus_by_fraction(cold_sample, **_WARM_GRID)
+    warm_sample, warm_calls = _counting_sampler(_linear_melt(1200.0))
+    reference_sample, reference_calls = _counting_sampler(_linear_melt(1200.0))
+    warm = find_liquidus_solidus_by_fraction(
+        warm_sample,
+        warm_solidus_T_C=cold.solidus_T_C,
+        warm_liquidus_T_C=cold.liquidus_T_C,
+        **_WARM_GRID,
+    )
+    reference = find_liquidus_solidus_by_fraction(
+        reference_sample,
+        **_WARM_GRID,
+    )
+    assert warm == reference
+    assert len(warm_calls) == len(reference_calls)
+    assert set(warm_calls) == set(reference_calls)
+
+
+def test_unusable_warm_hint_runs_the_full_scan():
+    sample, calls = _counting_sampler(_linear_melt(1000.0))
+    reference_sample, reference_calls = _counting_sampler(_linear_melt(1000.0))
+    hinted = find_liquidus_solidus_by_fraction(
+        sample,
+        warm_solidus_T_C=float('nan'),
+        warm_liquidus_T_C=True,
+        **_WARM_GRID,
+    )
+    reference = find_liquidus_solidus_by_fraction(
+        reference_sample,
+        **_WARM_GRID,
+    )
+    assert hinted == reference
+    assert calls == reference_calls
+
+
+def test_warm_start_still_refuses_a_grid_endpoint():
+    clean, _calls = _counting_sampler(_linear_melt(1000.0))
+    cold = find_liquidus_solidus_by_fraction(clean, **_WARM_GRID)
+    seen: list[float] = []
+
+    def sample(temperature_C: float) -> float:
+        temperature = float(temperature_C)
+        seen.append(temperature)
+        if temperature == _WARM_GRID['min_T_C']:
+            raise LiquidusSampleError(
+                'out_of_domain',
+                ('cold grid end refused',),
+                {'reason': 'cold_end'},
+            )
+        return _linear_melt(1000.0)(temperature)
+
+    result = find_liquidus_solidus_by_fraction(
+        sample,
+        warm_solidus_T_C=cold.solidus_T_C,
+        warm_liquidus_T_C=cold.liquidus_T_C,
+        **_WARM_GRID,
+    )
+    assert result.status == 'out_of_domain'
+    assert _WARM_GRID['min_T_C'] in seen
+    assert len(seen) < 17

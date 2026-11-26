@@ -2294,6 +2294,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         projected_retry: bool = False,
         projected_oxide_wt_pct: Optional[Mapping[str, float]] = None,
         redox_state: RedoxState | None = None,
+        warm_solidus_T_C: Optional[float] = None,
+        warm_liquidus_T_C: Optional[float] = None,
     ) -> LiquidusSolidusResult:
         """Find solidus/liquidus by repeated MAGEMin single-point frac_M."""
         fO2_log, redox_state = normalize_redox_state(fO2_log, redox_state)
@@ -2435,6 +2437,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             scan_step_C=scan_step_C,
             tolerance_C=tolerance_C,
             budget_s=budget_s,
+            warm_solidus_T_C=warm_solidus_T_C,
+            warm_liquidus_T_C=warm_liquidus_T_C,
         )
         warnings_out = [*result.warnings, *sample_warnings[:6]]
         diagnostics = dict(result.diagnostics or {})
@@ -2493,6 +2497,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 projected_oxide_wt_pct=(
                     dict(folded_wt) if isinstance(folded_wt, Mapping) else None
                 ),
+                warm_solidus_T_C=warm_solidus_T_C,
+                warm_liquidus_T_C=warm_liquidus_T_C,
             )
             diagnostics['projected_liquidus_status'] = projected.status
             diagnostics['projected_liquidus_diagnostics'] = dict(
