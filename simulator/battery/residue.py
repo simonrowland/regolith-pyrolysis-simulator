@@ -1014,6 +1014,7 @@ def _residue_oxygen_balance(
     temperature,
     background_pressure_Pa=0.0,
     on_accepted_evaluation=None,
+    warm_start_log10_pO2_bar=None,
 ):
     """The shared channel stoichiometry and pressure-root call for both paths."""
     try:
@@ -1022,6 +1023,8 @@ def _residue_oxygen_balance(
             root_kwargs["background_pressure_Pa"] = background_pressure_Pa
         if on_accepted_evaluation is not None:
             root_kwargs["on_accepted_evaluation"] = on_accepted_evaluation
+        if warm_start_log10_pO2_bar is not None:
+            root_kwargs["warm_start_log10_pO2_bar"] = warm_start_log10_pO2_bar
         return _solve_vacuum_oxygen_balance(
             pressure_at,
             _residue_oxygen_channels(terms, inventory),
@@ -1426,6 +1429,7 @@ def integrate_knudsen_residue_inventory(
         _KNUDSEN_MAX_LINEAR_RHS_EVALUATIONS if linear_temperature else _KNUDSEN_MAX_RHS_EVALUATIONS
     )
     evaluations = 0
+    previous_root_log10_pO2_bar: float | None = None
     # The pressure closure and channels are fixed during this integration;
     # these exact dynamic inputs fully identify each pressure evaluation.
     pressure_state_cache: dict[
@@ -1468,8 +1472,19 @@ def integrate_knudsen_residue_inventory(
                 return pressures
 
             if logp is None:
+                def remember_accepted_root(root):
+                    nonlocal previous_root_log10_pO2_bar
+                    previous_root_log10_pO2_bar = float(root)
+
                 try:
-                    balance = _residue_oxygen_balance(terms, current, pressure_at, current_temperature)
+                    balance = _residue_oxygen_balance(
+                        terms,
+                        current,
+                        pressure_at,
+                        current_temperature,
+                        warm_start_log10_pO2_bar=previous_root_log10_pO2_bar,
+                        on_accepted_evaluation=remember_accepted_root,
+                    )
                 except ResidueInventoryRefusal:
                     raise
                 except ValueError as exc:

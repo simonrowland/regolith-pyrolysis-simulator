@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import math
 from collections.abc import Callable, Mapping, Sequence
+from functools import lru_cache
 
 from scipy.optimize import brentq
 
@@ -43,6 +44,27 @@ OXYGEN_BALANCE_EFFUSION_ENGINES: frozenset[Engine] = frozenset(
 OXYGEN_BALANCE_NOTICE_PREFIX = "fo2_oxygen_balance_effusion_solved:"
 _MODELLED_REACTIVE_CELL = frozenset({CellMaterial.W, CellMaterial.MO})
 _CHROMIUM_OXYGEN_PER_CR_CANDIDATES = (1.0, 1.5, 3.0)
+# Neighboring RHS inventories should move the monotone root locally; starting
+# at a quarter-decade and doubling preserves the original full bracket as the
+# fallback when a depletion event moves the root farther than that. brentq
+# keeps its original xtol/rtol below, so only the starting bracket changes.
+_WARM_ROOT_INITIAL_HALF_WIDTH_LOG10 = 0.25
+
+
+@lru_cache(maxsize=256)
+def _cached_molar_flux_denominators(
+    temperature_hex: str,
+    channel_keys: tuple[tuple[str, str], ...],
+) -> tuple[float, ...]:
+    """Cache the T and channel-only denominator in each molar flux."""
+
+    temperature = float.fromhex(temperature_hex)
+    return tuple(
+        math.sqrt(
+            2.0 * math.pi * GAS_CONSTANT * temperature * float.fromhex(mass_hex)
+        )
+        for _species, mass_hex in channel_keys
+    )
 
 
 def _cell_material_class(
@@ -158,6 +180,7 @@ def _solve_vacuum_oxygen_balance(
     temperature_K: float,
     background_pressure_Pa: float = 0.0,
     bracket_log10_pO2_bar: tuple[float, float] = (-30.0, 0.0),
+    warm_start_log10_pO2_bar: float | None = None,
     on_accepted_evaluation: Callable[[float], None] | None = None,
 ) -> _VacuumOxygenBalance:
     """Solve an alpha-weighted, engine-supplied vacuum pressure model.
@@ -247,14 +270,34 @@ def _solve_vacuum_oxygen_balance(
     if not active_channels or not strictly_monotone:
         raise ValueError("oxygen-balance flux is not strictly monotone for active channels")
 
+    flux_channel_keys = tuple(
+        (channel.species, float(channel.molar_mass_kg_per_mol).hex())
+        for channel in active_channels
+    )
+    flux_denominators = dict(zip(
+        (channel.species for channel in active_channels),
+        _cached_molar_flux_denominators(temperature.hex(), flux_channel_keys),
+        strict=True,
+    ))
+    fixed_parent_oxygen_demands = tuple(
+        None
+        if (
+            (channel.species == "CrO2" and channel.redox_metal_atoms > 0.0)
+            or (
+                channel.oxygen_per_metal_atom is not None
+                and channel.redox_metal_atoms > 0.0
+            )
+        )
+        else channel.parent_oxygen_demand
+        for channel in active_channels
+    )
+
     def molar_flux(channel: _VacuumOxygenChannel, pressure: float) -> float:
         # Only the flux uses the bulk-partial ceiling. Keep equilibrium Peq
         # untouched for the power-law validation and thermodynamic root axis.
         drive = (_net_evaporation_pressure_Pa(pressure, background_pressure_Pa)
                  if background_pressure_Pa else pressure)
-        return channel.alpha * drive / math.sqrt(
-            2.0 * math.pi * GAS_CONSTANT * temperature * channel.molar_mass_kg_per_mol
-        )
+        return channel.alpha * drive / flux_denominators[channel.species]
 
     def evaluate(
         logp: float, model_pressures: Mapping[str, float] | None = None,
@@ -275,7 +318,9 @@ def _solve_vacuum_oxygen_balance(
         demands: dict[str, float] = {}
         oxygen_flux = 0.0
         parent_flux = 0.0
-        for channel in active_channels:
+        for channel, fixed_demand in zip(
+            active_channels, fixed_parent_oxygen_demands, strict=True
+        ):
             try:
                 pressure = float(model_pressures[channel.species])
             except (KeyError, TypeError, ValueError, OverflowError) as exc:
@@ -287,7 +332,11 @@ def _solve_vacuum_oxygen_balance(
                     f"pressure model returned invalid {channel.species!r} pressure"
                 )
             pressures[channel.species] = pressure
-            demand = _channel_parent_oxygen_demand(channel, model_pressures)
+            demand = (
+                fixed_demand
+                if fixed_demand is not None
+                else _channel_parent_oxygen_demand(channel, model_pressures)
+            )
             if not math.isfinite(demand) or demand < 0.0:
                 raise ValueError(
                     f"parent oxygen demand is invalid for {channel.species!r}"
@@ -321,6 +370,15 @@ def _solve_vacuum_oxygen_balance(
         channel.pO2_exponent > 0.0
         for channel in active_channels if channel.parent_oxygen_demand == 0.0
     )
+    warm_start = None
+    if warm_start_log10_pO2_bar is not None:
+        try:
+            candidate = float(warm_start_log10_pO2_bar)
+        except (TypeError, ValueError, OverflowError):
+            candidate = math.nan
+        if math.isfinite(candidate) and low < candidate < high:
+            warm_start = candidate
+
     if zero_oxygen_boundary:
         # Without an oxygen supplier the root is pO2=0. Neutral oxide gases
         # retain their pressures; oxygen-consuming gases and free O/O2 vanish.
@@ -341,6 +399,63 @@ def _solve_vacuum_oxygen_balance(
         bracket_boundary = "lower"
     elif f_low < 0.0 and f_high < 0.0:
         raise ValueError("vacuum oxygen balance has no root in the declared pO2 bracket")
+    elif warm_start is not None:
+        f_warm = evaluate(warm_start)[0]
+        if f_warm == 0.0:
+            root = warm_start
+        elif f_warm < 0.0:
+            # The residual is monotone increasing, so search right from the
+            # preceding RHS root. Grow the local bracket geometrically until
+            # it encloses the new root or reaches the original upper bound.
+            left = warm_start
+            width = min(_WARM_ROOT_INITIAL_HALF_WIDTH_LOG10, high - warm_start)
+            right = min(high, warm_start + width)
+            f_right = f_high if right == high else evaluate(right)[0]
+            while f_right < 0.0 and right < high:
+                width = min(width * 2.0, high - warm_start)
+                right = min(high, warm_start + width)
+                f_right = f_high if right == high else evaluate(right)[0]
+            if f_right < 0.0:
+                raise ValueError(
+                    "vacuum oxygen balance has no root in the declared pO2 bracket"
+                )
+            if f_right == 0.0:
+                root = right
+                if right == high:
+                    bracket_boundary = "upper"
+            else:
+                root = brentq(
+                    lambda value: evaluate(value)[0],
+                    left,
+                    right,
+                    xtol=1.0e-12,
+                    rtol=1.0e-12,
+                    maxiter=200,
+                )
+        else:
+            # Symmetric search toward the original lower bound. Reuse its
+            # already evaluated residual when the geometric bracket reaches it.
+            right = warm_start
+            width = min(_WARM_ROOT_INITIAL_HALF_WIDTH_LOG10, warm_start - low)
+            left = max(low, warm_start - width)
+            f_left = f_low if left == low else evaluate(left)[0]
+            while f_left > 0.0 and left > low:
+                width = min(width * 2.0, warm_start - low)
+                left = max(low, warm_start - width)
+                f_left = f_low if left == low else evaluate(left)[0]
+            if f_left == 0.0:
+                root = left
+                if left == low:
+                    bracket_boundary = "lower"
+            else:
+                root = brentq(
+                    lambda value: evaluate(value)[0],
+                    left,
+                    right,
+                    xtol=1.0e-12,
+                    rtol=1.0e-12,
+                    maxiter=200,
+                )
     else:
         root = brentq(
             lambda value: evaluate(value)[0],
