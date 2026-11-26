@@ -22,7 +22,7 @@ from simulator.backend_names import (
 )
 from simulator.chemistry.kernel import ProposalRejected
 from simulator.core import PoisonedHourError, PoisonedHourState
-from simulator.engine_pool import EngineWorkerRemoteError
+from simulator.engine_pool import EngineWorkerRemoteError, EngineWorkerTimeout
 import simulator.optimize.evaluate as evaluate_module
 import simulator.optimize.pool as pool_module
 from tests._plugins.time_isolation import patch_module_time
@@ -764,6 +764,63 @@ def test_engine_worker_pool_timeout_evicts_only_hung_slot(tmp_path: Path) -> Non
 
     assert results[0].run_reference.backend_status_reason == 'optimizer_eval_timeout'
     assert results[1].candidate_id == 'fast'
+
+
+def test_engine_worker_spawn_timeout_keeps_green_values_in_optimizer_result(
+    tmp_path: Path,
+) -> None:
+    task = replace(
+        _pool_task(
+            0,
+            feedstock_id='lunar_mare_low_ti',
+            stage0_subprocess_required=False,
+        ),
+        candidate_id='spawn-stalled',
+        output_dir=str(tmp_path / 'spawn-stalled'),
+    )
+    timeout = EngineWorkerTimeout(
+        'ThermoEngine equilibrium', 30.0, phase='initialization',
+    )
+    timeout.effective_wait_s = 31.0
+    timeout.diagnostic_detail = 'effective spawn wait 31s'
+
+    class ImmediatePool:
+        def submit(self, _request, *, timeout_s: float) -> Future[object]:
+            assert timeout_s == 30.0
+            future: Future[object] = Future()
+            future.set_exception(timeout)
+            return future
+
+        def close(self, *, cancel_pending: bool) -> None:
+            assert cancel_pending is False
+
+    result = pool_module._evaluate_tasks_in_engine_worker_pool(
+        (task,),
+        _fake_evaluate,
+        max_workers=1,
+        per_eval_timeout_seconds=30.0,
+        warm_runtime_spec=pool_module._WarmRuntimeSpec(
+            backend_name=ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+            feedstock_id='lunar_mare_low_ti',
+            stage0_subprocess_required=False,
+        ),
+        engine_worker_pool=ImmediatePool(),
+    )[0]
+
+    margin = result.feasibility_margins['optimizer_eval_wall_timeout']
+    assert timeout.timeout_s == 30.0
+    assert timeout.effective_wait_s == 31.0
+    assert margin.threshold.value == 30.0
+    assert margin.observed == 30.0
+    assert margin.status_payload == {
+        'timeout_seconds': 30.0,
+        'elapsed_seconds': 30.0,
+    }
+    assert result.run_reference.error_message == (
+        'optimizer eval timed out after 30.000s (limit 30.000s)'
+    )
+    assert result.run_reference.trace['elapsed_seconds'] == 30.0
+    assert result.run_reference.trace['timeout_seconds'] == 30.0
 
 
 def test_engine_worker_pool_records_poisoned_candidate_and_runs_healthy_one(

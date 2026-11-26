@@ -254,19 +254,6 @@ class EngineWorkerTimeout(TimeoutError):
         )
         super().__init__(self._diagnostic_message)
 
-    def _set_configured_diagnostic_timeout(
-        self,
-        timeout_s: float,
-    ) -> None:
-        self.diagnostic_timeout_s = float(timeout_s)
-        context = self.worker_name
-        self._diagnostic_message = self._message_for_context(
-            context,
-            self.phase,
-            self.diagnostic_timeout_s,
-        )
-        self.args = (self._diagnostic_message,)
-
     @staticmethod
     def _message_for_context(
         context: str,
@@ -847,16 +834,21 @@ class WarmEngineWorker:
 
     def _startup_timeout(
         self,
-        effective_timeout_s: float,
+        timeout_s: float,
         *,
+        effective_wait_s: float | None = None,
         worker_name: str | None = None,
     ) -> EngineWorkerTimeout:
         timeout = EngineWorkerTimeout(
             self.name if worker_name is None else worker_name,
-            effective_timeout_s,
+            timeout_s,
             phase='initialization',
         )
-        timeout._set_configured_diagnostic_timeout(self.startup_timeout_s)
+        if effective_wait_s is not None:
+            timeout.effective_wait_s = float(effective_wait_s)
+            timeout.diagnostic_detail = (
+                f'effective spawn wait {timeout.effective_wait_s:g}s'
+            )
         return timeout
 
     def _finish_frame_reader(self, connection: Any) -> None:
@@ -1486,7 +1478,10 @@ class WarmEngineWorker:
                 startup_timeout + ENGINE_WORKER_SPAWN_SLACK_S
             )
             if not launch.started.wait(timeout=spawn_wait_timeout_s):
-                raise self._startup_timeout(spawn_wait_timeout_s)
+                raise self._startup_timeout(
+                    startup_timeout,
+                    effective_wait_s=spawn_wait_timeout_s,
+                )
             if launch.start_error is not None:
                 raise launch.start_error
             with self._state_lock:
@@ -2872,9 +2867,15 @@ class EngineWorkerPool:
             if backend.endswith(pool_suffix):
                 backend = backend.removesuffix(pool_suffix)
                 break
-        detail = f'failed worker slot(s): {slot_details}'
+        detail_parts = []
+        if timeout.diagnostic_detail:
+            detail_parts.append(timeout.diagnostic_detail)
+        detail_parts.append(f'failed worker slot(s): {slot_details}')
         if ready_wait_s is not None:
-            detail += f'; pool ready wait budget {ready_wait_s:g}s'
+            detail_parts.append(
+                f'pool ready wait budget {ready_wait_s:g}s'
+            )
+        detail = '; '.join(detail_parts)
         timeout.diagnostic_detail = detail
         timeout._set_diagnostic_context(
             backend=backend,

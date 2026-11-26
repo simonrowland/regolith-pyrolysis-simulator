@@ -960,15 +960,30 @@ class _DeadlineRaceStartProcess:
         self.alive = True
         self.exitcode = None
         self.pid = None
+        self.cancel_requested = None
 
     def start(self):
         pass
 
     def is_alive(self):
+        if (
+            self.cancel_requested is not None
+            and self.cancel_requested.is_set()
+        ):
+            self.alive = False
+            if self.exitcode is None:
+                self.exitcode = -9
         return self.alive
 
     def join(self, timeout=None):
-        pass
+        del timeout
+        if (
+            self.cancel_requested is not None
+            and self.cancel_requested.is_set()
+        ):
+            self.alive = False
+            if self.exitcode is None:
+                self.exitcode = -9
 
     def kill(self):
         self.alive = False
@@ -1038,6 +1053,9 @@ def _deadline_race_start_worker(
         discarded.append(kwargs)
         process = worker.process
         connection = worker.connection
+        launch = worker._launch_owner
+        if launch is not None and launch.process is process:
+            launch.cancel_requested.set()
         worker.process = None
         worker.connection = None
         process.alive = False
@@ -1117,6 +1135,8 @@ def _deadline_race_start_worker(
 
         def stall_launch_start_event(launch, *args, **kwargs):
             real_launch_init(launch, *args, **kwargs)
+            launch.process.cancel_requested = launch.cancel_requested
+            worker._spawn_stall_launch = launch
             worker._spawn_stall_event = _DeadlineRaceSpawnStallEvent()
             launch.started = worker._spawn_stall_event
 
@@ -1462,32 +1482,62 @@ def _dead_worker_with_spawn_stall(monkeypatch, *, name):
     return worker, startup_timeout_s
 
 
-def test_standalone_dead_worker_spawn_stall_keeps_configured_diagnostic(
+def test_standalone_thermoengine_consumer_keeps_green_timeout(
     monkeypatch,
 ):
+    from engines.alphamelts.thermoengine import ThermoEngineTimeoutError
+    from simulator.melt_backend.thermoengine import ThermoEngineBackend
+
     worker, startup_timeout_s = _dead_worker_with_spawn_stall(
         monkeypatch,
-        name='PetThermoTools native operation',
+        name='ThermoEngine equilibrium',
     )
 
-    with pytest.raises(EngineWorkerTimeout) as caught:
-        worker.call({})
+    worker_timeouts = []
 
-    timeout = caught.value
-    effective_wait_s = startup_timeout_s + ENGINE_WORKER_SPAWN_SLACK_S
-    assert worker._spawn_stall_event.wait_timeouts == [effective_wait_s]
+    class StandaloneTransport:
+        def equilibrate(self, **_kwargs):
+            try:
+                return worker.call({})
+            except EngineWorkerTimeout as exc:
+                worker_timeouts.append(exc)
+                raise
+
+    backend = ThermoEngineBackend()
+    backend._thermoengine_transport = StandaloneTransport()
+    monkeypatch.setattr(
+        backend,
+        '_clamped_operating_point_context',
+        lambda **_kwargs: ({}, []),
+    )
+    with pytest.raises(ThermoEngineTimeoutError) as caught:
+        backend._equilibrate_thermoengine(
+            1200.0,
+            {'SiO2': 60.0, 'MgO': 40.0},
+            None,
+            1.0,
+        )
+
+    timeout = worker_timeouts[0]
+    assert startup_timeout_s == 30.0
+    assert worker._spawn_stall_event.wait_timeouts == [31.0]
     assert timeout.phase == 'initialization'
-    assert timeout.timeout_s == pytest.approx(effective_wait_s)
+    assert timeout.timeout_s == 30.0
+    assert timeout.effective_wait_s == 31.0
+    assert timeout.diagnostic_detail == 'effective spawn wait 31s'
     diagnostic = timeout.serialized_diagnostic_fields()
-    assert diagnostic['timeout_s'] == pytest.approx(startup_timeout_s)
+    assert diagnostic['timeout_s'] == 30.0
+    assert 'effective_wait_s' not in diagnostic
+    assert 'diagnostic_detail' not in diagnostic
     assert diagnostic['exception_message'] == (
-        'PetThermoTools native operation initialization exceeded hard '
-        'timeout of 30s'
+        'ThermoEngine equilibrium initialization exceeded hard timeout of 30s'
     )
-    launch = worker._launch_owner
-    if launch is not None:
-        launch.thread.join(timeout=1.0)
-        assert not launch.thread.is_alive()
+    assert caught.value.timeout_s == 30.0
+    assert str(caught.value).endswith('after 30.0s')
+    launch = worker._spawn_stall_launch
+    launch.thread.join(timeout=_RENDEZVOUS_TIMEOUT_S)
+    assert not launch.thread.is_alive()
+    assert launch.finished.is_set()
 
 
 def test_pool_restart_spawn_stall_uses_configured_serialized_timeout(
@@ -1553,34 +1603,35 @@ def test_pool_restart_spawn_stall_uses_configured_serialized_timeout(
         consumer.join(timeout=1.0)
         assert not consumer.is_alive()
     timeout = caught.value
-    effective_wait_s = startup_timeout_s + ENGINE_WORKER_SPAWN_SLACK_S
-    assert worker._spawn_stall_event.wait_timeouts == [effective_wait_s]
+    assert startup_timeout_s == 30.0
+    assert worker._spawn_stall_event.wait_timeouts == [31.0]
     assert timeout.phase == 'initialization'
-    assert timeout.timeout_s == pytest.approx(effective_wait_s)
+    assert timeout.timeout_s == 30.0
+    assert timeout.effective_wait_s == 31.0
 
     diagnostic = timeout.serialized_diagnostic_fields()
-    assert diagnostic['timeout_s'] == pytest.approx(startup_timeout_s)
-    assert timeout.diagnostic_timeout_s == pytest.approx(startup_timeout_s)
+    assert diagnostic['timeout_s'] == 30.0
+    assert timeout.diagnostic_timeout_s == 30.0
     assert diagnostic['exception_message'] == (
         'MAGEMin startup initialization exceeded hard timeout of 30s'
     )
     assert 'slot 5' in timeout.diagnostic_detail
+    assert 'effective spawn wait 31s' in timeout.diagnostic_detail
     startup_detail_logs = [
         entry for entry in startup_logs if 'startup timeout' in entry
     ]
     assert len(startup_detail_logs) == 1
     assert 'slot 5' in startup_detail_logs[0]
+    assert 'effective spawn wait 31s' in startup_detail_logs[0]
     request_detail = json.loads(
         timeout.diagnostic_detail.rsplit('; MAGEMin request: ', 1)[1]
     )
-    assert request_detail['pool_timeout']['effective_wait_timeout_s'] == (
-        effective_wait_s
-    )
+    assert request_detail['pool_timeout']['effective_wait_timeout_s'] == 31.0
     assert request_detail['pool_timeout']['worker_phase'] == 'initialization'
-    launch = worker._launch_owner
-    if launch is not None:
-        launch.thread.join(timeout=1.0)
-        assert not launch.thread.is_alive()
+    launch = worker._spawn_stall_launch
+    launch.thread.join(timeout=_RENDEZVOUS_TIMEOUT_S)
+    assert not launch.thread.is_alive()
+    assert launch.finished.is_set()
 
 
 def test_late_job_frame_completion_times_out(monkeypatch):

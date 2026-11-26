@@ -3335,7 +3335,11 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                                     'configured_per_job_timeout_s': (
                                         configured_timeout_s
                                     ),
-                                    'effective_wait_timeout_s': timeout.timeout_s,
+                                    'effective_wait_timeout_s': getattr(
+                                        timeout,
+                                        'effective_wait_s',
+                                        timeout.timeout_s,
+                                    ),
                                     'wait_state': 'running',
                                     'worker_phase': timeout.phase,
                                 },
