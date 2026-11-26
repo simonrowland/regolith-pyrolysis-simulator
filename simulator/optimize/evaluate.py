@@ -169,7 +169,8 @@ from simulator.pumping_cost import (
 )
 from simulator.reduced_real_determinism import PT0NonFinitePayload
 from simulator.mre_ladder import max_voltage_for_target, parse_ladder_from_setpoints
-from simulator.run_executor import RunExecutor, _campaign_stops_for_trace
+from simulator.run_executor import RunExecutor
+from simulator.session import _campaign_stops_for_trace
 from simulator.recipe_errors import MalformedRecipeError
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.runner import PyrolysisRun, RunnerError

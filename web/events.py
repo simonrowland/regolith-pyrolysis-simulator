@@ -2829,19 +2829,12 @@ def _full_runner_payload(
             )
         else:
             payload.pop('refusal_diagnostic', None)
-        run_metadata = payload.get('run_metadata')
-        had_run_metadata = isinstance(run_metadata, Mapping)
-        run_metadata = dict(run_metadata) if had_run_metadata else {}
-        if had_run_metadata or run_metadata:
-            payload['run_metadata'] = run_metadata
         recipe_snapshot = _recipe_snapshot_from_projector(projector)
         if recipe_snapshot is not None:
             payload['recipe_snapshot'] = recipe_snapshot
         return payload
 
-    sim = getattr(session, '_sim', None)
-    if sim is None:
-        raise RuntimeError('web session has no live simulator')
+    sim = session.simulator
     config = session._config
     if config is None:
         raise RuntimeError('web session has no runner configuration')
@@ -2926,11 +2919,6 @@ def _available_runner_payload(
         and 'run_flags' in recorded_metadata
     ):
         metadata['run_flags'] = copy.deepcopy(recorded_metadata['run_flags'])
-    elif (
-        isinstance(metadata_overrides, Mapping)
-        and 'run_flags' in metadata_overrides
-    ):
-        metadata['run_flags'] = copy.deepcopy(metadata_overrides['run_flags'])
     if (
         isinstance(recorded_metadata, Mapping)
         and 'campaign_stops' in recorded_metadata

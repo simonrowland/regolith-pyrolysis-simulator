@@ -42,6 +42,12 @@ from simulator.state import (
 
 _ALLOWED_SESSION_TRACKS = frozenset({"pyrolysis", "mre_baseline"})
 _RUN_HOUR_BUDGET_FLAG_CODE = "run_hour_budget_exhausted_mid_campaign"
+_CAMPAIGN_STOP_REASONS = frozenset({
+    "endpoint_met",
+    "time_cap",
+    "refused",
+    "stop_reason_unrecorded",
+})
 
 
 def _canonical_runtime_campaign_overrides(
@@ -809,12 +815,14 @@ class SimSession:
             document = self._config.result_document_factory(self)
         else:
             raise RuntimeError("no result document has been recorded")
-        if not isinstance(document, Mapping):
+        if self._sim is None or not isinstance(document, Mapping):
             return document
         payload = dict(document)
         run_metadata = payload.get("run_metadata")
         if isinstance(run_metadata, Mapping):
-            payload["run_metadata"] = dict(run_metadata)
+            attached_metadata = dict(run_metadata)
+            _attach_execution_diagnostics(attached_metadata, self)
+            payload["run_metadata"] = attached_metadata
         return payload
 
     def per_hour_summaries(self) -> list[dict[str, Any]]:
@@ -827,14 +835,7 @@ class SimSession:
         self._operator_decisions.append(event)
 
     def _set_result_document(self, document: Mapping[str, Any]) -> None:
-        if self._sim is None or not isinstance(document, Mapping):
-            self._result_document = document
-            return
-        payload = dict(document)
-        run_metadata = payload.get("run_metadata")
-        if isinstance(run_metadata, Mapping):
-            payload["run_metadata"] = dict(run_metadata)
-        self._result_document = payload
+        self._result_document = document
 
     def _require_sim(self) -> PyrolysisSimulator:
         if self._sim is None:
@@ -1003,6 +1004,83 @@ def _write_run_flags_to_metadata(
         run_metadata["run_flags"] = list(run_flags)
     else:
         run_metadata["run_flags"] = run_flags
+
+
+def campaign_stop_record(summary: Mapping[str, Any] | None) -> dict[str, Any] | None:
+    """Compact ranking record for one completed campaign.
+
+    Accepts a campaign summary (``stop_detail``) or an already compact
+    record (``detail``). A summary with no stop token returns None. It is
+    not stored as ``endpoint_met``.
+    """
+
+    if not isinstance(summary, Mapping):
+        return None
+    reason = str(summary.get("stop_reason") or "")
+    if reason not in _CAMPAIGN_STOP_REASONS:
+        return None
+    record: dict[str, Any] = {
+        "campaign": str(summary.get("campaign") or ""),
+        "stop_reason": reason,
+        "duration_h": summary.get("duration_h"),
+    }
+    detail = summary.get("stop_detail", summary.get("detail"))
+    if detail:
+        record["detail"] = str(detail)
+    flags = summary.get("flags")
+    if isinstance(flags, (list, tuple)):
+        record["flags"] = [
+            copy.deepcopy(dict(flag)) for flag in flags if isinstance(flag, Mapping)
+        ]
+    return record
+
+
+def _campaign_stops_for_trace(
+    run_execution: Any,
+    *,
+    recorded_campaign_stops: Any = None,
+) -> tuple[dict[str, Any], ...]:
+    """Project stop records from live session history or its recorded artifact."""
+
+    session = getattr(run_execution, "session", run_execution)
+    has_live_session = getattr(session, "_sim", None) is not None
+    if has_live_session:
+        stored = None
+    elif recorded_campaign_stops is not None:
+        stored = recorded_campaign_stops
+    else:
+        stored = getattr(run_execution, "campaign_stops", None)
+    if stored is None or (recorded_campaign_stops is None and not stored):
+        stored = []
+        for result in getattr(session, "_step_results", ()) or ():
+            record = campaign_stop_record(getattr(result, "campaign_summary", None))
+            if record is not None:
+                stored.append(record)
+    records: list[dict[str, Any]] = []
+    for item in stored:
+        record = campaign_stop_record(item)
+        if record is not None:
+            records.append(record)
+    return tuple(records)
+
+
+def _attach_execution_diagnostics(
+    run_metadata: dict[str, Any],
+    session: Any,
+) -> None:
+    """Attach live run flags and campaign-stop history to one result document."""
+
+    if getattr(session, "_sim", None) is None:
+        return
+    stored_run_flags = run_metadata.get("run_flags", [])
+    live_flags = _run_flags_for_export(session)
+    live_budget_flag = live_flags[0] if live_flags else None
+    run_flags = _merge_run_flags(stored_run_flags, live_budget_flag)
+    if run_flags is not stored_run_flags:
+        _write_run_flags_to_metadata(run_metadata, run_flags)
+    run_metadata["campaign_stops"] = _json_safe(
+        list(_campaign_stops_for_trace(session))
+    )
 
 
 def drive_auto_apply(

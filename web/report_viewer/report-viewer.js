@@ -717,8 +717,7 @@ function panelRegistry() {
 
 function appendRunDiagnostics(container, artifact) {
   const metadata = artifact?.terminal?.run_metadata || {};
-  const runFlagsAreArray = Array.isArray(metadata.run_flags);
-  const runFlags = runFlagsAreArray
+  const runFlags = Array.isArray(metadata.run_flags)
     ? metadata.run_flags
     : metadata.run_flags === undefined ? [] : [metadata.run_flags];
   const campaignStops = Array.isArray(metadata.campaign_stops)
@@ -739,10 +738,14 @@ function appendRunDiagnostics(container, artifact) {
   const list = document.createElement("ul");
   for (const flag of runFlags) {
     const item = document.createElement("li");
-    if (!runFlagsAreArray) {
-      item.textContent = typeof flag === "string"
-        ? flag
-        : JSON.stringify(flag);
+    const recognizedFlag = flag !== null &&
+      typeof flag === "object" &&
+      !Array.isArray(flag) &&
+      typeof flag.code === "string" &&
+      (flag.kind === "run_diagnostic" || flag.kind === "campaign_stop");
+    if (!recognizedFlag) {
+      const serialized = typeof flag === "string" ? flag : JSON.stringify(flag);
+      item.textContent = serialized === undefined ? String(flag) : serialized;
       list.appendChild(item);
       continue;
     }

@@ -40,6 +40,7 @@ from simulator.session import (
     _at_stage0_exit as _session_at_stage0_exit,
     _drive_session_with_budget_intent,
     _run_flags_for_export,
+    campaign_stop_record,
     drive_session,
 )
 from simulator.scalar_boundary import is_declared_real_scalar
@@ -133,72 +134,6 @@ class RunExecution:
     @property
     def run_flags(self) -> tuple[Any, ...]:
         return tuple(_run_flags_for_export(self.session))
-
-
-_CAMPAIGN_STOP_REASONS = frozenset({
-    "endpoint_met",
-    "time_cap",
-    "refused",
-    "stop_reason_unrecorded",
-})
-
-
-def campaign_stop_record(summary: Mapping[str, Any] | None) -> dict[str, Any] | None:
-    """Compact ranking record for one completed campaign.
-
-    Accepts a campaign summary (``stop_detail``) or an already compact
-    record (``detail``). A summary with no stop token returns None. It is
-    not stored as ``endpoint_met``.
-    """
-
-    if not isinstance(summary, Mapping):
-        return None
-    reason = str(summary.get("stop_reason") or "")
-    if reason not in _CAMPAIGN_STOP_REASONS:
-        return None
-    record: dict[str, Any] = {
-        "campaign": str(summary.get("campaign") or ""),
-        "stop_reason": reason,
-        "duration_h": summary.get("duration_h"),
-    }
-    detail = summary.get("stop_detail", summary.get("detail"))
-    if detail:
-        record["detail"] = str(detail)
-    flags = summary.get("flags")
-    if isinstance(flags, (list, tuple)):
-        record["flags"] = [
-            deepcopy(dict(flag)) for flag in flags if isinstance(flag, Mapping)
-        ]
-    return record
-
-
-def _campaign_stops_for_trace(
-    run_execution: Any,
-    *,
-    recorded_campaign_stops: Any = None,
-) -> tuple[dict[str, Any], ...]:
-    """Project stop records from live session history or its recorded artifact."""
-
-    session = getattr(run_execution, "session", run_execution)
-    has_live_session = getattr(session, "_sim", None) is not None
-    if has_live_session:
-        stored = None
-    elif recorded_campaign_stops is not None:
-        stored = recorded_campaign_stops
-    else:
-        stored = getattr(run_execution, "campaign_stops", None)
-    if stored is None or (recorded_campaign_stops is None and not stored):
-        stored = []
-        for result in getattr(session, "_step_results", ()) or ():
-            record = campaign_stop_record(getattr(result, "campaign_summary", None))
-            if record is not None:
-                stored.append(record)
-    records: list[dict[str, Any]] = []
-    for item in stored:
-        record = campaign_stop_record(item)
-        if record is not None:
-            records.append(record)
-    return tuple(records)
 
 
 def _campaigns_elapsed_from_session_history(

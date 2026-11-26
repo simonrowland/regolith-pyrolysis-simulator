@@ -132,7 +132,6 @@ from simulator.pumping_cost import pumping_context_from_sim
 from simulator.run_executor import (
     RunExecution,
     RunExecutor,
-    _campaign_stops_for_trace,
     _json_safe,
     _safe_exception_text,
 )
@@ -149,9 +148,7 @@ from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.session import (
     SimSession,
     SimSessionConfig,
-    _merge_run_flags,
-    _run_flags_for_export,
-    _write_run_flags_to_metadata,
+    _attach_execution_diagnostics,
 )
 from simulator.state import (
     Atmosphere,
@@ -1373,7 +1370,7 @@ class PyrolysisRun:
                 )
         run_metadata = output.get("run_metadata")
         if isinstance(run_metadata, dict):
-            _attach_execution_diagnostics(run_metadata, execution)
+            _attach_execution_diagnostics(run_metadata, execution.session)
         return output
 
     def _minimal_failure_output(
@@ -5881,24 +5878,6 @@ def _execution_shadow_trace(execution: RunExecution | None) -> list[Any]:
     if execution is None:
         return []
     return _json_safe(list(getattr(execution, "shadow_trace", ()) or ()))
-
-
-def _attach_execution_diagnostics(
-    run_metadata: dict[str, Any],
-    execution: RunExecution,
-) -> None:
-    session = getattr(execution, "session", None)
-    if getattr(session, "_sim", None) is None:
-        return
-    stored_run_flags = run_metadata.get("run_flags", [])
-    live_flags = _run_flags_for_export(session)
-    live_budget_flag = live_flags[0] if live_flags else None
-    run_flags = _merge_run_flags(stored_run_flags, live_budget_flag)
-    if run_flags is not stored_run_flags:
-        _write_run_flags_to_metadata(run_metadata, run_flags)
-    run_metadata["campaign_stops"] = _json_safe(
-        list(_campaign_stops_for_trace(execution))
-    )
 
 
 def _execution_pO2_enforcement_by_hour(

@@ -253,3 +253,25 @@ def test_non_list_run_flag_renders_as_one_text_content_row() -> None:
 
     assert rendered["lines"] == [json.dumps(stored_flag, separators=(",", ":"))]
     assert rendered["itemChildCounts"] == [0]
+
+
+def test_legacy_run_flag_and_live_flag_render_as_separate_rows() -> None:
+    artifact = _minimal_artifact()
+    artifact["terminal"]["run_metadata"] = {
+        "run_flags": [
+            "legacy",
+            {
+                "kind": "run_diagnostic",
+                "code": "run_hour_budget_exhausted_mid_campaign",
+                "detail": {"campaign": "C2A"},
+            },
+        ],
+    }
+
+    rendered = _render_diagnostics(artifact)
+
+    assert rendered["lines"][0] == "legacy"
+    assert rendered["lines"][1] == (
+        'run_hour_budget_exhausted_mid_campaign: {"campaign":"C2A"}'
+    )
+    assert rendered["itemChildCounts"] == [0, 0]
