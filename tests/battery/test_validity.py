@@ -11,6 +11,7 @@ from simulator.battery.enums import (
     AdmissionStatus,
     AmountBasis,
     EvidenceClass,
+    MethodToken,
     Quantity,
     RefusalReason,
 )
@@ -33,6 +34,7 @@ from simulator.battery.validity import (
     run_validity_gates,
     underdetermined_apparatus,
 )
+from simulator.source_ids import ZHANG_2021_ACSESC_SOURCE_ID
 from tests.battery import factories as F
 
 
@@ -194,6 +196,47 @@ def test_comparison_ratio_does_not_admit_activity_coefficient() -> None:
         check.name == "comparison_method_cell_constant_cancels" and check.passed
         for check in gate.checks
     )
+
+
+@pytest.mark.parametrize(
+    ("source_id", "has_row_area", "expected_pass"),
+    (
+        (ZHANG_2021_ACSESC_SOURCE_ID, False, True),
+        (ZHANG_2021_ACSESC_SOURCE_ID, True, True),
+        ("other-source", True, False),
+    ),
+)
+def test_time_forward_mass_loss_defers_row_geometry_to_predictor(
+    source_id: str, has_row_area: bool, expected_pass: bool,
+) -> None:
+    experiment = F.tabulation_experiment(
+        method=MethodToken.LANGMUIR_FREE_EVAPORATION
+    )
+    identity = replace(
+        F.activity_identity(), quantity=Quantity.MASS_LOSS_FRACTION
+    )
+    reference = F.observation(
+        "time-forward-mass-loss",
+        experiment.experiment_id,
+        identity,
+        "0.01",
+        source_id=source_id,
+    )
+    if has_row_area:
+        reference = replace(
+            reference,
+            point_conditions={
+                "exposed_area_initial_m2": F.located(Decimal("1e-5"))
+            },
+        )
+
+    outcome = underdetermined_apparatus(
+        experiment, Quantity.MASS_LOSS_FRACTION, observation=reference
+    )
+
+    assert outcome.passed is expected_pass
+    if not expected_pass:
+        assert outcome.reason is RefusalReason.UNDERDETERMINED_APPARATUS
 
 
 _VALIDITY_BUCKET_COUNT = 8

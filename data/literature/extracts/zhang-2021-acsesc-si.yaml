@@ -17,8 +17,6 @@ review_status: draft
 schema_gaps:
 - Table S1 initial/final sample weights have no standalone mass-measurement quantity token; retained as measured-direct
   typed refusal, with mass-loss fractions linked to those weights.
-- A complete multicomponent residue-composition vector has no value field in the current migrator; each run is retained
-  as a typed-refused residue_composition_vs_time row; all nine printed oxide cells remain under printed_residue_oxide_wt_pct.
 fidelity_samples:
 - path: species.unknown.observations[zhang_si_table_s1_published_weights].values.runs[0].mass_before_mg
   value: 40.4
@@ -58,8 +56,8 @@ scope_assessment:
   - 'Fig. S6 and Figs. S7-S15: spatial Na, K, Rb concentration profiles; no figure-only values transcribed.'
   note: >-
     Table S1 provides 12 whole-sample before/after masses. The main article Table 1 provides 12 run-level residue
-    compositions, stored as printed with its Table 1 locators; complete composition vectors are typed-refused by
-    the current value schema. SI Tables S2-S11 contain 608 individual EPMA spot analyses for spatial profiles
+    compositions, stored as printed with its Table 1 locators; the migrator expands each vector into oxide-cell
+    observations. SI Tables S2-S11 contain 608 individual EPMA spot analyses for spatial profiles
     (S2–S9: 488; S10: 67; S11: 53); per controller ruling, those spot values are not transcribed or averaged in this
     extract. No Na-specific flux or Na(g)/Na pressure is inferred.
 species:
@@ -77,6 +75,21 @@ species:
       values:
         quantity: untyped_sample_mass_measurements
         method_class: measured_direct
+        heating_schedule:
+          ramp_start_C:
+            value: 850
+            locator:
+              page: 8
+              section: 2.2 Vacuum evaporation experiments
+              line_range: "208"
+              note: "Main article Methods §2.2, page 8 line 208: programmed ramp starts at 850°C."
+          ramp_rate_C_per_min:
+            value: 40
+            locator:
+              page: 9
+              section: 2.2 Vacuum evaporation experiments
+              line_range: "211 and 214"
+              note: "Main article Methods §2.2, page 9 lines 211 and 214: ramp rate is 40°C/min."
         runs:
         - sample: Bas1400C0m1
           mass_before_mg: 40.4
@@ -162,6 +175,55 @@ species:
             page: 9
             table: S1
             row: Bas1200C40h
+      equipment:
+        sample_surface_area:
+          value:
+          - sample: Bas1400C0m1
+            initial_area_mm2: 28.4
+            final_area_mm2: 29.4
+            locator: {page: 9, table: S1, row: Bas1400C0m1}
+          - sample: Bas1400C15m
+            initial_area_mm2: 30.8
+            final_area_mm2: 34.1
+            locator: {page: 9, table: S1, row: Bas1400C15m}
+          - sample: Bas1400C30m
+            initial_area_mm2: 31.0
+            final_area_mm2: 31.3
+            locator: {page: 9, table: S1, row: Bas1400C30m}
+          - sample: Bas1400C60m
+            initial_area_mm2: 27.6
+            final_area_mm2: 42.7
+            locator: {page: 9, table: S1, row: Bas1400C60m}
+          - sample: Bas1400C90m
+            initial_area_mm2: 23.4
+            final_area_mm2: 28.2
+            locator: {page: 9, table: S1, row: Bas1400C90m}
+          - sample: Bas1200C0h1
+            initial_area_mm2: 16.4
+            final_area_mm2: 13.8
+            locator: {page: 9, table: S1, row: Bas1200C0h1}
+          - sample: Bas1200C0h2
+            initial_area_mm2: 29.0
+            final_area_mm2: 28.5
+            locator: {page: 9, table: S1, row: Bas1200C0h2}
+          - sample: Bas1200C1h
+            initial_area_mm2: 30.2
+            final_area_mm2: 29.5
+            locator: {page: 9, table: S1, row: Bas1200C1h}
+          - sample: Bas1200C4h
+            initial_area_mm2: 26.3
+            final_area_mm2: 29.3
+            locator: {page: 9, table: S1, row: Bas1200C4h}
+          - sample: Bas1200C10h
+            initial_area_mm2: 30.8
+            final_area_mm2: 31.0
+            locator: {page: 9, table: S1, row: Bas1200C10h}
+          - sample: Bas1200C40h
+            initial_area_mm2: 19.1
+            final_area_mm2: 23.2
+            locator: {page: 9, table: S1, row: Bas1200C40h}
+          units: mm2
+          locator: {page: 9, table: S1, note: "Before and after experimental surface areas as printed; no area uncertainty stated."}
     - observation_id: zhang_2021_table1_bas1400c0m1_residue_composition
       type: rate_series
       locator: &id001
@@ -229,8 +291,7 @@ species:
             K2O: 2.5
             Rb2O: 1.89
           locator: *id001
-        note: Composition vector as printed in main article Table 1; no value schema is available for the complete
-          vector.
+        note: Composition vector as printed in main article Table 1; the migrator expands it into oxide-cell observations.
         zero_time_procedure: '1200°C: held 5 min before quench; 1400°C: quenched upon reaching 1400°C'
         starting_glass_wt_pct: &id004
           Na2O: 2.27
@@ -308,8 +369,7 @@ species:
             K2O: 2.46
             Rb2O: 1.86
           locator: *id002
-        note: Composition vector as printed in main article Table 1; no value schema is available for the complete
-          vector.
+        note: Composition vector as printed in main article Table 1; the migrator expands it into oxide-cell observations.
         zero_time_procedure: '1200°C: held 5 min before quench; 1400°C: quenched upon reaching 1400°C'
         starting_glass_wt_pct: *id004
       quench_state:
@@ -378,8 +438,7 @@ species:
             K2O: 1.63
             Rb2O: 1.12
           locator: *id005
-        note: Composition vector as printed in main article Table 1; no value schema is available for the complete
-          vector.
+        note: Composition vector as printed in main article Table 1; the migrator expands it into oxide-cell observations.
         starting_glass_wt_pct: *id004
       quench_state:
         status: not_stated
@@ -447,8 +506,7 @@ species:
             K2O: 1.19
             Rb2O: 0.74
           locator: *id006
-        note: Composition vector as printed in main article Table 1; no value schema is available for the complete
-          vector.
+        note: Composition vector as printed in main article Table 1; the migrator expands it into oxide-cell observations.
         starting_glass_wt_pct: *id004
       quench_state:
         status: not_stated
@@ -516,8 +574,7 @@ species:
             K2O: 0.28
             Rb2O: 0.1
           locator: *id007
-        note: Composition vector as printed in main article Table 1; no value schema is available for the complete
-          vector.
+        note: Composition vector as printed in main article Table 1; the migrator expands it into oxide-cell observations.
         starting_glass_wt_pct: *id004
       quench_state:
         status: not_stated
@@ -585,8 +642,7 @@ species:
             K2O: 0.05
             Rb2O: b.d.l.
           locator: *id008
-        note: Composition vector as printed in main article Table 1; no value schema is available for the complete
-          vector.
+        note: Composition vector as printed in main article Table 1; the migrator expands it into oxide-cell observations.
         starting_glass_wt_pct: *id004
       quench_state:
         status: not_stated
@@ -654,8 +710,7 @@ species:
             K2O: 2.56
             Rb2O: 1.98
           locator: *id009
-        note: Composition vector as printed in main article Table 1; no value schema is available for the complete
-          vector.
+        note: Composition vector as printed in main article Table 1; the migrator expands it into oxide-cell observations.
         zero_time_procedure: '1200°C: held 5 min before quench; 1400°C: quenched upon reaching 1400°C'
         starting_glass_wt_pct: *id004
       quench_state:
@@ -724,8 +779,7 @@ species:
             K2O: 2.58
             Rb2O: 1.87
           locator: *id010
-        note: Composition vector as printed in main article Table 1; no value schema is available for the complete
-          vector.
+        note: Composition vector as printed in main article Table 1; the migrator expands it into oxide-cell observations.
         zero_time_procedure: '1200°C: held 5 min before quench; 1400°C: quenched upon reaching 1400°C'
         starting_glass_wt_pct: *id004
       quench_state:
@@ -794,8 +848,7 @@ species:
             K2O: 2.53
             Rb2O: 1.93
           locator: *id011
-        note: Composition vector as printed in main article Table 1; no value schema is available for the complete
-          vector.
+        note: Composition vector as printed in main article Table 1; the migrator expands it into oxide-cell observations.
         starting_glass_wt_pct: *id004
       quench_state:
         status: not_stated
@@ -863,8 +916,7 @@ species:
             K2O: 2.15
             Rb2O: 1.56
           locator: *id012
-        note: Composition vector as printed in main article Table 1; no value schema is available for the complete
-          vector.
+        note: Composition vector as printed in main article Table 1; the migrator expands it into oxide-cell observations.
         starting_glass_wt_pct: *id004
       quench_state:
         status: not_stated
@@ -932,8 +984,7 @@ species:
             K2O: 1.84
             Rb2O: 1.27
           locator: *id013
-        note: Composition vector as printed in main article Table 1; no value schema is available for the complete
-          vector.
+        note: Composition vector as printed in main article Table 1; the migrator expands it into oxide-cell observations.
         starting_glass_wt_pct: *id004
       quench_state:
         status: not_stated
@@ -1001,8 +1052,7 @@ species:
             K2O: 1.09
             Rb2O: 0.67
           locator: *id014
-        note: Composition vector as printed in main article Table 1; no value schema is available for the complete
-          vector.
+        note: Composition vector as printed in main article Table 1; the migrator expands it into oxide-cell observations.
         starting_glass_wt_pct: *id004
       quench_state:
         status: not_stated

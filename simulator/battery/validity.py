@@ -78,6 +78,7 @@ from simulator.battery.records import (
 )
 from simulator.reference_data.janaf import formula_composition
 from simulator.physical_constants import TABLE_SELF_CHECK_FINDING_DEX
+from simulator.source_ids import TIME_FORWARD_RESIDUE_SOURCE_IDS
 from simulator.transport_constants import FREE_MOLECULAR_KNUDSEN_MIN
 
 KEMS_GEOMETRY_FACTS = ("orifice_area_m2", "clausing_factor")
@@ -567,6 +568,11 @@ def underdetermined_apparatus(
         return _pass(checks)
     method = method_state.value
     geometry = None if experiment.apparatus is None else experiment.apparatus.geometry
+    time_forward_mass_loss = (
+        quantity is Quantity.MASS_LOSS_FRACTION
+        and observation is not None
+        and observation.source_id in TIME_FORWARD_RESIDUE_SOURCE_IDS
+    )
     missing: list[str] = []
     invalid: tuple[str, ...] = ()
     if _is_kems_calibrated_pressure(method, quantity):
@@ -772,10 +778,11 @@ def underdetermined_apparatus(
             _finite_positive(geometry.exposed_area_m2) is None
             and _finite_positive(geometry.orifice_area_m2) is None
         ):
-            if method is MethodToken.LANGMUIR_FREE_EVAPORATION:
-                if "exposed_area_m2" not in missing:
-                    missing.append("exposed_area_m2")
-            elif "exposed_area_m2" not in missing:
+            # Zhang's row-level SI areas and DP-116's runtime geometry belong
+            # to the existing time-forward predictor. The experiment packet
+            # cannot represent each run's separate endpoints, so this
+            # preflight lets that owner validate and flag them itself.
+            if not time_forward_mass_loss:
                 missing.append("exposed_area_m2")
     detail = {"missing": missing, "method": method.value, "quantity": quantity.value}
     if invalid:

@@ -110,6 +110,7 @@ def test_every_entry_loads_with_closed_flags_and_trace_fields() -> None:
         "DP-108",
         "DP-112",
         "DP-114",
+        "DP-116",
     }
 
     required = {
@@ -172,6 +173,30 @@ def test_every_entry_loads_with_closed_flags_and_trace_fields() -> None:
         elif policy_id == "DP-114":
             assert entry["status"] == "proposed"
             assert entry["flag"] == "total_pressure_interval_nominal"
+        elif policy_id == "DP-116":
+            assert entry["status"] == "proposed"
+            assert entry["proposed_by"] == "w1125tszi2"
+            assert entry["formula_owner"] == (
+                "simulator.battery.residue._langmuir_default_geometry"
+            )
+            assert "unprinted sample size or area" in entry["condition"]
+            assert "printed mass" in entry["formula"]
+            assert "melt_density_fallback_kg_m3" in entry["formula"]
+            assert "2700 kg/m3" in entry["formula"]
+            assert "2 mm diameter sphere (1 mm radius)" in entry["formula"]
+            assert "2 mm diameter sphere (1 mm radius)" in entry["physical_basis"]
+            assert "2 mm diameter sphere" in entry["evidence"]
+            assert "2 mm sphere diameter" in entry["bias"]
+            assert "2800" not in entry["formula"]
+            assert entry["authority"] == "convention"
+            assert entry["notices"] == [
+                "sample_mass_not_printed",
+                "exposed_area_not_printed",
+            ]
+            assert entry["sensitivity"] == [0.5, 2.0]
+            assert entry["flag"] == "knob_defaulted"
+            assert entry["canonized_by"] is None
+            assert entry["canonized_at"] is None
         else:
             assert entry["status"] == "canonical"
             assert entry["canonized_by"] in {"owner", "controller"}
@@ -192,6 +217,15 @@ def test_canonical_policy_values() -> None:
     assert resolve("DP-006").value == Decimal("1")
     assert resolve("DP-015").value == Decimal("298.15")
     assert resolve("DP-015").units == "K"
+
+
+def test_dp116_resolves_owner_geometry_as_a_proposed_convention() -> None:
+    resolved = resolve("DP-116", formula_result=Decimal("1.111111111"))
+    assert resolved.value == Decimal("1.111111111")
+    assert resolved.units == "m2/kg"
+    assert resolved.flag is NoticeKind.KNOB_DEFAULTED
+    assert resolved.payload["policy_status"] == "proposed"
+    assert resolved.payload["policy"]["id"] == "DP-116"
 
 
 def test_notice_policy_requires_a_normalized_string_value() -> None:

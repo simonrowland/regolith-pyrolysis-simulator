@@ -243,7 +243,7 @@ def _resolved_value(
         return (low * high).sqrt()
     if policy_id == "DP-012" and "printed_value" in context:
         return context["printed_value"]
-    if policy_id in {"DP-010", "DP-112"}:
+    if policy_id in {"DP-010", "DP-112", "DP-116"}:
         if "formula_result" not in context:
             raise ValueError(f"{policy_id} requires the owning formula result")
         return _decimal(
