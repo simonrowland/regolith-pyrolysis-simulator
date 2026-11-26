@@ -13699,6 +13699,8 @@ def _plain_observation_values(obs: Mapping[str, Any]) -> dict[str, Any]:
 def _method_claim_fields(
     obs: Mapping[str, Any],
     values: Mapping[str, Any],
+    *,
+    include_analytical_method: bool = True,
 ) -> tuple[
     tuple[object, ...],
     tuple[object, ...],
@@ -13710,8 +13712,9 @@ def _method_claim_fields(
 
     Regime stays its own tuple. A declared printed method must not be
     overridden by a regime label, and the caller must not drop that label
-    before the resolver sees it. The split plan and the row migration both
-    read this tuple.
+    before the resolver sees it. Row resolution includes analytical methods;
+    run-method split planning and evaluation exclude them because an assay
+    does not define a second experiment.
     """
 
     derivation_method_candidates = tuple(
@@ -13749,12 +13752,12 @@ def _method_claim_fields(
             obs.get("method"),
             obs.get("measured_by_as_printed"),
             obs.get("method_text"),
-            obs.get("analytical_method"),
+            obs.get("analytical_method") if include_analytical_method else None,
             obs.get("method_detail_as_printed"),
             values.get("method"),
             values.get("measured_by_as_printed"),
             values.get("method_text"),
-            values.get("analytical_method"),
+            values.get("analytical_method") if include_analytical_method else None,
             values.get("method_detail_as_printed"),
         ),
         (
@@ -27386,7 +27389,9 @@ class Migrator:
                 printed_method_candidates,
                 method_evidence_candidates,
                 evidence_candidates,
-            ) = _method_claim_fields(obs, values)
+            ) = _method_claim_fields(
+                obs, values, include_analytical_method=False
+            )
             # A regime label can fill the row method. It is not a printed
             # technique, so it does not choose the home or mint an id.
             method, _notice = self._resolve_method_for_observation(
@@ -29401,28 +29406,38 @@ class Migrator:
             quantity=quantity_for_notice,
             regime_candidates=regime_candidates,
         )
-        # Split on a method field only. Regime may still be the row method
-        # (the call above), and it must not move the row off the named
-        # experiment. method_as_printed is the assay of a run whose technique
-        # the source already named, so it does not mint a second id either.
-        # commit=False so this pass does not write that choice onto the
-        # experiment.
+        # The first resolution keeps analytical_method on this observation for
+        # row scoring. The split pass considers run-method fields only: an
+        # analytical assay does not mint another experiment. Regime may still
+        # resolve the row method above, but does not move it off the named run.
+        # commit=False keeps this split decision off the experiment.
         declared_method = self._declared_experiment_methods.get(experiment_id)
         assay_stays_on_named_run = (
             declared_method is not None
             and declared_method.is_value
             and declared_method.value is not MethodToken.UNSPECIFIED
         )
+        (
+            _,
+            split_method_raw_candidates,
+            split_printed_method_candidates,
+            split_method_evidence_candidates,
+            split_evidence_candidates,
+        ) = _method_claim_fields(
+            obs, values, include_analytical_method=False
+        )
         _split_method, _split_notice = self._resolve_method_for_observation(
             observation_id=obs_id,
             experiment_id=experiment_id,
             method=State.unknown("source does not state method"),
-            method_raw_candidates=method_raw_candidates,
+            method_raw_candidates=split_method_raw_candidates,
             printed_method_candidates=(
-                () if assay_stays_on_named_run else printed_method_candidates
+                ()
+                if assay_stays_on_named_run
+                else split_printed_method_candidates
             ),
-            method_evidence_candidates=method_evidence_candidates,
-            evidence_candidates=evidence_candidates,
+            method_evidence_candidates=split_method_evidence_candidates,
+            evidence_candidates=split_evidence_candidates,
             quantity=quantity_for_notice,
             regime_candidates=(),
             commit=False,
