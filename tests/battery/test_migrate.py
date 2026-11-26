@@ -23203,12 +23203,19 @@ def test_t1795_store_probe_finalize(_t1795_migrator: Migrator) -> None:
 
 def test_t1795_store_probe_write_and_validate(_t1795_migrator: Migrator) -> None:
     import json
+    from multiprocessing import get_context
     import subprocess
     import sys
     import warnings
 
     result = _t1795_migrator.result
-    write_outputs(result, REPO_ROOT)
+    writer = get_context("fork").Process(
+        target=write_outputs,
+        args=(result, REPO_ROOT),
+    )
+    writer.start()
+    writer.join()
+    assert writer.exitcode == 0
     validation = subprocess.run(
         [sys.executable, "scripts/battery_validate_store.py", "--root", str(REPO_ROOT)],
         cwd=REPO_ROOT,
