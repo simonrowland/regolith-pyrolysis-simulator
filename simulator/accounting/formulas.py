@@ -110,7 +110,7 @@ MOLAR_MASS_REL_TOLERANCE = 1e-6
 
 _OPEN_TO_CLOSE = {"(": ")", "[": "]", "{": "}"}
 _CLOSE_TO_OPEN = {v: k for k, v in _OPEN_TO_CLOSE.items()}
-_NUMBER_RE = re.compile(r"\d+(?:\.\d+)?")
+_NUMBER_RE = re.compile(r"(?:\d+(?:\.\d+)?|\.\d+)")
 _PHASE_SUFFIX_RE = re.compile(
     r"(?:\((?:s|l|g|aq|cr|liq|liquid|solid|gas|vapor)\)|"
     r"\[(?:s|l|g|aq|cr|liq|liquid|solid|gas|vapor)\])$",
@@ -235,7 +235,15 @@ def parse_formula(
     *,
     name: str | None = None,
 ) -> SpeciesFormula:
-    """Parse formula text and return a SpeciesFormula."""
+    """Parse formula text and return a SpeciesFormula.
+
+    An ASCII decimal may omit its leading zero when it follows an element,
+    as in ``Fe.875S``, ``Fe.90S``, and ``Fe.95O``. The existing ASCII-dot
+    rule treats a dot as an adduct only when every separated segment contains
+    at least two distinct integer-count elements. Here the left segment is
+    the single element Fe, so the dot is the decimal point in Fe's printed
+    count; accepting the leading-dot number adds no alternative stoichiometry.
+    """
 
     cleaned = _clean_formula_text(formula)
     if not cleaned:
@@ -495,7 +503,7 @@ class _FormulaParser:
                 continue
             if char.isupper():
                 element = self._read_element()
-                count = self._read_number(default=1.0)
+                count = self._read_number(default=1.0, allow_leading_decimal=True)
                 elements[element] += count
                 continue
             raise UnknownSpeciesError(f"unexpected formula token {char!r} in {self.text!r}")
@@ -511,9 +519,13 @@ class _FormulaParser:
             self.index += 1
         return self.text[start : self.index]
 
-    def _read_number(self, default: float) -> float:
+    def _read_number(
+        self, default: float, *, allow_leading_decimal: bool = False
+    ) -> float:
         match = _NUMBER_RE.match(self.text, self.index)
         if match is None:
+            return default
+        if match.group(0).startswith(".") and not allow_leading_decimal:
             return default
         self.index = match.end()
         value = float(match.group(0))
@@ -685,7 +697,7 @@ def _split_formula_segments(formula: str) -> list[str]:
 
 def _leading_multiplier(segment: str) -> tuple[float, str]:
     match = _NUMBER_RE.match(segment)
-    if match is None:
+    if match is None or match.group(0).startswith("."):
         return 1.0, segment
     body = segment[match.end() :]
     if not body:
