@@ -168,6 +168,11 @@ def assert_pin(name, actual, tmp_path, runner_output=None):
     # stage captures what its wall saturation pressure condenses, so
     # Stage 4 now holds Fe 74.20, SiO 255.54 and Mg 30.11 kg, and the
     # terminal falls (Fe 85.64 -> 18.04, SiO 311.51 -> 59.99 kg).
+    # 2026-11-26 b274 receipt 6bac433a at b7a91af39c. Every species moved.
+    # Ledger fO2 (a95942989e) and the d-469 floor (8f174cc807) put the
+    # melt on the Fe line, so Fe, Cr, Na, K and Mg capture change. The
+    # oxide-Fe debit (f187184015) leaves oxygen in the melt; that oxygen
+    # books the SiO oxidative wall leg, which was 0 under the old pin.
     expected = json.loads(PINS.read_text())[name]
     # Collect every species before failing: stopping at the first mismatch
     # hid stale Cr/SiO pins behind an Fe miss through two repins.
