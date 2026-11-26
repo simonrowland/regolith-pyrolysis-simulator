@@ -2179,7 +2179,7 @@ class PT0DeterminismStore:
             decoded = self._verify_entry(
                 artifact,
                 entry_key,
-                canonical_json_bytes(entry_key),
+                None,
                 str(key_hash),
                 entry,
                 admission_keys=(
@@ -2211,7 +2211,7 @@ class PT0DeterminismStore:
                 decoded = self._verify_entry(
                     artifact,
                     candidate_key,
-                    canonical_json_bytes(candidate_key),
+                    None,
                     candidate_hash,
                     candidate,
                     admission_keys=(
@@ -2407,43 +2407,67 @@ class PT0DeterminismStore:
         self,
         artifact: str,
         key: Mapping[str, Any],
-        key_bytes: bytes,
+        key_bytes: bytes | None,
         key_hash: str,
         entry: Mapping[str, Any],
         *,
         admission_keys: Sequence[Mapping[str, Any]] | None = None,
     ) -> Any | None:
-        if entry.get("artifact") != artifact:
-            raise PT0CacheCollision(
-                f"PT-0 stored artifact mismatch for {artifact}: {key_hash}"
+        try:
+            expected_key_bytes = canonical_json_bytes(key)
+            if entry.get("artifact") != artifact:
+                raise PT0CacheCollision(
+                    f"PT-0 stored artifact mismatch for {artifact}: {key_hash}"
+                )
+            stored_key_hash = entry.get("key_hash")
+            if stored_key_hash is not None and stored_key_hash != key_hash:
+                raise PT0CacheCollision(
+                    f"PT-0 stored key hash mismatch for {artifact}: {key_hash}"
+                )
+            stored_key_bytes = entry.get("key_bytes")
+            if isinstance(stored_key_bytes, str):
+                stored_key_bytes = stored_key_bytes.encode("utf-8")
+            canonical_entry_key_bytes = canonical_json_bytes(entry["key"])
+            if stored_key_bytes is None:
+                stored_key_bytes = canonical_entry_key_bytes
+            if (
+                stored_key_bytes != canonical_entry_key_bytes
+                or (
+                    key_bytes is not None
+                    and (
+                        key_bytes != canonical_entry_key_bytes
+                        or expected_key_bytes != key_bytes
+                    )
+                )
+            ):
+                raise PT0CacheCollision(
+                    f"PT-0 stored key bytes mismatch for {artifact}: {key_hash}"
+                )
+            payload_bytes = _payload_integrity_bytes(entry["payload"])
+            if entry.get("payload_hash") != _sha256(payload_bytes):
+                raise PT0CacheCollision(
+                    f"PT-0 stored payload bytes mismatch for {artifact}: {key_hash}"
+                )
+            decoded = _decode_payload_for_admission(
+                artifact,
+                entry.get("payload"),
+                payload_codec_version=entry.get("payload_codec_version"),
+                keys=(
+                    tuple(admission_keys)
+                    if admission_keys is not None
+                    else (key,)
+                ),
             )
-        if entry.get("key_hash") not in {None, key_hash}:
-            raise PT0CacheCollision(
-                f"PT-0 stored key hash mismatch for {artifact}: {key_hash}"
-            )
-        stored_key_bytes = entry.get("key_bytes")
-        if isinstance(stored_key_bytes, str):
-            stored_key_bytes = stored_key_bytes.encode("utf-8")
-        if stored_key_bytes is None:
-            stored_key_bytes = canonical_json_bytes(entry["key"])
-        if stored_key_bytes != key_bytes or canonical_json_bytes(key) != key_bytes:
-            raise PT0CacheCollision(
-                f"PT-0 stored key bytes mismatch for {artifact}: {key_hash}"
-            )
-        payload_bytes = _payload_integrity_bytes(entry["payload"])
-        if entry.get("payload_hash") != _sha256(payload_bytes):
-            raise PT0CacheCollision(
-                f"PT-0 stored payload bytes mismatch for {artifact}: {key_hash}"
-            )
-        decoded = _decode_payload_for_admission(
-            artifact,
-            entry.get("payload"),
-            payload_codec_version=entry.get("payload_codec_version"),
-            keys=tuple(admission_keys) if admission_keys is not None else (key,),
-        )
-        if decoded is None:
+            if decoded is None:
+                return None
+            decode_repair_notices_json(entry.get("repair_notices_json"))
+            if not _disclosures_known(entry):
+                return None
+            return decoded
+        except PT0CacheCollision:
+            raise
+        except Exception:
             return None
-        return decoded
 
     def _drift_fields_for_latest_replay(self) -> list[str]:
         index = len(self.replay_sequence) - 1
@@ -3427,6 +3451,41 @@ class PT1PersistentEquilibriumStore:
         expected_replay_scope_sha256: str | None = None,
         decoded_row_key: Mapping[str, Any] | None = None,
     ) -> Any:
+        expected_key = _json_ready(key)
+        try:
+            return self._decode_entry_from_row_fields(
+                row,
+                artifact=artifact,
+                key=key,
+                key_bytes=key_bytes,
+                key_hash=key_hash,
+                return_decoded=return_decoded,
+                admission_keys=admission_keys,
+                expected_replay_scope_sha256=expected_replay_scope_sha256,
+                decoded_row_key=decoded_row_key,
+                expected_key=expected_key,
+            )
+        except (sqlite3.Error, PT1PersistentStoreCorrupt):
+            raise
+        except Exception as exc:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row contains invalid stored fields: {key_hash}"
+            ) from exc
+
+    def _decode_entry_from_row_fields(
+        self,
+        row: sqlite3.Row,
+        *,
+        artifact: str,
+        key: Mapping[str, Any],
+        key_bytes: bytes,
+        key_hash: str,
+        return_decoded: bool = False,
+        admission_keys: Sequence[Mapping[str, Any]] | None = None,
+        expected_replay_scope_sha256: str | None = None,
+        decoded_row_key: Mapping[str, Any] | None = None,
+        expected_key: Any,
+    ) -> Any:
         row_key_bytes = _pt1_row_bytes(
             row["key_bytes"],
             field="key",
@@ -3472,36 +3531,19 @@ class PT1PersistentEquilibriumStore:
             if decoded_row_key is not None
             else _pt1_row_key(row_key_bytes, key_hash=key_hash)
         )
-        try:
-            canonical_key_bytes = canonical_json_bytes(row_key)
-        except (TypeError, ValueError, OverflowError, RecursionError) as exc:
-            raise PT1PersistentStoreCorrupt(
-                f"PT-1 row request key cannot be canonicalized: {key_hash}"
-            ) from exc
+        canonical_key_bytes = canonical_json_bytes(row_key)
         if canonical_key_bytes != row_key_bytes:
             raise PT1PersistentStoreCorrupt(
                 f"PT-1 row non-canonical request bytes: {key_hash}"
             )
-        if row_key != _json_ready(key):
+        if row_key != expected_key:
             raise PT1PersistentStoreCorrupt(
                 f"PT-1 row canonical request mismatch: {key_hash}"
             )
         if expected_replay_scope_sha256 is not None:
-            try:
-                row_replay_scope = _replay_scope_hash(
-                    canonical_physics_bucket_key_from_replay_key(row_key)
-                )
-            except (
-                AttributeError,
-                KeyError,
-                TypeError,
-                ValueError,
-                OverflowError,
-                RecursionError,
-            ) as exc:
-                raise PT1PersistentStoreCorrupt(
-                    f"PT-1 row exact key replay scope is invalid: {key_hash}"
-                ) from exc
+            row_replay_scope = _replay_scope_hash(
+                canonical_physics_bucket_key_from_replay_key(row_key)
+            )
             if row_replay_scope != expected_replay_scope_sha256:
                 raise PT1PersistentStoreCorrupt(
                     f"PT-1 row exact key replay scope mismatch: {key_hash}"
@@ -3511,12 +3553,7 @@ class PT1PersistentEquilibriumStore:
             field="payload",
             key_hash=key_hash,
         )
-        try:
-            canonical_payload_bytes = _payload_integrity_bytes(row_payload)
-        except (TypeError, ValueError, OverflowError, RecursionError) as exc:
-            raise PT1PersistentStoreCorrupt(
-                f"PT-1 row payload cannot be canonicalized: {key_hash}"
-            ) from exc
+        canonical_payload_bytes = _payload_integrity_bytes(row_payload)
         if canonical_payload_bytes != row_payload_bytes:
             raise PT1PersistentStoreCorrupt(
                 f"PT-1 row non-canonical payload bytes: {key_hash}"
@@ -3525,14 +3562,24 @@ class PT1PersistentEquilibriumStore:
             artifact,
             row_payload,
             payload_codec_version=payload_codec_version,
-            keys=tuple(admission_keys) if admission_keys is not None else (key,),
+            keys=(
+                tuple(admission_keys)
+                if admission_keys is not None
+                else (key,)
+            ),
         )
-        if admission is None:
-            admitted_payload = copy.deepcopy(row_payload)
-        else:
-            admitted_payload = copy.deepcopy(dict(row_payload))
+        admitted_payload = (
+            copy.deepcopy(row_payload)
+            if admission is None
+            else copy.deepcopy(dict(row_payload))
+        )
         repair_notices_json = _row_repair_notices(row)
         validate_repair_notices_json(repair_notices_json)
+        law_disclosures = _law_disclosures_from_json(
+            row["law_disclosures_json"]
+            if "law_disclosures_json" in row.keys()
+            else None
+        )
         entry = {
             "artifact": artifact,
             "key": copy.deepcopy(dict(row_key)),
@@ -3542,11 +3589,7 @@ class PT1PersistentEquilibriumStore:
             "payload_hash": row["payload_sha256"],
             "payload_codec_version": payload_codec_version,
             "repair_notices_json": repair_notices_json,
-            "law_disclosures": _law_disclosures_from_json(
-                row["law_disclosures_json"]
-                if "law_disclosures_json" in row.keys()
-                else None
-            ),
+            "law_disclosures": law_disclosures,
             "cache_state": "live_fill",
         }
         return (entry, admission) if return_decoded else entry

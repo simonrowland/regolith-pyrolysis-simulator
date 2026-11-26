@@ -4267,6 +4267,82 @@ def test_pt1_repair_notices_4301_digit_integer_is_typed_corruption(
         )
 
 
+@pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))
+@pytest.mark.parametrize(
+    ("stored_field", "corrupt_json"),
+    (
+        pytest.param(
+            "repair_notices_json",
+            '[{"kind":"repair","value":1e400}]',
+            id="repair-notices-overflow",
+        ),
+        pytest.param(
+            "repair_notices_json",
+            "[" * 10_000 + "0" + "]" * 10_000,
+            id="repair-notices-deep",
+        ),
+        pytest.param(
+            "law_disclosures_json",
+            "[" * 10_000 + "0" + "]" * 10_000,
+            id="law-disclosures-deep",
+        ),
+    ),
+)
+def test_stored_row_json_decode_errors_miss_or_raise_typed(
+    tmp_path: Path,
+    persistent: bool,
+    stored_field: str,
+    corrupt_json: str,
+) -> None:
+    db_path = tmp_path / f"corrupt-stored-json-{stored_field}.db"
+    key, payload = _repair_notice_test_record()
+    capture = PT0DeterminismStore(
+        "capture",
+        db_path=db_path if persistent else None,
+    )
+    capture._store(
+        "freeze_gate_curve",
+        key,
+        payload,
+        repair_notices=[],
+        law_disclosures=[],
+    )
+    key_hash = rrd._sha256(canonical_json_bytes(key))
+
+    if persistent:
+        with sqlite3.connect(db_path) as conn:
+            checksums = conn.execute(
+                f"SELECT key_sha256, payload_sha256, key_bytes, payload_bytes "
+                f"FROM {PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
+                (key_hash,),
+            ).fetchone()
+            conn.execute(
+                f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+                f"SET {stored_field} = ? WHERE key_hash = ?",
+                (corrupt_json, key_hash),
+            )
+        assert checksums is not None
+        assert checksums[0] == key_hash == rrd._sha256(checksums[2])
+        assert checksums[1] == rrd._sha256(checksums[3])
+        reader = PT0DeterminismStore("replay", db_path=db_path)
+        expected_error = PT1PersistentStoreCorrupt
+    else:
+        entry = copy.deepcopy(capture._entries[key_hash])
+        entry_field = (
+            "repair_notices_json"
+            if stored_field == "repair_notices_json"
+            else "law_disclosures"
+        )
+        entry[entry_field] = corrupt_json
+        reader = PT0DeterminismStore("replay")
+        reader._entries[key_hash] = entry
+        expected_error = PT0CacheMiss
+
+    with pytest.raises(expected_error):
+        _replay_repair_notice_test_record(reader)
+    assert reader.hits == 0
+
+
 def test_pt1_legacy_null_repair_notices_emit_typed_unavailable_notice(
     tmp_path: Path,
 ) -> None:
@@ -8217,7 +8293,7 @@ def _curated_recursive_mutations(
             # Keep a string-shaped bad id so identity admission must reject it.
             (
                 ("authority", "provider", "fallback_provider_id"),
-                "wrong-type",
+                "wrong-scalar",
                 "wrong-type",
             ),
             (
@@ -9369,7 +9445,7 @@ def _run_real_cache_payload_recursive_mutations(
         assert outcomes[authoritative_provider_path] == "miss"
         fallback_provider_path = (
             "encoded-row: root.authority.provider.fallback_provider_id "
-            "wrong-type"
+            "wrong-scalar"
         )
         assert outcomes[fallback_provider_path] == "miss"
     else:
