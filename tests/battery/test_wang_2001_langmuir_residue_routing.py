@@ -507,6 +507,14 @@ def test_wang_residue_cells_emit_one_production_score_event_each(monkeypatch):
         )
 
     stripped = [without_langmuir_ramp(residual) for residual in ree_scored]
+    assert all(
+        not (
+            notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+            and notice.origin == "Langmuir residue extent"
+        )
+        for residual in stripped
+        for notice in residual.notices
+    )
     for residual in stripped:
         strata = score_module.flagged_strata(residual.notices)
         assert "proposed-policy" in strata
@@ -530,14 +538,13 @@ def test_wang_residue_cells_emit_one_production_score_event_each(monkeypatch):
             ),
         )
 
-    admitted = score_module._measured_residuals(
-        [without_retention_notice(residual) for residual in stripped],
-        context,
-        include_engine_out_of_band=True,
-    )
-    assert {residual.reference for residual in admitted} == {
-        residual.reference for residual in ree_scored
-    }
+    for residual in (
+        without_retention_notice(residual) for residual in stripped
+    ):
+        strata = score_module.flagged_strata(
+            score_module._score_eligibility_notices(residual.notices)
+        )
+        assert "proposed-policy" not in strata, strata
 
 
 def test_wang_imp_closure_notice_preserves_printed_wt_percent(monkeypatch):
