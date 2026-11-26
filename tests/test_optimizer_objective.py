@@ -11453,11 +11453,16 @@ def test_sso2_owner_execution_uses_certified_na_dose_and_partition_path() -> Non
     assert evidence["metal_product_path"]["Fe_kg"] == pytest.approx(0.0)
     assert evidence["metal_product_path"]["product_ledger_Fe_kg"] > 0.0
     fallback = evidence["prototype_alpha_fallback_provenance"]
-    # CrO2 is predicted using the Cr proxy, but 0.5 Cr2O3 + 0.25 O2 -> CrO2
-    # consumes overhead O2. With no O2 inventory, depletion commits no CrO2;
-    # provider fallback warnings and committed-run authority have distinct scopes.
-    assert "CrO2" not in execution.simulator._alpha_authority_status_by_species_engaged
-    assert not any(
+    # Receipt d0f75638. 0.5 Cr2O3(l) + 0.25 O2 -> CrO2(g), so
+    # O2_per_product_kg is negative. The depletion gate drops that rate
+    # when overhead O2 is at or below 1e-12 kg. Oxide Fe now leaves its
+    # oxygen behind (f187184015), overhead O2 stays above the gate, and
+    # the proxy flux is committed. Authority stays proxy/bridge.
+    assert (
+        execution.simulator._alpha_authority_status_by_species_engaged.get("CrO2")
+        == "proxy/bridge"
+    )
+    assert any(
         transition.reason == "evaporate_CrO2"
         for transition in execution.simulator.atom_ledger.transitions
     )
