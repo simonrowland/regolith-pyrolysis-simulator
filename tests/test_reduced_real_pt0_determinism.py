@@ -7553,6 +7553,239 @@ def test_pt1_bucket_and_ladder_integrity_precedes_stale_codec_admission(
             )
 
 
+@pytest.mark.parametrize(
+    ("reader", "corruption", "error_type"),
+    (
+        ("pt0_exact", "artifact", rrd.PT0CacheCollision),
+        ("pt0_exact", "key_hash", rrd.PT0CacheCollision),
+        ("pt0_exact", "key_bytes", rrd.PT0CacheCollision),
+        ("pt0_bucket", "key_bytes", rrd.PT0CacheCollision),
+        ("pt0_verify", "payload_checksum", rrd.PT0CacheCollision),
+        ("pt0_replace", "artifact", rrd.PT0CacheCollision),
+        ("pt1_exact", "artifact", PT1PersistentStoreCorrupt),
+        ("pt1_exact", "key_hash", PT1PersistentStoreCorrupt),
+        ("pt1_exact", "key_bytes", PT1PersistentStoreCorrupt),
+        ("pt1_exact", "payload_checksum", PT1PersistentStoreCorrupt),
+        ("pt1_bucket", "physics_key_bytes", PT1PersistentStoreCorrupt),
+        ("pt0_ladder", "ladder_distance", PT1PersistentStoreCorrupt),
+        ("pt1_ladder", "ladder_distance", PT1PersistentStoreCorrupt),
+        ("pt0_interpolation", "replay_scope", PT1PersistentStoreCorrupt),
+        (
+            "pt1_interpolation_candidates",
+            "replay_scope",
+            PT1PersistentStoreCorrupt,
+        ),
+        ("pt1_row_decode", "payload_checksum", PT1PersistentStoreCorrupt),
+        ("pt1_replace", "key_hash", PT1PersistentStoreCorrupt),
+    ),
+    ids=(
+        "pt0-exact-artifact",
+        "pt0-exact-key-hash",
+        "pt0-exact-key-bytes",
+        "pt0-bucket-key-bytes",
+        "pt0-verify-payload-checksum",
+        "pt0-replace-artifact",
+        "pt1-exact-artifact",
+        "pt1-exact-key-hash",
+        "pt1-exact-key-bytes",
+        "pt1-exact-payload-checksum",
+        "pt1-bucket-physics-key-bytes",
+        "pt0-ladder-distance",
+        "pt1-ladder-distance",
+        "pt0-interpolation-replay-scope",
+        "pt1-interpolation-replay-scope",
+        "pt1-row-decode-payload-checksum",
+        "pt1-replace-key-hash",
+    ),
+)
+def test_stale_codec_integrity_checks_precede_admission_for_every_reader(
+    tmp_path: Path,
+    reader: str,
+    corruption: str,
+    error_type: type[Exception],
+) -> None:
+    interpolation_reader = "interpolation" in reader
+    persistent_reader = reader.startswith("pt1_") or reader in {
+        "pt0_ladder",
+        "pt0_interpolation",
+    }
+    db_path = tmp_path / f"{reader}-{corruption}.sqlite" if persistent_reader else None
+    if interpolation_reader:
+        assert db_path is not None
+        artifact = "equilibrium_post_record"
+        key = _c3a_ladder_key(
+            "stored",
+            feo_fraction=0.20,
+            temperature_K=1490.0,
+        )
+        key["model"]["model"] = "other-binding"
+        query_key = _c3a_ladder_key(
+            "query",
+            feo_fraction=0.20,
+            temperature_K=1500.0,
+        )
+        _put_c3a_payload(db_path, key, "stored")
+        capture = PT0DeterminismStore("replay", db_path=db_path)
+        payload = None
+    else:
+        artifact = "freeze_gate_curve"
+        key = _freeze_gate_key()
+        query_key = key
+        payload = _valid_test_gate_payload()
+        capture = PT0DeterminismStore("capture", db_path=db_path)
+        capture._store(artifact, key, payload, law_disclosures=[])
+
+    key_hash = _key_hash(key)
+    entry = capture._entries.get(key_hash)
+    if entry is not None:
+        entry["payload_codec_version"] = 0
+    if persistent_reader:
+        assert db_path is not None
+        _set_pt1_payload_codec_version(db_path, key_hash, 0)
+
+    rung_tag = rrd.PHYSICS_BUCKET_LADDER_RUNGS[0][0]
+    if persistent_reader:
+        assert db_path is not None
+        if corruption == "replay_scope":
+            bad_value = rrd._replay_scope_hash(
+                canonical_physics_bucket_key_from_replay_key(query_key)
+            )
+        elif corruption == "ladder_distance":
+            bad_value = None
+        else:
+            bad_value = {
+                "artifact": "corrupt-artifact",
+                "key_hash": "0" * 64,
+                "key_bytes": sqlite3.Binary(b"{}"),
+                "payload_checksum": "0" * 64,
+                "physics_key_bytes": sqlite3.Binary(b"{}"),
+            }[corruption]
+        column = {
+            "artifact": "artifact",
+            "key_hash": "key_sha256",
+            "key_bytes": "key_bytes",
+            "payload_checksum": "payload_sha256",
+            "physics_key_bytes": "physics_key_bytes",
+            "ladder_distance": rrd._physics_ladder_distance_column(rung_tag),
+            "replay_scope": "replay_scope_sha256",
+        }[corruption]
+        with sqlite3.connect(db_path) as conn:
+            conn.execute(
+                f"UPDATE {PT1_EQUILIBRIUM_TABLE} SET {column} = ? "
+                "WHERE key_hash = ?",
+                (bad_value, key_hash),
+            )
+    else:
+        assert entry is not None
+        entry_field, bad_value = {
+            "artifact": ("artifact", "corrupt-artifact"),
+            "key_hash": ("key_hash", "0" * 64),
+            "key_bytes": ("key_bytes", "{}"),
+            "payload_checksum": ("payload_hash", "0" * 64),
+        }[corruption]
+        entry[entry_field] = bad_value
+
+    with pytest.raises(error_type) as raised:
+        if reader == "pt0_exact":
+            capture._lookup(artifact, key)
+        elif reader == "pt0_bucket":
+            capture._entry_for_physics_bucket(
+                artifact,
+                canonical_physics_bucket_key_from_replay_key(key),
+            )
+        elif reader == "pt0_verify":
+            assert entry is not None
+            capture._verify_entry(
+                artifact,
+                key,
+                canonical_json_bytes(key),
+                key_hash,
+                entry,
+            )
+        elif reader == "pt0_replace":
+            assert payload is not None
+            capture._store(artifact, key, payload, law_disclosures=[])
+        elif reader == "pt0_ladder":
+            rung_key = rrd.canonical_physics_ladder_bucket_key_from_replay_key(
+                key,
+                rung_tag,
+            )
+            capture._entry_for_physics_ladder_bucket(
+                artifact,
+                rung_tag,
+                rung_key,
+                query_key=query_key,
+            )
+        elif reader == "pt0_interpolation":
+            capture._lookup_interpolated(artifact, query_key)
+        else:
+            assert capture.persistent_store is not None
+            persistent = capture.persistent_store
+            if reader == "pt1_exact":
+                persistent._get_with_decoded(
+                    artifact=artifact,
+                    key=key,
+                    key_bytes=canonical_json_bytes(key),
+                    key_hash=key_hash,
+                )
+            elif reader == "pt1_bucket":
+                bucket_key = canonical_physics_bucket_key_from_replay_key(key)
+                bucket_bytes = canonical_json_bytes(bucket_key)
+                persistent._get_by_physics_bucket(
+                    artifact=artifact,
+                    physics_bucket_key=bucket_key,
+                    physics_bucket_bytes=bucket_bytes,
+                    physics_bucket_hash=rrd._sha256(bucket_bytes),
+                    query_key=query_key,
+                )
+            elif reader == "pt1_ladder":
+                rung_key = rrd.canonical_physics_ladder_bucket_key_from_replay_key(
+                    key,
+                    rung_tag,
+                )
+                persistent._get_by_physics_ladder_bucket(
+                    artifact=artifact,
+                    rung_tag=rung_tag,
+                    rung_key=rung_key,
+                    rung_hash=rrd._sha256(canonical_json_bytes(rung_key)),
+                    query_key=query_key,
+                )
+            elif reader == "pt1_interpolation_candidates":
+                persistent._list_interpolation_candidates(
+                    artifact=artifact,
+                    replay_scope_sha256=rrd._replay_scope_hash(
+                        canonical_physics_bucket_key_from_replay_key(query_key)
+                    ),
+                    query_key=query_key,
+                )
+            elif reader == "pt1_row_decode":
+                with persistent._connect() as conn:
+                    row = persistent._fetch(conn, key_hash)
+                    assert row is not None
+                    persistent._entry_from_row(
+                        row,
+                        artifact=artifact,
+                        key=key,
+                        key_bytes=canonical_json_bytes(key),
+                        key_hash=key_hash,
+                        return_decoded=True,
+                    )
+            elif reader == "pt1_replace":
+                assert payload is not None
+                payload_bytes = canonical_json_bytes(payload)
+                persistent.put(
+                    artifact=artifact,
+                    key=key,
+                    key_bytes=canonical_json_bytes(key),
+                    key_hash=key_hash,
+                    payload=payload,
+                    payload_bytes=payload_bytes,
+                    payload_hash=rrd._sha256(payload_bytes),
+                    law_disclosures=[],
+                )
+    assert type(raised.value) is error_type
+
+
 @pytest.mark.skipif(
     os.environ.get("REGOLITH_PT0_REAL_PROVIDER") != "1",
     reason="set REGOLITH_PT0_REAL_PROVIDER=1 to run the real MAGEMin PT-0 proof",
