@@ -2149,141 +2149,30 @@ def test_bonnand_gorojovsky_printed_domain_ids_match_green() -> None:
     }
 
 
-def _printed_width_census_row_inputs(
-    uncertainty: Uncertainty,
-    identity: object,
-    value: Value,
-) -> tuple[Quantity, Decimal] | None:
-    from simulator.battery.identity import quantity_token
-    from simulator.battery.score import point_magnitude
-
-    if uncertainty.kind is UncertaintyKind.NONE:
-        return None
-    quantity = quantity_token(identity)
-    if quantity is None:
-        return None
-    reference = point_magnitude(value)
-    if reference is None:
-        return None
-    return quantity, reference
-
-
-@pytest.mark.timeout(300)
-def test_filtered_migrated_store_matches_typed_uncertainty_selection(
-    tmp_path: Path,
-) -> None:
-    from simulator.battery.migrate import (
-        _load_migrated_store,
-        _identity_from_plain,
-        _uncertainty_from_plain,
-        _value_from_plain,
-        load_migrated_store,
-        to_plain,
-    )
-
-    without_uncertainty = F.observation(
-        "t1745-no-width",
-        "t1745-experiment",
-        F.psat_identity("Mg"),
-        Decimal("1"),
-        source_id="t1745-selector",
-    )
-    with_uncertainty = replace(
-        F.observation(
-            "t1745-width",
-            "t1745-experiment",
-            F.psat_identity("Mg"),
-            Decimal("1"),
-            source_id="t1745-selector",
-        ),
-        uncertainty=Uncertainty(
-            kind=UncertaintyKind.PRINTED,
-            verbatim={"standard_deviation": "0.1", "units": "Pa"},
-        ),
-    )
-    store_path = (
-        tmp_path / "data" / "literature" / "observations-v2" / "t1745.yaml"
-    )
-    store_path.parent.mkdir(parents=True)
-    store_path.write_text(
-        yaml.safe_dump(
-            {
-                "observations": [
-                    to_plain(without_uncertainty),
-                    to_plain(with_uncertainty),
-                ]
-            }
-        ),
-        encoding="utf-8",
-    )
-
-    def keep_census_row(raw_observation: Mapping[str, object]) -> bool:
-        uncertainty = _uncertainty_from_plain(raw_observation.get("uncertainty"))
-        if uncertainty.kind is UncertaintyKind.NONE:
-            return False
-        return (
-            _printed_width_census_row_inputs(
-                uncertainty,
-                _identity_from_plain(raw_observation["identity"]),
-                _value_from_plain(raw_observation["value"]),
-            )
-            is not None
-        )
-
-    expected = {
-        observation_id: observation
-        for observation_id, observation in load_migrated_store(tmp_path)[2].items()
-        if _printed_width_census_row_inputs(
-            observation.uncertainty, observation.identity, observation.value
-        )
-        is not None
-    }
-    filtered = _load_migrated_store(
-        tmp_path,
-        raw_observation_filter=keep_census_row,
-    )[2]
-    assert filtered == expected
-
-
 @pytest.mark.nightly
 @pytest.mark.timeout(300)
-def test_full_store_printed_width_band_census_matches_green() -> None:
-    from simulator.battery.migrate import (
-        REPO_ROOT,
-        _load_migrated_store,
-        _identity_from_plain,
-        _uncertainty_from_plain,
-        _value_from_plain,
-    )
-    from simulator.battery.score import _printed_uncertainty_band
+@pytest.mark.xdist_group("t1745-parsed-store")
+def test_full_store_printed_width_band_census_matches_green(
+    parsed_store_cache_root: Path,
+) -> None:
+    from simulator.battery.identity import quantity_token
+    from simulator.battery.migrate import REPO_ROOT
+    from simulator.battery.score import _printed_uncertainty_band, point_magnitude
+    from tests.battery.store_cache import load_cached_test_store
 
-    def keep_census_row(raw_observation: Mapping[str, object]) -> bool:
-        uncertainty = _uncertainty_from_plain(raw_observation.get("uncertainty"))
-        if uncertainty.kind is UncertaintyKind.NONE:
-            return False
-        return (
-            _printed_width_census_row_inputs(
-                uncertainty,
-                _identity_from_plain(raw_observation["identity"]),
-                _value_from_plain(raw_observation["value"]),
-            )
-            is not None
-        )
-
-    _, _, observations = _load_migrated_store(
-        REPO_ROOT,
-        raw_observation_filter=keep_census_row,
+    _, _, observations = load_cached_test_store(
+        REPO_ROOT, cache_root=parsed_store_cache_root, typed=True
     )
     width_count = 0
     band_count = 0
     conflicts: list[str] = []
     for observation in observations.values():
-        row_inputs = _printed_width_census_row_inputs(
-            observation.uncertainty, observation.identity, observation.value
-        )
-        if row_inputs is None:
+        if observation.uncertainty.kind is UncertaintyKind.NONE:
             continue
-        quantity, reference = row_inputs
+        quantity = quantity_token(observation.identity)
+        reference = point_magnitude(observation.value)
+        if quantity is None or reference is None:
+            continue
         resolution = _printed_uncertainty_band(
             quantity,
             observation.uncertainty,

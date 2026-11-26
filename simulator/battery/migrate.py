@@ -4412,17 +4412,6 @@ def load_migrated_store(
     still resolves. ``None`` loads every observation file.
     """
 
-    return _load_migrated_store(root, sources=sources)
-
-
-def _load_migrated_store(
-    root: Path | None = None,
-    *,
-    sources: Sequence[str] | None = None,
-    raw_observation_filter: Callable[[Mapping[str, Any]], bool] | None = None,
-) -> tuple[dict[str, Work], dict[str, Experiment], dict[str, Observation]]:
-    """Load the store, optionally selecting raw observation rows before typing."""
-
     root = root or REPO_ROOT
     tokens = source_filter_tokens(sources)
     works: dict[str, Work] = {}
@@ -4453,22 +4442,11 @@ def _load_migrated_store(
             if not isinstance(doc, Mapping):
                 continue
             for raw_obs in doc.get("observations") or []:
-                if raw_observation_filter is None or not isinstance(raw_obs, Mapping):
-                    obs = observation_from_plain(raw_obs)
-                    if not observation_matches_source_tokens(
-                        obs.observation_id, obs.source_id, tokens
-                    ):
-                        continue
-                else:
-                    observation_id = str(raw_obs["observation_id"])
-                    source_id = raw_obs.get("source_id")
-                    if not observation_matches_source_tokens(
-                        observation_id, source_id, tokens
-                    ):
-                        continue
-                    if not raw_observation_filter(raw_obs):
-                        continue
-                    obs = observation_from_plain(raw_obs)
+                obs = observation_from_plain(raw_obs)
+                if not observation_matches_source_tokens(
+                    obs.observation_id, obs.source_id, tokens
+                ):
+                    continue
                 observations[obs.observation_id] = obs
     from simulator.battery.validity import comparison_method_cell_constant_cancels
 
