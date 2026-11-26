@@ -302,9 +302,12 @@ def test_score_decimal_subscripts_use_accounting_parser_owner(
     assert expected_hydrate is not None
     assert score_parse(hydrate) == expected_hydrate
     assert composition_parse(hydrate) == expected_hydrate
+    # CuSO4.5H2O has no Si, Al, or P, so NBO/T is unavailable. The mutation
+    # needs a network former the accounting parser accepts as an adduct.
+    silicate = "Al2O3.2SiO2"
     nbo_composition = {
         "amount_basis": AmountBasis.MOLE_FRACTION.value,
-        "components": ((hydrate, Decimal(1)),),
+        "components": ((silicate, Decimal(1)),),
     }
     expected_nbo_t = _battery_hero_nbo_t(nbo_composition)
     assert expected_nbo_t is not None

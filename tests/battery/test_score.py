@@ -4773,6 +4773,12 @@ def test_species_formula_parser_accepts_hydrate_segments() -> None:
         ("O", 4.5),
         ("S", 1.0),
     )
+    assert parse_species_formula("CaSO4.1/2H2O") == (
+        ("Ca", 1.0),
+        ("H", 1.0),
+        ("O", 4.5),
+        ("S", 1.0),
+    )
     assert parse_species_formula("H2SO4·6.5H2O") == (
         ("H", 15.0),
         ("O", 10.5),
@@ -4781,7 +4787,10 @@ def test_species_formula_parser_accepts_hydrate_segments() -> None:
 
 
 def test_species_formula_parser_requires_phase_axis_for_suffix() -> None:
-    assert parse_species_formula("$As(g)$") is None
+    # No species axis: a parenthetical phase suffix is typography. The
+    # 200-formula pin parses CH4(g) that way. A supplied species that
+    # disagrees still refuses.
+    assert parse_species_formula("$As(g)$") == (("As", 1.0),)
     assert parse_species_formula("$As(g)$", species=Species("As", Phase.G)) == (
         ("As", 1.0),
     )
@@ -4805,7 +4814,7 @@ def test_species_formula_parser_gates_common_phase_suffixes(
     formula = f"Fe2O3({label})"
     wrong_phase = Phase.L if phase is not Phase.L else Phase.G
 
-    assert parse_species_formula(formula) is None
+    assert parse_species_formula(formula) == score_mod.formula_composition("Fe2O3")
     assert parse_species_formula(
         formula, species=Species("Fe2O3", wrong_phase)
     ) is None
