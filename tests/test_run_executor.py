@@ -1201,30 +1201,36 @@ def test_finite_capacity_in_domain_rates_match_parent_nonbinding_baseline(
     assert not sim._last_evaporation_flux_diagnostic.get(
         "continuum_extrapolation_notice"
     )
-    # Re-pinned from the production resolver after c3's clamp-order change;
-    # the four changed rates move by at most 1.4%.
+    # 2026-11-26 receipt 17e0816e at 6db27b213e. Fe is new at
+    # 3.3904576358450609e-07 kg/h: d-469 (8f174cc807) precipitates native
+    # Fe and f187184015 lets the oxide-Fe debit use the Langmuir capacity,
+    # so Fe vapor clears the 1e-12 kg/h floor. SiO rises
+    # 7.769179203709372e-09 -> 8.6442356840838498e-08 kg/h because that
+    # debit leaves oxygen in the gas (a95942989e ledger fO2). The other
+    # carriers move by a few percent on the same oxygen balance.
     expected_rates = {
-        "Al": 1.776974630811854e-10,
-        "AlO": 2.5868512647895485e-10,
-        "Ca": 6.00143229355403e-09,
-        "CaO_gas": 2.067737447801073e-11,
-        "Cr": 4.3552191736308734e-05,
-        "CrO": 9.129280757927083e-06,
-        "CrO2": 3.170453002929102e-06,
-        "CrO3": 9.294384109563237e-10,
-        "K": 1.8395070246088384e-04,
-        "K2": 1.6813544178336032e-11,
-        "Mg": 7.23266209617007e-05,
-        "MgO_gas": 1.0307259466430569e-07,
-        "Mn": 2.2585292315558916e-05,
-        "Na": 5.142690508092712e-03,
-        "Na2": 3.013634463408095e-08,
-        "Na2O_gas": 3.0031933641137976e-11,
-        "Si": 1.2046947950628297e-10,
-        "SiO": 7.769179203709372e-09,
-        "SiO2_gas": 4.598894711291365e-06,
-        "TiO": 2.8635316467141483e-09,
-        "TiO2_gas": 4.788176871001818e-08,
+        "Al": 1.789269763883407e-10,
+        "AlO": 2.4971541382164936e-10,
+        "Ca": 5.9168308552594104e-09,
+        "CaO_gas": 1.9543796520004764e-11,
+        "Cr": 4.3853613062064352e-05,
+        "CrO": 8.8127454105578785e-06,
+        "CrO2": 2.9337358745904382e-06,
+        "CrO3": 8.2451709834535378e-10,
+        "Fe": 3.3904576358450609e-07,
+        "K": 0.00017763926333385068,
+        "K2": 1.567366908980952e-11,
+        "Mg": 7.1307107081973212e-05,
+        "MgO_gas": 9.7422023636948713e-08,
+        "Mn": 2.226713318587091e-05,
+        "Na": 0.0049798191341988585,
+        "Na2": 2.8170051809863292e-08,
+        "Na2O_gas": 2.6912848304714164e-11,
+        "Si": 1.238887834600154e-10,
+        "SiO": 8.6442356840838498e-08,
+        "SiO2_gas": 4.346773521329708e-06,
+        "TiO": 2.8231648246199435e-09,
+        "TiO2_gas": 4.5256787981332239e-08,
     }
     actual_rates = {
         str(species): float(rate)
