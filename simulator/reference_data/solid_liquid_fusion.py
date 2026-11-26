@@ -106,6 +106,9 @@ _JANAF_PHASE_OR_TEMPERATURE_GAPS = (
 
 _SOLID_PHASES = frozenset({"solid", "crystal", "cr", "condensed"})
 _LIQUID_PHASES = frozenset({"liquid", "l", "melt"})
+# Printed solid and liquid Gibbs with no evaluator in this module.
+# Not a JANAF gap and not "no located fusion": the walker tries the next source.
+_NO_EVALUATOR_FOR_TABLE = "no evaluator for that table"
 _PHASE_ANCHORS = {
     "solid": (_BARIN_SOLID_CP, _BARIN_SOLID_H, _BARIN_SOLID_S),
     "liquid": (_BARIN_LIQUID_CP, _BARIN_LIQUID_H, _BARIN_LIQUID_S),
@@ -141,7 +144,9 @@ def located_fusion_when_janaf_does_not_cover(
     None is also the answer when JANAF has a gap and no located solid and
     liquid function covers that oxide at T. A ValueError that is not a
     phase or temperature gap is re-raised: those are corrupt JANAF inputs,
-    not a missing phase.
+    not a missing phase. A printed solid and liquid table with no evaluator
+    does not end the walk; that error is re-raised only when no later
+    source covers the oxide at T.
     """
 
     temperature_K = Decimal(str(temperature_K))
@@ -158,16 +163,31 @@ def located_fusion_when_janaf_does_not_cover(
 def _first_located_solid_liquid(
     oxide: str, temperature_K: Decimal
 ) -> LocatedFusionEnergy | None:
-    """IVTAN, then Barin, then Robie. Looked up at call time so a test can patch it."""
+    """IVTAN, then Barin, then Robie. Looked up at call time so a test can patch it.
 
+    A source that prints solid and liquid but has no evaluator is not the
+    "no located fusion" gap. The walk continues to the next source. The
+    first energy wins. If every later source misses, that evaluator error
+    is re-raised so the caller does not report it as a JANAF gap.
+    """
+
+    unevaluated: ValueError | None = None
     for source in (
         _ivtan_solid_liquid,
         _barin_mno_solid_liquid,
         _robie_hemingway_solid_liquid,
     ):
-        found = source(oxide, temperature_K)
+        try:
+            found = source(oxide, temperature_K)
+        except ValueError as exc:
+            if _NO_EVALUATOR_FOR_TABLE not in str(exc):
+                raise
+            unevaluated = exc
+            continue
         if found is not None:
             return found
+    if unevaluated is not None:
+        raise unevaluated
     return None
 
 
@@ -260,7 +280,7 @@ def _ivtan_solid_liquid(
         return None
     raise ValueError(
         f"IVTAN extract prints solid and liquid Gibbs for {oxide} at "
-        f"{temperature_K} K but this owner has no evaluator for that table"
+        f"{temperature_K} K but this owner has {_NO_EVALUATOR_FOR_TABLE}"
     )
 
 
@@ -292,5 +312,5 @@ def _robie_hemingway_solid_liquid(
         return None
     raise ValueError(
         "Robie & Hemingway 1995 prints a liquid MnO Gibbs function at "
-        f"{temperature_K} K but this owner has no evaluator for that table"
+        f"{temperature_K} K but this owner has {_NO_EVALUATOR_FOR_TABLE}"
     )

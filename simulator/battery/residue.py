@@ -1271,9 +1271,16 @@ _SCCM_STANDARD_TEMPERATURE_K = 273.15
 def _sphere_equivalent_diameter_m(mass_kg: float, density_kg_m3: float) -> float:
     """Diameter of the sphere with this mass and density.
 
+    Premise: one uniform sphere, so its volume is the mass divided by the
+    density. Algebra: ``V = m/rho = 4*pi*r^3/3``, so
+    ``d = 2*(3m/(4*pi*rho))**(1/3)``. This function is the only owner of
+    that rule. ``_sphere_geometry_from_mass`` takes half of this diameter;
+    ``_sphere_area_m2`` remains the owner of ``A = 4*pi*r^2``.
+    Units: mass in kg, density in kg/m3, diameter in m, area in m2.
+    Sanity check: a 2 mm diameter sphere (r = 1 mm) at 2700 kg/m3 has
+    ``A/m = 3/(rho*r) = 3/(2700*0.001) = 1.111`` m2/kg.
     The printed mass and the labelled density fallback are the bead.
-    ``d = 2*(3m/(4*pi*rho))**(1/3)``. The series length is this
-    diameter, so Sh = 2 is ``k_c = D/r``.
+    The series length is this diameter, so Sh = 2 is ``k_c = D/r``.
     """
 
     if (
@@ -1283,6 +1290,7 @@ def _sphere_equivalent_diameter_m(mass_kg: float, density_kg_m3: float) -> float
         or density_kg_m3 <= 0.0
     ):
         raise ResidueInventoryRefusal("bead_diameter_invalid")
+    # V = m/rho, then r = (3V/(4*pi))**(1/3), is the identity above.
     volume_m3 = mass_kg / density_kg_m3
     radius_m = (3.0 * volume_m3 / (4.0 * math.pi)) ** (1.0 / 3.0)
     return 2.0 * radius_m
@@ -2976,11 +2984,13 @@ def _time_forward_thermal_segments(
 def _sphere_geometry_from_mass(
     sample_mass_kg: float, density_kg_m3: float,
 ) -> tuple[float, float]:
-    """Return sphere radius and area for a mass and density."""
-    # For a sphere V=m/rho=4πr³/3 [m³], so r=(3m/(4πrho))^(1/3) [m].
-    radius_m = (
-        3.0 * sample_mass_kg / (4.0 * math.pi * density_kg_m3)
-    ) ** (1.0 / 3.0)
+    """Return sphere radius and area for a mass and density.
+
+    The radius is half the diameter from ``_sphere_equivalent_diameter_m``,
+    the only owner of ``d = 2*(3m/(4*pi*rho))**(1/3)``.
+    """
+
+    radius_m = _sphere_equivalent_diameter_m(sample_mass_kg, density_kg_m3) / 2.0
     return radius_m, _sphere_area_m2(radius_m)
 
 

@@ -4183,6 +4183,9 @@ _OWNER_SATURATION_NOTICE = "fe_saturation_composition_owner_supplied"
 _FE_PER_O_FORMULA = re.compile(r"^Fe([0-9]+(?:\.[0-9]+)?)O$")
 _KELVIN_FROM_CELSIUS = Decimal("273.15")
 _IRON_SATURATED_FEO_MISSING_INPUT = "iron-saturated FeO conversion missing input:"
+_LOCATED_FUSION_NO_EVALUATOR_NOTICE = (
+    "located solid and liquid are printed but this module has no evaluator"
+)
 # Cold and hot ends of the Holzheid and Distin rows this conversion scores.
 _FEO_SCORED_SPAN_K = (Decimal("1578"), Decimal("2233.15"))
 
@@ -5269,6 +5272,7 @@ def fusion_comparison_reference(
     )
     from simulator.reference_data.solid_liquid_fusion import (
         LocatedFusionEnergy,
+        _NO_EVALUATOR_FOR_TABLE,
         located_fusion_when_janaf_does_not_cover,
     )
     from simulator.battery.generators.janaf import (
@@ -5292,11 +5296,31 @@ def fusion_comparison_reference(
         and standard_state.endmember.polymorph is not None
         and _source_polymorph_is_unspecified(standard_state.endmember.polymorph)
     )
+
+    def no_evaluator_notice(exc: ValueError) -> Notice:
+        return Notice(
+            kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+            affected_quantities=(Quantity.ACTIVITY,),
+            reason=f"{_LOCATED_FUSION_NO_EVALUATOR_NOTICE}: {exc}",
+            origin=reference.observation_id,
+            band="located fusion source has no evaluator; not a JANAF gap",
+        )
+
     located_fusion = None
     if polymorph_unspecified and engine is not Engine.MAGEMIN:
-        located_fusion = located_fusion_when_janaf_does_not_cover(
-            formula, temperature_K
-        )
+        try:
+            located_fusion = located_fusion_when_janaf_does_not_cover(
+                formula, temperature_K
+            )
+        except ValueError as exc:
+            if _NO_EVALUATOR_FOR_TABLE not in str(exc):
+                raise
+            return replace(
+                reference,
+                notices=union_notices(
+                    reference.notices, (no_evaluator_notice(exc),)
+                ),
+            )
     if located_fusion is None and polymorph_unspecified:
         updated, refusal = _decide_omitted_reference_polymorph(
             reference, identity, standard_state, formula, temperature_K
@@ -5395,16 +5419,27 @@ def fusion_comparison_reference(
                 raise
             fallback = None
             if engine is not Engine.MAGEMIN:
-                # The located lookup re-raises a JANAF ValueError that is not
-                # a phase or temperature gap (a missing table node, a
-                # non-unique crossing). That is not a located energy. The
-                # missing-input notice above is the result.
+                # Catch only the walker's "no located fusion" gap: a JANAF
+                # ValueError that is not a phase or temperature gap (a
+                # missing table node, a non-unique crossing). That is not a
+                # located energy, so the missing-input notice above stands.
+                # A printed solid and liquid table with no evaluator is not
+                # that gap. The walker already tried the next source. If it
+                # still raises, this notice is the result, not the JANAF one.
                 try:
                     fallback = located_fusion_when_janaf_does_not_cover(
                         formula, temperature_K
                     )
-                except ValueError:
-                    fallback = None
+                except ValueError as exc:
+                    if _NO_EVALUATOR_FOR_TABLE not in str(exc):
+                        fallback = None
+                    else:
+                        return replace(
+                            reference,
+                            notices=union_notices(
+                                reference.notices, (no_evaluator_notice(exc),)
+                            ),
+                        )
             if fallback is None:
                 return replace(
                     reference, notices=union_notices(reference.notices, (notice,))
@@ -21425,6 +21460,7 @@ def _compile_residual_with_lineage(
             if notice.reason.startswith("fusion conversion missing input:")
             or notice.reason.startswith("fusion conversion missing input for ")
             or notice.reason.startswith(_IRON_SATURATED_FEO_MISSING_INPUT)
+            or notice.reason.startswith(_LOCATED_FUSION_NO_EVALUATOR_NOTICE)
         ),
         None,
     )
@@ -21444,6 +21480,10 @@ def _compile_residual_with_lineage(
             missing_input = "JANAF solid polymorph matching the selected table"
         elif "no temperature_K" in missing_fusion_input.reason:
             missing_input = "activity observation temperature_K"
+        elif missing_fusion_input.reason.startswith(
+            _LOCATED_FUSION_NO_EVALUATOR_NOTICE
+        ):
+            missing_input = "evaluator for the printed solid and liquid Gibbs table"
         else:
             missing_input = "JANAF solid/liquid formation Gibbs rows"
         return _refused(

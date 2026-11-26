@@ -220,6 +220,111 @@ def test_polymorph_never_set_still_uses_the_located_owner() -> None:
     assert converted.value.point < reference.value.point
 
 
+def _mno_polymorph_absent_reference():
+    identity = _without_activity_reference_polymorph(
+        F.activity_identity(
+            formula="MnO",
+            T_K=Decimal("1673.15"),
+            endmember_phase=Phase.CR,
+            component_basis="MnO",
+        )
+    )
+    return F.observation(
+        "mno-polymorph-absent-stub",
+        F.kems_experiment().experiment_id,
+        identity,
+        Decimal("0.2"),
+    )
+
+
+def _stub_ivtan_without_evaluator(calls: list[str]):
+    def ivtan(oxide, temperature_K):
+        calls.append("ivtan")
+        raise ValueError(
+            "IVTAN extract prints solid and liquid Gibbs for "
+            f"{oxide} at {temperature_K} K but this owner has no evaluator "
+            "for that table"
+        )
+
+    return ivtan
+
+
+def test_stub_source_without_evaluator_falls_through_to_barin(monkeypatch) -> None:
+    """A printed table with no evaluator is not the JANAF missing-input gap.
+
+    The stub raises that error. The walker continues, and Barin still
+    supplies the fusion shift.
+    """
+
+    calls: list[str] = []
+    real_barin = fusion_owner._barin_mno_solid_liquid
+
+    def barin(oxide, temperature_K):
+        calls.append("barin")
+        return real_barin(oxide, temperature_K)
+
+    monkeypatch.setattr(
+        fusion_owner, "_ivtan_solid_liquid", _stub_ivtan_without_evaluator(calls)
+    )
+    monkeypatch.setattr(fusion_owner, "_barin_mno_solid_liquid", barin)
+    reference = _mno_polymorph_absent_reference()
+    converted = fusion_comparison_reference(
+        reference, engine=Engine.INTERNAL_ANALYTICAL
+    )
+    assert calls == ["ivtan", "barin"]
+    notice = _fusion_notice(converted)
+    assert "source=Barin 1995" in notice.reason
+    assert converted.value.point < reference.value.point
+    assert not any(
+        item.reason.startswith("fusion conversion missing input")
+        for item in converted.notices
+    )
+    assert not any(
+        "no evaluator" in item.reason for item in converted.notices
+    )
+
+
+def test_evaluator_gap_with_no_later_source_is_not_a_janaf_notice(
+    monkeypatch,
+) -> None:
+    calls: list[str] = []
+
+    def miss(name):
+        def source(oxide, temperature_K):
+            calls.append(name)
+            return None
+
+        return source
+
+    monkeypatch.setattr(
+        fusion_owner, "_ivtan_solid_liquid", _stub_ivtan_without_evaluator(calls)
+    )
+    monkeypatch.setattr(fusion_owner, "_barin_mno_solid_liquid", miss("barin"))
+    monkeypatch.setattr(
+        fusion_owner, "_robie_hemingway_solid_liquid", miss("robie")
+    )
+    reference = _mno_polymorph_absent_reference()
+    converted = fusion_comparison_reference(
+        reference, engine=Engine.INTERNAL_ANALYTICAL
+    )
+    assert calls == ["ivtan", "barin", "robie"]
+    assert converted.value.point == reference.value.point
+    evaluator = [
+        item
+        for item in converted.notices
+        if item.reason.startswith(
+            "located solid and liquid are printed but this module has no evaluator"
+        )
+    ]
+    assert len(evaluator) == 1
+    assert "no evaluator for that table" in evaluator[0].reason
+    assert "fusion conversion missing input" not in evaluator[0].reason
+    assert not any(
+        item.reason.startswith("fusion conversion missing input")
+        for item in converted.notices
+    )
+
+
 def test_magemin_mno_stays_a_missing_input_refusal() -> None:
     reference = _omitted_solid(
         "MnO", Decimal("1673.15"), "polymorph_not_published", point="0.001569"
