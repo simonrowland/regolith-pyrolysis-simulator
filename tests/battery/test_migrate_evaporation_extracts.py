@@ -7,7 +7,9 @@ from pathlib import Path
 import yaml
 
 from simulator.battery.enums import (
+    Engine,
     EvidenceClass,
+    MethodToken,
     Quantity,
     UncertaintyKind,
     ValueKind,
@@ -24,6 +26,8 @@ HASHIMOTO_SID = "kems-015-hashimoto-1983"
 HASHIMOTO_EXTRACT = f"{HASHIMOTO_SID}.yaml"
 RICHTER07_SID = "kems-010-richter-2007"
 RICHTER07_EXTRACT = f"{RICHTER07_SID}.yaml"
+RICHTER11_SID = "richter-mendybaev-christensen-etal-2011-olivine-chondrule-evaporation"
+RICHTER11_EXTRACT = f"{RICHTER11_SID}.yaml"
 ROOT = Path(__file__).resolve().parents[2]
 TABLE2_RUNS = {
     "sossi-2019-run-2m-16-07-16e": Decimal("848.9"),
@@ -430,6 +434,227 @@ def _assert_richter07_pins(result) -> None:
 def test_richter07_table1_mass_loss_and_context_keep_conditions(tmp_path: Path) -> None:
     result = _migrate_real_extract(tmp_path, RICHTER07_EXTRACT)
     _assert_richter07_pins(result)
+
+
+def test_richter11_residue_rows_migrate_temperature_and_time_conditions(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(tmp_path, RICHTER11_EXTRACT)
+    residues = [
+        row
+        for row in result.observations.values()
+        if row.source_id == RICHTER11_SID
+        and row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    ]
+    assert residues
+    for row in residues:
+        assert row.value.kind is ValueKind.POINT
+        temperature = row.point_conditions.get("temperature_K")
+        assert temperature is not None
+        assert temperature.locator is not None
+        identity_temperature = row.identity.temperature_K
+        if identity_temperature is not None and identity_temperature.is_value:
+            assert temperature.state.is_value
+            assert temperature.state.value == identity_temperature.value
+        else:
+            assert temperature.state.is_unknown
+
+        run_time = row.point_conditions.get("time_min")
+        assert run_time is not None
+        assert run_time.locator is not None
+        assert all(
+            condition.locator is not None
+            for condition in row.point_conditions.values()
+        )
+
+
+def test_richter_time_series_residue_routes_to_owner_and_dependencies(
+    tmp_path: Path, monkeypatch,
+) -> None:
+    import simulator.battery.migrate as migrate_module
+    import simulator.battery.score as score_module
+    from simulator.battery.score_run import _residue_adapter_kinds
+
+    source = yaml.safe_load(
+        (ROOT / "data/literature/extracts" / RICHTER11_EXTRACT).read_text(
+            encoding="utf-8"
+        )
+    )
+    raw_residue_rows = [
+        row
+        for _formula, row in migrate_module.iter_extract_observations(source)
+        if (row.get("values") or {}).get("quantity")
+        == "residue_composition_vs_time"
+    ]
+    assert len(raw_residue_rows) == 325
+    censored = next(
+        row for row in raw_residue_rows
+        if row["observation_id"] == "richter_2011_table1_iiab1-3_residue_na2o"
+    )
+    assert censored["values"]["series"][0]["Na2O_wt_pct"] == "<0.01"
+
+    result = _migrate_real_extract(tmp_path, RICHTER11_EXTRACT)
+    residues = [
+        row
+        for row in result.observations.values()
+        if row.source_id == RICHTER11_SID
+        and row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    ]
+    # The 325th printed cell is the censored <0.01 Na2O value above; the
+    # existing numeric selector keeps that cell typed-refused.
+    assert len(residues) == 324
+    vacuum_rows = []
+    gas_rows = []
+    for row in residues:
+        experiment = result.experiments[row.experiment_id]
+        adapters = _residue_adapter_kinds(
+            row, Engine.OPENIMCC, experiment,
+            Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        )
+        if (
+            experiment.method.is_value
+            and experiment.method.value is MethodToken.LANGMUIR_FREE_EVAPORATION
+        ):
+            assert adapters == (MethodToken.LANGMUIR_FREE_EVAPORATION,)
+            vacuum_rows.append(row)
+        else:
+            assert experiment.method.is_value
+            assert experiment.method.value is MethodToken.UNSPECIFIED
+            # Selector dispatch is only for the existing typed-refusal path;
+            # the unreported gas method never reaches a Langmuir engine call.
+            assert adapters == (MethodToken.LANGMUIR_FREE_EVAPORATION,)
+            gas_rows.append(row)
+    assert len(vacuum_rows) == 167
+    assert len(gas_rows) == 157
+
+    context = score_module.ScoreContext(
+        {}, dict(result.experiments), dict(result.observations), root=ROOT
+    )
+    for row in vacuum_rows:
+        prediction = score_module._extent_residue_prediction(
+            context, row, Engine.OPENIMCC
+        )
+        assert prediction is not None and prediction.value is None
+        assert prediction.refusal_detail["reason"] == (
+            "awaits_time_forward_langmuir_route"
+        )
+        assert prediction.refusal_detail["upstream_reason"] == (
+            "measured_mass_loss_fraction_missing_or_invalid"
+        )
+    for row in gas_rows:
+        prediction = score_module._extent_residue_prediction(
+            context, row, Engine.OPENIMCC
+        )
+        assert prediction is not None and prediction.value is None
+        assert prediction.refusal_detail["reason"] == "awaits_d475_series_flux"
+        assert prediction.refusal_detail["sample_support_not_printed"] is True
+    langmuir_owner = score_module._langmuir_residue_prediction
+
+    def reject_gas_langmuir_route(*_args, **_kwargs):
+        raise AssertionError("one-bar gas rows must not enter vacuum Langmuir")
+
+    monkeypatch.setattr(
+        score_module, "_langmuir_residue_prediction", reject_gas_langmuir_route
+    )
+    gas_prediction = score_module._extent_residue_prediction(
+        context, gas_rows[0], Engine.OPENIMCC
+    )
+    assert gas_prediction is not None
+    assert gas_prediction.refusal_detail["reason"] == "awaits_d475_series_flux"
+    # Mutation probe: restore the former absent-state-only check. It misses
+    # migrated UNSPECIFIED gas methods and makes the routed prediction vanish.
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            score_module,
+            "_richter2011_method_is_unreported",
+            lambda experiment: experiment is not None
+            and not experiment.method.is_value,
+        )
+        assert score_module._extent_residue_prediction(
+            context, gas_rows[0], Engine.OPENIMCC
+        ) is None
+    monkeypatch.setattr(
+        score_module, "_langmuir_residue_prediction", langmuir_owner
+    )
+
+    richter07_root = tmp_path / "richter07"
+    richter07_root.mkdir()
+    result07 = _migrate_real_extract(richter07_root, RICHTER07_EXTRACT)
+    residues07 = [
+        row for row in result07.observations.values()
+        if row.source_id == RICHTER07_SID
+        and row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    ]
+    assert len(residues07) == 204
+    context07 = score_module.ScoreContext(
+        {}, dict(result07.experiments), dict(result07.observations), root=ROOT
+    )
+    anchor_pairs = []
+    missing_anchor_rows = []
+    for row in residues07:
+        experiment = result07.experiments[row.experiment_id]
+        assert _residue_adapter_kinds(
+            row, Engine.INTERNAL_ANALYTICAL, experiment,
+            Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        ) == (MethodToken.LANGMUIR_FREE_EVAPORATION,)
+        anchors = [
+            candidate for candidate in result07.observations.values()
+            if candidate.source_id == RICHTER07_SID
+            and candidate.experiment_id == row.experiment_id
+            and candidate.identity.quantity.is_value
+            and candidate.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
+            and candidate.locator is not None and row.locator is not None
+            and candidate.locator.table == row.locator.table
+            and candidate.locator.note == row.locator.note
+        ]
+        if anchors:
+            assert len(anchors) == 1
+            anchor_pairs.append((row, experiment))
+        else:
+            missing_anchor_rows.append((row, experiment))
+    assert len(anchor_pairs) == 200
+    assert len(missing_anchor_rows) == 4
+    missing_row, _missing_experiment = missing_anchor_rows[0]
+    prediction = score_module._extent_residue_prediction(
+        context07, missing_row, Engine.INTERNAL_ANALYTICAL
+    )
+    assert prediction is not None and prediction.value is None
+    assert prediction.refusal_detail["reason"] == (
+        "awaits_time_forward_langmuir_route"
+    )
+    anchored_row, anchored_experiment = anchor_pairs[0]
+    prediction = score_module._extent_residue_prediction(
+        context07, anchored_row, Engine.INTERNAL_ANALYTICAL
+    )
+    assert prediction is not None
+    assert prediction.value is not None, prediction.refusal_detail
+
+    # Mutation probe: restore the old source lock and show the real score-run
+    # consumer loses both Richter residue series.
+    previous_selector = score_module._extent_residue_method
+
+    def old_source_lock(reference, experiment, quantity):
+        if reference.source_id in {RICHTER07_SID, RICHTER11_SID}:
+            return None
+        return previous_selector(reference, experiment, quantity)
+
+    monkeypatch.setattr(score_module, "_extent_residue_method", old_source_lock)
+    for row, experiment in (
+        (vacuum_rows[0], result.experiments[vacuum_rows[0].experiment_id]),
+        (anchored_row, anchored_experiment),
+    ):
+        assert MethodToken.LANGMUIR_FREE_EVAPORATION not in _residue_adapter_kinds(
+            row, Engine.INTERNAL_ANALYTICAL, experiment,
+            Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        )
+        assert score_module._extent_residue_prediction(
+            context07 if row.source_id == RICHTER07_SID else context,
+            row,
+            Engine.INTERNAL_ANALYTICAL,
+        ) is None
 
 
 def test_richter02_type_b_melt_phase_is_canonical(tmp_path: Path) -> None:

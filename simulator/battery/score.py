@@ -14270,6 +14270,10 @@ def _predict_mass_loss_with_residue(
             kind=(NoticeKind.OUT_OF_CERTIFIED_BAND if (
                 "paper-demonstrated-window" in flag or flag == "openimcc_extrapolated"
                 or flag.startswith("alpha_extrapolated:")
+            ) else NoticeKind.ALPHA_ASSUMED if (
+                flag.startswith("mass_loss_alpha_default:")
+            ) else NoticeKind.KNOB_DEFAULTED if (
+                flag.startswith("mass_loss_area_")
             ) else NoticeKind.FALLBACK),
             affected_quantities=(Quantity.MASS_LOSS_FRACTION,),
             reason=flag,
@@ -19455,11 +19459,33 @@ def _langmuir_residue_prediction(
         )
 
 
+_RICHTER_2007_SOURCE_ID = "kems-010-richter-2007"
+_RICHTER_2011_SOURCE_ID = (
+    "richter-mendybaev-christensen-etal-2011-olivine-chondrule-evaporation"
+)
+_MENDYBAEV_2013_SOURCE_ID = "mendybaev-2013-fun-cai-evaporation"
+_LANGMUIR_EXTENT_SOURCE_IDS = frozenset({
+    _RICHTER_2007_SOURCE_ID,
+    _MENDYBAEV_2013_SOURCE_ID,
+    _RICHTER_2011_SOURCE_ID,
+})
+_RICHTER_TIME_FORWARD_SOURCE_IDS = frozenset({
+    _RICHTER_2007_SOURCE_ID,
+    _RICHTER_2011_SOURCE_ID,
+})
+
+
+def _richter2011_method_is_unreported(experiment) -> bool:
+    if experiment is None:
+        return False
+    if not experiment.method.is_value:
+        return True
+    return experiment.method.value is MethodToken.UNSPECIFIED
+
+
 def _extent_residue_method(reference, experiment, quantity) -> MethodToken | None:
     """Select a method-specific extent adapter without widening cohort locks."""
-    if (
-        experiment is None or quantity is None
-    ):
+    if experiment is None or quantity is None:
         return None
     if (
         quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
@@ -19469,10 +19495,9 @@ def _extent_residue_method(reference, experiment, quantity) -> MethodToken | Non
         # time-forward Langmuir integrator, even though Ivanova names its
         # apparatus method as vacuum-chamber pyrolysis.
         return MethodToken.LANGMUIR_FREE_EVAPORATION
-    if not experiment.method.is_value:
-        return None
+    method = experiment.method.value if experiment.method.is_value else None
     if (
-        experiment.method.value is MethodToken.KNUDSEN_EFFUSION
+        method is MethodToken.KNUDSEN_EFFUSION
         and quantity in {
             Quantity.RESIDUE_COMPONENT_COMPOSITION,
             Quantity.ELEMENT_RETENTION_RATIO,
@@ -19480,14 +19505,23 @@ def _extent_residue_method(reference, experiment, quantity) -> MethodToken | Non
     ):
         return MethodToken.KNUDSEN_EFFUSION
     if (
-        experiment.method.value is MethodToken.LANGMUIR_FREE_EVAPORATION
-        and quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
-        and reference.source_id in {
-            "mendybaev-2013-fun-cai-evaporation",
-            _WANG_2001_SOURCE_ID,
-        }
+        quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and (
+            reference.source_id in _LANGMUIR_EXTENT_SOURCE_IDS
+            or reference.source_id == _WANG_2001_SOURCE_ID
+        )
         and _declared_residue_predictor(reference.source_id) is None
+        and (
+            method is MethodToken.LANGMUIR_FREE_EVAPORATION
+            or (
+                reference.source_id == _RICHTER_2011_SOURCE_ID
+                and _richter2011_method_is_unreported(experiment)
+            )
+        )
     ):
+        # R11's unreported-method one-bar rows use the existing score-run
+        # dispatch slot only to emit a typed d-475 dependency refusal. The
+        # method stays unreported and no vacuum Langmuir owner is called.
         return MethodToken.LANGMUIR_FREE_EVAPORATION
     return None
 
@@ -19500,15 +19534,51 @@ def _extent_residue_prediction(
         tuple[str, Engine, frozenset[str] | None], Mapping[str, object]
     ] | None = None,
 ) -> EnginePrediction | None:
+    experiment = context.experiments.get(reference.experiment_id)
     method = _extent_residue_method(
         reference,
-        context.experiments.get(reference.experiment_id),
+        experiment,
         quantity_token(reference.identity),
     )
     if method is MethodToken.KNUDSEN_EFFUSION:
         return _knudsen_residue_prediction(context, reference, engine, cache)
     if method is MethodToken.LANGMUIR_FREE_EVAPORATION:
-        return _langmuir_residue_prediction(context, reference, engine, cache)
+        if (
+            reference.source_id == _RICHTER_2011_SOURCE_ID
+            and experiment is not None
+            and _richter2011_method_is_unreported(experiment)
+        ):
+            return EnginePrediction(
+                engine=engine,
+                channel=ENGINE_CHANNELS[engine],
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+                coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
+                lineage_complete=False,
+                refusal_reason=RefusalReason.UNSUPPORTED,
+                refusal_detail={
+                    "reason": "awaits_d475_series_flux",
+                    "sample_support_not_printed": True,
+                },
+                identity=reference.identity,
+            )
+        prediction = _langmuir_residue_prediction(context, reference, engine, cache)
+        if prediction.value is not None:
+            return prediction
+        original_reason = prediction.refusal_detail.get("reason")
+        pending_reason = None
+        if (
+            reference.source_id in _RICHTER_TIME_FORWARD_SOURCE_IDS
+            and original_reason == "measured_mass_loss_fraction_missing_or_invalid"
+        ):
+            pending_reason = "awaits_time_forward_langmuir_route"
+        if pending_reason is not None:
+            refusal_detail = {
+                **prediction.refusal_detail,
+                "reason": pending_reason,
+                "upstream_reason": original_reason,
+            }
+            return replace(prediction, refusal_detail=refusal_detail)
+        return prediction
     return None
 
 

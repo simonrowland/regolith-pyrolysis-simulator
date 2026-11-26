@@ -2929,8 +2929,8 @@ def _mass_loss_sourced_alphas(
 
 def _mass_loss_area_inputs(
     experiment: object, observation: object, source: Mapping[str, Any],
-) -> tuple[float, float, float]:
-    """Read the two printed endpoints and test the approved shape premise."""
+) -> tuple[float, float, float, Mapping[str, float | str] | None]:
+    """Read printed area endpoints and report conflict with the default shape."""
     # Raw table row locators migrate to the observation paragraph; Experiment
     # Locator has no row field (its raw row is retained only as a note).
     row_name = getattr(getattr(observation, "locator", None), "paragraph", None)
@@ -2967,13 +2967,22 @@ def _mass_loss_area_inputs(
         raise ResidueInventoryRefusal("sample_area_endpoints_not_stated")
     initial, final, relative_uncertainty = matches.pop()
     predicted_final = _self_similar_area_m2(initial, 1.0 - observed_loss, 1.0)
+    shape_diagnostic = None
     if abs(final - predicted_final) > relative_uncertainty * predicted_final:
-        raise ResidueInventoryRefusal("area_shape_not_self_similar", json.dumps({
+        if getattr(observation, "source_id", None) != "kems-010-richter-2007":
+            raise ResidueInventoryRefusal("area_shape_not_self_similar", json.dumps({
+                "initial_area_m2": initial, "final_area_m2": final,
+                "self_similar_final_area_m2": predicted_final,
+                "relative_area_uncertainty": relative_uncertainty,
+            }, sort_keys=True))
+        shape_diagnostic = {
             "initial_area_m2": initial, "final_area_m2": final,
             "self_similar_final_area_m2": predicted_final,
             "relative_area_uncertainty": relative_uncertainty,
-        }, sort_keys=True))
-    return initial, final, relative_uncertainty
+            "default": _HASHIMOTO_PRIMARY_GEOMETRY,
+            "reason": "printed final area is outside the self-similar area uncertainty",
+        }
+    return initial, final, relative_uncertainty, shape_diagnostic
 
 
 def _mass_loss_thermal_segments(
@@ -3014,7 +3023,10 @@ def _mass_loss_thermal_segments(
     if holds or last != temperature_K:
         raise ResidueInventoryRefusal("thermal_schedule_invalid")
     duration = _located_point(schedule.total_duration_s)
-    segments.append((temperature_K, duration))
+    if duration is None or duration < 0.0:
+        raise ResidueInventoryRefusal("duration_not_stated")
+    if duration > 0.0:
+        segments.append((temperature_K, duration))
     # The source calls the preheat "about an hour". The rectangle uses that
     # printed approximate duration, never an invented start T or ramp rate.
     return maximum, _SECONDS_PER_HOUR, tuple(segments)
@@ -4216,6 +4228,9 @@ def predict_mass_loss_fraction(
             else getattr(identity, "composition", None)
         ),
     )
+    source_is_richter07 = (
+        getattr(observation, "source_id", None) == "kems-010-richter-2007"
+    )
     if time_forward_source:
         if temperature_K is None or not math.isfinite(float(temperature_K)):
             raise ResidueInventoryRefusal(
@@ -4232,7 +4247,11 @@ def predict_mass_loss_fraction(
         duration_s = _located_point(
             None if schedule is None else getattr(schedule, "total_duration_s", None)
         )
-        if duration_s is None or duration_s <= 0.0:
+        if (
+            duration_s is None
+            or duration_s < 0.0
+            or (duration_s == 0.0 and not source_is_richter07)
+        ):
             raise ResidueInventoryRefusal(
                 "duration_not_stated", "thermal_schedule.total_duration_s"
             )
@@ -4282,13 +4301,14 @@ def predict_mass_loss_fraction(
         source_flags.update(geometry_policy["missing_inputs"])
     if sample_mass_kg is None or sample_mass_kg <= 0.0:
         raise ResidueInventoryRefusal("sample_mass_not_stated", "sample.mass_kg point")
-    if area_m2 is None or area_m2 <= 0.0:
-        raise ResidueInventoryRefusal(
-            "sample_geometry_not_stated",
-            "point_conditions.exposed_area_initial_m2",
-        )
-    if final_area_m2 is None:
-        final_area_m2 = area_m2
+    if not source_is_richter07:
+        if area_m2 is None or area_m2 <= 0.0:
+            raise ResidueInventoryRefusal(
+                "sample_geometry_not_stated",
+                "point_conditions.exposed_area_initial_m2",
+            )
+        if final_area_m2 is None:
+            final_area_m2 = area_m2
 
     if time_forward_source and source_id == ZHANG_2021_ACSESC_SOURCE_ID:
         if (
@@ -4418,33 +4438,51 @@ def predict_mass_loss_fraction(
     if not gas_channels:
         raise ResidueInventoryRefusal("residue_gas_channels_missing")
     template_by_species = {channel.species: channel for channel in channel_templates}
-    try:
-        fits = _mass_loss_sourced_alphas(
-            experiment, source_document or {}, float(temperature_K)
-        )
-    except ResidueInventoryRefusal as exc:
-        if not time_forward_source or exc.reason != "evaporation_coefficients_not_sourced":
-            raise
-        from simulator.battery.default_policy import resolve as resolve_default_policy
 
-        alpha = float(resolve_default_policy("DP-005").value)
-        fits = {
-            str(species): {
-                "alpha": alpha,
-                "source_observation_id": "DP-005",
-                "locator": {},
-                "T_range_K": [],
-                "extrapolated": False,
+    def sourced_alphas_at(at_temperature_K: float) -> dict[str, dict[str, Any]]:
+        try:
+            return _mass_loss_sourced_alphas(
+                experiment, source_document or {}, at_temperature_K
+            )
+        except ResidueInventoryRefusal as exc:
+            if (
+                source_is_richter07
+                and exc.reason == "evaporation_coefficients_not_sourced"
+            ):
+                return {}
+            if (
+                not time_forward_source
+                or exc.reason != "evaporation_coefficients_not_sourced"
+            ):
+                raise
+            from simulator.battery.default_policy import resolve as resolve_default_policy
+
+            alpha = float(resolve_default_policy("DP-005").value)
+            source_flags.add("DP-005_alpha_unmeasured")
+            return {
+                str(species): {
+                    "alpha": alpha,
+                    "source_observation_id": "DP-005",
+                    "locator": {},
+                    "T_range_K": [],
+                    "extrapolated": False,
+                }
+                for species, (parent, *_rest) in gas_channels
+                if parent
             }
-            for species, (parent, *_rest) in gas_channels
-            if parent
-        }
-        source_flags.add("DP-005_alpha_unmeasured")
+
+    fits = sourced_alphas_at(float(temperature_K))
     if total_pressure_Pa is None or not math.isfinite(total_pressure_Pa) or total_pressure_Pa < 0:
         raise ResidueInventoryRefusal("total_pressure_not_stated")
     area_uncertainty = None
+    area_shape_diagnostic = None
     if not time_forward_source:
-        area_m2, final_area_m2, area_uncertainty = _mass_loss_area_inputs(
+        (
+            area_m2,
+            final_area_m2,
+            area_uncertainty,
+            area_shape_diagnostic,
+        ) = _mass_loss_area_inputs(
             experiment, observation, source_document or {}
         )
         preheat_maximum_K, preheat_duration_s, segments = _mass_loss_thermal_segments(
@@ -4483,12 +4521,29 @@ def predict_mass_loss_fraction(
             f"duration_s={preheat_duration_s}; approximate printed duration; "
             "excluded from point loss; rectangle enters B only"
         )
-        flags.add(
-            f"mass_loss_area_self_similarity: initial_m2={area_m2}; final_m2={final_area_m2}; "
-            f"relative_area_uncertainty={area_uncertainty}"
-        )
-    unsourced = tuple(str(species) for species, (parent, *_rest) in gas_channels
-                      if parent and str(species) not in fits)
+        if source_is_richter07:
+            flags.add(
+                f"mass_loss_area_self_similarity_default: {_HASHIMOTO_PRIMARY_GEOMETRY}; "
+                "source prints "
+                "initial and final areas but no within-run area trajectory; "
+                f"initial_m2={area_m2}; final_m2={final_area_m2}; "
+                f"relative_area_uncertainty={area_uncertainty}"
+            )
+            if area_shape_diagnostic is not None:
+                flags.add(
+                    "mass_loss_area_endpoint_mismatch_default: "
+                    + json.dumps(area_shape_diagnostic, sort_keys=True)
+                )
+        else:
+            flags.add(
+                f"mass_loss_area_self_similarity: initial_m2={area_m2}; final_m2={final_area_m2}; "
+                f"relative_area_uncertainty={area_uncertainty}"
+            )
+    unsourced = tuple(
+        str(species)
+        for species, (parent, *_rest) in gas_channels
+        if parent and str(species) not in fits and not source_is_richter07
+    )
 
     bounds_by_channel = {species: 0.0 for species in unsourced}
     preheat_bounds_by_channel: defaultdict[str, float] = defaultdict(float)
@@ -4592,15 +4647,12 @@ def predict_mass_loss_fraction(
         segment_area_end_m2: float | None = None,
     ) -> tuple[Mapping[str, float], float]:
         nonlocal corner_evaluations, corner_root_solves, corner_neighbour_evaluations
-        at_fits = (
-            fits
-            if time_forward_source
-            else _mass_loss_sourced_alphas(experiment, source_document or {}, at_K)
-        )
+        at_fits = sourced_alphas_at(at_K)
         for species, fit in at_fits.items():
             if fit["extrapolated"]:
                 flags.add(f"alpha_extrapolated:{species}:source_domain_K={fit['T_range_K']}")
         channels = []
+        defaulted_alpha_species = []
         for species, (parent, *_rest) in gas_channels:
             species = str(species)
             if not parent:
@@ -4608,6 +4660,10 @@ def predict_mass_loss_fraction(
             elif species in at_fits:
                 alpha = at_fits[species]["alpha"]
                 provenance = at_fits[species]["source_observation_id"]
+            elif source_is_richter07:
+                alpha = 1.0
+                provenance = "default alpha=1.0; no experiment-linked coefficient is printed"
+                defaulted_alpha_species.append(species)
             else:
                 alpha = 1.0 if unsourced_unity else 0.0
                 provenance = ("alpha<=1 joint/preheat arm; not sourced coefficient" if unsourced_unity
@@ -4619,6 +4675,11 @@ def predict_mass_loss_fraction(
                     alpha_source=provenance,
                 )
             )
+        flags.update(
+            f"mass_loss_alpha_default:{species}=1.0; original_reason=experiment-linked "
+            "evaporation coefficient not published"
+            for species in defaulted_alpha_species
+        )
         terms = _channel_terms(channels)
         terms_by_species = {term.source.species: term for term in terms}
         pressure_model = _make_residue_pressure_model(

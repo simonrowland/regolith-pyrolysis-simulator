@@ -1,4 +1,4 @@
-"""Per-bead Langmuir residue extent scoring for Mendybaev Table 1."""
+"""Per-bead Langmuir residue extent scoring for printed Table 1 runs."""
 
 import math
 from dataclasses import replace
@@ -539,7 +539,9 @@ def test_declared_hashimoto_cohort_does_not_enter_langmuir_extent_dispatch():
     ) is None
 
 
-def test_richter_langmuir_residue_stays_out_of_mendybaev_dispatch():
+def test_richter07_table1_residue_uses_langmuir_extent_owner(monkeypatch):
+    import simulator.battery.residue as residue
+
     migrator = Migrator(root=ROOT, index={}, aliases={})
     migrator._migrate_extract(RICHTER_EXTRACT)
     migrator.finalize()
@@ -557,9 +559,40 @@ def test_richter_langmuir_residue_stays_out_of_mendybaev_dispatch():
         )
     )
     assert reference.source_id == "kems-010-richter-2007"
-    assert _extent_residue_prediction(
+    matching_anchor = [
+        row for row in observations.values()
+        if row.experiment_id == reference.experiment_id
+        and row.source_id == reference.source_id
+        and row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
+        and row.locator is not None
+        and reference.locator is not None
+        and row.locator.table == reference.locator.table
+        and row.locator.note == reference.locator.note
+    ]
+    assert len(matching_anchor) == 1
+    pressure_model = residue._make_residue_pressure_model
+    starting_inventories = []
+
+    def capture_starting_inventory(*args, **kwargs):
+        starting_inventories.append(dict(kwargs["starting_inventory"]))
+        return pressure_model(*args, **kwargs)
+
+    monkeypatch.setattr(
+        residue, "_make_residue_pressure_model", capture_starting_inventory
+    )
+    prediction = _extent_residue_prediction(
         context, reference, Engine.INTERNAL_ANALYTICAL
-    ) is None
+    )
+    assert prediction is not None
+    assert prediction.value is not None, prediction.refusal_detail
+    assert prediction.refusal_reason is None
+    expected_inventory = residue._oxide_wt_percent_to_mol_inventory(
+        residue._initial_oxide_wt_percent(
+            context.experiments[reference.experiment_id].sample
+        )
+    )
+    assert starting_inventories == [expected_inventory]
 
 
 def test_score_store_caches_langmuir_extent_per_bead_and_rechecks_anchors(monkeypatch):
