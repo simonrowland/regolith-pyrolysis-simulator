@@ -26349,6 +26349,27 @@ class Migrator:
                 # state's reason in the DP-106 notice instead of queueing it.
                 method_was_unspecified = True
         if method_was_unspecified:
+            # A tagged-unknown experiment method carries the printed sentence.
+            # The row starts as the placeholder "source does not state method",
+            # and that placeholder must not erase the sentence when DP-106
+            # stores UNSPECIFIED. A row that stated its own method keeps that
+            # text. The two lift placeholders are not a published sentence.
+            published_experiment_reason = None
+            if (
+                method_raw is None
+                and declared_experiment_method is not None
+                and declared_experiment_method.is_unknown
+                and declared_experiment_method.reason
+                not in {
+                    "experiment method not published",
+                    "source does not state method",
+                }
+                and (
+                    not method.reason
+                    or method.reason == "source does not state method"
+                )
+            ):
+                published_experiment_reason = declared_experiment_method.reason
             cached_reason = (
                 self._unstated_method_original_reason_by_experiment.get(
                     experiment_id
@@ -26356,7 +26377,9 @@ class Migrator:
                 if method_raw is None and method_source_text is None
                 else None
             )
-            if method.reason:
+            if published_experiment_reason:
+                original_reason = published_experiment_reason
+            elif method.reason:
                 original_reason = method.reason
             elif cached_reason:
                 original_reason = cached_reason
