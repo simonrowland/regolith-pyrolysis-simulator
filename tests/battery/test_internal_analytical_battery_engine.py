@@ -460,7 +460,30 @@ def test_internal_analytical_scores_cho_suito_1994_sio2_row() -> None:
     assert observation.identity.reference_state.value.endmember.polymorph.is_unknown
 
 
-def test_internal_analytical_scores_feo_with_ideal_fallback_notice() -> None:
+@pytest.mark.parametrize(
+    ("formula", "expected_model", "expected_source", "expected_destination"),
+    (
+        (
+            "FeO",
+            "declared_ideal_solution",
+            "no measured parent-oxide activity",
+            "Raoultian gamma=1 ideal-activity convention",
+        ),
+        (
+            "CaO",
+            "constant_gamma_table_with_endmember_continuity",
+            "certified melt-activity evidence unavailable at this point",
+            "constant activity-coefficient table "
+            "(melt_activity.MELT_OXIDE_ACTIVITY_COEFFICIENTS)",
+        ),
+    ),
+)
+def test_internal_analytical_activity_fallback_notice_uses_model_provenance(
+    formula: str,
+    expected_model: str,
+    expected_source: str,
+    expected_destination: str,
+) -> None:
     from simulator.battery.generators.bench import activity_request_for_engine
 
     temperature = Decimal("1873")
@@ -469,7 +492,7 @@ def test_internal_analytical_scores_feo_with_ideal_fallback_notice() -> None:
             ("CaO", "0.4"), ("SiO2", "0.4"), ("FeO", "0.2")
         ),
         temperature=Value.point_of(temperature),
-        formula="FeO",
+        formula=formula,
     )
     observation = replace(
         observation,
@@ -483,11 +506,12 @@ def test_internal_analytical_scores_feo_with_ideal_fallback_notice() -> None:
     )
     assert request is not None and request.payload is not None
     expected = melt_oxide_activity(
-        "FeO",
+        formula,
         request.payload["composition_mol"],
         temperature_K=float(temperature),
     )
     assert expected is not None
+    assert expected.activity_model == expected_model
 
     prediction = predict_with_engine(
         Engine.INTERNAL_ANALYTICAL,
@@ -506,9 +530,11 @@ def test_internal_analytical_scores_feo_with_ideal_fallback_notice() -> None:
         notice for notice in prediction.notices if notice.kind is NoticeKind.FALLBACK
     )
     assert notice.authority is Authority.BRIDGE
-    assert notice.reason == expected.warning
-    assert notice.source == "no measured parent-oxide activity"
-    assert notice.destination == "Raoultian gamma=1 ideal-activity convention"
+    assert notice.reason == (
+        expected.warning or "melt_oxide_activity has no certified evidence tier"
+    )
+    assert notice.source == expected_source
+    assert notice.destination == expected_destination
     from simulator.battery.validate import _check_notice
 
     issues = []

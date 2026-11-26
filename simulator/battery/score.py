@@ -14770,7 +14770,11 @@ def _predict_with_engine(
                 requested_composition=requested,
             )
         if engine is Engine.INTERNAL_ANALYTICAL and quantity is Quantity.ACTIVITY:
-            from simulator.chemistry.melt_activity import melt_oxide_activity
+            from simulator.chemistry.melt_activity import (
+                MELT_OXIDE_IDEAL_SOLUTION_MODEL,
+                MELT_OXIDE_TABLE_GAMMA_MODEL,
+                melt_oxide_activity,
+            )
 
             activity = melt_oxide_activity(
                 formula,
@@ -14825,6 +14829,26 @@ def _predict_with_engine(
                         )
                     )
             elif activity.evidence_tier == "UNCERTIFIED" or activity.warning:
+                if activity.activity_model == MELT_OXIDE_IDEAL_SOLUTION_MODEL:
+                    fallback_source = "no measured parent-oxide activity"
+                    fallback_destination = (
+                        "Raoultian gamma=1 ideal-activity convention"
+                    )
+                elif activity.activity_model == MELT_OXIDE_TABLE_GAMMA_MODEL:
+                    fallback_source = (
+                        "certified melt-activity evidence unavailable at this point"
+                    )
+                    fallback_destination = (
+                        "constant activity-coefficient table "
+                        "(melt_activity.MELT_OXIDE_ACTIVITY_COEFFICIENTS)"
+                    )
+                else:
+                    fallback_source = (
+                        "certified melt-activity evidence unavailable at this point"
+                    )
+                    fallback_destination = (
+                        f"melt-activity model {activity.activity_model or 'unknown'}"
+                    )
                 notices.append(
                     Notice(
                         kind=NoticeKind.FALLBACK,
@@ -14836,8 +14860,8 @@ def _predict_with_engine(
                         origin=(
                             "simulator.chemistry.melt_activity.melt_oxide_activity"
                         ),
-                        source="no measured parent-oxide activity",
-                        destination="Raoultian gamma=1 ideal-activity convention",
+                        source=fallback_source,
+                        destination=fallback_destination,
                         authority=Authority.BRIDGE,
                     )
                 )
