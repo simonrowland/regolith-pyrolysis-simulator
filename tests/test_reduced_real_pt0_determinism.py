@@ -8740,7 +8740,7 @@ def _real_producer_diagnostic_mutation_sources(
     ):
         mutation_payload = copy.deepcopy(payload)
         mutation_payload["last_vapor_pressure_diagnostic"] = copy.deepcopy(
-            diagnostic
+            rrd._json_ready(diagnostic)
         )
         assert rrd._decode_payload_for_admission(
             "equilibrium_post_record",
