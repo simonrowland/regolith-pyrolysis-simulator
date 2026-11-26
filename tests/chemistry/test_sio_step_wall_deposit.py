@@ -353,21 +353,25 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
         # and saturation thresholds, the unavailable-MAGEMin run measured
         # 5.12945178146e-06 kg at 1050 C under the Psat = 0 backstop.
         # b-1188 removes the Psat = 0 backstop. The unavailable-MAGEMin
-        # report then deposited 0 kg: driving = max(0, p_local - Psat), and
-        # the 1050 C wall was not supersaturated.
-        # 2026-11-26 b274, receipt 760753a1 at b7a91af39c. The same law now
-        # deposits 1.3825809621333287e-05 kg of Si+SiO2 at 1050 C. The
-        # ledger melt-fO2 publish (a95942989e) and the d-469 native-Fe floor
-        # (8f174cc807) hold the analytical melt on the Fe line, so p_SiO
-        # rises (SiO equilibrium scales as pO2^-0.5) and the cold wall is
-        # supersaturated. The hour-path oxygen clip (60a659627a) equals the
-        # inventory at dt_h = 1, which is this report's step, so it is not
-        # the move. 1400 C and 1500 C stay the hot-wall zeros.
+        # report then deposited 0 kg because the trace was not supersaturated.
+        # 2026-11-26 b274. The SiO wall ladder is unchanged since green
+        # 0ef47e3c09. At the 1e-9 bar oxygen floor the oxidative leg
+        # (SiO + 1/2 O2 -> SiO2) has Psat 5.67e-11 Pa at 1050 C and
+        # 1.93e-4 Pa at 1400 C, so a booked oxidative capture is the
+        # supply, not a dew point. Disproportionation cannot explain equal
+        # deposits: its Psat is 1.145 Pa at 1050 C and 754 Pa at 1400 C.
+        # Receipt 760753a1 measured 1.3825809621333287e-05 kg at 1050 C.
+        # Receipt 72fbe252 measured 1.3800219536e-05 kg at 1400 C. The
+        # hour-path oxygen clip (60a659627a) equals the inventory at
+        # dt_h = 1, which is this report's step. The oxygen that arms the
+        # oxidative leg is the committed inventory left when oxide Fe
+        # evaporates and the oxygen stays (f187184015). 1500 C stays the
+        # remaining hot-wall zero until that temperature is remeasured.
         assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
             1.3825809621333287e-05, rel=1e-9
         )
         assert _sio_wall_product_deposit_kg(1400.0) == pytest.approx(
-            0.0, rel=1e-9
+            1.3800219536e-05, rel=1e-9
         )
         assert _sio_wall_product_deposit_kg(1500.0) == pytest.approx(
             0.0, rel=1e-9
