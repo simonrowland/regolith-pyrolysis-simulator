@@ -23203,13 +23203,24 @@ def test_t1795_store_probe_finalize(_t1795_migrator: Migrator) -> None:
 
 def test_t1795_store_probe_write_and_validate(_t1795_migrator: Migrator) -> None:
     import json
+    import subprocess
+    import sys
     import warnings
-
-    from simulator.battery.store_validation import validate_migrated_store
 
     result = _t1795_migrator.result
     write_outputs(result, REPO_ROOT)
-    record = validate_migrated_store(REPO_ROOT)
+    validation = subprocess.run(
+        [sys.executable, "scripts/battery_validate_store.py", "--root", str(REPO_ROOT)],
+        cwd=REPO_ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    record = json.loads(
+        (REPO_ROOT / "data" / "battery" / "store-validation.json").read_text(
+            encoding="utf-8"
+        )
+    )
     assert result.validation is not None
     hard_issues_by_source = Counter()
     for observation_id, issues in result.validation.hard_issues_by_observation.items():
@@ -23229,3 +23240,4 @@ def test_t1795_store_probe_write_and_validate(_t1795_migrator: Migrator) -> None
             sort_keys=True,
         )
     )
+    assert "forbidden shape count: 0" in validation.stdout
