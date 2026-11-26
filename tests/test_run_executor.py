@@ -37,9 +37,6 @@ from simulator.session import (
 from simulator.state import CampaignPhase, DecisionType
 from simulator.trace import PhysicsTrace
 
-FULL_PAYLOAD_DIGEST_PENDING_STUDIO_PIN = "PENDING_STUDIO_RECEIPT"
-
-
 def _run(**overrides) -> PyrolysisRun:
     kwargs = {
         "feedstock_id": "mars_basalt",
@@ -150,9 +147,9 @@ def test_short_run_payload_and_ledger_match_rollback_baseline_golden():
     assert hashlib.sha256(payload_without_diagnostics_bytes).hexdigest() == (
         "718ffcf58809ccc9d85d8f125a7e418b19e711a61d8b6f22ec9279b251d4c751"
     )
-    # constack merge: repin on gate box
     assert hashlib.sha256(payload_bytes).hexdigest() == (
-        FULL_PAYLOAD_DIGEST_PENDING_STUDIO_PIN
+        # Mac-Studio-256-3 receipt 54e87930 at ab332cbb5 supplied the full pin.
+        "f5b0f8f0a722f761e6dc6b46cb34b69b8e16e3ad990be5fbeb1a3a650d66c7b9"
     )
     assert hashlib.sha256(ledger_bytes).hexdigest() == (
         "c366b84c33ed81fb2a2c3c376df6cd20ac8366a5ae8e279d1679ba143a9bc4a3"
@@ -966,7 +963,7 @@ def test_equal_budget_flag_keeps_its_recorded_position():
     assert exported_flags == [current_budget_flag, "legacy notice"]
 
 
-def test_result_document_keeps_equal_non_list_budget_flag_unchanged():
+def test_result_document_replaces_equal_non_list_budget_flag_with_live_flag():
     session = _started_internal_session(_run(campaign="C2A", hours=1))
     current_budget_flag = _live_budget_flag(session)
     session._set_result_document({
@@ -976,7 +973,7 @@ def test_result_document_keeps_equal_non_list_budget_flag_unchanged():
 
     exported_flags = session.result_document()["run_metadata"]["run_flags"]
 
-    assert exported_flags is current_budget_flag
+    assert exported_flags == current_budget_flag
 
 
 def test_result_document_replaces_stale_budget_flags_with_live_flag():
@@ -1004,8 +1001,8 @@ def test_result_document_replaces_stale_budget_flags_with_live_flag():
     [
         {
             "kind": "run_diagnostic",
-            "code": "run_hour_budget_exhausted_mid_campaign",
-            "detail": {"campaign": "recorded", "hours_run_in_campaign": 9},
+            "code": "legacy_notice",
+            "message": "operator note",
         },
         "legacy notice",
     ],
@@ -1031,12 +1028,49 @@ def test_live_document_remerges_raw_legacy_run_flags_once(legacy_flags):
         flag for flag in batch_flags
         if flag["code"] == "run_hour_budget_exhausted_mid_campaign"
     )
-    expected = [legacy_flags, live_flag]
-    assert batch_flags == expected
+    assert batch_flags[0] == legacy_flags
+    assert batch_flags[1] == live_flag
+    assert batch_flags[1]["code"] == "run_hour_budget_exhausted_mid_campaign"
 
     session._set_result_document(batch_payload)
 
-    assert session.result_document()["run_metadata"]["run_flags"] == expected
+    result_flags = session.result_document()["run_metadata"]["run_flags"]
+    assert result_flags[0] == legacy_flags
+    assert result_flags[1] == live_flag
+    assert result_flags[1]["code"] == "run_hour_budget_exhausted_mid_campaign"
+
+
+def test_live_document_replaces_stale_non_list_budget_flag():
+    stale_flag = {
+        "kind": "run_diagnostic",
+        "code": "run_hour_budget_exhausted_mid_campaign",
+        "detail": {"campaign": "recorded", "hours_run_in_campaign": 9},
+    }
+    run = _run(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C2A",
+        hours=1,
+        additives_kg={},
+        run_metadata_overrides={"run_flags": stale_flag},
+    )
+    session = _started_internal_session(run)
+    sim = session.simulator
+    sim.record.path = "A_post_mg_boiloff"
+    sim.record.branch = "two"
+    sim.campaign_mgr.campaigns["C2A_continuous"]["max_hold_hr"] = 1
+
+    execution = RunExecutor().execute_session(session, hours=1)
+    batch_payload = run._build_output(execution)
+    batch_flags = batch_payload["run_metadata"]["run_flags"]
+    live_flag = next(
+        flag for flag in execution.run_flags
+        if flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+    )
+    assert batch_flags == live_flag
+
+    session._set_result_document(batch_payload)
+
+    assert session.result_document()["run_metadata"]["run_flags"] == live_flag
 
 
 def test_live_result_document_recomputes_budget_flag_when_chain_completes():
@@ -1105,6 +1139,16 @@ def test_merge_run_flags_returns_non_list_unchanged_without_live_flag(stored):
     assert merged is stored
 
 
+def test_merge_run_flags_drops_non_list_budget_flag_without_live_flag():
+    stale = {
+        "kind": "run_diagnostic",
+        "code": "run_hour_budget_exhausted_mid_campaign",
+        "detail": {"stale": True},
+    }
+
+    assert _merge_run_flags(stale, None) is None
+
+
 def test_merge_run_flags_keeps_scalar_before_live_flag():
     live = {
         "kind": "run_diagnostic",
@@ -1114,7 +1158,7 @@ def test_merge_run_flags_keeps_scalar_before_live_flag():
     assert _merge_run_flags("legacy", live) == ["legacy", live]
 
 
-def test_merge_run_flags_keeps_equal_non_list_budget_value_unchanged():
+def test_merge_run_flags_replaces_equal_non_list_budget_value_with_live_flag():
     live = {
         "kind": "run_diagnostic",
         "code": "run_hour_budget_exhausted_mid_campaign",
@@ -1122,7 +1166,7 @@ def test_merge_run_flags_keeps_equal_non_list_budget_value_unchanged():
     }
     stored = dict(live)
 
-    assert _merge_run_flags(stored, live) is stored
+    assert _merge_run_flags(stored, live) is live
 
 
 def test_merge_run_flags_returns_list_unchanged_without_budget_or_live_flag():
@@ -1173,6 +1217,81 @@ def test_merge_run_flags_returns_same_list_when_result_is_unchanged():
     stored = [live, "legacy"]
 
     assert _merge_run_flags(stored, live) is stored
+
+
+@pytest.mark.parametrize(
+    ("stored", "live"),
+    [
+        (None, None),
+        ("legacy", None),
+        ("legacy", {
+            "kind": "run_diagnostic",
+            "code": "run_hour_budget_exhausted_mid_campaign",
+        }),
+        ({"legacy": True}, {
+            "kind": "run_diagnostic",
+            "code": "run_hour_budget_exhausted_mid_campaign",
+        }),
+        ({
+            "kind": "run_diagnostic",
+            "code": "run_hour_budget_exhausted_mid_campaign",
+            "detail": {"stale": True},
+        }, {
+            "kind": "run_diagnostic",
+            "code": "run_hour_budget_exhausted_mid_campaign",
+            "detail": {"live": True},
+        }),
+        ({
+            "kind": "run_diagnostic",
+            "code": "run_hour_budget_exhausted_mid_campaign",
+            "detail": {"live": True},
+        }, {
+            "kind": "run_diagnostic",
+            "code": "run_hour_budget_exhausted_mid_campaign",
+            "detail": {"live": True},
+        }),
+        ({
+            "kind": "run_diagnostic",
+            "code": "run_hour_budget_exhausted_mid_campaign",
+            "detail": {"stale": True},
+        }, None),
+        ([], None),
+        (["legacy"], None),
+        (["legacy"], {
+            "kind": "run_diagnostic",
+            "code": "run_hour_budget_exhausted_mid_campaign",
+        }),
+        ([{
+            "kind": "run_diagnostic",
+            "code": "run_hour_budget_exhausted_mid_campaign",
+            "detail": {"stale": True},
+        }, "legacy", {
+            "kind": "run_diagnostic",
+            "code": "run_hour_budget_exhausted_mid_campaign",
+            "detail": {"stale": True},
+        }], {
+            "kind": "run_diagnostic",
+            "code": "run_hour_budget_exhausted_mid_campaign",
+            "detail": {"live": True},
+        }),
+        ([{
+            "kind": "run_diagnostic",
+            "code": "run_hour_budget_exhausted_mid_campaign",
+            "detail": {"stale": True},
+        }, "legacy"], None),
+        ([{
+            "kind": "run_diagnostic",
+            "code": "run_hour_budget_exhausted_mid_campaign",
+        }, "legacy"], {
+            "kind": "run_diagnostic",
+            "code": "run_hour_budget_exhausted_mid_campaign",
+        }),
+    ],
+)
+def test_merge_run_flags_is_idempotent_for_each_branch(stored, live):
+    merged = _merge_run_flags(stored, live)
+
+    assert _merge_run_flags(merged, live) == merged
 
 
 @pytest.mark.parametrize("legacy_flags", [[], None])
