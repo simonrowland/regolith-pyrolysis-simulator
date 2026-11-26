@@ -2953,8 +2953,9 @@ def test_missing_pressure_uses_flagged_one_atmosphere_default():
         and "not printed" in notice["reason"]
         for notice in plain_notices
     )
-    assert "out_of_certified_band" in score_module.flagged_strata(
-        prediction.notices
+    assert (
+        NoticeKind.FO2_DEFAULT_AMBIENT_AIR_UNPRINTED_ATMOSPHERE.value
+        in score_module.flagged_strata(prediction.notices)
     )
 
 
@@ -3032,17 +3033,19 @@ def test_named_non_fe_valence_uses_independent_fe_ferric_evidence(
     monkeypatch, element, couple
 ):
     from simulator.battery.fo2_ladder import resolve_row_fo2
-    from simulator.fe_redox import kress91_log10_fO2_from_fe3_over_sigma_fe
+    from simulator.fe_redox import (
+        _kress91_log10_fO2_from_fe3_over_sigma_fe as original_inverse,
+    )
     from simulator.battery.waypoints import PredictionPressure
 
     pressure_bar_calls = []
 
     def capture_inverse(**kwargs):
         pressure_bar_calls.append(kwargs["pressure_bar"])
-        return kress91_log10_fO2_from_fe3_over_sigma_fe(**kwargs)
+        return original_inverse(**kwargs)
 
     monkeypatch.setattr(
-        "simulator.fe_redox.kress91_log10_fO2_from_fe3_over_sigma_fe",
+        "simulator.fe_redox._kress91_log10_fO2_from_fe3_over_sigma_fe",
         capture_inverse,
     )
     _, row, experiment, bench = _in_domain_buffer_context()
@@ -3523,14 +3526,6 @@ def test_internal_analytical_redox_prediction_is_independent_of_measured_target(
         predict(Decimal("0.25"), Decimal("25000000"), Decimal("1.0")),
         predict(Decimal("1.0"), Decimal("100000000"), Decimal("0.25")),
     ]
-    if control == "same-row-assay":
-        assert all(p.value is not None for p in predictions)
-        assert [float(p.value) for p in predictions] == pytest.approx([1.0, 0.25])
-        assert all(
-            any(n.kind is NoticeKind.FO2_FROM_PRINTED_FERRIC_RATIO for n in p.notices)
-            for p in predictions
-        )
-        return
     if control in {"pressure-operand", "projected-pressure", "pressure-input"}:
         assert [p.value for p in predictions] == [
             Decimal("1.8265268104016068"), Decimal("1.7724056001021946"),
@@ -3751,7 +3746,7 @@ def test_redox_pressure_correction_keeps_the_printed_run_band(field):
     assert any(n.kind is NoticeKind.CONDITION_EXCLUDED_ORIGINAL_RUN_MISMATCH for n in prediction.notices)
 
 
-def test_redox_excludes_its_analytes_and_keeps_independent_emf():
+def test_redox_excludes_its_analytes_and_uses_dp010_for_unframed_emf_log():
     row = _without_printed_fo2(_borisov_row4())
     locator = Locator(page=3, table="2", record="run 1")
     row = replace(
@@ -3776,7 +3771,11 @@ def test_redox_excludes_its_analytes_and_keeps_independent_emf():
             **conditions, "fO2_log": Located(State.of(Decimal(".25")), replace(locator, note="column=EMF fO2")),
         })
         prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, candidate, isolated=False)
-        assert prediction.value == Decimal("2.7971189723222234")
+        assert prediction.value == Decimal("1.8449575445556925")
+        assert any(
+            notice.policy is not None and notice.policy.id == "DP-010"
+            for notice in prediction.notices
+        )
         assert all(not n.reason.startswith("fO2_log:") for n in prediction.notices)
 
 

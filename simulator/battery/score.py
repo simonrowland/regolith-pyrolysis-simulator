@@ -9768,14 +9768,6 @@ def _score_pressure_state(
             identity_pressure = identity_pressure_state(state)
             if identity_pressure is not None:
                 return identity_pressure
-    if (
-        missing
-        and observation is not None
-        and observation.source_id == "borisov-2018-compilation"
-    ):
-        # Use the compilation's 1 atm premise only when the row and run
-        # provide no usable total pressure.
-        return State.of(ATM_PA_DECIMAL)
     return pressure
 
 
