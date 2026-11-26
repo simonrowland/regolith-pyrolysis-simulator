@@ -187,12 +187,21 @@ def test_richter_printed_zero_extent_scores_as_the_starting_composition():
     )
     refused = [by_reference[row.observation_id] for row in blank_rows]
     assert all(residual.numeric is None for residual in refused)
-    assert all(
-        residual.refusal is not None
-        and residual.refusal.detail["reason"]
-        == "measured_mass_loss_fraction_missing_or_invalid"
-        for residual in refused
-    )
+    # score.py::_extent_residue_prediction rewrites a missing Richter
+    # mass-loss anchor. The inventory reason stays on upstream_reason.
+    for residual in refused:
+        detail = (
+            {}
+            if residual.refusal is None
+            else dict(residual.refusal.detail)
+        )
+        assert residual.refusal is not None, detail
+        assert detail.get("reason") == (
+            "awaits_time_forward_langmuir_route"
+        ), detail
+        assert detail.get("upstream_reason") == (
+            "measured_mass_loss_fraction_missing_or_invalid"
+        ), detail
     reference = zero_rows[0]
     experiment = context.experiments[reference.experiment_id]
     prediction = predict_langmuir_residue_composition(
