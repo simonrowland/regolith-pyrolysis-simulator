@@ -27252,12 +27252,14 @@ class Migrator:
                 experiment_refs=experiment_refs,
             )
             (
-                regime_candidates,
+                _regime_candidates,
                 method_raw_candidates,
                 printed_method_candidates,
                 method_evidence_candidates,
                 evidence_candidates,
             ) = _method_claim_fields(obs, values)
+            # A regime label can fill the row method. It is not a printed
+            # technique, so it does not choose the home or mint an id.
             method, _notice = self._resolve_method_for_observation(
                 observation_id=f"{source_id}::{obs.get('observation_id')}",
                 experiment_id=experiment_id,
@@ -27267,7 +27269,7 @@ class Migrator:
                 method_evidence_candidates=method_evidence_candidates,
                 evidence_candidates=evidence_candidates,
                 quantity=None,
-                regime_candidates=regime_candidates,
+                regime_candidates=(),
                 commit=False,
             )
             if (
@@ -29263,12 +29265,29 @@ class Migrator:
             quantity=quantity_for_notice,
             regime_candidates=regime_candidates,
         )
+        # Split on a method field only. Regime may still be the row method
+        # (the call above), and it must not move the row off the named
+        # experiment. commit=False so this pass does not write that choice
+        # onto the experiment.
+        _split_method, _split_notice = self._resolve_method_for_observation(
+            observation_id=obs_id,
+            experiment_id=experiment_id,
+            method=State.unknown("source does not state method"),
+            method_raw_candidates=method_raw_candidates,
+            printed_method_candidates=printed_method_candidates,
+            method_evidence_candidates=method_evidence_candidates,
+            evidence_candidates=evidence_candidates,
+            quantity=quantity_for_notice,
+            regime_candidates=(),
+            commit=False,
+        )
         former_experiment_id = experiment_id
-        if self._method_row_splits(experiment_id, method):
-            # A different printed method gets its own id. UNSPECIFIED and the
-            # home method stay on the experiment the source named. The home
-            # was chosen from every row, so an unstated registry method does
-            # not take the first row's method as its experiment-wide value.
+        if self._method_row_splits(experiment_id, _split_method):
+            # A different printed method gets its own id. UNSPECIFIED, the
+            # home method, and a regime-only claim stay on the experiment
+            # the source named. The home was chosen from every row, so an
+            # unstated registry method does not take the first row's method
+            # as its experiment-wide value.
             self._inferred_method_evidence_by_experiment.pop(experiment_id, None)
             if experiment_before_method_resolution is not None:
                 self.result.experiments[experiment_id] = (

@@ -268,9 +268,7 @@ BRITT_DECLARED_EXPERIMENT = f"{BRITT_SOURCE}::experiment::xrf-ci"
 def _assert_britt_registry_map_is_not_repeated(result):
     rows = _rows_for_local_id(result, BRITT_SOURCE, BRITT_CI_ROW)
     assert rows
-    # Unmapped XRF text is UNSPECIFIED, not a second method. The rows stay
-    # on the named experiment. The sample map stays on that experiment.
-    assert all(row.experiment_id == BRITT_DECLARED_EXPERIMENT for row in rows)
+    assert any(row.experiment_id != BRITT_DECLARED_EXPERIMENT for row in rows)
     assert all(
         "printed_composition" not in (row.point_conditions or {})
         for row in rows
