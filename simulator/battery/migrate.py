@@ -13681,6 +13681,98 @@ def conditional_reduced_lineage_is_measured(
     return True
 
 
+def _plain_observation_values(obs: Mapping[str, Any]) -> dict[str, Any]:
+    """The mapping method claims are read from. A point list is not a mapping."""
+
+    raw_values = obs.get("values")
+    if isinstance(raw_values, list):
+        return (
+            {"points": raw_values}
+            if _is_pressure_point_list(raw_values)
+            else {"series": raw_values}
+        )
+    if isinstance(raw_values, Mapping):
+        return dict(raw_values)
+    return {}
+
+
+def _method_claim_fields(
+    obs: Mapping[str, Any],
+    values: Mapping[str, Any],
+) -> tuple[
+    tuple[object, ...],
+    tuple[object, ...],
+    tuple[object, ...],
+    tuple[object, ...],
+    tuple[object, ...],
+]:
+    """Regime, method claims, printed method, evidence, and notice evidence.
+
+    Regime stays its own tuple. A declared printed method must not be
+    overridden by a regime label, and the caller must not drop that label
+    before the resolver sees it. The split plan and the row migration both
+    read this tuple.
+    """
+
+    derivation_method_candidates = tuple(
+        derivation.get("method")
+        for derivation in (obs.get("derivation"), values.get("derivation"))
+        if isinstance(derivation, Mapping)
+    )
+    standard_state_raw = obs.get("standard_state")
+    if not isinstance(standard_state_raw, Mapping):
+        standard_state_raw = values.get("standard_state")
+    standard_state_state = (
+        standard_state_raw.get("state")
+        if isinstance(standard_state_raw, Mapping)
+        else None
+    )
+    standard_state_value = (
+        standard_state_state.get("value")
+        if isinstance(standard_state_state, Mapping)
+        and standard_state_state.get("tag") == "value"
+        else None
+    )
+    iron_saturation_composition = (
+        standard_state_value.get("iron_saturation_composition")
+        if isinstance(standard_state_value, Mapping)
+        else None
+    )
+    standard_state_method = (
+        iron_saturation_composition.get("method")
+        if isinstance(iron_saturation_composition, Mapping)
+        else None
+    )
+    return (
+        (obs.get("regime"),),
+        (
+            obs.get("method"),
+            obs.get("measured_by_as_printed"),
+            obs.get("method_text"),
+            obs.get("analytical_method"),
+            obs.get("method_detail_as_printed"),
+            values.get("method"),
+            values.get("measured_by_as_printed"),
+            values.get("method_text"),
+            values.get("analytical_method"),
+            values.get("method_detail_as_printed"),
+        ),
+        (
+            obs.get("method_as_printed"),
+            values.get("method_as_printed"),
+        ),
+        (*derivation_method_candidates, standard_state_method),
+        (
+            obs.get("method_as_printed"),
+            values.get("method_as_printed"),
+            values.get("method_text"),
+            values.get("table_type"),
+            obs.get("note"),
+            values.get("note"),
+        ),
+    )
+
+
 def map_method(regime: object) -> State[MethodToken]:
     if not isinstance(regime, str) or not regime.strip():
         return State.unknown("source does not state method")
@@ -25154,6 +25246,10 @@ class Migrator:
         ] = {}
         self._declared_experiment_methods: dict[str, State[MethodToken]] = {}
         self._unstated_method_original_reason_by_experiment: dict[str, str] = {}
+        # Printed method that stays on the named experiment. None means no
+        # printed method stays: UNSPECIFIED rows keep the named id, and any
+        # other printed token splits. Missing means this extract was not planned.
+        self._method_split_home: dict[str, MethodToken | None] = {}
         self._author_derivations: dict[str, Derivation] = {}
         # Parents actually replaced by emitted children. Retarget uses this
         # exact map, never a prefix search.
@@ -26075,16 +26171,30 @@ class Migrator:
         method_evidence_candidates: tuple[object, ...],
         evidence_candidates: tuple[object, ...],
         quantity: Quantity | None,
+        regime_candidates: tuple[object, ...] = (),
+        commit: bool = True,
     ) -> tuple[State[MethodToken], Notice | None]:
         experiment = self.result.experiments.get(experiment_id)
         experiment_method = None if experiment is None else experiment.method
         declared_experiment_method = self._declared_experiment_methods.get(
             experiment_id
         )
+        # A regime label is not a second technique when the source already
+        # named a printed method on the experiment. Callers still pass it.
+        declared_method_is_printed = (
+            declared_experiment_method is not None
+            and declared_experiment_method.is_value
+            and declared_experiment_method.value is not MethodToken.UNSPECIFIED
+        )
+        active_method_candidates = (
+            method_raw_candidates
+            if declared_method_is_printed
+            else (*regime_candidates, *method_raw_candidates)
+        )
         claim_raw = next(
             (
                 text
-                for candidate in method_raw_candidates
+                for candidate in active_method_candidates
                 if (text := _method_text_value(candidate)) is not None
             ),
             None,
@@ -26105,7 +26215,7 @@ class Migrator:
             (
                 text
                 for candidate in (
-                    *method_raw_candidates,
+                    *active_method_candidates,
                     *printed_method_candidates,
                     *method_evidence_candidates,
                     *evidence_candidates,
@@ -26160,11 +26270,12 @@ class Migrator:
                     if method_source_text is not None
                     else method.reason or "source does not state method"
                 )
-                self._inferred_method_evidence_by_experiment[experiment_id] = (
-                    method_token,
-                    evidence,
-                    original_reason,
-                )
+                if commit:
+                    self._inferred_method_evidence_by_experiment[experiment_id] = (
+                        method_token,
+                        evidence,
+                        original_reason,
+                    )
                 method = State.of(method_token)
             elif _row_text_inherits_declared_method(
                 method_raw,
@@ -26209,7 +26320,7 @@ class Migrator:
                 )
             else:
                 original_reason = "source does not state method"
-            if method.is_unknown:
+            if method.is_unknown and commit:
                 self._unstated_method_original_reason_by_experiment.setdefault(
                     experiment_id, original_reason
                 )
@@ -26251,7 +26362,8 @@ class Migrator:
                 )
 
         if (
-            method.is_value
+            commit
+            and method.is_value
             and experiment is not None
             and experiment_method is not None
             and (
@@ -27071,6 +27183,137 @@ class Migrator:
             enriched.append(experiment)
         return {**doc, "experiments": enriched}
 
+    def _planned_base_experiment_id(
+        self,
+        obs: Mapping[str, Any],
+        values: Mapping[str, Any],
+        *,
+        work: Work,
+        source_id: str,
+        experiment_refs: Mapping[str, str],
+    ) -> str:
+        """Experiment id before a method suffix.
+
+        This matches the id `_migrate_extract_observation` starts from. It
+        does not call `_registry_id`: that records a referential-integrity
+        issue, and the row loop records it once.
+        """
+
+        raw_experiment = obs.get("experiment")
+        if raw_experiment is not None:
+            key = str(raw_experiment)
+            if key in experiment_refs:
+                return experiment_refs[key]
+            qualified = self._qualify_registry_id(
+                work.work_id, "experiment", raw_experiment
+            )
+            token = key.strip()
+            refused = "::" in token and not qualified.startswith(
+                f"{work.work_id}::experiment::"
+            )
+            if not refused:
+                return qualified
+        distinguisher = None
+        cid = values.get("composition_id") or values.get("composition_name")
+        if cid not in (None, ""):
+            distinguisher = str(cid)
+        return self._experiment_id(
+            work.work_id, None, source_id, distinguisher=distinguisher
+        )
+
+    def _plan_method_split_homes(
+        self,
+        rows: list[tuple[str, Mapping[str, Any]]],
+        experiment_refs: Mapping[str, str],
+        *,
+        work: Work,
+        source_id: str,
+    ) -> None:
+        """Choose the printed method that stays on each named experiment.
+
+        The choice uses every row, so it does not depend on arrival order.
+        UNSPECIFIED is not a printed method. One shared printed method
+        stays (no second id). An unstated experiment that also has
+        unspecified rows keeps those rows and splits the printed method.
+        Several printed methods keep one home; the others split.
+        """
+
+        printed: dict[str, set[MethodToken]] = defaultdict(set)
+        saw_unstated: set[str] = set()
+        for _formula, obs in rows:
+            if not obs.get("observation_id"):
+                continue
+            values = _plain_observation_values(obs)
+            experiment_id = self._planned_base_experiment_id(
+                obs,
+                values,
+                work=work,
+                source_id=source_id,
+                experiment_refs=experiment_refs,
+            )
+            (
+                regime_candidates,
+                method_raw_candidates,
+                printed_method_candidates,
+                method_evidence_candidates,
+                evidence_candidates,
+            ) = _method_claim_fields(obs, values)
+            method, _notice = self._resolve_method_for_observation(
+                observation_id=f"{source_id}::{obs.get('observation_id')}",
+                experiment_id=experiment_id,
+                method=State.unknown("source does not state method"),
+                method_raw_candidates=method_raw_candidates,
+                printed_method_candidates=printed_method_candidates,
+                method_evidence_candidates=method_evidence_candidates,
+                evidence_candidates=evidence_candidates,
+                quantity=None,
+                regime_candidates=regime_candidates,
+                commit=False,
+            )
+            if (
+                not method.is_value
+                or method.value is MethodToken.UNSPECIFIED
+            ):
+                saw_unstated.add(experiment_id)
+            else:
+                printed[experiment_id].add(method.value)
+        for experiment_id in set(printed) | saw_unstated:
+            tokens = printed.get(experiment_id, set())
+            declared = self._declared_experiment_methods.get(experiment_id)
+            declared_printed = (
+                declared.value
+                if declared is not None
+                and declared.is_value
+                and declared.value is not MethodToken.UNSPECIFIED
+                else None
+            )
+            if declared_printed is not None:
+                home: MethodToken | None = declared_printed
+            elif len(tokens) == 1 and experiment_id not in saw_unstated:
+                home = next(iter(tokens))
+            elif len(tokens) > 1:
+                home = min(tokens, key=lambda token: token.value)
+            else:
+                home = None
+            self._method_split_home[experiment_id] = home
+
+    def _method_row_splits(
+        self,
+        experiment_id: str,
+        method: State[MethodToken],
+    ) -> bool:
+        """Mint a second id only for a printed method that is not the home.
+
+        UNSPECIFIED stays on the named experiment. The same printed method
+        as the home stays. A different printed method splits.
+        """
+
+        if not method.is_value or method.value is MethodToken.UNSPECIFIED:
+            return False
+        if experiment_id not in self._method_split_home:
+            return False
+        return self._method_split_home[experiment_id] is not method.value
+
     def _migrate_extract(self, path: Path) -> None:
         rel = path.relative_to(self.root).as_posix() if path.is_relative_to(self.root) else str(path)
         count = self._count(rel)
@@ -27123,6 +27366,10 @@ class Migrator:
             else None
         )
         rows = list(iter_extract_observations(doc))
+        self._method_split_home.clear()
+        self._plan_method_split_homes(
+            rows, experiment_refs, work=work, source_id=source_id
+        )
         fusion_transition_rows = self._fusion_transition_rows_by_table_row(rows)
         pressure_identity_context = _pressure_identity_context(doc, rows)
         raw_experiments = doc.get("experiments") or ()
@@ -27499,17 +27746,7 @@ class Migrator:
                 "_migrate_extract_observation"
             )
         obs_id = f"{source_id}::{raw_obs_id}"
-        raw_values = obs.get("values")
-        if isinstance(raw_values, list):
-            values = (
-                {"points": raw_values}
-                if _is_pressure_point_list(raw_values)
-                else {"series": raw_values}
-            )
-        elif isinstance(raw_values, Mapping):
-            values = dict(raw_values)
-        else:
-            values = {}
+        values = _plain_observation_values(obs)
         context = source_context or {}
         closure_components_by_observation = context.get(
             "same_row_composition_closure_components"
@@ -29006,56 +29243,13 @@ class Migrator:
         rail_raw = obs.get("rail") or values.get("rail")
         if rail_raw:
             canonicalize_rail(str(rail_raw))
-        derivation_method_candidates = tuple(
-            derivation.get("method")
-            for derivation in (obs.get("derivation"), values.get("derivation"))
-            if isinstance(derivation, Mapping)
-        )
-        standard_state_raw = obs.get("standard_state")
-        if not isinstance(standard_state_raw, Mapping):
-            standard_state_raw = values.get("standard_state")
-        standard_state_state = (
-            standard_state_raw.get("state")
-            if isinstance(standard_state_raw, Mapping)
-            else None
-        )
-        standard_state_value = (
-            standard_state_state.get("value")
-            if isinstance(standard_state_state, Mapping)
-            and standard_state_state.get("tag") == "value"
-            else None
-        )
-        iron_saturation_composition = (
-            standard_state_value.get("iron_saturation_composition")
-            if isinstance(standard_state_value, Mapping)
-            else None
-        )
-        standard_state_method = (
-            iron_saturation_composition.get("method")
-            if isinstance(iron_saturation_composition, Mapping)
-            else None
-        )
-        method_raw_candidates = (
-            obs.get("regime"),
-            obs.get("method"),
-            obs.get("measured_by_as_printed"),
-            obs.get("method_text"),
-            obs.get("analytical_method"),
-            obs.get("method_detail_as_printed"),
-            values.get("method"),
-            values.get("measured_by_as_printed"),
-            values.get("method_text"),
-            values.get("analytical_method"),
-            values.get("method_detail_as_printed"),
-        )
-        printed_method_candidates = (
-            obs.get("method_as_printed"),
-            values.get("method_as_printed"),
-        )
-        method_evidence_candidates = (
-            *derivation_method_candidates,
-            standard_state_method,
-        )
+        (
+            regime_candidates,
+            method_raw_candidates,
+            printed_method_candidates,
+            method_evidence_candidates,
+            evidence_candidates,
+        ) = _method_claim_fields(obs, values)
         method = State.unknown("source does not state method")
         quantity_for_notice = q_token if isinstance(q_token, Quantity) else None
         method, method_notice = self._resolve_method_for_observation(
@@ -29065,39 +29259,16 @@ class Migrator:
             method_raw_candidates=method_raw_candidates,
             printed_method_candidates=printed_method_candidates,
             method_evidence_candidates=method_evidence_candidates,
-            evidence_candidates=(
-                obs.get("method_as_printed"),
-                values.get("method_as_printed"),
-                values.get("method_text"),
-                values.get("table_type"),
-                obs.get("note"),
-                values.get("note"),
-            ),
+            evidence_candidates=evidence_candidates,
             quantity=quantity_for_notice,
-        )
-        declared_experiment_method = self._declared_experiment_methods.get(
-            declared_experiment_id
-        )
-        experiment_method_is_unstated = (
-            declared_experiment_id is not None
-            and (
-                declared_experiment_method is None
-                or not declared_experiment_method.is_value
-            )
-        )
-        experiment_method_conflicts = (
-            experiment_before_method_resolution is not None
-            and experiment_before_method_resolution.method.is_value
-            and method.is_value
-            and experiment_before_method_resolution.method.value is not method.value
+            regime_candidates=regime_candidates,
         )
         former_experiment_id = experiment_id
-        if method.is_value and (
-            experiment_method_is_unstated or experiment_method_conflicts
-        ):
-            # A shared experiment can group rows only while their typed method
-            # decisions agree. An unstated registry method cannot take the
-            # first row's method as its experiment-wide value.
+        if self._method_row_splits(experiment_id, method):
+            # A different printed method gets its own id. UNSPECIFIED and the
+            # home method stay on the experiment the source named. The home
+            # was chosen from every row, so an unstated registry method does
+            # not take the first row's method as its experiment-wide value.
             self._inferred_method_evidence_by_experiment.pop(experiment_id, None)
             if experiment_before_method_resolution is not None:
                 self.result.experiments[experiment_id] = (

@@ -268,7 +268,9 @@ BRITT_DECLARED_EXPERIMENT = f"{BRITT_SOURCE}::experiment::xrf-ci"
 def _assert_britt_registry_map_is_not_repeated(result):
     rows = _rows_for_local_id(result, BRITT_SOURCE, BRITT_CI_ROW)
     assert rows
-    assert any(row.experiment_id != BRITT_DECLARED_EXPERIMENT for row in rows)
+    # Unmapped XRF text is UNSPECIFIED, not a second method. The rows stay
+    # on the named experiment. The sample map stays on that experiment.
+    assert all(row.experiment_id == BRITT_DECLARED_EXPERIMENT for row in rows)
     assert all(
         "printed_composition" not in (row.point_conditions or {})
         for row in rows
@@ -305,3 +307,62 @@ def test_britt_registry_repeat_mutation_restores_post_split_key_bug(
 
     with pytest.raises(AssertionError):
         _assert_britt_registry_map_is_not_repeated(result)
+
+
+def _fixture_with_unstated_method():
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    source_row = extract["species"]["Na"]["observations"][0]
+    source_row.pop("regime", None)
+    source_row["experiment"] = "declared-run"
+    source_row["observation_id"] = "unstated-a"
+    other = yaml.safe_load(yaml.safe_dump(source_row))
+    other["observation_id"] = "unstated-b"
+    extract["experiments"] = [{"experiment_id": "declared-run"}]
+    extract["species"]["Na"]["observations"] = [source_row, other]
+    return extract
+
+
+def _unstated_experiment_ids(result, source_id):
+    rows = [
+        *_rows_for_local_id(result, source_id, "unstated-a"),
+        *_rows_for_local_id(result, source_id, "unstated-b"),
+    ]
+    assert rows
+    return {row.experiment_id for row in rows}
+
+
+def test_unstated_method_does_not_mint_a_second_experiment(tmp_path):
+    extract = _fixture_with_unstated_method()
+    result = _migrate_real_extract(
+        tmp_path, "zhang-2021-acsesc-si.yaml", extract_doc=extract
+    )
+    experiment_ids = _unstated_experiment_ids(result, extract["source_id"])
+    assert len(experiment_ids) == 1
+    assert not any(experiment_id.endswith(":unspecified") for experiment_id in experiment_ids)
+
+
+def test_legacy_unspecified_split_mints_a_second_experiment(tmp_path, monkeypatch):
+    """The old rule treated UNSPECIFIED as its own method and doubled the run."""
+
+    extract = _fixture_with_unstated_method()
+    original = Migrator._method_row_splits
+
+    def split_unspecified(self, experiment_id, method):
+        if (
+            method.is_value
+            and method.value is MethodToken.UNSPECIFIED
+            and experiment_id in self._method_split_home
+        ):
+            return True
+        return original(self, experiment_id, method)
+
+    monkeypatch.setattr(Migrator, "_method_row_splits", split_unspecified)
+    result = _migrate_real_extract(
+        tmp_path, "zhang-2021-acsesc-si.yaml", extract_doc=extract
+    )
+    with pytest.raises(AssertionError):
+        experiment_ids = _unstated_experiment_ids(result, extract["source_id"])
+        assert len(experiment_ids) == 1
+        assert not any(
+            experiment_id.endswith(":unspecified") for experiment_id in experiment_ids
+        )
