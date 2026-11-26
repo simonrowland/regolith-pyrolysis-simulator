@@ -11439,7 +11439,10 @@ def test_sso2_owner_execution_uses_certified_na_dose_and_partition_path() -> Non
     assert partition_basis["native_fe_source_account"] == "process.cleaned_melt"
     assert partition_basis["native_fe_split_commit_status"] == "ok"
     assert partition_basis["native_fe_vapor_route_status"] == "committed"
-    assert partition["native_fe_saturation_split_count"] == 0
+    # Receipt f527cd9f. The same precipitation commits five saturation
+    # splits. The old pin expected none because the metal-phase tap was
+    # the only Fe path.
+    assert partition["native_fe_saturation_split_count"] == 5
     assert partition["native_fe_metal_partition_count"] >= 1
     assert partition["native_fe_partition_transition_count"] >= 1
     assert partition["tap_basis"]["status"] == "available"

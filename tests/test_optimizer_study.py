@@ -3861,8 +3861,11 @@ def test_parallel_composition_target_stub_study_completes(
                 3.600782827250454e-08,
                 rel=1e-9,
             )
+            # Same receipt f527cd9f. The cumulative is the per-campaign
+            # deposit times the 24/35 campaign fraction this run covers:
+            # 3.600782827250454e-08 * 24 / 35 = 2.4691082244003112e-08 kg.
             assert summary["wall_deposit_cumulative_kg_by_species"]["Fe"] == (
-                pytest.approx(4.238593160063097e-12, rel=1e-9)
+                pytest.approx(2.4691082244003112e-08, rel=1e-9)
             )
             # Derivation (kg/run): the direct congruent JANAF pressure for
             # FeO(cr)=FeO(g) enters the 24-hour activity-1 Hertz-Knudsen
