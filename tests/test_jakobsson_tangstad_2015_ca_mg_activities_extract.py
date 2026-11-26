@@ -1,6 +1,7 @@
 """Independent render-grid and isolated migration checks for Jakobsson and Tangstad (2015)."""
 
 from copy import deepcopy
+from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
 
@@ -119,26 +120,26 @@ FIGURE9_READS = {
 FIGURE9_X = ["0.49", "0.53", "0.55"]
 
 FIGURE10C_READS = [
-    ("present_work", "Present work", "0.05", "0.246", "0.139", "0.615", "model_derived", "held_out_present_work"),
-    ("present_work", "Present work", "0.1", "0.105", "0.291", "0.604", "model_derived", "held_out_present_work"),
-    ("present_work", "Present work", "0.15", "0.000", "0.499", "0.501", "model_derived", "held_out_present_work"),
-    ("present_work", "Present work", "0.2", "0.047", "0.503", "0.450", "model_derived", "held_out_present_work"),
-    ("present_work", "Present work", "0.3", "0.196", "0.387", "0.417", "model_derived", "held_out_present_work"),
-    ("present_work", "Present work", "0.5", "0.591", "0.216", "0.193", "model_derived", "held_out_present_work"),
-    ("rein_chipman", "Rein and Chipman", "0.06", "0.584", "0.037", "0.379", "quoted_attributed", "prior_source_replot_not_held_out"),
-    ("rein_chipman", "Rein and Chipman", "0.1", "0.692", "0.039", "0.269", "quoted_attributed", "prior_source_replot_not_held_out"),
-    ("rein_chipman", "Rein and Chipman", "0.2", "0.843", "0.028", "0.129", "quoted_attributed", "prior_source_replot_not_held_out"),
-    ("rein_chipman", "Rein and Chipman", "0.5", "0.634", "0.188", "0.178", "quoted_attributed", "prior_source_replot_not_held_out"),
-    ("morita", "Morita et al.", "0.1", "0.549", "0.113", "0.338", "quoted_attributed", "prior_source_replot_not_held_out"),
-    ("morita", "Morita et al.", "0.2", "0.269", "0.294", "0.437", "quoted_attributed", "prior_source_replot_not_held_out"),
-    ("morita", "Morita et al.", "0.3", "0.197", "0.378", "0.425", "quoted_attributed", "prior_source_replot_not_held_out"),
-    ("morita", "Morita et al.", "0.5", "0.278", "0.386", "0.336", "quoted_attributed", "prior_source_replot_not_held_out"),
-    ("jung", "Jung et al.", "0.05", "0.257", "0.110", "0.633", "quoted_attributed", "prior_source_replot_not_held_out"),
-    ("jung", "Jung et al.", "0.17", "0.055", "0.329", "0.616", "quoted_attributed", "prior_source_replot_not_held_out"),
-    ("jung", "Jung et al.", "0.15", "0.000", "0.483", "0.517", "quoted_attributed", "prior_source_replot_not_held_out"),
-    ("jung", "Jung et al.", "0.2", "0.005", "0.525", "0.470", "quoted_attributed", "prior_source_replot_not_held_out"),
-    ("jung", "Jung et al.", "0.3", "0.213", "0.394", "0.393", "quoted_attributed", "prior_source_replot_not_held_out"),
-    ("jung", "Jung et al.", "0.5", "0.265", "0.415", "0.320", "quoted_attributed", "prior_source_replot_not_held_out"),
+    ("present_work", "Present work", "0.05", "model_derived", "held_out_present_work"),
+    ("present_work", "Present work", "0.1", "model_derived", "held_out_present_work"),
+    ("present_work", "Present work", "0.15", "model_derived", "held_out_present_work"),
+    ("present_work", "Present work", "0.2", "model_derived", "held_out_present_work"),
+    ("present_work", "Present work", "0.3", "model_derived", "held_out_present_work"),
+    ("present_work", "Present work", "0.5", "model_derived", "held_out_present_work"),
+    ("rein_chipman", "Rein and Chipman", "0.06", "quoted_attributed", "prior_source_replot_not_held_out"),
+    ("rein_chipman", "Rein and Chipman", "0.1", "quoted_attributed", "prior_source_replot_not_held_out"),
+    ("rein_chipman", "Rein and Chipman", "0.2", "quoted_attributed", "prior_source_replot_not_held_out"),
+    ("rein_chipman", "Rein and Chipman", "0.5", "quoted_attributed", "prior_source_replot_not_held_out"),
+    ("morita", "Morita et al.", "0.1", "quoted_attributed", "prior_source_replot_not_held_out"),
+    ("morita", "Morita et al.", "0.2", "quoted_attributed", "prior_source_replot_not_held_out"),
+    ("morita", "Morita et al.", "0.3", "quoted_attributed", "prior_source_replot_not_held_out"),
+    ("morita", "Morita et al.", "0.5", "quoted_attributed", "prior_source_replot_not_held_out"),
+    ("jung", "Jung et al.", "0.05", "quoted_attributed", "prior_source_replot_not_held_out"),
+    ("jung", "Jung et al.", "0.17", "quoted_attributed", "prior_source_replot_not_held_out"),
+    ("jung", "Jung et al.", "0.15", "quoted_attributed", "prior_source_replot_not_held_out"),
+    ("jung", "Jung et al.", "0.2", "quoted_attributed", "prior_source_replot_not_held_out"),
+    ("jung", "Jung et al.", "0.3", "quoted_attributed", "prior_source_replot_not_held_out"),
+    ("jung", "Jung et al.", "0.5", "quoted_attributed", "prior_source_replot_not_held_out"),
 ]
 
 
@@ -248,7 +249,7 @@ def test_all_typed_rows_migrate_with_species_temperature_and_conditions():
     migrator.finalize()
 
     records = list(migrator.result.observations.values())
-    assert len(records) == 124
+    assert len(records) == 80
     assert not migrator.result.validation.hard_issues
     assert not migrator.result.registry_issues
     migrated = {record.observation_id.split("::", 1)[1]: record for record in records}
@@ -297,8 +298,10 @@ def test_all_typed_rows_migrate_with_species_temperature_and_conditions():
             assert temperature.locator is not None and temperature.locator.pdf_page_index in {5, 6, 8, 9}
             composition = record.point_conditions["composition"]
             assert composition.locator is not None
-            if "figure9_" in row["observation_id"] or "figure10c_" in row["observation_id"]:
+            if "figure9_" in row["observation_id"]:
                 assert composition.state.is_value
+            elif "figure10c_" in row["observation_id"]:
+                assert composition.state.is_unknown
 
     outlier_rows = {
         (row["values"]["sample_id"], row["values"]["formula"]): row
@@ -317,10 +320,17 @@ def test_all_typed_rows_migrate_with_species_temperature_and_conditions():
         for figure in figures:
             obs_id = figure["observation_id"]
             digitisation = figure["values"]["digitisation"]
-            if "figure_9_" in obs_id or obs_id == "jakobsson_2015_figure_10_panel_c_mgo_activity":
-                assert digitisation.startswith("figure-read")
+            if "figure_9_" in obs_id:
+                assert "present-work curve reads" in digitisation
+                assert figure["values"]["figure_read_point_count"] == 3
+                assert figure["values"]["context_point_count"] == 15
+            elif obs_id == "jakobsson_2015_figure_10_panel_c_mgo_activity":
+                assert "without ternary compositions" in digitisation
+                assert figure["values"]["figure_read_point_count"] == 6
+                assert figure["values"]["context_point_count"] == 14
             elif obs_id == "jakobsson_2015_figure_10_panel_a_sio2_activity":
-                assert "no printed numerical" in digitisation
+                assert "0.1–0.9" in digitisation
+                assert "deferred" in digitisation
             else:
                 assert digitisation == "deferred to a figure pass"
             assert "points" not in figure["values"]
@@ -416,19 +426,59 @@ def test_figure_activity_reads_pin_every_series_label_and_standard_state():
         for body in document["species"].values()
         for row in body["observations"]
     }
+    figure_records = {
+        item["observation_id"]: item
+        for body in document["species"].values()
+        for item in body["context"]
+        if item["type"] == "figure_record"
+    }
+    coverage = {
+        item["field_path"]: item
+        for item in document["fidelity_samples"]
+        if "field_path" in item
+    }
+    for row in rows.values():
+        if row["values"].get("source_relation") != "held_out_present_work":
+            continue
+        observation_id = row["observation_id"]
+        common_locator = row["locator"]
+        species = row["values"]["formula"]
+        assert all(condition["locator"] is common_locator for condition in row["point_conditions"].values())
+        assert row["measurement_method"]["locator"] is common_locator
+        assert row["uncertainty"]["locator"] is common_locator
+        for field in ("values", "point_conditions"):
+            entry = coverage[f"species.{species}.observations[{observation_id}].{field}"]
+            assert entry["locator"] is common_locator
+            if field == "point_conditions":
+                assert all(condition["locator"] == common_locator for condition in entry["value"].values())
 
-    figure9_count = 0
+    figure9_scored_count = 0
+    figure9_context_count = 0
+    figure9_references = {
+        "rein_chipman": "[15]",
+        "morita": "[2]",
+        "kambayashi_kato": "[31]",
+        "jung": "[33]",
+        "zaitsev": "[32]",
+    }
     for species, series_rows in FIGURE9_READS.items():
         panel = "upper" if species == "SiO2" else "lower"
         axis = f"a_{species}(s)"
+        figure_id = f"jakobsson_2015_figure_9_{species.lower()}_activity"
+        figure = figure_records[figure_id]
+        present_series = next(series for series in figure["values"]["series"] if series["name"] == "present work")
+        assert present_series["evidence_class"] == "model_derived"
+        assert present_series["role"] == "scored present-work observations"
+        context_reads = {
+            item["observation_id"]: item
+            for item in figure["values"]["prior_series_context_reads"]
+        }
         for slug, name, evidence, source_relation, activities in series_rows:
             for x, activity in zip(FIGURE9_X, activities, strict=True):
                 observation_id = (
                     f"jakobsson_2015_figure9_{species.lower()}_{slug}_x{x.replace('.', '')}"
                 )
-                row = rows[observation_id]
-                figure9_count += 1
-                assert row["locator"] == {
+                expected_locator = {
                     "page": 9,
                     "published_page": 603,
                     "pdf_page_index": 8,
@@ -438,84 +488,218 @@ def test_figure_activity_reads_pin_every_series_label_and_standard_state():
                     "column": axis,
                     "line_range": "555-609",
                 }
-                assert row["values"]["activity_as_published"] == activity
-                assert row["values"]["digitisation"] == "figure-read"
-                assert row["values"]["digitisation_uncertainty"] == {
-                    "activity": "±0.01 dimensionless activity units",
-                    "x_SiO2": "±0.001 mole fraction",
-                }
-                assert row["values"]["method_class"] == evidence
-                assert row["values"]["source_relation"] == source_relation
-                assert "Raoultian pure solid" in row["values"]["standard_state_as_printed"]
-                assert row["uncertainty"]["value"] == 0.01
-                components = row["point_conditions"]["composition"]["state"]["value"]["components"]
-                assert dict(components) == {
-                    "SiO2": x,
-                    "MgO": format(1 - float(x), ".2f"),
-                }
-                method_state = row["measurement_method"]["state"]
-                assert method_state["tag"] == ("unknown" if slug == "morita" else "value")
-    assert figure9_count == 36
+                if slug == "present_work":
+                    row = rows[observation_id]
+                    figure9_scored_count += 1
+                    assert row["locator"] == expected_locator
+                    assert row["values"]["activity_as_published"] == activity
+                    assert row["values"]["digitisation"] == "figure-read"
+                    assert row["values"]["digitisation_uncertainty"] == {
+                        "activity": "±0.01 dimensionless activity units",
+                        "x_SiO2": "±0.001 mole fraction",
+                    }
+                    assert row["values"]["method_class"] == evidence
+                    assert row["values"]["source_relation"] == source_relation
+                    assert "Raoultian pure solid" in row["values"]["standard_state_as_printed"]
+                    assert row["uncertainty"]["value"] == 0.01
+                    components = row["point_conditions"]["composition"]["state"]["value"]["components"]
+                    assert dict(components) == {
+                        "SiO2": x,
+                        "MgO": format(1 - float(x), ".2f"),
+                    }
+                    assert row["measurement_method"]["state"]["tag"] == "value"
+                    assert len(row["derived_from"]) == 5
+                    thermo = row["values"]["thermochemical_sources_as_printed"]
+                    assert len(thermo) == 4
+                    assert any(item["source_citation_as_printed"] == "Barin [24]" for item in thermo)
+                    assert any(item["source_citation_as_printed"] == "NIST–JANAF [23]" for item in thermo)
+                    assert any(item.get("delta_G_standard_as_printed") == "−1326.229 kJ/mol" for item in thermo)
+                    assert any(item.get("delta_G_standard_as_printed") == "−345.887 kJ/mol" for item in thermo)
+                    assert any(item.get("delta_G_standard_as_printed") == "−575.914 kJ/mol" for item in thermo)
+                    mg_silicate = next(item for item in thermo if item.get("oxide_as_printed") == "Mg2SiO4(s)")
+                    assert mg_silicate["formation_basis_as_printed"] == "from elements at 1873 K (1600 °C)"
+                    assert mg_silicate["saturation_reaction_as_printed"]["state"]["tag"] == "unknown"
+                    assert any(item.get("reaction_as_printed") == "2Mg(l) + O2(g) = 2MgO(s) [Eq. 20]" for item in thermo)
+                else:
+                    context = context_reads[observation_id]
+                    figure9_context_count += 1
+                    assert context["locator"] == expected_locator
+                    assert context["activity_as_published"] == activity
+                    assert context["source_relation"] == source_relation
+                    assert context["series_reference_as_printed"] == figure9_references[slug]
+                    assert context["temperature_K"]["state"]["tag"] == "unknown"
+                    expected_uncertainty = (
+                        "±0.03 dimensionless activity units"
+                        if species == "SiO2" and x in {"0.53", "0.55"}
+                        else "±0.01 dimensionless activity units"
+                    )
+                    assert context["digitisation_uncertainty"]["activity"] == expected_uncertainty
+                    assert context["digitisation_uncertainty"]["x_SiO2"] == "±0.001 mole fraction"
+                    components = context["binary_composition_as_digitised"]["components"]
+                    assert dict(components) == {
+                        "SiO2": x,
+                        "MgO": format(1 - float(x), ".2f"),
+                    }
+                    if slug == "kambayashi_kato":
+                        assert "1973 K" in context["temperature_K"]["state"]["reason"]
+                        assert "shifted" in context["temperature_K"]["state"]["reason"]
+    assert figure9_scored_count == 6
+    assert figure9_context_count == 30
 
-    figure10c_count = 0
-    for slug, name, activity, cao, mgo, sio2, evidence, source_relation in FIGURE10C_READS:
+    figure10c_scored_count = 0
+    figure10c_context_count = 0
+    figure10c_figure = figure_records["jakobsson_2015_figure_10_panel_c_mgo_activity"]
+    figure10c_context = {
+        item["observation_id"]: item
+        for item in figure10c_figure["values"]["prior_series_context_reads"]
+    }
+    references = {"rein_chipman": "[15]", "morita": "[34]", "jung": "[10]"}
+    for slug, name, activity, evidence, source_relation in FIGURE10C_READS:
         observation_id = f"jakobsson_2015_figure10c_mgo_{slug}_{activity.replace('.', '')}"
-        row = rows[observation_id]
-        figure10c_count += 1
         label = {
             "present_work": activity,
             "rein_chipman": f"[{activity}]",
             "morita": f"({activity})",
             "jung": f"<{activity}>",
         }[slug]
-        assert row["locator"] == {
-            "page": 10,
-            "published_page": 604,
-            "pdf_page_index": 9,
-            "figure": "10",
-            "panel": "c",
-            "row": f"{name} contour label {label}",
-            "column": "a_MgO(s) contour and ternary composition axes",
-            "line_range": "611-660",
-        }
-        assert row["values"]["activity_as_published"] == activity
-        assert row["values"]["series_label_as_printed"] == label
-        assert row["values"]["digitisation"] == "figure-read"
-        assert row["values"]["digitisation_uncertainty"]["composition"] == (
-            "±0.02 mole fraction on each ternary component"
-        )
-        assert row["values"]["method_class"] == evidence
-        assert row["values"]["source_relation"] == source_relation
-        assert "Raoultian pure solid MgO(s)" in row["values"]["standard_state_as_printed"]
-        components = row["point_conditions"]["composition"]["state"]["value"]["components"]
-        assert dict(components) == {"CaO": cao, "MgO": mgo, "SiO2": sio2}
-        method_state = row["measurement_method"]["state"]
-        assert method_state["tag"] == ("value" if slug == "present_work" else "unknown")
-    assert figure10c_count == 20
+        if slug == "present_work":
+            row = rows[observation_id]
+            figure10c_scored_count += 1
+            assert row["locator"]["page"] == 10
+            assert row["locator"]["published_page"] == 604
+            assert row["locator"]["pdf_page_index"] == 9
+            assert row["locator"]["figure"] == "10"
+            assert row["locator"]["panel"] == "c"
+            assert row["locator"]["row"] == f"{name} contour label {label}"
+            assert row["locator"]["line_range"] == "611-660"
+            assert "composition not assigned" in row["locator"]["column"]
+            assert row["values"]["activity_as_published"] == activity
+            assert row["values"]["series_label_as_printed"] == label
+            assert row["values"]["digitisation"] == "printed activity label; no ternary composition assigned"
+            assert "composition" not in row["values"]["digitisation_uncertainty"]
+            assert row["values"]["method_class"] == evidence
+            assert row["values"]["source_relation"] == source_relation
+            assert "Raoultian pure solid MgO(s)" in row["values"]["standard_state_as_printed"]
+            assert row["point_conditions"]["composition"]["state"]["tag"] == "unknown"
+            assert row["uncertainty"]["kind"] == "none"
+            assert len(row["derived_from"]) == 40
+            thermo = row["values"]["thermochemical_sources_as_printed"]
+            assert len(thermo) == 7
+            assert any(item["source_citation_as_printed"] == "Barin [24]" for item in thermo)
+            assert any(item["source_citation_as_printed"] == "NIST–JANAF [23]" for item in thermo)
+            assert {
+                "−575.914 kJ/mol",
+                "−426.199 kJ/mol",
+                "−1573.218 kJ/mol",
+                "−869.028 kJ/mol",
+                "−1326.229 kJ/mol",
+                "−345.887 kJ/mol",
+                "−784.402 kJ/mol",
+            } <= {item.get("delta_G_standard_as_printed") for item in thermo}
+            mg_silicate = next(item for item in thermo if item.get("oxide_as_printed") == "Mg2SiO4(s)")
+            assert mg_silicate["formation_basis_as_printed"] == "from elements at 1873 K (1600 °C)"
+            assert mg_silicate["saturation_reaction_as_printed"]["state"]["tag"] == "unknown"
+            assert any(item.get("reaction_as_printed") == "2Ca(l) + O2(g) = 2CaO(s) [Eq. 18]" for item in thermo)
+            assert any(item.get("reaction_as_printed") == "2Mg(l) + O2(g) = 2MgO(s) [Eq. 20]" for item in thermo)
+            assert any(item.get("reaction_as_printed") == "Ca2SiO4(s) = 2CaO(s) + SiO2(s) [Eq. 16]" for item in thermo)
+            assert row["measurement_method"]["state"]["tag"] == "value"
+        else:
+            context = figure10c_context[observation_id]
+            figure10c_context_count += 1
+            assert context["series_as_printed"] == name
+            assert context["series_reference_as_printed"] == references[slug]
+            assert context["activity_as_published"] == activity
+            assert context["series_label_as_printed"] == label
+            assert context["source_relation"] == source_relation
+            assert context["ternary_composition"]["state"]["tag"] == "unknown"
+            assert "not a verified on-contour coordinate" in context["ternary_composition"]["state"]["reason"]
+            assert context["locator"]["page"] == 10
+            assert context["locator"]["published_page"] == 604
+            assert context["locator"]["pdf_page_index"] == 9
+            assert context["locator"]["figure"] == "10"
+            assert context["locator"]["panel"] == "c"
+            assert context["locator"]["row"] == f"{name} contour label {label}"
+            assert context["locator"]["line_range"] == "611-660"
+    assert figure10c_scored_count == 6
+    assert figure10c_context_count == 14
 
 
-def test_figure_activity_observations_reach_melt_activity_rail_and_mutation_fails(monkeypatch):
+def test_figure_activity_observations_reach_melt_activity_rail_and_replot_mutation_fails(monkeypatch):
     migrator = Migrator(root=ROOT, index={}, aliases={})
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
+    migrated = {
+        record.observation_id.split("::", 1)[1]: record
+        for record in migrator.result.observations.values()
+    }
     figure_rows = [
         record
         for record in migrator.result.observations.values()
         if "figure9_" in record.observation_id or "figure10c_" in record.observation_id
     ]
-    assert len(figure_rows) == 56
+    assert len(figure_rows) == 12
+    assert {record.observation_id.split("::", 1)[1] for record in figure_rows} == {
+        oid for oid in migrated if "figure9_" in oid or "figure10c_" in oid
+    }
 
-    def assert_activity_rail(records):
-        for record in records:
-            assert record.identity.quantity.is_value
-            assert record.identity.quantity.value is Quantity.ACTIVITY
-            assert battery_score.rail_for_quantity(record.identity.quantity.value) is Rail.MELT_ACTIVITY
+    for record in figure_rows:
+        assert record.identity.quantity.is_value
+        assert record.identity.quantity.value is Quantity.ACTIVITY
+        assert battery_score.rail_for_quantity(record.identity.quantity.value) is Rail.MELT_ACTIVITY
 
-    assert_activity_rail(figure_rows)
-    with pytest.raises(AssertionError):
-        with monkeypatch.context() as mutation:
-            mutation.setattr(battery_score, "rail_for_quantity", lambda *_args, **_kwargs: None)
-            assert_activity_rail(figure_rows)
+    document = _document()
+    prior_context_ids = {
+        point["observation_id"]
+        for body in document["species"].values()
+        for figure in body["context"]
+        if figure["type"] == "figure_record"
+        for point in figure["values"].get("prior_series_context_reads", [])
+    }
+    assert len(prior_context_ids) == 44
+    prior_candidate_ids = {f"{EXTRACT.stem}::{oid}" for oid in prior_context_ids}
+    context = battery_score.ScoreContext(
+        works=migrator.result.works,
+        experiments=migrator.result.experiments,
+        observations=migrator.result.observations,
+    )
+    candidates = {row.observation_id for row in battery_score.comparison_candidates(context)}
+
+    def assert_no_prior_replots(candidate_ids):
+        assert not (candidate_ids & prior_candidate_ids)
+
+    assert_no_prior_replots(candidates)
+    expected_present_ids = {row.observation_id for row in figure_rows}
+    assert expected_present_ids <= candidates
+
+    # Inject a candidate under a representative prior-series ID; the invariant
+    # must fail if that ID reaches comparison_candidates.
+    prior_id = sorted(prior_context_ids)[0]
+    prior_candidate_id = f"{EXTRACT.stem}::{prior_id}"
+    mutated_observation = replace(
+        figure_rows[0],
+        observation_id=prior_candidate_id,
+    )
+    mutated_observations = dict(migrator.result.observations)
+    mutated_observations[prior_candidate_id] = mutated_observation
+    mutated_context = battery_score.ScoreContext(
+        works=migrator.result.works,
+        experiments=migrator.result.experiments,
+        observations=mutated_observations,
+    )
+    real_comparison_candidates = battery_score.comparison_candidates
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            battery_score,
+            "comparison_candidates",
+            lambda _context: real_comparison_candidates(mutated_context),
+        )
+        mutated_candidates = {
+            row.observation_id
+            for row in battery_score.comparison_candidates(context)
+        }
+        assert prior_candidate_id in mutated_candidates
+        with pytest.raises(AssertionError):
+            assert_no_prior_replots(mutated_candidates)
 
 
 def test_extract_validator_covers_every_scored_leaf_and_reports_no_uncovered_observation():
