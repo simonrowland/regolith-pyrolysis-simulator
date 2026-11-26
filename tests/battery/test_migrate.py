@@ -70,6 +70,9 @@ from simulator.battery.migrate import (
     MigrationResult,
     QueueEntry,
     Migrator,
+    _InvalidDecimalValue,
+    _prune_carried_doi_aliases_to_live_works,
+    discover_extracts,
     UnknownRailSpellingError,
     UnresolvedEquipmentContextError,
     canonicalize_doi,
@@ -23116,19 +23119,98 @@ def test_exploded_rows_keep_parent_evidence_outside_author_estimates(
         } == {expected_attribution}
 
 
-@pytest.mark.cpu_budget(1800)
-def test_t1795_fold2_store_probe() -> None:
-    """Temporary matched-pair store regeneration receipt for the mass gate."""
+_T1795_COMPILATION_ROOT = REPO_ROOT / "data" / "literature" / "compilations"
+_T1795_COMPILATION_PATHS = tuple(
+    path
+    for path in sorted(_T1795_COMPILATION_ROOT.rglob("*"))
+    if path.is_file()
+    and path.suffix in {".yaml", ".yml", ".json"}
+    and path.name != "README.md"
+    and "__pycache__" not in path.parts
+)
+_T1795_COMPILATION_CHUNKS = tuple(
+    _T1795_COMPILATION_PATHS[index : index + 100]
+    for index in range(0, len(_T1795_COMPILATION_PATHS), 100)
+)
+_T1795_EXTRACT_PATHS = tuple(
+    discover_extracts(REPO_ROOT / "data" / "literature" / "extracts")
+)
 
+
+@pytest.fixture(scope="module")
+def _t1795_migrator() -> Migrator:
+    return Migrator(REPO_ROOT)
+
+
+def test_t1795_store_probe_index(_t1795_migrator: Migrator) -> None:
+    _t1795_migrator.migrate_index_only_sources()
+
+
+@pytest.mark.parametrize("path", _T1795_EXTRACT_PATHS, ids=lambda path: path.stem)
+def test_t1795_store_probe_extract(
+    _t1795_migrator: Migrator, path: Path
+) -> None:
+    relative = path.relative_to(REPO_ROOT).as_posix()
+    try:
+        _t1795_migrator._migrate_extract(path)
+    except _InvalidDecimalValue as exc:
+        _t1795_migrator._record_invalid_decimal_source(
+            f"extract[{relative}].numeric", exc
+        )
+
+
+@pytest.mark.parametrize(
+    ("method", "filename"),
+    (
+        ("_migrate_kems", "kems_measurements.yaml"),
+        ("_migrate_mre", "mre_measurements.yaml"),
+        ("_migrate_langmuir", "langmuir_knudsen_flux_validation.yaml"),
+        (
+            "_migrate_refractory",
+            "refractory_vaporization_validation.yaml",
+        ),
+        ("_migrate_vacuum_pyrolysis", "vacuum_pyrolysis_measurements.yaml"),
+        ("_migrate_ledger", "gibbs_battery_residual_ledger.yaml"),
+        ("_migrate_ledger", "species_rail_differential_ledger.yaml"),
+    ),
+)
+def test_t1795_store_probe_named_source(
+    _t1795_migrator: Migrator, method: str, filename: str
+) -> None:
+    getattr(_t1795_migrator, method)(_t1795_migrator.literature / filename)
+
+
+@pytest.mark.parametrize(
+    "paths",
+    _T1795_COMPILATION_CHUNKS,
+    ids=lambda paths: f"{paths[0].stem}-{paths[-1].stem}",
+)
+def test_t1795_store_probe_compilations(
+    _t1795_migrator: Migrator, paths: tuple[Path, ...]
+) -> None:
+    for path in paths:
+        _t1795_migrator._migrate_compilation_file(path)
+
+
+def test_t1795_store_probe_finalize(_t1795_migrator: Migrator) -> None:
+    _prune_carried_doi_aliases_to_live_works(
+        _t1795_migrator.result, _t1795_migrator._carried_aliases
+    )
+    _t1795_migrator.aliases = dict(_t1795_migrator.result.aliases)
+    _t1795_migrator.finalize()
+    assert _t1795_migrator.result.validation is not None
+
+
+def test_t1795_store_probe_write_and_validate(_t1795_migrator: Migrator) -> None:
     import json
     import warnings
 
-    from simulator.battery.migrate import REPO_ROOT, migrate
     from simulator.battery.store_validation import validate_migrated_store
 
-    result = migrate(REPO_ROOT, write=True)
-    assert result.validation is not None
+    result = _t1795_migrator.result
+    write_outputs(result, REPO_ROOT)
     record = validate_migrated_store(REPO_ROOT)
+    assert result.validation is not None
     hard_issues_by_source = Counter()
     for observation_id, issues in result.validation.hard_issues_by_observation.items():
         observation = result.observations.get(observation_id)
