@@ -8388,13 +8388,16 @@ def _curated_recursive_mutations(
     payload: Mapping[str, Any],
     artifact: str,
     source_name: str,
-) -> list[tuple[tuple[str, ...], str, Any]]:
+) -> list[tuple[tuple[Any, ...], str, Any]]:
     """Return representative admission mutations for a single captured row."""
     if artifact == "equilibrium_post_record":
         diagnostic = payload["last_vapor_pressure_diagnostic"]
         provenance = diagnostic.get("vapor_pressure_numerator_provenance")
         assert isinstance(provenance, Mapping) and provenance
         species = sorted(provenance)[0]
+        source_names = payload["last_vapor_pressures_source"]
+        assert isinstance(source_names, Mapping) and source_names
+        source_species = sorted(source_names)[0]
         mutations = [
             (("equilibrium_result", "temperature_C"), "delete", None),
             (
@@ -8437,6 +8440,16 @@ def _curated_recursive_mutations(
                 [],
             ),
             (("last_vapor_pressures_source",), "wrong-scalar", []),
+            # Keep a real source-entry deletion: it remains admitted and the
+            # full replay consumer completes for both stores.
+            (
+                (
+                    "last_vapor_pressures_source",
+                    _RecursiveMappingKey(source_species),
+                ),
+                "delete",
+                None,
+            ),
             (("last_vapor_pressure_diagnostic",), "none", None),
         ]
         equilibrium_result = payload["equilibrium_result"]
@@ -8471,6 +8484,19 @@ def _curated_recursive_mutations(
         raise AssertionError(f"unexpected recursive payload artifact: {artifact}")
     if source_name == "real-gate-step-down-output":
         return [
+            # This optional producer detail can be removed while the stored
+            # curve still replays through the real consumer in both stores.
+            (
+                (
+                    "curve",
+                    "gate_provider_step_down",
+                    "failed_providers",
+                    0,
+                    "status",
+                ),
+                "delete",
+                None,
+            ),
             (
                 ("curve", "gate_provider_step_down", "realized_provider"),
                 "delete",
@@ -8508,6 +8534,11 @@ def _curated_recursive_mutations(
 def _payload_path_exists(payload: Any, path: tuple[Any, ...]) -> bool:
     value = payload
     for part in path:
+        if isinstance(part, _RecursiveMappingKey):
+            if not isinstance(value, Mapping) or part.key not in value:
+                return False
+            value = value[part.key]
+            continue
         if isinstance(value, Mapping):
             if part not in value:
                 return False
@@ -9500,6 +9531,12 @@ def _run_real_cache_payload_recursive_mutations(
         for outcome in outcomes.values()
     )
     if artifact == "equilibrium_post_record":
+        source_species = sorted(baseline["last_vapor_pressures_source"])[0]
+        admitted_source_path = (
+            "encoded-row: root.last_vapor_pressures_source"
+            f"[key={source_species!r}] delete"
+        )
+        assert outcomes[admitted_source_path] == "admitted"
         source_reaction_path = (
             "encoded-row: "
             "root.last_vapor_pressure_diagnostic.source_reaction_fO2_bar"
@@ -9512,6 +9549,11 @@ def _run_real_cache_payload_recursive_mutations(
         )
         assert outcomes[high_t_cap_path] == "miss"
     else:
+        admitted_step_down_path = (
+            "real-gate-step-down-output: "
+            "root.curve.gate_provider_step_down.failed_providers[0].status delete"
+        )
+        assert outcomes[admitted_step_down_path] == "admitted"
         realized_provider_path = (
             "real-gate-step-down-output: "
             "root.curve.gate_provider_step_down.realized_provider delete"
