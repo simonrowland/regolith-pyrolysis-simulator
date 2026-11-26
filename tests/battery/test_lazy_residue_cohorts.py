@@ -90,7 +90,11 @@ def test_hashimoto_selected_experiments_match_full_rows_and_integrate_only_selec
         steps,
         geometry_policy_id,
         initial_area_m2,
+        gas_film=None,
     ):
+        # The film car passes gas_film into the geometry integrator.
+        # This double records which runs were integrated, not film transport.
+        del gas_film
         integrated_conditions.append((temperature_K, duration_s))
         values = residue._hashimoto_project_oxide_wt_pct(inventory)
         shift = 0.8 / steps
