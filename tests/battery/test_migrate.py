@@ -23114,3 +23114,35 @@ def test_exploded_rows_keep_parent_evidence_outside_author_estimates(
         assert {
             observation.evidence.attribution for observation in observations
         } == {expected_attribution}
+
+
+def test_t1795_fold2_store_probe() -> None:
+    """Temporary matched-pair store regeneration receipt for the mass gate."""
+
+    import json
+    import warnings
+
+    from simulator.battery.migrate import REPO_ROOT, migrate
+    from simulator.battery.store_validation import validate_migrated_store
+
+    result = migrate(REPO_ROOT, write=True)
+    assert result.validation is not None
+    record = validate_migrated_store(REPO_ROOT)
+    hard_issues_by_source = Counter()
+    for observation_id, issues in result.validation.hard_issues_by_observation.items():
+        observation = result.observations.get(observation_id)
+        source_id = None if observation is None else observation.source_id
+        hard_issues_by_source[source_id or "unattributed"] += len(issues)
+    warnings.warn(
+        "T1795_STORE_RESULT\t"
+        + json.dumps(
+            {
+                "observations": len(result.observations),
+                "hard_issue_count": len(result.validation.hard_issues),
+                "hard_issues_by_source": dict(sorted(hard_issues_by_source.items())),
+                "hard_issues_by_shape": record["hard_issue_counts_by_shape"],
+                "forbidden_shape_count": record["forbidden_shape_count"],
+            },
+            sort_keys=True,
+        )
+    )
