@@ -26350,14 +26350,28 @@ class Migrator:
                 method_was_unspecified = True
         if method_was_unspecified:
             # A tagged-unknown experiment method carries the printed sentence.
-            # The row starts as the placeholder "source does not state method",
-            # and a regime label is not that sentence. The placeholder must
-            # not erase it when DP-106 stores UNSPECIFIED. A row that stated
-            # its own method keeps that text. The two lift placeholders are
-            # not a published sentence.
+            # The row starts as the placeholder "source does not state method".
+            # A regime that does not map then rewrites that to
+            # "source method text is not mapped: <regime>". Neither text is
+            # the published sentence, and neither may erase it when DP-106
+            # stores UNSPECIFIED. A row that stated its own method keeps
+            # that text. The two lift placeholders are not a published
+            # sentence. A string experiment method lives on
+            # _unmapped_experiment_method_text for inference; its mapper
+            # diagnostic is not this sentence (Wetzel).
             row_stated_method = any(
                 _method_text_value(candidate) is not None
                 for candidate in method_raw_candidates
+            )
+            regime_is_not_the_published_sentence = (
+                regime_text is not None
+                and self._unmapped_experiment_method_text.get(experiment_id)
+                is None
+                and method.reason
+                in {
+                    f"source method text is not mapped: {regime_text}",
+                    f"source method text: {regime_text}",
+                }
             )
             published_experiment_reason = None
             if (
@@ -26372,6 +26386,7 @@ class Migrator:
                 and (
                     not method.reason
                     or method.reason == "source does not state method"
+                    or regime_is_not_the_published_sentence
                 )
             ):
                 published_experiment_reason = declared_experiment_method.reason
