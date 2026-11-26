@@ -109,6 +109,9 @@ ATOMIC_WEIGHTS_G_PER_MOL = MappingProxyType(
 
 MOLAR_MASS_ABS_TOLERANCE_G_MOL = 1e-9
 MOLAR_MASS_REL_TOLERANCE = 1e-6
+DIAMOND_POLYMORPH_REFUSAL_REASON = (
+    "diamond polymorph is not represented by the formula identity"
+)
 
 _OPEN_TO_CLOSE = {"(": ")", "[": "]", "{": "}"}
 _CLOSE_TO_OPEN = {v: k for k, v in _OPEN_TO_CLOSE.items()}
@@ -325,9 +328,7 @@ def parse_formula(
     if not cleaned:
         raise UnknownSpeciesError("formula is required")
     if name and re.search(r"\bdiamond\b", name, re.IGNORECASE):
-        raise UnknownSpeciesError(
-            "diamond polymorph is not represented by the formula identity"
-        )
+        raise UnknownSpeciesError(DIAMOND_POLYMORPH_REFUSAL_REASON)
     previous = None
     while cleaned and previous != cleaned:
         previous = cleaned
@@ -376,12 +377,13 @@ def _canonicalize_formula_from_printed_weight(
     name: str | None = None,
     repaired: bool = False,
 ) -> tuple[str | None, str]:
-    """Accept a case/OCR-repaired formula only against its printed mass.
+    """Accept source formula spellings only against their own printed mass.
 
     ``repaired`` marks an explicit source transcription or raster correction.
-    Without that flag, this helper is a no-op for an exact-case parse and only
-    considers a unique element-symbol case normalization. The return reason
-    is suitable for census evidence and typed-refusal diagnostics.
+    A spelling that parses exactly is retained without a weight only when it
+    needs no repair. Whenever a printed weight exists, exact and repaired
+    candidates must both match it. The return reason is suitable for source
+    evidence and typed-refusal diagnostics.
     """
 
     cleaned = _clean_formula_text(formula)
@@ -394,49 +396,49 @@ def _canonicalize_formula_from_printed_weight(
     try:
         parse_formula(body, name=name)
         normalized = body
-        exact_case_parses = True
     except AccountingError as exc:
-        if "diamond polymorph" in str(exc):
+        if DIAMOND_POLYMORPH_REFUSAL_REASON in str(exc):
             return None, str(exc)
-        exact_case_parses = False
         try:
             normalized = _unambiguous_element_case(body)
         except UnknownSpeciesError as exc:
             return None, f"ambiguous element case: {exc}"
     case_changed = normalized != body
-    if not repaired and exact_case_parses:
-        try:
-            parse_formula(formula, name=name)
-        except AccountingError as exc:
-            return None, f"exact-case formula did not parse: {exc}"
-        return formula, "accepted exact-case formula"
-    if not repaired and not case_changed:
-        try:
-            parse_formula(formula, name=name)
-        except AccountingError as exc:
-            return None, f"exact-case formula did not parse: {exc}"
-        return formula, "accepted exact-case formula"
+    repaired_or_case_folded = repaired or case_changed
+    if not repaired_or_case_folded:
+        candidate = formula
+    else:
+        candidate = normalized
+        if phase_suffix is not None:
+            raw_formula = (
+                cleaned[1:-1]
+                if cleaned.startswith("$") and cleaned.endswith("$")
+                else cleaned
+            )
+            raw_suffix = _RAW_PHASE_SUFFIX_RE.search(raw_formula)
+            candidate += (
+                raw_suffix.group(0)
+                if raw_suffix is not None
+                else f"({phase_suffix})"
+            )
     if printed_weight_g_mol is None or isinstance(printed_weight_g_mol, bool):
-        return None, "case/OCR repair has no printed formula weight"
+        if repaired_or_case_folded:
+            return None, "case/OCR repair has no printed formula weight"
+        try:
+            parse_formula(candidate, name=name)
+        except AccountingError as exc:
+            return None, f"exact-case formula did not parse: {exc}"
+        return candidate, "accepted exact-case formula"
     try:
         printed_mass = float(printed_weight_g_mol)
     except (TypeError, ValueError):
         return None, "printed formula weight is not numeric"
     if not math.isfinite(printed_mass) or printed_mass <= 0.0:
         return None, "printed formula weight is not positive and finite"
-    candidate = normalized
-    if phase_suffix is not None:
-        raw_formula = cleaned[1:-1] if cleaned.startswith("$") and cleaned.endswith("$") else cleaned
-        raw_suffix = _RAW_PHASE_SUFFIX_RE.search(raw_formula)
-        candidate += (
-            raw_suffix.group(0)
-            if raw_suffix is not None
-            else f"({phase_suffix})"
-        )
     try:
         parsed = parse_formula(candidate, name=name)
     except AccountingError as exc:
-        return None, f"repaired formula did not parse: {exc}"
+        return None, f"formula did not parse: {exc}"
     difference = abs(parsed.molar_mass_g_mol - printed_mass)
     tolerance = max(0.05, abs(printed_mass) * 0.0002)
     if difference > tolerance:

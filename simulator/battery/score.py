@@ -1219,6 +1219,8 @@ def parse_species_formula(
 
     if not formula or formula.strip().lower() in {"unknown", "none", "n/a"}:
         return None
+    if species is not None and _source_polymorph_is_rejected(species.polymorph):
+        return None
 
     text = _clean_formula_text(formula)
     if "$" in text:

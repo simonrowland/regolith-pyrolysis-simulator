@@ -25,12 +25,16 @@ from dataclasses import dataclass, replace
 from decimal import Decimal, InvalidOperation
 from typing import Any, Mapping
 
-from simulator.accounting.formulas import _canonicalize_formula_from_printed_weight
+from simulator.accounting.formulas import (
+    DIAMOND_POLYMORPH_REFUSAL_REASON,
+    _canonicalize_formula_from_printed_weight,
+)
 from simulator.battery.enums import (
     QUANTITY_UNITS,
     EvidenceClass,
     PerBasis,
     Phase,
+    PolymorphRejectionKind,
     Quantity,
     UncertaintyKind,
     ValueKind,
@@ -184,14 +188,17 @@ def _printed_formula_weight(doc: Mapping[str, Any]) -> Decimal | None:
 
 
 def formula_for_record(doc: Mapping[str, Any]) -> tuple[str, str | None]:
-    """Stored formula, plus evidence when case or OCR correction is applied.
+    """Stored formula, plus source evidence or a formula refusal reason.
 
-    Raster and case corrections pass through the formula owner's printed-mass
-    gate. A correction without a printed formula weight, or whose parsed mass
-    misses it, leaves the published spelling in place for typed refusal.
+    Any parsed spelling for a weighed record passes through the formula
+    owner's printed-mass gate. A mismatch is stored as a non-formula refusal
+    carrying the published spelling and mass reason. Diamond retains its
+    formula text and carries the polymorph refusal on the Species axis.
     """
 
     published = _published_formula(doc)
+    if not published.strip():
+        return published, None
     record_id = str(doc.get("record_id") or "")
     candidate = published
     quote = None
@@ -218,9 +225,19 @@ def formula_for_record(doc: Mapping[str, Any]) -> tuple[str, str | None]:
         repaired=corrected,
     )
     if accepted is None:
+        if mass_reason == DIAMOND_POLYMORPH_REFUSAL_REASON:
+            return published, mass_reason
+        if printed_weight is not None:
+            if not corrected and mass_reason.startswith("formula did not parse:"):
+                return published, None
+            return (
+                f"{published} (formula refusal: {mass_reason})",
+                f"published formula {published!r} refused: {mass_reason}",
+            )
         published_as_formula, _reason = _canonicalize_formula_from_printed_weight(
             published,
             None,
+            name=str(doc.get("name_as_published") or ""),
         )
         if published_as_formula is not None:
             return (
@@ -321,8 +338,18 @@ def _locator(
     )
 
 
-def _species(formula: str, phase: Phase | State[Phase]):
-    return make_species(formula, phase)
+def _species(
+    formula: str,
+    phase: Phase | State[Phase],
+    polymorph_refusal_reason: str | None = None,
+):
+    polymorph = None
+    if polymorph_refusal_reason == DIAMOND_POLYMORPH_REFUSAL_REASON:
+        polymorph = State.unknown(
+            polymorph_refusal_reason,
+            rejection_kind=PolymorphRejectionKind.UNRECOGNISED,
+        )
+    return make_species(formula, phase, polymorph=polymorph)
 
 
 def _basis_kwargs(
@@ -364,9 +391,10 @@ def _one_observation(
     note: str,
     relation: str,
     point_temperature: Decimal | None,
+    polymorph_refusal_reason: str | None = None,
 ) -> Observation:
     record_id = str(doc["record_id"])
-    species = _species(formula, phase)
+    species = _species(formula, phase, polymorph_refusal_reason)
     known = _basis_kwargs(
         formula=formula,
         phase=phase,
@@ -560,6 +588,11 @@ def _generate_ht(doc: Mapping[str, Any]) -> RecordGeneration:
                 note=note,
                 relation=_HT_RELATION,
                 point_temperature=None,
+                polymorph_refusal_reason=(
+                    quote
+                    if quote == DIAMOND_POLYMORPH_REFUSAL_REASON
+                    else None
+                ),
             )
         )
     return RecordGeneration(
@@ -700,6 +733,9 @@ def _generate_reference(doc: Mapping[str, Any]) -> RecordGeneration:
             note="; ".join(bit for bit in bits if bit),
             relation=_REFERENCE_RELATION,
             point_temperature=temperature,
+            polymorph_refusal_reason=(
+                quote if quote == DIAMOND_POLYMORPH_REFUSAL_REASON else None
+            ),
         )
         if uncertainty_obj.kind is not UncertaintyKind.NONE:
             observation = replace(observation, uncertainty=uncertainty_obj)

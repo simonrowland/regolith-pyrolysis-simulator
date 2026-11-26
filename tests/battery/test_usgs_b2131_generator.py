@@ -2,10 +2,26 @@
 
 import json
 from decimal import Decimal
+from pathlib import Path
 
-from simulator.accounting.formulas import _canonicalize_formula_from_printed_weight
-from simulator.battery.enums import PerBasis, Phase, Quantity, UncertaintyKind, ValueKind
+import pytest
+
+from simulator.accounting.exceptions import AccountingError
+from simulator.accounting import formulas
+from simulator.accounting.formulas import (
+    DIAMOND_POLYMORPH_REFUSAL_REASON,
+    _canonicalize_formula_from_printed_weight,
+)
+from simulator.battery.enums import (
+    PerBasis,
+    Phase,
+    PolymorphRejectionKind,
+    Quantity,
+    UncertaintyKind,
+    ValueKind,
+)
 from simulator.battery.generators.compilation_formula import aligned_raster_formula
+from simulator.battery.generators import usgs_b2131
 from simulator.battery.generators.usgs_b2131 import (
     SOURCE_ID,
     formula_for_record,
@@ -21,6 +37,7 @@ from simulator.battery.generators.usgs_b2131_raster import (
 )
 from simulator.battery.identity import bar_to_pa, quantity_token
 from simulator.battery.migrate import REPO_ROOT
+from simulator.battery.score import parse_species_formula
 
 _ROOT = (
     REPO_ROOT
@@ -35,6 +52,54 @@ def _load(relative: str) -> dict:
     document = json.loads((_ROOT / relative).read_text(encoding="utf-8"))
     assert isinstance(document, dict)
     return document
+
+
+EXACT_WEIGHT_MISMATCH_RECORDS = (
+    "reference-p014-07",
+    "reference-p016-10",
+    "reference-p018-15",
+    "reference-p021-10",
+    "reference-p023-05",
+    "reference-p023-14",
+    "reference-p024-08",
+    "reference-p028-01",
+    "reference-p028-08",
+    "reference-p028-13",
+    "reference-p029-03",
+    "reference-p032-07",
+    "high-temperature-p084",
+    "high-temperature-p160",
+    "high-temperature-p251",
+    "high-temperature-p262",
+)
+
+
+def _synthetic_cerianite() -> dict:
+    return {
+        "record_id": "reference-t1795-cao2",
+        "formula_as_published": "CaO2",
+        "name_as_published": "CERIANITE",
+        "rows": [{"cells": {"weight": {"value": "172.114"}}}],
+    }
+
+
+def _assert_exact_weight_mismatches_refused(records) -> None:
+    for document in records:
+        formula, evidence = formula_for_record(document)
+        assert evidence is not None and "refused" in evidence
+        assert _published_formula(document) in formula
+        with pytest.raises(AccountingError):
+            formulas.parse_formula(formula)
+        assert parse_species_formula(formula) is None
+        generated = generate_record(document)
+        for observation in generated.observations:
+            species = observation.identity.species
+            assert species is not None
+            assert parse_species_formula(species.formula, species=species) is None
+
+
+def _published_formula(document: dict) -> str:
+    return str(document.get("formula_as_published") or document.get("formula") or "")
 
 
 def _compilation_path(record_id: str) -> str:
@@ -89,18 +154,24 @@ def test_committed_raster_rows_are_allowed_edits() -> None:
             assert evidence is not None and quote in evidence
             assert "source formula weight confirms" in evidence
         else:
-            published_as_exact, _raw_reason = _canonicalize_formula_from_printed_weight(
-                published,
-                None,
-                name=name,
-            )
-            if published_as_exact is None:
-                assert formula == published
-                assert evidence is None
+            assert evidence is not None and "refused" in evidence
+            assert reason in evidence
+            if _printed_formula_weight(document) is not None:
+                assert published in formula
+                with pytest.raises(AccountingError):
+                    formulas.parse_formula(formula)
             else:
-                assert formula == f"{published} (unverified source correction)"
-                assert evidence is not None and "refused" in evidence
-                assert reason in evidence
+                published_as_exact, _published_reason = (
+                    _canonicalize_formula_from_printed_weight(
+                        published,
+                        None,
+                        name=name,
+                    )
+                )
+                if published_as_exact is not None:
+                    assert formula == f"{published} (unverified source correction)"
+                else:
+                    assert formula == published
         assert document["formula_as_published"] == published
 
 
@@ -122,6 +193,132 @@ def test_formula_weight_is_read_after_its_heading_label() -> None:
     )
     assert candidate is None
     assert "differs from printed 159.979000" in reason
+
+
+def test_exact_case_formula_weight_mismatches_are_nonparsing_refusals() -> None:
+    documents = [
+        _load(
+            f"{'summary' if record_id.startswith('reference-') else 'records'}"
+            f"/{record_id}.json"
+        )
+        for record_id in EXACT_WEIGHT_MISMATCH_RECORDS
+    ]
+    synthetic = _synthetic_cerianite()
+    documents.append(synthetic)
+    _assert_exact_weight_mismatches_refused(documents)
+
+    for document in documents:
+        formula, evidence = formula_for_record(document)
+        weight = _printed_formula_weight(document)
+        assert weight is not None
+        assert evidence is not None
+        assert str(weight) in evidence or f"{weight:.6f}" in evidence
+        if document is synthetic:
+            assert "72.076000" in evidence
+            assert "172.114000" in evidence
+
+
+def test_mutation_probe_exact_case_mass_gate_removal_rejects_all_mismatches(
+    monkeypatch,
+) -> None:
+    records = [
+        _load(
+            f"{'summary' if record_id.startswith('reference-') else 'records'}"
+            f"/{record_id}.json"
+        )
+        for record_id in EXACT_WEIGHT_MISMATCH_RECORDS
+    ] + [_synthetic_cerianite()]
+    _assert_exact_weight_mismatches_refused(records)
+    original = usgs_b2131._canonicalize_formula_from_printed_weight
+
+    def skip_exact_weight_gate(
+        formula: str,
+        printed_weight_g_mol: object,
+        *,
+        name: str | None = None,
+        repaired: bool = False,
+    ) -> tuple[str | None, str]:
+        if not repaired and printed_weight_g_mol is not None:
+            return original(formula, None, name=name, repaired=False)
+        return original(
+            formula,
+            printed_weight_g_mol,
+            name=name,
+            repaired=repaired,
+        )
+
+    monkeypatch.setattr(
+        usgs_b2131, "_canonicalize_formula_from_printed_weight", skip_exact_weight_gate
+    )
+    with pytest.raises(AssertionError):
+        _assert_exact_weight_mismatches_refused(records)
+
+
+def test_every_weighted_b2131_formula_matches_its_row_or_is_typed_refusal() -> None:
+    record_paths = sorted((_ROOT / "records").glob("*.json"))
+    summary_paths = sorted((_ROOT / "summary").glob("*.json"))
+    weighted = []
+    for path in (*summary_paths, *record_paths):
+        document = json.loads(path.read_text(encoding="utf-8"))
+        weight = _printed_formula_weight(document)
+        if weight is not None:
+            weighted.append((document, weight))
+    assert weighted
+
+    for document, weight in weighted:
+        name = str(document.get("name_as_published") or "")
+        formula, evidence = formula_for_record(document)
+        if "diamond" in name.casefold():
+            generated = generate_record(document)
+            for observation in generated.observations:
+                species = observation.identity.species
+                assert species is not None
+                assert species.formula == _published_formula(document)
+                assert species.polymorph is not None
+                assert species.polymorph.is_unknown
+                assert (
+                    species.polymorph.rejection_kind
+                    is PolymorphRejectionKind.UNRECOGNISED
+                )
+                assert species.polymorph.reason == DIAMOND_POLYMORPH_REFUSAL_REASON
+                assert parse_species_formula(species.formula, species=species) is None
+            continue
+        try:
+            parsed = formulas.parse_formula(formula)
+        except AccountingError:
+            assert parse_species_formula(formula) is None, document["record_id"]
+            continue
+        assert abs(parsed.molar_mass_g_mol - float(weight)) <= max(
+            0.05, float(weight) * 0.0002
+        ), document["record_id"]
+
+
+@pytest.mark.parametrize(
+    "relative",
+    (
+        "summary/cp-p041-10.json",
+        "records/high-temperature-p077.json",
+        "summary/reference-p005-16.json",
+    ),
+)
+def test_diamond_refusal_stays_on_typed_polymorph_axis(relative: str) -> None:
+    document = _load(relative)
+    formula, reason = formula_for_record(document)
+    assert formula == _published_formula(document)
+    assert reason == DIAMOND_POLYMORPH_REFUSAL_REASON
+
+    generated = generate_record(document)
+    if not generated.observations:
+        assert document["compilation_role"]["scoring_eligible"] is False
+        return
+    for observation in generated.observations:
+        species = observation.identity.species
+        assert species is not None
+        assert species.formula == formula
+        assert species.polymorph is not None and species.polymorph.is_unknown
+        assert species.polymorph.rejection_kind is PolymorphRejectionKind.UNRECOGNISED
+        assert species.polymorph.reason == DIAMOND_POLYMORPH_REFUSAL_REASON
+        assert parse_species_formula(species.formula, species=species) is None
 
 
 def test_phase_sentence_overrides_keep_the_mineru_bounds() -> None:

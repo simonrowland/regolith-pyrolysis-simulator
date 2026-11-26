@@ -166,24 +166,67 @@ def test_bornite_raster_formula_matches_printed_weight() -> None:
 
 
 @pytest.mark.parametrize(
-    ("record_id", "published"),
+    ("record_id", "published", "parsed_mass", "printed_mass"),
     (
-        ("reference-p021-04", "ca2Fe2  as"),
-        ("high-temperature-p184", "cao2"),
-        ("reference-p021-09", "Fe2Tio4"),
-        ("reference-p005-16", "c"),
+        (
+            "reference-p021-04",
+            "ca2Fe2  as",
+            "266.767595",
+            "271.847000",
+        ),
+        (
+            "high-temperature-p184",
+            "cao2",
+            "72.076000",
+            "172.114000",
+        ),
     ),
 )
-def test_repaired_or_diamond_formula_without_mass_match_stays_refused(
-    record_id: str, published: str
+def test_mass_mismatched_formula_is_stored_as_nonparsing_refusal(
+    record_id: str, published: str, parsed_mass: str, printed_mass: str
 ) -> None:
     document = _load_b2131_record(record_id)
     assert document["formula_as_published"] == published
     formula, evidence = usgs_b2131.formula_for_record(document)
-    assert formula == published
+    assert formula.startswith(f"{published} (formula refusal:")
+    assert evidence is not None and "refused" in evidence
+    assert parsed_mass in evidence and printed_mass in evidence
+    with pytest.raises(UnknownSpeciesError):
+        formulas.parse_formula(formula)
+    assert parse_species_formula(formula) is None
+
+
+def test_no_weight_case_repair_and_diamond_name_remain_refused() -> None:
+    fe2tio4 = _load_b2131_record("reference-p021-09")
+    assert fe2tio4["formula_as_published"] == "Fe2Tio4"
+    formula, evidence = usgs_b2131.formula_for_record(fe2tio4)
+    assert formula == "Fe2Tio4"
     assert evidence is None
     with pytest.raises(UnknownSpeciesError):
         formulas.parse_formula(formula)
+
+    diamond = _load_b2131_record("reference-p005-16")
+    assert diamond["formula_as_published"] == "c"
+    formula, reason = usgs_b2131.formula_for_record(diamond)
+    assert formula == "c"
+    assert reason == formulas.DIAMOND_POLYMORPH_REFUSAL_REASON
+    with pytest.raises(UnknownSpeciesError, match="diamond polymorph"):
+        formulas.parse_formula(formula, name=diamond["name_as_published"])
+
+
+@pytest.mark.parametrize(
+    "record_id", ("high-temperature-p179", "high-temperature-p340")
+)
+def test_no_weight_raster_correction_stays_refused(record_id: str) -> None:
+    document = _load_b2131_record(record_id)
+    published = document["formula_as_published"]
+    assert usgs_b2131._printed_formula_weight(document) is None
+
+    formula, evidence = usgs_b2131.formula_for_record(document)
+
+    assert published in formula
+    assert evidence is None or "refused" in evidence
+    assert parse_species_formula(formula) is None
 
 
 @pytest.mark.parametrize(
@@ -200,10 +243,11 @@ def test_mutation_probe_mass_gate_removal_reproduces_wrong_p0_formula(
 
     def assert_refused() -> None:
         formula, evidence = usgs_b2131.formula_for_record(document)
-        assert formula == published
-        assert evidence is None
+        assert formula.startswith(f"{published} (formula refusal:")
+        assert evidence is not None and "refused" in evidence
         with pytest.raises(UnknownSpeciesError):
             formulas.parse_formula(formula)
+        assert parse_species_formula(formula) is None
 
     def omit_mass_gate(
         formula: str,
@@ -247,6 +291,27 @@ def test_leading_decimal_is_not_a_formula_segment_multiplier() -> None:
 def test_diamond_name_is_not_collapsed_to_the_bare_carbon_formula() -> None:
     with pytest.raises(UnknownSpeciesError, match="diamond polymorph"):
         formulas.parse_formula("C", name="diamond")
+
+
+def test_exact_case_formula_requires_its_printed_weight_when_weight_is_present() -> None:
+    formula, reason = formulas._canonicalize_formula_from_printed_weight(
+        "CaO2",
+        Decimal("172.114"),
+        name="CERIANITE",
+    )
+    assert formula is None
+    assert "parsed mass 72.076000 g/mol" in reason
+    assert "printed 172.114000 g/mol" in reason
+
+
+def test_diamond_name_refusal_precedes_an_exact_carbon_mass_match() -> None:
+    formula, reason = formulas._canonicalize_formula_from_printed_weight(
+        "C",
+        Decimal("12.011"),
+        name="DIAMOND",
+    )
+    assert formula is None
+    assert reason == formulas.DIAMOND_POLYMORPH_REFUSAL_REASON
 
 
 @pytest.mark.parametrize(
