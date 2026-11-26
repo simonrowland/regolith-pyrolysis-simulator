@@ -8361,7 +8361,7 @@ def _write_pt1_payload_for_invariant(
     key_hash: str,
     payload: Any,
 ) -> None:
-    payload_bytes = canonical_json_bytes(payload)
+    payload_bytes = rrd._payload_integrity_bytes(payload)
     with sqlite3.connect(db_path) as conn:
         conn.execute(
             f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
@@ -9065,16 +9065,9 @@ def _run_real_cache_payload_recursive_mutations(
                 replacement,
             )
             capture._entries[key_hash]["payload"] = copy.deepcopy(mutated)
-            try:
-                capture._entries[key_hash]["payload_hash"] = rrd._sha256(
-                    canonical_json_bytes(mutated)
-                )
-            except Exception as exc:
-                failures.append(
-                    f"{path_name} {mutation}: memory payload serialization raised "
-                    f"{type(exc).__name__}: {exc}"
-                )
-                continue
+            capture._entries[key_hash]["payload_hash"] = rrd._sha256(
+                rrd._payload_integrity_bytes(mutated)
+            )
             if persistent:
                 _write_pt1_payload_for_invariant(db_path, key_hash, mutated)
                 reader._entries.pop(key_hash, None)
@@ -9084,6 +9077,8 @@ def _run_real_cache_payload_recursive_mutations(
                 )
             reset_reader_for_next_row()
             before_disclosures = _accepted_hit_disclosures_for_test(reader)
+            nonfinite_mutation = mutation == "non-finite"
+            typed_rejection = False
             try:
                 admitted = reader._lookup(
                     artifact,
@@ -9092,14 +9087,39 @@ def _run_real_cache_payload_recursive_mutations(
                 )
             except PT0CacheMiss:
                 admitted = None
+            except PT0NonFinitePayload as exc:
+                if persistent or not nonfinite_mutation:
+                    failures.append(
+                        f"{path_name} {mutation}: admission lookup raised "
+                        f"{type(exc).__name__}: {exc}"
+                    )
+                    continue
+                admitted = None
+                typed_rejection = True
+            except PT1PersistentStoreCorrupt as exc:
+                if not persistent or not nonfinite_mutation:
+                    failures.append(
+                        f"{path_name} {mutation}: admission lookup raised "
+                        f"{type(exc).__name__}: {exc}"
+                    )
+                    continue
+                admitted = None
+                typed_rejection = True
             except Exception as exc:
                 failures.append(
                     f"{path_name} {mutation}: admission lookup raised "
                     f"{type(exc).__name__}: {exc}"
                 )
                 continue
+            if nonfinite_mutation and admitted is not None:
+                failures.append(
+                    f"{path_name} {mutation}: non-finite payload was admitted"
+                )
+                continue
             if admitted is None:
-                outcomes[case_name] = "miss"
+                outcomes[case_name] = (
+                    "typed-rejection" if typed_rejection else "miss"
+                )
                 if (
                     reader.hits != 0
                     or _accepted_hit_disclosures_for_test(reader)
@@ -9219,7 +9239,7 @@ def _run_real_cache_payload_recursive_mutations(
     assert not failures, "\n".join(failures)
     assert len(outcomes) == cases_expected
     assert all(
-        outcome in {"miss", "admitted", "typed-outcome"}
+        outcome in {"miss", "admitted", "typed-outcome", "typed-rejection"}
         for outcome in outcomes.values()
     ), (
         "recursive mutation cases did not each take exactly one admission branch: "
@@ -9227,6 +9247,14 @@ def _run_real_cache_payload_recursive_mutations(
             f"{case}={outcome}" for case, outcome in outcomes.items()
         )
     )
+    if not exhaustive_sweep:
+        nonfinite_outcomes = [
+            outcome
+            for case, outcome in outcomes.items()
+            if case.endswith(" non-finite")
+        ]
+        assert len(nonfinite_outcomes) == 1
+        assert nonfinite_outcomes[0] in {"miss", "typed-rejection"}
     assert "miss" in outcomes.values()
     assert any(
         outcome in {"admitted", "typed-outcome"}
