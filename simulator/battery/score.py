@@ -56,6 +56,7 @@ from simulator.battery.oxygen_identity import (
 from simulator.supervised_process_pool import (
     supervised_process_map,
 )
+from simulator.scalar_boundary import finite_float
 from simulator.battery.source_declarations import (
     HASHIMOTO_RESIDUE_PREDICTOR,
     SOSSI_RESIDUE_PREDICTOR,
@@ -16935,21 +16936,100 @@ def _predict_with_engine(
         Engine.ALPHAMELTS,
         Engine.THERMOENGINE,
     ):
-        # The converter refuses Na2O, CaO, MgO, FeO, and K2O, including a
-        # same-named key. It returns a(SiO2) from SiO2_Liq and a(H2O)
-        # from H2O or H2O_Liq. Element labels are not oxide activities.
+        # The parent-oxide converter still refuses Na2O, CaO, MgO, FeO, and
+        # K2O, including a same-named key. d-476 handles CaO above that
+        # fallback only for its exact printed solid reference and a positive
+        # CaSiO3/SiO2 pair. The converter returns a(SiO2) from SiO2_Liq and
+        # a(H2O) from H2O or H2O_Liq; element labels are not oxide activities.
         from engines.alphamelts.domain import (
+            MELTS_ACTIVITY_BRIDGE_REFERENCES,
+            MELTS_CAO_EXCHANGE_MU_FIELD,
             _canonical_oxide_activity_map_with_notices,
             melts_endmember_to_parent_oxide_activity,
+        )
+        from simulator.melt_backend.pure_phase_janaf_score import (
+            cao_activity_from_melts_exchange_mu,
         )
 
         if engine is Engine.ALPHAMELTS:
             _, activity_repair_warnings = (
                 _canonical_oxide_activity_map_with_notices(reported)
             )
-        value, converter_reason = melts_endmember_to_parent_oxide_activity(
-            reported, compared,
+        reference_state_state = getattr(identity, 'reference_state', None)
+        reference_state = (
+            reference_state_state.value
+            if isinstance(reference_state_state, State)
+            and reference_state_state.is_value
+            and isinstance(reference_state_state.value, StandardState)
+            else None
         )
+        reference_phase = (
+            None
+            if reference_state is None
+            else phase_token(reference_state.endmember)
+        )
+        reference_triple = (
+            None
+            if reference_state is None
+            else (
+                reference_state.convention.value,
+                None if reference_phase is None else reference_phase.value,
+                reference_state.component_basis,
+            )
+        )
+        bridge_target = MELTS_ACTIVITY_BRIDGE_REFERENCES.get(compared)
+        positive_cao_pair = all(
+            (activity := finite_float(reported.get(name))) is not None
+            and activity > 0.0
+            for name in ('CaSiO3', 'SiO2')
+        )
+        mu_cao = finite_float(getattr(cell, MELTS_CAO_EXCHANGE_MU_FIELD, None))
+        if (
+            compared == 'CaO'
+            and reference_triple == bridge_target
+            and positive_cao_pair
+            and mu_cao is not None
+        ):
+            try:
+                value, reference_extrapolated = cao_activity_from_melts_exchange_mu(
+                    float(mu_cao),
+                    float(T),
+                    phase=str(reference_phase.value),
+                )
+            except (OverflowError, TypeError, ValueError) as exc:
+                value = None
+                converter_reason = (
+                    f'typed-refusal:melts_cao_reference_conversion:{exc}'
+                )
+            else:
+                converter_reason = ''
+                if reference_extrapolated:
+                    notices = union_notices(
+                        notices,
+                        (
+                            Notice(
+                                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                                affected_quantities=(Quantity.ACTIVITY,),
+                                reason=(
+                                    'liquid CaO G0 uses the JANAF metastable '
+                                    'liquid reference below its 3200 K '
+                                    'G_liq = G_cr crossing'
+                                ),
+                                origin=(
+                                    'simulator.melt_backend.pure_phase_janaf_score.'
+                                    'melts_reference_g0_cao_kJ_mol'
+                                ),
+                                band='CaO(l) JANAF reference: T < 3200 K',
+                                authority=Authority.EXTRAPOLATED,
+                            ),
+                        ),
+                    )
+                if value is not None:
+                    authority = Authority.BRIDGE
+        else:
+            value, converter_reason = melts_endmember_to_parent_oxide_activity(
+                reported, compared,
+            )
         magnitude = value
     else:
         matched, activity_repair_warnings = _match_reported_species_with_notices(
@@ -18549,9 +18629,35 @@ def _compile_residual_with_lineage(
         if isinstance(reference.identity, Identity)
         else None
     )
+    preserve_melts_cao_reference = False
+    if (
+        engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE)
+        and isinstance(reference.identity, Identity)
+        and reference.identity.species is not None
+        and reference.identity.species.formula == "CaO"
+        and quantity_token(reference.identity) is Quantity.ACTIVITY
+        and reference.identity.reference_state is not None
+        and reference.identity.reference_state.is_value
+        and isinstance(reference.identity.reference_state.value, StandardState)
+    ):
+        from engines.alphamelts.domain import MELTS_ACTIVITY_BRIDGE_REFERENCES
+
+        standard = reference.identity.reference_state.value
+        state_phase = phase_token(standard.endmember)
+        preserve_melts_cao_reference = (
+            (
+                standard.convention.value,
+                None if state_phase is None else state_phase.value,
+                standard.component_basis,
+            )
+            == MELTS_ACTIVITY_BRIDGE_REFERENCES["CaO"]
+        )
     # A crystalline sample is not converted onto a liquid reference. That
-    # conversion is a melt comparison, and this row is not one.
-    if sample_phase_detail is None:
+    # conversion is a melt comparison, and this row is not one. MELTS CaO
+    # bridge rows also retain the source's printed solid-lime reference: the
+    # worker reports the exchange chemical potential, which the scorer maps
+    # directly to that printed standard.
+    if sample_phase_detail is None and not preserve_melts_cao_reference:
         reference = fusion_comparison_reference(reference, engine=engine)
     identity = reference.identity
     quantity = quantity_token(identity) if isinstance(identity, Identity) else None

@@ -270,6 +270,18 @@ def _reference_matches(
     if state.convention is ReferenceStateConvention.TEMKIN:
         return False, reported.reported
 
+    if engine in ('alphamelts', 'thermoengine') and state.endmember.formula == 'CaO':
+        from engines.alphamelts.domain import MELTS_ACTIVITY_BRIDGE_REFERENCES
+
+        phase = phase_token(state.endmember)
+        triple = (
+            state.convention.value,
+            None if phase is None else phase.value,
+            state.component_basis,
+        )
+        if triple == MELTS_ACTIVITY_BRIDGE_REFERENCES['CaO']:
+            return True, 'melts_cao_exchange_mu_to_printed_solid_reference'
+
     structural = (
         state.convention is reported.convention
         and phase_token(state.endmember) is reported.phase

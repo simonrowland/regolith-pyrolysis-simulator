@@ -6,6 +6,7 @@ from typing import List, Mapping, Optional
 import math
 import warnings
 
+from engines.alphamelts.domain import MELTS_CAO_EXCHANGE_MU_FIELD
 from engines.alphamelts.thermoengine import (
     THERMOENGINE_HEALTH_TIMEOUT_S,
     THERMOENGINE_WARM_CALL_TIMEOUT_S,
@@ -609,6 +610,15 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                         **dict(commissioning_diagnostics or {}),
                         **clamp_diagnostics,
                         **vaporock_envelope_diagnostics,
+                        **(
+                            {
+                                MELTS_CAO_EXCHANGE_MU_FIELD:
+                                    payload.mu_CaO_J_per_mol_melts_berman_apparent
+                            }
+                            if payload.mu_CaO_J_per_mol_melts_berman_apparent
+                            is not None
+                            else {}
+                        ),
                         'thermodynamic_basis': dict(
                             payload.thermodynamic_basis
                         ),

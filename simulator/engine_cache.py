@@ -484,8 +484,8 @@ ENGINE_CHEMISTRY_VERSION = {
     "internal-analytical": 4,
     "vaporock": 1,
     "magemin": 4,
-    "alphamelts": 4,
-    "thermoengine": 4,
+    "alphamelts": 5,
+    "thermoengine": 5,
 }
 
 # Bump only when an engine change can alter predictions. Runtime identity is
@@ -508,6 +508,8 @@ ENGINE_CHEMISTRY_VERSION = {
 # magemin v4: 2026-11-18 MAGEMin pin unchanged, b265 e7fbd4c052 onto b-1244 71806e046 - positive SiO2 outside [30, 80] wt% is predicted and flagged; Fe-free cells leave fO2 indeterminate
 # alphamelts v4: 2026-11-18 alphaMELTS binary pin unchanged, b265 e7fbd4c052 onto b-1244 71806e046 - subfloor oxygen extrapolation notice and freeze-gate cooling path
 # thermoengine v4: 2026-11-18 ThermoEngine pin unchanged, b265 e7fbd4c052 onto b-1244 71806e046 - same subfloor oxygen extrapolation notice
+# alphamelts v5: d-476 CaO exchange-potential bridge to the printed solid-lime reference.
+# thermoengine v5: d-476 cache the MELTS-basis CaO exchange potential for JANAF reference conversion.
 
 
 _ENGINE_CACHE_ROOT = Path(__file__).resolve().parents[1]

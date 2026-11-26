@@ -60,8 +60,10 @@ report rendering live in ``scripts/janaf_pure_phase_score.py``.
 
 from __future__ import annotations
 
+import math
 import re
 from dataclasses import dataclass
+from decimal import Decimal, InvalidOperation
 from functools import lru_cache
 from pathlib import Path
 from typing import Callable, Iterable, Mapping, Optional, Tuple
@@ -74,6 +76,12 @@ from simulator.battery.polymorph_dictionary import (
 )
 from simulator.melt_backend.pure_phase import PurePhaseProperties
 from simulator.reference_data.janaf import TABLES_DIR, load_table_document
+from simulator.reference_data.janaf import (
+    _interpolate_table_points,
+    _missing_node_for_interpolation,
+)
+from simulator.physical_constants import GAS_CONSTANT
+from engines.alphamelts.domain import MELTS_CAO_EXCHANGE_MU_FIELD
 
 # Engine polymorph maps are imported from the engines' own modules so this
 # consumer never restates phase identity (the maps are the same source the
@@ -138,6 +146,146 @@ ELEMENT_REFERENCE_TABLES: Mapping[str, str] = {
     'Si': 'Si-001',
     'O2': 'O-029',
 }
+
+
+@lru_cache(maxsize=64)
+def _janaf_column_points(
+    table_id: str, column: str,
+) -> tuple[tuple[tuple[Decimal, Decimal], ...], tuple[Decimal, ...]]:
+    """Load one JANAF column as printed interpolation points and gaps."""
+
+    document = load_janaf_table(table_id)
+    table = document.get('table') or {}
+    rows: list[tuple[Decimal, Decimal]] = []
+    missing: set[Decimal] = set()
+    for row in table.get('values') or ():
+        temperature_cell = row.get('temperature') or {}
+        value_cell = row.get(column) or {}
+        try:
+            temperature = Decimal(str(temperature_cell.get('as_published')))
+        except (InvalidOperation, TypeError, ValueError):
+            continue
+        if not temperature.is_finite():
+            continue
+        try:
+            value = Decimal(str(value_cell.get('value')))
+        except (InvalidOperation, TypeError, ValueError):
+            missing.add(temperature)
+            continue
+        if not value.is_finite():
+            missing.add(temperature)
+            continue
+        # Keep both printed values at a phase-transition temperature. The
+        # adjacent pair selected below then follows the proper side of T.
+        rows.append((temperature, value))
+    points = tuple(sorted(rows, key=lambda item: item[0]))
+    if len(points) < 2:
+        raise ValueError(f'{table_id}: fewer than two usable {column} points')
+    return points, tuple(sorted(missing))
+
+
+def _janaf_column_at(
+    table_id: str,
+    column: str,
+    temperature_K: float,
+    *,
+    extrapolate: bool = False,
+) -> float:
+    """Interpolate one JANAF table column, rejecting unprinted grid gaps."""
+
+    temperature = Decimal(str(temperature_K))
+    if not temperature.is_finite() or temperature <= 0:
+        raise ValueError('temperature_K must be finite and positive')
+    points, missing = _janaf_column_points(table_id, column)
+    if not extrapolate and not points[0][0] <= temperature <= points[-1][0]:
+        raise ValueError(f'{table_id}: {temperature} K is outside printed rows')
+    missing_node = _missing_node_for_interpolation(points, missing, temperature)
+    if missing_node is not None:
+        raise ValueError(f'{table_id}: JANAF {column} is missing at {missing_node} K')
+    return float(_interpolate_table_points(
+        points, temperature, extrapolate=extrapolate,
+    ))
+
+
+def _cao_element_reference_g_at_kJ_mol(temperature_K: float) -> dict[str, float]:
+    references: dict[str, float] = {}
+    for element in ('Ca', 'O2'):
+        table_id = ELEMENT_REFERENCE_TABLES[element]
+        enthalpy = _janaf_column_at(
+            table_id, 'enthalpy_increment', temperature_K,
+        )
+        entropy = _janaf_column_at(table_id, 'entropy', temperature_K)
+        references[element] = element_reference_g_kJ_mol(
+            enthalpy, entropy, temperature_K,
+        )
+    return references
+
+
+def melts_reference_g0_cao_kJ_mol(
+    temperature_K: float,
+    phase: str,
+) -> tuple[float, bool]:
+    """JANAF CaO standard G0 converted to MELTS's apparent-element basis.
+
+    The phase flag is true for liquid CaO below the printed 3200 K
+    G_liq = G_cr crossing; JANAF's metastable liquid reference is then
+    extrapolated for scoring purposes.
+    """
+
+    table_by_phase = {'cr': 'Ca-027', 'l': 'Ca-028'}
+    table_id = table_by_phase.get(str(phase))
+    if table_id is None:
+        raise ValueError(f'unsupported JANAF CaO phase {phase!r}')
+    extrapolated = str(phase) == 'l' and float(temperature_K) < 3200.0
+    formation_g = _janaf_column_at(
+        table_id,
+        'formation_gibbs_energy',
+        temperature_K,
+        extrapolate=extrapolated,
+    )
+    element_g = _cao_element_reference_g_at_kJ_mol(temperature_K)
+    # CaO has one Ca atom and one half O2 molecule. Adding those JANAF
+    # element-reference Gibbs terms puts ΔfG(CaO) on the same H(298.15)=0
+    # apparent basis as ThermoEngine's Berman liquid component.
+    apparent_g = formation_g + element_g['Ca'] + 0.5 * element_g['O2']
+    if not math.isfinite(apparent_g):
+        raise ValueError('JANAF CaO reference Gibbs energy is not finite')
+    return apparent_g, extrapolated
+
+
+def cao_activity_from_melts_exchange_mu(
+    mu_cao_J_mol: float,
+    temperature_K: float,
+    *,
+    phase: str,
+) -> tuple[float, bool]:
+    """Convert the MELTS exchange potential to the row's CaO standard state.
+
+    Premise: the worker returns μ_CaO = μ(CaSiO3) − μ(SiO2) on MELTS's
+    apparent Berman basis; the row prints pure solid or liquid CaO. The
+    JANAF G0 reference is shifted onto that same basis using Ca-001 and O-029.
+    Algebra: μ_CaO = G0_ref + RT ln(a), hence ln(a)=(μ_CaO−G0_ref)/(RT).
+    Units: J/mol divided by J/(mol K)·K is dimensionless. Sanity: when
+    μ_CaO equals G0_ref, ln(a)=0 and the returned activity is exactly 1.
+    """
+
+    temperature = float(temperature_K)
+    mu = float(mu_cao_J_mol)
+    if not math.isfinite(temperature) or temperature <= 0.0:
+        raise ValueError('temperature_K must be finite and positive')
+    if not math.isfinite(mu):
+        raise ValueError(f'{MELTS_CAO_EXCHANGE_MU_FIELD} must be finite')
+    g0_kJ_mol, extrapolated = melts_reference_g0_cao_kJ_mol(
+        temperature, phase,
+    )
+    ln_activity = (mu - g0_kJ_mol * 1000.0) / (GAS_CONSTANT * temperature)
+    try:
+        activity = math.exp(ln_activity)
+    except OverflowError as exc:
+        raise ValueError('CaO activity is outside finite numeric range') from exc
+    if not math.isfinite(activity) or activity <= 0.0:
+        raise ValueError('CaO activity is not positive and finite')
+    return activity, extrapolated
 
 
 class PolymorphMismatchError(ValueError):

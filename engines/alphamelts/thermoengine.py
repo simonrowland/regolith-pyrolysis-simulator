@@ -26,6 +26,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Callable, Mapping, Optional
 
+from engines.alphamelts.domain import MELTS_CAO_EXCHANGE_MU_FIELD
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.engine_local_config import (
     cache_version_for,
@@ -47,6 +48,7 @@ from simulator.melt_backend.pure_phase import (
     PurePhaseProperties,
     PurePhaseUnknownSymbolError,
 )
+from simulator.physical_constants import GAS_CONSTANT
 
 
 ActivityConverter = Callable[[float, float, float], float]
@@ -1058,6 +1060,7 @@ class ThermoEnginePayload:
     solver_converged: Optional[bool] = None
     solver_iterations: Optional[int] = None
     warnings: tuple[str, ...] = ()
+    mu_CaO_J_per_mol_melts_berman_apparent: Optional[float] = None
 
 
 class ThermoEngineTransport:
@@ -1590,6 +1593,7 @@ print('ok')
         solved_fO2_reason: Optional[str] = None
         fO2_solve_count = 1
         repair_notices: list[str] = []
+        cao_exchange_mu: dict[str, float] = {}
         if fO2_log is None:
             _thermoengine_native_call(
                 lambda: melts.set_bulk_composition(bulk_wt)
@@ -1874,6 +1878,7 @@ print('ok')
                 component_mole_fraction=liquid_components,
                 comp_wt=liquid_comp,
                 repair_notices=repair_notices,
+                cao_exchange_out=cao_exchange_mu,
             )
             fe_redox_split = self._fe_redox_split(liquid_comp)
         else:
@@ -1903,6 +1908,9 @@ print('ok')
             liquid_composition_wt_pct=liquid_comp,
             activity_coefficients=activities,
             fe_redox_split=fe_redox_split,
+            mu_CaO_J_per_mol_melts_berman_apparent=(
+                cao_exchange_mu.get(MELTS_CAO_EXCHANGE_MU_FIELD)
+            ),
             solved_fO2_log=solved_fO2_log,
             solved_fO2_reason=solved_fO2_reason,
             phase_universe_size=len(_thermoengine_native_call(
@@ -2357,7 +2365,10 @@ print('ok')
         component_mole_fraction: Mapping[str, float],
         comp_wt: Mapping[str, float],
         repair_notices: list[str] | None = None,
+        cao_exchange_out: dict[str, float] | None = None,
     ) -> dict[str, float]:
+        if cao_exchange_out is not None:
+            cao_exchange_out.pop(MELTS_CAO_EXCHANGE_MU_FIELD, None)
         liq_phase = self._liq_phase
         if liq_phase is None:
             return {}
@@ -2434,6 +2445,7 @@ print('ok')
             dtype=float,
         ).reshape(-1)
         activities: dict[str, float] = {}
+        pure_g0_by_name: dict[str, float] = {}
         for idx, name in enumerate(endmember_names):
             if idx >= len(mu_values):
                 if repair_notices is not None:
@@ -2465,6 +2477,9 @@ print('ok')
                         reason='empty_pure_state_value',
                     ))
                 continue
+            pure_g0 = float(mu0_values[0])
+            if math.isfinite(pure_g0):
+                pure_g0_by_name[name] = pure_g0
             try:
                 # For a MELTS liquid component, mu_i - mu_i^0 = RT ln(a_i):
                 # chem_potential supplies mu_i and gibbs_energy at pure i,
@@ -2499,6 +2514,27 @@ print('ok')
                         else 'nonpositive_computed_activity'
                     ),
                 ))
+        if cao_exchange_out is not None:
+            pair = ('CaSiO3', 'SiO2')
+            if all(
+                activities.get(name, 0.0) > 0.0
+                and name in pure_g0_by_name
+                for name in pair
+            ):
+                RT = GAS_CONSTANT * T_K
+                # Rebuild each component chemical potential from its pure
+                # MELTS liquid G0 and positive activity, then take the
+                # CaSiO3 - SiO2 exchange. No JANAF target reference enters
+                # this isolated worker.
+                mu_casio3 = pure_g0_by_name['CaSiO3'] + RT * math.log(
+                    activities['CaSiO3']
+                )
+                mu_sio2 = pure_g0_by_name['SiO2'] + RT * math.log(
+                    activities['SiO2']
+                )
+                mu_cao = mu_casio3 - mu_sio2
+                if math.isfinite(mu_cao):
+                    cao_exchange_out[MELTS_CAO_EXCHANGE_MU_FIELD] = mu_cao
         return activities
 
     def _endmember_moles_from_wt(

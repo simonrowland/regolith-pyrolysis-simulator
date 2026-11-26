@@ -51,6 +51,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional
 
 from engines.alphamelts.domain import (
+    MELTS_CAO_EXCHANGE_MU_FIELD,
     _canonical_oxide_activity_map_with_notices,
     canonical_melt_oxide_activity_name,
 )
@@ -5762,6 +5763,12 @@ class _MELTSBackendSupport(MeltBackend):
                 'gamma*x, phase field, or mu/mu0 path); '
                 'activity-scaled Antoine fallback skipped'
             )
+        cao_exchange_mu = self._cao_exchange_mu_from_chemical_potentials(
+            run_result,
+            temperature_C=temperature_C,
+        )
+        if cao_exchange_mu is not None:
+            activity_diagnostics[MELTS_CAO_EXCHANGE_MU_FIELD] = cao_exchange_mu
         selected_activity_source = str(
             activity_diagnostics.get('diagnostic_activity_source') or 'none'
         )
@@ -6270,6 +6277,53 @@ class _MELTSBackendSupport(MeltBackend):
             if activity > 0.0 and math.isfinite(activity):
                 raw_activities[str(species)] = activity
         return raw_activities
+
+    def _cao_exchange_mu_from_chemical_potentials(
+        self,
+        results: Mapping[str, object],
+        *,
+        temperature_C: float,
+    ) -> float | None:
+        """Return μ(CaSiO3)-μ(SiO2) only for a positive provider pair.
+
+        alphaMELTS may expose direct activities or its μ/μ0 maps. The latter
+        provide the absolute component chemical potentials needed by d-476;
+        a bare activity ratio has only the hypothetical liquid reference and
+        cannot be relabelled as the source's solid CaO activity.
+        """
+
+        mu = self._extract_potential_mapping(
+            results,
+            ('chemical_potentials', 'chem_potentials', 'mu', 'mu_oxides', 'oxide_mu'),
+            ('_mu', '_chemical_potential'),
+        )
+        mu0 = self._extract_potential_mapping(
+            results,
+            (
+                'standard_chemical_potentials',
+                'pure_chemical_potentials',
+                'reference_chemical_potentials',
+                'mu0',
+                'mu0_oxides',
+                'oxide_mu0',
+            ),
+            ('_mu0', '_pure_mu', '_standard_mu', '_reference_mu'),
+        )
+        pair = ('CaSiO3', 'SiO2')
+        if not all(name in mu and name in mu0 for name in pair):
+            return None
+        temperature_K = float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET
+        for name in pair:
+            try:
+                activity = activity_from_chem_potential(
+                    mu[name], mu0[name], temperature_K,
+                )
+            except (OverflowError, ValueError):
+                return None
+            if not math.isfinite(activity) or activity <= 0.0:
+                return None
+        mu_cao = mu['CaSiO3'] - mu['SiO2']
+        return mu_cao if math.isfinite(mu_cao) else None
 
     def _extract_potential_mapping(
         self,

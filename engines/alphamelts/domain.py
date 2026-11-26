@@ -38,6 +38,20 @@ MELTS_OXIDE_BASIS: Tuple[str, ...] = (
 )
 _MELTS_OXIDE_SET = frozenset(MELTS_OXIDE_BASIS)
 
+# d-476 / d-474 peer-activity bridge. Stolyarova et al. (1996), Eq. (13),
+# published p. 19, defines the reference as “over the individual oxides (CaO,
+# Al2O3, SiO2), respectively.”; the existing source rows encode CaO(cr), with
+# the phase marked inferred in the extraction audit. Kume et al. (2000), Eq.
+# (1), published p. 562, writes “CaO(s)”; Allibert et al. (1981), Table II
+# footnote, published p. 309, says “Activities are referred to solid standard
+# states.” The three peer rows use (convention, phase, component_basis) below.
+MELTS_CAO_EXCHANGE_MU_FIELD = (
+    'mu_CaO_J_per_mol_melts_berman_apparent'
+)
+MELTS_ACTIVITY_BRIDGE_REFERENCES = {
+    'CaO': ('raoultian_pure_endmember', 'cr', 'CaO'),
+}
+
 # Aliases the adapter recognises (same map as
 # ``alphamelts.MELTS_OXIDE_ALIASES``); kept duplicated rather than
 # imported because the provider package must stay importable without
