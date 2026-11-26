@@ -111,8 +111,12 @@ def test_short_run_payload_and_ledger_match_rollback_baseline_golden():
     # 9666fc129 plus the de32c69ca runner regen). Mars runs diverge between
     # the laptop and studio-3, so this digest is not a laptop re-run.
     # constack merge: repin on gate box
+    # 2026-11-26 b274 receipt 66d482b2 at b7a91af39c. The deterministic
+    # payload moved with the evaporation-stack publish (a95942989e) and
+    # the oxide-Fe debit (f187184015). The ledger digest is still the
+    # assert below; this receipt did not reach it.
     assert hashlib.sha256(payload_bytes).hexdigest() == (
-        "718ffcf58809ccc9d85d8f125a7e418b19e711a61d8b6f22ec9279b251d4c751"
+        "15af17bf60d709093a1964b867cb2375f92af855e6aecb9d4f12bba0ceb75b9f"
     )
     assert hashlib.sha256(ledger_bytes).hexdigest() == (
         "c366b84c33ed81fb2a2c3c376df6cd20ac8366a5ae8e279d1679ba143a9bc4a3"
