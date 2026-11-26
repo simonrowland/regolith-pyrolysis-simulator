@@ -585,6 +585,10 @@ def _without_engine_versions(value):
 @pytest.mark.nightly
 @pytest.mark.xdist_group("magemin_fullrun_a")
 @pytest.mark.timeout(5400)
+# Receipt b5022121: the capture maps matched the pin and the call then
+# failed the unmarked 300 s worker budget at 370.9 s. Sibling MAGEMin
+# full runs already declare the same 5400 s budget as this wall guard.
+@pytest.mark.cpu_budget(5400)
 def test_green_full_lunar_capture_pin(route_totals, tmp_path):
     # Current full_lunar pins: studio-2 actuals at a2299343eb, equal to the
     # d-441 owner card (b265 values). History of the earlier pins follows.
