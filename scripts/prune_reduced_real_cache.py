@@ -44,6 +44,14 @@ def main(argv: list[str] | None = None) -> int:
         **result,
     }
     print(json.dumps(output, sort_keys=True))
+    vacuum_error = result["vacuum_error"]
+    if vacuum_error is not None:
+        deleted = sum(result["deleted_by_artifact"].values())
+        print(
+            f"deleted {deleted}, vacuum failed: {vacuum_error}",
+            file=sys.stderr,
+        )
+        return 1
     return 0
 
 

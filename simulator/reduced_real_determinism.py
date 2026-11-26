@@ -186,6 +186,10 @@ def _payload_codec_version(artifact: str) -> int | None:
     return _PAYLOAD_CODEC_VERSION_BY_ARTIFACT.get(artifact)
 
 
+def _vacuum_pt1_cache(connection: sqlite3.Connection) -> None:
+    connection.execute("VACUUM")
+
+
 def _prune_pt1_payload_codec_rows(
     db_path: str | Path,
     *,
@@ -222,6 +226,7 @@ def _prune_pt1_payload_codec_rows(
         rows_by_artifact = {artifact: 0 for artifact in artifacts}
         matched_by_artifact = {artifact: 0 for artifact in artifacts}
         deleted_by_artifact = {artifact: 0 for artifact in artifacts}
+        vacuum_error = None
 
         for artifact in artifacts:
             current_version = _payload_codec_version(artifact)
@@ -259,10 +264,13 @@ def _prune_pt1_payload_codec_rows(
 
         if apply:
             connection.commit()
-            if any(deleted_by_artifact.values()):
+            try:
                 # The connection sees existing WAL/SHM sidecars; SQLite manages
-                # them through commit, VACUUM, and close.
-                connection.execute("VACUUM")
+                # them through commit, VACUUM, and close. Always vacuum on
+                # apply so a retry can finish compaction after a prior failure.
+                _vacuum_pt1_cache(connection)
+            except sqlite3.Error as exc:
+                vacuum_error = f"{type(exc).__name__}: {exc}"
     except BaseException:
         if connection.in_transaction:
             connection.rollback()
@@ -276,7 +284,8 @@ def _prune_pt1_payload_codec_rows(
         "rows_by_artifact": rows_by_artifact,
         "matched_by_artifact": matched_by_artifact,
         "deleted_by_artifact": deleted_by_artifact,
-        "vacuumed": bool(apply and any(deleted_by_artifact.values())),
+        "vacuumed": bool(apply and vacuum_error is None),
+        "vacuum_error": vacuum_error,
     }
 
 

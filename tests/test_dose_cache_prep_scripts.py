@@ -76,43 +76,18 @@ def _put_real_equilibrium_cache_row(
     *,
     tag: str | None = None,
 ) -> str:
-    key = {
-        "schema_version": SCHEMA_VERSION,
-        "namespace_id": "alphamelts:equilibrium-composite",
-        "artifact": "equilibrium_post_record",
-        "intent": "EQUILIBRIUM",
-        "vapor_pressure_provider_selection": "builtin-vapor-pressure",
-        "code_version": f"test:{tag}" if tag is not None else "test",
-        "data_digests": {},
-    }
-    payload = {
-        "authority": {
-            "schema": "reduced-real-authority-v1",
-            "evidence_class": "melts",
-            "backend_family": "alphamelts",
-            "backend": {
-                "backend_name": "AlphaMELTSBackend",
-                "backend_class": (
-                    "simulator.melt_backend.alphamelts.AlphaMELTSBackend"
-                ),
-            },
-            "provider": {
-                "resolved_provider_id": "alphamelts-diagnostic",
-                "resolved_role": "authoritative",
-                "authoritative_provider_id": "alphamelts-diagnostic",
-                "fallback_provider_id": None,
-            },
-            "vapor_pressure": {
-                "resolved_provider_id": "builtin-vapor-pressure",
-                "resolved_role": "authoritative",
-                "authoritative_provider_id": "builtin-vapor-pressure",
-                "fallback_provider_id": None,
-                "fallback_allowed": False,
-            },
-        },
-        "equilibrium_result": {"status": "ok"},
-        "last_vapor_pressures_source": {"Na": "builtin_authoritative"},
-    }
+    """Persist a production-serialized equilibrium replay payload."""
+
+    from tests.test_reduced_real_pt0_determinism import (
+        _pt0_equilibrium_capture_context,
+    )
+
+    capture = rrd.PT0DeterminismStore("capture")
+    sim, result = _pt0_equilibrium_capture_context(capture)
+    key = capture._equilibrium_key(sim)
+    if tag is not None:
+        key["code_version"] = f"test:{tag}"
+    payload = rrd.equilibrium_payload(sim, result)
     key_bytes = canonical_json_bytes(key)
     payload_bytes = canonical_json_bytes(payload)
     key_hash = hashlib.sha256(key_bytes).hexdigest()
@@ -258,6 +233,50 @@ def test_reduced_real_prune_is_dry_by_default_and_deletes_only_stale_codecs(
         )
         assert entry is not None
     wal_connection.close()
+
+
+def test_reduced_real_prune_reports_delete_when_vacuum_fails_and_retries(
+    tmp_path: Path,
+    capsys,
+    monkeypatch,
+) -> None:
+    db_path = tmp_path / "reduced-real-vacuum-retry.sqlite"
+    _put_cache_row(db_path, tag="vacuum-retry")
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+            "SET payload_codec_version = NULL"
+        )
+
+    real_vacuum = rrd._vacuum_pt1_cache
+    vacuum_calls = 0
+
+    def fail_once(connection) -> None:
+        nonlocal vacuum_calls
+        vacuum_calls += 1
+        if vacuum_calls == 1:
+            raise sqlite3.OperationalError("disk full")
+        real_vacuum(connection)
+
+    monkeypatch.setattr(rrd, "_vacuum_pt1_cache", fail_once)
+
+    assert prune_reduced_real_cache_main([str(db_path), "--apply"]) == 1
+    failed_output = capsys.readouterr()
+    failed_summary = json.loads(failed_output.out)
+    assert failed_summary["deleted_by_artifact"]["freeze_gate_curve"] == 1
+    assert "deleted 1, vacuum failed: OperationalError: disk full" in (
+        failed_output.err
+    )
+    assert payload_count(db_path) == 0
+
+    assert prune_reduced_real_cache_main([str(db_path), "--apply"]) == 0
+    retry_summary = json.loads(capsys.readouterr().out)
+    assert vacuum_calls == 2
+    assert retry_summary["deleted_by_artifact"] == {
+        "freeze_gate_curve": 0,
+        "equilibrium_post_record": 0,
+    }
+    assert retry_summary["vacuumed"] is True
 
 
 def _put_internal_analytical_cache_row(db_path: Path) -> None:
