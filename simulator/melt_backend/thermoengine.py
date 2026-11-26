@@ -646,10 +646,20 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                         ),
                     }
                     cao_model_systematic_notices.append(fusion_notice)
-                except Exception:
-                    # The disclosure is optional when the live pWo query is
-                    # unavailable; it is never a gate on the raw CaO exchange.
-                    pass
+                except Exception as exc:
+                    # Report failed disclosure work; keep the raw exchange
+                    # potential scoreable and let score.py scope this CaSiO3
+                    # caveat to CaO activity, away from redox and other rows.
+                    cao_model_systematic_notices.append(
+                        {
+                            'kind': 'engine_model_caveat',
+                            'reason': (
+                                'ThermoEngine CaSiO3(l)-pWo fusion residual '
+                                'band could not be computed; '
+                                f'{type(exc).__name__}: {exc}'
+                            ),
+                        }
+                    )
             emitted_imcc_notices = []
             emitted_imcc_notices.extend(cao_model_systematic_notices)
             eq = self._emit_equilibrium_result(

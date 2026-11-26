@@ -36,7 +36,7 @@ ENGINE_GOLDEN_PROBES = {
     "vaporock": (1, "673a8c5ac16725e21c985b585a5320f08bc2bf31f785d9f68e7c1cd3f9753f3b"),
     "magemin": (4, "59eb4ffd0c28195b79b5fdfb1f212fe0f13ed1c1112afa1ae724ce60797cbac8"),
     "alphamelts": (5, "3d6e809e84c119afc0341d5bcec193fd0c0886e027c16d0fcf247035f3547af4"),
-    "thermoengine": (5, "3db7ad76c46e3130880e2782b235e739a7de72b825180c84fa94e46ec68bfb53"),
+    "thermoengine": (5, "985e3fdc1738dec493b1d32c16aa2fc9ae684b891dd941a4421105970ba1bc8e"),
 }
 
 _EXPECTED_NUMERIC_TRACE_PATHS = {

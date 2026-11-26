@@ -2211,6 +2211,59 @@ def test_melts_fe_redox_uses_ferric_fraction_only_without_weights(monkeypatch):
     assert len(calls) == 1
 
 
+def test_melts_fe_redox_keeps_unrelated_cell_notice_without_cao_caveats(
+    monkeypatch,
+):
+    row4 = _borisov_row4()
+    calls = _patch_melts_cell(
+        monkeypatch,
+        lambda _handle: _ok_cell(
+            fe_redox_split={"FeO_wt_pct": 9.0, "Fe2O3_wt_pct": 1.0},
+            melt_activities={"CaSiO3": 0.35, "SiO2": 0.4},
+            notices=[
+                {
+                    "kind": "engine_model_caveat",
+                    "reason": "ThermoEngine CaSiO3(l)-pWo fusion residual",
+                    "band": "-0.006 dex at 1502 K",
+                },
+                {
+                    "kind": "engine_model_caveat",
+                    "reason": "Berman-vs-HHR CaSiO3(cr) reassessment",
+                    "band": "+0.109 dex at 1502 K",
+                },
+                {
+                    "kind": "fallback",
+                    "reason": "unrelated redox cell fallback",
+                    "from": "vaporock",
+                    "to": "antoine_fallback",
+                },
+            ],
+        ),
+    )
+
+    prediction = predict_with_engine(
+        Engine.THERMOENGINE, row4, isolated=False,
+    )
+
+    assert prediction.value == fe3_fe2_ratio_from_oxide_wt_pct(
+        Decimal("1.0"), Decimal("9.0"),
+    )
+    assert calls[0]["pot"].composition_wt_pct["CaO"] > 0.0
+    assert any(
+        notice.kind is NoticeKind.FALLBACK
+        and notice.reason == "unrelated redox cell fallback"
+        for notice in prediction.notices
+    )
+    assert not any(
+        notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        and (
+            "CaSiO3(l)-pWo fusion residual" in notice.reason
+            or "Berman-vs-HHR CaSiO3(cr) reassessment" in notice.reason
+        )
+        for notice in prediction.notices
+    )
+
+
 def test_standalone_melts_fe_redox_prediction_closes_its_engine_handle(monkeypatch):
     from simulator.diagnostic_helpers import binary_pot_battery
     from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle

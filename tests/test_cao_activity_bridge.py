@@ -484,13 +484,12 @@ def test_thermoengine_cao_activity_uses_the_printed_solid_reference(
     assert len(model_flags) == (
         2 if engine is Engine.THERMOENGINE else 1
     )
-    assert all(notice.band is not None for notice in model_flags)
-    assert all('dex at 1933 K' in notice.band for notice in model_flags)
     hhr_flag = next(
         notice for notice in model_flags
         if 'Berman-vs-HHR CaSiO3(cr) reassessment' in notice.reason
     )
     assert hhr_flag.affected_quantities == (Quantity.ACTIVITY,)
+    assert hhr_flag.band is not None and 'dex at 1933 K' in hhr_flag.band
     assert 'cyclowollastonite' in hhr_flag.reason
     assert 'wollastonite' in hhr_flag.reason
     assert 'HHR does not extend to the row temperature' in hhr_flag.reason
@@ -501,13 +500,69 @@ def test_thermoengine_cao_activity_uses_the_printed_solid_reference(
         f'{hhr_residual_dex:+.8g} '
         'dex at 1933 K from the measured +3.151 kJ/mol residual at 1400 K'
     )
-    if engine is Engine.THERMOENGINE:
-        assert any(
-            'CaSiO3(l)-pWo fusion residual' in notice.reason
-            for notice in model_flags
+    fusion_flag = next(
+        notice for notice in model_flags
+        if 'CaSiO3(l)-pWo fusion residual' in notice.reason
+    )
+    assert fusion_flag.affected_quantities == (Quantity.ACTIVITY,)
+    assert fusion_flag.band is not None and 'dex at 1933 K' in fusion_flag.band
+
+
+@pytest.mark.skipif(
+    not thermoengine_package_available(),
+    reason='ThermoEngine runtime is not installed',
+)
+def test_thermoengine_fusion_failure_is_disclosed_on_cao_activity(
+    monkeypatch,
+) -> None:
+    from simulator.battery.enums import Engine, Quantity
+    from simulator.battery.score import _cell_notices_scoped_to_cao_activity
+    from simulator.melt_backend.thermoengine import ThermoEngineBackend
+
+    temperature_K = 1933.0
+    backend = ThermoEngineBackend()
+    if not backend.initialize({}):
+        pytest.skip(backend.unavailable_reason())
+    try:
+        def fail_pwo_fusion_query(symbol, *, temperature_K, pressure_bar):
+            if symbol == 'pWo':
+                raise RuntimeError('forced pWo fusion query failure')
+            return backend.transport.pure_phase_properties(
+                symbol,
+                temperature_K=temperature_K,
+                pressure_bar=pressure_bar,
+            )
+
+        monkeypatch.setattr(
+            backend, 'pure_phase_properties', fail_pwo_fusion_query,
         )
-    else:
-        assert len(model_flags) == 1
+        result = backend.equilibrate(
+            temperature_C=temperature_K - CELSIUS_TO_KELVIN_OFFSET,
+            composition_kg={'CaO': 56.077, 'SiO2': 60.0843},
+            fO2_log=-10.0,
+            pressure_bar=1.0,
+        )
+        assert result.status == 'ok', result.warnings
+        raw_mu = result.diagnostics['mu_CaO_J_per_mol_melts_berman_apparent']
+        activity, _ = cao_activity_from_melts_exchange_mu(
+            float(raw_mu), temperature_K, phase='cr',
+        )
+        assert math.isfinite(activity) and activity > 0.0
+
+        cell = SimpleNamespace(notices=result.diagnostics['imcc_notices'])
+        activity_notices = _cell_notices_scoped_to_cao_activity(
+            Quantity.ACTIVITY, Engine.THERMOENGINE, cell, 'CaO',
+        )
+        gap = next(
+            notice for notice in activity_notices
+            if 'CaSiO3(l)-pWo fusion residual band could not be computed'
+            in notice.reason
+        )
+        assert gap.affected_quantities == (Quantity.ACTIVITY,)
+        assert gap.band is None
+        assert 'RuntimeError: forced pWo fusion query failure' in gap.reason
+    finally:
+        backend.close()
 
 
 def test_alphamelts_cao_scoring_uses_raw_cell_exchange_and_scopes_hhr(
@@ -640,7 +695,7 @@ def test_alphamelts_cao_scoring_uses_raw_cell_exchange_and_scopes_hhr(
 
 def test_melts_cao_cell_model_caveats_do_not_leak_to_other_activity_species() -> None:
     from simulator.battery.enums import Engine, NoticeKind, Quantity
-    from simulator.battery.score import _cell_notices_for_activity_species
+    from simulator.battery.score import _cell_notices_scoped_to_cao_activity
 
     cell = SimpleNamespace(notices=[
         {
@@ -654,13 +709,13 @@ def test_melts_cao_cell_model_caveats_do_not_leak_to_other_activity_species() ->
             'band': '+0.085 dex at 1933 K',
         },
     ])
-    cao_notices = _cell_notices_for_activity_species(
+    cao_notices = _cell_notices_scoped_to_cao_activity(
         Quantity.ACTIVITY, Engine.THERMOENGINE, cell, 'CaO',
     )
-    silica_notices = _cell_notices_for_activity_species(
+    silica_notices = _cell_notices_scoped_to_cao_activity(
         Quantity.ACTIVITY, Engine.THERMOENGINE, cell, 'SiO2',
     )
-    non_activity_notices = _cell_notices_for_activity_species(
+    non_activity_notices = _cell_notices_scoped_to_cao_activity(
         Quantity.P_SAT, Engine.THERMOENGINE, cell, 'CaO',
     )
     assert len(cao_notices) == 2

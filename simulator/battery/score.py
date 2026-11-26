@@ -8315,7 +8315,7 @@ def cell_notices(
     return tuple(notices)
 
 
-def _cell_notices_for_activity_species(
+def _cell_notices_scoped_to_cao_activity(
     quantity: Quantity,
     engine: Engine,
     cell: object,
@@ -10471,7 +10471,12 @@ def _predict_redox(
         )
 
     ratio = _reported_engine_fe3_fe2_ratio(cell)
-    notices = cell_notices(Quantity.FE3_FE2_RATIO, engine, cell)
+    notices = _cell_notices_scoped_to_cao_activity(
+        Quantity.FE3_FE2_RATIO,
+        engine,
+        cell,
+        identity.species.formula if identity.species is not None else "",
+    )
     authority, certified_band = _flags_from_scored_cell(
         cell, Authority.BRIDGE, None
     )
@@ -16310,7 +16315,7 @@ def _predict_with_engine(
             return engine_call_failure(exc)
     notices = union_notices(
         tuple(extra_notices),
-        _cell_notices_for_activity_species(quantity, engine, cell, formula),
+        _cell_notices_scoped_to_cao_activity(quantity, engine, cell, formula),
     )
     authority, certified_band = _flags_from_scored_cell(cell, authority, certified_band)
     refusal = getattr(cell, "refusal_reason", None)
@@ -16598,7 +16603,7 @@ def _predict_with_engine(
             return engine_call_failure(exc)
         notices = union_notices(
             notices,
-            _cell_notices_for_activity_species(quantity, engine, cell, formula),
+            _cell_notices_scoped_to_cao_activity(quantity, engine, cell, formula),
         )
         if getattr(cell, "status", None) != "ok":
             return EnginePrediction(
