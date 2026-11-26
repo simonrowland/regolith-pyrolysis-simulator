@@ -8734,15 +8734,22 @@ def _real_producer_diagnostic_mutation_sources(
     )
 
     sources = []
+    result_temperature_K = (
+        float(payload["equilibrium_result"]["temperature_C"])
+        + CELSIUS_TO_KELVIN_OFFSET
+    )
     for source_name, diagnostic in (
         ("builtin-provider-full-diagnostic", builtin_diagnostic),
         ("vaporock-provider-full-diagnostic", vaporock_diagnostic),
     ):
         mutation_payload = copy.deepcopy(payload)
-        mutation_payload["last_vapor_pressure_diagnostic"] = copy.deepcopy(
-            rrd._json_ready(diagnostic)
+        mutation_payload["last_vapor_pressure_diagnostic"] = (
+            rrd._cache_payload_diagnostic(
+                diagnostic,
+                temperature_K=result_temperature_K,
+            )
         )
-        assert rrd._decode_payload_for_admission(
+        assert rrd._admission_rejection(
             "equilibrium_post_record",
             mutation_payload,
             payload_codec_version=rrd._payload_codec_version(
@@ -8750,7 +8757,7 @@ def _real_producer_diagnostic_mutation_sources(
             ),
             keys=(key,),
             interpolation_synthesized=interpolation_synthesized,
-        ) is not None
+        ) is None
         sources.append((source_name, mutation_payload))
     return sources
 
@@ -9262,7 +9269,7 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
             f"weight_info={weight_info}"
         )
     baseline = copy.deepcopy(attempt["payload"])
-    assert rrd._decode_payload_for_admission(
+    assert rrd._admission_rejection(
         "equilibrium_post_record",
         baseline,
         payload_codec_version=rrd._payload_codec_version(
@@ -9270,7 +9277,7 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
         ),
         keys=(query_key,),
         interpolation_synthesized=True,
-    ) is not None
+    ) is None
 
     if not persistent:
         capture.persistent_store = _MemoryInterpolationCandidates(capture)

@@ -254,24 +254,24 @@ def _is_finite_cache_number(value: Any) -> bool:
         return False
 
 
-def _decode_payload_for_admission(
+def _admission_rejection(
     artifact: str,
     payload: Any,
     *,
     payload_codec_version: int | None = None,
     keys: Sequence[Mapping[str, Any]] = (),
     interpolation_synthesized: bool = False,
-) -> Any | None:
+) -> str | None:
     expected_version = _payload_codec_version(artifact)
     if expected_version is None:
-        return payload
+        return None
     if (
         type(payload_codec_version) is not int
         or payload_codec_version != expected_version
     ):
-        return None
+        return "payload.codec_version"
     if not isinstance(payload, Mapping):
-        return None
+        return "payload.type"
 
     def has_finite_json_numbers(value: Any) -> bool:
         if isinstance(value, Mapping):
@@ -422,27 +422,27 @@ def _decode_payload_for_admission(
         )
 
     if not has_finite_json_numbers(payload):
-        return None
+        return "payload.json_number"
     if artifact == "freeze_gate_curve":
         if not keys:
-            return None
+            return "gate.key_missing"
         curve_payload = payload.get("curve")
         if not isinstance(curve_payload, Mapping):
-            return None
+            return "gate.curve.type"
         try:
             curve = _curve_from_payload(curve_payload)
-        except Exception:
-            return None
+        except Exception as exc:
+            return f"gate.curve.decode:{type(exc).__name__}"
         projected_notice = curve.get("composition_projected_notice")
         if (
             "composition_projected_notice" in curve
             and not valid_composition_projected_notice(projected_notice)
         ):
-            return None
+            return "gate.composition_projected_notice"
         magemin_identities = []
         for key in keys:
             if not isinstance(key, Mapping):
-                return None
+                return "gate.key.type"
             identity_key = key.get("freeze_gate_cache_key")
             identity_is_required = (
                 getattr(identity_key, "magemin_domain_identity", None) is not None
@@ -461,11 +461,11 @@ def _decode_payload_for_admission(
             except (OverflowError, TypeError, ValueError):
                 identity = None
             if identity is None and identity_is_required:
-                return None
+                return "gate.key.identity"
             if identity is None:
                 continue
             if identity.silica_verdict not in {"in_band", "extrapolated"}:
-                return None
+                return "gate.key.silica_verdict"
             magemin_identities.append(identity)
         extrapolated_identities = [
             identity
@@ -481,7 +481,7 @@ def _decode_payload_for_admission(
                 not stored_or_query_identity.matches(identity)
                 for identity in magemin_identities
             ):
-                return None
+                return "gate.key.identity_mismatch"
             certified_band = curve.get("certified_band")
             silica_bounds = (
                 certified_band.get("sio2_wt_pct")
@@ -502,8 +502,8 @@ def _decode_payload_for_admission(
                 or tuple(float(bound) for bound in silica_bounds)
                 != stored_or_query_identity.certified_band
             ):
-                return None
-        return curve
+                return "gate.key.certified_band_mismatch"
+        return None
     if artifact == "equilibrium_post_record":
         equilibrium_result = payload.get("equilibrium_result")
         required_result_fields = {
@@ -511,12 +511,16 @@ def _decode_payload_for_admission(
             for field in _equilibrium_result_payload_fields()
             if field.name not in _EQUILIBRIUM_RESULT_FIELDS_OMITTED_WHEN_NONE
         }
-        if (
-            not isinstance(equilibrium_result, Mapping)
-            or not required_result_fields.issubset(equilibrium_result)
-            or any(field_name not in payload for field_name in _EQUILIBRIUM_REPLAY_SIDE_FIELDS)
-        ):
-            return None
+        if not isinstance(equilibrium_result, Mapping):
+            return "equilibrium.result.type"
+        missing_result_fields = required_result_fields.difference(
+            equilibrium_result
+        )
+        if missing_result_fields:
+            return f"equilibrium.required_field:{sorted(missing_result_fields)[0]}"
+        for field_name in _EQUILIBRIUM_REPLAY_SIDE_FIELDS:
+            if field_name not in payload:
+                return f"equilibrium.required_field:{field_name}"
         authority = payload.get("authority")
         if not interpolation_synthesized:
             if (
@@ -534,7 +538,7 @@ def _decode_payload_for_admission(
                     )
                 )
             ):
-                return None
+                return "equilibrium.authority.shape"
             backend_identity = authority.get("backend")
             provider_identity = authority.get("provider")
             vapor_pressure_identity = authority.get("vapor_pressure")
@@ -548,13 +552,13 @@ def _decode_payload_for_admission(
                 or not has_provider_authority_shape(provider_identity)
                 or not has_provider_authority_shape(vapor_pressure_identity)
             ):
-                return None
+                return "equilibrium.authority.provider_shape"
         elif "authority" in payload and not isinstance(authority, Mapping):
-            return None
+            return "equilibrium.authority.type"
         try:
             decoded = _decode_equilibrium_replay_payload(payload)
-        except Exception:
-            return None
+        except Exception as exc:
+            return f"equilibrium.decode:{type(exc).__name__}"
         diagnostics = equilibrium_result.get("diagnostics")
         feo_activity = (
             diagnostics.get("a_FeO_calphad")
@@ -562,7 +566,7 @@ def _decode_payload_for_admission(
             else None
         )
         if isinstance(feo_activity, Mapping) and "notices" in feo_activity:
-            return None
+            return "equilibrium.diagnostics.a_FeO_calphad.notices"
         provenance_diagnostics = [decoded.vapor_pressure_diagnostic]
         if isinstance(decoded.result.diagnostics, Mapping):
             provenance_diagnostics.append(decoded.result.diagnostics)
@@ -609,7 +613,7 @@ def _decode_payload_for_admission(
                     high_t_activity.get("vaporock_cap_K")
                 )
             ):
-                return None
+                return "diagnostic.high_t_melt_activity.shape"
             # VapoRock writes this field as species-to-pressure data; the
             # SiO report publishes its values directly as pressures.
             vaporock_speciation = diagnostic.get(
@@ -622,7 +626,7 @@ def _decode_payload_for_admission(
                     for pressure in vaporock_speciation.values()
                 )
             ):
-                return None
+                return "diagnostic.vaporock_full_speciation_Pa"
             backend_pressures = diagnostic.get("backend_vapor_pressures_Pa")
             if "backend_vapor_pressures_Pa" in diagnostic and (
                 not isinstance(backend_pressures, Mapping)
@@ -631,7 +635,7 @@ def _decode_payload_for_admission(
                     for pressure in backend_pressures.values()
                 )
             ):
-                return None
+                return "diagnostic.backend_vapor_pressures_Pa"
             # Evaporation's shadow comparison refuses non-finite entries.
             activities = diagnostic.get("activities")
             if "activities" in diagnostic and (
@@ -642,21 +646,21 @@ def _decode_payload_for_admission(
                     for species, activity in activities.items()
                 )
             ):
-                return None
+                return "diagnostic.activities"
             activity_standard_state_required = (
                 isinstance(activities, Mapping) and bool(activities)
             )
             if activity_standard_state_required and (
                 "activities_standard_state" not in diagnostic
             ):
-                return None
+                return "diagnostic.activities_standard_state.missing"
             if (
                 "activities_standard_state" in diagnostic
                 and not valid_activity_standard_state(
                     diagnostic["activities_standard_state"]
                 )
             ):
-                return None
+                return "diagnostic.activities_standard_state"
             if "source_reaction_fO2_bar" in diagnostic:
                 source_reaction_fO2_bar = diagnostic[
                     "source_reaction_fO2_bar"
@@ -665,31 +669,31 @@ def _decode_payload_for_admission(
                     source_reaction_fO2_bar is not None
                     and not _is_finite_cache_number(source_reaction_fO2_bar)
                 ):
-                    return None
+                    return "diagnostic.source_reaction_fO2_bar"
             if "vapor_pressure_numerator_provenance" not in diagnostic:
                 continue
             provenance = diagnostic["vapor_pressure_numerator_provenance"]
             if not isinstance(provenance, Mapping):
-                return None
+                return "diagnostic.vapor_pressure_numerator_provenance.type"
             for species, species_provenance in provenance.items():
                 if (
                     not isinstance(species, str)
                     or not isinstance(species_provenance, Mapping)
                     or any(not isinstance(field, str) for field in species_provenance)
                 ):
-                    return None
+                    return "diagnostic.vapor_pressure_numerator_provenance.species"
                 if (
                     "activities_standard_state" in species_provenance
                     and not valid_activity_standard_state(
                         species_provenance["activities_standard_state"]
                     )
                 ):
-                    return None
+                    return "diagnostic.provenance.activities_standard_state"
                 for field_name in string_fields:
                     if field_name in species_provenance and not isinstance(
                         species_provenance[field_name], str
                     ):
-                        return None
+                        return f"diagnostic.provenance.{field_name}.type"
                 for field_name in nullable_string_fields:
                     value = species_provenance.get(field_name)
                     if (
@@ -697,12 +701,12 @@ def _decode_payload_for_admission(
                         and value is not None
                         and not isinstance(value, str)
                     ):
-                        return None
+                        return f"diagnostic.provenance.{field_name}.type"
                 for field_name in finite_number_fields:
                     value = species_provenance.get(field_name)
                     if field_name in species_provenance and value is not None:
                         if not _is_finite_cache_number(value):
-                            return None
+                            return f"diagnostic.provenance.{field_name}.number"
                 if "melt_oxide_gamma_valid_range_K" in species_provenance:
                     valid_range = species_provenance[
                         "melt_oxide_gamma_valid_range_K"
@@ -712,17 +716,17 @@ def _decode_payload_for_admission(
                         or isinstance(valid_range, (str, bytes))
                         or len(valid_range) != 2
                     ):
-                        return None
+                        return "diagnostic.provenance.melt_oxide_gamma_valid_range_K.shape"
                     if not all(
                         _is_finite_cache_number(bound)
                         for bound in valid_range
                     ):
-                        return None
+                        return "diagnostic.provenance.melt_oxide_gamma_valid_range_K.number"
                 if (
                     "melt_activity_fallback" in species_provenance
                     and type(species_provenance["melt_activity_fallback"]) is not bool
                 ):
-                    return None
+                    return "diagnostic.provenance.melt_activity_fallback.type"
                 refusal = species_provenance.get("openimcc_refusal")
                 if refusal is not None:
                     if not isinstance(refusal, Mapping) or any(
@@ -735,8 +739,34 @@ def _decode_payload_for_admission(
                             ("reason", refusal.get("reason")),
                         )
                     ):
-                        return None
-        return decoded
+                        return "diagnostic.provenance.openimcc_refusal"
+        return None
+    return "payload.artifact"
+
+
+def _decode_payload_for_admission(
+    artifact: str,
+    payload: Any,
+    *,
+    payload_codec_version: int | None = None,
+    keys: Sequence[Mapping[str, Any]] = (),
+    interpolation_synthesized: bool = False,
+) -> Any | None:
+    if _admission_rejection(
+        artifact,
+        payload,
+        payload_codec_version=payload_codec_version,
+        keys=keys,
+        interpolation_synthesized=interpolation_synthesized,
+    ) is not None:
+        return None
+    expected_version = _payload_codec_version(artifact)
+    if expected_version is None:
+        return payload
+    if artifact == "freeze_gate_curve":
+        return _curve_from_payload(payload["curve"])
+    if artifact == "equilibrium_post_record":
+        return _decode_equilibrium_replay_payload(payload)
     return None
 
 
