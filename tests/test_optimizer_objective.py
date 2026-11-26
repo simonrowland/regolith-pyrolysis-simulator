@@ -11432,7 +11432,11 @@ def test_sso2_owner_execution_uses_certified_na_dose_and_partition_path() -> Non
         surface["pO2_mbar"]
     )
     assert partition_basis["status"] == "available"
-    assert partition_basis["native_fe_source_account"] == "process.metal_phase"
+    # Receipt ab6a568b. Saturation extent now precipitates above 1e-12 mol,
+    # so core.py keeps the FeO split on process.cleaned_melt instead of
+    # falling through to a pre-existing metal-phase tap. d-469
+    # (8f174cc807) is that precipitation.
+    assert partition_basis["native_fe_source_account"] == "process.cleaned_melt"
     assert partition_basis["native_fe_split_commit_status"] == "ok"
     assert partition_basis["native_fe_vapor_route_status"] == "committed"
     assert partition["native_fe_saturation_split_count"] == 0

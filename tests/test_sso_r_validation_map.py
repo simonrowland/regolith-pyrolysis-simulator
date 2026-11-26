@@ -403,7 +403,14 @@ def test_exact_full_dose_oxidizing_pn2_row_skips_c3_reduction_without_capacity()
 
     assert math.isfinite(row["post_exchange_fO2_log_diagnostic"])
     assert math.isfinite(row["redox_source_delta_ln_fO2"])
-    assert row["redox_source_skip_reason"] == "no_melt_redox_capacity"
+    # Receipt 5abafffc at b7a91af39c, after the noop-capacity skip
+    # (8bbab57720) and the anode mirror (99a095ed70). The summary joins
+    # every skipped label. This full-dose row still refuses the c3
+    # integration at noop capacity, and a ferric label is exhausted
+    # (ledger fO2 a95942989e / d-469 8f174cc807), so both reasons remain.
+    assert row["redox_source_skip_reason"] == (
+        "ferric_couple_exhausted|no_melt_redox_capacity"
+    )
     assert row["redox_source_applied_terms_mol_o2_equiv_by_label"][
         "redox_source:evaporative_metal_loss"
     ] > 0.0

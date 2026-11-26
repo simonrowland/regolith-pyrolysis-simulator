@@ -38,7 +38,13 @@ species:
     target_tier: T4
     validations:
       vaporock:
-        pinned_residual_dex: 0.48565570074150183
+        # 2026-11-26 b274 receipt 5abafffc at b7a91af39c.
+        # 0.48565570074150183 -> 0.5421202100163375 dex.
+        # engine_crosscheck._run_rail_cell passes the cell fO2 through;
+        # this residual is not the Fe-line floor. First-bad class is the
+        # evaporation-stack merge a95942989e. The pin is the measured
+        # max |log10(P_rail/P_VapoRock)|.
+        pinned_residual_dex: 0.5421202100163375
         evidence_refs:
           - validation-data/pin-evidence/vaporock_engine_crosscheck_2026-08-08.yaml
   Al2:

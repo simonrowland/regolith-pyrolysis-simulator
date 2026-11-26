@@ -361,12 +361,15 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
         # supply, not a dew point. Disproportionation cannot explain equal
         # deposits: its Psat is 1.145 Pa at 1050 C and 754 Pa at 1400 C.
         # Receipt 760753a1 measured 1.3825809621333287e-05 kg at 1050 C.
-        # Receipt 72fbe252 measured 1.3800219536e-05 kg at 1400 C. The
-        # hour-path oxygen clip (60a659627a) equals the inventory at
+        # Receipt 72fbe252 measured 1.3800219536e-05 kg at 1400 C.
+        # Receipt 9fcc3329 measured 1.35194903715e-05 kg at 1500 C.
+        # Oxidative Psat at 1500 C is 4.67e-3 Pa, still negligible, so
+        # the same supply books there too. Disproportionation Psat is
+        # 2731 Pa at 1500 C and cannot make the three masses agree.
+        # The hour-path oxygen clip (60a659627a) equals the inventory at
         # dt_h = 1, which is this report's step. The oxygen that arms the
         # oxidative leg is the committed inventory left when oxide Fe
-        # evaporates and the oxygen stays (f187184015). 1500 C stays the
-        # remaining hot-wall zero until that temperature is remeasured.
+        # evaporates and the oxygen stays (f187184015).
         assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
             1.3825809621333287e-05, rel=1e-9
         )
@@ -374,7 +377,7 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
             1.3800219536e-05, rel=1e-9
         )
         assert _sio_wall_product_deposit_kg(1500.0) == pytest.approx(
-            0.0, rel=1e-9
+            1.35194903715e-05, rel=1e-9
         )
     finally:
         _report_at_wall_T.cache_clear()
