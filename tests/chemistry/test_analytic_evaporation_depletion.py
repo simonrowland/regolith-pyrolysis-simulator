@@ -52,6 +52,17 @@ def test_evaporation_batch_redox_is_independent_of_carrier_commit_order(
             melt_intrinsic_fO2_log=initial_fO2_log,
             reference_T_K=2173.15,
         )
+        # d-469 publishes the condensed-metal line when the injection
+        # is below it. At 1900 C the -20 case is below the Fe line and
+        # the -2.1 case is above it. The PT-0 reader samples that
+        # published log, not the illegal injection.
+        refreshed_fO2_log = float(
+            sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+        )
+        if initial_fO2_log <= -20.0:
+            assert refreshed_fO2_log > initial_fO2_log
+        else:
+            assert refreshed_fO2_log == pytest.approx(initial_fO2_log)
         # A fixed tangent isolates batch integration from the capacity model.
         # TiO releases gas O2 (negative source); Fe/Mg leave oxide oxygen in
         # the buffer (positive sources). The first case crosses the ceiling.
@@ -130,7 +141,7 @@ def test_evaporation_batch_redox_is_independent_of_carrier_commit_order(
             sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log,
             sim.atom_ledger.mol_by_account("reservoir.fo2_buffer").get("O2", 0.0),
             sim.atom_ledger.mol_by_account(),
-            committed, applied, reader_values,
+            committed, applied, reader_values, refreshed_fO2_log,
         ))
 
     reference, canonical, producer_first = results
@@ -142,7 +153,7 @@ def test_evaporation_batch_redox_is_independent_of_carrier_commit_order(
             assert result[2][account] == pytest.approx(
                 reference[2][account], rel=1e-14, abs=1e-14,
             )
-    for _, _, _, committed, applied, reader_values in results:
+    for _, _, _, committed, applied, reader_values, refreshed_fO2_log in results:
         assert len(applied) == len(committed) == 3
         for transition in committed.values():
             assert sum(item is transition for item in applied) == 1
@@ -150,7 +161,7 @@ def test_evaporation_batch_redox_is_independent_of_carrier_commit_order(
             id(committed[species]) for species in canonical_order
         ]
         assert len(reader_values) == 6  # evaporation + condensation per carrier
-        assert reader_values == [initial_fO2_log] * len(reader_values)
+        assert reader_values == [refreshed_fO2_log] * len(reader_values)
 
 
 def test_parent_grouped_analytic_depletion_is_shared_and_deterministic(

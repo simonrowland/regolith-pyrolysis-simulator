@@ -157,6 +157,15 @@ def test_pn2_sweep_sio_provider_uses_transport_floor_not_holdup_reservoir():
     sim.melt.pO2_mbar = requested_transport_pO2_bar * 1000.0
     sim.melt.p_total_mbar = 10.0
 
+    # r20 caps an over-P_total exchange target and still equilibrates.
+    # A reduced melt with redox capacity absorbs a 1e-3 mol holdup down
+    # to the numerical floor, so planting that holdup before the
+    # exchange leaves the ledger on the floor. The claim is the refresh
+    # split: ledger pO2 is the planted inventory, and inert-sweep
+    # transport pO2 is the sweep floor after the hour's bleed. Load the
+    # holdup once the absorbing steps have run.
+    sim._apply_oxygen_reservoir_exchange()
+    sim._apply_native_fe_saturation_split(sample_time_h=0.0)
     holdup_o2_mol = 1.0e-3
     sim.atom_ledger.load_external_mol(
         "process.overhead_gas",
@@ -164,9 +173,6 @@ def test_pn2_sweep_sio_provider_uses_transport_floor_not_holdup_reservoir():
         source="test PN2 holdup O2 must not drive SiO transport pO2",
         material_origin="feedstock",
     )
-
-    sim._apply_oxygen_reservoir_exchange()
-    sim._apply_native_fe_saturation_split(sample_time_h=0.0)
     reservoir = sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
     assert reservoir.headspace_ledger_pO2_bar > requested_transport_pO2_bar * 1.0e5
     assert requested_transport_pO2_bar * 1.0e5 == pytest.approx(1.0e-4)

@@ -574,7 +574,13 @@ def test_every_vacuum_preset_declares_imposed_pressure() -> None:
         assert parsed.pressure_driver == "imposed"
         assert parsed.pump is None or parsed.pump.nominal_speed_m3_s is None
     sample = robinot["lab_geometry"]["sample"]
-    assert sample["exposed_melt_area_m2"] is None
+    # Deck-declared pellet top face, not a measured liquid footprint.
+    # D = 13 mm. A = pi*(D/2)^2 = pi*(0.0065 m)^2 m2.
+    # A -> 0 as D -> 0. Certification still blocks on
+    # exposed_melt_area_not_printed: the area is an assumption.
+    assert sample["exposed_melt_area_m2"] == pytest.approx(
+        math.pi * (0.0065 ** 2)
+    )
     assert sample["pellet_diameter_mm"] == 13
     assert sample["pellet_height_mm"] == 10
     assert sample["mass_g"] == pytest.approx(3.38)
