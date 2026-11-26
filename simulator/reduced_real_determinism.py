@@ -496,6 +496,7 @@ def _decode_payload_for_admission(
                     _is_finite_cache_number(bound)
                     for bound in silica_bounds
                 )
+                or silica_bounds[0] >= silica_bounds[1]
                 or stored_or_query_identity.certified_band is None
                 or curve.get("authority") != "extrapolated"
                 or tuple(float(bound) for bound in silica_bounds)
@@ -3472,21 +3473,6 @@ class PT1PersistentEquilibriumStore:
     ) -> tuple[dict[str, Any], Any]:
         row_key_bytes = _sqlite_bytes(row["key_bytes"])
         row_key = json.loads(row_key_bytes.decode("utf-8"))
-        entry, decoded = self._entry_from_row(
-            row,
-            artifact=artifact,
-            key=row_key,
-            key_bytes=row_key_bytes,
-            key_hash=str(row["key_hash"]),
-            return_decoded=True,
-            admission_keys=(
-                (row_key, query_key)
-                if query_key is not None
-                else (row_key,)
-            ),
-        )
-        if decoded is None:
-            return entry, None
         row_physics_bytes = _sqlite_bytes(row["physics_key_bytes"])
         if row["physics_bucket_schema_version"] != PHYSICS_BUCKET_SCHEMA_VERSION:
             raise PT1PersistentStoreCorrupt(
@@ -3516,6 +3502,19 @@ class PT1PersistentEquilibriumStore:
                 "PT-1 row exact key does not reproduce physics bucket: "
                 f"{physics_bucket_hash}"
             )
+        entry, decoded = self._entry_from_row(
+            row,
+            artifact=artifact,
+            key=row_key,
+            key_bytes=row_key_bytes,
+            key_hash=str(row["key_hash"]),
+            return_decoded=True,
+            admission_keys=(
+                (row_key, query_key)
+                if query_key is not None
+                else (row_key,)
+            ),
+        )
         return entry, decoded
 
     def _entry_from_physics_ladder_bucket_row(
@@ -3530,22 +3529,8 @@ class PT1PersistentEquilibriumStore:
     ) -> tuple[dict[str, Any], Any]:
         row_key_bytes = _sqlite_bytes(row["key_bytes"])
         row_key = json.loads(row_key_bytes.decode("utf-8"))
-        entry, decoded = self._entry_from_row(
-            row,
-            artifact=artifact,
-            key=row_key,
-            key_bytes=row_key_bytes,
-            key_hash=str(row["key_hash"]),
-            return_decoded=True,
-            admission_keys=(
-                (row_key, query_key)
-                if query_key is not None
-                else (row_key,)
-            ),
-        )
-        if decoded is None:
-            return entry, None
-        if row[_physics_ladder_hash_column(rung_tag)] != rung_hash:
+        row_hash = row[_physics_ladder_hash_column(rung_tag)]
+        if row_hash != rung_hash:
             raise PT1PersistentStoreCorrupt(
                 f"PT-1 row {rung_tag} physics bucket hash mismatch: {rung_hash}"
             )
@@ -3574,6 +3559,19 @@ class PT1PersistentEquilibriumStore:
             raise PT1PersistentStoreCorrupt(
                 f"PT-1 row {rung_tag} distance mismatch: {rung_hash}"
             )
+        entry, decoded = self._entry_from_row(
+            row,
+            artifact=artifact,
+            key=row_key,
+            key_bytes=row_key_bytes,
+            key_hash=str(row["key_hash"]),
+            return_decoded=True,
+            admission_keys=(
+                (row_key, query_key)
+                if query_key is not None
+                else (row_key,)
+            ),
+        )
         return entry, decoded
 
 
