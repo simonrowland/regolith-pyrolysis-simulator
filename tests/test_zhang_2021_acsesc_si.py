@@ -121,8 +121,10 @@ def test_zhang_si_migrates_percent_and_keeps_unprinted_fo2_unknown() -> None:
 
     for observation in mass_loss_rows.values():
         identity = observation.identity
-        assert identity.method.is_value
-        assert identity.method.value is MethodToken.LANGMUIR_FREE_EVAPORATION
+        # Method is a MethodToken on the experiment. Identity has no method field.
+        experiment = migrator.result.experiments[observation.experiment_id]
+        assert experiment.method.is_value
+        assert experiment.method.value is MethodToken.LANGMUIR_FREE_EVAPORATION
         assert identity.temperature_K.is_value
         assert identity.composition.is_value
         assert identity.fO2_Pa.is_unknown
