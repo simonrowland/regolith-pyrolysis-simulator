@@ -426,10 +426,16 @@ def test_successful_openimcc_physics_is_bit_identical() -> None:
     assert hashlib.sha256(
         json.dumps(numeric_payload, sort_keys=True).encode()
     ).hexdigest() == "d0e6be0b136271284b56fa387dfc0a8977455951c25b7981c85fde05fffdf6f9"
-    # Projected metadata digest captured from merged green cb20fb3d4 on studio-2.
+    # Combined digest embeds numeric_payload. Receipt 5abafffc moved
+    # vapor_pressures_Pa and activities at 2400.65 K (evaporation-stack
+    # publish a95942989e, remeasured after the d-469 floor); that numeric
+    # pin is the assert above and it passed again on receipt e1976c37.
+    # The combined digest was still the pre-move green value, so it moves
+    # with the numeric payload it contains. Sources, numerator provenance
+    # and warnings ride along; this receipt does not separate them.
     assert hashlib.sha256(
         json.dumps((*numeric_payload, *metadata_payload), sort_keys=True).encode()
-    ).hexdigest() == "1064588935496b5f0ff99e1ff6e2908bc62f20e1845520ebe8aa321a91c76582"
+    ).hexdigest() == "1aa8934529adcfe6ee1ad603e736107bb57ccccf8b1666931d891bb299502145"
 
 
 def test_1800_k_pre_switch_physics_pin() -> None:

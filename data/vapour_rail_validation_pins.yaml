@@ -662,7 +662,14 @@ species:
     target_tier: T4
     validations:
       vaporock:
-        pinned_residual_dex: 0.17562698423078063
+        # 2026-11-26 b274 receipt e1976c37 at 8cafb9ec3a.
+        # 0.17562698423078063 -> 0.23155145669969357 dex.
+        # Same cell as the Al pin: _run_rail_cell passes the crosscheck
+        # fO2 through, and this path does not apply the d-469 Fe floor.
+        # The residual is max |log10(P_rail / P_VapoRock)| after the
+        # evaporation-stack merge a95942989e. Species before Ti in the
+        # sorted vaporock set still sat inside their pins on this receipt.
+        pinned_residual_dex: 0.23155145669969357
         evidence_refs:
           - validation-data/pin-evidence/vaporock_engine_crosscheck_2026-08-08.yaml
   TiO:
