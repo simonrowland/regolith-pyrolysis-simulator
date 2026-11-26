@@ -8180,13 +8180,24 @@ def test_interpolated_flux_replay_mutation_cannot_finish_campaign_hour(
         db_path=tmp_path / "interpolation-mutation-warm.sqlite",
     )
 
-    with pytest.raises(EvaporationFluxRefusal):
+    with pytest.raises(EvaporationFluxRefusal) as refusal:
         _run_interpolation_class_guard_hour(
             warm_store,
             interpolation_source=cold_row,
             monkeypatch=monkeypatch,
             replay_interpolation_into_flux=True,
         )
+
+    assert refusal.value.reason == (
+        "interpolated_equilibrium_not_flux_eligible"
+    )
+    notices = refusal.value.diagnostic["vapour_batch_flux_overlay"]["notices"]
+    assert notices
+    assert all(
+        notice["kind"] == "vapour_batch_unresolved"
+        and notice["reason"] == "interpolated_equilibrium_not_flux_eligible"
+        for notice in notices
+    )
 
 
 def test_tier_ceiling_cached_exact_refuses_physics_bucket_hit(tmp_path: Path) -> None:

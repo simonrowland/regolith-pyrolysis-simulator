@@ -7949,6 +7949,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             FiniteCapacity,
             thermal_train_parameters_from_mapping,
         )
+        from simulator.vapour_rail.instrumentation import serialize_vapour_batch
 
         capacity, cold_train = self._cold_train_capacity_policy()
         if not isinstance(capacity, FiniteCapacity) or cold_train is None:
@@ -7976,6 +7977,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         batch_flux_pressures = None
         batch_flux_overlay: dict[str, Any] = {}
         resolve_error: dict[str, Any] = {}
+        vapor_pressure_diagnostic: dict[str, Any] = {}
+        vapour_batch = None
         if not (
             liquid_fraction is not None
             and legacy_raw_liquid_fraction_is_zero(liquid_fraction)
@@ -7983,15 +7986,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             (
                 batch_flux_pressures,
                 batch_flux_overlay,
-                _vapour_batch,
+                vapour_batch,
                 resolve_error,
-                _vapor_pressure_diagnostic,
+                vapor_pressure_diagnostic,
                 _effective_pressure_source,
             ) = (
                 self._resolve_evaporation_batch_flux_state(
                     equilibrium,
                     temperature_K=temperature_K,
                 )
+            )
+            EvaporationMixin._classify_proven_zero_langmuir_channels(
+                self,
+                batch_flux_overlay,
+                vapor_pressure_diagnostic,
             )
             refusal = EvaporationMixin._vapour_batch_resolution_refusal(
                 self,
@@ -8006,6 +8014,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             equilibrium,
             overhead_partials_Pa=initial_partials,
             vapour_batch_flux_pressures_Pa=batch_flux_pressures,
+            vapour_batch_report=(
+                serialize_vapour_batch(vapour_batch)
+                if batch_flux_pressures is not None
+                else None
+            ),
+            vapour_batch_flux_overlay=(
+                batch_flux_overlay if batch_flux_pressures is not None else None
+            ),
         )
         for species in pre_holdup:
             molar_masses.setdefault(
@@ -8078,6 +8094,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     batch_flux_overlay,
                     reclosed,
                     final_pressures=reclosed_pressures,
+                )
+                EvaporationMixin._classify_proven_zero_langmuir_channels(
+                    self,
+                    batch_flux_overlay,
+                    vapor_pressure_diagnostic,
+                    surface=reclosed,
+                    overhead_partials_Pa=partials_Pa,
+                )
+                iteration_controls['vapour_batch_flux_overlay'] = dict(
+                    batch_flux_overlay
                 )
                 refusal = EvaporationMixin._vapour_batch_resolution_refusal(
                     self,

@@ -482,6 +482,10 @@ _REFUSAL_EXPLANATIONS = {
     'vapour_batch_resolution_error': (
         'Vapour-batch resolution failed without a more specific typed reason.'
     ),
+    'interpolated_equilibrium_not_flux_eligible': (
+        'A cached interpolated equilibrium is available to non-flux consumers, '
+        'but it cannot supply evaporation pressure; the flux channel is unavailable.'
+    ),
     'missing_vapour_batch_flux_pressures_Pa': (
         'The authoritative vapour-batch pressure map is missing; legacy '
         'pressure fields are not permitted to drive evaporation flux.'

@@ -1866,15 +1866,29 @@ class EvaporationMixin:
             } if isinstance(states, Mapping) else set()
             if not notices or resolved_species:
                 return None
-        reason = str(
-            error.get('reason')
-            or next(
-                (notice.get('reason') for notice in notices if notice.get('reason')),
-                None,
-            )
-            or overlay.get('selection_source')
-            or 'vapour_batch_no_debiting_pressure_outcome'
+        notice_reason = next(
+            (notice.get('reason') for notice in notices if notice.get('reason')),
+            None,
         )
+        # A closure's free-form diagnostic remains in its per-species notice;
+        # it is not a stable public terminal reason.
+        stable_notice_reason = (
+            notice_reason
+            if isinstance(notice_reason, str) and notice_reason.isidentifier()
+            else None
+        )
+        if error.get('reason'):
+            reason = str(error['reason'])
+        elif notices:
+            reason = str(
+                stable_notice_reason
+                or 'vapour_batch_no_debiting_pressure_outcome'
+            )
+        else:
+            reason = str(
+                overlay.get('selection_source')
+                or 'vapour_batch_no_debiting_pressure_outcome'
+            )
         return EvaporationFluxRefusal(
             reason,
             {
@@ -1919,6 +1933,124 @@ class EvaporationMixin:
                 species=species_id,
                 reason=str(reason),
             )
+
+    def _classify_proven_zero_langmuir_channels(
+        self,
+        flux_overlay: dict[str, Any],
+        vapor_pressure_diagnostic: Mapping[str, Any],
+        *,
+        flux: Any = None,
+        surface: Any = None,
+        overhead_partials_Pa: Mapping[str, float] | None = None,
+    ) -> dict[str, dict[str, Any]]:
+        """Mark closure-refused channels as typed zero only with cap proof."""
+        from simulator.langmuir_surface_oxygen import (
+            LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED,
+            _condensed_cap,
+        )
+
+        surface = (
+            getattr(self, '_last_langmuir_surface_oxygen', {}) or {}
+            if surface is None
+            else surface
+        )
+        as_diagnostic = getattr(surface, 'as_diagnostic', None)
+        surface_report = (
+            dict(as_diagnostic())
+            if callable(as_diagnostic)
+            else dict(surface)
+            if isinstance(surface, Mapping)
+            else {}
+        )
+        if not (
+            surface_report.get('applied', getattr(surface, 'applied', False))
+            and surface_report.get(
+                'surface_pO2_bar', getattr(surface, 'surface_pO2_bar', None)
+            ) is None
+        ):
+            return {}
+
+        provenance = vapor_pressure_diagnostic.get(
+            'vapor_pressure_numerator_provenance', {}
+        ) or {}
+        selected = flux_overlay.get('selected_runtime_pa_by_species', {})
+        partials = (
+            overhead_partials_Pa
+            if overhead_partials_Pa is not None
+            else surface_report.get('overhead_partials_Pa', {})
+        )
+        refused_species = getattr(
+            surface, 'refused_species', surface_report.get('refused_species', {})
+        ) or {}
+        refusal_codes = getattr(
+            surface,
+            'refusal_codes_by_species',
+            surface_report.get('refusal_codes_by_species', {}),
+        ) or {}
+        channel_states = dict(flux_overlay.get('batch_channel_states', {}) or {})
+        driving_forces: dict[str, dict[str, Any]] = {}
+        if not isinstance(refused_species, Mapping):
+            return driving_forces
+        for species in refused_species:
+            if (
+                channel_states.get(species) != 'eligible'
+                or not isinstance(refusal_codes, Mapping)
+                or refusal_codes.get(species)
+                != LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED
+            ):
+                continue
+            pressure = selected.get(species) if isinstance(selected, Mapping) else None
+            headspace = partials.get(species) if isinstance(partials, Mapping) else None
+            if not all(
+                isinstance(value, Real) and not isinstance(value, bool)
+                and math.isfinite(value) and value > 0.0
+                for value in (pressure, headspace)
+            ):
+                continue
+            _capped, _activity, cap = _condensed_cap(
+                provenance.get(species, {}) if isinstance(provenance, Mapping) else {},
+                pressure,
+            )
+            if cap is None:
+                continue
+            drive = cap - headspace
+            driving_forces[str(species)] = {
+                'capped_equilibrium_pressure_Pa': cap,
+                'headspace_partial_pressure_Pa': headspace,
+                'driving_force_Pa': drive,
+                'driving_force_sign': 'non_positive' if drive <= 0.0 else 'positive',
+                'closure_bracket_state': surface_report.get('warning'),
+            }
+            # With net condensation disabled, J <= 0 at the pure-component
+            # cap proves no outward flux at any possible surface pO2.
+            if drive > 0.0:
+                continue
+            channel_states[str(species)] = 'zero_by_physics'
+            authorities = getattr(flux, 'carrier_authority_by_species', None)
+            if isinstance(authorities, dict) and species in authorities:
+                channel = authorities[species]
+                channel['pressure'] = {
+                    'kind': 'zero_by_physics',
+                    'evidence_ref': 'non_positive_capped_net_driving_force',
+                }
+                channel['extra'] = {
+                    **channel.get('extra', {}),
+                    'net_driving_force': driving_forces[str(species)],
+                }
+            notices = flux_overlay.get('notices')
+            if isinstance(notices, list):
+                flux_overlay['notices'] = [
+                    notice for notice in notices
+                    if not (
+                        isinstance(notice, Mapping)
+                        and notice.get('kind') == 'vapour_batch_unresolved'
+                        and notice.get('species') == species
+                    )
+                ]
+        if driving_forces:
+            flux_overlay['net_driving_force_by_species'] = driving_forces
+            flux_overlay['batch_channel_states'] = channel_states
+        return driving_forces
 
     def _resolve_evaporation_batch_flux_state(
         self,
@@ -1979,6 +2111,36 @@ class EvaporationMixin:
         resolve_error = dict(
             getattr(self, '_last_vapour_batch_resolve_error', {}) or {}
         )
+        served_from = vapor_pressure_diagnostic.get('served_from')
+        source_map = (
+            getattr(self, '_last_vapor_pressures_source', {})
+            or getattr(equilibrium, 'vapor_pressures_source', {})
+            or {}
+        )
+        warnings = getattr(equilibrium, 'warnings', ()) or ()
+        interpolated_provenance = (
+            vapor_pressure_diagnostic.get('source') == 'cached_interpolated'
+            or (
+                vapor_pressure_diagnostic.get('source') == 'served_not_executed'
+                and isinstance(served_from, Mapping)
+                and served_from.get('source') == 'cached_interpolated'
+            )
+            or (
+                isinstance(source_map, Mapping)
+                and any(source == 'cached_interpolated' for source in source_map.values())
+            )
+            or 'cached_interpolated_linear_estimate' in warnings
+        )
+        if interpolated_provenance:
+            # Defense in depth at the flux consumer: even if a cache caller
+            # admits a synthesized estimate, no interpolated pressure reaches
+            # the selector or the evaporation provider.
+            vapour_batch = None
+            resolve_error = {
+                'status': 'unavailable',
+                'reason': 'interpolated_equilibrium_not_flux_eligible',
+                'detail': 'cached interpolation is served for non-flux consumers only',
+            }
         vapor_pressures, flux_overlay_report = flux_pressures_from_batch(
             vapour_batch,
             effective_pressure_source=effective_pressure_source,
@@ -2407,6 +2569,16 @@ class EvaporationMixin:
             self._last_evaporation_flux_diagnostic = refusal.diagnostic
             raise refusal
 
+        driving_forces = EvaporationMixin._classify_proven_zero_langmuir_channels(
+            self,
+            flux_overlay_report,
+            vapor_pressure_diagnostic,
+            flux=flux,
+        )
+        channel_states = dict(
+            flux_overlay_report.get('batch_channel_states', {}) or {}
+        )
+
         liquid_state_admits_inventory_zero = liquid_fraction is None
         if (
             isinstance(liquid_fraction, Real)
@@ -2547,83 +2719,6 @@ class EvaporationMixin:
                     pass
             if regime_diagnostic:
                 self._last_evaporation_flux_diagnostic = regime_diagnostic
-            channel_states = dict(
-                flux_overlay_report.get('batch_channel_states', {}) or {}
-            )
-            surface = getattr(self, '_last_langmuir_surface_oxygen', {}) or {}
-            driving_forces = {}
-            if surface.get('applied') and surface.get('surface_pO2_bar') is None:
-                from simulator.langmuir_surface_oxygen import (
-                    LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED,
-                    _condensed_cap,
-                )
-
-                provenance = vapor_pressure_diagnostic.get(
-                    'vapor_pressure_numerator_provenance', {}
-                ) or {}
-                selected = flux_overlay_report.get('selected_runtime_pa_by_species', {})
-                partials = surface.get('overhead_partials_Pa', {})
-                refusal_codes = surface.get('refusal_codes_by_species')
-                for species in surface.get('refused_species', {}):
-                    if (
-                        channel_states.get(species) != 'eligible'
-                        or not isinstance(refusal_codes, Mapping)
-                        or refusal_codes.get(species)
-                        != LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED
-                    ):
-                        continue
-                    pressure = selected.get(species)
-                    headspace = partials.get(species)
-                    if not all(
-                        isinstance(value, Real) and not isinstance(value, bool)
-                        and math.isfinite(value) and value > 0.0
-                        for value in (pressure, headspace)
-                    ):
-                        continue
-                    _capped, _activity, cap = _condensed_cap(
-                        provenance.get(species, {}), pressure,
-                    )
-                    if cap is None:
-                        continue
-                    drive = cap - headspace
-                    driving_forces[species] = {
-                        'capped_equilibrium_pressure_Pa': cap,
-                        'headspace_partial_pressure_Pa': headspace,
-                        'driving_force_Pa': drive,
-                        'driving_force_sign': 'non_positive' if drive <= 0.0 else 'positive',
-                        'closure_bracket_state': surface.get('warning'),
-                    }
-                    # J = alpha*(P_eq - P_h)/sqrt(2*pi*M*R*T). The
-                    # positive denominator makes J <= 0 when P_h >= the
-                    # pure-component cap (Pa). Net condensation into the
-                    # melt is disabled, so this is zero outward flux at
-                    # every possible surface pO2, even without a root.
-                    if drive <= 0.0:
-                        channel_states[species] = 'zero_by_physics'
-                        channel = flux.carrier_authority_by_species[species]
-                        channel['pressure'] = {
-                            'kind': 'zero_by_physics',
-                            'evidence_ref': 'non_positive_capped_net_driving_force',
-                        }
-                        channel['extra'] = {
-                            **channel.get('extra', {}),
-                            'net_driving_force': driving_forces[species],
-                        }
-                        notices = flux_overlay_report.get('notices')
-                        if isinstance(notices, list):
-                            flux_overlay_report['notices'] = [
-                                notice
-                                for notice in notices
-                                if not (
-                                    isinstance(notice, Mapping)
-                                    and notice.get('kind')
-                                    == 'vapour_batch_unresolved'
-                                    and notice.get('species') == species
-                                )
-                            ]
-            if driving_forces:
-                flux_overlay_report['net_driving_force_by_species'] = driving_forces
-                flux_overlay_report['batch_channel_states'] = channel_states
             # When every channel is a typed non-debit outcome (genuine bound,
             # zero, dormant) and none is refused / eligible / missing-seam,
             # empty flux is authorized, not an empty-provider false zero.
