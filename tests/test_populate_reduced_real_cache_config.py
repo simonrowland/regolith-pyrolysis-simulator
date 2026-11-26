@@ -356,7 +356,9 @@ def test_populate_merge_skips_missing_codec_for_versioned_artifacts(
     target_db = tmp_path / "codec-target.db"
     key = _pt1_key("codec-transfer")
     key["artifact"] = "equilibrium_post_record"
-    key_hash = _write_pt1_row(shard_db, key)
+    payload = _pt1_payload("codec-transfer")
+    payload["equilibrium_result"] = {"status": "ok", "liquid_fraction": 1.0}
+    key_hash = _write_pt1_row(shard_db, key, payload)
     if drop_codec_column:
         with sqlite3.connect(shard_db) as conn:
             conn.execute(
@@ -675,7 +677,9 @@ def test_magemin_accounting_reads_new_namespace_schema(tmp_path):
     summary = driver._cache_row_summary(db_path)
 
     assert summary["magemin_unique_keys"] == 1
-    assert driver._magemin_key_hashes(db_path) == {key_hash}
+    assert driver._admitted_cache_payload_rows(
+        driver._cache_payload_rows(db_path)
+    )[2] == {key_hash}
 
 
 def test_new_schema_pt1_gate_rejects_fallback_authority(tmp_path):

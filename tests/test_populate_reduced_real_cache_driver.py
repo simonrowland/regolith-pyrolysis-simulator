@@ -145,7 +145,7 @@ def _strict_vapor_pt1_payload(
                 "fallback_allowed": fallback_provider_id is not None,
             },
         },
-        "equilibrium_result": {"status": "ok"},
+        "equilibrium_result": {"status": "ok", "liquid_fraction": 1.0},
         "last_vapor_pressures_source": {"Na": "builtin_authoritative"},
     }
 
@@ -524,6 +524,45 @@ def test_mass_balance_failure_discards_shard_without_seeding_target(tmp_path, mo
     assert emitted[-1]["status"] == "failed"
     assert emitted[-1]["failed_reason"] == "mass_balance_gate_failed"
     assert emitted[-1]["live"][0]["cache_merge"]["discarded"] is True
+    assert driver._cache_row_summary(target_db)["rows"] == 0
+
+
+def test_validate_replay_discarded_capture_shard_ignores_superseded_magemin_rows(
+    tmp_path,
+    monkeypatch,
+):
+    emitted = []
+    _patch_common(monkeypatch, emitted)
+    target_db = tmp_path / "target.db"
+
+    def fake_run_case(*, db_path, mode, **kwargs):
+        if mode == "capture":
+            _write_superseded_gate_rows(db_path)
+            return _result(marker="live", mode=mode)
+        return _result(marker="replay", mode=mode)
+
+    monkeypatch.setattr(driver, "_run_case", fake_run_case)
+
+    rc = driver.main(
+        [
+            "--profile",
+            "unused",
+            "--db",
+            str(target_db),
+            "--hours",
+            "1",
+            "--validate-replay",
+        ]
+    )
+
+    assert rc == 3
+    assert emitted[-1]["validation"]["cached_exact_confirmed"] is False
+    assert emitted[-1]["estimate"]["observed_magemin_keys"] == 0
+    discarded = emitted[-1]["live"][0]["cache_merge"]
+    assert discarded["discarded"] is True
+    assert discarded["rows"] == 2
+    assert discarded["superseded_rows"] == 2
+    assert discarded["magemin_unique_keys"] == 0
     assert driver._cache_row_summary(target_db)["rows"] == 0
 
 

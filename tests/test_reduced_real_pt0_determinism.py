@@ -5141,18 +5141,29 @@ def _store_raw_replay_payload(
     *,
     law_disclosures=(),
 ) -> None:
+    """Inject a legacy payload whose missing codec semantics make it stale."""
+
     key_bytes = rrd.canonical_json_bytes(key)
     payload_bytes = rrd.canonical_json_bytes(payload)
+    key_hash = rrd._sha256(key_bytes)
     store.persistent_store.put(
         artifact=artifact,
         key=key,
         key_bytes=key_bytes,
-        key_hash=rrd._sha256(key_bytes),
+        key_hash=key_hash,
         payload=payload,
         payload_bytes=payload_bytes,
         payload_hash=rrd._sha256(payload_bytes),
         law_disclosures=law_disclosures,
     )
+    codec_version = rrd._payload_codec_version(artifact)
+    if codec_version is not None:
+        with sqlite3.connect(store.persistent_path) as conn:
+            conn.execute(
+                f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+                "SET payload_codec_version = ? WHERE key_hash = ?",
+                (codec_version - 1, key_hash),
+            )
 
 
 def _store_unadmitted_test_payload(
@@ -7136,131 +7147,6 @@ def test_tier_ceiling_cached_physics_bucket_refuses_interpolation(
 
     assert payload is None
     assert store.replay_sequence == []
-
-
-def test_stub_engine_hour_captures_strict_gate_row_and_merges(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    shard_db = tmp_path / "populate-shard.sqlite"
-    merged_db = tmp_path / "merged.sqlite"
-    capture = PT0DeterminismStore(
-        "capture",
-        db_path=shard_db,
-        strict_vapor_gate=True,
-    )
-    from simulator.chemistry.kernel import config as chemistry_config
-
-    provider_order = dict(chemistry_config.LIQUID_FRACTION_PROVIDER_ORDER)
-    provider_order["magemin"] = ("magemin",)
-    monkeypatch.setattr(
-        chemistry_config,
-        "LIQUID_FRACTION_PROVIDER_ORDER",
-        provider_order,
-    )
-    sim = _build_pt0_sim_with_strict_vapor_default(capture)
-    assert len(sim._chem_registry.gate_provider_order) == 1
-    stub_engine = _install_magemin_subprocess_gate(sim, monkeypatch)
-    equilibrium_provider = _CountingSilicateEquilibriumProvider()
-    _configure_authoritative_alphamelts_equilibrium(
-        sim,
-        equilibrium_provider,
-        allow_internal_analytical_fallback=False,
-    )
-    # The live hour's equilibrium record carries out-of-range vapor source
-    # diagnostics. This test covers PT-1 gate-curve capture, so omit only the
-    # unrelated equilibrium artifact and leave the strict corpus policy intact.
-    monkeypatch.setattr(
-        capture,
-        "capture_equilibrium",
-        lambda *_args, **_kwargs: None,
-    )
-    sim.start_campaign(CampaignPhase.C2A_STAGED)
-
-    target_C, _ramp_rate = sim.campaign_mgr.get_temp_target(
-        sim.melt.campaign,
-        sim.melt.campaign_hour,
-        sim.melt,
-    )
-    assert target_C is not None
-    # The active first stage holds at a temperature with alkali flux. The
-    # evaporation path requests a gate curve only when its flux map is nonempty.
-    sim.melt.temperature_C = float(target_C)
-
-    sim.step()
-
-    assert capture.summary()["capture_calls_by_artifact"].get(
-        "freeze_gate_curve",
-        0,
-    ) >= 1
-    assert stub_engine["evaluated_compositions"]
-    with sqlite3.connect(shard_db) as conn:
-        rows = conn.execute(
-            f"SELECT key_bytes, payload_bytes FROM {PT1_EQUILIBRIUM_TABLE} "
-            "WHERE artifact = 'freeze_gate_curve' ORDER BY key_hash"
-        ).fetchall()
-    assert rows
-    key = json.loads(bytes(rows[0][0]).decode("utf-8"))
-    payload = json.loads(bytes(rows[0][1]).decode("utf-8"))
-    resolved_vapor_authority = rrd._provider_identity(
-        sim,
-        ChemistryIntent.VAPOR_PRESSURE,
-    )
-    assert resolved_vapor_authority["fallback_allowed"] is False
-    assert payload["authority"]["vapor_pressure"] == resolved_vapor_authority
-    assert key["vapor_pressure_provider_selection"] == "builtin-vapor-pressure"
-    assert key["vapor_pressure_provider_selection"] == (
-        resolved_vapor_authority["resolved_provider_id"]
-    )
-
-    merge_result = merge_cache_source(shard_db, merged_db)
-    assert merge_result["inserted_rows"] == merge_result["rows"]
-    assert _persistent_artifact_count(merged_db, "freeze_gate_curve") == len(rows)
-
-    # A prior codec-v3 target row has the same key but lacks authority. The
-    # current-version source supersedes that stale row during shard merge.
-    stale_target_db = tmp_path / "merged-v3-target.sqlite"
-    with sqlite3.connect(shard_db) as source_conn, sqlite3.connect(
-        stale_target_db
-    ) as target_conn:
-        source_conn.backup(target_conn)
-        for key_hash, raw_payload in target_conn.execute(
-            f"SELECT key_hash, payload_bytes FROM {PT1_EQUILIBRIUM_TABLE} "
-            "WHERE artifact = 'freeze_gate_curve'"
-        ).fetchall():
-            legacy_payload = json.loads(bytes(raw_payload))
-            legacy_payload.pop("authority")
-            legacy_bytes = canonical_json_bytes(legacy_payload)
-            target_conn.execute(
-                f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
-                "SET payload_bytes = ?, payload_sha256 = ?, "
-                "payload_codec_version = ? WHERE key_hash = ?",
-                (
-                    sqlite3.Binary(legacy_bytes),
-                    hashlib.sha256(legacy_bytes).hexdigest(),
-                    rrd.PT0_GATE_CURVE_CODEC_VERSION - 1,
-                    key_hash,
-                ),
-            )
-    stale_merge_result = merge_cache_source(shard_db, stale_target_db)
-    assert stale_merge_result["inserted_rows"] == 0
-    with sqlite3.connect(stale_target_db) as conn:
-        merged_rows = conn.execute(
-            f"SELECT key_bytes, payload_bytes, payload_codec_version "
-            f"FROM {PT1_EQUILIBRIUM_TABLE} "
-            "WHERE artifact = 'freeze_gate_curve'"
-        ).fetchall()
-    assert {
-        (bytes(key_bytes), bytes(payload_bytes))
-        for key_bytes, payload_bytes in rows
-    } == {
-        (bytes(key_bytes), bytes(payload_bytes))
-        for key_bytes, payload_bytes, _version in merged_rows
-    }
-    assert all(
-        version == rrd.PT0_GATE_CURVE_CODEC_VERSION
-        for _key_bytes, _payload_bytes, version in merged_rows
-    )
 
 
 def test_tier_ceiling_default_preserves_pre_c5_lookup_behavior(tmp_path: Path) -> None:

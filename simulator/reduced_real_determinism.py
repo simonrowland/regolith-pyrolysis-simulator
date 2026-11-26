@@ -461,6 +461,34 @@ _PT1_CACHE_MERGE_IDENTITY_FIELDS = (
 )
 
 
+def _pt1_existing_payload_is_superseded(
+    artifact: str,
+    payload: Any,
+    *,
+    payload_codec_version: int | None,
+    keys: Sequence[Mapping[str, Any]],
+    key_hash: str,
+) -> bool:
+    """Treat only old codecs as superseded; invalid current rows are corrupt."""
+
+    codec_stamp_is_current = _payload_codec_stamp_is_current(
+        artifact,
+        payload_codec_version,
+    )
+    if codec_stamp_is_current is False:
+        return True
+    if _decode_payload_for_admission(
+        artifact,
+        payload,
+        payload_codec_version=payload_codec_version,
+        keys=keys,
+    ) is None:
+        raise PT1PersistentStoreCorrupt(
+            f"PT-1 current payload fails codec admission for {artifact}: {key_hash}"
+        )
+    return False
+
+
 class PT0InvalidControls(RuntimeError):
     """PT-0 control quantization received a non-finite process value."""
 
@@ -2070,12 +2098,13 @@ class PT1PersistentEquilibriumStore:
                     key_bytes=key_bytes,
                     key_hash=key_hash,
                 )
-                stale_payload = _decode_payload_for_admission(
+                stale_payload = _pt1_existing_payload_is_superseded(
                     artifact,
                     entry.get("payload"),
                     payload_codec_version=entry.get("payload_codec_version"),
                     keys=(entry.get("key", {}), key),
-                ) is None
+                    key_hash=key_hash,
+                )
                 if not stale_payload and (
                     entry["payload_hash"] != payload_hash
                     or canonical_json_bytes(entry["payload"]) != payload_bytes
@@ -3127,12 +3156,13 @@ def _pt1_row_admission(
         or _sha256(payload_bytes) != row["payload_sha256"]
     ):
         return False
-    return _decode_payload_for_admission(
+    return not _pt1_existing_payload_is_superseded(
         str(row["artifact"]),
         payload,
         payload_codec_version=row["payload_codec_version"],
         keys=(key,),
-    ) is not None
+        key_hash=key_hash,
+    )
 
 
 def _pt1_cache_merge_identity(

@@ -49,6 +49,7 @@ from simulator.reduced_real_determinism import (
     PT1PersistentEquilibriumStore,
     _physics_ladder_values_from_replay_key,
     _payload_codec_stamp_is_current,
+    _pt1_row_admission,
     canonical_json_bytes,
     canonical_physics_bucket_key_from_replay_key,
     _copy_pt1_equilibrium_rows,
@@ -763,8 +764,11 @@ def _validated_cache_payload_row(row: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
-def _cache_row_summary(db_path: Path) -> dict[str, Any]:
-    payload_rows = _cache_payload_rows(db_path)
+def _admitted_cache_payload_rows(
+    payload_rows: list[dict[str, Any]],
+) -> tuple[list[dict[str, Any]], int, set[str]]:
+    """Validate current rows and derive MAGEMin hashes from admitted keys."""
+
     rows: list[dict[str, Any]] = []
     superseded_rows = 0
     for row in payload_rows:
@@ -775,12 +779,33 @@ def _cache_row_summary(db_path: Path) -> dict[str, Any]:
         if codec_stamp_is_current is False:
             superseded_rows += 1
             continue
-        key = json.loads(bytes(row["key_bytes"]).decode("utf-8"))
-        payload = json.loads(bytes(row["payload_bytes"]).decode("utf-8"))
+        validated_row = _validated_cache_payload_row(row)
+        if not _pt1_row_admission(row):
+            raise RuntimeError(
+                "PT-1 cache row failed current payload admission: "
+                f"{row['key_hash']}"
+            )
+        rows.append(validated_row)
+    magemin_key_hashes = {
+        str(row["key_hash"])
+        for row in rows
+        if str(row["key"].get("namespace_id") or "").startswith("magemin:")
+    }
+    return rows, superseded_rows, magemin_key_hashes
+
+
+def _cache_row_summary(db_path: Path) -> dict[str, Any]:
+    rows, superseded_rows, magemin_key_hashes = _admitted_cache_payload_rows(
+        _cache_payload_rows(db_path)
+    )
+    summary_rows: list[dict[str, Any]] = []
+    for row in rows:
+        key = row["key"]
+        payload = row["payload"]
         authority = payload.get("authority") or {}
         provider = authority.get("provider") or {}
         namespace_id = str(key.get("namespace_id") or "")
-        rows.append(
+        summary_rows.append(
             {
                 "key_hash": row["key_hash"],
                 "artifact": row["artifact"],
@@ -789,57 +814,27 @@ def _cache_row_summary(db_path: Path) -> dict[str, Any]:
                 "namespace_id": namespace_id,
             }
         )
-    by_artifact = Counter(row["artifact"] for row in rows)
+    by_artifact = Counter(row["artifact"] for row in summary_rows)
     by_provider = Counter(
         f"{row['artifact']}|{row['provider_id']}|{row['provider_role']}"
-        for row in rows
+        for row in summary_rows
     )
-    magemin_keys = {
-        row["key_hash"]
-        for row in rows
-        if row["namespace_id"].startswith("magemin:")
-    }
     return {
-        "rows": len(rows),
+        "rows": len(summary_rows),
         "superseded_rows": superseded_rows,
         "by_artifact": dict(sorted(by_artifact.items())),
         "by_provider": dict(sorted(by_provider.items())),
-        "unique_keys": len({row["key_hash"] for row in rows}),
-        "magemin_unique_keys": len(magemin_keys),
+        "unique_keys": len({row["key_hash"] for row in summary_rows}),
+        "magemin_unique_keys": len(magemin_key_hashes),
     }
-
-
-def _magemin_key_hashes(db_path: Path) -> set[str]:
-    key_hashes: set[str] = set()
-    for row in _cache_payload_rows(db_path):
-        key = json.loads(bytes(row["key_bytes"]).decode("utf-8"))
-        if str(key.get("namespace_id") or "").startswith("magemin:"):
-            key_hashes.add(str(row["key_hash"]))
-    return key_hashes
 
 
 def _merge_cache_shard(shard_path: Path, target_path: Path) -> dict[str, Any]:
     rows = _cache_payload_rows(shard_path)
-    admitted_key_hashes: set[str] = set()
-    magemin_key_hashes: set[str] = set()
-    superseded_rows = 0
-    for row in rows:
-        artifact = str(row["artifact"])
-        codec_version = row.get("payload_codec_version")
-        codec_stamp_is_current = _payload_codec_stamp_is_current(
-            artifact,
-            codec_version,
-        )
-        if codec_stamp_is_current is False:
-            superseded_rows += 1
-            continue
-        validated_row = _validated_cache_payload_row(row)
-        key_hash = str(row["key_hash"])
-        admitted_key_hashes.add(key_hash)
-        if str(validated_row["key"].get("namespace_id") or "").startswith(
-            "magemin:"
-        ):
-            magemin_key_hashes.add(key_hash)
+    admitted_rows, superseded_rows, magemin_key_hashes = (
+        _admitted_cache_payload_rows(rows)
+    )
+    admitted_key_hashes = {str(row["key_hash"]) for row in admitted_rows}
     result = _copy_pt1_equilibrium_rows(
         [shard_path],
         target_path,
@@ -858,13 +853,17 @@ def _merge_cache_shard(shard_path: Path, target_path: Path) -> dict[str, Any]:
 
 def _discarded_cache_shard_summary(shard_path: Path, reason: str) -> dict[str, Any]:
     rows = _cache_payload_rows(shard_path)
+    _, superseded_rows, magemin_key_hashes = (
+        _admitted_cache_payload_rows(rows)
+    )
     return {
         "merged": False,
         "discarded": True,
         "reason": reason,
         "source": "temporary_shard",
         "rows": len(rows),
-        "magemin_unique_keys": len(_magemin_key_hashes(shard_path)),
+        "superseded_rows": superseded_rows,
+        "magemin_unique_keys": len(magemin_key_hashes),
     }
 
 
@@ -1183,7 +1182,10 @@ def main(argv: list[str]) -> int:
                     }
                     _emit(result, args.json_out)
                     return 4
-                run_magemin_key_hashes.update(_magemin_key_hashes(shard_db))
+                _, _, admitted_magemin_key_hashes = _admitted_cache_payload_rows(
+                    _cache_payload_rows(shard_db)
+                )
+                run_magemin_key_hashes.update(admitted_magemin_key_hashes)
                 if args.validate_replay:
                     replay_merge_summary = _replay_cache_merge_summary(
                         shard_db,
