@@ -197,6 +197,10 @@ def _payload_codec_stamp_is_current(
     )
 
 
+def _sqlite_readonly_uri(path: Path) -> str:
+    return f"{path.resolve().as_uri()}?mode=ro"
+
+
 def _vacuum_pt1_cache(connection: sqlite3.Connection) -> None:
     connection.execute("VACUUM")
 
@@ -215,7 +219,7 @@ def _prune_pt1_payload_codec_rows(
     connection_path = str(path)
     connect_options: dict[str, Any] = {}
     if not apply:
-        connection_path = f"{path.resolve().as_uri()}?mode=ro"
+        connection_path = _sqlite_readonly_uri(path)
         connect_options["uri"] = True
     connection = sqlite3.connect(
         connection_path,
@@ -238,49 +242,40 @@ def _prune_pt1_payload_codec_rows(
                 f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})"
             )
         }
-        has_codec_column = "payload_codec_version" in columns
         artifacts = tuple(_PAYLOAD_CODEC_VERSION_BY_ARTIFACT)
         rows_by_artifact = {artifact: 0 for artifact in artifacts}
         matched_by_artifact = {artifact: 0 for artifact in artifacts}
         deleted_by_artifact = {artifact: 0 for artifact in artifacts}
         vacuum_error = None
+        artifact_parameters = ", ".join("?" for _ in artifacts)
+        for artifact, count in connection.execute(
+            f"SELECT artifact, count(*) FROM {PT1_EQUILIBRIUM_TABLE} "
+            f"WHERE artifact IN ({artifact_parameters}) GROUP BY artifact",
+            artifacts,
+        ):
+            rows_by_artifact[str(artifact)] = int(count)
+
+        codec_version_column = (
+            "payload_codec_version" if "payload_codec_version" in columns else "NULL"
+        )
+        candidate_rows = connection.execute(
+            f"SELECT rowid, artifact, {codec_version_column} "
+            f"FROM {PT1_EQUILIBRIUM_TABLE} "
+            f"WHERE artifact IN ({artifact_parameters})",
+            artifacts,
+        ).fetchall()
+        stale_rowids_by_artifact = {artifact: [] for artifact in artifacts}
+        for rowid, artifact_value, payload_codec_version in candidate_rows:
+            artifact = str(artifact_value)
+            if not _payload_codec_stamp_is_current(
+                artifact, payload_codec_version
+            ):
+                stale_rowids_by_artifact[artifact].append(int(rowid))
 
         for artifact in artifacts:
-            current_version = _payload_codec_version(artifact)
-            total = connection.execute(
-                f"SELECT count(*) FROM {PT1_EQUILIBRIUM_TABLE} WHERE artifact = ?",
-                (artifact,),
-            ).fetchone()[0]
-            rows_by_artifact[artifact] = int(total)
-
-            if current_version is None:
-                continue
-            if has_codec_column:
-                candidate_rows = connection.execute(
-                    f"SELECT rowid, payload_codec_version "
-                    f"FROM {PT1_EQUILIBRIUM_TABLE} WHERE artifact = ? "
-                    "AND (payload_codec_version IS NULL "
-                    "OR typeof(payload_codec_version) != 'integer' "
-                    "OR payload_codec_version != ?)",
-                    (artifact, current_version),
-                ).fetchall()
-            else:
-                candidate_rows = connection.execute(
-                    f"SELECT rowid, NULL FROM {PT1_EQUILIBRIUM_TABLE} "
-                    "WHERE artifact = ?",
-                    (artifact,),
-                ).fetchall()
-
-            # SQL supplies a candidate superset. Admission's exact stamp rule
-            # decides which candidates are actually stale.
-            stale_rowids = [
-                int(row[0])
-                for row in candidate_rows
-                if not _payload_codec_stamp_is_current(artifact, row[1])
-            ]
-            matched = len(stale_rowids)
-            matched_by_artifact[artifact] = matched
-            if apply and matched:
+            stale_rowids = stale_rowids_by_artifact[artifact]
+            matched_by_artifact[artifact] = len(stale_rowids)
+            if apply and stale_rowids:
                 changes_before = connection.total_changes
                 connection.executemany(
                     f"DELETE FROM {PT1_EQUILIBRIUM_TABLE} WHERE rowid = ?",
@@ -326,6 +321,8 @@ def _decode_payload_for_admission(
     payload_codec_version: Any = None,
     keys: Sequence[Mapping[str, Any]] = (),
 ) -> Any | None:
+    if _payload_codec_version(artifact) is None:
+        return payload
     if not _payload_codec_stamp_is_current(artifact, payload_codec_version):
         return None
     if not isinstance(payload, Mapping):
@@ -2733,15 +2730,11 @@ class PT1PersistentEquilibriumStore:
                 self.read_only_base_db_path,
             )
             return
-        uri = self._sqlite_readonly_uri(self.read_only_base_db_path)
+        uri = _sqlite_readonly_uri(self.read_only_base_db_path)
         conn.execute(
             f"ATTACH DATABASE ? AS {PT1_READ_ONLY_BASE_ALIAS}",
             (uri,),
         )
-
-    @staticmethod
-    def _sqlite_readonly_uri(path: Path) -> str:
-        return f"{path.resolve().as_uri()}?mode=ro"
 
     def _read_only_equilibrium_table(self, conn: sqlite3.Connection) -> str | None:
         alias = PT1_READ_ONLY_BASE_ALIAS

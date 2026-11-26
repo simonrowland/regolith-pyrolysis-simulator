@@ -155,6 +155,37 @@ def _put_replayable_equilibrium_cache_row(
     return key_hash
 
 
+def _put_unversioned_equilibrium_cache_row(db_path: Path, *, tag: str):
+    key = {
+        "namespace_id": "magemin:equilibrium-composite",
+        "artifact": "equilibrium_result",
+        "intent": "EQUILIBRIUM",
+        "vapor_pressure_provider_selection": "builtin-vapor-pressure",
+        "controls": {
+            "T_K": 1500.0,
+            "pressure_bar": 0.01,
+            "pO2_bar": 1.0e-6,
+        },
+        "composition_mol_fraction": [["SiO2", 0.45], ["FeO", 0.10]],
+        "tag": tag,
+    }
+    payload = {"tag": tag}
+    key_bytes = canonical_json_bytes(key)
+    payload_bytes = canonical_json_bytes(payload)
+    key_hash = hashlib.sha256(key_bytes).hexdigest()
+    payload_hash = hashlib.sha256(payload_bytes).hexdigest()
+    PT1PersistentEquilibriumStore(db_path).put(
+        artifact="equilibrium_result",
+        key=key,
+        key_bytes=key_bytes,
+        key_hash=key_hash,
+        payload=payload,
+        payload_bytes=payload_bytes,
+        payload_hash=payload_hash,
+    )
+    return key, payload, key_bytes, key_hash
+
+
 def _run_reduced_real_prune(capsys, *args: object) -> dict[str, object]:
     assert prune_reduced_real_cache_main([str(arg) for arg in args]) == 0
     return json.loads(capsys.readouterr().out)
@@ -191,36 +222,20 @@ def test_reduced_real_prune_is_dry_by_default_and_deletes_only_stale_codecs(
             row_hashes[(artifact, tag)] = _put_replayable_equilibrium_cache_row(
                 db_path, tag=tag
             )
+    (
+        unversioned_key,
+        unversioned_payload,
+        unversioned_key_bytes,
+        unversioned_key_hash,
+    ) = _put_unversioned_equilibrium_cache_row(db_path, tag="unversioned")
 
     with sqlite3.connect(db_path) as conn:
-        conn.row_factory = sqlite3.Row
-        columns = [
-            str(row[1])
-            for row in conn.execute(
-                f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})"
-            )
-        ]
         for artifact, tag, version in rows:
             conn.execute(
                 f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
                 "SET payload_codec_version = ? WHERE key_hash = ?",
                 (version, row_hashes[(artifact, tag)]),
             )
-
-        current_freeze = conn.execute(
-            f"SELECT * FROM {PT1_EQUILIBRIUM_TABLE} "
-            "WHERE key_hash = ?",
-            (row_hashes[("freeze_gate_curve", "freeze-current")],),
-        ).fetchone()
-        unversioned = dict(current_freeze)
-        unversioned["key_hash"] = "unversioned-test-row"
-        unversioned["artifact"] = "unversioned_test_artifact"
-        unversioned["payload_codec_version"] = None
-        conn.execute(
-            f"INSERT INTO {PT1_EQUILIBRIUM_TABLE} "
-            f"({', '.join(columns)}) VALUES ({', '.join('?' for _ in columns)})",
-            tuple(unversioned[column] for column in columns),
-        )
 
     assert Path(f"{db_path}-wal").exists()
     assert Path(f"{db_path}-shm").exists()
@@ -260,12 +275,12 @@ def test_reduced_real_prune_is_dry_by_default_and_deletes_only_stale_codecs(
         }
         assert conn.execute(
             f"SELECT count(*) FROM {PT1_EQUILIBRIUM_TABLE} "
-            "WHERE artifact = 'unversioned_test_artifact'"
+            "WHERE artifact = 'equilibrium_result'"
         ).fetchone()[0] == 1
     assert remaining_hashes == {
         row_hashes[(freeze_artifact, "freeze-current")],
         row_hashes[(equilibrium_artifact, "equilibrium-current")],
-        "unversioned-test-row",
+        unversioned_key_hash,
     }
     for artifact, tag in (
         (freeze_artifact, "freeze-current"),
@@ -284,6 +299,31 @@ def test_reduced_real_prune_is_dry_by_default_and_deletes_only_stale_codecs(
             key_hash=row_hashes[(artifact, tag)],
         )
         assert entry is not None
+
+    unversioned_entry = store.get(
+        artifact="equilibrium_result",
+        key=unversioned_key,
+        key_bytes=unversioned_key_bytes,
+        key_hash=unversioned_key_hash,
+    )
+    assert unversioned_entry is not None
+    assert unversioned_entry["payload"] == unversioned_payload
+
+    conflicting_payload = {"tag": "conflicting-unversioned"}
+    conflicting_payload_bytes = canonical_json_bytes(conflicting_payload)
+    with pytest.raises(
+        rrd.PT1PersistentStoreCorrupt,
+        match="payload collision for equilibrium_result",
+    ):
+        store.put(
+            artifact="equilibrium_result",
+            key=unversioned_key,
+            key_bytes=unversioned_key_bytes,
+            key_hash=unversioned_key_hash,
+            payload=conflicting_payload,
+            payload_bytes=conflicting_payload_bytes,
+            payload_hash=hashlib.sha256(conflicting_payload_bytes).hexdigest(),
+        )
     wal_connection.close()
 
 
