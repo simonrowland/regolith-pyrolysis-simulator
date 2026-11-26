@@ -1058,13 +1058,15 @@ def _counting_sampler(fraction):
     return sample, calls
 
 
-def test_warm_start_same_cell_matches_full_scan_with_fewer_samples():
-    """A one-cell move bisects the same grid neighbours as the full scan.
+def test_warm_start_same_cell_matches_the_full_scan():
+    """A same-cell hint publishes the cold scan's root.
 
-    6.25 C is one dyadic of the 50 C step (50/2^3). The landing temperature
-    is the temperature the full scan of that cell would publish.
+    The hint probes the previous cells, then the grid is walked low to
+    high. An unsampled grid point could hide a dip or a refusal, so the
+    walk is the full grid and the call set matches the cold scan. Five
+    halvings of the same 50 C neighbours land on 1.5625 C.
     """
-    cold_sample, cold_calls = _counting_sampler(_linear_melt(1000.0))
+    cold_sample, _cold_calls = _counting_sampler(_linear_melt(1000.0))
     cold = find_liquidus_solidus_by_fraction(cold_sample, **_WARM_GRID)
     assert cold.status == 'ok'
 
@@ -1084,11 +1086,9 @@ def test_warm_start_same_cell_matches_full_scan_with_fewer_samples():
             **_WARM_GRID,
         )
         assert warm.status == 'ok'
-        assert warm.solidus_T_C == reference.solidus_T_C
-        assert warm.liquidus_T_C == reference.liquidus_T_C
-        assert len(warm_calls) < len(reference_calls)
-        assert len(warm_calls) <= 16
-        assert len(warm_calls) < len(cold_calls)
+        assert warm == reference
+        assert len(warm_calls) == len(reference_calls)
+        assert set(warm_calls) == set(reference_calls)
 
 
 def test_warm_start_outside_the_window_matches_the_full_scan():
@@ -1155,3 +1155,76 @@ def test_warm_start_refuses_when_the_bracket_cell_refuses():
     assert 1000.0 in seen
     assert _WARM_GRID['min_T_C'] not in seen
     assert len(seen) < 8
+
+
+def test_warm_start_matches_full_scan_on_multicrossing_and_out_of_cell_refusal():
+    """A between-cell dip and a between-cell refusal match the cold scan.
+
+    The hint still sits on the linear curve's cells. Those cells bracket
+    a sign change. The point the probe skips is 1150 C, between them.
+    """
+    cold_sample, _cold_calls = _counting_sampler(_linear_melt(1000.0))
+    cold = find_liquidus_solidus_by_fraction(cold_sample, **_WARM_GRID)
+    assert cold.status == 'ok'
+    hints = {
+        'warm_solidus_T_C': cold.solidus_T_C,
+        'warm_liquidus_T_C': cold.liquidus_T_C,
+    }
+
+    def _dip_between_cells(temperature_C: float) -> float:
+        temperature = float(temperature_C)
+        if temperature == 1150.0:
+            # 1100 C on the linear curve is 1/3. A further 0.05 is a
+            # drop of 0.05, above the 0.02 monotone tolerance, and the
+            # value stays inside [0, 1].
+            return _linear_melt(1000.0)(1100.0) - 0.05
+        return _linear_melt(1000.0)(temperature)
+
+    def _refuse_between_cells(temperature_C: float) -> float:
+        temperature = float(temperature_C)
+        if temperature == 1150.0:
+            raise LiquidusSampleError(
+                'out_of_domain',
+                ('between the hinted cells',),
+                {'reason': 'out_of_cell'},
+            )
+        return _linear_melt(1000.0)(temperature)
+
+    def _lifted_earlier_solidus(temperature_C: float) -> float:
+        temperature = float(temperature_C)
+        # 950 C is 0.0075. The raw 1000 C point is 0, a drop of 0.0075,
+        # inside the 0.02 lift. The lift stays above 1e-3, so the first
+        # crossing is [900, 950], not the hinted [1000, 1050] cell.
+        if temperature <= 900.0:
+            return 0.0
+        if temperature < 1000.0:
+            return (temperature - 900.0) / 100.0 * 0.015
+        if temperature == 1000.0:
+            return 0.0
+        return min(1.0, (temperature - 1000.0) / 300.0)
+
+    for fraction in (
+        _dip_between_cells,
+        _refuse_between_cells,
+        _lifted_earlier_solidus,
+    ):
+        warm_sample, _warm_calls = _counting_sampler(fraction)
+        reference_sample, _reference_calls = _counting_sampler(fraction)
+        warm = find_liquidus_solidus_by_fraction(
+            warm_sample,
+            **hints,
+            **_WARM_GRID,
+        )
+        reference = find_liquidus_solidus_by_fraction(
+            reference_sample,
+            **_WARM_GRID,
+        )
+        assert warm == reference
+        if fraction is _dip_between_cells:
+            assert warm.status == 'not_converged'
+        elif fraction is _refuse_between_cells:
+            assert warm.status == 'out_of_domain'
+        else:
+            assert warm.status == 'ok'
+            assert warm.solidus_T_C == reference.solidus_T_C
+            assert warm.solidus_T_C < 950.0

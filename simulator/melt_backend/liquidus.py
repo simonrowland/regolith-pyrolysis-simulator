@@ -404,10 +404,12 @@ def find_liquidus_solidus_by_fraction(
     tolerance-bounded bisections.
 
     ``warm_solidus_T_C`` and ``warm_liquidus_T_C`` are optional previous
-    bounds. When both are finite and the crossings still lie in the
-    previous scan cells, the search bisects those cells. A missing,
-    non-finite, or out-of-window hint runs the full grid. Callers that
-    omit the hints are unchanged.
+    bounds. A finite in-window hint probes those cells first, so a
+    refusal inside the previous bracket raises before the cold tail.
+    The published root is still the ascending grid walk: the lowest
+    crossing, with the same monotone lift and the same out-of-cell
+    refusal as a cold scan. A missing, non-finite, or out-of-window
+    hint skips the probe. Callers that omit the hints are unchanged.
     """
     from engines.alphamelts.thermoengine import (
         DECLARED_THERMOENGINE_FAILURE_TYPES,
@@ -633,76 +635,66 @@ def find_liquidus_solidus_by_fraction(
     try:
         solidus_bracket = None
         liquidus_bracket = None
-        # Same-grid-cell warm start.
+        # Warm probe, then the same ascending walk as a cold scan.
         #
-        # Premise: a freeze-gate hour whose oxide vector moves by one
-        # 0.0001 quantum can return the same solidus and liquidus, and
-        # the full 50 C scan is the whole cost of that hour. A folded
-        # FeOt move of 0.0002 already shifted the solidus by 6.25 C, so
-        # the FeO quantum stays at 0.0001. 6.25 C is one bisection
-        # dyadic of the 50 C grid, not noise.
+        # Premise: one melt-fraction curve has one lowest solidus and
+        # one lowest liquidus. frac_M is accepted only when each grid
+        # step drops by at most monotonicity_tolerance (0.02). A larger
+        # drop refuses. A smaller drop is lifted to the lower
+        # neighbour, and that lift can move which cell first crosses
+        # solid_epsilon. The previous hour's cell is a hint about
+        # where the crossing sits. It is not a second root.
         #
-        # Algebra: grid[i] = min(max_T, min_T + i * scan_step). i = max
-        # {i : grid[i] <= T_prev}. When grid[i] is still unmelted the
-        # same cell is [i, i+1] and only those two points are sampled
-        # before _bisect_solidus / _bisect_liquidus. One cell up samples
-        # i+2 as well. One cell down, when grid[i] is already melted,
-        # samples i-1. A wider move samples at most those points, does
-        # not bisect, and falls through to the full grid.
+        # Algebra: probe grid cell i of each hint first, where
+        # i = max {i : grid[i] <= T_prev}. A sample error in that cell
+        # raises before the cold tail is touched. The probe's smoothed
+        # samples are then discarded, raw fractions kept. The grid is
+        # walked from min_T to max_T, low to high, and the first
+        # crossing of each threshold is the bracket that is bisected.
+        # That is the cold scan. A hinted cell that does not bracket a
+        # sign change is the same walk: the probe brackets are not
+        # published either way.
         #
-        # Unit check: halving a 50 C cell until the width is <= 2 C
-        # lands on the same dyadic from either search, because both
-        # start from the same two grid neighbours. 50/2^3 = 6.25 C,
-        # then 3.125 C, then 1.5625 C, which is inside the 2 C
-        # tolerance. A same-cell hour is 2 grid points plus 5
-        # halvings per bound. 50/2^4 = 3.125 C is still above 2 C, so
-        # the fifth halving is required.
+        # Unit check: both entries bisect the same two grid neighbours,
+        # so five halvings of a 50 C cell land on the same 1.5625 C
+        # dyadic (50/2^5 = 1.5625, which is inside the 2 C tolerance;
+        # 50/2^4 = 3.125 is still outside it).
         #
-        # Limiting cases. No previous curve, a non-finite hint, a hint
-        # outside the grid, or a crossing more than one cell away: the
-        # points already sampled are a subset of the grid, no bisection
-        # has run, and the search falls through to the full grid.
-        # Unique evaluations stay at one grid plus two bisections,
-        # inside the sample cap.
-        #
-        # Residual: a warm hit does not observe a temperature-specific
-        # refusal outside the sampled cell, including the grid
-        # endpoints. A composition-level refusal does not depend on
-        # temperature, so the first sampled point still raises it. A
-        # move of more than one cell full-scans.
+        # Limits: no hint, a non-finite hint, or a hint off the grid
+        # skips the probe. A dip of more than 0.02 on a grid point the
+        # probe did not sample, including a point between the hinted
+        # cells or a grid endpoint, refuses on the walk. A dip of at
+        # most 0.02 is lifted before the first-crossing test, so the
+        # warm root stays on the cold scan's cell.
         warm_solidus = _finite_warm_hint(warm_solidus_T_C)
         warm_liquidus = _finite_warm_hint(warm_liquidus_T_C)
         if warm_solidus is not None and warm_liquidus is not None:
             solidus_floor = _grid_floor_index(grid, warm_solidus)
             liquidus_floor = _grid_floor_index(grid, warm_liquidus)
             if solidus_floor is not None and liquidus_floor is not None:
-                solidus_bracket = _lazy_bound_bracket(
-                    solidus_floor,
-                    liquid=False,
-                )
-                liquidus_bracket = _lazy_bound_bracket(
-                    liquidus_floor,
-                    liquid=True,
-                )
-                if solidus_bracket is None or liquidus_bracket is None:
-                    samples.clear()
-                    solidus_bracket = None
-                    liquidus_bracket = None
-                else:
-                    _annotate_renormalised_threshold(
-                        solidus_bracket,
-                        solidus_bracket[0],
-                        solidus_bracket[1],
-                        tolerance,
-                        closure_notices,
+                # Probe for an in-cell sample refusal only. A sign
+                # change inside the hinted cell is not the root: the
+                # walk below is, because it applies the lower-neighbour
+                # lift and keeps the lowest crossing. The probe can
+                # also compare non-adjacent grid points and refuse a
+                # chain of dips the ascending walk would lift. That
+                # refusal is not the full scan's, so it is dropped and
+                # the walk decides. A LiquidusSampleError still
+                # propagates here, before the cold tail is sampled.
+                try:
+                    _lazy_bound_bracket(
+                        solidus_floor,
+                        liquid=False,
                     )
-                    _annotate_renormalised_threshold(
-                        liquidus_bracket,
-                        liquidus_bracket[0],
-                        liquidus_bracket[1],
-                        tolerance,
-                        closure_notices,
+                    _lazy_bound_bracket(
+                        liquidus_floor,
+                        liquid=True,
                     )
+                except _LiquidusNonMonotoneError:
+                    pass
+                samples.clear()
+                solidus_bracket = None
+                liquidus_bracket = None
 
         if solidus_bracket is None:
             grid_points = [sample(T) for T in grid]
