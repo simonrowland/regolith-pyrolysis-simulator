@@ -542,10 +542,11 @@ def test_internal_analytical_activity_fallback_notice_uses_model_provenance(
     assert issues == []
 
 
+# ZrO2 is supported now; PbO remains outside the activity cation map.
 def test_internal_analytical_types_unsupported_activity_species() -> None:
     experiment, bench, observation = _case(
-        composition=_composition(("ZrO2", "0.5"), ("SiO2", "0.5")),
-        formula="ZrO2",
+        composition=_composition(("PbO", "0.5"), ("SiO2", "0.5")),
+        formula="PbO",
     )
 
     prediction = predict_with_engine(
@@ -559,14 +560,22 @@ def test_internal_analytical_types_unsupported_activity_species() -> None:
 
     assert prediction.execution.state is ExecutionState.UNSUPPORTED
     assert prediction.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
-    assert prediction.refusal_detail["formula"] == "ZrO2"
+    assert prediction.refusal_detail["formula"] == "PbO"
 
 
 def test_internal_analytical_types_unsupported_activity_composition() -> None:
     experiment, bench, observation = _case(
-        composition=_composition(("MgO", "0.5"), ("ZrO2", "0.5")),
+        composition=_composition(("MgO", "0.5"), ("PbO", "0.5")),
         formula="MgO",
     )
+
+    from simulator.battery.generators.bench import activity_request_for_engine
+
+    request = activity_request_for_engine(
+        experiment, observation, Engine.INTERNAL_ANALYTICAL.value
+    )
+    assert request is not None and request.payload is not None
+    assert "PbO" in request.payload["composition_mol"]
 
     prediction = predict_with_engine(
         Engine.INTERNAL_ANALYTICAL,
@@ -579,7 +588,7 @@ def test_internal_analytical_types_unsupported_activity_composition() -> None:
 
     assert prediction.execution.state is ExecutionState.UNSUPPORTED
     assert prediction.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
-    assert prediction.refusal_detail["unsupported_composition_components"] == ["ZrO2"]
+    assert prediction.refusal_detail["unsupported_composition_components"] == ["PbO"]
 
 
 def test_internal_analytical_predicts_below_gamma_band_with_notice() -> None:

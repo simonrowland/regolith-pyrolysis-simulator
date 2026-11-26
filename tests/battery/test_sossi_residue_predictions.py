@@ -722,9 +722,19 @@ def test_sossi_scorer_projects_trace_species_and_flags_ideal_activity(monkeypatc
 
 
 @pytest.mark.engine_cache_off
+@pytest.mark.parametrize("shard_index", range(3))
 def test_sossi_trace_score_reports_pre_film_residual_metrics(
-    request: pytest.FixtureRequest,
+    shard_index: int,
 ) -> None:
+    """Pin 43-run pre-film metrics in three shards under the 300 s budget.
+
+    The three shards recombine to the full-cohort RMS/max dex table in
+    worker-report-sossi-parents.md: Gd 0.049689/0.110569, La
+    0.042670/0.096800, Sc 0.135025/0.207755, V 3.501036/7.333433, Yb
+    0.039469/0.092958, and Zr 0.054138/0.232363. Recomputed metrics differ
+    from that six-decimal table by at most 4.88e-7 dex, setting the max-error
+    tolerance to half the final printed decimal place.
+    """
     from simulator.battery.enums import Authority, Engine, NoticeKind, Quantity
     from simulator.battery.score import (
         _sossi_residue_prediction,
@@ -751,18 +761,14 @@ def test_sossi_trace_score_reports_pre_film_residual_metrics(
         sorted({row.experiment_id.rsplit("::", 1)[-1] for row in all_target_rows})
     )
     assert len(all_experiment_ids) == 43
-    representative_experiment_ids = (
-        all_experiment_ids[0],
-        all_experiment_ids[len(all_experiment_ids) // 2],
-        all_experiment_ids[-1],
-    )
-    selected_experiment_ids = frozenset(representative_experiment_ids)
+    selected_experiment_ids = frozenset(all_experiment_ids[shard_index::3])
     target_rows = [
         row
         for row in all_target_rows
         if row.experiment_id.rsplit("::", 1)[-1] in selected_experiment_ids
     ]
-    assert len(target_rows) == len(representative_experiment_ids) * len(scored_elements)
+    assert len(selected_experiment_ids) == (15 if shard_index == 0 else 14)
+    assert len(target_rows) == len(selected_experiment_ids) * len(scored_elements)
 
     cache = {}
     errors_by_element: dict[str, list[float]] = {
@@ -803,41 +809,48 @@ def test_sossi_trace_score_reports_pre_film_residual_metrics(
         assert all(channel["alpha_assumed"] for channel in alpha_by_channel)
         errors_by_element[element].append(math.log10(predicted / observed))
 
-    reporter = request.config.pluginmanager.get_plugin("terminalreporter")
-    # The six full-cohort metrics across all 43 runs are recorded in the
-    # worker report from the complete 258-row Studio run. This gate scores a
-    # deterministic three-run sample to stay within the 300 s suite budget.
-    expected_sample_metrics = {
-        "Gd": (0.062060, 0.083431),
-        "La": (0.061037, 0.096800),
-        "Sc": (0.154345, 0.207755),
-        "V": (3.889401, 6.582410),
-        "Yb": (0.050686, 0.063336),
-        "Zr": (0.030665, 0.047882),
-    }
-    metric_tolerance_dex = 0.005
+    # Each tuple is the measured (sum of squared dex errors, max absolute
+    # dex error) from one shard. The sums combine across 43 runs to the full
+    # RMS values above; the greatest shard maximum is the full-cohort max.
+    expected_shard_statistics = (
+        {
+            "Gd": (0.043709516, 0.110569),
+            "La": (0.031653071, 0.096800),
+            "Sc": (0.302134953, 0.207755),
+            "V": (143.463476654, 7.077763),
+            "Yb": (0.028056356, 0.092958),
+            "Zr": (0.040795296, 0.130543),
+        },
+        {
+            "Gd": (0.027699183, 0.081336),
+            "La": (0.023502369, 0.080433),
+            "Sc": (0.262768899, 0.193789),
+            "V": (198.328783056, 7.058729),
+            "Yb": (0.020527783, 0.062743),
+            "Zr": (0.070483243, 0.232363),
+        },
+        {
+            "Gd": (0.034758361, 0.089781),
+            "La": (0.023137362, 0.067588),
+            "Sc": (0.219055759, 0.189524),
+            "V": (185.269477158, 7.333433),
+            "Yb": (0.018400945, 0.070591),
+            "Zr": (0.014750603, 0.056354),
+        },
+    )
     for element in scored_elements:
         errors = errors_by_element[element]
-        assert len(errors) == len(representative_experiment_ids)
+        assert len(errors) == len(selected_experiment_ids)
         sum_squared_dex = math.fsum(error * error for error in errors)
-        rms_dex = math.sqrt(sum_squared_dex / len(errors))
         max_abs_dex = max(abs(error) for error in errors)
-        expected_rms_dex, expected_max_abs_dex = expected_sample_metrics[element]
-        assert rms_dex == pytest.approx(
-            expected_rms_dex, abs=metric_tolerance_dex
+        expected_sum_squared_dex, expected_max_abs_dex = (
+            expected_shard_statistics[shard_index][element]
         )
-        assert max_abs_dex == pytest.approx(
-            expected_max_abs_dex, abs=metric_tolerance_dex
+        # Sum precision is 9 decimals and maximum precision is 6 decimals.
+        assert sum_squared_dex == pytest.approx(
+            expected_sum_squared_dex, abs=5e-10
         )
-        line = (
-            f"Sossi pre-film sample {element}: n={len(errors)} "
-            f"rms_dex={rms_dex:.6f} sum_squared_dex={sum_squared_dex:.9f} "
-            f"max_abs_dex={max_abs_dex:.6f}"
-        )
-        if reporter is None:
-            print(line, flush=True)
-        else:
-            reporter.write_line(line)
+        assert max_abs_dex == pytest.approx(expected_max_abs_dex, abs=5e-7)
 
 
 def test_mixed_hashimoto_and_sossi_score_keep_separate_engine_cohorts(
