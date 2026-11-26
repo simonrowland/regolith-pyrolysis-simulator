@@ -45,10 +45,19 @@ def _put_cache_row(
         "schema_version": "test",
         "tag": tag,
     }
+    vapor_pressure_provider = {
+        "resolved_provider_id": "builtin-vapor-pressure",
+        "resolved_role": "authoritative",
+        "authoritative_provider_id": "builtin-vapor-pressure",
+        "fallback_provider_id": None,
+        "fallback_allowed": False,
+    }
     key.update(
         {
             "namespace_id": "test:freeze_gate_curve",
-            "vapor_pressure_provider_selection": "test-vapor-pressure",
+            "vapor_pressure_provider_selection": vapor_pressure_provider[
+                "resolved_provider_id"
+            ],
             "sulfur_side": {
                 "S_input_ppm": 0.0,
                 "inventory": {"salt_phase": {}, "sulfide_matte": {}},
@@ -63,7 +72,8 @@ def _put_cache_row(
         }
     )
     # 6d9a817da7 requires complete replay-key/curve fields; fab8e9a976
-    # requires the PT1 row codec stamp, which PT1PersistentEquilibriumStore.put adds.
+    # requires a PT1 codec stamp, which put adds. Use the live built-in vapor
+    # provider identity so strict shard-source validation accepts the fixture.
     curve = {
         "source": "test",
         "solidus_T_C": 1000.0,
@@ -73,6 +83,7 @@ def _put_cache_row(
     }
     payload = {"curve": _curve_payload(curve)}
     payload["curve"]["tag"] = tag
+    payload["authority"] = {"vapor_pressure": vapor_pressure_provider}
     key_bytes = canonical_json_bytes(key)
     payload_bytes = canonical_json_bytes(payload)
     PT1PersistentEquilibriumStore(db_path).put(
