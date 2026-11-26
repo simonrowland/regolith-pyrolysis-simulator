@@ -249,7 +249,7 @@ def test_all_typed_rows_migrate_with_species_temperature_and_conditions():
     migrator.finalize()
 
     records = list(migrator.result.observations.values())
-    assert len(records) == 80
+    assert len(records) == 74
     assert not migrator.result.validation.hard_issues
     assert not migrator.result.registry_issues
     migrated = {record.observation_id.split("::", 1)[1]: record for record in records}
@@ -269,7 +269,7 @@ def test_all_typed_rows_migrate_with_species_temperature_and_conditions():
         method = migrator.result.experiments[record.experiment_id].method.value
         expected_method = (
             MethodToken.UNSPECIFIED
-            if "figure9_" in row["observation_id"] or "figure10c_" in row["observation_id"]
+            if "figure9_" in row["observation_id"]
             else MethodToken.QUENCH_EQUILIBRATION
         )
         assert method is expected_method
@@ -300,8 +300,6 @@ def test_all_typed_rows_migrate_with_species_temperature_and_conditions():
             assert composition.locator is not None
             if "figure9_" in row["observation_id"]:
                 assert composition.state.is_value
-            elif "figure10c_" in row["observation_id"]:
-                assert composition.state.is_unknown
 
     outlier_rows = {
         (row["values"]["sample_id"], row["values"]["formula"]): row
@@ -325,9 +323,9 @@ def test_all_typed_rows_migrate_with_species_temperature_and_conditions():
                 assert figure["values"]["figure_read_point_count"] == 3
                 assert figure["values"]["context_point_count"] == 15
             elif obs_id == "jakobsson_2015_figure_10_panel_c_mgo_activity":
-                assert "without ternary compositions" in digitisation
-                assert figure["values"]["figure_read_point_count"] == 6
-                assert figure["values"]["context_point_count"] == 14
+                assert "retained as context" in digitisation
+                assert figure["values"]["figure_read_point_count"] == 0
+                assert figure["values"]["context_point_count"] == 20
             elif obs_id == "jakobsson_2015_figure_10_panel_a_sio2_activity":
                 assert "0.1–0.9" in digitisation
                 assert "deferred" in digitisation
@@ -432,6 +430,12 @@ def test_figure_activity_reads_pin_every_series_label_and_standard_state():
         for item in body["context"]
         if item["type"] == "figure_record"
     }
+    figure10a = figure_records["jakobsson_2015_figure_10_panel_a_sio2_activity"]
+    figure10a_present_series = next(
+        series for series in figure10a["values"]["series"]
+        if series["name"] == "present-work activity contours"
+    )
+    assert figure10a_present_series["evidence_class"] == "model_derived"
     coverage = {
         item["field_path"]: item
         for item in document["fidelity_samples"]
@@ -546,14 +550,27 @@ def test_figure_activity_reads_pin_every_series_label_and_standard_state():
     assert figure9_scored_count == 6
     assert figure9_context_count == 30
 
-    figure10c_scored_count = 0
-    figure10c_context_count = 0
     figure10c_figure = figure_records["jakobsson_2015_figure_10_panel_c_mgo_activity"]
+    present_series = next(
+        series for series in figure10c_figure["values"]["series"]
+        if series["name"] == "present-work activity contours"
+    )
+    assert present_series["evidence_class"] == "model_derived"
+    assert present_series["role"] == (
+        "present-work activity labels retained as context without ternary composition"
+    )
     figure10c_context = {
         item["observation_id"]: item
         for item in figure10c_figure["values"]["prior_series_context_reads"]
     }
-    references = {"rein_chipman": "[15]", "morita": "[34]", "jung": "[10]"}
+    assert len(figure10c_context) == 20
+    references = {
+        "present_work": "present study",
+        "rein_chipman": "[15]",
+        "morita": "[34]",
+        "jung": "[10]",
+    }
+    present_work_thermo = None
     for slug, name, activity, evidence, source_relation in FIGURE10C_READS:
         observation_id = f"jakobsson_2015_figure10c_mgo_{slug}_{activity.replace('.', '')}"
         label = {
@@ -562,69 +579,61 @@ def test_figure_activity_reads_pin_every_series_label_and_standard_state():
             "morita": f"({activity})",
             "jung": f"<{activity}>",
         }[slug]
+        context = figure10c_context[observation_id]
+        assert context["series_as_printed"] == name
+        assert context["series_reference_as_printed"] == references[slug]
+        assert context["activity_as_published"] == activity
+        assert context["series_label_as_printed"] == label
+        assert context["source_relation"] == source_relation
+        assert context["evidence_class"] == evidence
+        assert context["temperature_K"]["state"]["value"] == "1873"
+        assert context["locator"]["page"] == 10
+        assert context["locator"]["published_page"] == 604
+        assert context["locator"]["pdf_page_index"] == 9
+        assert context["locator"]["figure"] == "10"
+        assert context["locator"]["panel"] == "c"
+        assert context["locator"]["row"] == f"{name} contour label {label}"
+        assert context["locator"]["line_range"] == "611-660"
         if slug == "present_work":
-            row = rows[observation_id]
-            figure10c_scored_count += 1
-            assert row["locator"]["page"] == 10
-            assert row["locator"]["published_page"] == 604
-            assert row["locator"]["pdf_page_index"] == 9
-            assert row["locator"]["figure"] == "10"
-            assert row["locator"]["panel"] == "c"
-            assert row["locator"]["row"] == f"{name} contour label {label}"
-            assert row["locator"]["line_range"] == "611-660"
-            assert "composition not assigned" in row["locator"]["column"]
-            assert row["values"]["activity_as_published"] == activity
-            assert row["values"]["series_label_as_printed"] == label
-            assert row["values"]["digitisation"] == "printed activity label; no ternary composition assigned"
-            assert "composition" not in row["values"]["digitisation_uncertainty"]
-            assert row["values"]["method_class"] == evidence
-            assert row["values"]["source_relation"] == source_relation
-            assert "Raoultian pure solid MgO(s)" in row["values"]["standard_state_as_printed"]
-            assert row["point_conditions"]["composition"]["state"]["tag"] == "unknown"
-            assert row["uncertainty"]["kind"] == "none"
-            assert len(row["derived_from"]) == 40
-            thermo = row["values"]["thermochemical_sources_as_printed"]
-            assert len(thermo) == 7
-            assert any(item["source_citation_as_printed"] == "Barin [24]" for item in thermo)
-            assert any(item["source_citation_as_printed"] == "NIST–JANAF [23]" for item in thermo)
-            assert {
-                "−575.914 kJ/mol",
-                "−426.199 kJ/mol",
-                "−1573.218 kJ/mol",
-                "−869.028 kJ/mol",
-                "−1326.229 kJ/mol",
-                "−345.887 kJ/mol",
-                "−784.402 kJ/mol",
-            } <= {item.get("delta_G_standard_as_printed") for item in thermo}
-            mg_silicate = next(item for item in thermo if item.get("oxide_as_printed") == "Mg2SiO4(s)")
-            assert mg_silicate["formation_basis_as_printed"] == "from elements at 1873 K (1600 °C)"
-            assert mg_silicate["saturation_reaction_as_printed"]["state"]["tag"] == "unknown"
-            assert any(item.get("reaction_as_printed") == "2Ca(l) + O2(g) = 2CaO(s) [Eq. 18]" for item in thermo)
-            assert any(item.get("reaction_as_printed") == "2Mg(l) + O2(g) = 2MgO(s) [Eq. 20]" for item in thermo)
-            assert any(item.get("reaction_as_printed") == "Ca2SiO4(s) = 2CaO(s) + SiO2(s) [Eq. 16]" for item in thermo)
-            assert row["measurement_method"]["state"]["tag"] == "value"
+            assert "point_conditions" not in context
+            assert "ternary_composition" not in context
+            assert "Raoultian pure solid MgO(s)" in context["standard_state_as_printed"]
+            assert context["digitisation"] == "printed activity label; composition not assigned"
+            thermo = context["thermochemical_sources_as_printed"]
+            if present_work_thermo is None:
+                present_work_thermo = thermo
+            else:
+                assert thermo is present_work_thermo
+            assert len(thermo) == 8
+            formation = next(
+                item for item in thermo
+                if item.get("source_citation_as_printed") == "Barin [24]"
+                and item.get("oxide_as_printed") == "Ca2SiO4(s)"
+            )
+            assert formation["delta_G_standard_as_printed"] == "−1573.218 kJ/mol"
+            assert formation["formation_basis_as_printed"] == "from elements at 1873 K (1600 °C)"
+            assert formation["reaction_as_printed"]["state"]["tag"] == "unknown"
+            eq16 = next(
+                item for item in thermo
+                if item.get("reaction_as_printed") == "Ca2SiO4(s) = 2CaO(s) + SiO2(s) [Eq. 16]"
+            )
+            assert eq16["equilibrium_constant_as_printed"] == "K2 = 9.10 × 10^-5"
+            assert eq16["delta_G_standard_as_printed"]["state"]["tag"] == "unknown"
+            assert eq16["delta_G_standard_as_printed"] != formation["delta_G_standard_as_printed"]
+            eq18 = next(item for item in thermo if item.get("reaction_as_printed") == "2Ca(l) + O2(g) = 2CaO(s) [Eq. 18]")
+            assert eq18["delta_G_standard_as_printed"] == "−869.028 kJ/mol"
+            eq20 = next(item for item in thermo if item.get("reaction_as_printed") == "2Mg(l) + O2(g) = 2MgO(s) [Eq. 20]")
+            assert eq20["delta_G_standard_as_printed"] == "−784.402 kJ/mol"
         else:
-            context = figure10c_context[observation_id]
-            figure10c_context_count += 1
-            assert context["series_as_printed"] == name
-            assert context["series_reference_as_printed"] == references[slug]
-            assert context["activity_as_published"] == activity
-            assert context["series_label_as_printed"] == label
-            assert context["source_relation"] == source_relation
-            assert context["ternary_composition"]["state"]["tag"] == "unknown"
             assert "not a verified on-contour coordinate" in context["ternary_composition"]["state"]["reason"]
-            assert context["locator"]["page"] == 10
-            assert context["locator"]["published_page"] == 604
-            assert context["locator"]["pdf_page_index"] == 9
-            assert context["locator"]["figure"] == "10"
-            assert context["locator"]["panel"] == "c"
-            assert context["locator"]["row"] == f"{name} contour label {label}"
-            assert context["locator"]["line_range"] == "611-660"
-    assert figure10c_scored_count == 6
-    assert figure10c_context_count == 14
+    expected_figure10c_context_ids = {
+        f"jakobsson_2015_figure10c_mgo_{slug}_{activity.replace('.', '')}"
+        for slug, _name, activity, _evidence, _source_relation in FIGURE10C_READS
+    }
+    assert set(figure10c_context) == expected_figure10c_context_ids
 
 
-def test_figure_activity_observations_reach_melt_activity_rail_and_replot_mutation_fails(monkeypatch):
+def test_figure_activity_observations_reach_melt_activity_rail_and_context_mutation_fails(monkeypatch):
     migrator = Migrator(root=ROOT, index={}, aliases={})
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
@@ -635,11 +644,11 @@ def test_figure_activity_observations_reach_melt_activity_rail_and_replot_mutati
     figure_rows = [
         record
         for record in migrator.result.observations.values()
-        if "figure9_" in record.observation_id or "figure10c_" in record.observation_id
+        if "figure9_" in record.observation_id
     ]
-    assert len(figure_rows) == 12
+    assert len(figure_rows) == 6
     assert {record.observation_id.split("::", 1)[1] for record in figure_rows} == {
-        oid for oid in migrated if "figure9_" in oid or "figure10c_" in oid
+        oid for oid in migrated if "figure9_" in oid
     }
 
     for record in figure_rows:
@@ -648,15 +657,29 @@ def test_figure_activity_observations_reach_melt_activity_rail_and_replot_mutati
         assert battery_score.rail_for_quantity(record.identity.quantity.value) is Rail.MELT_ACTIVITY
 
     document = _document()
-    prior_context_ids = {
+    context_ids = {
         point["observation_id"]
         for body in document["species"].values()
         for figure in body["context"]
         if figure["type"] == "figure_record"
         for point in figure["values"].get("prior_series_context_reads", [])
     }
-    assert len(prior_context_ids) == 44
-    prior_candidate_ids = {f"{EXTRACT.stem}::{oid}" for oid in prior_context_ids}
+    assert len(context_ids) == 50
+    context_candidate_ids = {f"{EXTRACT.stem}::{oid}" for oid in context_ids}
+    figure10c = next(
+        figure
+        for body in document["species"].values()
+        for figure in body["context"]
+        if figure.get("observation_id") == "jakobsson_2015_figure_10_panel_c_mgo_activity"
+    )
+    figure10c_present_ids = {
+        point["observation_id"]
+        for point in figure10c["values"]["prior_series_context_reads"]
+        if point["series_as_printed"] == "Present work"
+    }
+    assert len(figure10c_present_ids) == 6
+    assert figure10c_present_ids <= context_ids
+    assert not (figure10c_present_ids & set(migrated))
     context = battery_score.ScoreContext(
         works=migrator.result.works,
         experiments=migrator.result.experiments,
@@ -664,23 +687,24 @@ def test_figure_activity_observations_reach_melt_activity_rail_and_replot_mutati
     )
     candidates = {row.observation_id for row in battery_score.comparison_candidates(context)}
 
-    def assert_no_prior_replots(candidate_ids):
-        assert not (candidate_ids & prior_candidate_ids)
+    def assert_no_context_activities(candidate_ids):
+        assert not (candidate_ids & context_candidate_ids)
 
-    assert_no_prior_replots(candidates)
+    assert_no_context_activities(candidates)
     expected_present_ids = {row.observation_id for row in figure_rows}
     assert expected_present_ids <= candidates
+    assert not (candidates & {f"{EXTRACT.stem}::{oid}" for oid in figure10c_present_ids})
 
-    # Inject a candidate under a representative prior-series ID; the invariant
-    # must fail if that ID reaches comparison_candidates.
-    prior_id = sorted(prior_context_ids)[0]
-    prior_candidate_id = f"{EXTRACT.stem}::{prior_id}"
+    # Inject a candidate under a composition-unknown Fig. 10(c) ID; the invariant
+    # must fail if a context label reaches comparison_candidates.
+    context_id = sorted(figure10c_present_ids)[0]
+    context_candidate_id = f"{EXTRACT.stem}::{context_id}"
     mutated_observation = replace(
         figure_rows[0],
-        observation_id=prior_candidate_id,
+        observation_id=context_candidate_id,
     )
     mutated_observations = dict(migrator.result.observations)
-    mutated_observations[prior_candidate_id] = mutated_observation
+    mutated_observations[context_candidate_id] = mutated_observation
     mutated_context = battery_score.ScoreContext(
         works=migrator.result.works,
         experiments=migrator.result.experiments,
@@ -697,9 +721,9 @@ def test_figure_activity_observations_reach_melt_activity_rail_and_replot_mutati
             row.observation_id
             for row in battery_score.comparison_candidates(context)
         }
-        assert prior_candidate_id in mutated_candidates
+        assert context_candidate_id in mutated_candidates
         with pytest.raises(AssertionError):
-            assert_no_prior_replots(mutated_candidates)
+            assert_no_context_activities(mutated_candidates)
 
 
 def test_extract_validator_covers_every_scored_leaf_and_reports_no_uncovered_observation():
