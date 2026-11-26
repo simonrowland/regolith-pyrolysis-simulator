@@ -2910,6 +2910,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         pressure_bar: float,
         pressure_kbar: float,
         fO2_log: float,
+        timeout_context: Mapping[str, Any] | None = None,
     ) -> str:
         """Return a bounded record of the exact timed-out MAGEMin request."""
         args, buffer_name, buffer_n, _buffer_warnings = (
@@ -2934,6 +2935,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             'database': self._effective_database(),
             'argv': args,
         }
+        if timeout_context is not None:
+            payload['pool_timeout'] = timeout_context
         return self._encode_magemin_timeout_diagnostic(payload)
 
     def _magemin_timeout_diagnostic_detail_safely(
@@ -2945,6 +2948,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         pressure_bar: float,
         pressure_kbar: float,
         fO2_log: float,
+        timeout_context: Mapping[str, Any] | None = None,
     ) -> str:
         try:
             return self._magemin_timeout_diagnostic_detail(
@@ -2954,6 +2958,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 pressure_bar=pressure_bar,
                 pressure_kbar=pressure_kbar,
                 fO2_log=fO2_log,
+                timeout_context=timeout_context,
             )
         except Exception as exc:
             try:
@@ -2972,6 +2977,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     'database': self._effective_database(),
                     'argv': [],
                     'argv_truncated': True,
+                    'pool_timeout': timeout_context,
                 })
             except Exception:
                 return '{"diagnostic_capture_error":"capture_failed"}'
@@ -3079,6 +3085,22 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             record['diagnostic_capture_error'] = str(
                 payload['diagnostic_capture_error']
             )[:64]
+        pool_timeout = payload.get('pool_timeout')
+        if isinstance(pool_timeout, Mapping):
+            wait_state, _ = text(pool_timeout.get('wait_state', ''), 16)
+            timeout_detail = {
+                'configured_per_job_timeout_s': value(
+                    pool_timeout.get('configured_per_job_timeout_s')
+                )[0],
+                'effective_wait_timeout_s': value(
+                    pool_timeout.get('effective_wait_timeout_s')
+                )[0],
+                'wait_state': wait_state,
+            }
+            if pool_timeout.get('worker_phase') is not None:
+                worker_phase, _ = text(pool_timeout['worker_phase'], 32)
+                timeout_detail['worker_phase'] = worker_phase
+            record['pool_timeout'] = timeout_detail
         detail = json.dumps(
             record,
             ensure_ascii=True,
@@ -3094,12 +3116,29 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
     def _attach_magemin_timeout_diagnostic(
         timeout: EngineWorkerTimeout,
         detail: str,
+        *,
+        configured_timeout_s: float | None = None,
     ) -> EngineWorkerTimeout:
-        timeout.diagnostic_detail = detail
-        timeout._set_diagnostic_context(
-            backend='MAGEMin',
-            operation='equilibrate',
-        )
+        if timeout.diagnostic_detail:
+            timeout.diagnostic_detail = (
+                f'{timeout.diagnostic_detail}; MAGEMin request: {detail}'
+            )
+        else:
+            timeout.diagnostic_detail = detail
+        if (
+            timeout.diagnostic_operation == 'startup'
+            or timeout.phase in {'initialization', 'restart', 'startup'}
+        ):
+            timeout._set_diagnostic_context(
+                backend='MAGEMin',
+                operation='startup',
+            )
+        else:
+            timeout._set_diagnostic_context(
+                backend='MAGEMin',
+                operation='equilibrate',
+                configured_timeout_s=configured_timeout_s,
+            )
         return timeout
 
     def _call_magemin(
@@ -3297,6 +3336,12 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                                 pressure_bar=pressure_bar,
                                 pressure_kbar=pressure_kbar,
                                 fO2_log=fO2_log,
+                                timeout_context={
+                                    'configured_per_job_timeout_s': timeout_s,
+                                    'effective_wait_timeout_s': timeout.timeout_s,
+                                    'wait_state': 'running',
+                                    'worker_phase': timeout.phase,
+                                },
                             )
                         )
                         self._subprocess_pool._abort_request(
@@ -3306,9 +3351,15 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         self._attach_magemin_timeout_diagnostic(
                             timeout,
                             diagnostic_detail,
+                            configured_timeout_s=timeout_s,
                         )
                         raise
                     except FutureTimeoutError as exc:
+                        running = getattr(future, 'running', None)
+                        wait_state = (
+                            'running' if callable(running) and running()
+                            else 'queued'
+                        )
                         future.cancel()
                         diagnostic_detail = (
                             self._magemin_timeout_diagnostic_detail_safely(
@@ -3318,6 +3369,11 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                                 pressure_bar=pressure_bar,
                                 pressure_kbar=pressure_kbar,
                                 fO2_log=fO2_log,
+                                timeout_context={
+                                    'configured_per_job_timeout_s': timeout_s,
+                                    'effective_wait_timeout_s': future_timeout_s,
+                                    'wait_state': wait_state,
+                                },
                             )
                         )
                         self._subprocess_pool._abort_request(
@@ -3332,6 +3388,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                         self._attach_magemin_timeout_diagnostic(
                             timeout,
                             diagnostic_detail,
+                            configured_timeout_s=timeout_s,
                         )
                         raise timeout from exc
                     except (

@@ -2336,6 +2336,57 @@ def test_pool_startup_timeout_message_omits_missing_slot_count(monkeypatch):
     assert 'slot 2' in startup_logs[1]
 
 
+@pytest.mark.timeout(15)
+def test_pool_normalizes_timeout_during_worker_restart(monkeypatch):
+    pool = EngineWorkerPool(lambda _index: _test_worker(timeout_s=5.0), size=1)
+    worker = pool.workers[0]
+    worker.name = 'MAGEMin subprocess pool slot 5'
+    worker._discard_current(diagnostic=False)
+
+    def fail_restart(*, timeout_s=None):
+        raise EngineWorkerTimeout(
+            worker.name,
+            worker.startup_timeout_s,
+            phase='initialization',
+        )
+
+    monkeypatch.setattr(worker, 'start', fail_restart)
+    try:
+        future = pool.submit(_points()[0], timeout_s=5.0)
+        with pytest.raises(EngineWorkerTimeout) as caught:
+            future.result(timeout=3.0)
+    finally:
+        pool.close(cancel_pending=True, timeout_s=3.0)
+
+    timeout = caught.value
+    diagnostic = timeout.serialized_diagnostic_fields()
+    assert diagnostic['reason'] == EngineWorkerTimeout.reason_code
+    assert diagnostic['backend'] == 'MAGEMin'
+    assert diagnostic['operation'] == 'startup'
+    assert diagnostic['phase'] == 'initialization'
+    assert diagnostic['timeout_s'] == pytest.approx(worker.startup_timeout_s)
+    assert diagnostic['exception_message'] == (
+        'MAGEMin startup initialization exceeded hard timeout of '
+        f'{worker.startup_timeout_s:g}s'
+    )
+    assert 'slot 5' not in diagnostic['exception_message']
+    assert 'slot 5' in timeout.diagnostic_detail
+
+
+def test_queued_abort_logs_detail_without_an_assigned_worker(monkeypatch):
+    pool = object.__new__(EngineWorkerPool)
+    pool._active_requests_lock = threading.Lock()
+    pool._active_requests = {}
+    pool._request_workers = {}
+    pool._diagnostic_written_futures = set()
+    logs = []
+    monkeypatch.setattr(engine_pool_module, '_pool_debug', logs.append)
+    detail = '{"wait_state":"queued","effective_wait_timeout_s":47.4}'
+
+    assert pool._abort_request(object(), diagnostic_detail=detail) is False
+    assert logs == [f'pool request detail: {detail}']
+
+
 @pytest.mark.cpu_budget(20)
 @pytest.mark.timeout(20)
 def test_constructor_reaps_child_when_process_start_blocks_before_publish():

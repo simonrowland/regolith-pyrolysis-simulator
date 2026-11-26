@@ -742,13 +742,20 @@ def test_startup_timeout_keeps_shared_diagnostic_on_unavailable_route(
     assert result.status == 'unavailable'
     diagnostic = result.diagnostic
     assert diagnostic['backend_status'] == 'unavailable'
-    assert diagnostic['backend_status_reason'] == 'engine_worker_timeout'
-    assert diagnostic['reason'] == 'engine_worker_timeout'
-    assert diagnostic['backend_diagnostics'] == (
+    assert diagnostic.get('backend_status_reason') is None
+    assert diagnostic.get('reason') is None
+    assert diagnostic['startup_timeout_diagnostic'] == (
         timeout.serialized_diagnostic_fields()
     )
-    assert diagnostic['backend_diagnostics']['backend'] == 'MAGEMin'
-    assert diagnostic['backend_diagnostics']['timeout_s'] == 30.0
-    assert diagnostic['backend_diagnostics']['phase'] == 'initialization'
-    assert diagnostic['backend_diagnostics']['operation'] == 'startup'
-    assert 'slot 5' not in diagnostic['backend_diagnostics']['exception_message']
+    assert diagnostic['startup_timeout_diagnostic']['backend'] == 'MAGEMin'
+    assert diagnostic['startup_timeout_diagnostic']['timeout_s'] == 30.0
+    assert diagnostic['startup_timeout_diagnostic']['phase'] == 'initialization'
+    assert diagnostic['startup_timeout_diagnostic']['operation'] == 'startup'
+    assert 'slot 5' not in diagnostic[
+        'startup_timeout_diagnostic'
+    ]['exception_message']
+    from simulator.reduced_real_determinism import (
+        gate_curve_provider_timeout_reason,
+    )
+
+    assert gate_curve_provider_timeout_reason(diagnostic) is None

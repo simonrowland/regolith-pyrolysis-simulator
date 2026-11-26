@@ -3392,7 +3392,7 @@ class EvaporationMixin:
 
         if (
             self._liquid_fraction_provider != 'magemin'
-            or 'engine_worker_timeout'
+            or EngineWorkerTimeout.reason_code
             not in gate_curve_provider_diagnostic_reasons(diagnostic)
         ):
             return curve
@@ -3400,7 +3400,7 @@ class EvaporationMixin:
         notice = {
             'type': 'typed_notice',
             'kind': 'freeze_gate_magemin_source_fallback',
-            'reason': 'engine_worker_timeout',
+            'reason': EngineWorkerTimeout.reason_code,
             'attempted_source': 'magemin',
             'source_used': str(curve.get('source') or ''),
         }

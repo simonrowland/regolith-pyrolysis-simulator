@@ -289,6 +289,7 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
                 backend_status='unavailable',
             )
             initialization_error = self._backend_initialization_error
+            diagnostic = unavailable.as_diagnostic()
             if initialization_error is not None:
                 from simulator.engine_pool import (
                     EngineWorkerTimeout,
@@ -296,21 +297,17 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
                 )
 
                 if isinstance(initialization_error, EngineWorkerTimeout):
-                    unavailable = replace(
-                        unavailable,
-                        backend_status_reason=initialization_error.reason_code,
-                        backend_diagnostics=(
-                            serialized_exception_diagnostic_fields(
-                                initialization_error
-                            )
-                        ),
+                    diagnostic['startup_timeout_diagnostic'] = (
+                        serialized_exception_diagnostic_fields(
+                            initialization_error
+                        )
                     )
             return IntentResult(
                 intent=request.intent,
                 status='unavailable',
                 transition=None,
                 control_audit=control_audit,
-                diagnostic=unavailable.as_diagnostic(),
+                diagnostic=diagnostic,
                 warnings=(
                     'MAGEMin adapter not available (binary not located '
                     'and no Python bridge importable)',

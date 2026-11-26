@@ -1072,6 +1072,17 @@ def test_magemin_cold_start_envelope_covers_spawn_startup_and_solve(
                 fO2_log=-8.0,
             )
         assert caught.value.timeout_s == pytest.approx(47.4)
+        diagnostic = caught.value.serialized_diagnostic_fields()
+        assert diagnostic['timeout_s'] == pytest.approx(15.0)
+        assert diagnostic['exception_message'] == (
+            'MAGEMin equilibrate job exceeded hard timeout of 15s'
+        )
+        detail = json.loads(caught.value.diagnostic_detail)
+        assert detail['pool_timeout'] == {
+            'configured_per_job_timeout_s': 15.0,
+            'effective_wait_timeout_s': 47.4,
+            'wait_state': 'queued',
+        }
         assert pool.future.cancelled
         assert pool.abort_detail is not None
     else:
@@ -1084,6 +1095,116 @@ def test_magemin_cold_start_envelope_covers_spawn_startup_and_solve(
         assert completion_s == pytest.approx(0.99 + 29.99 + 14.99)
 
     assert pool.future.timeout_s == pytest.approx(47.4)
+
+
+def test_magemin_worker_and_future_timeouts_serialize_configured_deadline():
+    class ScriptedFuture:
+        def __init__(self, outcome, *, running):
+            self.outcome = outcome
+            self.is_running = running
+            self.cancelled = False
+
+        def result(self, timeout=None):
+            raise self.outcome
+
+        def running(self):
+            return self.is_running
+
+        def cancel(self):
+            self.cancelled = True
+            return not self.is_running
+
+    worker_timeout = EngineWorkerTimeout(
+        'MAGEMin subprocess pool slot 4', 15.0, phase='job',
+    )
+    running_future = ScriptedFuture(worker_timeout, running=True)
+    queued_future = ScriptedFuture(FutureTimeoutError(), running=False)
+
+    class ScriptedPool:
+        def __init__(self):
+            self.futures = iter((running_future, queued_future))
+            self.abort_details = []
+
+        def submit(self, *_args, **_kwargs):
+            return next(self.futures)
+
+        def _abort_request(self, _future, *, diagnostic_detail=None):
+            self.abort_details.append(diagnostic_detail)
+            return False
+
+    backend = _make_pooled_subprocess_backend(None)
+    backend._config = {
+        'warm_call_timeout_s': 15.0,
+        'worker_startup_timeout_s': 30.0,
+    }
+    pool = ScriptedPool()
+    _attach_fake_magemin_worker(pool, backend)
+    backend._subprocess_pool = pool
+    projection = backend._build_db_bulk_projection({'SiO2': 60.0, 'MgO': 40.0})
+    timeouts = []
+
+    for _ in range(2):
+        with pytest.raises(EngineWorkerTimeout) as caught:
+            backend._call_magemin(
+                projection,
+                temperature_C=1200.0,
+                pressure_bar=1.0,
+                fO2_log=-8.0,
+            )
+        timeouts.append(caught.value)
+
+    running, queued = timeouts
+    assert running.timeout_s == pytest.approx(15.0)
+    assert queued.timeout_s == pytest.approx(47.4)
+    running_fields = running.serialized_diagnostic_fields()
+    queued_fields = queued.serialized_diagnostic_fields()
+    assert running_fields == queued_fields
+    assert running_fields['reason'] == EngineWorkerTimeout.reason_code
+    assert running_fields['backend'] == 'MAGEMin'
+    assert running_fields['timeout_s'] == pytest.approx(15.0)
+    assert running_fields['phase'] == 'job'
+    assert running_fields['operation'] == 'equilibrate'
+    assert running_fields['exception_message'] == (
+        'MAGEMin equilibrate job exceeded hard timeout of 15s'
+    )
+    running_detail = json.loads(running.diagnostic_detail)
+    queued_detail = json.loads(queued.diagnostic_detail)
+    assert running_detail['pool_timeout']['wait_state'] == 'running'
+    assert running_detail['pool_timeout']['effective_wait_timeout_s'] == 15.0
+    assert running_detail['pool_timeout']['worker_phase'] == 'job'
+    assert queued_detail['pool_timeout']['wait_state'] == 'queued'
+    assert queued_detail['pool_timeout']['effective_wait_timeout_s'] == 47.4
+    assert 'worker_phase' not in queued_detail['pool_timeout']
+    assert all(pool.abort_details)
+
+
+def test_magemin_request_detail_preserves_restart_startup_timeout_context():
+    timeout = EngineWorkerTimeout(
+        'MAGEMin subprocess pool slot 5', 30.0, phase='initialization',
+    )
+    pool = object.__new__(engine_pool.EngineWorkerPool)
+    pool._workers = [types.SimpleNamespace(
+        name='MAGEMin subprocess pool slot 5',
+    )]
+    pool._normalize_startup_timeout(timeout, failed_slots=(0,))
+
+    MAGEMinBackend._attach_magemin_timeout_diagnostic(
+        timeout,
+        '{"request_id":"restart-timeout"}',
+        configured_timeout_s=15.0,
+    )
+
+    diagnostic = timeout.serialized_diagnostic_fields()
+    assert diagnostic['reason'] == EngineWorkerTimeout.reason_code
+    assert diagnostic['backend'] == 'MAGEMin'
+    assert diagnostic['operation'] == 'startup'
+    assert diagnostic['phase'] == 'initialization'
+    assert diagnostic['timeout_s'] == 30.0
+    assert diagnostic['exception_message'] == (
+        'MAGEMin startup initialization exceeded hard timeout of 30s'
+    )
+    assert 'slot 5' in timeout.diagnostic_detail
+    assert 'restart-timeout' in timeout.diagnostic_detail
 
 
 @pytest.mark.parametrize(

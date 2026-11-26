@@ -241,6 +241,7 @@ class EngineWorkerTimeout(TimeoutError):
     ):
         self.worker_name = str(worker_name)
         self.timeout_s = float(timeout_s)
+        self.diagnostic_timeout_s = self.timeout_s
         self.phase = str(phase)
         self.failed_slots = tuple(int(slot) for slot in failed_slots)
         self.diagnostic_backend: str | None = None
@@ -264,16 +265,24 @@ class EngineWorkerTimeout(TimeoutError):
             f'{timeout_s:g}s'
         )
 
-    def _set_diagnostic_context(self, *, backend: str, operation: str) -> None:
+    def _set_diagnostic_context(
+        self,
+        *,
+        backend: str,
+        operation: str,
+        configured_timeout_s: float | None = None,
+    ) -> None:
         """Replace slot-specific text with stable backend/operation context."""
 
         self.diagnostic_backend = str(backend)
         self.diagnostic_operation = str(operation)
+        if configured_timeout_s is not None:
+            self.diagnostic_timeout_s = float(configured_timeout_s)
         context = f'{self.diagnostic_backend} {self.diagnostic_operation}'
         self._diagnostic_message = self._message_for_context(
             context,
             self.phase,
-            self.timeout_s,
+            self.diagnostic_timeout_s,
         )
         self.args = (self._diagnostic_message,)
 
@@ -284,7 +293,7 @@ class EngineWorkerTimeout(TimeoutError):
             'exception_class': type(self).__name__,
             'exception_message': self._diagnostic_message,
             'reason': self.reason_code,
-            'timeout_s': self.timeout_s,
+            'timeout_s': self.diagnostic_timeout_s,
             'phase': self.phase,
         }
         if self.diagnostic_backend is not None:
@@ -3056,15 +3065,19 @@ class EngineWorkerPool:
                 diagnostic_path = worker.diagnostic_log_path
                 should_log = diagnostic_path is not None
 
+        logged = False
         if should_log and diagnostic_path is not None:
             try:
                 diagnostic_path.parent.mkdir(parents=True, exist_ok=True)
                 with diagnostic_path.open('a', encoding='utf-8') as log:
                     log.write(f'{diagnostic_detail}\n')
+                logged = True
             except OSError:
                 # Logging must not prevent worker cleanup or replace the
                 # typed timeout returned to the caller.
                 pass
+        if diagnostic_detail is not None and not logged:
+            _pool_debug(f'pool request detail: {diagnostic_detail}')
         return aborted
 
     def _start_and_consume(
@@ -3137,6 +3150,14 @@ class EngineWorkerPool:
                 try:
                     result = worker.call(request, timeout_s=timeout_s)
                 except BaseException as exc:
+                    if (
+                        isinstance(exc, EngineWorkerTimeout)
+                        and exc.phase == 'initialization'
+                    ):
+                        self._normalize_startup_timeout(
+                            exc,
+                            failed_slots=(index,),
+                        )
                     call_finished.set()
                     with self._active_requests_lock:
                         self._active_requests.pop(future, None)
