@@ -566,21 +566,6 @@ def _decode_payload_for_admission(
         provenance_diagnostics = [decoded.vapor_pressure_diagnostic]
         if isinstance(decoded.result.diagnostics, Mapping):
             provenance_diagnostics.append(decoded.result.diagnostics)
-        replay_activities = decoded.vapor_pressure_diagnostic.get("activities")
-        if isinstance(replay_activities, Mapping):
-            effective_pressures = decoded.result.vapor_pressures_Pa
-            if (
-                not isinstance(effective_pressures, Mapping)
-                or any(
-                    not isinstance(species, str)
-                    or species not in replay_activities
-                    for species in effective_pressures
-                )
-            ):
-                # Evaporation activates every finite backend pressure channel
-                # against this explicit activity map. A missing species makes
-                # the vapor batch fail closed after cache-hit accounting.
-                return None
         string_fields = {
             "pressure_rail",
             "melt_oxide_component",

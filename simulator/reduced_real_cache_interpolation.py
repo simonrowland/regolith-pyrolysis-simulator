@@ -441,10 +441,32 @@ def interpolate_equilibrium_payload(
     payload[_EQUILIBRIUM_REPLAY_SIDE_FIELDS[0]] = dict(
         interpolated_result.get("vapor_pressures_source") or {}
     )
-    payload[_EQUILIBRIUM_REPLAY_SIDE_FIELDS[1]] = {
+    reference_diagnostic = reference.get(_EQUILIBRIUM_REPLAY_SIDE_FIELDS[1])
+    interpolated_diagnostic = (
+        copy.deepcopy(dict(reference_diagnostic))
+        if isinstance(reference_diagnostic, Mapping)
+        else {}
+    )
+    interpolated_diagnostic.update({
         "source": "cached_interpolated",
         "interpolation_mode": "linear",
-    }
+    })
+    interpolated_activities = interpolated_result.get("activity_coefficients")
+    reference_activities = (
+        reference_diagnostic.get("activities")
+        if isinstance(reference_diagnostic, Mapping)
+        else None
+    )
+    if (
+        isinstance(reference_activities, Mapping)
+        and reference_activities
+        and isinstance(interpolated_activities, Mapping)
+        and interpolated_activities
+    ):
+        interpolated_diagnostic["activities"] = copy.deepcopy(
+            dict(interpolated_activities)
+        )
+    payload[_EQUILIBRIUM_REPLAY_SIDE_FIELDS[1]] = interpolated_diagnostic
     return payload
 
 
