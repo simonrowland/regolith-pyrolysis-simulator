@@ -4432,18 +4432,36 @@ def predict_langmuir_residue_composition(
         )
 
         gas_pack = load_gas_datapack()
-        gas_channels, omissions = _openimcc_gas_channels_and_omission_notices(
+        raw_gas_channels, omissions = _openimcc_gas_channels_and_omission_notices(
             tuple(initial), gas_pack
         )
         if omissions:
             raise ResidueInventoryRefusal("residue_gas_channel_missing", str(omissions))
-        channels = tuple(
-            ResidueChannel(
-                str(species), str(species), parent, 1.0,
-                "DP-005 assumed common alpha=1 for a composition ratio",
-            )
-            for species, (parent, _, _) in gas_channels
+        # AlSiO is 1/2 Al2O3 + SiO2. A bare primary-parent channel fails the
+        # metal-set check and refuses the whole bead. The channel-set owner
+        # also drops AlSiO and Si2O2 for internal-analytical, whose vapour
+        # catalog has no rows for them.
+        gas_channels, channels, channel_omissions = _openimcc_residue_channel_set(
+            raw_gas_channels,
+            (),
+            engine=engine,
+            alpha=1.0,
+            alpha_source="DP-005 assumed common alpha=1 for a composition ratio",
         )
+        if not gas_channels:
+            raise ResidueInventoryRefusal("residue_gas_channels_missing")
+        for omission in channel_omissions:
+            notices.append(
+                Notice(
+                    kind=NoticeKind.INPUT_OMITTED,
+                    affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+                    reason=(
+                        f"{omission.get('channel', 'OpenIMCC gas channel')}: "
+                        f"{omission.get('reason')}"
+                    ),
+                    origin="OpenIMCC gas channel selection",
+                )
+            )
         flags: set[str] = set()
         metadata: dict[str, str] = {}
         base_pressure_model = _make_residue_pressure_model(

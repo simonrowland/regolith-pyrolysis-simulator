@@ -688,3 +688,94 @@ def test_score_store_caches_langmuir_extent_per_bead_and_rechecks_anchors(monkey
         later.refusal.detail["reason"]
         == "measured_mass_loss_fraction_missing_or_invalid"
     )
+
+
+def test_langmuir_inventory_uses_residue_channel_owner(monkeypatch, mendybaev_context):
+    """Langmuir must debit through the shared OpenIMCC channel owner.
+
+    A bare AlSiO channel (primary parent Al2O3, no multi-parent stoich) is the
+    shape that refuses the bead. Internal-analytical omits that channel;
+    OpenIMCC keeps the owner's 1/2 Al2O3 + SiO2 coefficients.
+    """
+    import simulator.battery.residue as residue
+
+    context, rows = mendybaev_context
+    reference = _row(rows, "FUN1-10")
+    captured: list[dict] = []
+    real = residue._openimcc_residue_channel_set
+
+    def wrapping(raw_channels, initial_notices, *, engine, alpha, alpha_source):
+        gas_channels, channels, omissions = real(
+            raw_channels,
+            initial_notices,
+            engine=engine,
+            alpha=alpha,
+            alpha_source=alpha_source,
+        )
+        captured.append(
+            {
+                "engine": engine,
+                "raw_species": {str(species) for species, _reaction in raw_channels},
+                "channels": channels,
+                "omissions": omissions,
+            }
+        )
+        raise ResidueInventoryRefusal("langmuir_channel_owner_probe")
+
+    monkeypatch.setattr(residue, "_openimcc_residue_channel_set", wrapping)
+    experiment = context.experiments[reference.experiment_id]
+    for engine_name in ("internal-analytical", "openimcc"):
+        with pytest.raises(ResidueInventoryRefusal) as exc_info:
+            predict_langmuir_residue_composition(
+                engine_name, reference, experiment, rows.values()
+            )
+        assert exc_info.value.reason == "langmuir_channel_owner_probe"
+
+    by_engine = {row["engine"]: row for row in captured}
+    analytical = by_engine["internal-analytical"]
+    # The gate OpenIMCC pack selects AlSiO for this bead. That is the channel
+    # whose bare primary parent refused the inventory.
+    assert "AlSiO" in analytical["raw_species"]
+    omitted = {row.get("channel") for row in analytical["omissions"]}
+    for species in analytical["raw_species"] & {"AlSiO", "Si2O2"}:
+        assert species in omitted
+    assert all(
+        channel.species not in {"AlSiO", "Si2O2"} for channel in analytical["channels"]
+    )
+    openimcc_run = by_engine["openimcc"]
+    assert "AlSiO" in openimcc_run["raw_species"]
+    openimcc_channels = {
+        channel.species: channel for channel in openimcc_run["channels"]
+    }
+    alsio = openimcc_channels["AlSiO"]
+    assert dict(alsio.parent_oxide_stoich) == {"Al2O3": 0.5, "SiO2": 1.0}
+
+
+def test_removing_alsio_stoich_omits_the_channel(monkeypatch):
+    """The metal-set check still refuses a bare AlSiO channel.
+
+    Mutating the owner back to no parent stoichiometry must not let that
+    channel into the inventory.
+    """
+    import simulator.battery.residue as residue
+
+    real = residue._openimcc_residue_channel
+
+    def without_stoich(species, parent, alpha, alpha_source):
+        channel = real(species, parent, alpha, alpha_source)
+        if species == "AlSiO":
+            return replace(channel, parent_oxide_stoich=None)
+        return channel
+
+    monkeypatch.setattr(residue, "_openimcc_residue_channel", without_stoich)
+    accepted, channels, omissions = residue._openimcc_residue_channel_set(
+        [("AlSiO", ("Al2O3", 0.5, -1.25))],
+        (),
+        engine="openimcc",
+        alpha=1.0,
+        alpha_source="DP-005 assumed common alpha=1 for a composition ratio",
+    )
+    assert accepted == []
+    assert channels == ()
+    assert omissions[0]["channel"] == "AlSiO"
+    assert "residue_stoichiometry_invalid" in omissions[0]["reason"]
