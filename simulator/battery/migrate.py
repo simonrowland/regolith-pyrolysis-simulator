@@ -13797,6 +13797,25 @@ def _method_text_value(candidate: object) -> str | None:
     return None
 
 
+def _regime_candidates_precede_method_field(
+    *,
+    method_field_is_printed: bool,
+    declared_method_is_printed: bool,
+    regime_agrees_with_declared: bool,
+) -> bool:
+    """Regime text leads only when the method field is not a closed token.
+
+    A method field that exact-maps to a non-UNSPECIFIED token wins, including
+    when the declared experiment method is still prose. An unmapped regime may
+    lead when that field does not exact-map. A regime that names a different
+    method does not override a printed declared method.
+    """
+
+    return (not method_field_is_printed) and (
+        not declared_method_is_printed or regime_agrees_with_declared
+    )
+
+
 _METHOD_TEXT_EVIDENCE = (
     ("electron microprobe analysis", MethodToken.ELECTRON_MICROPROBE),
     ("electron microprobe", MethodToken.ELECTRON_MICROPROBE),
@@ -26186,7 +26205,8 @@ class Migrator:
         )
         # A regime label is not a second technique when the source already
         # named a printed method. Callers still pass it. A method field that
-        # exact-maps wins. An exact regime alias that names that same method
+        # exact-maps wins, including when the declared experiment method is
+        # still prose. An exact regime alias that names that same method
         # resolves the row, so the prose is not re-inferred (Tyurnina
         # kems_effusion on a knudsen experiment). A regime that names a
         # different method does not override the declared one.
@@ -26226,8 +26246,10 @@ class Migrator:
             and regime_state.is_value
             and regime_state.value is declared_experiment_method.value
         )
-        if not declared_method_is_printed or (
-            regime_agrees_with_declared and not method_field_is_printed
+        if _regime_candidates_precede_method_field(
+            method_field_is_printed=method_field_is_printed,
+            declared_method_is_printed=declared_method_is_printed,
+            regime_agrees_with_declared=regime_agrees_with_declared,
         ):
             active_method_candidates = (
                 *regime_candidates,
@@ -29406,21 +29428,25 @@ class Migrator:
             commit=False,
         )
         former_experiment_id = experiment_id
+        # The row resolve may still be a regime-resolved UNSPECIFIED. The
+        # split id and the split experiment use the method-field token.
+        row_method = method
         if self._method_row_splits(experiment_id, _split_method):
             # A different printed method gets its own id. UNSPECIFIED, the
             # home method, and a regime-only claim stay on the experiment
             # the source named. The home was chosen from every row, so an
             # unstated registry method does not take the first row's method
-            # as its experiment-wide value.
+            # as its experiment-wide value. A regime-resolved UNSPECIFIED
+            # must not label a split this predicate already accepted.
             self._inferred_method_evidence_by_experiment.pop(experiment_id, None)
             if experiment_before_method_resolution is not None:
                 self.result.experiments[experiment_id] = (
                     experiment_before_method_resolution
                 )
             method_distinguisher = (
-                f"declared:{declared_experiment_id}::method:{method.value.value}"
+                f"declared:{declared_experiment_id}::method:{_split_method.value.value}"
                 if declared_experiment_id is not None
-                else f"method:{method.value.value}"
+                else f"method:{_split_method.value.value}"
             )
             distinguisher = (
                 f"{distinguisher}::{method_distinguisher}"
@@ -29441,14 +29467,15 @@ class Migrator:
             if existing_method_experiment is not None:
                 self.result.experiments[experiment_id] = replace(
                     existing_method_experiment,
-                    method=method,
+                    method=_split_method,
                 )
             elif experiment_before_method_resolution is not None:
                 self.result.experiments[experiment_id] = replace(
                     experiment_before_method_resolution,
                     experiment_id=experiment_id,
-                    method=method,
+                    method=_split_method,
                 )
+            row_method = _split_method
         (
             derived_from,
             source_derivation,
@@ -29892,7 +29919,7 @@ class Migrator:
                 work_id=work.work_id,
                 experiment_id=experiment_id,
                 locator=locator,
-                method=method,
+                method=row_method,
                 equipment=obs.get("equipment"),
                 values=(
                     composition_closure_context
@@ -30266,7 +30293,7 @@ class Migrator:
         experiment_identity, experiment_provenance = self._experiment_identity_fields(
             experiment_id,
             ident_kwargs,
-            method=method,
+            method=row_method,
             quantity=q_token,
             species_formula=species.formula,
             source_values=values if isinstance(values, Mapping) else None,

@@ -537,3 +537,91 @@ def test_treating_assay_prose_as_a_method_field_mints_a_second_id(
     )
     with pytest.raises(AssertionError):
         _assert_assay_stays_on_named_run(result, extract["source_id"])
+
+
+def _prose_declared_method_with_unmapped_regime():
+    """Prose declared method. Calorimetry is home. Knudsen carries a bad regime."""
+
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    source_row = extract["species"]["Na"]["observations"][0]
+    source_row.pop("regime", None)
+    source_row["experiment"] = "named-run"
+    source_row["observation_id"] = "calorimetry-home"
+    source_row["method"] = "calorimetry"
+    knudsen_row = yaml.safe_load(yaml.safe_dump(source_row))
+    knudsen_row["observation_id"] = "knudsen-beside-unmapped-regime"
+    knudsen_row["method"] = "knudsen_effusion"
+    knudsen_row["regime"] = "not_a_closed_method_label"
+    extract["experiments"] = [
+        {
+            "experiment_id": "named-run",
+            "method": "laboratory campaign on one named run",
+        }
+    ]
+    extract["species"]["Na"]["observations"] = [source_row, knudsen_row]
+    return extract
+
+
+def _assert_printed_knudsen_survives_unmapped_regime(result, source_id):
+    calorimetry = _rows_for_local_id(result, source_id, "calorimetry-home")
+    knudsen = _rows_for_local_id(
+        result, source_id, "knudsen-beside-unmapped-regime"
+    )
+    assert calorimetry and knudsen
+    assert all(
+        row.experiment_id.endswith("::experiment::named-run")
+        and "::method:" not in row.experiment_id
+        for row in calorimetry
+    )
+    stored = []
+    for row in knudsen:
+        experiment = result.experiments[row.experiment_id]
+        method_value = (
+            experiment.method.value.value if experiment.method.is_value else None
+        )
+        stored.append((row.experiment_id, method_value))
+        assert row.experiment_id.endswith("::method:knudsen_effusion"), stored
+        assert method_value == "knudsen_effusion", stored
+        assert "unspecified" not in row.experiment_id
+        assert not any(
+            "not_a_closed_method_label" in notice.reason for notice in row.notices
+        ), stored
+    return stored
+
+
+def test_unmapped_regime_does_not_replace_a_printed_method_on_the_split(
+    tmp_path,
+):
+    extract = _prose_declared_method_with_unmapped_regime()
+    result = _migrate_real_extract(
+        tmp_path, "fixture-source.yaml", extract_doc=extract
+    )
+    _assert_printed_knudsen_survives_unmapped_regime(result, extract["source_id"])
+
+
+def test_old_candidate_order_lets_the_unmapped_regime_lead(tmp_path, monkeypatch):
+    import simulator.battery.migrate as migrate_module
+
+    def old_order(
+        *,
+        method_field_is_printed,
+        declared_method_is_printed,
+        regime_agrees_with_declared,
+    ):
+        return (not declared_method_is_printed) or (
+            regime_agrees_with_declared and not method_field_is_printed
+        )
+
+    monkeypatch.setattr(
+        migrate_module,
+        "_regime_candidates_precede_method_field",
+        old_order,
+    )
+    extract = _prose_declared_method_with_unmapped_regime()
+    result = _migrate_real_extract(
+        tmp_path, "fixture-source.yaml", extract_doc=extract
+    )
+    with pytest.raises(AssertionError):
+        _assert_printed_knudsen_survives_unmapped_regime(
+            result, extract["source_id"]
+        )
