@@ -42,6 +42,7 @@ from simulator.melt_backend.base import (
 )
 from simulator.melt_backend.pure_phase import PurePhaseProperties
 from simulator.melt_backend.pure_phase_janaf_score import (
+    MELTS_CASIO3_HHR_SOLID_RESIDUAL_AT_1400_J_MOL,
     casio3_fusion_model_systematic_dex,
 )
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET, GAS_CONSTANT
@@ -584,7 +585,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                         base_source='thermoengine',
                     )
                 )
-            cao_model_systematic_notice = None
+            cao_model_systematic_notices = []
             cao_exchange_mu = (
                 payload.mu_CaO_J_per_mol_melts_berman_apparent
             )
@@ -626,7 +627,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                         g0_casio3_liquid - float(pwo.G_J_mol),
                         temperature_K,
                     )
-                    cao_model_systematic_notice = {
+                    fusion_notice = {
                         'kind': 'engine_model_caveat',
                         'reason': (
                             'ThermoEngine CaSiO3(l)-pWo fusion residual '
@@ -637,13 +638,40 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                             f'{temperature_K:g} K'
                         ),
                     }
+                    hhr_residual_dex = (
+                        MELTS_CASIO3_HHR_SOLID_RESIDUAL_AT_1400_J_MOL
+                        / (
+                            GAS_CONSTANT * temperature_K * math.log(10.0)
+                        )
+                    )
+                    hhr_solid_notice = {
+                        'kind': 'engine_model_caveat',
+                        'reason': (
+                            'Phase-specific Berman-vs-HHR CaSiO3(cr) '
+                            'reassessment: raw residual +3.151 kJ/mol at '
+                            '1400 K and +2.947 kJ/mol at 1000 K; consistency '
+                            'disclosure only: do not validate an engine against '
+                            'a compilation it consumes. HHR (1982) is marked '
+                            'engine_reference_input/scoring_eligible:false and '
+                            'Berman (1988) used Haas/Hemingway data; HHR pp. '
+                            '49–50 reports ±0.608 kJ/mol. Robie & Hemingway '
+                            '(1995, USGS B2131) is present in the corpus.'
+                        ),
+                        'band': (
+                            f'{hhr_residual_dex:+.8g} dex at '
+                            f'{temperature_K:g} K from the measured '
+                            '+3.151 kJ/mol residual at 1400 K'
+                        ),
+                    }
+                    cao_model_systematic_notices.extend(
+                        (fusion_notice, hhr_solid_notice)
+                    )
                 except Exception:
                     # Without the phase-named fusion diagnostic, omit the
                     # exchange potential so CaO stays a typed refusal.
                     cao_exchange_mu = None
             emitted_imcc_notices = []
-            if cao_model_systematic_notice is not None:
-                emitted_imcc_notices.append(cao_model_systematic_notice)
+            emitted_imcc_notices.extend(cao_model_systematic_notices)
             eq = self._emit_equilibrium_result(
                 temperature_C=temperature_C,
                 pressure_bar=solved_pressure_bar,

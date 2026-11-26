@@ -6,10 +6,10 @@ so minor versions may carry significant changes.
 
 ## Unreleased
 
-- d-476 aligns the ThermoEngine CaSiO3 exchange potential to the named-phase
-  HHR solid reference and flags its measured CaSiO3 fusion residual per row.
-  The residual is reported as a model systematic and is not applied as a
-  correction.
+- d-476 converts ThermoEngine CaO activity from the raw CaSiO3−SiO2 exchange
+  potential to JANAF's printed solid-lime reference. It discloses both the
+  phase-specific Berman/HHR CaSiO3(cr) reassessment and the measured fusion
+  residual as model systematics; neither is applied as a correction.
 
 ## [0.6.8] — 2026-11-12
 

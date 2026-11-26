@@ -134,21 +134,23 @@ AL2SIO5_MULLITE_ABOVE_K = 1473.0
 # the constant, so per-phase rows are unaffected.
 MELTS_QUARTZ_ADJUSTMENT_KJ_MOL = -1.291
 
-# HHR (1982), pp. 49–50, reports CaSiO3(cr) with its phase named. At 1400 K,
-# the Berman pWo apparent G is 3151.241 J/mol above the HHR value after adding
-# the same Ca-001, Si-001 and O-029 element terms. Apply that independently
-# measured solid-component basis offset to the MELTS CaSiO3−SiO2 exchange
-# before comparing it with JANAF CaO. The 1000 K wollastonite check leaves
-# −0.204 kJ/mol, within HHR's stated ±0.608 kJ/mol formation-G uncertainty.
-MELTS_CASIO3_HHR_BASIS_OFFSET_J_MOL = 3151.241323
+# HHR (1982), pp. 49–50, is marked engine_reference_input / scoring_eligible:false.
+# Its named-phase solid comparison is therefore a consistency disclosure, not
+# independent validation. Do not validate an engine against a compilation it
+# consumes: Berman (1988) used Haas/Hemingway data. The raw
+# Berman-minus-HHR residual is +3151.241 J/mol at 1400 K and +2947.320 J/mol
+# at 1000 K after the same Ca-001, Si-001, and O-029 element terms. Preserve the
+# 1400 K value only as a model-systematic disclosure; never apply it to μ_CaO.
+MELTS_CASIO3_HHR_SOLID_RESIDUAL_AT_1400_J_MOL = 3151.241323
 
 
 def casio3_fusion_delta_g_kJ_mol(temperature_K: float) -> float:
     """Adamkovičová et al. (1980) CaSiO3 fusion ΔG at temperature T.
 
-    Eq. (8), p. 197, gives ΔH_fus(1817 K)=57.3 kJ/mol and Eq. (6)/(7)
-    give Cp(s)=0.06358+5.724e−5*T and Cp(l)=0.14985 kJ/(mol K). Integrating
-    ΔCp from the fusion point supplies the final two terms.
+    Eq. (8), p. 197, gives ΔH_fus(1817 K)=57.3 kJ/mol. Eq. (4), p. 196,
+    gives Cp(s)=0.06358+5.724e−5*T; the slope of the liquid Hrel fit in
+    Eq. (7), p. 197, gives Cp(l)=0.14985 kJ/(mol K). Integrating ΔCp from
+    the fusion point supplies the final two terms.
     """
 
     temperature = float(temperature_K)
@@ -312,13 +314,15 @@ def cao_activity_from_melts_exchange_mu(
     """Convert the MELTS exchange potential to the row's CaO standard state.
 
     Premise: the worker returns μ_CaO = μ(CaSiO3) − μ(SiO2) on MELTS's
-    apparent Berman basis; the row prints pure solid or liquid CaO. The named-
-    phase HHR solid anchor measures a +3151.241 J/mol CaSiO3-component offset,
-    so subtract it before comparing with JANAF's CaO G0, shifted to the same
-    basis using Ca-001 and O-029. Algebra: μ_CaO,aligned=μ_CaO−ΔG_basis and
-    ln(a)=(μ_CaO,aligned−G0_ref)/(RT). Units: J/mol divided by
-    J/(mol K)·K is dimensionless. Sanity: when aligned μ_CaO equals G0_ref,
-    ln(a)=0 and the returned activity is exactly 1.
+    apparent Berman basis; the row prints pure solid or liquid CaO. Use JANAF
+    CaO G0 on the shared apparent element basis from Ca-001 and O-029. The
+    phase-specific Berman-minus-HHR CaSiO3(cr) reassessment is disclosed as a
+    model systematic; HHR is marked engine_reference_input / scoring_eligible:false
+    and Berman (1988) used Haas/Hemingway data, so this is a consistency
+    disclosure rather than independent validation. Algebra: ln(a(CaO)) =
+    (μ_CaO − G0_ref(CaO))/(RT), with no fitted solid-phase subtraction.
+    Units: J/mol divided by J/(mol K)·K is dimensionless. Sanity: when raw
+    μ_CaO equals G0_ref, ln(a)=0 and the returned activity is exactly 1.
     """
 
     temperature = float(temperature_K)
@@ -330,8 +334,7 @@ def cao_activity_from_melts_exchange_mu(
     g0_kJ_mol, extrapolated = melts_reference_g0_cao_kJ_mol(
         temperature, phase,
     )
-    aligned_mu = mu - MELTS_CASIO3_HHR_BASIS_OFFSET_J_MOL
-    ln_activity = (aligned_mu - g0_kJ_mol * 1000.0) / (
+    ln_activity = (mu - g0_kJ_mol * 1000.0) / (
         GAS_CONSTANT * temperature
     )
     try:

@@ -13,7 +13,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
 )
 from simulator.melt_backend.pure_phase_janaf_score import (
     ELEMENT_REFERENCE_TABLES,
-    MELTS_CASIO3_HHR_BASIS_OFFSET_J_MOL,
+    MELTS_CASIO3_HHR_SOLID_RESIDUAL_AT_1400_J_MOL,
     casio3_fusion_delta_g_kJ_mol,
     casio3_fusion_model_systematic_dex,
     cao_activity_from_melts_exchange_mu,
@@ -63,7 +63,7 @@ def test_cao_activity_conversion_uses_requested_janaf_reference() -> None:
         temperature_K, 'cr',
     )
     activity, extrapolated = cao_activity_from_melts_exchange_mu(
-        g0_solid_kJ_mol * 1000.0 + MELTS_CASIO3_HHR_BASIS_OFFSET_J_MOL,
+        g0_solid_kJ_mol * 1000.0,
         temperature_K,
         phase='cr',
     )
@@ -75,7 +75,7 @@ def test_cao_activity_conversion_uses_requested_janaf_reference() -> None:
         temperature_K, 'l',
     )
     liquid_activity, extrapolated = cao_activity_from_melts_exchange_mu(
-        g0_liquid_kJ_mol * 1000.0 + MELTS_CASIO3_HHR_BASIS_OFFSET_J_MOL,
+        g0_liquid_kJ_mol * 1000.0,
         temperature_K,
         phase='l',
     )
@@ -220,9 +220,11 @@ def test_thermoengine_sio2_liquid_g0_uses_janaf_o038_element_basis() -> None:
         residual_dex = residual_kJ_mol * 1000.0 / (
             GAS_CONSTANT * temperature_K * math.log(10.0)
         )
-        # O-038 has no formal uncertainty field; retain and report both
-        # residuals instead of introducing a test-selected agreement cutoff.
-        assert math.isfinite(residual_kJ_mol)
+        # O-038 and each element table print these Gibbs/enthalpy tokens to
+        # 0.001 kJ and entropy to 0.001 J/K. A conservative worst-case sum of
+        # token rounding contributes <0.004 kJ/mol here; no formal uncertainty
+        # is published. Pin the measured residual within that source precision.
+        assert residual_kJ_mol == pytest.approx(-0.084, abs=0.004)
         assert math.isfinite(residual_dex)
     finally:
         backend.close()
@@ -232,10 +234,12 @@ def test_thermoengine_sio2_liquid_g0_uses_janaf_o038_element_basis() -> None:
     not thermoengine_package_available(),
     reason='ThermoEngine runtime is not installed',
 )
-def test_thermoengine_named_solid_casio3_basis_matches_hhr_with_offset() -> None:
+def test_thermoengine_named_solid_casio3_hhr_residual_is_disclosed_not_applied() -> None:
     from simulator.melt_backend.thermoengine import ThermoEngineBackend
 
     source = _hhr_casio3_source()
+    assert source['compilation_role']['engine_reference_input'] is True
+    assert source['compilation_role']['scoring_eligible'] is False
     assert 'Wollastonite crystals 298.15 to 1398 K' in source['phase_as_published']
     assert 'Cyclowollastonite is the stable phase above 1398 K' in source[
         'phase_as_published'
@@ -248,12 +252,14 @@ def test_thermoengine_named_solid_casio3_basis_matches_hhr_with_offset() -> None
         pytest.skip(backend.unavailable_reason())
     try:
         # Premise: at 1400 K HHR names stable cyclowollastonite; at 1000 K it
-        # names wollastonite. Add the same Ca-001 + Si-001 + 3/2 O-029 terms
-        # to ΔfG before comparison. The 1400 K residual defines the Berman
-        # CaSiO3-component basis offset; at 1000 K the held-out residual must
-        # remain inside HHR's published ±0.608 kJ/mol uncertainty. J/kJ are
-        # converted explicitly. Sanity: the offset substantially reduces the
-        # held-out residual rather than hiding it with a broad tolerance.
+        # names wollastonite. Add identical Ca-001 + Si-001 + 3/2 O-029 terms
+        # to the phase-named ΔfG values before comparing to Berman. HHR is an
+        # engine_reference_input with scoring_eligible:false; Berman (1988)
+        # used Haas/Hemingway data, so these +3.15/+2.95 kJ/mol results are a
+        # consistency disclosure, never independent validation or a correction.
+        # Robie & Hemingway (1995), USGS B2131, is also in the corpus. J/kJ are
+        # converted explicitly; HHR's published ±0.608 kJ/mol uncertainty is
+        # the only tolerance used for these consistency comparisons.
         row_1400 = _hhr_casio3_row(source, 1400.0)
         terms_1400 = _apparent_element_g_kJ_mol(1400.0)
         janaf_1400 = (
@@ -264,10 +270,9 @@ def test_thermoengine_named_solid_casio3_basis_matches_hhr_with_offset() -> None
             'pWo', temperature_K=1400.0, pressure_bar=1.0,
         )
         assert berman_pwo.G_J_mol is not None
-        calibration_residual_kJ_mol = berman_pwo.G_J_mol / 1000.0 - janaf_1400
-        offset_kJ_mol = MELTS_CASIO3_HHR_BASIS_OFFSET_J_MOL / 1000.0
-        assert abs(calibration_residual_kJ_mol - offset_kJ_mol) <= (
-            source_uncertainty_kJ_mol
+        residual_1400_kJ_mol = berman_pwo.G_J_mol / 1000.0 - janaf_1400
+        assert residual_1400_kJ_mol == pytest.approx(
+            3.151, abs=source_uncertainty_kJ_mol,
         ), 'HHR (1982), pp. 49–50: ΔfG uncertainty is ±0.608 kJ/mol'
 
         row_1000 = _hhr_casio3_row(source, 1000.0)
@@ -280,12 +285,18 @@ def test_thermoengine_named_solid_casio3_basis_matches_hhr_with_offset() -> None
             'Wo', temperature_K=1000.0, pressure_bar=1.0,
         )
         assert berman_wo.G_J_mol is not None
-        raw_residual_kJ_mol = berman_wo.G_J_mol / 1000.0 - janaf_1000
-        aligned_residual_kJ_mol = raw_residual_kJ_mol - offset_kJ_mol
-        assert abs(aligned_residual_kJ_mol) <= source_uncertainty_kJ_mol, (
+        residual_1000_kJ_mol = berman_wo.G_J_mol / 1000.0 - janaf_1000
+        assert residual_1000_kJ_mol == pytest.approx(
+            2.947, abs=source_uncertainty_kJ_mol,
+        ), (
             'HHR (1982), pp. 49–50: ΔfG uncertainty is ±0.608 kJ/mol'
         )
-        assert abs(aligned_residual_kJ_mol) < abs(raw_residual_kJ_mol)
+        row_temperature_K = 1933.0
+        residual_band_dex = (
+            MELTS_CASIO3_HHR_SOLID_RESIDUAL_AT_1400_J_MOL
+            / (GAS_CONSTANT * row_temperature_K * math.log(10.0))
+        )
+        assert residual_band_dex == pytest.approx(0.085, abs=0.001)
     finally:
         backend.close()
 
@@ -310,6 +321,18 @@ def test_thermoengine_casio3_liquid_fusion_residual_is_a_dex_systematic() -> Non
     )
     assert fusion['locator']['published_page'] == 197
     assert fusion['locator']['equation'] == '8'
+    solid_cp = next(
+        row for row in source['species']['CaSiO3']['observations']
+        if row['observation_id'] == 'adamkovicova_1980_solid_heat_capacity_eq4'
+    )
+    assert solid_cp['locator']['published_page'] == 196
+    assert solid_cp['locator']['equation'] == '4'
+    liquid_hrel = next(
+        row for row in source['species']['CaSiO3']['observations']
+        if row['observation_id'] == 'adamkovicova_1980_melt_relative_enthalpy_fit_eq7'
+    )
+    assert liquid_hrel['locator']['published_page'] == 197
+    assert liquid_hrel['locator']['equation'] == '7'
     assert fusion['values']['delta_H_fus_kJ_mol-1'] == 57.3
     assert fusion['values']['uncertainty_kJ_mol-1'] == 2.9
     assert fusion['values']['T_fus_K'] == 1817
@@ -319,8 +342,9 @@ def test_thermoengine_casio3_liquid_fusion_residual_is_a_dex_systematic() -> Non
         activity = float(result.activity_coefficients['CaSiO3'])
         assert activity > 0.0
         # The source reports “ΔH_fus(1817 K) = 57.3 ± 2.9 kJ mol−1”
-        # (Adamkovičová et al., 1980, p. 197, Eq. 8); Eqs. (6)/(7) give
-        # the solid/liquid Cp functions in the corpus extract. Premise: both
+        # (Adamkovičová et al., 1980, p. 197, Eq. 8); Eq. (4), p. 196, gives
+        # Cp(s), while the slope of the liquid Hrel fit Eq. (7), p. 197, gives
+        # Cp(l). Premise: both
         # G0 values are Berman apparent energies for one mol
         # CaSiO3. Ca-001 + Si-001 + 3/2 O-029 cancel in the liquid-solid
         # difference. Algebra removes RT ln(a) from μ(CaSiO3), then compares
@@ -342,7 +366,12 @@ def test_thermoengine_casio3_liquid_fusion_residual_is_a_dex_systematic() -> Non
         residual_dex = casio3_fusion_model_systematic_dex(
             melts_delta_g_J_mol, temperature_K,
         )
-        assert math.isfinite(residual_kJ_mol)
+        source_tolerance_kJ_mol = (
+            abs(1.0 - temperature_K / 1817.0) * 2.9 + 0.001
+        )
+        assert residual_kJ_mol == pytest.approx(
+            -0.233, abs=source_tolerance_kJ_mol,
+        ), '±2.9 kJ/mol ΔH_fus uncertainty propagated to 1933 K, plus Cp token rounding'
         assert math.isfinite(residual_dex)
         caveat = next(
             notice
@@ -352,6 +381,29 @@ def test_thermoengine_casio3_liquid_fusion_residual_is_a_dex_systematic() -> Non
         assert caveat['kind'] == 'engine_model_caveat'
         assert caveat['band'] == (
             f'{residual_dex:+.8g} dex at {temperature_K:g} K'
+        )
+        hhr_caveat = next(
+            notice
+            for notice in result.diagnostics['imcc_notices']
+            if 'Berman-vs-HHR CaSiO3(cr) reassessment' in notice['reason']
+        )
+        assert hhr_caveat['kind'] == 'engine_model_caveat'
+        assert 'engine_reference_input/scoring_eligible:false' in hhr_caveat[
+            'reason'
+        ]
+        assert 'do not validate an engine against a compilation it consumes' in (
+            hhr_caveat['reason']
+        )
+        assert 'Haas/Hemingway' in hhr_caveat['reason']
+        assert '±0.608 kJ/mol' in hhr_caveat['reason']
+        assert 'Robie & Hemingway (1995, USGS B2131) is present' in (
+            hhr_caveat['reason']
+        )
+        assert '+3.151 kJ/mol at 1400 K' in hhr_caveat['reason']
+        assert '+2.947 kJ/mol at 1000 K' in hhr_caveat['reason']
+        assert hhr_caveat['band'] == (
+            f'{MELTS_CASIO3_HHR_SOLID_RESIDUAL_AT_1400_J_MOL / (GAS_CONSTANT * temperature_K * math.log(10.0)):+.8g} '
+            f'dex at {temperature_K:g} K from the measured +3.151 kJ/mol residual at 1400 K'
         )
     finally:
         backend.close()
@@ -425,8 +477,11 @@ def test_thermoengine_cao_activity_uses_the_printed_solid_reference(
     model_flags = [
         notice for notice in candidate.notices
         if notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
-        and 'CaSiO3(l)-pWo fusion residual' in notice.reason
+        and (
+            'CaSiO3(l)-pWo fusion residual' in notice.reason
+            or 'Berman-vs-HHR CaSiO3(cr) reassessment' in notice.reason
+        )
     ]
-    assert len(model_flags) == 1
-    assert model_flags[0].band is not None
-    assert 'dex at 1933 K' in model_flags[0].band
+    assert len(model_flags) == 2
+    assert all(notice.band is not None for notice in model_flags)
+    assert all('dex at 1933 K' in notice.band for notice in model_flags)
