@@ -4,6 +4,7 @@ from copy import deepcopy
 from dataclasses import replace
 import builtins
 import errno
+import json
 import multiprocessing.process
 import subprocess
 from pathlib import Path
@@ -14,7 +15,11 @@ import pytest
 
 from engines.magemin import MAGEMinShadowProvider
 from engines.alphamelts import AlphaMELTSProvider
-from simulator.chemistry.kernel import normalize_chemistry_kernel_config
+from simulator.chemistry.kernel import (
+    ChemistryKernel,
+    IntentResult,
+    normalize_chemistry_kernel_config,
+)
 from simulator.evaporation import EvaporationFluxRefusal
 from simulator.fe_redox import KRESS91_LIQUID_CALIBRATION_MIN_T_C
 from simulator.engine_pool import (
@@ -62,6 +67,68 @@ def _sim(provider, vapor_pressure_data, feedstocks_data, setpoints_data):
     return _build_sim(
         'lunar_mare_low_ti', vapor_pressure_data, feedstocks_data, setpoints,
     )
+
+
+def test_gate_step_down_serializes_pool_timeout_without_slot_or_request():
+    def serialize_timeout(slot: int, detail: str):
+        timeout = EngineWorkerTimeout(
+            f'MAGEMin subprocess pool slot {slot}',
+            15.0,
+            phase='job',
+        )
+        MAGEMinBackend._attach_magemin_timeout_diagnostic(timeout, detail)
+
+        primary = SimpleNamespace(
+            capability_profile=lambda: SimpleNamespace(provider_id='magemin-shadow'),
+        )
+        fallback = SimpleNamespace(
+            capability_profile=lambda: SimpleNamespace(provider_id='alphamelts'),
+        )
+        kernel = object.__new__(ChemistryKernel)
+        kernel._registry = SimpleNamespace(gate_provider_order=(primary, fallback))
+
+        def dispatch(intent, provider, **_controls):
+            if provider is primary:
+                raise timeout
+            return IntentResult(
+                intent=intent,
+                status='ok',
+                diagnostic={'solidus_T_C': 1000.0, 'liquidus_T_C': 1300.0},
+            )
+
+        kernel._dispatch_through_provider = dispatch
+        result = kernel._dispatch_gate_provider_order()
+        step_down = result.diagnostic['gate_provider_step_down']
+        attempts = step_down['failed_providers']
+        diagnostic = attempts[0]['diagnostic']
+        return timeout, result, attempts, json.dumps(diagnostic, sort_keys=True)
+
+    first, first_result, first_attempts, first_json = serialize_timeout(
+        0,
+        '{"request_id":"first","temperature_C":1200}',
+    )
+    second, second_result, second_attempts, second_json = serialize_timeout(
+        4,
+        '{"request_id":"second","temperature_C":1300}',
+    )
+
+    assert first_json == second_json
+    assert first_result.status == second_result.status == 'ok'
+    assert len(first_attempts) == len(second_attempts) == 1
+    assert first_attempts[0]['provider'] == second_attempts[0]['provider'] == (
+        'magemin-shadow'
+    )
+    assert first_result.diagnostic['gate_provider_step_down'][
+        'realized_provider'
+    ] == 'alphamelts'
+    diagnostic = json.loads(first_json)
+    assert diagnostic['exception_class'] == 'EngineWorkerTimeout'
+    assert diagnostic['reason'] == 'engine_worker_timeout'
+    assert diagnostic['backend'] == 'MAGEMin'
+    assert diagnostic['timeout_s'] == 15.0
+    assert diagnostic['operation'] == 'equilibrate'
+    assert first.diagnostic_detail not in first_json
+    assert second.diagnostic_detail not in second_json
 
 
 def _injected_launch_exception(name):

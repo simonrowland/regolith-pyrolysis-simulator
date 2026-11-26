@@ -723,6 +723,7 @@ def test_run_executor_timeout_envelope_keeps_honest_exception(monkeypatch):
     assert execution.failure_exception is timeout
     assert execution.backend_status == "not_converged"
     assert execution.backend_status != "unavailable"
+    assert execution.reason == "engine_worker_timeout"
     assert type(execution.failure_exception) is EngineWorkerTimeout
 
 

@@ -560,8 +560,9 @@ def test_magemin_timeout_kills_and_reaps_a_hung_worker(
         assert outcomes[0].phase == 'job'
         assert outcomes[0].timeout_s == pytest.approx(4.45)
         assert outcomes[0].diagnostic_detail
-        assert outcomes[0].diagnostic_detail in str(outcomes[0])
         timeout_text = str(outcomes[0])
+        assert outcomes[0].diagnostic_detail not in timeout_text
+        assert 'MAGEMin subprocess pool slot' not in timeout_text
         for field in (
             'composition_mol',
             'SiO2',
@@ -576,7 +577,7 @@ def test_magemin_timeout_kills_and_reaps_a_hung_worker(
             'database',
             'argv',
         ):
-            assert field in timeout_text
+            assert field in outcomes[0].diagnostic_detail
         if failure_kind == 'capture-error':
             assert json.loads(outcomes[0].diagnostic_detail)[
                 'diagnostic_capture_error'
@@ -589,7 +590,7 @@ def test_magemin_timeout_kills_and_reaps_a_hung_worker(
                 '--Pres=0.001000',
                 '--db=ig',
             ):
-                assert arg in timeout_text
+                assert arg in outcomes[0].diagnostic_detail
         assert time.monotonic() - started_at < 5.5
         assert worker.process is None
         with pytest.raises(ProcessLookupError):
@@ -650,7 +651,8 @@ def test_magemin_unmodified_worker_timeout_captures_request(tmp_path):
         assert timeout.worker_name == 'fake MAGEMin slot 0'
         assert timeout.timeout_s == pytest.approx(0.05)
         assert timeout.phase == 'job'
-        assert timeout.diagnostic_detail in str(timeout)
+        assert timeout.diagnostic_detail not in str(timeout)
+        assert 'slot 0' not in str(timeout)
         diagnostic = json.loads(timeout.diagnostic_detail)
         assert diagnostic['composition_mol']
         assert diagnostic['composition_wt_pct']

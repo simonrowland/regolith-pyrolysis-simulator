@@ -667,7 +667,10 @@ class ChemistryKernel:
 
     def _dispatch_gate_provider_order(self, **controls) -> IntentResult:
         from simulator.melt_backend.liquidus import LiquidusSampleError
-        from simulator.engine_pool import EngineWorkerTimeout
+        from simulator.engine_pool import (
+            EngineWorkerTimeout,
+            serialized_exception_diagnostic_fields,
+        )
         from simulator.reduced_real_determinism import (
             failed_provider_attempt_is_environment,
             gate_curve_provider_diagnostic_reasons,
@@ -686,9 +689,7 @@ class ChemistryKernel:
                 )
             except (ProviderUnavailableError, LiquidusSampleError, EngineWorkerTimeout) as exc:
                 diagnostic = dict(getattr(exc, 'diagnostics', {}) or {})
-                diagnostic.update(exception_class=type(exc).__name__, exception_message=str(exc))
-                if isinstance(exc, EngineWorkerTimeout):
-                    diagnostic['reason'] = 'engine_worker_timeout'
+                diagnostic.update(serialized_exception_diagnostic_fields(exc))
                 result = IntentResult(
                     intent=ChemistryIntent.GATE_LIQUID_FRACTION,
                     status=str(getattr(exc, 'status', 'unavailable')),

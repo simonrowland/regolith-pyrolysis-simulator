@@ -79,7 +79,7 @@ class BackendStatusAggregationFailure(RuntimeError):
 
 
 def _typed_refusal_reason(exc: BaseException) -> str:
-    for attr in ("reason", "category"):
+    for attr in ("reason", "reason_code", "category"):
         value = getattr(exc, attr, None)
         if value:
             return str(value)

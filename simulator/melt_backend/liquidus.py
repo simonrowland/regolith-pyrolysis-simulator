@@ -11,6 +11,7 @@ from simulator.melt_backend.base import (
     LiquidFractionInvalidError,
     MeltBackendError,
 )
+from simulator.engine_pool import serialized_exception_diagnostic_fields
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.melt_regime import liquid_fraction_invalidity
 
@@ -86,8 +87,8 @@ def _sample_error_with_exception_context(
     exc: LiquidusSampleError,
 ) -> LiquidusSampleError:
     diagnostics = dict(exc.diagnostics)
-    diagnostics.setdefault('exception_class', type(exc).__name__)
-    diagnostics.setdefault('exception_message', str(exc))
+    for field_name, value in serialized_exception_diagnostic_fields(exc).items():
+        diagnostics.setdefault(field_name, value)
     return LiquidusSampleError(exc.status, exc.warnings, diagnostics)
 
 
@@ -153,14 +154,18 @@ def liquidus_sample_error_from_exception(
         'backend_status_reason': str(reason),
         'backend_failure_reason_code': str(reason),
         'backend_failure_category': status,
-        'exception_class': type(exc).__name__,
-        'exception_message': str(exc),
     }
+    exception_diagnostics = serialized_exception_diagnostic_fields(exc)
+    diagnostics.update(exception_diagnostics)
     for field_name in ('requested', 'solved'):
         value = getattr(exc, field_name, None)
         if value is not None:
             diagnostics[f'{field_name}_fO2_log'] = value
-    return LiquidusSampleError(status, (str(exc),), diagnostics)
+    return LiquidusSampleError(
+        status,
+        (str(exception_diagnostics['exception_message']),),
+        diagnostics,
+    )
 
 
 @dataclass(frozen=True)

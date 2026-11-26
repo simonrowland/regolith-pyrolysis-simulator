@@ -229,6 +229,8 @@ class EngineWorkerDied(RuntimeError):
 class EngineWorkerTimeout(TimeoutError):
     """Typed hard-wall expiry for an isolated engine worker."""
 
+    reason_code = 'engine_worker_timeout'
+
     def __init__(
         self,
         worker_name: str,
@@ -241,10 +243,68 @@ class EngineWorkerTimeout(TimeoutError):
         self.timeout_s = float(timeout_s)
         self.phase = str(phase)
         self.failed_slots = tuple(int(slot) for slot in failed_slots)
-        super().__init__(
-            f'{self.worker_name} {self.phase} exceeded hard timeout of '
-            f'{self.timeout_s:g}s'
+        self.diagnostic_backend: str | None = None
+        self.diagnostic_operation: str | None = None
+        self.diagnostic_detail: str | None = None
+        self._diagnostic_message = self._message_for_context(
+            self.worker_name,
+            self.phase,
+            self.timeout_s,
         )
+        super().__init__(self._diagnostic_message)
+
+    @staticmethod
+    def _message_for_context(
+        context: str,
+        phase: str,
+        timeout_s: float,
+    ) -> str:
+        return (
+            f'{context} {phase} exceeded hard timeout of '
+            f'{timeout_s:g}s'
+        )
+
+    def _set_diagnostic_context(self, *, backend: str, operation: str) -> None:
+        """Replace slot-specific text with stable backend/operation context."""
+
+        self.diagnostic_backend = str(backend)
+        self.diagnostic_operation = str(operation)
+        context = f'{self.diagnostic_backend} {self.diagnostic_operation}'
+        self._diagnostic_message = self._message_for_context(
+            context,
+            self.phase,
+            self.timeout_s,
+        )
+        self.args = (self._diagnostic_message,)
+
+    def serialized_diagnostic_fields(self) -> dict[str, Any]:
+        """Return invariant typed fields for serialized timeout diagnostics."""
+
+        fields: dict[str, Any] = {
+            'exception_class': type(self).__name__,
+            'exception_message': self._diagnostic_message,
+            'reason': self.reason_code,
+            'timeout_s': self.timeout_s,
+            'phase': self.phase,
+        }
+        if self.diagnostic_backend is not None:
+            fields['backend'] = self.diagnostic_backend
+        if self.diagnostic_operation is not None:
+            fields['operation'] = self.diagnostic_operation
+        return fields
+
+
+def serialized_exception_diagnostic_fields(
+    exc: BaseException,
+) -> dict[str, Any]:
+    """Serialize an exception without losing typed worker-timeout facts."""
+
+    if isinstance(exc, EngineWorkerTimeout):
+        return exc.serialized_diagnostic_fields()
+    return {
+        'exception_class': type(exc).__name__,
+        'exception_message': str(exc),
+    }
 
 
 def _worker_startup_timeout_s(worker: Any) -> float:

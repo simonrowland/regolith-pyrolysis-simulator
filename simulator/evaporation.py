@@ -45,7 +45,10 @@ from simulator.melt_backend.liquidus import (
     LIQUIDUS_LIQUID_EPSILON,
     LiquidusSampleError,
 )
-from simulator.engine_pool import EngineWorkerTimeout
+from simulator.engine_pool import (
+    EngineWorkerTimeout,
+    serialized_exception_diagnostic_fields,
+)
 from simulator.melt_regime import (
     MeltRegime,
     legacy_raw_liquid_fraction_is_zero,
@@ -4365,10 +4368,7 @@ class EvaporationMixin:
                 ProviderUnavailableError, LiquidusSampleError, EngineWorkerTimeout,
             ) as exc:
                 diagnostic = dict(getattr(exc, 'diagnostics', {}) or {})
-                if isinstance(exc, EngineWorkerTimeout):
-                    diagnostic['reason'] = 'engine_worker_timeout'
-                diagnostic['exception_class'] = type(exc).__name__
-                diagnostic['exception_message'] = str(exc)
+                diagnostic.update(serialized_exception_diagnostic_fields(exc))
                 status = str(getattr(exc, 'status', 'unavailable'))
                 warnings = list(getattr(exc, 'warnings', ()) or ())
             else:

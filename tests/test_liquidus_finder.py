@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import json
+
 import pytest
 
 import simulator.melt_backend.liquidus as liquidus_module
@@ -773,6 +775,63 @@ def test_liquidus_finder_preserves_sample_timeout_over_hang_guard(
     assert diagnostics['backend_status_reason'] == 'engine_worker_timeout'
     assert diagnostics['exception_class'] == 'EngineWorkerTimeout'
     assert diagnostics.get('reason') != 'aggregate_budget_exceeded'
+
+
+def test_magemin_pool_timeout_liquidus_diagnostic_is_run_invariant():
+    from simulator.engine_pool import EngineWorkerTimeout
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    def serialized_timeout(slot: int, request_detail: str):
+        timeout = EngineWorkerTimeout(
+            f'MAGEMin subprocess pool slot {slot}',
+            15.0,
+            phase='job',
+        )
+        MAGEMinBackend._attach_magemin_timeout_diagnostic(
+            timeout,
+            request_detail,
+        )
+
+        def fail_sample(_temperature_C: float) -> float:
+            raise timeout
+
+        result = find_liquidus_solidus_by_fraction(
+            fail_sample,
+            min_T_C=800.0,
+            max_T_C=900.0,
+            scan_step_C=100.0,
+        )
+        serialized = json.dumps(dict(result.diagnostics), sort_keys=True)
+        return timeout, result, serialized
+
+    first, first_result, first_json = serialized_timeout(
+        0,
+        '{"request_id":"first","temperature_C":1200}',
+    )
+    second, second_result, second_json = serialized_timeout(
+        7,
+        '{"request_id":"second","temperature_C":1300}',
+    )
+
+    assert first_result.status == second_result.status == 'not_converged'
+    assert first_json == second_json
+    diagnostic = json.loads(first_json)
+    assert diagnostic['exception_class'] == 'EngineWorkerTimeout'
+    assert diagnostic['reason'] == 'engine_worker_timeout'
+    assert diagnostic['backend_failure_reason_code'] == (
+        'warm_call_equilibrium_timeout'
+    )
+    assert diagnostic['backend'] == 'MAGEMin'
+    assert diagnostic['timeout_s'] == 15.0
+    assert diagnostic['phase'] == 'job'
+    assert diagnostic['operation'] == 'equilibrate'
+    assert diagnostic['exception_message'] == (
+        'MAGEMin equilibrate job exceeded hard timeout of 15s'
+    )
+    assert first.diagnostic_detail not in first_json
+    assert second.diagnostic_detail not in second_json
+    assert first.diagnostic_detail not in first_result.warnings[0]
+    assert second.diagnostic_detail not in second_result.warnings[0]
 
 
 def test_finder_projects_tagged_external_failure():

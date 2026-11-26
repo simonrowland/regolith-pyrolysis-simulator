@@ -3096,7 +3096,10 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         detail: str,
     ) -> EngineWorkerTimeout:
         timeout.diagnostic_detail = detail
-        timeout.args = (f'{timeout}; MAGEMin request: {detail}',)
+        timeout._set_diagnostic_context(
+            backend='MAGEMin',
+            operation='equilibrate',
+        )
         return timeout
 
     def _call_magemin(
