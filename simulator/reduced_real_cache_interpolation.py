@@ -17,7 +17,10 @@ from simulator.reduced_real_determinism import (
     physics_control_rung_error_budget,
     replay_dependency_vectors_match,
 )
-from simulator.interpolation_uncertainty import build_interpolation_uncertainty_vector
+from simulator.interpolation_uncertainty import (
+    _standardized_distance,
+    build_interpolation_uncertainty_vector,
+)
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
@@ -815,20 +818,6 @@ def _euclidean_distance(left: Sequence[float], right: Sequence[float]) -> float:
     return math.sqrt(
         sum((float(a) - float(b)) ** 2 for a, b in zip(left, right, strict=False))
     )
-
-
-def _standardized_distance(
-    left: Sequence[float],
-    right: Sequence[float],
-) -> float:
-    if not left:
-        return 0.0
-    scales = [max(abs(value), 1.0e-9) for value in left]
-    deltas = [
-        (float(a) - float(b)) / scale
-        for a, b, scale in zip(left, right, scales, strict=False)
-    ]
-    return math.sqrt(sum(delta * delta for delta in deltas))
 
 
 def _axis_aligned_bracketed(

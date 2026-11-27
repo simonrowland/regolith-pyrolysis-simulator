@@ -278,14 +278,14 @@ def _cache_distance_component(
             "value": None,
             "status": "insufficient_neighbors",
             "units": "standardized_distance",
-            "source": "simulator.reduced_real_cache_interpolation._standardized_distance",
+            "source": "simulator.interpolation_uncertainty._standardized_distance",
         }
     return {
         "kind": "scalar",
         "value": float(max(distances)),
         "status": "available",
         "units": "standardized_distance",
-        "source": "simulator.reduced_real_cache_interpolation._standardized_distance",
+        "source": "simulator.interpolation_uncertainty._standardized_distance",
         "max_neighbor_distance": float(max(distances)),
         "mean_neighbor_distance": float(sum(distances) / len(distances)),
     }
