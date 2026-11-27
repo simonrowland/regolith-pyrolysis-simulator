@@ -2831,6 +2831,7 @@ def _figure_read_extract() -> dict:
                     "species.Fe.observations[fe_alpha_1].values.figure_read.read_uncertainty.x",
                     "species.Fe.observations[fe_alpha_1].values.figure_read.read_uncertainty.y",
                 ],
+                "locators": {},
             },
         }
     ]
@@ -2945,6 +2946,101 @@ def test_render_verification_does_not_attest_a_non_figure_leaf():
 
     assert by_kind.get("source_blind_pin") == 1
     assert "unattested_sample" not in by_kind
+
+
+def _render_leaf_locator(path: str = "render-leaf-source.txt") -> dict:
+    return {"page": 2, "line_range": "1", "source_path": path}
+
+
+def _render_partition_extract_with_temperature() -> dict:
+    doc = _figure_read_extract()
+    values = doc["species"]["Fe"]["observations"][0]["values"]
+    values["T_C"] = "1630"
+    sample = doc["fidelity_samples"][0]
+    sample["value"]["T_C"] = "1630"
+    return doc
+
+
+def test_render_sample_rejects_a_measured_leaf_in_neither_partition():
+    doc = _figure_read_extract()
+    verification = doc["fidelity_samples"][0]["verification"]
+    verification["covers"].remove(
+        "species.Fe.observations[fe_alpha_1].values.alpha"
+    )
+
+    warnings = vle.fidelity_source_warnings(doc, label="missing-render-leaf")
+    by_kind = {warning.kind: warning for warning in warnings}
+
+    assert by_kind["unattested_sample"].count == 1
+    assert "exactly one of covers or locators" in by_kind[
+        "unattested_sample"
+    ].detail
+
+
+def test_render_sample_rejects_a_measured_leaf_in_both_partitions():
+    doc = _figure_read_extract()
+    path = "species.Fe.observations[fe_alpha_1].values.alpha"
+    doc["fidelity_samples"][0]["verification"]["locators"][path] = (
+        _render_leaf_locator()
+    )
+
+    warnings = vle.fidelity_source_warnings(doc, label="overlapping-render-leaf")
+    by_kind = {warning.kind: warning for warning in warnings}
+
+    assert by_kind["unattested_sample"].count == 1
+    assert "appears in both covers and locators" in by_kind[
+        "unattested_sample"
+    ].detail
+
+
+def test_render_sample_cannot_cover_a_prose_leaf():
+    doc = _render_partition_extract_with_temperature()
+    path = "species.Fe.observations[fe_alpha_1].values.T_C"
+    verification = doc["fidelity_samples"][0]["verification"]
+    verification["covers"].append(path)
+    verification["locators"][path] = _render_leaf_locator()
+
+    warnings = vle.fidelity_source_warnings(doc, label="render-covers-prose")
+    by_kind = {warning.kind: warning for warning in warnings}
+
+    assert by_kind["unattested_sample"].count == 1
+    assert "appears in both covers and locators" in by_kind[
+        "unattested_sample"
+    ].detail
+
+
+def test_render_sample_accepts_a_correct_render_and_text_leaf_split(tmp_path):
+    doc = _render_partition_extract_with_temperature()
+    (tmp_path / "render-leaf-source.txt").write_text("Temperature 1630 C.\n")
+    path = "species.Fe.observations[fe_alpha_1].values.T_C"
+    verification = doc["fidelity_samples"][0]["verification"]
+    verification["locators"][path] = _render_leaf_locator()
+
+    warnings = vle.fidelity_source_warnings(
+        doc, label="correct-render-text-split", artifact_root=tmp_path
+    )
+    by_kind = {warning.kind: warning for warning in warnings}
+
+    assert "unattested_sample" not in by_kind
+    assert "source_blind_pin" not in by_kind
+    assert "uncovered_observation" not in by_kind
+
+
+def test_legacy_render_binding_without_leaf_locators_would_fail(monkeypatch):
+    doc = _render_partition_extract_with_temperature()
+    path = "species.Fe.observations[fe_alpha_1].values.T_C"
+    doc["fidelity_samples"][0]["verification"]["locators"][path] = (
+        _render_leaf_locator()
+    )
+
+    monkeypatch.setattr(vle, "_figure_render_locator_addresses", lambda *_: ([], []))
+    warnings = vle.fidelity_source_warnings(doc, label="legacy-no-leaf-locators")
+    by_kind = {warning.kind: warning for warning in warnings}
+
+    with pytest.raises(AssertionError, match="legacy missing locator coverage"):
+        assert by_kind.get("uncovered_observation") is None, (
+            "legacy missing locator coverage"
+        )
 
 
 def _derivation_extract() -> dict:
