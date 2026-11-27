@@ -323,7 +323,12 @@ def test_raoultian_gamma_notice_flags_proposed_policy_and_the_named_gaps():
         if formula == "Eu":
             assert any(
                 notice.reason.startswith(f"{REE_SPECIATION_LIMITED}:")
+                and "integrated parent Eu2O3" in notice.reason
+                and "unprinted vacuum closure" in notice.reason
+                and "no printed fO2" in notice.reason
                 and "not a test of gamma=1" in notice.reason
+                and "treated as reduced" not in notice.reason
+                and "2+" not in notice.reason
                 for notice in notices
             )
         if formula == "Dy":
@@ -611,13 +616,92 @@ def test_linear_extent_keeps_one_shared_rhs_budget(monkeypatch):
     assert calls == [0.0]
 
 
+def test_unratified_dp118_keeps_ree_parents_out_of_the_oxide_solve(monkeypatch):
+    """REE parents stay out of the oxide extent until DP-118 is canonical.
+
+    The vapour stratum still integrates those parents. It does not publish
+    their inventory as the oxide wt% projection. Flipping the registry gate
+    to canonical is what puts the parents into the oxide solve.
+    """
+
+    from simulator.battery.default_policy import resolve as resolve_default_policy
+    from simulator.battery.residue import (
+        KnudsenResidueResult,
+        _ree_activity_policy_ratified,
+        _ree_sesquioxide_parent,
+        predict_langmuir_residue_composition,
+    )
+    import simulator.battery.residue as residue
+
+    resolved = resolve_default_policy("DP-118")
+    assert resolved.payload["policy_status"] == "proposed"
+    assert _ree_activity_policy_ratified() is False
+    sesquioxides = {
+        parent
+        for element in ("La", "Ce", "Eu", "Yb")
+        if (parent := _ree_sesquioxide_parent(element)) is not None
+    }
+    assert sesquioxides == {"La2O3", "Ce2O3", "Eu2O3", "Yb2O3"}
+
+    watched: list[dict[str, float]] = []
+
+    def fake_integrate(initial, channels, pressure_model, **kwargs):
+        del channels, pressure_model, kwargs
+        watched.append(
+            {str(oxide): float(amount) for oxide, amount in initial.items()}
+        )
+        return KnudsenResidueResult(
+            residue_mol={str(oxide): float(amount) for oxide, amount in initial.items()},
+            evaporated_mol={},
+            retained_oxygen_atoms_mol=0.0,
+            atom_closure_mol={},
+            pO2_bar_by_step=(),
+        )
+
+    monkeypatch.setattr(
+        residue, "integrate_knudsen_residue_inventory", fake_integrate
+    )
+    context, observations = wang_context()
+    references = wang_residue_rows(observations)
+    oxide = _wang_ree_row(references, "SiO2", "sc1")
+    cerium = _wang_ree_row(references, "Ce", "sc1")
+    observation_rows = observations.values()
+
+    def project(reference):
+        watched.clear()
+        result = predict_langmuir_residue_composition(
+            "openimcc",
+            reference,
+            context.experiments[reference.experiment_id],
+            observation_rows,
+        )
+        assert len(watched) == 1
+        return result, watched[0]
+
+    oxide_result, oxide_inventory = project(oxide)
+    assert sesquioxides.isdisjoint(oxide_inventory)
+    assert sesquioxides.isdisjoint(oxide_result["composition_wt_pct"])
+    assert "SiO2" in oxide_result["composition_wt_pct"]
+
+    ree_result, ree_inventory = project(cerium)
+    assert sesquioxides <= set(ree_inventory)
+    assert sesquioxides.isdisjoint(ree_result["composition_wt_pct"])
+    assert "Ce" in ree_result["element_ppm_by_mass"]
+
+    monkeypatch.setattr(residue, "_ree_activity_policy_ratified", lambda: True)
+    ratified_result, ratified_inventory = project(oxide)
+    assert sesquioxides <= set(ratified_inventory)
+    assert sesquioxides <= set(ratified_result["composition_wt_pct"])
+
+
 def test_wang_sc9_extent_names_its_outcome():
     """sc9 at the printed 95% loss must finish, as sc10 at 90% already does.
 
     sc9 previously raised knudsen_extent_evaluation_limit at extent
     0.951545 of 0.953559 because trace-parent events shared one RHS
-    budget. sc10's Ce ppm is the value that run returned, pinned so a
-    later segment reset cannot move a row that already fit in one budget.
+    budget. After the segment reset, sc9 Ce is complete loss: 0.0 ppm.
+    That value is pinned the same way as sc10. A later budget change
+    must not turn the reset's zero into an unpinned finite ppm.
     """
 
     import warnings
@@ -663,5 +747,4 @@ def test_wang_sc9_extent_names_its_outcome():
         )
         ppm_by_row[row_id] = float(ppm)
     assert ppm_by_row["sc10"] == pytest.approx(225.98182155362952, rel=1e-9, abs=0.0)
-    assert math.isfinite(ppm_by_row["sc9"])
-    assert ppm_by_row["sc9"] >= 0.0
+    assert ppm_by_row["sc9"] == pytest.approx(0.0, rel=1e-9, abs=0.0)

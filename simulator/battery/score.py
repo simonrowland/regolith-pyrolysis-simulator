@@ -19697,6 +19697,7 @@ def _langmuir_residue_prediction(
         _time_forward_extent_notices,
         predict_langmuir_residue_composition,
         wang_langmuir_physics_result,
+        wang_langmuir_projection_stratum,
         wang_langmuir_series_result,
         wang_ree_channel_prediction,
         wang_ree_full_retention_prediction,
@@ -19714,9 +19715,14 @@ def _langmuir_residue_prediction(
     if reference.source_id == _WANG_2001_SOURCE_ID:
         run_row = _langmuir_residue_row_id(reference.locator)
         if run_row is not None:
-            # Composition inputs are shared by run row. The IMP closure
-            # notice is attached on read, so EMP and IMP do not each integrate.
+            # EMP and IMP share one solve per stratum. The IMP closure
+            # notice is attached on read. Until DP-118 is canonical the
+            # oxide stratum and the REE vapour stratum do not share that
+            # solve: REE parents would move the oxide wt% denominator.
             cache_locator = f"run-row:{run_row}"
+            stratum = wang_langmuir_projection_stratum(reference)
+            if stratum is not None:
+                cache_locator += f":{stratum}"
     cache_source_id = (
         f"langmuir:{reference.source_id}:{reference.experiment_id}:{cache_locator}"
     )

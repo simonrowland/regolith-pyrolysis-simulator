@@ -4,6 +4,7 @@ from collections import Counter, defaultdict
 from dataclasses import replace
 from decimal import Decimal
 from math import sqrt
+import hashlib
 import json
 import warnings
 
@@ -250,19 +251,70 @@ def _assert_wang_imp_basis_notice(notices, *, expected):
     if expected:
         notice = basis_notices[0]
         assert notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
-        assert "six major oxides plus the REE sesquioxides" in notice.reason
+        assert "model basis is six-oxide wt% summing to 100" in notice.reason
         assert "printed basis is total ion-microprobe wt%" in notice.reason
         assert "including ΣLn2O3 and WO3" in notice.reason
-        assert "WO3 stays blank" in notice.reason
+        assert "WO3 stays blank" not in notice.reason
 
 
-# Sixteen OpenIMCC integrations (one shared Langmuir extent per Wang run
-# row, then cache hits for the other cells). With the REE gas rail that
-# pass was still advancing at 368/416 when the 1800 s addopts guard fired.
-# The marker overrides that hang guard for this test. It is not a fit to
-# Wang. cpu_budget stays at the 300 s default: a higher mark fails the
-# suite-shape roster audit, and this test is not on that roster.
-@pytest.mark.timeout(4200)
+def _is_wang_ree_ppm_row(row) -> bool:
+    identity = row.identity
+    subtype = None if identity is None else identity.subtype
+    formula = (
+        None if identity is None or identity.species is None
+        else identity.species.formula
+    )
+    return (
+        subtype is not None
+        and subtype.is_value
+        and subtype.value == "element_ppm_by_mass"
+        and formula in _WANG_REE_FORMULAS
+    )
+
+
+def _is_mass_loss_row(row) -> bool:
+    identity = row.identity
+    return (
+        identity is not None
+        and identity.quantity.value is Quantity.MASS_LOSS_FRACTION
+    )
+
+
+def _wang_scoring_context(context, observations, selected_rows):
+    selected_ids = {row.observation_id for row in selected_rows}
+    kept = {
+        key: row
+        for key, row in observations.items()
+        if row.observation_id in selected_ids or _is_mass_loss_row(row)
+    }
+    return ScoreContext({}, context.experiments, kept, root=ROOT)
+
+
+def _oxide_prediction_digest(residuals, references, candidates) -> tuple[str, int]:
+    """sha256 of the scored oxide predictions, one canonical line each."""
+
+    by_id = {row.observation_id: row for row in references.values()}
+    lines = []
+    for residual in residuals:
+        reference = by_id.get(residual.reference)
+        if reference is None or residual.numeric is None:
+            continue
+        formula = reference.identity.species.formula
+        if formula in _WANG_REE_FORMULAS or formula == "WO3":
+            continue
+        predicted = candidates[residual.candidate].value.point
+        lines.append(
+            f"{residual.reference}\t{formula}\t{format(predicted, 'f')}"
+        )
+    payload = "\n".join(sorted(lines))
+    digest = hashlib.sha256(payload.encode("utf-8")).hexdigest()
+    return digest, len(lines)
+
+
+# Oxide cells are one Langmuir solve per run row, with REE parents left
+# out of that inventory. REE vapour is a separate test so this one stays
+# inside the default 300 s CPU budget. No timeout mark: the suite-shape
+# ceiling is 300 s, and the post-fix receipt was 272 s.
 def test_wang_residue_cells_emit_one_production_score_event_each(
     monkeypatch, pytestconfig,
 ):
@@ -364,10 +416,15 @@ def test_wang_residue_cells_emit_one_production_score_event_each(
     predictions_by_run_row = Counter()
 
     def count_real_owner_calls(engine, reference, experiment, owner_observations):
+        del owner_observations
         row_id = _langmuir_residue_row_id(reference.locator)
         predictions_by_run_row[row_id] += 1
+        # The scored context omits REE rows so this test does not also
+        # integrate the vapour stratum. The owner still receives every
+        # observation, including the printed REE ppm that DP-118 would
+        # otherwise put on the oxide inventory.
         return production_predictor(
-            engine, reference, experiment, owner_observations
+            engine, reference, experiment, observations.values()
         )
 
     monkeypatch.setattr(
@@ -375,47 +432,34 @@ def test_wang_residue_cells_emit_one_production_score_event_each(
         "predict_langmuir_residue_composition",
         count_real_owner_calls,
     )
+    oxide_rows = {
+        key: row for key, row in references.items()
+        if not _is_wang_ree_ppm_row(row)
+    }
     score_store = score_module.score_store
     residuals, candidates = score_store(
-        context,
+        _wang_scoring_context(context, observations, oxide_rows.values()),
         engines=(Engine.OPENIMCC,),
         rail=Rail.RESIDUE_COMPOSITION,
     )
     by_reference = {residual.reference: residual for residual in residuals}
-    assert set(by_reference) == set(references)
-    assert len(residuals) == 416
+    assert set(by_reference) == set(oxide_rows)
+    assert len(residuals) == 192
     # Print before the call-count assert. xdist keeps the warnings summary
     # when the count is wrong, and drops worker stdout when the run is green.
-    # The pin is the DP-117 retained baseline captured at c661581627.
-    # The vapour path is a finding, not a calibration target.
-    vapour_dex = _wang_ree_dex_summary(residuals, all_references)
-    exhausted_by_formula = Counter(
-        references[residual.reference].identity.species.formula
-        for residual in residuals
-        if residual.numeric is None
-        and references[residual.reference].identity.species.formula in starting_ppm
+    digest, digest_n = _oxide_prediction_digest(
+        residuals, all_references, candidates
     )
+    digest_line = f"WANG_OXIDE_PREDICTION_DIGEST {digest} n={digest_n}"
     reporter = pytestconfig.pluginmanager.getplugin("terminalreporter")
-    vapour_line = "WANG_REE_VAPOUR_DEX " + json.dumps(vapour_dex, sort_keys=True)
-    baseline_line = "WANG_REE_RETAINED_BASELINE " + _WANG_REE_DEX_PIN
-    exhausted_line = "WANG_REE_EXHAUSTED " + json.dumps(
-        dict(exhausted_by_formula), sort_keys=True,
-    )
-    warnings.warn(
-        vapour_line + "\n" + baseline_line + "\n" + exhausted_line,
-        UserWarning,
-        stacklevel=1,
-    )
+    warnings.warn(digest_line, UserWarning, stacklevel=1)
     if reporter is not None:
-        reporter.write_line(vapour_line)
-        reporter.write_line(baseline_line)
-        reporter.write_line(exhausted_line)
+        reporter.write_line(digest_line)
     else:
-        print(vapour_line)
-        print(baseline_line)
-        print(exhausted_line)
-    # One solve per run row. The IMP closure notice is attached on read,
-    # so the ion-microprobe series does not integrate the bead again.
+        print(digest_line)
+    # One oxide solve per run row. REE vapour is a different cache stratum,
+    # so it does not integrate this bead again. The IMP closure notice is
+    # attached on read.
     assert predictions_by_run_row == Counter({row_id: 1 for row_id in by_run_row})
 
     # Mutate the source selector back to its previous Mendybaev-only rule.
@@ -446,24 +490,135 @@ def test_wang_residue_cells_emit_one_production_score_event_each(
     )
     assert all(residual.reference != reference.observation_id for residual in mutated)
 
-    _benchm1_residual_report(residuals, all_references)
-    numeric = [residual for residual in residuals if residual.numeric is not None]
-    ree_rows = [
-        residual for residual in residuals
-        if references[residual.reference].identity.species.formula
-        in starting_ppm
+    report_references = {
+        key: row for key, row in all_references.items()
+        if not _is_wang_ree_ppm_row(row)
+    }
+    _benchm1_residual_report(residuals, report_references)
+    oxide_numeric = [
+        residual for residual in residuals if residual.numeric is not None
     ]
+    assert len(oxide_numeric) == 192
+    assert digest_n == 192
+    assert not any(
+        references[residual.reference].identity.species.formula == "WO3"
+        for residual in residuals
+    )
+    assert all(
+        any(
+            notice.kind.value == "input_omitted"
+            and "congruent vapour-only zero-storage closure" in notice.reason
+            and "source_oxygen_fallback=no_oxygen_condition_printed"
+            in notice.reason
+            for notice in residual.notices
+        )
+        and any(
+            notice.kind.value == "input_omitted"
+            and "ΣLn2O3=0.142 wt%" in notice.reason
+            and "WO3 is blank" in notice.reason
+            and "not oxide-speciated" in notice.reason
+            for notice in residual.notices
+        )
+        and not any(
+            notice.reason.startswith("trace_components_outside_melt_model:")
+            or notice.reason.startswith(
+                "ree_oxide_activity_raoultian_default:"
+            )
+            for notice in residual.notices
+        )
+        for residual in oxide_numeric
+    )
+    for residual in oxide_numeric:
+        reference = references[residual.reference]
+        series_id = reference.observation_id.split("::", maxsplit=2)[1]
+        is_imp = series_id == (
+            "wang_2001_table1_ion_microprobe_residue_compositions"
+        )
+        is_emp = series_id == (
+            "wang_2001_table1_electron_microprobe_residue_compositions"
+        )
+        assert is_imp or is_emp
+        _assert_wang_imp_basis_notice(residual.notices, expected=is_imp)
+
+
+def test_wang_ree_vapour_rows_keep_the_dp118_stratum(
+    monkeypatch, pytestconfig,
+):
+    """REE ppm stays the flagged vapour stratum, off the oxide projection."""
+
+    import simulator.battery.residue as residue_module
+    import simulator.battery.score as score_module
+
+    context, observations = wang_context()
+    references = wang_residue_rows(observations)
+    ree_reference_rows = {
+        key: row for key, row in references.items()
+        if _is_wang_ree_ppm_row(row)
+    }
+    assert len(ree_reference_rows) == 224
+    by_run_row = {
+        _langmuir_residue_row_id(row.locator)
+        for row in ree_reference_rows.values()
+    }
+    assert len(by_run_row) == 16
+    predictions_by_run_row = Counter()
+    production_predictor = residue_module.predict_langmuir_residue_composition
+
+    def count_real_owner_calls(engine, reference, experiment, owner_observations):
+        row_id = _langmuir_residue_row_id(reference.locator)
+        predictions_by_run_row[row_id] += 1
+        return production_predictor(
+            engine, reference, experiment, owner_observations
+        )
+
+    monkeypatch.setattr(
+        residue_module,
+        "predict_langmuir_residue_composition",
+        count_real_owner_calls,
+    )
+    residuals, candidates = score_module.score_store(
+        _wang_scoring_context(
+            context, observations, ree_reference_rows.values()
+        ),
+        engines=(Engine.OPENIMCC,),
+        rail=Rail.RESIDUE_COMPOSITION,
+    )
+    assert {residual.reference for residual in residuals} == set(
+        ree_reference_rows
+    )
+    assert len(residuals) == 224
+    vapour_dex = _wang_ree_dex_summary(residuals, references)
+    exhausted_by_formula = Counter(
+        references[residual.reference].identity.species.formula
+        for residual in residuals
+        if residual.numeric is None
+    )
+    reporter = pytestconfig.pluginmanager.getplugin("terminalreporter")
+    vapour_line = "WANG_REE_VAPOUR_DEX " + json.dumps(vapour_dex, sort_keys=True)
+    baseline_line = "WANG_REE_RETAINED_BASELINE " + _WANG_REE_DEX_PIN
+    exhausted_line = "WANG_REE_EXHAUSTED " + json.dumps(
+        dict(exhausted_by_formula), sort_keys=True,
+    )
+    warnings.warn(
+        vapour_line + "\n" + baseline_line + "\n" + exhausted_line,
+        UserWarning,
+        stacklevel=1,
+    )
+    if reporter is not None:
+        reporter.write_line(vapour_line)
+        reporter.write_line(baseline_line)
+        reporter.write_line(exhausted_line)
+    else:
+        print(vapour_line)
+        print(baseline_line)
+        print(exhausted_line)
+    assert predictions_by_run_row == Counter({row_id: 1 for row_id in by_run_row})
+
+    ree_rows = list(residuals)
     ree_scored = [residual for residual in ree_rows if residual.numeric is not None]
     # A vapour law that exhausts the parent predicts 0 ppm. Dex is undefined
     # there (log10 of zero), so the row is metric_domain, not a missing score.
     ree_exhausted = [residual for residual in ree_rows if residual.numeric is None]
-    oxide_numeric = [
-        residual for residual in numeric
-        if references[residual.reference].identity.species.formula
-        not in starting_ppm
-    ]
-    assert len(oxide_numeric) == 192
-    assert len(ree_rows) == 224
     assert len(ree_scored) + len(ree_exhausted) == 224
     for residual in ree_exhausted:
         assert residual.refusal is not None
@@ -498,9 +653,22 @@ def test_wang_residue_cells_emit_one_production_score_event_each(
         )
         if formula == "Ce":
             assert "ree_ce_all_as_ce2o3_default:" in default_notices[0].reason
-        if formula in {"Eu", "Yb"}:
+        if formula == "Eu":
             assert any(
                 notice.reason.startswith("ree_speciation_limited:")
+                and "integrated parent Eu2O3" in notice.reason
+                and "unprinted vacuum closure" in notice.reason
+                and "treated as reduced" not in notice.reason
+                and "2+" not in notice.reason
+                for notice in residual.notices
+            )
+        if formula == "Yb":
+            assert any(
+                notice.reason.startswith("ree_speciation_limited:")
+                and "integrated parent Yb2O3" in notice.reason
+                and "unprinted vacuum closure" in notice.reason
+                and "treated as reduced" not in notice.reason
+                and "2+" not in notice.reason
                 for notice in residual.notices
             )
         if formula == "Dy":
@@ -528,10 +696,6 @@ def test_wang_residue_cells_emit_one_production_score_event_each(
     assert ce_predicted.is_finite() and ce_predicted >= 0
     assert ce_candidate.value.point == ce_predicted
     assert "ree_retention_default" not in ce_candidate.provenance
-    assert not any(
-        references[residual.reference].identity.species.formula == "WO3"
-        for residual in residuals
-    )
     assert all(
         any(
             notice.kind.value == "input_omitted"
@@ -544,6 +708,7 @@ def test_wang_residue_cells_emit_one_production_score_event_each(
             notice.kind.value == "input_omitted"
             and "ΣLn2O3=0.142 wt%" in notice.reason
             and "WO3 is blank" in notice.reason
+            and "sesquioxides carried" in notice.reason
             for notice in residual.notices
         )
         and any(
@@ -555,19 +720,8 @@ def test_wang_residue_cells_emit_one_production_score_event_each(
             and "0.01 dex applies" in notice.reason
             for notice in residual.notices
         )
-        for residual in (*numeric, *ree_exhausted)
+        for residual in (*ree_scored, *ree_exhausted)
     )
-    for residual in oxide_numeric:
-        reference = references[residual.reference]
-        series_id = reference.observation_id.split("::", maxsplit=2)[1]
-        is_imp = series_id == (
-            "wang_2001_table1_ion_microprobe_residue_compositions"
-        )
-        is_emp = series_id == (
-            "wang_2001_table1_electron_microprobe_residue_compositions"
-        )
-        assert is_imp or is_emp
-        _assert_wang_imp_basis_notice(residual.notices, expected=is_imp)
 
     def without_langmuir_ramp(residual):
         return replace(

@@ -91,16 +91,27 @@ def _wang_imp_closure_notice(reference: Any):
     from simulator.battery.enums import NoticeKind, Quantity
     from simulator.battery.records import Notice
 
+    if _ree_activity_policy_ratified():
+        basis = (
+            "model basis is the six major oxides plus the REE "
+            "sesquioxides carried from element ppm; printed basis is "
+            "total ion-microprobe wt% including ΣLn2O3 and WO3. "
+            "Printed values are compared as reported without "
+            "renormalization. WO3 stays blank."
+        )
+    else:
+        # The unratified oxide solve is the six-oxide projection. This
+        # is the pre-REE wording those cells already carried.
+        basis = (
+            "model basis is six-oxide wt% summing to 100; printed "
+            "basis is total ion-microprobe wt% including ΣLn2O3 and "
+            "WO3. Printed values are compared as reported without "
+            "renormalization."
+        )
     return Notice(
         kind=NoticeKind.ENGINE_MODEL_CAVEAT,
         affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
-        reason=(
-            f"{_WANG_IMP_CLOSURE_BASIS}: model basis is the six major "
-            "oxides plus the REE sesquioxides carried from element "
-            "ppm; printed basis is total ion-microprobe wt% including "
-            "ΣLn2O3 and WO3. Printed values are compared as reported "
-            "without renormalization. WO3 stays blank."
-        ),
+        reason=f"{_WANG_IMP_CLOSURE_BASIS}: {basis}",
         origin=reference.observation_id,
     )
 
@@ -1122,6 +1133,50 @@ _REE_ACTIVITY_POLICY_ID = "DP-118"
 _REE_TRACE_MOL_FRACTION_EACH = 0.01
 _REE_TRACE_MOL_FRACTION_TOTAL = 0.02
 _REE_TRACE_ACTIVITY_BIAS_DEX = 0.01
+
+
+def _ree_activity_policy_ratified() -> bool:
+    """True only when DP-118's registry status is canonical.
+
+    Proposed is not ratified. The oxide projection keeps REE parents
+    out of the extent partition until this flips.
+    """
+
+    from simulator.battery.default_policy import resolve as resolve_default_policy
+
+    resolved = resolve_default_policy(_REE_ACTIVITY_POLICY_ID)
+    return resolved.payload.get("policy_status") == "canonical"
+
+
+def _reference_is_ree_vapour_row(reference: Any) -> bool:
+    if getattr(reference, "source_id", None) != WANG_2001_SOURCE_ID:
+        return False
+    identity = getattr(reference, "identity", None)
+    if identity is None or identity.species is None:
+        return False
+    subtype = identity.subtype
+    if (
+        subtype is None
+        or not subtype.is_value
+        or subtype.value != "element_ppm_by_mass"
+    ):
+        return False
+    return identity.species.formula in _REE_VAPOUR_ELEMENTS
+
+
+def wang_langmuir_projection_stratum(reference: Any) -> str | None:
+    """Cache suffix while oxide wt% and REE vapour must not share an inventory.
+
+    A canonical DP-118 is one combined solve, so the key is not split.
+    """
+
+    if getattr(reference, "source_id", None) != WANG_2001_SOURCE_ID:
+        return None
+    if _ree_activity_policy_ratified():
+        return None
+    if _reference_is_ree_vapour_row(reference):
+        return "ree-vapour"
+    return "oxide"
 
 
 def _ree_gas_element(species: str) -> str | None:
@@ -4777,14 +4832,20 @@ def _ree_vapour_caveat_notices(
         formula in _REE_SPECIATION_LIMITED_ELEMENTS
         and oxygen_unprinted
     ):
+        parent = _ree_sesquioxide_parent(formula)
+        parent_clause = (
+            f"integrated parent {parent}"
+            if parent is not None
+            else "no sesquioxide parent was named by the pack"
+        )
         notices.append(
             Notice(
                 kind=NoticeKind.ENGINE_MODEL_CAVEAT,
                 affected_quantities=quantity,
                 reason=(
-                    f"{REE_SPECIATION_LIMITED}: {formula}2O3 does not represent "
-                    f"{formula}2+; this row closed oxygen without a printed fO2, "
-                    "so it is treated as reduced and is not a test of gamma=1"
+                    f"{REE_SPECIATION_LIMITED}: {parent_clause}; "
+                    "oxygen closed on the unprinted vacuum closure "
+                    "(no printed fO2). This is not a test of gamma=1"
                 ),
                 origin=origin,
             )
@@ -5056,20 +5117,36 @@ def predict_langmuir_residue_composition(
             "residue composition is normalized to inventory scale."
         )
         sample_mass_origin = "stated 1 kg reference inventory default"
-    initial = {
+    oxide_initial = {
         oxide: amount * sample_mass_kg / _OXIDE_WT_PERCENT_REFERENCE_MASS_KG
         for oxide, amount in _oxide_wt_percent_to_mol_inventory(wt_pct).items()
     }
     # OpenIMCC can evaporate the sesquioxides. Analytical has no REE
     # catalogue rows, so those moles stay off that inventory and DP-117
-    # remains the score.
+    # remains the score. Until DP-118 is canonical the headline oxide
+    # projection is the solve without those parents: they are not in its
+    # extent partition and not in its wt% denominator. The vapour ppm
+    # stay on the separate REE stratum.
     ree_parent_moles = (
         _wang_ree_starting_parent_moles(reference, observations, sample_mass_kg)
         if engine == "openimcc"
         else {}
     )
+    ree_initial = dict(oxide_initial)
     for parent, moles in ree_parent_moles.items():
-        initial[parent] = initial.get(parent, 0.0) + moles
+        ree_initial[parent] = ree_initial.get(parent, 0.0) + moles
+    ratified = _ree_activity_policy_ratified()
+    ree_vapour_stratum = bool(
+        ree_parent_moles
+        and not ratified
+        and _reference_is_ree_vapour_row(reference)
+    )
+    if ree_vapour_stratum:
+        initial = ree_initial
+    elif ratified and ree_parent_moles:
+        initial = ree_initial
+    else:
+        initial = oxide_initial
     ree_activity = _ree_raoultian_activities(
         initial, tuple(ree_parent_moles),
     )
@@ -5190,10 +5267,18 @@ def predict_langmuir_residue_composition(
                 kind=NoticeKind.INPUT_OMITTED,
                 affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
                 reason=(
-                    "starting inventory uses the six named major oxides plus "
-                    "La–Lu sesquioxides carried from the printed element ppm; "
-                    f"the printed {aggregate_text} is that aggregate, and WO3 "
-                    "is blank, so WO3 is omitted rather than assigned zero."
+                    (
+                        "starting inventory uses the six named major oxides plus "
+                        "La–Lu sesquioxides carried from the printed element ppm; "
+                        f"the printed {aggregate_text} is that aggregate, and WO3 "
+                        "is blank, so WO3 is omitted rather than assigned zero."
+                    )
+                    if any(parent in initial for parent in ree_parent_moles)
+                    else (
+                        "starting inventory uses the six named major oxides; the printed "
+                        f"{aggregate_text} and La–Lu ppm are not oxide-speciated, and WO3 "
+                        "is blank, so these components are omitted rather than assigned zero."
+                    )
                 ),
                 origin="Wang 2001 starting composition",
             )
@@ -5318,7 +5403,12 @@ def predict_langmuir_residue_composition(
             near_saturated=True,
             source_fO2_log_by_interval=[None],
         )
-        composition = _hashimoto_project_oxide_wt_pct(result.residue_mol)
+        if ree_vapour_stratum:
+            # This inventory is the vapour stratum. Its wt% denominator
+            # contains the REE parents, so it is not the oxide projection.
+            composition = {}
+        else:
+            composition = _hashimoto_project_oxide_wt_pct(result.residue_mol)
         ree_elements = _ree_elements_in_channels(gas_channels)
         carried_elements = tuple(
             element
