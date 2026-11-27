@@ -179,7 +179,7 @@ def test_sossi_redox_row_projects_its_printed_glass_analysis(monkeypatch) -> Non
     def record_row_method(migrator, *args, **kwargs):
         resolved, notice = resolve_method(migrator, *args, **kwargs)
         if kwargs.get("commit", True):
-            resolved_methods[kwargs["observation_id"]] = resolved
+            resolved_methods.setdefault(kwargs["observation_id"], resolved)
         return resolved, notice
 
     monkeypatch.setattr(
