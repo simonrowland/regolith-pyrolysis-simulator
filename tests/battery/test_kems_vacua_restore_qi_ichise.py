@@ -219,11 +219,23 @@ def test_balabanova_partial_pressure_stays_unknown_after_method_split(
 def test_pressure_identity_mutations_reintroduce_both_pressure_identity_errors(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    original_payload_value = migrate_module._pressure_payload_value
+
+    def partial_pressure_as_total(obs, values, *names):
+        if (
+            names == ("total_pressure_Pa",)
+            and isinstance(values, dict)
+            and values.get("quantity")
+            in {"partial_pressure", Quantity.P_PARTIAL.value}
+        ):
+            return values.get("pressure_Pa")
+        return original_payload_value(obs, values, *names)
+
     with monkeypatch.context() as mutation:
         mutation.setattr(
             migrate_module,
-            "_pressure_hit_is_not_in_cell_total",
-            lambda *args, **kwargs: False,
+            "_pressure_payload_value",
+            partial_pressure_as_total,
         )
         balabanova = _migrate_real_extract(tmp_path / "mutated-balabanova", BALABANOVA)
 
