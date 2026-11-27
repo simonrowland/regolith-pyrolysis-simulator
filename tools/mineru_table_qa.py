@@ -40,7 +40,6 @@ _NUMBER_TOKEN = re.compile(
     r"(?<![A-Za-z0-9])(?:[+\-−–—])?(?:\d+(?:[.,]\d+)?|\.\d+)"
     r"(?:\(\d+\))?(?:[eE][+\-−–—]?\d+)?"
 )
-_CHUNK_PAGE_START = re.compile(r"(?:^|[-_])p(\d+)(?:[-_]|$)")
 _NUMBER_ATOM = (
     r"[+\-−–—]?(?:\d+(?:[.,]\d+)?|\.\d+)"
     r"(?:\(\d+\))?(?:[eE][+\-−–—]?\d+)?"
@@ -156,19 +155,6 @@ def _chunk_name(path: Path) -> str:
         if match:
             return match.group()
     return "full-document"
-
-
-def _chunk_start_page(path: Path) -> int:
-    """Use the draft tool's range parser, then accept single-page chunk names."""
-    try:
-        return draft._chunk_start_page(path)
-    except ValueError:
-        pass
-    for part in reversed(path.parts):
-        match = _CHUNK_PAGE_START.search(part)
-        if match:
-            return int(match.group(1))
-    return 1
 
 
 def _row_cell_counts(grid: list[list[draft.Cell]]) -> list[int]:
@@ -382,7 +368,7 @@ def _table_row(
     ragged_rate = mismatch_count / len(body_counts) if body_counts else 0.0
 
     page_idx = int(item["page_idx"])
-    chunk_start_page = _chunk_start_page(path)
+    chunk_start_page = draft._chunk_start_page(path)
     page = draft.absolute_pdf_page(chunk_start_page, page_idx)
     page_text: str | None = None
     scan = False
