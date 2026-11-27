@@ -63,24 +63,27 @@ _O2_CONTROLLED_ATMOSPHERES = frozenset({
 _ELLINGHAM_STANDARD_PRESSURE_PA = PA_PER_BAR
 
 
-def _mgo_liquid_standard_log10_factor_per_oxide(temperature_K: float) -> float:
-    """Return log10(K_liquid/K_crystal) for one MgO formula unit.
+def _oxide_liquid_standard_log10_factor_per_oxide(
+    oxide: str,
+    temperature_K: float,
+) -> float:
+    """Return log10(K_liquid/K_crystal) for one oxide formula unit.
 
-    Premise: the active Mg equilibrium uses MgO(cr), while melt activities are
-    Raoultian on MgO(l). JANAF Mg-008/Mg-009 supplies
-    ΔG_fus° = G°(MgO,l) - G°(MgO,cr). For a reaction consuming n oxide units,
-    ΔG°_liq = ΔG°_cr + n(G°_cr - G°_liq), so
-    log10(K_liq/K_cr) = n ΔG_fus°/(R T ln 10). Unit check: kJ/mol is
-    converted to J/mol before division by R T; the result is dimensionless.
-    Sanity: at 2156.15 K JANAF gives +0.54 dex per MgO, so the liquid-standard
-    Mg pressure is about 3.5 times the crystal-standard pressure at fixed
-    activity and pO2; as T approaches the fusion crossing, the correction
-    tends to zero.
+    Premise: Mg and Ca decomposition/vaporization rows use crystalline JANAF
+    oxide standards, while melt activities are Raoultian on the liquid
+    standard. JANAF Mg-008/Mg-009 and Ca-027/Ca-028 supply
+    ΔG_fus° = G°(oxide,l) - G°(oxide,cr). Replacing n crystalline reactants
+    with liquid-standard activities gives ΔG°_liq = ΔG°_cr +
+    n(G°_cr - G°_liq), hence log10(K_liq/K_cr) per oxide is
+    ΔG_fus°/(R T ln 10). Unit check: kJ/mol is converted to J/mol before
+    division by R T; the result is dimensionless. Sanity: at 2156.15 K the
+    JANAF factors are +0.542275 dex per MgO and +0.624220 dex per CaO; at a
+    crystal/liquid Gibbs crossing ΔG_fus°=0 and the correction vanishes.
     """
     from simulator.reference_data.janaf import janaf_fusion_energy
 
     delta_g_fus_kj_per_mol = float(
-        janaf_fusion_energy("MgO", temperature_K).delta_g_fus_kJ_per_mol
+        janaf_fusion_energy(oxide, temperature_K).delta_g_fus_kJ_per_mol
     )
     return (
         delta_g_fus_kj_per_mol
@@ -681,35 +684,9 @@ class EquilibriumMixin:
 
         activity_standard_state_flags: dict[str, dict[str, Any]] = {}
 
-        def _refuse_unresolved_activity_standard_state(
-            channel: str,
-            *,
-            parent_oxide: str,
-            K_reference_phase: str,
-            reason: str,
-        ) -> None:
-            activity_standard_state_flags[channel] = {
-                'type': 'typed_notice',
-                'kind': 'standard_state_mismatch_unresolved',
-                'K_reference_phase': K_reference_phase,
-                'activity_reference_phase': (
-                    f'{parent_oxide}(l), Raoultian pure-liquid'
-                ),
-                'temperature_K': T_K,
-                'reason': reason,
-                'conversion_applied': False,
-            }
-            _sz_omit(
-                channel,
-                ZeroBecause.MISSING_THERMO,
-                field='liquid_standard_state_conversion',
-                detail=reason,
-                category=CATEGORY_REFUSE,
-            )
-
         try:
             mgo_liquid_standard_log10_factor = (
-                _mgo_liquid_standard_log10_factor_per_oxide(T_K)
+                _oxide_liquid_standard_log10_factor_per_oxide('MgO', T_K)
             )
         except ValueError as exc:
             mgo_liquid_standard_log10_factor = None
@@ -781,23 +758,6 @@ class EquilibriumMixin:
                         'vapor_pressures_Pa while status=ok'
                     ),
                     category=CATEGORY_REFUSE,
-                )
-                continue
-
-            if parent_oxide == 'CaO':
-                _refuse_unresolved_activity_standard_state(
-                    species,
-                    parent_oxide='CaO',
-                    K_reference_phase=(
-                        'CaO(cr); liquid-standard conversion unresolved '
-                        '(JANAF Ca-027/Ca-028)'
-                    ),
-                    reason=(
-                        'JANAF Ca-027/Ca-028 has an unresolved glass/liquid '
-                        'assignment and crosses at 3200 K versus the accepted '
-                        '2886 K CaO melting point; no liquid-standard K is '
-                        'grounded, so the channel is omitted rather than guessed'
-                    ),
                 )
                 continue
 
@@ -1414,6 +1374,20 @@ class EquilibriumMixin:
                 K_decomp *= 10.0 ** (
                     n_ox * mgo_liquid_standard_log10_factor
                 )
+            elif parent_oxide == 'CaO':
+                # Ca-027/Ca-028 gives ΔG_fus° = G°(CaO,l)-G°(CaO,cr).
+                # The Ca Ellingham reaction consumes n_ox crystalline CaO,
+                # so replacing it with the liquid activity changes ΔG° by
+                # -n_ox ΔG_fus° and K by 10**(n_ox ΔG_fus°/(R T ln 10)).
+                # Unit check: n_ox and the logarithmic factor are dimensionless.
+                # Sanity: Ca consumes/produces two CaO/Ca units per O2, then
+                # the square-root metal pressure law leaves one per-CaO factor.
+                cao_liquid_standard_log10_factor = (
+                    _oxide_liquid_standard_log10_factor_per_oxide('CaO', T_K)
+                )
+                K_decomp *= 10.0 ** (
+                    n_ox * cao_liquid_standard_log10_factor
+                )
 
             # a_M(row basis) = (K × a_oxide^n_ox / pO₂_bar)^(1/n_M)
             dissociation_pO2_bar = _surface_pO2_for_channel(species)
@@ -1550,37 +1524,8 @@ class EquilibriumMixin:
 
         for name, data in oxide_vapors_data.items():
             parent_oxide = data.get('parent_oxide', '')
-            if parent_oxide == 'CaO':
-                _refuse_unresolved_activity_standard_state(
-                    name,
-                    parent_oxide='CaO',
-                    K_reference_phase=(
-                        'CaO(cr); liquid-standard conversion unresolved '
-                        '(JANAF Ca-027/Ca-028)'
-                    ),
-                    reason=(
-                        'JANAF Ca-027/Ca-028 has an unresolved glass/liquid '
-                        'assignment and crosses at 3200 K versus the accepted '
-                        '2886 K CaO melting point; no liquid-standard K is '
-                        'grounded, so the channel is omitted rather than guessed'
-                    ),
-                )
-                continue
-            if parent_oxide == 'CoO':
-                _refuse_unresolved_activity_standard_state(
-                    name,
-                    parent_oxide='CoO',
-                    K_reference_phase='CoO(cr), CEA CoO standard-reaction rows',
-                    reason=(
-                        'The CoO(cr) to CoO(g) source reaction has no JANAF '
-                        'solid/liquid fusion pair for conversion to the '
-                        'liquid-standard activity; the channel is omitted '
-                        'rather than guessed'
-                    ),
-                )
-                continue
-
             antoine = data.get('antoine', {})
+            coefficient_block = COEFF_BLOCK_ANTOINE
             try:
                 A, B, C = _read_antoine_coefficients(antoine)
             except _AntoineCoefficientRefusal as exc:
@@ -1590,32 +1535,86 @@ class EquilibriumMixin:
                         species=str(name),
                         field="P_sat",
                     )
-                reason = _antoine_skip_reason_for_refusal(exc)
-                _append_antoine_skip_notice(
-                    warnings,
-                    antoine_skip_notice_keys,
-                    antoine,
-                    species=name,
-                    site=(
-                        "equilibrium.internal_analytical."
-                        "oxide_vapor_antoine"
-                    ),
-                    temperature_K=T_K,
-                    reason=reason,
-                )
-                _sz_missing_antoine_intercept(str(name), reason)
-                continue
+                if (
+                    parent_oxide in {'CaO', 'CoO'}
+                    and data.get('reference_pressure_model')
+                ):
+                    from simulator.vapour_rail.catalog import compiled_catalog_for
+
+                    catalog = getattr(self, 'vapour_rail_catalog', None)
+                    if catalog is None:
+                        payload = getattr(
+                            self.vapor_pressures,
+                            'catalog_payload',
+                            None,
+                        )
+                        if payload is not None:
+                            catalog = compiled_catalog_for(payload)
+                    if catalog is None:
+                        raise RuntimeError(
+                            f'{name} requires its compiled standard-reaction model'
+                        )
+                    evaluator = catalog.evaluator_for_hot_train(name)
+                    reference_evaluation = evaluator.evaluate(
+                        T_K,
+                        source_activity=1.0,
+                        pO2_bar=evaluator.pO2_reference_bar,
+                    )
+                    P_sat = reference_evaluation.pressure_pa
+                    coefficient_block = 'compiled_reference_pressure_model'
+                    if parent_oxide == 'CoO':
+                        from simulator.policy.enums import NoticeKind
+
+                        activity_standard_state_flags[name] = {
+                            'type': 'typed_notice',
+                            'kind': NoticeKind.ENGINE_MODEL_CAVEAT.value,
+                            'K_reference_phase': 'CoO(cr)',
+                            'activity_reference_phase': (
+                                'CoO(l), Raoultian pure-liquid'
+                            ),
+                            'temperature_K': T_K,
+                            'reference_phase_mismatch_magnitude': 'unknown',
+                            'conversion_applied': False,
+                            'reason': (
+                                'The available CoO(cr) -> CoO(g) '
+                                'standard-reaction K is retained with the '
+                                'liquid-standard activity; no grounded CoO '
+                                'crystal/liquid fusion pair bounds the '
+                                'reference-phase correction.'
+                            ),
+                        }
+                else:
+                    reason = _antoine_skip_reason_for_refusal(exc)
+                    _append_antoine_skip_notice(
+                        warnings,
+                        antoine_skip_notice_keys,
+                        antoine,
+                        species=name,
+                        site=(
+                            "equilibrium.internal_analytical."
+                            "oxide_vapor_antoine"
+                        ),
+                        temperature_K=T_K,
+                        reason=reason,
+                    )
+                    _sz_missing_antoine_intercept(str(name), reason)
+                    continue
             valid = data.get('valid_range_K', [0, 9999])
 
-            log_P = _antoine_log10_pressure(A, B, C, T_K)
-            P_sat = _pow10_pressure_or_raise(log_P, species=name, field="P_sat")
+            if coefficient_block == COEFF_BLOCK_ANTOINE:
+                log_P = _antoine_log10_pressure(A, B, C, T_K)
+                P_sat = _pow10_pressure_or_raise(
+                    log_P,
+                    species=name,
+                    field="P_sat",
+                )
             if not valid[0] <= T_K <= valid[1]:
                 oxide_vapor_extrapolations[name] = _vapor_pressure_temperature_extrapolation_notice(
                     temperature_K=T_K, valid_range_K=valid,
                     reason="out_of_domain_marked",
                 )
                 warnings.append(
-                    f"{name} oxide-vapor Antoine fit extrapolated beyond "
+                    f"{name} oxide-vapor {coefficient_block} extrapolated beyond "
                     f"valid_range_K {valid} at {T_K:.2f} K"
                 )
 
@@ -1644,6 +1643,35 @@ class EquilibriumMixin:
                     species=name,
                     field="P_sat_activity",
                 )
+                reaction = data.get('reaction')
+                reaction_formula = (
+                    reaction.get('formula', '')
+                    if isinstance(reaction, Mapping)
+                    else ''
+                )
+                if parent_oxide == 'CaO' and 'CaO(cr)' in reaction_formula:
+                    # Ca-027/Ca-028 gives ΔG_fus° = G°(CaO,l)-G°(CaO,cr).
+                    # A standard-reaction pressure exponent α means the
+                    # reaction consumes α CaO units per gas molecule, so
+                    # K_liq/K_cr = 10**(α ΔG_fus°/(R T ln 10)). Multiplying
+                    # the pressure by that factor converts the crystalline K
+                    # to the liquid activity basis. Unit check: α and dex are
+                    # dimensionless; pressure remains Pa. Sanity: α=0 leaves
+                    # pressure unchanged, while α=1 gives one CaO correction.
+                    cao_liquid_standard_log10_factor = (
+                        _oxide_liquid_standard_log10_factor_per_oxide(
+                            'CaO', T_K
+                        )
+                    )
+                    P_sat = _require_finite_vapor_value(
+                        P_sat
+                        * 10.0 ** (
+                            activity_exponent
+                            * cao_liquid_standard_log10_factor
+                        ),
+                        species=name,
+                        field='P_sat_CaO_liquid_standard',
+                    )
 
             pO2_exponent = float(data.get('pO2_exponent', 0.0) or 0.0)
             if pO2_exponent:
@@ -1691,7 +1719,7 @@ class EquilibriumMixin:
                     ('builtin_extrapolation_limited'
                      if name in oxide_vapor_extrapolations else 'builtin_authoritative'),
                     data,
-                    coefficient_block=COEFF_BLOCK_ANTOINE,
+                    coefficient_block=coefficient_block,
                     temperature_K=T_K,
                     authority_limited_by_ellingham_fit_range=(
                         name in ellingham_extrapolations
