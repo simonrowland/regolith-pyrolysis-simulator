@@ -634,7 +634,10 @@ def test_thermoengine_fusion_failure_is_disclosed_on_cao_activity(
         )
         with pytest.raises(
             RuntimeError,
-            match='NameError: forced fusion implementation error',
+            # The outer equilibrium handler re-raises as RuntimeError with
+            # 'ThermoEngine equilibrium failed: {exc}' (no class prefix); the
+            # original NameError is asserted via __cause__ below.
+            match='ThermoEngine equilibrium failed: forced fusion implementation error',
         ) as error:
             backend.equilibrate(
                 temperature_C=temperature_K - CELSIUS_TO_KELVIN_OFFSET,
