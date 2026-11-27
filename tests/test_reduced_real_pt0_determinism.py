@@ -5414,11 +5414,14 @@ def test_pt1_recapture_supersedes_stale_row_without_decoding_payload(
     assert codec_version == rrd.PT0_GATE_CURVE_CODEC_VERSION - 1 == 3
     assert bytes(stored_key_bytes) == rrd.canonical_json_bytes(key)
     invalid_old_payload = b"{invalid json"
+    invalid_old_key = b"{invalid key"
     with sqlite3.connect(db_path) as conn:
         conn.execute(
             f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
-            "SET payload_bytes = ?, payload_sha256 = ? WHERE key_hash = ?",
+            "SET key_bytes = ?, payload_bytes = ?, payload_sha256 = ? "
+            "WHERE key_hash = ?",
             (
+                sqlite3.Binary(invalid_old_key),
                 sqlite3.Binary(invalid_old_payload),
                 hashlib.sha256(invalid_old_payload).hexdigest(),
                 key_hash,
@@ -5438,6 +5441,29 @@ def test_pt1_recapture_supersedes_stale_row_without_decoding_payload(
         current_payload,
         law_disclosures=[],
     )
+
+    current_key_bytes = rrd.canonical_json_bytes(key)
+    current_payload_bytes = rrd.canonical_json_bytes(current_payload)
+    with sqlite3.connect(db_path) as conn:
+        (
+            stored_key_hash,
+            stored_key_sha256,
+            stored_key_bytes,
+            stored_payload_sha256,
+            stored_payload_bytes,
+            stored_codec_version,
+        ) = conn.execute(
+            f"SELECT key_hash, key_sha256, key_bytes, payload_sha256, "
+            f"payload_bytes, payload_codec_version FROM "
+            f"{PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()
+    assert stored_key_hash == key_hash
+    assert stored_key_sha256 == hashlib.sha256(current_key_bytes).hexdigest()
+    assert bytes(stored_key_bytes) == current_key_bytes
+    assert stored_payload_sha256 == hashlib.sha256(current_payload_bytes).hexdigest()
+    assert bytes(stored_payload_bytes) == current_payload_bytes
+    assert stored_codec_version == rrd.PT0_GATE_CURVE_CODEC_VERSION
 
     replay = PT0DeterminismStore("replay", db_path=db_path)
     assert replay._lookup("freeze_gate_curve", key) == current_payload

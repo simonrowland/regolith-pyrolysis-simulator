@@ -195,7 +195,7 @@ def _put_internal_analytical_cache_row(db_path: Path) -> None:
                 "resolved_role": "authoritative",
             },
         },
-        "equilibrium_result": {"status": "ok"},
+        "equilibrium_result": {"status": "ok", "liquid_fraction": 1.0},
     }
     key_bytes = canonical_json_bytes(key)
     payload_bytes = canonical_json_bytes(payload)

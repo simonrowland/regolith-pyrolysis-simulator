@@ -74,6 +74,7 @@ from simulator.reduced_real_determinism import (
     ControlQuantization,
     PT1_EQUILIBRIUM_TABLE,
     PT1PersistentEquilibriumStore,
+    _payload_codec_stamp_is_current,
     _copy_pt1_equilibrium_rows,
 )
 from simulator.interpolation_uncertainty import (
@@ -1033,6 +1034,9 @@ def seed_job_cache(
         "seed_source_table": SEED_SOURCE_TABLE if seeded else None,
         "seeded_point_sources": seeded,
         "rejected_seed_rows": len(rejected),
+        "superseded_seed_rows": sum(
+            1 for row in rejected if row.get("rejected") == "superseded"
+        ),
         "rejected_seed_point_sources": rejected,
         "expected_seed_epoch": (
             _plain_mapping(expected_seed_epoch) if expected_seed_epoch else None
@@ -1084,9 +1088,15 @@ def _seed_cache_rows_from_base(
                 f"{base_cache} does not match {shard_db}"
             )
         placeholders = ",".join("?" for _ in point_ids)
+        codec_version_column = (
+            "payload_codec_version"
+            if "payload_codec_version" in source_columns
+            else "NULL"
+        )
         rows = conn.execute(
             f"""
-            SELECT key_hash, key_bytes
+            SELECT artifact, key_hash, key_bytes,
+                   {codec_version_column} AS payload_codec_version
             FROM {_SEED_BASE_ALIAS}.{PT1_EQUILIBRIUM_TABLE}
             WHERE key_hash IN ({placeholders})
             """,
@@ -1105,6 +1115,19 @@ def _seed_cache_rows_from_base(
         for point in clean_sources:
             point_id = str(point["point_id"])
             row = rows_by_hash[point_id]
+            if _payload_codec_stamp_is_current(
+                str(row["artifact"]), row["payload_codec_version"]
+            ) is False:
+                superseded = dict(point)
+                superseded.update(
+                    {
+                        "rejected": "superseded",
+                        "reason": "payload_codec_version",
+                        "payload_codec_version": row["payload_codec_version"],
+                    }
+                )
+                rejected_sources.append(superseded)
+                continue
             key_payload = _seed_row_key_payload(row)
             rejection = _seed_epoch_rejection(
                 key_payload,
@@ -1120,14 +1143,34 @@ def _seed_cache_rows_from_base(
     finally:
         conn.close()
 
-    _copy_pt1_equilibrium_rows(
+    copy_summary = _copy_pt1_equilibrium_rows(
         [base_cache],
         shard_db,
         require_capture_epoch_match=True,
         key_hashes=seed_ids,
     )
+    copied_row_count = sum(
+        int(source["inserted_rows"]) + int(source["replaced_rows"])
+        for source in copy_summary["sources"]
+    )
     conn = sqlite3.connect(shard_db)
     try:
+        copied_ids = {
+            str(row[0])
+            for row in conn.execute(
+                f"SELECT key_hash FROM {PT1_EQUILIBRIUM_TABLE}"
+            )
+        }
+        seeded_by_id: dict[str, dict[str, Any]] = {}
+        for point in seeded_sources:
+            point_id = str(point["point_id"])
+            if point_id in copied_ids:
+                seeded_by_id.setdefault(point_id, point)
+        seeded_sources = list(seeded_by_id.values())
+        if len(seeded_sources) != copied_row_count:
+            raise RuntimeError(
+                "PT-1 acquisition seed copy count does not match rows copied"
+            )
         _ensure_seed_source_table(conn)
         created_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
         for index, point in enumerate(seeded_sources):

@@ -2120,10 +2120,13 @@ class PT1PersistentEquilibriumStore:
                     if stale_payload:
                         conn.execute(
                             f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
-                            "SET payload_sha256 = ?, payload_bytes = ?, "
+                            "SET key_sha256 = ?, key_bytes = ?, "
+                            "payload_sha256 = ?, payload_bytes = ?, "
                             "payload_codec_version = ?, "
                             "repair_notices_json = ? WHERE key_hash = ?",
                             (
+                                key_hash,
+                                sqlite3.Binary(key_bytes),
                                 payload_hash,
                                 sqlite3.Binary(payload_bytes),
                                 payload_codec_version,

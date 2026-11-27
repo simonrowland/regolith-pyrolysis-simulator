@@ -146,7 +146,19 @@ def _pt1_cache_point_id(tag: str, **kwargs: object) -> str:
 
 def _put_pt1_cache_row(db_path: Path, tag: str, **kwargs: object) -> str:
     key = _pt1_cache_key(tag, **kwargs)
-    payload = {"curve": {"status": "in_range", "tag": tag}}
+    payload = {
+        "curve": {
+            "source": "gate_liquid_fraction",
+            "solidus_T_C": 1200.0,
+            "liquidus_T_C": 1300.0,
+            "path": [
+                {"temperature_C": 1200.0, "liquid_fraction": 0.0},
+                {"temperature_C": 1300.0, "liquid_fraction": 1.0},
+            ],
+            "is_liquidus_floor": False,
+            "tag": tag,
+        },
+    }
     key_bytes = canonical_json_bytes(key)
     payload_bytes = canonical_json_bytes(payload)
     key_hash = hashlib.sha256(key_bytes).hexdigest()
@@ -1412,6 +1424,13 @@ def test_epoch_seed_carries_codec_stamp_across_pt1_column_layouts(
             )
         if base_layout == "migrated":
             PT1PersistentEquilibriumStore(base)
+        # A stale stamp must be checked before decoding this key.
+        with sqlite3.connect(base) as conn:
+            conn.execute(
+                f"UPDATE {epoch_grind.PT1_EQUILIBRIUM_TABLE} "
+                "SET key_bytes = ? WHERE key_hash = ?",
+                (sqlite3.Binary(b"{invalid json"), point_id),
+            )
 
     shard = tmp_path / base_layout / "shards" / "job-a.sqlite"
     summary = epoch_grind.seed_job_cache(
@@ -1422,16 +1441,24 @@ def test_epoch_seed_carries_codec_stamp_across_pt1_column_layouts(
     )
 
     with sqlite3.connect(shard) as conn:
-        (stored_version,) = conn.execute(
+        stored_row = conn.execute(
             f"SELECT payload_codec_version FROM {epoch_grind.PT1_EQUILIBRIUM_TABLE} "
             "WHERE key_hash = ?",
             (point_id,),
         ).fetchone()
-    expected_version = (
-        PT0_GATE_CURVE_CODEC_VERSION if base_layout == "fresh" else None
-    )
-    assert summary["seed_rows"] == 1
-    assert stored_version == expected_version
+    if base_layout == "fresh":
+        assert summary["seed_rows"] == 1
+        assert summary["superseded_seed_rows"] == 0
+        assert stored_row == (PT0_GATE_CURVE_CODEC_VERSION,)
+    else:
+        assert summary["seed_rows"] == 0
+        assert summary["rejected_seed_rows"] == 1
+        assert summary["superseded_seed_rows"] == 1
+        assert summary["seeded_point_sources"] == []
+        assert summary["seed_source_table"] is None
+        assert summary["rejected_seed_point_sources"][0]["rejected"] == "superseded"
+        assert summary["rows_after"] == 0
+        assert stored_row is None
 
 
 def test_epoch_merge_preserves_payload_codec_stamp(tmp_path: Path) -> None:
