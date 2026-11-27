@@ -34,7 +34,7 @@ import sys
 
 root, label, source_id, mode, selector, group_size = sys.argv[1:]
 root = Path(root)
-sys.path.insert(0, str(root / "scripts" / "ia_hang_profiles"))
+sys.path[:0] = [str(root), str(root / "scripts" / "ia_hang_profiles")]
 os.environ["REGOLITH_PARSED_YAML_CACHE"] = "off"
 os.environ["REGOLITH_ENGINE_CACHE"] = ""
 os.environ["REGOLITH_ENGINE_CACHE_MODE"] = ""
