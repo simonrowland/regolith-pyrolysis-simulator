@@ -1132,6 +1132,7 @@ def _seed_cache_rows_from_base(
         shard_db,
         require_capture_epoch_match=True,
         key_hashes=seed_ids,
+        strict_source_validation=True,
     )
     conn = sqlite3.connect(shard_db)
     try:

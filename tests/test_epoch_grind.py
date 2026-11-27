@@ -1435,7 +1435,10 @@ def test_epoch_seed_carries_codec_stamp_across_pt1_column_layouts(
     assert stored_version == expected_version
 
 
-def test_epoch_seed_key_decode_uses_stored_row_admission(tmp_path: Path) -> None:
+def test_epoch_seed_key_decode_uses_stored_row_admission(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     base = tmp_path / "deep-key-base.sqlite"
     original_hash = _put_pt1_cache_row(base, "deep-key")
     with sqlite3.connect(base) as conn:
@@ -1464,13 +1467,26 @@ def test_epoch_seed_key_decode_uses_stored_row_admission(tmp_path: Path) -> None
             ),
         )
 
-    with pytest.raises(PT1PersistentStoreCorrupt, match="invalid stored fields"):
+    admission_calls: list[dict[str, object]] = []
+    original_admission = epoch_grind._admit_stored_row
+
+    def record_admission(row: object, **kwargs: object) -> object:
+        admission_calls.append(dict(kwargs))
+        return original_admission(row, **kwargs)  # type: ignore[arg-type]
+
+    monkeypatch.setattr(epoch_grind, "_admit_stored_row", record_admission)
+    with pytest.raises(
+        PT1PersistentStoreCorrupt,
+        match="invalid key JSON bytes",
+    ):
         epoch_grind.seed_job_cache(
             tmp_path / "deep-key-shard.sqlite",
             base,
             point_sources=[{"point_id": point_id, "source": "ladder_polish"}],
             job_id="job-deep-key",
         )
+    assert admission_calls
+    assert admission_calls[0]["strict_source_validation"] is True
 
 
 def test_epoch_merge_preserves_payload_codec_stamp(tmp_path: Path) -> None:
@@ -1755,7 +1771,12 @@ def test_epoch_child_cache_gate_receives_profile_strict_vapor_flag(
         lambda *args, **kwargs: epoch_grind.ChildOutcome(kind="completed", returncode=0),
     )
 
-    def record_cache_gate(db_path: Path, **kwargs: object) -> dict[str, int]:
+    def record_cache_gate(
+        db_path: Path,
+        decode_result_payload: object,
+        **kwargs: object,
+    ) -> dict[str, int]:
+        assert callable(decode_result_payload)
         calls.append({"db_path": db_path, **kwargs})
         return {"rows": 0, "vapor_active_rows": 0, "source_reports": 0}
 

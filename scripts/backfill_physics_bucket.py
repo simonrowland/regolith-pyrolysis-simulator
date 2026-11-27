@@ -28,6 +28,7 @@ from simulator.reduced_real_determinism import (  # noqa: E402
     PHYSICS_BUCKET_SCHEMA_VERSION,
     PHYSICS_BUCKET_ALL_LADDER_RUNGS,
     PT1_EQUILIBRIUM_TABLE,
+    _admit_stored_row,
     assert_strict_vapor_pt1_row,
     canonical_physics_ladder_bucket_key_from_replay_key,
     canonical_json_bytes,
@@ -289,58 +290,31 @@ def _ensure_backfill_columns(conn: sqlite3.Connection, columns: set[str]) -> Non
 
 
 def _select_rows_sql(columns: set[str]) -> str:
-    required = [
-        column if column in columns else f"NULL AS {column}"
-        for column in (
-            "artifact",
-            "key_hash",
-            "key_sha256",
-            "payload_sha256",
-            "key_bytes",
-            "payload_bytes",
-        )
-    ]
-    optional = [
-        column if column in columns else f"NULL AS {column}"
+    missing_physics = [
+        f"NULL AS {column}"
         for column in PHYSICS_COLUMNS
+        if column not in columns
     ]
     order_by = "key_hash" if "key_hash" in columns else "rowid"
+    projections = ["*"] + missing_physics
     return f"""
-        SELECT
-            {", ".join(required)},
-            {", ".join(optional)}
+        SELECT {", ".join(projections)}
         FROM {PT1_EQUILIBRIUM_TABLE}
         ORDER BY {order_by}
     """
 
 
 def _physics_values_from_admitted_row(row: sqlite3.Row) -> PhysicsBucketValues:
-    key_hash = str(row["key_hash"] or "")
-    key_bytes = _blob_bytes(row["key_bytes"])
-    if not key_hash:
-        raise ValueError("row key_hash is required")
-    actual_key_hash = _sha256(key_bytes)
-    if actual_key_hash != key_hash:
-        raise ValueError("row key_hash does not match key_bytes")
-    if row["key_sha256"] is not None and str(row["key_sha256"]) != actual_key_hash:
-        raise ValueError("row key_sha256 does not match key_bytes")
-
-    payload_bytes = _blob_bytes(row["payload_bytes"])
-    payload_hash = _sha256(payload_bytes)
-    if (
-        row["payload_sha256"] is not None
-        and str(row["payload_sha256"]) != payload_hash
-    ):
-        raise ValueError("row payload_sha256 does not match payload_bytes")
-
-    key = json.loads(key_bytes.decode("utf-8"))
-    payload = json.loads(payload_bytes.decode("utf-8"))
+    admitted = _admit_stored_row(row, store_kind="pt1")
+    assert admitted is not None
+    key = admitted.entry["key"]
+    payload = admitted.entry["payload"]
     if not isinstance(key, Mapping):
         raise ValueError("replay key must decode to a JSON object")
     if not isinstance(payload, Mapping):
         raise ValueError("payload must decode to a JSON object")
 
-    artifact = str(row["artifact"] or key.get("artifact", "") or "")
+    artifact = str(admitted.entry["artifact"] or key.get("artifact", "") or "")
     if not artifact:
         raise ValueError("row artifact is required")
     key_artifact = str(key.get("artifact", "") or "")
@@ -353,16 +327,9 @@ def _physics_values_from_admitted_row(row: sqlite3.Row) -> PhysicsBucketValues:
         artifact=artifact,
         key=key,
         payload=payload,
-        key_hash=key_hash,
-        context=f"physics-bucket backfill {artifact}:{key_hash}",
+        key_hash=str(admitted.entry["key_hash"]),
+        context=f"physics-bucket backfill {artifact}:{admitted.entry['key_hash']}",
     )
-    return _physics_values_from_replay_key(key)
-
-
-def _physics_values_from_key_bytes(key_bytes: Any) -> PhysicsBucketValues:
-    key = json.loads(_blob_bytes(key_bytes).decode("utf-8"))
-    if not isinstance(key, Mapping):
-        raise ValueError("replay key must decode to a JSON object")
     return _physics_values_from_replay_key(key)
 
 

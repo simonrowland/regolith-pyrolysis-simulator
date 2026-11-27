@@ -703,8 +703,14 @@ def test_interpolation_reemits_union_from_every_used_neighbor(tmp_path: Path) ->
     ]
 
 
+@pytest.mark.parametrize(
+    "null_bucket_schema",
+    (False, True),
+    ids=("bucket-schema", "null-bucket-schema"),
+)
 def test_interpolation_candidates_refuse_corrupt_replay_scope(
     tmp_path: Path,
+    null_bucket_schema: bool,
 ) -> None:
     key = _interpolation_key("stored", feo_fraction=0.20, temperature_K=1500.0)
     db_path = tmp_path / "corrupt-scope.sqlite"
@@ -712,11 +718,18 @@ def test_interpolation_candidates_refuse_corrupt_replay_scope(
     corrupt_scope = "0" * 64
 
     with sqlite3.connect(db_path) as conn:
-        conn.execute(
-            f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} "
-            "SET replay_scope_sha256 = ?",
-            (corrupt_scope,),
-        )
+        if null_bucket_schema:
+            conn.execute(
+                f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} "
+                "SET replay_scope_sha256 = ?, physics_bucket_schema_version = NULL",
+                (corrupt_scope,),
+            )
+        else:
+            conn.execute(
+                f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} "
+                "SET replay_scope_sha256 = ?",
+                (corrupt_scope,),
+            )
 
     store = rrd.PT1PersistentEquilibriumStore(db_path)
     with pytest.raises(

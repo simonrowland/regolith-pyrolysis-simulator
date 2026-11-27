@@ -533,9 +533,11 @@ def _strict_vapor_pt1_store_summary(
     approved_sources: frozenset[str],
     strict_vapor_gate: bool,
 ) -> dict[str, int]:
+    from simulator.reduced_real_determinism import _admit_stored_row
+
     rows = conn.execute(
         f"""
-        SELECT key_hash, artifact, key_bytes, payload_bytes
+        SELECT *
         FROM {_PT1_EQUILIBRIUM_TABLE}
         """
     ).fetchall()
@@ -550,14 +552,14 @@ def _strict_vapor_pt1_store_summary(
     vapor_active_rows = 0
     source_reports = 0
     for row in rows:
-        row_context = f"{context}:{row['key_hash']}"
-        key = _json_mapping(row["key_bytes"], f"{row_context}.key")
-        payload = _json_mapping(row["payload_bytes"], f"{row_context}.payload")
+        admitted = _admit_stored_row(row, store_kind="pt1")
+        assert admitted is not None
+        row_context = f"{context}:{admitted.entry['key_hash']}"
         row_summary = assert_strict_vapor_pt1_row(
-            artifact=str(row["artifact"]),
-            key=key,
-            payload=payload,
-            key_hash=str(row["key_hash"]),
+            artifact=str(admitted.entry["artifact"]),
+            key=admitted.entry["key"],
+            payload=admitted.entry["payload"],
+            key_hash=str(admitted.entry["key_hash"]),
             context=row_context,
             approved_sources=approved_sources,
         )

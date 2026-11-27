@@ -4603,6 +4603,66 @@ def test_pt1_shard_first_insert_admits_nested_repair_notices(
     assert isinstance(raised.value.__cause__, RecursionError)
 
 
+@pytest.mark.parametrize(
+    ("corruption", "error_type"),
+    (
+        ("missing-vapor-authority", GrindSourceGateError),
+        ("null-stamp-internal-analytical", PT1PersistentStoreCorrupt),
+    ),
+)
+def test_pt1_row_copy_rechecks_strict_source_validation_before_first_insert(
+    tmp_path: Path,
+    corruption: str,
+    error_type: type[Exception],
+) -> None:
+    source_path = tmp_path / "strict-copy-source.sqlite"
+    target_path = tmp_path / "strict-copy-target.sqlite"
+    key = _strict_vapor_key()
+    _put_c3a_payload(source_path, key, "missing-vapor-authority")
+    key_hash = _key_hash(key)
+    with sqlite3.connect(source_path) as conn:
+        (payload_bytes,) = conn.execute(
+            f"SELECT payload_bytes FROM {PT1_EQUILIBRIUM_TABLE} "
+            "WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()
+        payload = json.loads(bytes(payload_bytes))
+        if corruption == "missing-vapor-authority":
+            payload["authority"].pop("vapor_pressure")
+        else:
+            payload["authority"]["backend"] = {
+                "backend_name": "InternalAnalyticalBackend",
+                "backend_class": "simulator.backends.InternalAnalyticalBackend",
+            }
+        invalid_payload_bytes = canonical_json_bytes(payload)
+        assignments = "payload_bytes = ?, payload_sha256 = ?"
+        if corruption == "null-stamp-internal-analytical":
+            assignments += ", payload_codec_version = NULL"
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} SET {assignments} "
+            "WHERE key_hash = ?",
+            (
+                sqlite3.Binary(invalid_payload_bytes),
+                rrd._sha256(invalid_payload_bytes),
+                key_hash,
+            ),
+        )
+
+    with pytest.raises(error_type):
+        rrd._copy_pt1_equilibrium_rows(
+            (source_path,),
+            target_path,
+            require_capture_epoch_match=False,
+            strict_source_validation=True,
+        )
+
+    with sqlite3.connect(target_path) as conn:
+        (target_rows,) = conn.execute(
+            f"SELECT COUNT(*) FROM {PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+    assert target_rows == 0
+
+
 def test_pt1_legacy_null_repair_notices_emit_typed_unavailable_notice(
     tmp_path: Path,
 ) -> None:
@@ -8295,6 +8355,62 @@ def test_stale_codec_integrity_checks_precede_admission_for_every_reader(
         assert "distance is missing" in str(raised.value)
     elif corruption == "compound_replay_scope_malformed_payload_json":
         assert "exact key replay scope mismatch" in str(raised.value)
+
+
+@pytest.mark.parametrize("reader", ("exact", "ladder"))
+@pytest.mark.parametrize(
+    "bad_distance",
+    ("not-a-number", str(10**400)),
+    ids=("nonnumeric", "overflowing"),
+)
+def test_pt1_unconvertible_ladder_distance_is_typed_corruption(
+    tmp_path: Path,
+    reader: str,
+    bad_distance: str,
+) -> None:
+    db_path = tmp_path / f"unconvertible-distance-{reader}.sqlite"
+    key = _freeze_gate_key()
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    capture._store(
+        "freeze_gate_curve",
+        key,
+        _valid_test_gate_payload(),
+        law_disclosures=[],
+    )
+    key_hash = _key_hash(key)
+    rung_tag = rrd.PHYSICS_BUCKET_LADDER_RUNGS[0][0]
+    distance_column = rrd._physics_ladder_distance_column(rung_tag)
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} SET {distance_column} = ? "
+            "WHERE key_hash = ?",
+            (bad_distance, key_hash),
+        )
+
+    persistent = PT1PersistentEquilibriumStore(db_path)
+    with pytest.raises(
+        PT1PersistentStoreCorrupt,
+        match="distance is invalid",
+    ):
+        if reader == "exact":
+            persistent._get_with_decoded(
+                artifact="freeze_gate_curve",
+                key=key,
+                key_bytes=canonical_json_bytes(key),
+                key_hash=key_hash,
+            )
+        else:
+            rung_key = rrd.canonical_physics_ladder_bucket_key_from_replay_key(
+                key,
+                rung_tag,
+            )
+            persistent._get_by_physics_ladder_bucket(
+                artifact="freeze_gate_curve",
+                rung_tag=rung_tag,
+                rung_key=rung_key,
+                rung_hash=rrd._sha256(canonical_json_bytes(rung_key)),
+                query_key=key,
+            )
 
 
 @pytest.mark.skipif(

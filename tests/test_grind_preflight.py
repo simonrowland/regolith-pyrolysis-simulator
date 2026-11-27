@@ -27,6 +27,7 @@ from simulator.grind_preflight import (
     vapor_pressure_source_report_from_sim,
 )
 from simulator.optimize.results_store import _decode_result_payload
+from simulator import reduced_real_determinism as rrd
 
 
 def _eval_spec(**overrides: object) -> dict[str, object]:
@@ -296,50 +297,63 @@ def _write_pt1_store(
     *,
     source: str = "vaporock",
 ) -> None:
-    # Compose cache-design PT-1 keys use selection + payload authority (not the
-    # legacy key.vapor_pressure_provider blob alone). Emit both so the
-    # selection/authority mismatch gate and the vaporock rejection remain
-    # independently exercisable.
-    provider = {
-        "resolved_provider_id": source,
-        "authoritative_provider_id": source,
-    }
+    provider = rrd._provider_authority_payload(
+        resolved_provider_id="alphamelts-diagnostic",
+        resolved_role="authoritative",
+        authoritative_provider_id="alphamelts-diagnostic",
+        fallback_provider_id=None,
+        fallback_allowed=False,
+        model="MELTSv1.0.2",
+        mode="subprocess",
+    )
+    vapor_provider = rrd._provider_authority_payload(
+        resolved_provider_id=source,
+        resolved_role="authoritative",
+        authoritative_provider_id=source,
+        fallback_provider_id=None,
+        fallback_allowed=False,
+        model="test-vapor-provider",
+        mode="test",
+    )
     key = {
-        "schema_version": "pt1-test-key",
-        "corpus_version": "test-corpus",
-        "data_digests": {},
+        "namespace_id": "alphamelts:equilibrium-composite",
+        "composition_mol_fraction": [["Na2O", 0.1], ["SiO2", 0.9]],
+        "controls": {"T_K": 1473.15, "log_fO2": -8.0, "pressure_bar": 0.001},
+        "redox": {"fe_redox_policy": "intrinsic", "fe_split": {}},
         "vapor_pressure_provider_selection": source,
-        "vapor_pressure_provider": provider,
+        "sulfur_side": {"S_input_ppm": 0.0, "stage0_inventory_digest": "test"},
+        "model": {"model": "alphamelts-diagnostic", "mode": "AlphaMELTSProvider"},
     }
+    key_bytes = rrd.canonical_json_bytes(key)
+    key_hash = rrd._sha256(key_bytes)
     payload = {
-        "equilibrium_result": {},
+        "equilibrium_result": {"status": "ok"},
         "last_vapor_pressures_source": {"Na": source, "SiO": source},
-        "authority": {"vapor_pressure": provider},
+        "authority": {
+            "schema": "reduced-real-authority-v1",
+            "evidence_class": "melts",
+            "backend_family": "alphamelts",
+            "backend": {
+                "backend_name": "AlphaMELTSBackend",
+                "backend_class": (
+                    "simulator.melt_backend.alphamelts.AlphaMELTSBackend"
+                ),
+            },
+            "provider": provider,
+            "vapor_pressure": vapor_provider,
+        },
     }
-    with sqlite3.connect(db_path) as conn:
-        conn.execute(
-            """
-            CREATE TABLE reduced_real_equilibrium_payloads (
-                key_hash TEXT PRIMARY KEY,
-                artifact TEXT NOT NULL,
-                key_bytes BLOB NOT NULL,
-                payload_bytes BLOB NOT NULL
-            )
-            """
-        )
-        conn.execute(
-            """
-            INSERT INTO reduced_real_equilibrium_payloads
-                (key_hash, artifact, key_bytes, payload_bytes)
-            VALUES (?, ?, ?, ?)
-            """,
-            (
-                "pt1-row-1",
-                "equilibrium_post_record",
-                json.dumps(key, sort_keys=True).encode("utf-8"),
-                json.dumps(payload, sort_keys=True).encode("utf-8"),
-            ),
-        )
+    payload_bytes = rrd.canonical_json_bytes(payload)
+    rrd.PT1PersistentEquilibriumStore(db_path).put(
+        artifact="equilibrium_post_record",
+        key=key,
+        key_bytes=key_bytes,
+        key_hash=key_hash,
+        payload=payload,
+        payload_bytes=payload_bytes,
+        payload_hash=rrd._sha256(payload_bytes),
+        law_disclosures=[],
+    )
 
 
 def test_strict_vapor_config_rejects_fallback_enabled() -> None:
@@ -628,6 +642,41 @@ def test_strict_vapor_result_store_pt1_strict_on_rejects_vaporock(
     with pytest.raises(GrindSourceGateError, match="vaporock"):
         assert_strict_vapor_result_store(
             db_path, _decode_result_payload, strict_vapor_gate=True
+        )
+
+
+def test_strict_vapor_pt1_preflight_uses_stored_row_admission(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "strict-pt1-deep-key.sqlite"
+    _write_pt1_store(db_path, source="builtin-vapor-pressure")
+    with sqlite3.connect(db_path) as conn:
+        (key_bytes,) = conn.execute(
+            f"SELECT key_bytes FROM {rrd.PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+        deeply_nested_key = (
+            bytes(key_bytes)[:-1]
+            + b',"unread":'
+            + b"[" * 1100
+            + b"0"
+            + b"]" * 1100
+            + b"}"
+        )
+        key_hash = rrd._sha256(deeply_nested_key)
+        conn.execute(
+            f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} "
+            "SET key_hash = ?, key_sha256 = ?, key_bytes = ?",
+            (key_hash, key_hash, sqlite3.Binary(deeply_nested_key)),
+        )
+
+    with pytest.raises(
+        rrd.PT1PersistentStoreCorrupt,
+        match="invalid key JSON bytes",
+    ):
+        assert_strict_vapor_result_store(
+            db_path,
+            _decode_result_payload,
+            strict_vapor_gate=True,
         )
 
 
