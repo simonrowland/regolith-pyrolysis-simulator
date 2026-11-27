@@ -627,6 +627,29 @@ def test_freeze_gate_cache_key_distinguishes_nio_coo_moles(
     )
 
 
+def _curve_pin_mismatch(observed, expected):
+    """First rows that differ, so a studio failure is readable without -vv."""
+    parts = []
+    for key in sorted(set(observed) | set(expected)):
+        got = list(observed.get(key) or [])
+        want = list(expected.get(key) or [])
+        if got == want:
+            continue
+        parts.append(f'{key}: got {len(got)} want {len(want)}')
+        shown = 0
+        for index in range(max(len(got), len(want))):
+            got_row = got[index] if index < len(got) else None
+            want_row = want[index] if index < len(want) else None
+            if got_row == want_row:
+                continue
+            parts.append(f'  [{index}] got {got_row!r}')
+            parts.append(f'  [{index}] want {want_row!r}')
+            shown += 1
+            if shown >= 6:
+                break
+    return '\n'.join(parts)
+
+
 # Full 24 h / 12 h / 12 h runner campaigns: review call 294.56 s;
 # base run timed out at 310.90 s total under the unchanged 300 s test limit.
 @pytest.mark.nightly
@@ -1065,7 +1088,7 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
         for curves in logical_gate_reads.values()
         for curve in curves
     )
-    assert observed == expected
+    assert observed == expected, _curve_pin_mismatch(observed, expected)
 
 
 def test_native_fe_no_commit_split_suppresses_vapor_route(

@@ -523,7 +523,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/campaigns.py:_derived_override_field_names': {
         "path": 'simulator/campaigns.py',
-        "line": 900,
+        "line": 901,
         "kind": 'lru',
         "name": '_derived_override_field_names',
         "carries_disclosure": False,
@@ -531,7 +531,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/campaigns.py:_species_molar_mass_kg_per_mol': {
         "path": 'simulator/campaigns.py',
-        "line": 357,
+        "line": 358,
         "kind": 'lru',
         "name": '_species_molar_mass_kg_per_mol',
         "carries_disclosure": False,
@@ -915,7 +915,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/core.py:_freeze_gate_held_curve_record': {
         "path": 'simulator/core.py',
-        "line": 1504,
+        "line": 1509,
         "kind": 'store',
         "name": '_freeze_gate_held_curve_record',
         "carries_disclosure": True,
@@ -923,7 +923,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/core.py:_freeze_gate_liquid_fraction_cache': {
         "path": 'simulator/core.py',
-        "line": 1502,
+        "line": 1507,
         "kind": 'store',
         "name": '_freeze_gate_liquid_fraction_cache',
         "carries_disclosure": True,
@@ -931,7 +931,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/core.py:_freeze_gate_liquid_fraction_curve_memo': {
         "path": 'simulator/core.py',
-        "line": 1505,
+        "line": 1510,
         "kind": 'store',
         "name": '_freeze_gate_liquid_fraction_curve_memo',
         "carries_disclosure": True,
@@ -947,7 +947,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/core.py:rates_cache': {
         "path": 'simulator/core.py',
-        "line": 8606,
+        "line": 8785,
         "kind": 'store',
         "name": 'rates_cache',
         "carries_disclosure": False,
