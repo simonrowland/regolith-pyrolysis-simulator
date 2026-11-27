@@ -285,7 +285,6 @@ def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) ->
       "why": [
         "unsupported quantity 'equilibrium_composition'",
         "source T_range_K [273.15, 3273.15]; no midpoint invented",
-        "regime 'HSC_gibbs_minimization_model' is not a closed method token (kems_effusion alone is insufficient)",
         "derived evidence class with unstated ancestry; queued for page-grounding",
         "derived evidence class with unstated derivation; queued for page-grounding"
       ]
@@ -333,7 +332,6 @@ def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) ->
       "why": [
         "unsupported quantity 'equilibrium_composition'",
         "source T_range_K [273.15, 3273.15]; no midpoint invented",
-        "regime 'HSC_gibbs_minimization_model' is not a closed method token (kems_effusion alone is insufficient)",
         "derived evidence class with unstated ancestry; queued for page-grounding",
         "derived evidence class with unstated derivation; queued for page-grounding"
       ]

@@ -1249,8 +1249,14 @@ def parse_species_formula(
         label = annotation.group(1).strip().lower()
         annotated_phase = phase_labels.get(label)
         if annotated_phase is not None:
-            if not _species_axis_matches_phase(species, annotated_phase):
+            # No species axis: the suffix is typography. Green's formula pin
+            # parses CH4(g). A supplied species that disagrees still refuses.
+            if (
+                species is not None
+                and not _species_axis_matches_phase(species, annotated_phase)
+            ):
                 return None
+            text = text[: annotation.start()]
         else:
             from simulator.battery.polymorph_dictionary import coerce_polymorph_token
 
@@ -1262,8 +1268,6 @@ def parse_species_formula(
                 if species is None or polymorph_token(species) is not annotated_polymorph:
                     return None
                 text = text[: annotation.start()]
-        if annotated_phase is not None:
-            text = text[: annotation.start()]
 
     melt_suffix = re.search(r"_melt$", text, re.IGNORECASE)
     if melt_suffix is not None:

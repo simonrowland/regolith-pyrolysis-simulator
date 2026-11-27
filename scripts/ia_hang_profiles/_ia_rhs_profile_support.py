@@ -25,6 +25,7 @@ def profile_ia_residue_source(
     memoize=True,
     rhs_cap=None,
     single_hashimoto_experiment=False,
+    direct_compile_residual=False,
     flush_every_n_rhs=5,
 ):
     import scipy.integrate
@@ -336,6 +337,9 @@ def profile_ia_residue_source(
             try:
                 return pressure_model(inventory, logp, temperature)
             finally:
+                residue._inherit_residue_pressure_contract(
+                    tracked_pressure, pressure_model
+                )
                 record.setdefault("pressure_model_cpu_seconds", 0.0)
                 record["pressure_model_cpu_seconds"] += time.process_time() - started
 
@@ -712,9 +716,16 @@ def profile_ia_residue_source(
         score_loadavg_started = os.getloadavg()
     except (AttributeError, OSError):
         score_loadavg_started = None
-    residuals, _candidates = score.score_store(
-        context, engines=(Engine.INTERNAL_ANALYTICAL,), include_diagnostics=False,
-    )
+    if direct_compile_residual:
+        assert len(rows) == 1, "direct residual profiling requires one observation"
+        residual, _candidate = score.compile_residual(
+            rows[0], Engine.INTERNAL_ANALYTICAL, context=context
+        )
+        residuals = (residual,)
+    else:
+        residuals, _candidates = score.score_store(
+            context, engines=(Engine.INTERNAL_ANALYTICAL,), include_diagnostics=False,
+        )
     chosen = {}
     for residual in residuals:
         if residual.reference not in expected_ids:

@@ -17,7 +17,10 @@ from simulator.battery.store_validation import _issue_shape
 from simulator.battery.validate import validate_corpus
 from tests.battery.test_migrate import _migrate_real_extract
 
-SHORNIKOV = "shornikov-1997-diopside-vaporization.yaml"
+# Mysen still mints a method id: Mössbauer is a printed method and the
+# wet-chemical rows are unstated, so they stay on the named experiment.
+# Shornikov's gaps are unstated or the same Knudsen method and must not mint.
+MYSEN = "mysen-1985-cmas-redox.yaml"
 _REFINT_SHAPES = frozenset(
     {
         "referential_integrity:experiment_id",
@@ -34,7 +37,7 @@ def _assert_reloaded_split_ids_resolve(root: Path) -> None:
         for observation in observations.values()
         if "::method:" in observation.experiment_id
     ]
-    assert split_rows, "shornikov did not mint a method-qualified experiment id"
+    assert split_rows, "mysen did not mint a method-qualified experiment id"
     missing = sorted(
         {
             observation.experiment_id
@@ -55,7 +58,7 @@ def _assert_reloaded_split_ids_resolve(root: Path) -> None:
 def test_method_split_ids_resolve_after_reload(tmp_path: Path) -> None:
     _migrate_real_extract(
         tmp_path,
-        SHORNIKOV,
+        MYSEN,
         write=True,
         use_repository_index_row=True,
     )
@@ -72,7 +75,7 @@ def test_dropping_the_publish_map_dangles_method_split_ids(
     monkeypatch.setattr(Migrator, "_publish_experiment", drop_registration)
     result = _migrate_real_extract(
         tmp_path,
-        SHORNIKOV,
+        MYSEN,
         write=True,
         use_repository_index_row=True,
     )

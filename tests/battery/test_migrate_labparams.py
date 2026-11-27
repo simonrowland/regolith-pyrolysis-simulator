@@ -244,8 +244,15 @@ def test_ntrs_static_capsule_rows_migrate_with_source_validity_flags() -> None:
 def test_ntrs_reservoir_alias_mutation_probe_rejects_unmapped_regime(
     monkeypatch,
 ) -> None:
+    # The run names static capsule twice: the experiment method
+    # static_capsule_vapor_pressure and the row regime
+    # static_capsule_equilibrium. Either alias keeps STATIC_EQUILIBRIUM,
+    # and that token is what fills the pure reservoir. Dropping only the
+    # regime alias leaves the experiment method. Both have to go before
+    # the reservoir fill refuses.
     aliases = dict(migration_module.METHOD_TOKEN_ALIASES)
     aliases.pop("static_capsule_equilibrium")
+    aliases.pop("static_capsule_vapor_pressure")
     monkeypatch.setattr(migration_module, "METHOD_TOKEN_ALIASES", aliases)
 
     extract = REPO_ROOT / "data/literature/extracts/ntrs-19650014783.yaml"
@@ -259,6 +266,11 @@ def test_ntrs_reservoir_alias_mutation_probe_rejects_unmapped_regime(
         )
     ]
     assert rows
+    assert all(
+        migrator.result.experiments[row.experiment_id].method.value
+        is not MethodToken.STATIC_EQUILIBRIUM
+        for row in rows
+    )
     with pytest.raises(AssertionError):
         assert all(row.identity.reservoir.is_value for row in rows)
 

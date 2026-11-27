@@ -499,14 +499,39 @@ def _write_min_tree(root: Path, extract: dict | None = None) -> Path:
     return root
 
 
+# This sentence is a METHOD_TOKEN_ALIASES key, not free prose. An unmapped
+# regime must not replace it. A field that does not exact-map still yields.
+_KEMS_VALUES_METHOD = (
+    "KEMS ion-current intensities converted to partial pressures using "
+    "the thesis calibration (Eq. 2)."
+)
+_UNMAPPED_VALUES_METHOD = "thesis calibration curve, equation 2"
+
+
+def _na_psat_rows(result):
+    return [
+        row
+        for row in result.observations.values()
+        if row.observation_id == "fixture-source::na_psat"
+        or row.observation_id.startswith("fixture-source::na_psat::")
+    ]
+
+
+def _regime_notice_count(row) -> int:
+    return sum(
+        1
+        for notice in row.notices
+        if notice.kind is NoticeKind.METHOD_UNSTATED
+        and "source method text is not mapped: unmapped source regime"
+        in notice.reason
+    )
+
+
 def test_values_method_is_used_when_extract_regime_is_absent(tmp_path: Path) -> None:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     observation = extract["species"]["Na"]["observations"][0]
     observation.pop("regime")
-    observation["values"]["method"] = (
-        "KEMS ion-current intensities converted to partial pressures using "
-        "the thesis calibration (Eq. 2)."
-    )
+    observation["values"]["method"] = _KEMS_VALUES_METHOD
 
     result = migrate(_write_min_tree(tmp_path / "fallback", extract), write=False)
     migrated = next(iter(result.observations.values()))
@@ -516,34 +541,30 @@ def test_values_method_is_used_when_extract_regime_is_absent(tmp_path: Path) -> 
     explicit_regime = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     observation = explicit_regime["species"]["Na"]["observations"][0]
     observation["regime"] = "unmapped source regime"
-    observation["values"]["method"] = (
-        "KEMS ion-current intensities converted to partial pressures using "
-        "the thesis calibration (Eq. 2)."
-    )
+    observation["values"]["method"] = _KEMS_VALUES_METHOD
     result = migrate(
         _write_min_tree(tmp_path / "explicit-regime", explicit_regime), write=False
     )
     migrated = next(iter(result.observations.values()))
     experiment = result.experiments[migrated.experiment_id]
-    assert experiment.method == State.of(MethodToken.UNSPECIFIED)
-    unmapped_rows = [
-        row
-        for row in result.observations.values()
-        if row.observation_id == "fixture-source::na_psat"
-        or row.observation_id.startswith("fixture-source::na_psat::")
-    ]
-    assert unmapped_rows
-    assert all(
-        sum(
-            1
-            for notice in row.notices
-            if notice.kind is NoticeKind.METHOD_UNSTATED
-            and "source method text is not mapped: unmapped source regime"
-            in notice.reason
-        )
-        == 1
-        for row in unmapped_rows
+    assert experiment.method == State.of(MethodToken.KNUDSEN_EFFUSION)
+    alias_rows = _na_psat_rows(result)
+    assert alias_rows
+    assert all(_regime_notice_count(row) == 0 for row in alias_rows)
+
+    unmapped_method = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    observation = unmapped_method["species"]["Na"]["observations"][0]
+    observation["regime"] = "unmapped source regime"
+    observation["values"]["method"] = _UNMAPPED_VALUES_METHOD
+    result = migrate(
+        _write_min_tree(tmp_path / "unmapped-method", unmapped_method), write=False
     )
+    migrated = next(iter(result.observations.values()))
+    experiment = result.experiments[migrated.experiment_id]
+    assert experiment.method == State.of(MethodToken.UNSPECIFIED)
+    unmapped_rows = _na_psat_rows(result)
+    assert unmapped_rows
+    assert all(_regime_notice_count(row) == 1 for row in unmapped_rows)
 
 
 def test_unmapped_regime_method_notice_mutation_rejects_duplicate(
@@ -552,10 +573,7 @@ def test_unmapped_regime_method_notice_mutation_rejects_duplicate(
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     observation = extract["species"]["Na"]["observations"][0]
     observation["regime"] = "unmapped source regime"
-    observation["values"]["method"] = (
-        "KEMS ion-current intensities converted to partial pressures using "
-        "the thesis calibration (Eq. 2)."
-    )
+    observation["values"]["method"] = _UNMAPPED_VALUES_METHOD
     original = Migrator._add_observation
 
     def readd_method_notice(self, observation, source_key, *args, **kwargs):
@@ -579,25 +597,10 @@ def test_unmapped_regime_method_notice_mutation_rejects_duplicate(
     result = migrate(
         _write_min_tree(tmp_path / "duplicate-notice", extract), write=False
     )
-    rows = [
-        row
-        for row in result.observations.values()
-        if row.observation_id == "fixture-source::na_psat"
-        or row.observation_id.startswith("fixture-source::na_psat::")
-    ]
+    rows = _na_psat_rows(result)
     assert rows
     with pytest.raises(AssertionError):
-        assert all(
-            sum(
-                1
-                for notice in row.notices
-                if notice.kind is NoticeKind.METHOD_UNSTATED
-                and "source method text is not mapped: unmapped source regime"
-                in notice.reason
-            )
-            == 1
-            for row in rows
-        )
+        assert all(_regime_notice_count(row) == 1 for row in rows)
 
 
 def _migrate_real_extract(
