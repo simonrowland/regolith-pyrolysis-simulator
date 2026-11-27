@@ -411,6 +411,7 @@ from simulator.battery.records import (
     as_decimal,
 )
 from tests.battery import load_observation_store_summary
+from tests.battery.store_cache import load_cached_test_store
 from simulator.battery.validate import (
     AncestryFailure,
     _asset_ids,
@@ -16795,7 +16796,13 @@ def _account_compilation_shard(path: Path, summary: dict[str, dict]) -> None:
     assert cached["size"] == path.stat().st_size, rel
 
 
-def _load_store_if_needle(path: Path, needle: bytes, summary: dict[str, dict]) -> dict | None:
+def _load_store_if_needle(
+    path: Path,
+    needle: bytes,
+    summary: dict[str, dict],
+    *,
+    documents: Mapping[str, object] | None = None,
+) -> dict | None:
     """YAML-load a store file only when the needle is present.
 
     Compilation shards without the needle are not parsed; the derived summary
@@ -16810,7 +16817,11 @@ def _load_store_if_needle(path: Path, needle: bytes, summary: dict[str, dict]) -
             return None
     elif needle not in raw:
         return None
-    stored = yaml.load(raw.decode("utf-8"), Loader=_YAML_LOADER)
+    stored = (
+        load_cached_safe_yaml(raw)
+        if documents is None
+        else documents[path.relative_to(REPO_ROOT).as_posix()]
+    )
     return stored if isinstance(stored, dict) else {}
 
 
@@ -16863,7 +16874,8 @@ def test_l05c1_store_alpha_values_lie_in_unit_interval() -> None:
     assert not bad, bad[:20]
 
 
-def test_l05c5_store_unavailable_values_are_queued() -> None:
+@pytest.mark.xdist_group("t1745-parsed-store")
+def test_l05c5_store_unavailable_values_are_queued(parsed_store_cache_root: Path) -> None:
     queue_path = REPO_ROOT / "data" / "battery" / "migration-queue.yaml"
     roots = [
         REPO_ROOT / "data" / "literature" / "extracts-v2",
@@ -16886,10 +16898,13 @@ def test_l05c5_store_unavailable_values_are_queued() -> None:
     missing = []
     scanned = 0
     summary = load_observation_store_summary(REPO_ROOT)
+    documents = load_cached_test_store(REPO_ROOT, cache_root=parsed_store_cache_root)
     needle = b"kind: unavailable"
     for folder in roots:
         for path in iter_observation_store_paths(folder):
-            stored = _load_store_if_needle(path, needle, summary)
+            stored = _load_store_if_needle(
+                path, needle, summary, documents=documents
+            )
             if stored is None:
                 continue
             for obs in stored.get("observations") or []:
@@ -17512,15 +17527,17 @@ def test_f3_compilation_locator_names_the_record_file(tmp_path: Path) -> None:
     assert dest.is_file()
 
 
-def test_f3_store_every_compilation_observation_has_existing_source_path() -> None:
+@pytest.mark.xdist_group("t1745-parsed-store")
+def test_f3_store_every_compilation_observation_has_existing_source_path(
+    parsed_store_cache_root: Path,
+) -> None:
     obs_dir = REPO_ROOT / "data" / "literature" / "observations-v2"
     if not obs_dir.is_dir():
         pytest.skip("migrated store not generated yet")
     missing: list[str] = []
+    documents = load_cached_test_store(REPO_ROOT, cache_root=parsed_store_cache_root)
     for path in iter_observation_store_paths(obs_dir, "compilations-*.yaml"):
-        stored = yaml.load(
-            path.read_text(encoding="utf-8"), Loader=_FAST_SAFE_YAML_LOADER
-        )
+        stored = documents[path.relative_to(REPO_ROOT).as_posix()]
         for obs in stored.get("observations") or []:
             loc = obs.get("locator") or {}
             rel = loc.get("source_path")
@@ -21622,19 +21639,23 @@ def _same_work_observation_duplicate_pairs(observations: list[dict]) -> list[tup
     return sorted(pairs)
 
 
-def test_literature_store_has_no_duplicate_values_across_extracts() -> None:
+@pytest.mark.xdist_group("t1745-parsed-store")
+def test_literature_store_has_no_duplicate_values_across_extracts(
+    parsed_store_cache_root: Path,
+) -> None:
     roots = (
         REPO_ROOT / "data" / "literature" / "extracts-v2",
         REPO_ROOT / "data" / "literature" / "observations-v2",
     )
     observations: list[dict] = []
     summary = load_observation_store_summary(REPO_ROOT)
+    documents = load_cached_test_store(REPO_ROOT, cache_root=parsed_store_cache_root)
     for root in roots:
         for path in iter_observation_store_paths(root):
             if compilation_family_from_store_path(path) is not None:
                 _account_compilation_shard(path, summary)
                 continue
-            stored = yaml.load(path.read_text(encoding="utf-8"), Loader=yaml.CSafeLoader)
+            stored = documents[path.relative_to(REPO_ROOT).as_posix()]
             if isinstance(stored, dict):
                 observations.extend(stored.get("observations") or [])
     duplicates = _same_work_observation_duplicate_pairs(observations)
