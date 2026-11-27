@@ -685,12 +685,12 @@ def test_r2_f5_oxygen_input_decision_is_one_policy_on_both_cell_branches(
         assert any(
             notice.reason == (
                 "fo2_tier=1; physics_rung=1:printed_fO2_or_buffer; "
-                "route=identity_fO2_Pa"
+                "route=observation_fO2_Pa_to_log_fO2"
             )
             for notice in on_reactive_knudsen.notices
         )
         assert any(
-            notice.reason == "fo2_tier=1; route=identity_fO2_Pa"
+            notice.reason == "fo2_tier=1; route=observation_fO2_Pa_to_log_fO2"
             for notice in general.notices
         )
     expected = {
