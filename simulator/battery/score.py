@@ -19696,6 +19696,9 @@ def _langmuir_residue_prediction(
         _langmuir_residue_row_id,
         _time_forward_extent_notices,
         predict_langmuir_residue_composition,
+        wang_langmuir_physics_result,
+        wang_langmuir_series_result,
+        wang_ree_channel_prediction,
         wang_ree_full_retention_prediction,
     )
 
@@ -19707,15 +19710,13 @@ def _langmuir_residue_prediction(
         f"{getattr(reference.locator, 'table', None)}:"
         f"{getattr(reference.locator, 'note', None)}"
     )
+    run_row = None
     if reference.source_id == _WANG_2001_SOURCE_ID:
         run_row = _langmuir_residue_row_id(reference.locator)
         if run_row is not None:
-            # Composition inputs are shared by run row; IMP notices are not.
+            # Composition inputs are shared by run row. The IMP closure
+            # notice is attached on read, so EMP and IMP do not each integrate.
             cache_locator = f"run-row:{run_row}"
-            if _is_wang_imp_residue_series(reference):
-                # IMP carries a series-specific closure notice; do not reuse
-                # the EMP/REE cached notice tuple for its residuals.
-                cache_locator += ":wang-imp"
     cache_source_id = (
         f"langmuir:{reference.source_id}:{reference.experiment_id}:{cache_locator}"
     )
@@ -19754,16 +19755,51 @@ def _langmuir_residue_prediction(
             result = predict_langmuir_residue_composition(
                 engine.value, reference, experiment, context.observations.values()
             )
+            if reference.source_id == _WANG_2001_SOURCE_ID and run_row is not None:
+                result = wang_langmuir_physics_result(result)
             if cache is not None:
                 _residue_prediction_cache_entry(
                     cache, cache_source_id, engine, value=result
                 )
+        if reference.source_id == _WANG_2001_SOURCE_ID and run_row is not None:
+            series_source_id = cache_source_id + (
+                ":wang-imp"
+                if _is_wang_imp_residue_series(reference)
+                else ":wang-emp"
+            )
+            series_result = (
+                None if cache is None else
+                _residue_prediction_cache_entry(cache, series_source_id, engine)
+            )
+            if series_result is None:
+                series_result = wang_langmuir_series_result(result, reference)
+                if cache is not None:
+                    _residue_prediction_cache_entry(
+                        cache, series_source_id, engine, value=series_result
+                    )
+            result = series_result
         value = result["composition_wt_pct"].get(formula)
         if value is None:
-            retained = wang_ree_full_retention_prediction(
+            # The vapour owner wins when the pack accepted a channel.
+            # Retention is only the gap. Both results already carry the ppm
+            # and the notices; this caller does not recompute either.
+            channelled = wang_ree_channel_prediction(
                 reference, result, formula
             )
-            if retained is not None:
+            retained = (
+                None
+                if channelled is not None
+                else wang_ree_full_retention_prediction(
+                    reference, result, formula
+                )
+            )
+            produced = channelled if channelled is not None else retained
+            if produced is not None:
+                extra_notices = (
+                    produced["notices"]
+                    if channelled is not None
+                    else (produced["notice"],)
+                )
                 return EnginePrediction(
                     engine=engine,
                     channel=channel,
@@ -19771,20 +19807,20 @@ def _langmuir_residue_prediction(
                         state=ExecutionState.PRODUCED,
                         call_evidence=f"{engine.value}:langmuir_residue_extent",
                     ),
-                    value=retained["predicted_ppm"],
+                    value=produced["predicted_ppm"],
                     unit=QUANTITY_UNITS[Quantity.RESIDUE_COMPONENT_COMPOSITION],
                     coefficient_sources=sources,
                     lineage_complete=False,
                     notices=(
                         *result["notices"],
-                        retained["notice"],
+                        *extra_notices,
                         *_residue_engine_pressure_notices(
                             result.get("pressure_notices"),
                             Quantity.RESIDUE_COMPONENT_COMPOSITION,
                         ),
                     ),
                     identity=reference.identity,
-                    refusal_detail=retained["provenance"],
+                    refusal_detail=produced["provenance"],
                 )
             subtype = reference.identity.subtype
             if (

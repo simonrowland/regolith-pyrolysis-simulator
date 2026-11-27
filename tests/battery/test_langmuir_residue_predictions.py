@@ -720,13 +720,14 @@ def test_langmuir_inventory_uses_residue_channel_owner(monkeypatch, mendybaev_co
     captured: list[dict] = []
     real = residue._openimcc_residue_channel_set
 
-    def wrapping(raw_channels, initial_notices, *, engine, alpha, alpha_source):
+    def wrapping(raw_channels, initial_notices, *, engine, alpha, alpha_source, **kwargs):
         gas_channels, channels, omissions = real(
             raw_channels,
             initial_notices,
             engine=engine,
             alpha=alpha,
             alpha_source=alpha_source,
+            **kwargs,
         )
         captured.append(
             {
@@ -791,7 +792,12 @@ def test_removing_alsio_stoich_omits_the_channel(monkeypatch):
         alpha=1.0,
         alpha_source="DP-005 assumed common alpha=1 for a composition ratio",
     )
-    assert accepted == []
-    assert channels == ()
-    assert omissions[0]["channel"] == "AlSiO"
-    assert "residue_stoichiometry_invalid" in omissions[0]["reason"]
+    # The owner also accepts the pack's REE channels. The mutation is that
+    # bare AlSiO still does not enter the inventory.
+    assert all(species != "AlSiO" for species, _reaction in accepted)
+    assert all(channel.species != "AlSiO" for channel in channels)
+    assert any(
+        omission["channel"] == "AlSiO"
+        and "residue_stoichiometry_invalid" in omission["reason"]
+        for omission in omissions
+    )

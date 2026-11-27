@@ -81,6 +81,61 @@ def _is_wang_imp_residue_series(reference: Any) -> bool:
     )
 
 
+_WANG_IMP_CLOSURE_BASIS = "wang_imp_closure_basis"
+
+
+def _wang_imp_closure_notice(reference: Any):
+    """IMP assay notice. It does not change the shared Langmuir solve."""
+    if not _is_wang_imp_residue_series(reference):
+        return None
+    from simulator.battery.enums import NoticeKind, Quantity
+    from simulator.battery.records import Notice
+
+    return Notice(
+        kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+        affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+        reason=(
+            f"{_WANG_IMP_CLOSURE_BASIS}: model basis is the six major "
+            "oxides plus the REE sesquioxides carried from element "
+            "ppm; printed basis is total ion-microprobe wt% including "
+            "ΣLn2O3 and WO3. Printed values are compared as reported "
+            "without renormalization. WO3 stays blank."
+        ),
+        origin=reference.observation_id,
+    )
+
+
+def _notices_without_wang_imp_closure(notices: Sequence[Any]) -> tuple[Any, ...]:
+    return tuple(
+        notice for notice in notices
+        if not str(getattr(notice, "reason", "")).startswith(
+            f"{_WANG_IMP_CLOSURE_BASIS}:"
+        )
+    )
+
+
+def wang_langmuir_physics_result(result: Mapping[str, Any]) -> dict[str, Any]:
+    """Store one solve without the series notice."""
+    notices = tuple(result.get("notices") or ())
+    base = _notices_without_wang_imp_closure(notices)
+    if base == notices:
+        return result
+    return {**result, "notices": base}
+
+
+def wang_langmuir_series_result(
+    result: Mapping[str, Any], reference: Any,
+) -> dict[str, Any]:
+    """Attach the IMP closure notice onto the shared solve, per series."""
+    notices = tuple(result.get("notices") or ())
+    base = _notices_without_wang_imp_closure(notices)
+    closure = _wang_imp_closure_notice(reference)
+    series = base if closure is None else (*base, closure)
+    if series == notices:
+        return result
+    return {**result, "notices": series}
+
+
 _HASHIMOTO_DENSITY_KG_M3 = 2_700.0
 _HASHIMOTO_N_CAP = 256
 _HASHIMOTO_REFINEMENT_TOLERANCE_WT_PCT = 0.05
@@ -1048,6 +1103,143 @@ def _channel_terms(
     return tuple(terms)
 
 
+# La..Lu plus Y and Sc. Promethium is not a pack channel. Ions are opt-in
+# in the pack and are not members of this set.
+_REE_VAPOUR_ELEMENTS = (
+    "La", "Ce", "Pr", "Nd", "Sm", "Eu", "Gd", "Tb",
+    "Dy", "Ho", "Er", "Tm", "Yb", "Lu", "Y", "Sc",
+)
+_REE_SPECIATION_LIMITED_ELEMENTS = frozenset({"Eu", "Yb"})
+REE_OXIDE_ACTIVITY_RAOULTIAN_DEFAULT = "ree_oxide_activity_raoultian_default"
+REE_CE_ALL_AS_CE2O3_DEFAULT = "ree_ce_all_as_ce2o3_default"
+REE_SPECIATION_LIMITED = "ree_speciation_limited"
+REE_LIQUID_REFERENCE_EXTRAPOLATED = "ree_liquid_reference_extrapolated"
+REE_DYO_FORMATION_ENTHALPY_UNCERTAINTY = "dyo_formation_enthalpy_uncertainty"
+REE_TRACE_COMPONENTS_OUTSIDE_MELT_MODEL = "trace_components_outside_melt_model"
+_REE_ACTIVITY_POLICY_ID = "DP-118"
+# Species-rail bound quoted by the openimcc-species steer. It is not a
+# number this pin's evaluate() emits.
+_REE_TRACE_MOL_FRACTION_EACH = 0.01
+_REE_TRACE_MOL_FRACTION_TOTAL = 0.02
+_REE_TRACE_ACTIVITY_BIAS_DEX = 0.01
+
+
+def _ree_gas_element(species: str) -> str | None:
+    """Return the REE element of a neutral gas name, or None.
+
+    Longer symbols win, so YbO is ytterbium and YO is yttrium.
+    """
+
+    for element in sorted(_REE_VAPOUR_ELEMENTS, key=len, reverse=True):
+        if species == element or (
+            species.startswith(element)
+            and species[len(element):].startswith("O")
+        ):
+            return element
+    return None
+
+
+def _ree_sesquioxide_parent(element: str) -> str | None:
+    """Parent oxide of the element's M(g) channel, read from the pack."""
+
+    from openimcc.gas import _SF04_REACTIONS
+
+    reaction = _SF04_REACTIONS.get(element)
+    if not reaction or not reaction[0]:
+        return None
+    return str(reaction[0])
+
+
+def _ree_vapour_parent_oxides() -> tuple[str, ...]:
+    """Parents to ask the pack for. Coefficients stay in the pack.
+
+    M(g) and MO(g) use the sesquioxide. CeO2(g) uses CeO2(l). ScO2(g)
+    uses Sc2O3(l), which the Sc(g) parent already names.
+    """
+
+    from openimcc.gas import _SF04_REACTIONS
+
+    parents: list[str] = []
+    for element in _REE_VAPOUR_ELEMENTS:
+        parent = _ree_sesquioxide_parent(element)
+        if parent and parent not in parents:
+            parents.append(parent)
+    dioxide = _SF04_REACTIONS.get("CeO2")
+    if dioxide and dioxide[0] and str(dioxide[0]) not in parents:
+        parents.append(str(dioxide[0]))
+    return tuple(parents)
+
+
+def _ree_elements_in_channels(
+    gas_channels: Sequence[tuple[str, Sequence[Any]]],
+) -> frozenset[str]:
+    elements = {
+        element
+        for species, _reaction in gas_channels
+        if (element := _ree_gas_element(str(species))) is not None
+    }
+    return frozenset(elements)
+
+
+def _ree_raoultian_activities(
+    inventory: Mapping[str, float], parents: Sequence[str],
+) -> dict[str, float]:
+    """Formula-unit mole fraction. Gamma = 1 is the stated default.
+
+    a(parent) = n_parent / sum(n). No measured REE activity is applied
+    and nothing here is adjusted to a residue analysis.
+    """
+
+    positive: list[tuple[str, float]] = []
+    for oxide, amount in inventory.items():
+        try:
+            value = float(amount)
+        except (TypeError, ValueError):
+            continue
+        if math.isfinite(value) and value > 0.0:
+            positive.append((str(oxide), value))
+    total = math.fsum(value for _oxide, value in positive)
+    if total <= 0.0:
+        return {}
+    parent_set = set(parents)
+    return {
+        oxide: value / total
+        for oxide, value in positive
+        if oxide in parent_set
+    }
+
+
+def _openimcc_ree_pack_channels(
+    gas_pack: object,
+) -> tuple[tuple[tuple[str, tuple[str, float, float]], ...], Mapping[str, str]]:
+    """Neutral REE channels the loaded pack can actually evaluate.
+
+    Missing gas or liquid rows are returned as omissions. The caller
+    then keeps DP-117 for an element with no accepted channel. Ion
+    names are not requested: the pack builds them only when include_ions
+    is set, and this rail leaves that off.
+    """
+
+    from openimcc.gas import default_gas_channels
+
+    channels, omitted = default_gas_channels(
+        _ree_vapour_parent_oxides(), gas_pack,
+    )
+    neutral = tuple(
+        (str(name), reaction)
+        for name, reaction in channels
+        if _ree_gas_element(str(name)) is not None
+        and not str(name).endswith(("+", "-"))
+    )
+    neutral_omissions = {
+        str(name): str(reason)
+        for name, reason in omitted.items()
+        if _ree_gas_element(str(name)) is not None
+        and not str(name).endswith(("+", "-"))
+    }
+    return neutral, neutral_omissions
+
+
 def _openimcc_residue_channel(
     species: str,
     parent: str | None,
@@ -1077,6 +1269,26 @@ def _openimcc_residue_channel(
     )
 
 
+def _ree_channel_parent_is_carried(
+    species: str,
+    reaction: Sequence[Any],
+    carried_parent_oxides: set[str] | None,
+) -> bool:
+    """A pack REE channel is on this bead only when its parent is carried.
+
+    ``None`` means the caller asked for the pack set, not an inventory.
+    CeO2(g) stays when Ce2O3 is carried: a(CeO2) is the stated zero, so
+    the channel is present and its pressure is zero.
+    """
+
+    if carried_parent_oxides is None:
+        return True
+    parent = str(reaction[0]) if reaction and reaction[0] else ""
+    if parent in carried_parent_oxides:
+        return True
+    return species == "CeO2" and "Ce2O3" in carried_parent_oxides
+
+
 def _openimcc_residue_channel_set(
     raw_channels: Sequence[tuple[str, Sequence[Any]]],
     initial_notices: Sequence[dict[str, Any]],
@@ -1084,14 +1296,81 @@ def _openimcc_residue_channel_set(
     engine: str,
     alpha: float,
     alpha_source: str,
+    carried_parent_oxides: Sequence[str] | None = None,
 ) -> tuple[list[tuple[str, Sequence[Any]]], tuple[ResidueChannel, ...], tuple[dict[str, Any], ...]]:
-    """Keep consumable OpenIMCC channels and type notices for individual omissions."""
+    """Keep consumable OpenIMCC channels and type notices for individual omissions.
+
+    OpenIMCC also receives the pack's neutral REE channels. Internal-analytical
+    does not: its vapour catalog has no REE rows, and a required missing
+    pressure refuses the bead. REE stoichiometry is the pack's, not a second
+    table here. When the caller passes the bead's parent oxides, an REE
+    channel whose parent is not in that bead is left out. It is not an
+    omission: the pack has the channel, and this inventory has no activity
+    to give it. Omitting it keeps a REE-free bead on the previous channel
+    list.
+
+    Evaporation, per mole of liquid parent, p° = 1 bar. The pack stores
+    (parent, n_gas, n_O2). Condensed equilibrium is
+
+        parent(l) = n_gas * gas(g) + n_O2 * O2(g)
+        ΔG° = n_gas * G°(gas) + n_O2 * G°(O2) - G°(parent)   [J/mol]
+        K = exp(-ΔG° / (R T))                               [dimensionless]
+        p_gas = (K * a(parent) / p_O2**n_O2) ** (1/n_gas)   [bar]
+
+    Dividing the sesquioxide reactions by two is the per-metal form the
+    rail quotes: MO1.5(l) = M(g) + 3/4 O2, and MO1.5(l) = MO(g) + 1/4 O2.
+    The pO2 exponent is -n_O2/n_gas, so M is -3/4, MO is -1/4, CeO2(g)
+    from CeO2(l) is 0, and ScO2(g) from Sc2O3(l) is +1/4 because that
+    reaction consumes oxygen (n_O2 = -1/2, n_gas = 2). Raising pO2
+    therefore lowers p(M) and p(MO) and raises p(ScO2). a(parent) → 0
+    sends p_gas → 0. The residue law evaluates at fO2 = 1 bar and
+    multiplies by p_O2 to that exponent, then converts bar to pascal.
+    """
     from simulator.battery.enums import NoticeKind
 
     accepted_reactions: list[tuple[str, Sequence[Any]]] = []
     channels: list[ResidueChannel] = []
     omissions = [dict(notice) for notice in initial_notices]
-    for species, reaction in raw_channels:
+    selected_channels: list[tuple[str, Sequence[Any]]] = [
+        (str(species), reaction) for species, reaction in raw_channels
+    ]
+    if engine == "openimcc":
+        try:
+            from openimcc import load_gas_datapack
+        except ImportError as exc:
+            omissions.append(
+                {
+                    "kind": NoticeKind.INPUT_OMITTED.value,
+                    "channel": "REE",
+                    "reason": f"openimcc_ree_channels_unavailable:{exc}",
+                }
+            )
+        else:
+            ree_channels, ree_omissions = _openimcc_ree_pack_channels(
+                load_gas_datapack()
+            )
+            seen = {species for species, _reaction in selected_channels}
+            carried = (
+                None
+                if carried_parent_oxides is None
+                else {str(oxide) for oxide in carried_parent_oxides}
+            )
+            for species, reaction in ree_channels:
+                if species in seen:
+                    continue
+                if not _ree_channel_parent_is_carried(species, reaction, carried):
+                    continue
+                seen.add(species)
+                selected_channels.append((species, reaction))
+            for species, reason in ree_omissions.items():
+                omissions.append(
+                    {
+                        "kind": NoticeKind.INPUT_OMITTED.value,
+                        "channel": species,
+                        "reason": f"ree_pack_channel_omitted:{reason}",
+                    }
+                )
+    for species, reaction in selected_channels:
         if engine == "internal-analytical" and species in {"AlSiO", "Si2O2"}:
             # The internal analytical pressure path reads vapor_pressures.yaml,
             # which has no rows for these two OpenIMCC-only channels.
@@ -2095,6 +2374,17 @@ def integrate_knudsen_residue_inventory(
                     + [products[k] for k in gases])
 
         while xi < stop:
+            # A terminal parent event ends this solve. The next segment
+            # starts at that event. The non-linear cap bounds one segment.
+            # Summing every exhaustion onto one counter refuses the bead
+            # once trace parents have spent it: Wang 2001 sc9 (2273.15 K,
+            # measured mass-loss fraction 0.953559) raised
+            # knudsen_extent_evaluation_limit at extent 0.951545. The
+            # linear path keeps one shared budget across its ramp so a
+            # slow sensitivity solve cannot withhold the step-hold result.
+            if not linear_temperature:
+                evaluations = 0
+            xi_before = xi
             event_indices = [
                 i for i, k in enumerate(parents)
                 if state[i] > parent_cutoffs.get(k, 0.0)
@@ -2120,6 +2410,7 @@ def integrate_knudsen_residue_inventory(
             xi = float(solution.t[-1])
             if any(v < -absolute_tolerance for v in state):
                 raise ResidueInventoryRefusal("knudsen_inventory_negative")
+            retired_parent = False
             for index, hits in zip(event_indices, solution.t_events):
                 if index == oxygen_index:
                     if len(hits) and xi < stop:
@@ -2134,11 +2425,17 @@ def integrate_knudsen_residue_inventory(
                     cutoff = parent_cutoffs.get(parent, 0.0)
                     if len(hits) or state[index] <= cutoff:
                         active_parents.discard(parent)
+                        retired_parent = True
                         if cutoff > 0.0:
                             trace_tail_kg[parent] = state[index] * _formula_terms(parent)[1]
                         else:
                             state[index] = 0.0
             state = [max(0.0, v) for v in state]
+            if xi <= xi_before and not retired_parent:
+                raise ResidueInventoryRefusal(
+                    "knudsen_extent_nonconvergence",
+                    "extent did not advance",
+                )
         previous_endpoint, previous_temperature = endpoint, temperature
         if xi >= target:
             break
@@ -2580,10 +2877,30 @@ def _make_residue_pressure_model(
                 current_composition = {
                     oxide: amount for oxide, amount in key if amount > 0.0
                 }
+                # REE oxides are outside evaluate(). Keep a carried parent
+                # out of the melt call and pass a(M2O3) = X, gamma = 1,
+                # into the gas law. No carried REE parent leaves the melt
+                # call and the activity map exactly as they were.
+                ree_activity = _ree_raoultian_activities(
+                    current_composition, _ree_vapour_parent_oxides(),
+                )
+                if ree_activity:
+                    major_composition = {
+                        oxide: amount
+                        for oxide, amount in current_composition.items()
+                        if oxide not in ree_activity
+                    }
+                else:
+                    major_composition = current_composition
+                if not major_composition:
+                    raise ResidueInventoryRefusal(
+                        "openimcc_major_oxides_missing",
+                        "withholding REE parents left no oxide for evaluate()",
+                    )
                 try:
                     timeout_s = _ENGINE_OUTER_TIMEOUT_S["openimcc"]
                     state = _cached_isolated_openimcc_state(
-                        current_composition,
+                        major_composition,
                         temperature_K,
                         timeout_s=timeout_s,
                         allow_extrapolation=True,
@@ -2608,12 +2925,22 @@ def _make_residue_pressure_model(
                         "openimcc_version": state.openimcc_version,
                     }
                 )
+                if ree_activity:
+                    activities = dict(state.parent_oxide_activities)
+                    parent_oxides = tuple(state.parent_oxides)
+                    for oxide, activity in ree_activity.items():
+                        activities[oxide] = activity
+                        if oxide not in parent_oxides:
+                            parent_oxides = (*parent_oxides, oxide)
+                else:
+                    activities = state.parent_oxide_activities
+                    parent_oxides = state.parent_oxides
                 base_pressure_bar = openimcc_bridge.evaluate_gas(
-                    state.parent_oxide_activities,
+                    activities,
                     temperature_K,
                     1.0,
                     gas_pack,
-                    parent_oxides=state.parent_oxides,
+                    parent_oxides=parent_oxides,
                     allow_extrapolation=True,
                     gas_pack_selection=(
                         openimcc_bridge.DEFAULT_GAS_PACK_SELECTION
@@ -3928,6 +4255,9 @@ def predict_knudsen_residue_composition(
             engine=engine,
             alpha=1.0,
             alpha_source="near-saturated molecular effusion; common orifice factor cancels",
+            carried_parent_oxides=tuple(
+                oxide for oxide, amount in initial.items() if float(amount) > 0.0
+            ),
         )
         for omission in omissions:
             notices.append(
@@ -4189,6 +4519,354 @@ def wang_ree_full_retention_prediction(
     }
 
 
+def _wang_ree_starting_parent_moles(
+    reference: Any,
+    observations: Sequence[Any],
+    sample_mass_kg: float,
+) -> dict[str, float]:
+    """Carry each printed starting ppm as sesquioxide moles on this bead.
+
+    Ce is Ce2O3 only. The run does not print a Ce3+/Ce4+ split, so a(CeO2)
+    stays zero and CeO2(g) is carried at zero pressure. Element mass is
+    ppm * 1e-6 * sample mass; parent moles divide by the element atoms in
+    the sesquioxide. The same sample mass scales the major oxides, and it
+    cancels in the projected ppm.
+    """
+
+    from simulator.battery.enums import AdmissionStatus
+
+    if getattr(reference, "source_id", None) != WANG_2001_SOURCE_ID:
+        return {}
+    ppm_by_element: dict[str, float] = {}
+    for row in observations:
+        if getattr(row, "experiment_id", None) != reference.experiment_id:
+            continue
+        if getattr(row, "source_id", None) != WANG_2001_SOURCE_ID:
+            continue
+        if getattr(row, "engine", None) is not None:
+            continue
+        admission = getattr(row, "admission", None)
+        if (
+            admission is None
+            or getattr(admission, "status", None) is not AdmissionStatus.ADMITTED
+        ):
+            continue
+        identity = getattr(row, "identity", None)
+        subtype = None if identity is None else identity.subtype
+        if (
+            subtype is None
+            or not subtype.is_value
+            or subtype.value != "element_ppm_by_mass"
+        ):
+            continue
+        formula = identity.species.formula
+        if formula not in _REE_VAPOUR_ELEMENTS:
+            continue
+        start = (getattr(row, "point_conditions", None) or {}).get(
+            "starting_component_ppm"
+        )
+        state = getattr(start, "state", None)
+        if state is None or not state.is_value:
+            continue
+        try:
+            ppm = float(state.value)
+        except (TypeError, ValueError):
+            raise ResidueInventoryRefusal(
+                "ree_starting_ppm_invalid", formula
+            ) from None
+        if not math.isfinite(ppm) or ppm <= 0.0:
+            raise ResidueInventoryRefusal("ree_starting_ppm_invalid", formula)
+        previous = ppm_by_element.get(formula)
+        if previous is not None and not math.isclose(
+            previous, ppm, rel_tol=0.0, abs_tol=0.0
+        ):
+            raise ResidueInventoryRefusal(
+                "ree_starting_ppm_disagreement",
+                f"{formula}: {previous} and {ppm}",
+            )
+        ppm_by_element[formula] = ppm
+    parent_moles: dict[str, float] = {}
+    for element, ppm in ppm_by_element.items():
+        parent = _ree_sesquioxide_parent(element)
+        if parent is None:
+            continue
+        _element_atoms, element_molar_mass = _formula_terms(element)
+        parent_atoms, _parent_molar_mass = _formula_terms(parent)
+        per_parent = parent_atoms.get(element, 0.0)
+        if per_parent <= 0.0:
+            raise ResidueInventoryRefusal(
+                "ree_parent_oxide_invalid",
+                f"{parent} does not contain {element}",
+            )
+        element_mass_kg = ppm * 1.0e-6 * sample_mass_kg
+        parent_moles[parent] = parent_moles.get(parent, 0.0) + (
+            element_mass_kg / element_molar_mass / per_parent
+        )
+    return parent_moles
+
+
+def _ree_liquid_fusion_K(parent: str, gas_pack: object) -> float | None:
+    """Fusion temperature printed in the pack liquid-row Ref, if one token.
+
+    Konings rows use ``Tf2577``. The yttria construction uses ``Tf=2712``.
+    A missing or disagreeing marker is not replaced with a guessed temperature.
+    """
+
+    import re
+
+    key = f"{parent}(l)"
+    try:
+        selected = gas_pack.oxide_df.loc[key]
+    except (KeyError, AttributeError):
+        return None
+    if hasattr(selected, "iterrows"):
+        refs = [str(row["Ref"]) for _index, row in selected.iterrows()]
+    else:
+        refs = [str(selected["Ref"])]
+    found: set[float] = set()
+    for ref in refs:
+        for match in re.finditer(r"Tf=?(\d+(?:\.\d+)?)", ref):
+            found.add(float(match.group(1)))
+    if len(found) != 1:
+        return None
+    return found.pop()
+
+
+def _dyo_formation_uncertainty_J_per_mol() -> float | None:
+    """Read DyO(g)'s stated formation uncertainty from the pack status text."""
+
+    import re
+
+    from openimcc.gas import ELEMENT_STATUS
+
+    reason = str((ELEMENT_STATUS.get("Dy") or {}).get("reason") or "")
+    match = re.search(
+        r"±\s*(\d+(?:\.\d+)?)\s*kJ/mol formation uncertainty", reason
+    )
+    if match is None:
+        return None
+    return float(match.group(1)) * 1000.0
+
+
+def _ree_dyo_dex_band(temperature_K: float, uncertainty_J_per_mol: float) -> float:
+    """δlog10(p_DyO) after the two-product ΔG is divided by n_gas = 2.
+
+    Dy2O3(l) = 2 DyO(g) + 1/2 O2. A ±δ shift on each DyO(g) moves ΔG by
+    ±2δ. p scales as K**(1/2), so the log10 band is δ / (R T ln(10)).
+    The pressure itself is not moved.
+    """
+
+    from simulator.physical_constants import GAS_CONSTANT
+
+    return uncertainty_J_per_mol / (
+        GAS_CONSTANT * float(temperature_K) * math.log(10.0)
+    )
+
+
+def wang_ree_channel_prediction(
+    reference: Any,
+    result: Mapping[str, Any],
+    formula: str,
+) -> Mapping[str, Any] | None:
+    """Vapour ppm and the activity notices, or None when no channel was accepted.
+
+    score.py calls this before the DP-117 retention fallback. A missing
+    channel returns None so that fallback still owns the gap. An accepted
+    channel with no projected ppm is a refusal, not a silent retention.
+    """
+
+    if getattr(reference, "source_id", None) != WANG_2001_SOURCE_ID:
+        return None
+    identity = getattr(reference, "identity", None)
+    subtype = None if identity is None else identity.subtype
+    if (
+        subtype is None
+        or not subtype.is_value
+        or subtype.value != "element_ppm_by_mass"
+    ):
+        return None
+    if formula not in _REE_VAPOUR_ELEMENTS:
+        return None
+    accepted = result.get("ree_vapour_elements") or ()
+    if formula not in accepted:
+        return None
+    ppm_map = result.get("element_ppm_by_mass") or {}
+    if formula not in ppm_map:
+        raise ResidueInventoryRefusal("ree_channel_ppm_missing", formula)
+    try:
+        ppm = float(ppm_map[formula])
+    except (TypeError, ValueError) as exc:
+        raise ResidueInventoryRefusal(
+            "ree_channel_ppm_invalid", formula
+        ) from exc
+    if not math.isfinite(ppm) or ppm < 0.0:
+        raise ResidueInventoryRefusal("ree_channel_ppm_invalid", formula)
+    from simulator.battery.default_policy import resolve as resolve_default_policy
+    from simulator.battery.enums import Quantity
+    from simulator.battery.records import Notice, NoticePolicy
+
+    resolved = resolve_default_policy(_REE_ACTIVITY_POLICY_ID)
+    temperature = identity.temperature_K
+    temperature_K = (
+        float(temperature.value)
+        if temperature is not None and temperature.is_value
+        else None
+    )
+    reason = (
+        f"{REE_OXIDE_ACTIVITY_RAOULTIAN_DEFAULT}: "
+        "gamma=1 on the formula-unit mole fraction of the liquid sesquioxide; "
+        "no measured REE oxide activity is held, and gamma is not fitted"
+    )
+    if formula == "Ce":
+        reason += (
+            f". {REE_CE_ALL_AS_CE2O3_DEFAULT}: the run prints no Ce3+/Ce4+ "
+            "split, so every Ce mole is Ce2O3, a(Ce2O3)=X_Ce and a(CeO2)=0; "
+            "CeO2(g) stays in the channel set at zero pressure"
+        )
+    notices = [
+        Notice(
+            kind=resolved.flag,
+            affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+            reason=reason,
+            origin=reference.observation_id,
+            policy=NoticePolicy(**resolved.payload["policy"]),
+        )
+    ]
+    notices.extend(
+        _ree_vapour_caveat_notices(
+            formula,
+            temperature_K,
+            oxygen_unprinted=bool(result.get("oxygen_condition_unprinted")),
+            origin=str(reference.observation_id),
+        )
+    )
+    provenance = {
+        key: item for key, item in result.items() if key != "notices"
+    }
+    provenance["ree_vapour_channel"] = {
+        "element": formula,
+        "predicted_ppm": format(Decimal(str(ppm)), "f"),
+        "activity": REE_OXIDE_ACTIVITY_RAOULTIAN_DEFAULT,
+    }
+    return {
+        "predicted_ppm": Decimal(str(ppm)),
+        "notices": tuple(notices),
+        "provenance": provenance,
+    }
+
+
+def _ree_vapour_caveat_notices(
+    formula: str,
+    temperature_K: float | None,
+    *,
+    oxygen_unprinted: bool,
+    origin: str,
+) -> tuple[Any, ...]:
+    """Reference-state, speciation, and DyO-band notices for one REE row.
+
+    None of these carry a policy. The gamma notice already puts the row
+    in the proposed-policy stratum.
+    """
+
+    from simulator.battery.enums import NoticeKind, Quantity
+    from simulator.battery.records import Notice
+
+    notices: list[Notice] = []
+    quantity = (Quantity.RESIDUE_COMPONENT_COMPOSITION,)
+    if (
+        formula in _REE_SPECIATION_LIMITED_ELEMENTS
+        and oxygen_unprinted
+    ):
+        notices.append(
+            Notice(
+                kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                affected_quantities=quantity,
+                reason=(
+                    f"{REE_SPECIATION_LIMITED}: {formula}2O3 does not represent "
+                    f"{formula}2+; this row closed oxygen without a printed fO2, "
+                    "so it is treated as reduced and is not a test of gamma=1"
+                ),
+                origin=origin,
+            )
+        )
+    if temperature_K is not None and math.isfinite(temperature_K):
+        try:
+            from openimcc import load_gas_datapack
+            from openimcc.gas import _SF04_REACTIONS
+
+            gas_pack = load_gas_datapack()
+        except ImportError:
+            gas_pack = None
+            _SF04_REACTIONS = {}
+        parent = _ree_sesquioxide_parent(formula) if gas_pack is not None else None
+        parents = [parent] if parent else []
+        if formula == "Ce":
+            dioxide = _SF04_REACTIONS.get("CeO2")
+            if dioxide and dioxide[0]:
+                parents.append(str(dioxide[0]))
+        extrapolated: list[str] = []
+        unmarked: list[str] = []
+        for oxide in parents:
+            if gas_pack is None:
+                unmarked.append(oxide)
+                continue
+            fusion_K = _ree_liquid_fusion_K(oxide, gas_pack)
+            if fusion_K is None:
+                unmarked.append(oxide)
+            elif temperature_K < fusion_K:
+                extrapolated.append(f"{oxide}(l) below {fusion_K:g} K")
+        if extrapolated or unmarked:
+            detail = []
+            if extrapolated:
+                detail.append(
+                    "supercooled liquid reference: " + ", ".join(extrapolated)
+                )
+            if unmarked:
+                detail.append(
+                    "no single fusion marker in the pack Ref for "
+                    + ", ".join(unmarked)
+                )
+            notices.append(
+                Notice(
+                    kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                    affected_quantities=quantity,
+                    reason=(
+                        f"{REE_LIQUID_REFERENCE_EXTRAPOLATED}: "
+                        + "; ".join(detail)
+                        + f"; row temperature {temperature_K:g} K"
+                    ),
+                    origin=origin,
+                )
+            )
+    if formula == "Dy" and temperature_K is not None and math.isfinite(temperature_K):
+        uncertainty = _dyo_formation_uncertainty_J_per_mol()
+        if uncertainty is None:
+            band_text = (
+                "the pack Dy status did not state a parsed ±kJ/mol "
+                "formation uncertainty; the pressure was not adjusted"
+            )
+            band = None
+        else:
+            dex = _ree_dyo_dex_band(temperature_K, uncertainty)
+            band_text = (
+                f"DyO(g) formation uncertainty ±{uncertainty / 1000.0:g} kJ/mol; "
+                "n_gas=2 cancels the two-product ΔG, so "
+                f"δlog10(p_DyO)={dex:.6g} dex at {temperature_K:g} K; "
+                "the pressure was not adjusted"
+            )
+            band = f"±{dex:.6g} dex"
+        notices.append(
+            Notice(
+                kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                affected_quantities=quantity,
+                reason=f"{REE_DYO_FORMATION_ENTHALPY_UNCERTAINTY}: {band_text}",
+                origin=origin,
+                band=band,
+            )
+        )
+    return tuple(notices)
+
+
 def predict_langmuir_residue_composition(
     engine: str, reference, experiment, observations,
 ) -> dict[str, object]:
@@ -4382,6 +5060,19 @@ def predict_langmuir_residue_composition(
         oxide: amount * sample_mass_kg / _OXIDE_WT_PERCENT_REFERENCE_MASS_KG
         for oxide, amount in _oxide_wt_percent_to_mol_inventory(wt_pct).items()
     }
+    # OpenIMCC can evaporate the sesquioxides. Analytical has no REE
+    # catalogue rows, so those moles stay off that inventory and DP-117
+    # remains the score.
+    ree_parent_moles = (
+        _wang_ree_starting_parent_moles(reference, observations, sample_mass_kg)
+        if engine == "openimcc"
+        else {}
+    )
+    for parent, moles in ree_parent_moles.items():
+        initial[parent] = initial.get(parent, 0.0) + moles
+    ree_activity = _ree_raoultian_activities(
+        initial, tuple(ree_parent_moles),
+    )
 
     pressure_environment = experiment.pressure_environment
     pressure_record = next(
@@ -4482,20 +5173,9 @@ def predict_langmuir_residue_composition(
                 origin="Langmuir starting inventory",
             )
         )
-    if _is_wang_imp_residue_series(reference):
-        notices.append(
-            Notice(
-                kind=NoticeKind.ENGINE_MODEL_CAVEAT,
-                affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
-                reason=(
-                    "wang_imp_closure_basis: model basis is six-oxide wt% "
-                    "summing to 100; printed basis is total ion-microprobe "
-                    "wt% including ΣLn2O3 and WO3. Printed values are compared "
-                    "as reported without renormalization."
-                ),
-                origin=reference.observation_id,
-            )
-        )
+    closure = _wang_imp_closure_notice(reference)
+    if closure is not None:
+        notices.append(closure)
     if reference.source_id == WANG_2001_SOURCE_ID:
         aggregate_ln2o3 = (experiment.conditions or {}).get(
             "starting_aggregate_ln2o3_wt_pct"
@@ -4510,9 +5190,10 @@ def predict_langmuir_residue_composition(
                 kind=NoticeKind.INPUT_OMITTED,
                 affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
                 reason=(
-                    "starting inventory uses the six named major oxides; the printed "
-                    f"{aggregate_text} and La–Lu ppm are not oxide-speciated, and WO3 "
-                    "is blank, so these components are omitted rather than assigned zero."
+                    "starting inventory uses the six named major oxides plus "
+                    "La–Lu sesquioxides carried from the printed element ppm; "
+                    f"the printed {aggregate_text} is that aggregate, and WO3 "
+                    "is blank, so WO3 is omitted rather than assigned zero."
                 ),
                 origin="Wang 2001 starting composition",
             )
@@ -4529,6 +5210,41 @@ def predict_langmuir_residue_composition(
             Quantity.RESIDUE_COMPONENT_COMPOSITION, fallback_row
         )
     )
+    if ree_activity:
+        peak = max(ree_activity.values())
+        total = math.fsum(ree_activity.values())
+        within_bound = (
+            peak <= _REE_TRACE_MOL_FRACTION_EACH
+            and total <= _REE_TRACE_MOL_FRACTION_TOTAL
+        )
+        bound_text = (
+            f"the species-rail bound of {_REE_TRACE_ACTIVITY_BIAS_DEX:g} dex "
+            "applies while each REE parent is at most "
+            f"{_REE_TRACE_MOL_FRACTION_EACH:g} and together they are at most "
+            f"{_REE_TRACE_MOL_FRACTION_TOTAL:g}"
+            if within_bound
+            else (
+                "the species-rail "
+                f"{_REE_TRACE_ACTIVITY_BIAS_DEX:g} dex bound does not apply: "
+                "a REE parent exceeds "
+                f"{_REE_TRACE_MOL_FRACTION_EACH:g} or the parents together "
+                f"exceed {_REE_TRACE_MOL_FRACTION_TOTAL:g}"
+            )
+        )
+        notices.append(
+            Notice(
+                kind=NoticeKind.INPUT_OMITTED,
+                affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+                reason=(
+                    f"{REE_TRACE_COMPONENTS_OUTSIDE_MELT_MODEL}: REE oxides "
+                    "were withheld from openimcc evaluate(); this pin does "
+                    "not emit that notice. Majors are renormalized without "
+                    f"them. {bound_text}. max mole fraction {peak:.6g}; "
+                    f"total {total:.6g}."
+                ),
+                origin="REE vapour activity",
+            )
+        )
 
     try:
         try:
@@ -4555,6 +5271,9 @@ def predict_langmuir_residue_composition(
             engine=engine,
             alpha=1.0,
             alpha_source="DP-005 assumed common alpha=1 for a composition ratio",
+            carried_parent_oxides=tuple(
+                oxide for oxide, amount in initial.items() if float(amount) > 0.0
+            ),
         )
         if not gas_channels:
             raise ResidueInventoryRefusal("residue_gas_channels_missing")
@@ -4600,6 +5319,18 @@ def predict_langmuir_residue_composition(
             source_fO2_log_by_interval=[None],
         )
         composition = _hashimoto_project_oxide_wt_pct(result.residue_mol)
+        ree_elements = _ree_elements_in_channels(gas_channels)
+        carried_elements = tuple(
+            element
+            for element in _REE_VAPOUR_ELEMENTS
+            if element in ree_elements
+            and _ree_sesquioxide_parent(element) in ree_parent_moles
+        )
+        element_ppm = (
+            _sossi_project_element_ppm(result.residue_mol, 0.0, carried_elements)
+            if carried_elements
+            else {}
+        )
         provenance = {
             "mass_loss_observation_id": anchor.observation_id,
             "measured_mass_loss_fraction": xi,
@@ -4617,6 +5348,10 @@ def predict_langmuir_residue_composition(
         return {
             "composition_wt_pct": composition,
             "notices": tuple(notices),
+            "element_ppm_by_mass": element_ppm,
+            "ree_vapour_elements": tuple(sorted(ree_elements)),
+            "ree_activity_mole_fraction": dict(ree_activity),
+            "oxygen_condition_unprinted": True,
             **provenance,
         }
     except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
@@ -4870,6 +5605,11 @@ def predict_mass_loss_fraction(
         engine=engine,
         alpha=1.0,
         alpha_source="mass-loss residue channel",
+        carried_parent_oxides=tuple(
+            oxide
+            for oxide, amount in initial_inventory_mol.items()
+            if float(amount) > 0.0
+        ),
     )
     if not gas_channels:
         raise ResidueInventoryRefusal("residue_gas_channels_missing")
@@ -5951,6 +6691,11 @@ def _hashimoto_run_setup(
             engine=engine,
             alpha=1.0,
             alpha_source=_HASHIMOTO_COMMON_UNITY_SOURCE,
+            carried_parent_oxides=tuple(
+                oxide
+                for oxide, amount in initial_inventory_mol.items()
+                if float(amount) > 0.0
+            ),
         )
     )
     if not gas_channels:

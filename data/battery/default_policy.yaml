@@ -481,3 +481,19 @@ policies:
     canonized_by: null
     canonized_at: null
     history: []
+  - id: DP-118
+    condition: "REE residue row has a vapour channel and no measured oxide activity"
+    value: 1
+    units: dimensionless
+    physical_basis: "Raoultian gamma = 1 on the liquid M2O3 standard state (CeO2(l) for CeO2(g)). Activity is the formula-unit mole fraction. No measured REE oxide activity is held. Gamma is not fitted to a residue analysis."
+    bias: "Activity error moves the predicted vapour pressure in proportion to a^(1/n_gas)."
+    flag: knob_defaulted
+    ruling: "w1127reewire; openimcc-species steer 2026-11-27; proposed pending an owner physics ruling"
+    version: 1
+    status: proposed
+    proposed_by: w1127reewire
+    proposed_at: "2026-11-27"
+    evidence: "The declared OpenIMCC pin has no REE oxide melt activity. The gas law takes a caller-supplied parent activity. pyproject pins 7cf98e6; 66ec4a3 has the same caller-supplied M2O3 activities."
+    canonized_by: null
+    canonized_at: null
+    history: []
