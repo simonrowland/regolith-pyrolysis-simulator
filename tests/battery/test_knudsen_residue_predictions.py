@@ -115,7 +115,7 @@ def test_knudsen_extent_limits_rhs_evaluations(monkeypatch):
     monkeypatch.setattr(residue, "_KNUDSEN_MAX_RHS_EVALUATIONS", 1)
     with pytest.raises(
         ResidueInventoryRefusal,
-        match=r"RHS evaluation budget \(1\) exceeded in 2000 K",
+        match=r"RHS evaluation limit in 2000 K",
     ) as exc:
         integrate_knudsen_residue_inventory(
             {"FeO": 1.0}, _channels(),
@@ -123,7 +123,7 @@ def test_knudsen_extent_limits_rhs_evaluations(monkeypatch):
             temperature_path=((0.25, 2000.0),), measured_mass_loss_fraction=0.25,
             near_saturated=True, source_fO2_log_by_interval=(-10.0,),
         )
-    assert exc.value.reason == "residue_integration_budget_exceeded"
+    assert exc.value.reason == "knudsen_extent_evaluation_limit"
 
 
 def test_residue_pressure_state_key_preserves_full_precision_inputs():

@@ -258,7 +258,44 @@ def profile_ia_residue_source(
             # silently produce no match. Select the exact key to root the view.
             stats.fcn_list = [root]
             stats.print_callees()
-            return tottime.getvalue(), rooted.getvalue()
+            callers = io.StringIO()
+            stats.stream = callers
+            caller_targets = [
+                key for key in stats.stats
+                if any(
+                    name in pstats.func_std_string(key)
+                    for name in (
+                        "deepcopy", "generic_visit", "_canonical_jsonable",
+                        "compile", "_load_cea_source_text",
+                        "_thermo_extract_observation", "known_override_fields",
+                        "_override_fields_from_ast", "TextIOWrapper.read",
+                    )
+                )
+            ]
+            for target in sorted(caller_targets):
+                stats.fcn_list = [target]
+                stats.print_callers()
+            function_counts = {
+                pstats.func_std_string(key): {
+                    "primitive_calls": values[0],
+                    "calls": values[1],
+                    "self_cpu_seconds": values[2],
+                    "cumulative_cpu_seconds": values[3],
+                }
+                for key, values in stats.stats.items()
+                if any(
+                    name in pstats.func_std_string(key)
+                    for name in (
+                        "deepcopy", "generic_visit", "_canonical_jsonable",
+                        "compile", "_load_cea_source_text",
+                        "_thermo_extract_observation", "TextIOWrapper.read",
+                    )
+                )
+            }
+            return (
+                tottime.getvalue(), rooted.getvalue(), callers.getvalue(),
+                function_counts,
+            )
 
         def persist_snapshot(*, resume_profiler=False):
             if profiler is not None:
@@ -296,12 +333,16 @@ def profile_ia_residue_source(
                     stream.flush()
                     os.fsync(stream.fileno())
                 if profiler is not None:
-                    tottime_text, rooted_text = cprofile_views()
+                    tottime_text, rooted_text, callers_text, _function_counts = (
+                        cprofile_views()
+                    )
                     with profile_path.open("w", encoding="utf-8") as output:
                         output.write("TOP 25 BY TOTTIME\n")
                         output.write(tottime_text)
                         output.write("\nCUMULATIVE VIEW ROOTED AT DISPATCH\n")
                         output.write(rooted_text)
+                        output.write("\nCALLERS OF COPY, AST, AND CANONICALIZATION\n")
+                        output.write(callers_text)
                         output.flush()
                         os.fsync(output.fileno())
             except OSError:
@@ -508,10 +549,14 @@ def profile_ia_residue_source(
             record["raw_rhs_metrics_path"] = str(rhs_metrics_path)
             if cprofile_target:
                 persist_snapshot()
-                tottime_text, rooted_text = cprofile_views()
+                tottime_text, rooted_text, callers_text, function_counts = (
+                    cprofile_views()
+                )
                 record["cprofile_path"] = str(profile_path)
                 record["cprofile_top25_tottime"] = tottime_text
                 record["cprofile_vapor_pressure_dispatch_callees"] = rooted_text
+                record["cprofile_hot_function_callers"] = callers_text
+                record["cprofile_function_counts"] = function_counts
             integration_records.append(record)
             active_record.reset(record_token)
 

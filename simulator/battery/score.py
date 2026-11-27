@@ -17663,7 +17663,7 @@ def _knudsen_residue_prediction(
     reported_quantity = quantity or Quantity.RESIDUE_COMPONENT_COMPOSITION
     from simulator.battery.residue import (
         ResidueEngineNonconvergence, ResidueInventoryRefusal,
-        _KNUDSEN_BUDGET_EXCEEDED,
+        _KNUDSEN_EXTENT_EVALUATION_LIMIT,
         _element_retention_ratio_from_inventories,
         _knudsen_trace_tail_notices,
         _printed_fm_definition,
@@ -17788,7 +17788,7 @@ def _knudsen_residue_prediction(
     except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
         attempted = (
             isinstance(exc, ResidueEngineNonconvergence)
-            or exc.reason == _KNUDSEN_BUDGET_EXCEEDED
+            or exc.reason == _KNUDSEN_EXTENT_EVALUATION_LIMIT
         )
         return EnginePrediction(
             engine=engine, channel=ENGINE_CHANNELS[engine],
@@ -17812,7 +17812,7 @@ def _langmuir_residue_prediction(
     from simulator.battery.residue import (
         ResidueEngineNonconvergence,
         ResidueInventoryRefusal,
-        _KNUDSEN_BUDGET_EXCEEDED,
+        _KNUDSEN_EXTENT_EVALUATION_LIMIT,
         predict_langmuir_residue_composition,
     )
 
@@ -17860,7 +17860,7 @@ def _langmuir_residue_prediction(
     except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
         attempted = (
             isinstance(exc, ResidueEngineNonconvergence)
-            or exc.reason == _KNUDSEN_BUDGET_EXCEEDED
+            or exc.reason == _KNUDSEN_EXTENT_EVALUATION_LIMIT
         )
         return EnginePrediction(
             engine=engine,

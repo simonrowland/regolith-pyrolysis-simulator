@@ -646,13 +646,26 @@ def _load_cea_polynomials_from_text(
     return tuple(polynomials.items())
 
 
+@lru_cache(maxsize=4)
+def _load_cea_source_text(
+    extract_path: str, mtime_ns: int, size_bytes: int
+) -> str:
+    """Read one unchanged CEA source once per process and file signature."""
+
+    return pathlib.Path(extract_path).read_text()
+
+
 def _load_cea_polynomials(
     names: tuple[str, ...],
     extract_path: pathlib.Path | str,
     *,
     requirement: str,
 ) -> dict[str, NasaCeaPolynomial]:
-    source_text = pathlib.Path(extract_path).read_text()
+    path = pathlib.Path(extract_path)
+    stat = path.stat()
+    source_text = _load_cea_source_text(
+        str(extract_path), int(stat.st_mtime_ns), int(stat.st_size)
+    )
     return dict(
         _load_cea_polynomials_from_text(names, source_text, requirement)
     )

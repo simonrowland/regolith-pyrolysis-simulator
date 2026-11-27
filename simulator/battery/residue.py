@@ -51,7 +51,7 @@ _KRESS91_UNAVAILABLE_STOICHIOMETRIC_FEO_SOURCE = (
 )
 _KNUDSEN_MAX_RHS_EVALUATIONS = 1024
 _KNUDSEN_MAX_LINEAR_RHS_EVALUATIONS = 512
-_KNUDSEN_BUDGET_EXCEEDED = "residue_integration_budget_exceeded"
+_KNUDSEN_EXTENT_EVALUATION_LIMIT = "knudsen_extent_evaluation_limit"
 TRACE_TAIL_BELOW_LOADER_CUTOFF = "trace_tail_below_loader_cutoff"
 _OXIDE_WT_PERCENT_REFERENCE_MASS_KG = 1.0
 _HASHIMOTO_PRIMARY_ALPHA_ARM = "alpha_common_unity_sensitivity"
@@ -1451,13 +1451,19 @@ def integrate_knudsen_residue_inventory(
         if logp is not None and (not math.isfinite(logp) or logp > 0.0):
             raise ResidueInventoryRefusal("oxygen_condition_invalid")
         stop = min(target, endpoint)
+        # Each printed step-hold interval gets the established physics guard.
+        # The supplementary linear-temperature sensitivity shares one budget
+        # across its ramp, so a slow diagnostic cannot withhold the primary
+        # step-hold prediction.
+        if not linear_temperature:
+            evaluations = 0
+
         def derivative(extent, amounts):
             nonlocal evaluations
             if evaluations >= evaluation_limit:
                 raise ResidueInventoryRefusal(
-                    _KNUDSEN_BUDGET_EXCEEDED,
-                    f"RHS evaluation budget ({evaluation_limit}) exceeded in "
-                    f"{temperature:g} K interval "
+                    _KNUDSEN_EXTENT_EVALUATION_LIMIT,
+                    f"RHS evaluation limit in {temperature:g} K interval "
                     f"ending at mass-loss fraction {stop:g}",
                 )
             evaluations += 1

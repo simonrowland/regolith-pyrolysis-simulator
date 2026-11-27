@@ -196,7 +196,11 @@ def _thermo_extract_observation(
     observation_cache_key = (source_id, observation_id)
     cached_observation = _THERMO_OBSERVATION_CACHE.get(observation_cache_key)
     if cached_observation is not None and cached_observation[0] is extract:
-        return deepcopy(dict(cached_observation[1]))
+        # This private cached tree is read by _polynomial_from_thermo_record,
+        # which constructs frozen polynomial/segment values without mutating
+        # the source mapping. Share it on the compiler path instead of copying
+        # every nested coefficient list for each pressure-provider rebuild.
+        return cached_observation[1]
     species = _mapping(extract.get("species"), f"thermo extract {source_id}.species")
     matches: list[Mapping[str, Any]] = []
     for species_row in species.values():
@@ -227,7 +231,7 @@ def _thermo_extract_observation(
     phase = _required_string(observation.get("phase"), f"{field}.observation.phase")
     values["standard_state"] = "gas" if phase == "gas" else phase
     _THERMO_OBSERVATION_CACHE[observation_cache_key] = (extract, values)
-    return deepcopy(values)
+    return values
 
 
 def _resolve_thermo_record(
