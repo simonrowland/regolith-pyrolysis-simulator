@@ -142,6 +142,7 @@ from simulator.corpus_paths import regolith_corpus_root
 
 
 _CHUNK_START = re.compile(r"p(\d+)-p\d+")
+_CHUNK_PAGE_START = re.compile(r"(?:^|[-_])p(\d+)(?:[-_]|$)")
 _TABLE_LABEL_PREFIX = r"(?:tabelle|tableau|table|tab\.?)\s*(?:no\.?\s*)?"
 _TABLE_LABEL_PREFIX_RE = re.compile(r"^" + _TABLE_LABEL_PREFIX, re.IGNORECASE)
 _TABLE_CAPTION_LABEL = re.compile(
@@ -625,6 +626,9 @@ def _sid_from_path(path: Path) -> str:
 def _chunk_start_page(path: Path) -> int:
     for part in reversed(path.parts):
         match = _CHUNK_START.search(part)
+        if match:
+            return int(match.group(1))
+        match = _CHUNK_PAGE_START.search(part)
         if match:
             return int(match.group(1))
     if "mineru" in path.parts:

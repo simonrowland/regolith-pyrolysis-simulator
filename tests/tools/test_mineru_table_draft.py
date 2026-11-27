@@ -110,6 +110,26 @@ def test_absolute_page_mapping_for_nested_text_mineru_file(
     assert [table["pdf_page"] for table in index["tables"]] == [4]
 
 
+@pytest.mark.parametrize(
+    ("path", "expected_page"),
+    [
+        (
+            Path("text/source/mineru/chunk-p125-rot180/content_list.json"),
+            125,
+        ),
+        (Path("text/source/mineru/full-document/content_list.json"), 1),
+        (
+            Path("raw/source/ocr-mineru/chunk-p125-rot180/content_list.json"),
+            125,
+        ),
+    ],
+)
+def test_chunk_start_page_recognizes_single_page_chunks(
+    path: Path, expected_page: int
+) -> None:
+    assert draft._chunk_start_page(path) == expected_page
+
+
 def test_printed_caption_label_wins_over_table_block_ordinal(tmp_path: Path) -> None:
     source_root = tmp_path / "raw" / "caption-order" / "ocr-mineru" / "p001-p008"
     source_root.mkdir(parents=True)

@@ -150,6 +150,51 @@ def test_single_page_chunk_uses_its_absolute_start_page(tmp_path: Path) -> None:
     assert _by_sid(rows, "robiew")["absolute_page"] == 125
 
 
+def _text_single_page_chunk_corpus(tmp_path: Path) -> Path:
+    corpus = tmp_path / "corpus"
+    chunk = corpus / "text" / "robiew" / "mineru" / "chunk-p125-rot180"
+    chunk.mkdir(parents=True)
+    (chunk / "content_list.json").write_text(
+        json.dumps(
+            [
+                {
+                    "type": "table",
+                    "page_idx": 0,
+                    "table_body": (
+                        "<table><tr><th>Value</th></tr>"
+                        "<tr><td>1.2</td></tr></table>"
+                    ),
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+    text_dir = corpus / "text" / "robiew"
+    (text_dir / "pdftotext-layout.txt").write_text(
+        "\f" * 124 + "values " + "1.2 " * 30,
+        encoding="utf-8",
+    )
+    return corpus
+
+
+def test_text_mineru_single_page_chunk_uses_its_absolute_start_page(
+    tmp_path: Path,
+) -> None:
+    rows, _ = qa.rank_corpus(_text_single_page_chunk_corpus(tmp_path))
+
+    assert _by_sid(rows, "robiew")["absolute_page"] == 125
+
+
+def test_qa_page_origin_mutation_recreates_wrong_page(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(qa.draft, "_chunk_start_page", lambda path: 1)
+
+    with pytest.raises(AssertionError):
+        rows, _ = qa.rank_corpus(_text_single_page_chunk_corpus(tmp_path))
+        assert _by_sid(rows, "robiew")["absolute_page"] == 125
+
+
 def test_digit_matching_accepts_pdftotext_grouping_spaces(tmp_path: Path) -> None:
     body = "<table><tr><th>Value</th></tr><tr><td>1234.5</td></tr></table>"
     corpus = _write_corpus(tmp_path, "grouped", body, "Value 1 234.5. " * 10)
