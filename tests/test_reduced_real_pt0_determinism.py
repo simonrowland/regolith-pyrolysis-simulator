@@ -99,24 +99,24 @@ def _synthetic_binding_receipt_for_pt0_store_tests(
     if request.node.name == 'test_pt0_real_magemin_capped_replay_contract':
         source = DATA_DIR.parent / 'engines' / 'engines.local.toml'
         (tmp_path / source.name).write_bytes(source.read_bytes())
-    direct_alphamelts_test = request.node.name in {
+    direct_magemin_test = request.node.name in {
         "test_interpolated_equilibrium_cache_miss_keeps_campaign_flux_and_ledger",
         "test_interpolated_flux_replay_mutation_cannot_finish_campaign_hour",
     }
     identity_override = None
-    if direct_alphamelts_test:
+    if direct_magemin_test:
         from simulator.engine_binding_admission import BindingIdentity
 
         identity_override = BindingIdentity(
-            "alphamelts",
-            "MELTSv1.0.2",
-            "alphamelts-r1",
+            "magemin",
+            "ig",
+            "magemin-ig-r1",
             "subprocess",
         )
     install_synthetic_binding_receipt(
         tmp_path,
         monkeypatch,
-        bind_direct_backend=direct_alphamelts_test,
+        bind_direct_backend=direct_magemin_test,
         identity_override=identity_override,
     )
 
@@ -7974,38 +7974,51 @@ def _run_interpolation_class_guard_hour(
     replay_interpolation_into_flux: bool = False,
 ) -> tuple[Any, Any, int]:
     sim = _build_pt0_sim(store)
-    provider = _CountingSilicateEquilibriumProvider(
-        provider_id="alphamelts-diagnostic",
-        engine_version="alpha-v1",
-    )
-    provider._test_model = "MELTSv1.0.2"
-    provider._test_mode = "subprocess"
+    class DeterministicMAGEMinBackend(RealBackendAuthority):
+        real_backend_family = RealBackendFamily.MAGEMIN
+        name = "magemin"
 
-    class AlphaMELTSBackend(RealBackendAuthority):
-        real_backend_family = RealBackendFamily.ALPHAMELTS
-        _model = "MELTSv1.0.2"
-        _mode = "subprocess"
+        def __init__(self) -> None:
+            self.calls = 0
 
-        def is_available(self) -> bool:
+        def is_available(self):
             return True
 
         def get_engine_version(self) -> str:
-            return provider.engine_version
+            return "magemin-deterministic-test-stub"
 
-        def equilibrate(self, *_args: Any, **_kwargs: Any) -> Any:
-            raise AssertionError(
-                "registered deterministic provider must handle the live solve"
+        def equilibrate(
+            self,
+            *,
+            temperature_C: float,
+            pressure_bar: float,
+            fO2_log: float,
+            **_kwargs: Any,
+        ) -> EquilibriumResult:
+            self.calls += 1
+            return EquilibriumResult(
+                temperature_C=float(temperature_C),
+                pressure_bar=float(pressure_bar),
+                phases_present=["liquid"],
+                liquid_fraction=1.0,
+                liquid_composition_wt_pct={
+                    "SiO2": 45.0,
+                    "Al2O3": 15.0,
+                    "FeO": 10.0,
+                    "MgO": 10.0,
+                    "CaO": 10.0,
+                    "Na2O": 5.0,
+                    "K2O": 5.0,
+                },
+                fO2_log=float(fO2_log),
+                diagnostics={"deterministic_engine_stub": "magemin"},
             )
 
-    sim.backend = AlphaMELTSBackend()
-    provider._backend = sim.backend
+    backend = DeterministicMAGEMinBackend()
+    sim.backend = backend
     from simulator.engine_binding_admission import publish_live_backend_admission
 
-    publish_live_backend_admission(sim.backend)
-    sim._chem_registry.register(
-        provider,
-        [ChemistryIntent.SILICATE_EQUILIBRIUM],
-    )
+    publish_live_backend_admission(backend)
     sim.start_campaign(CampaignPhase.C2A_STAGED)
     sim.melt.temperature_C = 1500.0
     assert store._cached_real_binding_eligible(sim)
@@ -8058,7 +8071,7 @@ def _run_interpolation_class_guard_hour(
     with pytest.MonkeyPatch.context() as gate_monkeypatch:
         _install_magemin_subprocess_gate(sim, gate_monkeypatch)
         snapshot = sim.step()
-    return sim, snapshot, provider.calls
+    return sim, snapshot, backend.calls
 
 
 def test_interpolated_equilibrium_cache_miss_keeps_campaign_flux_and_ledger(
@@ -8179,6 +8192,22 @@ def test_interpolated_flux_replay_mutation_cannot_finish_campaign_hour(
         "capture",
         db_path=tmp_path / "interpolation-mutation-warm.sqlite",
     )
+    from simulator.core import PyrolysisSimulator
+
+    original_builder = PyrolysisSimulator.build_vapour_batch
+    interpolated_builder_inputs = []
+
+    def observe_interpolated_batch_build(self, *args, **kwargs):
+        diagnostic = getattr(self, "_last_vapor_pressure_diagnostic", {}) or {}
+        if diagnostic.get("source") == "cached_interpolated":
+            interpolated_builder_inputs.append((args, kwargs))
+        return original_builder(self, *args, **kwargs)
+
+    monkeypatch.setattr(
+        PyrolysisSimulator,
+        "build_vapour_batch",
+        observe_interpolated_batch_build,
+    )
 
     with pytest.raises(EvaporationFluxRefusal) as refusal:
         _run_interpolation_class_guard_hour(
@@ -8198,6 +8227,7 @@ def test_interpolated_flux_replay_mutation_cannot_finish_campaign_hour(
         and notice["reason"] == "interpolated_equilibrium_not_flux_eligible"
         for notice in notices
     )
+    assert interpolated_builder_inputs == []
 
 
 def test_tier_ceiling_cached_exact_refuses_physics_bucket_hit(tmp_path: Path) -> None:
@@ -9040,6 +9070,12 @@ def _exercise_sio_yield_report_diagnostic(sim: Any) -> None:
         "_last_vapor_pressure_diagnostic",
         {},
     ) or {}
+    for field_name in _SIO_REPORT_DIAGNOSTIC_FIELDS:
+        source_value = source_diagnostic.get(field_name) or {}
+        assert isinstance(source_value, Mapping)
+        assert (field_name in diagnostics) is bool(source_value)
+        if source_value:
+            assert diagnostics[field_name] == dict(source_value)
     source_speciation = source_diagnostic.get("vaporock_full_speciation_Pa")
     vaporock_speciation = diagnostics.get("vaporock_full_speciation_Pa")
     if isinstance(vaporock_speciation, Mapping):
@@ -9741,6 +9777,7 @@ def test_real_interpolated_payload_recursive_mutations_use_nonflux_admission(
     assert isinstance(baseline_result.result, EquilibriumResult)
     assert capture.hits == 1
     assert capture.last_cache_state == "cached_interpolated"
+    capture._equilibrium_from_payload(query_sim, baseline_result)
     _exercise_sio_yield_report_diagnostic(query_sim)
     mutation_sources = [("synthesized-row", copy.deepcopy(baseline))]
     mutation_paths = [
@@ -9831,6 +9868,14 @@ def test_real_interpolated_payload_recursive_mutations_use_nonflux_admission(
                     failures.append(
                         f"{case_name}: admitted interpolation omitted replay events"
                     )
+                try:
+                    capture._equilibrium_from_payload(query_sim, result)
+                    _exercise_sio_yield_report_diagnostic(query_sim)
+                except Exception as exc:
+                    failures.append(
+                        f"{case_name}: SiO report consumer raised "
+                        f"{type(exc).__name__}: {exc}"
+                    )
             monkeypatch.setattr(
                 interpolation,
                 "attempt_cached_interpolation",
@@ -9858,6 +9903,7 @@ def test_real_interpolated_payload_recursive_mutations_use_nonflux_admission(
                 and _is_sio_report_diagnostic_path(path)
             ):
                 try:
+                    capture._equilibrium_from_payload(query_sim, restored_result)
                     _exercise_sio_yield_report_diagnostic(query_sim)
                 except Exception as exc:
                     failures.append(

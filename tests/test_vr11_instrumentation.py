@@ -964,7 +964,7 @@ def test_post_langmuir_closure_notice_keeps_peer_flux(
         "kind": "vapour_batch_unresolved",
         "species": "Fe",
         "hour": 12,
-        "reason": LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED,
+        "reason": "surface pressure could not be resolved",
     }]
 
 

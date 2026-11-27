@@ -534,7 +534,7 @@ def test_capacity_shadow_refuses_unresolved_vapour_before_empty_source_solve(
         )
 
     assert refusal.value.reason == (
-        "typed_failure_effective_pressure_species_set_mismatch"
+        "vapour_batch_no_debiting_pressure_outcome"
     )
     assert refusal.value.diagnostic["evaporation_flux_kg_hr"] == {}
     assert refusal.value.diagnostic["vapour_batch_flux_overlay"] == overlay
@@ -568,7 +568,7 @@ def test_capacity_resolution_decision_is_owned_by_evaporation() -> None:
     )
 
     assert isinstance(refusal, EvaporationFluxRefusal)
-    assert refusal.reason == TYPED_FAILURE_EFFECTIVE_PRESSURE_SPECIES_SET_MISMATCH
+    assert refusal.reason == "vapour_batch_no_debiting_pressure_outcome"
     assert refusal.diagnostic["vapour_batch_flux_overlay"] == overlay
 
 
@@ -620,7 +620,7 @@ def test_capacity_only_carrier_uses_proven_zero_before_refusal(monkeypatch):
     cold_train = SimpleNamespace(
         accumulator_enabled=False,
         relief={
-            "k_relief_kg_hr_Pa": 0.0,
+            "k_relief_kg_hr_Pa": 1.0e-30,
             "p_open_Pa": 1.0e30,
             "vessel_rating_Pa": 1.0e30,
         },
@@ -741,7 +741,7 @@ def test_capacity_picard_reclose_keeps_peer_when_surface_refuses_fe(monkeypatch)
     cold_train = SimpleNamespace(
         accumulator_enabled=False,
         relief={
-            "k_relief_kg_hr_Pa": 0.0,
+            "k_relief_kg_hr_Pa": 1.0e-30,
             "p_open_Pa": 1.0e30,
             "vessel_rating_Pa": 1.0e30,
         },
@@ -812,7 +812,7 @@ def test_capacity_picard_reclose_keeps_peer_when_surface_refuses_fe(monkeypatch)
         lambda _self, request: captured.append(
             request.control_inputs
         ) or SimpleNamespace(
-            status="ok", diagnostic={"evaporation_flux_kg_hr": {}}
+            status="ok", diagnostic={"evaporation_flux_kg_hr": {"Na": 1.0e-9}}
         ),
     )
     result = PyrolysisSimulator._compute_capacity_coupling_shadow_impl(
@@ -825,20 +825,140 @@ def test_capacity_picard_reclose_keeps_peer_when_surface_refuses_fe(monkeypatch)
 
     assert isinstance(result, CapacityShadowResult)
     assert result.capacity is capacity
+    assert result.evaporation_flux_kg_hr["Na"] > 0.0
     assert captured
     assert captured[0]["vapour_batch_flux_pressures_Pa"] == {"Na": 2.0}
     assert captured[0]["vapour_batch_flux_overlay"]["notices"] == [{
         "kind": "vapour_batch_unresolved",
         "species": "Fe",
         "hour": int(sim.melt.hour),
-        "reason": LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED,
+        "reason": "surface closure could not resolve Fe",
     }]
-    assert overlay["notices"] == [{
+    assert overlay["notices"] == []
+
+
+def test_capacity_picard_trials_reclassify_proven_zero_from_original_selection(
+    monkeypatch,
+):
+    from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
+    from simulator.langmuir_surface_oxygen import (
+        LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED,
+    )
+
+    sim = _real_capacity_sim()
+    sim.melt.temperature_C = 1600.0
+    sim._last_langmuir_surface_oxygen = {}
+    capacity = FiniteCapacity(0.05)
+    cold_train = SimpleNamespace(
+        accumulator_enabled=False,
+        relief={
+            "k_relief_kg_hr_Pa": 1.0e-30,
+            "p_open_Pa": 1.0e30,
+            "vessel_rating_Pa": 1.0e30,
+        },
+    )
+    monkeypatch.setattr(
+        sim,
+        "_cold_train_capacity_policy",
+        lambda: (capacity, cold_train),
+    )
+    monkeypatch.setattr(
+        sim,
+        "_headspace_bleed_conductance_kg_s",
+        lambda **_kwargs: 0.0,
+    )
+    selection_overlay = {
+        "batch_channel_states": {"Fe": "eligible"},
+        "selected_runtime_pa_by_species": {"Fe": 1.0},
+        "notices": [],
+    }
+    pressure_diagnostic = {
+        "vapor_pressure_numerator_provenance": {
+            "Fe": {
+                "pressure_rail": "condensed_raoult_psat",
+                "activity_factor": 1.0,
+                "raw_metal_activity_root": 2.0,
+                "P_reference_Antoine_Pa": 1.0,
+            },
+        },
+    }
+    monkeypatch.setattr(
+        sim,
+        "_resolve_evaporation_batch_flux_state",
+        lambda *_args, **_kwargs: (
+            {"Fe": 1.0},
+            selection_overlay,
+            None,
+            {},
+            pressure_diagnostic,
+            None,
+        ),
+    )
+
+    def reclose(partials):
+        return SimpleNamespace(
+            applied=True,
+            surface_pO2_bar=None,
+            pressures_Pa={},
+            refused_species={"Fe": "surface oxygen closure did not converge"},
+            refusal_codes_by_species={
+                "Fe": LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED,
+            },
+            as_diagnostic=lambda: {
+                "applied": True,
+                "surface_pO2_bar": None,
+                "refused_species": {
+                    "Fe": "surface oxygen closure did not converge",
+                },
+                "refusal_codes_by_species": {
+                    "Fe": LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED,
+                },
+                "overhead_partials_Pa": dict(partials),
+                "warning": "surface oxygen closure did not converge",
+            },
+        )
+
+    monkeypatch.setattr(sim, "_reclose_langmuir_pressures", reclose)
+    provider_controls = []
+    monkeypatch.setattr(
+        BuiltinEvaporationFluxProvider,
+        "dispatch",
+        lambda _self, request: provider_controls.append(
+            dict(request.control_inputs)
+        ) or SimpleNamespace(
+            status="ok", diagnostic={"evaporation_flux_kg_hr": {}}
+        ),
+    )
+
+    def two_trial_solver(**kwargs):
+        kwargs["flux_kg_hr_at_partials"]({"Fe": 1.0})
+        return kwargs["flux_kg_hr_at_partials"]({"Fe": 0.5})
+
+    monkeypatch.setattr(capacity_coupling, "solve_capacity_shadow", two_trial_solver)
+    with pytest.raises(EvaporationFluxRefusal) as refusal:
+        PyrolysisSimulator._compute_capacity_coupling_shadow_impl(
+            sim,
+            SimpleNamespace(
+                liquid_fraction=1.0,
+                vapor_pressures_Pa={"Fe": 1.0},
+            ),
+        )
+
+    assert refusal.value.reason == "vapour_batch_no_debiting_pressure_outcome"
+    assert len(provider_controls) == 1
+    first_overlay = provider_controls[0]["vapour_batch_flux_overlay"]
+    assert first_overlay["batch_channel_states"]["Fe"] == "zero_by_physics"
+    assert first_overlay["notices"] == []
+    second_overlay = refusal.value.diagnostic["vapour_batch_flux_overlay"]
+    assert second_overlay["batch_channel_states"]["Fe"] == "eligible"
+    assert second_overlay["notices"] == [{
         "kind": "vapour_batch_unresolved",
         "species": "Fe",
         "hour": int(sim.melt.hour),
-        "reason": LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED,
+        "reason": "surface oxygen closure did not converge",
     }]
+    assert selection_overlay["batch_channel_states"]["Fe"] == "eligible"
+    assert selection_overlay["notices"] == []
 
 
 def test_real_finite_capacity_result_drives_live_short_session_once(monkeypatch):
@@ -1856,7 +1976,7 @@ def test_live_and_picard_share_evaporation_control_construction(monkeypatch):
     cold_train = SimpleNamespace(
         accumulator_enabled=False,
         relief={
-            "k_relief_kg_hr_Pa": 0.0,
+            "k_relief_kg_hr_Pa": 1.0e-30,
             "p_open_Pa": 1.0e30,
             "vessel_rating_Pa": 1.0e30,
         },

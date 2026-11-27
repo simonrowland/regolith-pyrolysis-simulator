@@ -78,6 +78,7 @@ from simulator.vapour_rail.instrumentation import (
     CONTROL_SHADOW_EQUAL_KEY,
     EFFECTIVE_PRESSURE_SOURCE_CONTEXT,
     EffectivePressureSource,
+    TYPED_FAILURE_EFFECTIVE_PRESSURE_SPECIES_SET_MISMATCH,
     compatibility_pressure_read_context,
     compare_live_shadow_to_batch_flux,
     finite_live_pressure_map,
@@ -89,6 +90,9 @@ from simulator.vapour_rail.request import REFUSAL_INAPPLICABLE_PREDICATE
 
 PRE_RG_EFFECTIVE_PRESSURE_SOURCE_ID = (
     'equilibrium_backend_effective_pressure_pre_rg'
+)
+_VAPOUR_BATCH_NO_DEBITING_PRESSURE_OUTCOME = (
+    'vapour_batch_no_debiting_pressure_outcome'
 )
 _TYPED_NON_DEBIT_VAPOUR_CHANNEL_STATES = frozenset(
     {
@@ -1870,24 +1874,40 @@ class EvaporationMixin:
             (notice.get('reason') for notice in notices if notice.get('reason')),
             None,
         )
+        from simulator.langmuir_surface_oxygen import (
+            LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED,
+        )
+
         # A closure's free-form diagnostic remains in its per-species notice;
         # it is not a stable public terminal reason.
         stable_notice_reason = (
             notice_reason
             if isinstance(notice_reason, str) and notice_reason.isidentifier()
+            and notice_reason not in {
+                TYPED_FAILURE_EFFECTIVE_PRESSURE_SPECIES_SET_MISMATCH,
+                LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED,
+            }
             else None
         )
-        if error.get('reason'):
-            reason = str(error['reason'])
+        error_reason = error.get('reason')
+        if error_reason in {
+            TYPED_FAILURE_EFFECTIVE_PRESSURE_SPECIES_SET_MISMATCH,
+            LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED,
+        }:
+            error_reason = None
+        if error_reason:
+            reason = str(error_reason)
         elif notices:
             reason = str(
                 stable_notice_reason
-                or 'vapour_batch_no_debiting_pressure_outcome'
+                or _VAPOUR_BATCH_NO_DEBITING_PRESSURE_OUTCOME
             )
         else:
+            selection_source = overlay.get('selection_source')
+            if selection_source == TYPED_FAILURE_EFFECTIVE_PRESSURE_SPECIES_SET_MISMATCH:
+                selection_source = None
             reason = str(
-                overlay.get('selection_source')
-                or 'vapour_batch_no_debiting_pressure_outcome'
+                selection_source or _VAPOUR_BATCH_NO_DEBITING_PRESSURE_OUTCOME
             )
         return EvaporationFluxRefusal(
             reason,
@@ -1920,12 +1940,12 @@ class EvaporationMixin:
                 or species_id in final_pressures
             ):
                 continue
-            reason = (
+            reason = detail or (
                 refusal_codes.get(species_id)
                 if isinstance(refusal_codes, Mapping)
                 else None
-            ) or detail or flux_overlay.get('selection_source') or (
-                'vapour_batch_no_debiting_pressure_outcome'
+            ) or flux_overlay.get('selection_source') or (
+                _VAPOUR_BATCH_NO_DEBITING_PRESSURE_OUTCOME
             )
             _append_vapour_batch_unresolved_notice(
                 self,
@@ -2095,22 +2115,6 @@ class EvaporationMixin:
         vapor_pressure_diagnostic = dict(
             getattr(self, '_last_vapor_pressure_diagnostic', {}) or {}
         )
-        effective_pressure_source = _pre_rg_effective_pressure_source(
-            self.vapor_pressures,
-            equilibrium,
-        )
-        live_vapor_pressures = _evaporation_legacy_shadow_pressure_map(
-            self.vapor_pressures,
-            vapor_pressure_diagnostic,
-        )
-        vapour_batch = self._resolve_evaporation_vapour_batch(
-            equilibrium,
-            temperature_K=temperature_K,
-            effective_pressure_source=effective_pressure_source,
-        )
-        resolve_error = dict(
-            getattr(self, '_last_vapour_batch_resolve_error', {}) or {}
-        )
         served_from = vapor_pressure_diagnostic.get('served_from')
         source_map = (
             getattr(self, '_last_vapor_pressures_source', {})
@@ -2132,15 +2136,37 @@ class EvaporationMixin:
             or 'cached_interpolated_linear_estimate' in warnings
         )
         if interpolated_provenance:
-            # Defense in depth at the flux consumer: even if a cache caller
-            # admits a synthesized estimate, no interpolated pressure reaches
-            # the selector or the evaporation provider.
+            # Reject provenance before reading cached pressure/activity inputs
+            # or invoking the batch builder. Non-flux replay remains available.
+            effective_pressure_source = EffectivePressureSource(
+                PRE_RG_EFFECTIVE_PRESSURE_SOURCE_ID,
+                {},
+            )
+            live_vapor_pressures = None
             vapour_batch = None
             resolve_error = {
                 'status': 'unavailable',
                 'reason': 'interpolated_equilibrium_not_flux_eligible',
                 'detail': 'cached interpolation is served for non-flux consumers only',
             }
+            self._last_vapour_batch_resolve_error = dict(resolve_error)
+        else:
+            effective_pressure_source = _pre_rg_effective_pressure_source(
+                self.vapor_pressures,
+                equilibrium,
+            )
+            live_vapor_pressures = _evaporation_legacy_shadow_pressure_map(
+                self.vapor_pressures,
+                vapor_pressure_diagnostic,
+            )
+            vapour_batch = self._resolve_evaporation_vapour_batch(
+                equilibrium,
+                temperature_K=temperature_K,
+                effective_pressure_source=effective_pressure_source,
+            )
+            resolve_error = dict(
+                getattr(self, '_last_vapour_batch_resolve_error', {}) or {}
+            )
         vapor_pressures, flux_overlay_report = flux_pressures_from_batch(
             vapour_batch,
             effective_pressure_source=effective_pressure_source,
@@ -2186,7 +2212,7 @@ class EvaporationMixin:
             for species in sorted(unresolved_missing_species):
                 unresolved_notice_reasons[str(species)] = str(
                     flux_overlay_report.get("selection_source")
-                    or "vapour_batch_no_debiting_pressure_outcome"
+                    or _VAPOUR_BATCH_NO_DEBITING_PRESSURE_OUTCOME
                 )
             channel_states = flux_overlay_report.get(
                 "batch_channel_states", {}
@@ -2745,7 +2771,7 @@ class EvaporationMixin:
                     'vapour_batch': batch_report,
                 }
                 return flux
-            reason = 'vapour_batch_no_debiting_pressure_outcome'
+            reason = _VAPOUR_BATCH_NO_DEBITING_PRESSURE_OUTCOME
             diagnostic = {
                 **regime_diagnostic,
                 'reason': reason,
@@ -6093,6 +6119,11 @@ class EvaporationMixin:
             vapor_pressures = dict(vapour_batch_flux_pressures_Pa)
         else:
             vapor_pressures = {}
+        filmed_partials, filmed_overhead_pressure = (
+            EvaporationMixin._langmuir_film(self, overhead_partials_Pa)
+        )
+        if overhead_pressure_pa is None:
+            overhead_pressure_pa = filmed_overhead_pressure
         # Reporting projection of the post-decision flux map (not a flux input).
         with compatibility_pressure_read_context('reporting_projection'):
             live_reporting = dict(
@@ -6155,7 +6186,7 @@ class EvaporationMixin:
                 equilibrium, vapor_pressure_diagnostic,
             ),
             'pO2_bar': vapor_pressure_diagnostic.get('pO2_bar'),
-            'overhead_partials_Pa': dict(overhead_partials_Pa),
+            'overhead_partials_Pa': filmed_partials,
             'molar_mass_kg_mol': molar_masses_kg_mol,
             'stoich_by_species': stoich_by_species,
             'available_oxide_kg': available_oxide_kg,
@@ -6167,11 +6198,7 @@ class EvaporationMixin:
             'pipe_diameter_m': float(
                 getattr(self.overhead_model, 'pipe_diameter_m', 0.12)
             ),
-            'overhead_pressure_pa': (
-                sum(overhead_partials_Pa.values())
-                if overhead_pressure_pa is None
-                else float(overhead_pressure_pa)
-            ),
+            'overhead_pressure_pa': float(overhead_pressure_pa),
             'commanded_pressure_pa': max(
                 0.0,
                 float(getattr(self.melt, 'p_total_mbar', 0.0) or 0.0) * 100.0,
