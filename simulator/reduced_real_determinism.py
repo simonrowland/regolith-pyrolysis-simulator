@@ -2120,25 +2120,13 @@ class PT1PersistentEquilibriumStore:
                     f"SELECT 1 FROM {PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
                     (key_hash,),
                 ).fetchone()
-                if local_row is not None:
-                    if stale_payload:
-                        conn.execute(
-                            f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
-                            "SET key_sha256 = ?, key_bytes = ?, "
-                            "payload_sha256 = ?, payload_bytes = ?, "
-                            "payload_codec_version = ?, "
-                            "repair_notices_json = ? WHERE key_hash = ?",
-                            (
-                                key_hash,
-                                sqlite3.Binary(key_bytes),
-                                payload_hash,
-                                sqlite3.Binary(payload_bytes),
-                                payload_codec_version,
-                                effective_notices_json,
-                                key_hash,
-                            ),
-                        )
-                    elif effective_notices_json != existing_notices_json:
+                if local_row is not None and stale_payload:
+                    conn.execute(
+                        f"DELETE FROM {PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
+                        (key_hash,),
+                    )
+                elif local_row is not None:
+                    if effective_notices_json != existing_notices_json:
                         conn.execute(
                             f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
                             "SET repair_notices_json = ? WHERE key_hash = ?",

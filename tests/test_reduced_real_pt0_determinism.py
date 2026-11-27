@@ -5390,8 +5390,18 @@ def test_markerless_gate_curve_row_is_a_miss_and_can_be_replaced(
 )
 def test_pt1_recapture_supersedes_stale_row_without_decoding_payload_or_notices(
     tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
     old_repair_notices_json: str,
 ) -> None:
+    datetime_type = rrd.datetime
+    fixed_time = datetime_type(2026, 11, 26, 12, 0, tzinfo=rrd.timezone.utc)
+
+    class FixedDatetime(datetime_type):
+        @classmethod
+        def now(cls, tz=None):
+            return fixed_time if tz is None else fixed_time.astimezone(tz)
+
+    monkeypatch.setattr(rrd, "datetime", FixedDatetime)
     db_path = tmp_path / "stale-invalid-gate-payload.sqlite"
     store = PT0DeterminismStore("capture", db_path=db_path)
     key = _freeze_gate_key()
@@ -5428,14 +5438,25 @@ def test_pt1_recapture_supersedes_stale_row_without_decoding_payload_or_notices(
     with sqlite3.connect(db_path) as conn:
         conn.execute(
             f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
-            "SET key_bytes = ?, payload_bytes = ?, payload_sha256 = ?, "
-            "repair_notices_json = ? "
+            "SET store_schema_version = ?, request_schema_version = ?, "
+            "key_bytes = ?, payload_bytes = ?, payload_sha256 = ?, "
+            "code_version = ?, corpus_version = ?, engine_version = ?, "
+            "data_digests_json = ?, repair_notices_json = ?, created_at = ?, "
+            "git_dirty = ? "
             "WHERE key_hash = ?",
             (
+                "stale-store-schema",
+                "stale-request-schema",
                 sqlite3.Binary(invalid_old_key),
                 sqlite3.Binary(invalid_old_payload),
                 hashlib.sha256(invalid_old_payload).hexdigest(),
+                "stale-code-version",
+                "stale-corpus-version",
+                "stale-engine-version",
+                '{"stale":"digest"}',
                 old_repair_notices_json,
+                "invalid stale timestamp",
+                0,
                 key_hash,
             ),
         )
@@ -5447,18 +5468,33 @@ def test_pt1_recapture_supersedes_stale_row_without_decoding_payload_or_notices(
         },
     }
     new_notice = {"kind": "new repair"}
+    fresh_db_path = tmp_path / "fresh-gate-capture.sqlite"
+    fresh_capture = PT0DeterminismStore("capture", db_path=fresh_db_path)
+    fresh_capture._store(
+        "freeze_gate_curve",
+        key,
+        current_payload,
+        repair_notices=[new_notice],
+        engine_version_provenance="fresh-engine-version",
+        law_disclosures=[],
+    )
     recapture = PT0DeterminismStore("capture", db_path=db_path)
     recapture._store(
         "freeze_gate_curve",
         key,
         current_payload,
         repair_notices=[new_notice],
+        engine_version_provenance="fresh-engine-version",
         law_disclosures=[],
     )
 
     current_key_bytes = rrd.canonical_json_bytes(key)
     current_payload_bytes = rrd.canonical_json_bytes(current_payload)
     with sqlite3.connect(db_path) as conn:
+        recaptured_row = conn.execute(
+            f"SELECT * FROM {PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()
         (
             stored_key_hash,
             stored_key_sha256,
@@ -5473,6 +5509,14 @@ def test_pt1_recapture_supersedes_stale_row_without_decoding_payload_or_notices(
             f"{PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
             (key_hash,),
         ).fetchone()
+    with sqlite3.connect(fresh_db_path) as conn:
+        fresh_row = conn.execute(
+            f"SELECT * FROM {PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()
+    # Compare the complete stored row with a fresh capture, including all
+    # request, code, engine, data-digest, timestamp, and dirty-state provenance.
+    assert recaptured_row == fresh_row
     assert stored_key_hash == key_hash
     assert stored_key_sha256 == hashlib.sha256(current_key_bytes).hexdigest()
     assert bytes(stored_key_bytes) == current_key_bytes

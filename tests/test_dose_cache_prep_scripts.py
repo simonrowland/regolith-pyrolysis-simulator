@@ -242,8 +242,12 @@ def test_seed_cache_merges_sources_idempotently(tmp_path: Path) -> None:
     second = seed_cache(target, [source])
 
     assert first["inserted_rows"] == 1
+    assert first["replaced_rows"] == 0
     assert first["rows_after"] == 1
     assert second["inserted_rows"] == 0
+    assert second["replaced_rows"] == 0
+    assert first["sources"][0]["replaced_rows"] == 0
+    assert second["sources"][0]["replaced_rows"] == 0
     assert payload_count(target) == 1
 
 

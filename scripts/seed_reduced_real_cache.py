@@ -272,6 +272,7 @@ def merge_cache_source(
             "rows": source_rows,
             "superseded_rows": superseded_rows,
             "inserted_rows": 0,
+            "replaced_rows": 0,
         }
     result = _copy_pt1_equilibrium_rows(
         [source],
@@ -286,6 +287,7 @@ def merge_cache_source(
         "rows": source_rows,
         "superseded_rows": superseded_rows,
         "inserted_rows": int(source_result["inserted_rows"]),
+        "replaced_rows": int(source_result["replaced_rows"]),
     }
 
 
@@ -368,6 +370,7 @@ def _seed_cache_from_validated_sources(
                     "source": str(source),
                     "source_rows": payload_count(source),
                     "inserted_rows": 0,
+                    "replaced_rows": 0,
                     "skipped": "target",
                 }
             )
@@ -381,6 +384,7 @@ def _seed_cache_from_validated_sources(
                 "source_rows": source_rows,
                 "superseded_rows": source_rows - len(rows),
                 "inserted_rows": int(result["inserted_rows"]),
+                "replaced_rows": int(result["replaced_rows"]),
             }
         )
 
@@ -390,6 +394,7 @@ def _seed_cache_from_validated_sources(
         "rows_before": before,
         "rows_after": after,
         "inserted_rows": int(merged["inserted_rows"]),
+        "replaced_rows": int(merged["replaced_rows"]),
         "sources": source_summaries,
     }
 
