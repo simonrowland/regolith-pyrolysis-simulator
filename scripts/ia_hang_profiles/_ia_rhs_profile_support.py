@@ -61,6 +61,8 @@ def profile_ia_residue_source(
     rhs_cap=None,
     single_hashimoto_experiment=False,
     direct_compile_residual=False,
+    observation_group_index=None,
+    observation_group_size=None,
     flush_every_n_rhs=5,
 ):
     import scipy.integrate
@@ -86,6 +88,16 @@ def profile_ia_residue_source(
         }
         and (selected_ids is None or row.observation_id in selected_ids)
     )
+    if observation_group_index is not None:
+        if observation_ids is not None or observation_group_size is None:
+            raise ValueError("row groups require a group size and no explicit ids")
+        grouped_rows = tuple(sorted(rows, key=lambda row: row.observation_id))
+        start = observation_group_index * observation_group_size
+        selected_ids = frozenset(
+            row.observation_id
+            for row in grouped_rows[start:start + observation_group_size]
+        )
+        rows = tuple(row for row in rows if row.observation_id in selected_ids)
     assert rows, f"{label}: requested residue observation rows were not admitted"
     expected_ids = {row.observation_id for row in rows}
     original_candidates = score.comparison_candidates
@@ -857,6 +869,12 @@ def profile_ia_residue_source(
         for row in rows_payload
     )
     digest = hashlib.sha256(payload.encode()).hexdigest()
+    row_digests = {
+        row["observation_id"]: hashlib.sha256(
+            json.dumps(row, sort_keys=True, separators=(",", ":")).encode()
+        ).hexdigest()
+        for row in rows_payload
+    }
     selected_row_output = None
     if direct_candidate is not None:
         selected_row_output = {
@@ -906,6 +924,8 @@ def profile_ia_residue_source(
         "numeric_rows": numeric_rows,
         "typed_refusal_rows": typed_refusal_rows,
         "residual_digest": digest,
+        "row_residuals": rows_payload,
+        "row_residual_digests": row_digests,
         "budget_refusal_rows": sum(
             row["refusal"] in budget_refusal_reasons
             for row in rows_payload
