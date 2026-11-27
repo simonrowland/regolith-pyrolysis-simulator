@@ -226,6 +226,25 @@ def test_rendered_figure_reads_standard_states_and_validator_coverage() -> None:
             assert sample["verification"] == {"method": "render", "dpi": 350}
         elif figure == "3":
             assert {"reviewed_by", "reviewed_on", "verification"}.isdisjoint(sample)
+        elif (
+            figure == "5"
+            and str(sample["path"]).endswith(".values")
+            and sample["path"].split("observations[", 1)[1].split("]", 1)[0]
+            in {
+                "omori_fig5_04",
+                "omori_fig5_06",
+                "omori_fig5_08",
+                "omori_fig5_11",
+                "omori_fig5_14",
+                "omori_fig5_15",
+            }
+        ):
+            # Independent 350 dpi re-read (w1127omorisq). Other Fig. 5 pins stay as found.
+            assert sample["reviewed_by"] == "w1127omorisq (grok)"
+            assert sample["reviewed_on"] == "2026-11-27"
+            assert sample["verification"] == {"method": "render", "dpi": 350}
+        elif figure == "5" and not str(sample["path"]).endswith(".values"):
+            assert {"reviewed_by", "reviewed_on", "verification"}.isdisjoint(sample)
 
     for row_id, (activity, px, py, n_sio2, mgo_wt) in FIG5_READS.items():
         row = rows[row_id]

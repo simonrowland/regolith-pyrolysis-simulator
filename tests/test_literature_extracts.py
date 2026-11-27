@@ -6041,6 +6041,25 @@ def _assert_corpus_pins_open(documents, artifact_root=None) -> vle.CorpusMountTa
     return tally
 
 
+def _unattested_excess_message(documents, total: int) -> str:
+    """Name every source that still has unattested samples when the ceiling fails."""
+    rows: list[tuple[int, str]] = []
+    for label, doc in documents:
+        count = sum(
+            warning.count
+            for warning in vle.fidelity_source_warnings(doc, label=label)
+            if warning.kind == "unattested_sample"
+        )
+        if count:
+            rows.append((count, label))
+    rows.sort(reverse=True)
+    lines = [
+        f"unattested_samples={total} ceiling={_UNATTESTED_SAMPLES_CEILING}",
+        *(f"{label}={count}" for count, label in rows),
+    ]
+    return "\n".join(lines)
+
+
 def test_fidelity_source_warning_ratchet(monkeypatch, tmp_path, record_property):
     """Source-fidelity holes are an upper bound, not a green bill of health.
 
@@ -6127,7 +6146,9 @@ def test_fidelity_source_warning_ratchet(monkeypatch, tmp_path, record_property)
     assert mount_dependent_pins <= source_blind_pins
     assert uncovered_obs <= _UNCOVERED_OBSERVATIONS_CEILING, uncovered_obs
     assert uncovered_extracts <= _UNCOVERED_EXTRACTS_CEILING, uncovered_extracts
-    assert unattested_samples <= _UNATTESTED_SAMPLES_CEILING, unattested_samples
+    assert unattested_samples <= _UNATTESTED_SAMPLES_CEILING, (
+        _unattested_excess_message(documents, unattested_samples)
+    )
     assert pilot_pins <= _PILOT_PINS_CEILING, pilot_pins
     assert pilot_extracts <= _PILOT_PIN_EXTRACTS_CEILING, pilot_extracts
     non_mount_dependent_source_blind = source_blind_pins - mount_dependent_pins
