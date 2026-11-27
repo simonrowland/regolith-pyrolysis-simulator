@@ -4610,9 +4610,16 @@ def _derivation_parent_supports_leaf(
         return False
     source_field = path.rsplit(".", 1)[-1]
     if role == "copied":
+        destination_field = (
+            address[2]
+            if len(address) >= 3
+            and address[0] == "composition"
+            and address[1] == "printed_coordinates"
+            else address[0] if address else None
+        )
         return (
-            bool(address)
-            and source_field == address[0]
+            destination_field is not None
+            and source_field == destination_field
             and _within_tighter_half_ulp(stored, value)
         )
     if (
@@ -4623,14 +4630,20 @@ def _derivation_parent_supports_leaf(
         component = parent.get("component")
         if not isinstance(component, str):
             return False
-        if role in _DERIVATION_MOLE_ROLES:
+        if role == "mole_fraction":
             expected_field = f"N_{component}_mole_fraction"
+            accepted_fields = {
+                expected_field,
+                f"{expected_field}_as_read",
+            }
+        elif role == "mole_percent":
+            accepted_fields = {f"N_{component}_percent_as_printed"}
         elif role == "mass_percent":
-            expected_field = f"{component}_mass_percent_as_series"
+            accepted_fields = {f"{component}_mass_percent_as_series"}
         else:
             return False
         return (
-            address[2] == expected_field
+            address[2] in accepted_fields
             and _within_tighter_half_ulp(stored, value)
         )
     return False
@@ -4696,6 +4709,20 @@ def _derivation_shape_defects(
             defects.append("derivation parent component is required")
             continue
         name = name.strip()
+        source_field = path.rsplit(".", 1)[-1]
+        expected_fields = {
+            "mole_fraction": {
+                f"N_{name}_mole_fraction",
+                f"N_{name}_mole_fraction_as_read",
+            },
+            "mole_percent": {f"N_{name}_percent_as_printed"},
+            "mass_percent": {f"{name}_mass_percent_as_series"},
+        }.get(role, set())
+        if source_field not in expected_fields:
+            defects.append(
+                "derivation parent role, component, and basis disagree with "
+                f"source field: {path}"
+            )
         if role in _DERIVATION_MOLE_ROLES:
             mole_roles += 1
             mole_component = name
