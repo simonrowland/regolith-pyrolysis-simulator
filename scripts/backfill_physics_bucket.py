@@ -418,23 +418,11 @@ def _backfill_state(row: sqlite3.Row, values: PhysicsBucketValues) -> str:
         if actual_value is None:
             complete = False
             continue
-        if name == "physics_key_bytes":
-            actual_value = _blob_bytes(actual_value)
         if name.endswith("_distance"):
             actual_value = float(actual_value)
         if actual_value != expected_value:
             return "conflict"
     return "complete" if complete else "missing"
-
-
-def _blob_bytes(value: Any) -> bytes:
-    if isinstance(value, bytes):
-        return value
-    if isinstance(value, memoryview):
-        return value.tobytes()
-    if isinstance(value, str):
-        return value.encode("utf-8")
-    return bytes(value)
 
 
 def _sha256(data: bytes) -> str:

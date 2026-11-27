@@ -9,6 +9,7 @@ from types import SimpleNamespace
 
 import pytest
 
+import simulator.interpolation_uncertainty as iu
 import simulator.reduced_real_cache_interpolation as rci
 import simulator.reduced_real_determinism as rrd
 from simulator.chemistry.kernel import ChemistryIntent
@@ -215,7 +216,9 @@ def test_standardized_distance_retains_compensated_sum_output() -> None:
     )
 
 
-def test_standardized_distance_squares_deltas_with_base_multiplication() -> None:
+def test_standardized_distance_keeps_each_base_squaring_expression(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     candidate = -7.970971849244846e-80
     for _ in range(8):
         left = candidate * 1.0e-9
@@ -226,7 +229,27 @@ def test_standardized_distance_squares_deltas_with_base_multiplication() -> None
     else:
         pytest.fail("the short delta search found no pow/multiply rounding edge")
 
-    assert rci._standardized_distance([left], [0.0]) == math.sqrt(delta * delta)
+    sqrt = math.sqrt
+    observed: list[float] = []
+
+    with monkeypatch.context() as patch:
+        patch.setattr(
+            rci.math,
+            "sqrt",
+            lambda value: (observed.append(value), sqrt(value))[1],
+        )
+        assert rci._standardized_distance([left], [0.0]) == sqrt(delta * delta)
+    assert observed == [delta * delta]
+
+    observed.clear()
+    with monkeypatch.context() as patch:
+        patch.setattr(
+            iu.math,
+            "sqrt",
+            lambda value: (observed.append(value), sqrt(value))[1],
+        )
+        assert iu._standardized_distance([left], [0.0]) == sqrt(delta**2)
+    assert observed == [delta**2]
 
 
 def test_greedy_nn_rejects_extreme_candidate_controls_before_distance_math() -> None:

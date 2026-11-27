@@ -688,8 +688,8 @@ def _validated_cache_payload_row(row: Mapping[str, Any]) -> dict[str, Any]:
     stored_columns = admitted.stored_columns
     artifact = str(entry["artifact"])
     key_hash = str(entry["key_hash"])
-    key_bytes = bytes(stored_columns["key_bytes"])
-    payload_bytes = bytes(stored_columns["payload_bytes"])
+    key_bytes = stored_columns["key_bytes"]
+    payload_bytes = stored_columns["payload_bytes"]
     payload_hash = str(stored_columns["payload_sha256"])
     key = entry["key"]
     payload = entry["payload"]

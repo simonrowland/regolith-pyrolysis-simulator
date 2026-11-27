@@ -8974,7 +8974,7 @@ _PT1_LADDER_ROW_DEFECT_GROUPS = (
         ),
     ),
 )
-_PT1_LADDER_ROW_PRECEDENCE_PAIRS = tuple(
+_PT1_LADDER_ROW_LOUDNESS_PAIRS = tuple(
     (earlier, later)
     for earlier_index, (_earlier_field, earlier_variants) in enumerate(
         _PT1_LADDER_ROW_DEFECT_GROUPS
@@ -8984,13 +8984,14 @@ _PT1_LADDER_ROW_PRECEDENCE_PAIRS = tuple(
     ]
     for earlier in earlier_variants
     for later in later_variants
+    if earlier[1] != later[1]
 )
 
 
-def test_pt1_ladder_row_admission_keeps_base_field_check_order(
+def test_pt1_ladder_row_admission_keeps_paired_defects_loudly_typed(
     tmp_path: Path,
 ) -> None:
-    """Earlier ladder row defects win each later field's stored defect forms."""
+    """Defects in different stored columns remain loud when combined."""
     db_path = tmp_path / "ladder-order-matrix.sqlite"
     key = _freeze_gate_key()
     capture = PT0DeterminismStore("capture", db_path=db_path)
@@ -9026,14 +9027,15 @@ def test_pt1_ladder_row_admission_keeps_base_field_check_order(
     original_values = {column: base_row[column] for column in columns}
     reset_sql = ", ".join(f"{column} = ?" for column in columns)
 
-    for earlier_defect, later_defect in _PT1_LADDER_ROW_PRECEDENCE_PAIRS:
+    for first_defect, second_defect in _PT1_LADDER_ROW_LOUDNESS_PAIRS:
+        assert first_defect[1] != second_defect[1]
         with persistent._connect() as conn:
             conn.execute(
                 f"UPDATE {PT1_EQUILIBRIUM_TABLE} SET {reset_sql} "
                 "WHERE key_hash = ?",
                 (*(original_values[column] for column in columns), key_hash),
             )
-            for defect in (earlier_defect, later_defect):
+            for defect in (first_defect, second_defect):
                 _, column, value, _expected_error = defect
                 if value == "canonical-key-with-whitespace":
                     value = sqlite3.Binary(
@@ -9049,7 +9051,7 @@ def test_pt1_ladder_row_admission_keeps_base_field_check_order(
                 (key_hash,),
             ).fetchone()
         assert row is not None
-        try:
+        with pytest.raises(PT1PersistentStoreCorrupt):
             persistent._entry_from_physics_ladder_bucket_row(
                 row,
                 artifact="freeze_gate_curve",
@@ -9057,13 +9059,89 @@ def test_pt1_ladder_row_admission_keeps_base_field_check_order(
                 rung_key=rung_key,
                 rung_hash=rung_hash,
             )
-        except PT1PersistentStoreCorrupt as exc:
-            assert earlier_defect[3] in str(exc), (
-                f"{earlier_defect[0]} before {later_defect[0]}: {exc}"
+
+
+@pytest.mark.parametrize(
+    "reader",
+    ("exact", "bucket", "ladder", "interpolation", "replace"),
+)
+@pytest.mark.parametrize(
+    "column",
+    ("key_bytes", "payload_bytes", "physics_key_bytes"),
+)
+def test_pt1_readers_type_check_blob_columns_before_conversion(
+    tmp_path: Path,
+    reader: str,
+    column: str,
+) -> None:
+    db_path = tmp_path / f"blob-type-{reader}-{column}.sqlite"
+    artifact = "freeze_gate_curve"
+    key = _freeze_gate_key()
+    payload = _valid_test_gate_payload()
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    capture._store(
+        artifact,
+        key,
+        payload,
+        law_disclosures=[],
+    )
+    key_hash = _key_hash(key)
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} SET {column} = ? "
+            "WHERE key_hash = ?",
+            (2**60, key_hash),
+        )
+
+    persistent = PT1PersistentEquilibriumStore(db_path)
+    bucket_key = canonical_physics_bucket_key_from_replay_key(key)
+    bucket_bytes = canonical_json_bytes(bucket_key)
+    with pytest.raises(PT1PersistentStoreCorrupt):
+        if reader == "exact":
+            persistent._get_with_decoded(
+                artifact=artifact,
+                key=key,
+                key_bytes=canonical_json_bytes(key),
+                key_hash=key_hash,
+            )
+        elif reader == "bucket":
+            persistent._get_by_physics_bucket(
+                artifact=artifact,
+                physics_bucket_key=bucket_key,
+                physics_bucket_bytes=bucket_bytes,
+                physics_bucket_hash=rrd._sha256(bucket_bytes),
+                query_key=key,
+            )
+        elif reader == "ladder":
+            rung_tag = rrd.PHYSICS_BUCKET_LADDER_RUNGS[0][0]
+            rung_key = rrd.canonical_physics_ladder_bucket_key_from_replay_key(
+                key,
+                rung_tag,
+            )
+            persistent._get_by_physics_ladder_bucket(
+                artifact=artifact,
+                rung_tag=rung_tag,
+                rung_key=rung_key,
+                rung_hash=rrd._sha256(canonical_json_bytes(rung_key)),
+                query_key=key,
+            )
+        elif reader == "interpolation":
+            persistent._list_interpolation_candidates(
+                artifact=artifact,
+                replay_scope_sha256=rrd._replay_scope_hash(bucket_key),
+                query_key=key,
             )
         else:
-            pytest.fail(
-                f"{earlier_defect[0]} did not reject before {later_defect[0]}"
+            payload_bytes = canonical_json_bytes(payload)
+            persistent.put(
+                artifact=artifact,
+                key=key,
+                key_bytes=canonical_json_bytes(key),
+                key_hash=key_hash,
+                payload=payload,
+                payload_bytes=payload_bytes,
+                payload_hash=rrd._sha256(payload_bytes),
+                law_disclosures=[],
             )
 
 

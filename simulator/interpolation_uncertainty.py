@@ -278,14 +278,14 @@ def _cache_distance_component(
             "value": None,
             "status": "insufficient_neighbors",
             "units": "standardized_distance",
-            "source": "simulator.interpolation_uncertainty._standardized_distance",
+            "source": "simulator.reduced_real_cache_interpolation._standardized_distance",
         }
     return {
         "kind": "scalar",
         "value": float(max(distances)),
         "status": "available",
         "units": "standardized_distance",
-        "source": "simulator.interpolation_uncertainty._standardized_distance",
+        "source": "simulator.reduced_real_cache_interpolation._standardized_distance",
         "max_neighbor_distance": float(max(distances)),
         "mean_neighbor_distance": float(sum(distances) / len(distances)),
     }
@@ -584,7 +584,7 @@ def _standardized_distance(left: Sequence[float], right: Sequence[float]) -> flo
             (float(a) - float(b)) / scale
             for a, b, scale in zip(left, right, scales, strict=False)
         ]
-        squared_distance = sum(delta * delta for delta in deltas)
+        squared_distance = sum(delta**2 for delta in deltas)
     except OverflowError:
         return math.inf
     return (

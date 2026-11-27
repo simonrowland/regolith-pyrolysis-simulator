@@ -100,6 +100,9 @@ def test_uncertainty_vector_reports_float64_cache_distance_component() -> None:
     assert vector["dtype"] == "float64"
     assert vector["vector"][CACHE_DISTANCE] == pytest.approx(0.025)
     assert vector["components"][CACHE_DISTANCE]["status"] == "available"
+    assert vector["components"][CACHE_DISTANCE]["source"] == (
+        "simulator.reduced_real_cache_interpolation._standardized_distance"
+    )
     assert vector["vector"][THRESHOLD_STRADDLE] == pytest.approx(0.0)
     assert vector["components"][NONLINEARITY_GENERAL]["status"] == "insufficient_neighborhood"
 
