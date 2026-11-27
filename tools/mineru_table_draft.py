@@ -627,6 +627,8 @@ def _chunk_start_page(path: Path) -> int:
         match = _CHUNK_START.search(part)
         if match:
             return int(match.group(1))
+    if "mineru" in path.parts:
+        return 1
     raise ValueError(f"cannot determine chunk start page from {path}")
 
 

@@ -73,6 +73,43 @@ def test_absolute_page_mapping_across_chunks(tmp_path: Path) -> None:
     assert (expanded["origin_row"], expanded["origin_column"]) == ("2", "1")
 
 
+def test_absolute_page_mapping_for_top_level_text_mineru_file(
+    tmp_path: Path,
+) -> None:
+    sid = "whole-document"
+    content_file = (
+        tmp_path / "text" / sid / "mineru" / f"{sid}_content_list.json"
+    )
+    content_file.parent.mkdir(parents=True)
+    shutil.copyfile(FIXTURE, content_file)
+
+    index_path = draft.convert_source(content_file, tmp_path / "draft")
+    index = yaml.safe_load(index_path.read_text(encoding="utf-8"))
+
+    assert [table["pdf_page"] for table in index["tables"]] == [4]
+
+
+def test_absolute_page_mapping_for_nested_text_mineru_file(
+    tmp_path: Path,
+) -> None:
+    content_file = (
+        tmp_path
+        / "text"
+        / "whole-document"
+        / "mineru"
+        / "source"
+        / "vlm"
+        / "source_content_list.json"
+    )
+    content_file.parent.mkdir(parents=True)
+    shutil.copyfile(FIXTURE, content_file)
+
+    index_path = draft.convert_source(content_file, tmp_path / "draft")
+    index = yaml.safe_load(index_path.read_text(encoding="utf-8"))
+
+    assert [table["pdf_page"] for table in index["tables"]] == [4]
+
+
 def test_printed_caption_label_wins_over_table_block_ordinal(tmp_path: Path) -> None:
     source_root = tmp_path / "raw" / "caption-order" / "ocr-mineru" / "p001-p008"
     source_root.mkdir(parents=True)

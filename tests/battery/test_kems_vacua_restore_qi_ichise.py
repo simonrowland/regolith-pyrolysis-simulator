@@ -216,7 +216,7 @@ def test_balabanova_partial_pressure_stays_unknown_after_method_split(
     _assert_balabanova_partial_has_no_total_pressure(result)
 
 
-def test_pressure_hit_mutation_reintroduces_both_pressure_identity_errors(
+def test_pressure_identity_mutations_reintroduce_both_pressure_identity_errors(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     with monkeypatch.context() as mutation:
@@ -230,8 +230,8 @@ def test_pressure_hit_mutation_reintroduces_both_pressure_identity_errors(
     with monkeypatch.context() as mutation:
         mutation.setattr(
             migrate_module,
-            "_pressure_evidence_is_chamber_background",
-            lambda *args, **kwargs: False,
+            "_knudsen_effusion_chamber_background_not_for_identity",
+            lambda *_args, **_kwargs: False,
         )
         qi = _migrate_real_extract(tmp_path / "mutated-qi", QI)
 
