@@ -149,19 +149,47 @@ def test_non_feo_metal_dissociation_uses_intrinsic_melt_fo2(
         )
         diagnostic = result.diagnostic
         provenance = diagnostic["vapor_pressure_numerator_provenance"][species]
-        return diagnostic["vapor_pressures_Pa"][species], provenance["pO2_bar"]
+        return (
+            diagnostic["vapor_pressures_Pa"][species],
+            provenance["pO2_bar"],
+            diagnostic,
+        )
 
-    reduced_pressure, reduced_pO2_bar = pressure(1.0e-6, -12.0)
-    high_transport_pressure, high_transport_pO2_bar = pressure(1.0e-4, -12.0)
-    oxidized_pressure, oxidized_pO2_bar = pressure(1.0e-6, -10.0)
+    def dissociation_pO2_bar(diagnostic: dict, planted_log: float) -> float:
+        # d-469: dissociation pO2 is the planted intrinsic when that
+        # log sits on or above the condensed-metal line, and the line
+        # when it does not. a_FeO is read at the unfloored log, so two
+        # injections can bind two slightly different Fe lines. The
+        # transport pressure is not this channel.
+        notice = diagnostic.get("melt_metal_saturation_floor_notice")
+        if notice is None:
+            return 10.0 ** planted_log
+        assert float(notice["unfloored_log10_fO2_bar"]) == pytest.approx(
+            planted_log
+        )
+        return 10.0 ** float(notice["floor_log10_fO2_bar"])
 
-    assert reduced_pO2_bar == pytest.approx(1.0e-12)
-    assert high_transport_pO2_bar == pytest.approx(1.0e-12)
-    assert oxidized_pO2_bar == pytest.approx(1.0e-10)
+    reduced_pressure, reduced_pO2_bar, reduced_diag = pressure(1.0e-6, -12.0)
+    high_transport_pressure, high_transport_pO2_bar, _high_diag = pressure(
+        1.0e-4, -12.0
+    )
+    oxidized_pressure, oxidized_pO2_bar, oxidized_diag = pressure(1.0e-6, -10.0)
+
+    assert reduced_pO2_bar == pytest.approx(
+        dissociation_pO2_bar(reduced_diag, -12.0)
+    )
+    assert high_transport_pO2_bar == pytest.approx(reduced_pO2_bar)
+    assert oxidized_pO2_bar == pytest.approx(
+        dissociation_pO2_bar(oxidized_diag, -10.0)
+    )
     assert high_transport_pressure == pytest.approx(reduced_pressure)
+    assert reduced_pO2_bar != pytest.approx(1.0e-6)
+    assert reduced_pO2_bar != pytest.approx(1.0e-4)
 
+    # Slope against the pO2 values the evaluator used. The planted
+    # -12/-10 pair is not that denominator once the floor binds.
     observed_slope = math.log10(oxidized_pressure / reduced_pressure) / math.log10(
-        1.0e-10 / 1.0e-12
+        oxidized_pO2_bar / reduced_pO2_bar
     )
     assert observed_slope == pytest.approx(expected_slope, abs=1.0e-9)
 

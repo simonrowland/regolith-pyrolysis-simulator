@@ -769,6 +769,7 @@ from simulator.chemistry.kernel import (
     normalize_oxygen_sink_channel_mode,
 )
 from simulator.physical_constants import (
+    CELSIUS_TO_KELVIN_OFFSET,
     MELT_DISSOCIATION_PO2_MIN_BAR,
     PA_PER_BAR,
 )
@@ -6954,7 +6955,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         bookable_o2_mol = (
             self._bookable_ferric_o2_mol() if has_cleaned_melt else 0.0
         )
-        reducing_demand = net_o2_equiv_mol < -OXYGEN_RESERVOIR_NOOP_MOL
         # The lock's noop is a closed reducing tangent, not a saturated
         # derivative. Honoring it must keep the skip. A derivative that
         # has collapsed at the ceiling, with ferric still on the ledger,
@@ -6964,6 +6964,24 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             and bool(honor_ferric_exhaustion)
             and not self._ferric_inventory_reappeared()
         )
+        # The electrolysis transition already booked
+        # Fe2O3 → 2 FeO + 1/2 O2 onto the anode. This label is that
+        # credit's mirror (mol = -anode O2), not a second release.
+        # Premise: booking it again debits the residual Fe2O3. The
+        # aim then hits the effervescence bound (p_total = 0 → -9),
+        # which is more reducing than the demand-sized q, so the
+        # split empties the couple into overhead. Anode O2 stays the
+        # Faraday slice while converted Fe counts the overhead too.
+        # Algebra: booking_net = net - mirror. A call that is only
+        # the mirror has booking demand 0. The tangent still sees
+        # the full net. Limit: mirror 0 leaves booking_net = net.
+        mirror_mol = float(
+            terms.get('redox_source:mre_electrolysis_reduction', 0.0) or 0.0
+        )
+        booking_net_o2_equiv_mol = net_o2_equiv_mol - mirror_mol
+        booking_reducing_demand = (
+            booking_net_o2_equiv_mol < -OXYGEN_RESERVOIR_NOOP_MOL
+        )
         # One reducing arm, whatever C_m is (d-463 ext 3a). The finite
         # tangent caps and locks but does not book Fe2O3. C_m at the
         # noop used to be the only arm that did. Both book
@@ -6972,7 +6990,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # predictor for an oxidizing step and for a reducing step whose
         # ferric inventory is already the noop.
         reducing_books = (
-            reducing_demand
+            booking_reducing_demand
             and bookable_o2_mol > OXYGEN_RESERVOIR_NOOP_MOL
             and not lock_honored
         )
@@ -6984,7 +7002,28 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # The buffer stays. The batch settle runs the Fe split
             # against it and books only the O2 that split did not take.
             # A positive source does not clear the ferric lock.
-            pass
+            # The no-capacity refusal is the vacuum-floor plant only.
+            # Premise: p_total <= 0 is floored to the vacuum floor
+            # (1e-9 bar), and log10(1e-9) = -9, the log that refusal
+            # plants. Algebra: pressure_bar = p_total_mbar / 1000.
+            # The plant is pressure_bar <= vacuum_floor_bar. A physical
+            # ceiling is not that plant: 10 mbar is 0.01 bar and
+            # log10(0.01) = -2. An empty skip_reason there means the
+            # ceiling rule was applied. The batch settle still books
+            # the O2 the couple did not take. Limit: pressure exactly
+            # at the floor is the plant.
+            pressure_bar = float(self.melt.p_total_mbar) / 1000.0
+            vacuum_floor_bar = float(self._vacuum_floor_bar())
+            at_vacuum_floor_plant = (
+                math.isfinite(pressure_bar)
+                and math.isfinite(vacuum_floor_bar)
+                and pressure_bar <= vacuum_floor_bar
+            )
+            if (
+                C_m <= OXYGEN_RESERVOIR_NOOP_MOL
+                and at_vacuum_floor_plant
+            ):
+                skip_reason = 'no_melt_redox_capacity'
         elif reducing_books:
             # Premise: bookable O2 is 1/2 mol per mol Fe2O3
             # (``ferric_couple_o2_mol``). Algebra: release =
@@ -6998,7 +7037,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # diagnosed hour's equilibrium q at log10(0.013) books
             # 1.790e-4 mol and minute 43 reads the melt-activity floor,
             # not -1.886.
-            demand_o2_mol = -net_o2_equiv_mol
+            demand_o2_mol = -booking_net_o2_equiv_mol
             if demand_o2_mol > bookable_o2_mol + OXYGEN_RESERVOIR_NOOP_MOL:
                 self._ferric_tangent_exhausted = True
                 self._ferric_exhausted_bookable_o2_mol = bookable_o2_mol
@@ -7432,6 +7471,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         absorbed_mol = 0.0
         passthrough_mol = 0.0
         absorption_respeciation: Dict[str, Any] = {}
+        at_effervescence_ceiling = False
         if rate_kg_hr <= 0.0:
             reason = 'rate_zero'
         elif commanded_mol <= 0.0:
@@ -7447,21 +7487,35 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             requested_absorbed_mol = max(0.0, commanded_mol * eta_absorb)
             reason = 'no_melt_redox_capacity'
             if requested_absorbed_mol > OXYGEN_RESERVOIR_NOOP_MOL:
-                reservoir = self._apply_oxygen_reservoir_redox_source_terms(
-                    {'redox_source:o2_bubbler': requested_absorbed_mol},
-                    exchange_direction='redox_source:o2_bubbler',
-                    temperature_K=T_K,
-                    gate_authority=gate_authority,
-                    # The dose was already refused. Recording the skip
-                    # must not apply an oxidizing tangent with no atoms.
-                    honor_ferric_exhaustion=True,
+                at_effervescence_ceiling = (
+                    self._effervescence_bounds_oxidizing_source(
+                        net_o2_equiv_mol=requested_absorbed_mol,
+                        base_fO2_log=current_fO2_log,
+                    )
                 )
-                reason = str(
-                    getattr(reservoir, 'redox_source_skip_reason', '')
-                    or reason
-                )
+                if at_effervescence_ceiling:
+                    # Unlike an evaporative source, this dose has not been
+                    # loaded into the atom ledger. Do not pass a hypothetical
+                    # positive term to the shared source path: its ceiling
+                    # rule means “buffer it for the batch settle,” which
+                    # would label unprovided bubbler oxygen as applied.
+                    reason = 'at_effervescence_ceiling'
+                else:
+                    reservoir = self._apply_oxygen_reservoir_redox_source_terms(
+                        {'redox_source:o2_bubbler': requested_absorbed_mol},
+                        exchange_direction='redox_source:o2_bubbler',
+                        temperature_K=T_K,
+                        gate_authority=gate_authority,
+                        # The dose was already refused. Recording the skip
+                        # must not apply an oxidizing tangent with no atoms.
+                        honor_ferric_exhaustion=True,
+                    )
+                    reason = str(
+                        getattr(reservoir, 'redox_source_skip_reason', '')
+                        or reason
+                    )
             absorption_respeciation = {
-                'status': 'refused',
+                'status': 'skipped' if at_effervescence_ceiling else 'refused',
                 'reason': reason,
                 'oxygen_source': FE_REDOX_OXYGEN_SOURCE_FO2_BUFFER,
                 'applied_o2_mol': 0.0,
@@ -7691,7 +7745,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             + passthrough_kg
         )
         diagnostic = {
-            'status': 'ok',
+            'status': (
+                'skipped'
+                if (
+                    at_effervescence_ceiling
+                    and actual_injected_mol <= OXYGEN_RESERVOIR_NOOP_MOL
+                )
+                else 'ok'
+            ),
             'reason': reason,
             'rate_kg_per_hr': rate_kg_hr,
             'eta_absorb': eta_absorb,
@@ -8635,7 +8696,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             build_provider_account_view,
         )
         from simulator.chemistry.kernel.dto import IntentRequest
-        from simulator.evaporation import EvaporationFluxRefusal
+        from simulator.evaporation import (
+            EvaporationFluxRefusal,
+            shared_fe_hkl_residual_kg_hr,
+        )
         from simulator.thermal_train import (
             FiniteCapacity,
             thermal_train_parameters_from_mapping,
@@ -8779,17 +8843,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     ) or {}
                 ).items()
             }
-            residual_fe_mol = getattr(
-                self,
-                '_native_fe_vapor_residual_capacity_mol_this_hr',
-                None,
+            # Same leftover as _calculate_evaporation. The native split
+            # stored it before this shadow. One p_Fe, so one ceiling.
+            fe_residual_kg_hr = shared_fe_hkl_residual_kg_hr(
+                getattr(
+                    self,
+                    '_native_fe_vapor_residual_capacity_mol_this_hr',
+                    None,
+                ),
+                molar_mass_kg_mol=float(molar_masses.get('Fe', 0.0) or 0.0),
             )
-            if residual_fe_mol is not None and 'Fe' in rates:
-                rates['Fe'] = min(
-                    rates['Fe'],
-                    max(0.0, float(residual_fe_mol))
-                    * molar_masses.get('Fe', 0.0),
-                )
+            if fe_residual_kg_hr is not None and 'Fe' in rates:
+                rates['Fe'] = min(rates['Fe'], fe_residual_kg_hr)
             rates = self._analytic_evaporation_depletion_rates(
                 rates,
                 dt_hr=self.process_dt_hr(),
@@ -11957,7 +12022,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     result.warnings.append(warning)
         from engines.vapor_limits import BUILTIN_VAPOR_BELOW_400K_LIMIT_K
 
-        if T_C + 273.15 < BUILTIN_VAPOR_BELOW_400K_LIMIT_K:
+        if T_C + CELSIUS_TO_KELVIN_OFFSET < BUILTIN_VAPOR_BELOW_400K_LIMIT_K:
             restore_retained_backend_activity_sources()
             self._last_vapor_pressures_source = dict(
                 getattr(result, 'vapor_pressures_source', {}) or {}

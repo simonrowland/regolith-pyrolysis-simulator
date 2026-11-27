@@ -139,7 +139,7 @@ def test_version_probe_is_cached_by_binary_and_slot_timeout_is_typed(
     assert first.get_engine_version() == 'MAGEMin 1.9.6'
     assert second.get_engine_version() == 'MAGEMin 1.9.6'
     assert len(run_calls) == 1
-    assert slot_calls == [5]
+    assert slot_calls == [magemin._MAGEMIN_SUBPROCESS_SLOT_WAIT_LIMIT_S]
 
     @contextmanager
     def timed_out_slot(_timeout_s):
@@ -155,6 +155,63 @@ def test_version_probe_is_cached_by_binary_and_slot_timeout_is_typed(
         f'MAGEMin subprocess ({busy._binary_path.resolve()})'
     )
     assert len(run_calls) == 1
+
+
+def test_failed_version_probe_is_cached_for_the_process(
+    monkeypatch, tmp_path,
+):
+    import simulator.engine_local_config as local_config
+
+    monkeypatch.setattr(local_config, 'cache_version_for', lambda _: None)
+    monkeypatch.setattr(local_config, 'warn_legacy_once', lambda *_args: None)
+    binary = tmp_path / 'MAGEMin'
+    binary.write_bytes(b'fake MAGEMin executable')
+    slot_calls = []
+    run_calls = []
+
+    @contextmanager
+    def timed_out_slot(timeout_s):
+        slot_calls.append(timeout_s)
+        raise magemin._MAGEMinEngineLifecycleError(
+            'MAGEMinSubprocessSlotTimeout', 'slot timed out'
+        )
+        yield
+
+    def run(args, **kwargs):
+        run_calls.append((args, kwargs))
+        return subprocess.CompletedProcess(
+            args, 0, stdout='MAGEMin 1.9.6\n', stderr=''
+        )
+
+    monkeypatch.setattr(magemin, '_magemin_subprocess_slot', timed_out_slot)
+    monkeypatch.setattr(magemin.subprocess, 'run', run)
+    first = MAGEMinBackend()
+    first._binary_path = binary
+    second = MAGEMinBackend()
+    second._binary_path = binary
+
+    first_identity = first.get_engine_version()
+    assert first_identity == f'MAGEMin subprocess ({binary.resolve()})'
+    # A failed probe is cached for the life of the process. The identity
+    # stays the path fallback, and the typed slot failure is recorded
+    # beside it, so a later call must not enter the 300 s slot wait again.
+    assert second.get_engine_version() == first_identity
+    assert len(slot_calls) == 1
+    assert run_calls == []
+
+    stat = binary.stat()
+    version_key = (
+        str(binary.resolve()),
+        stat.st_ino,
+        stat.st_size,
+        stat.st_mtime_ns,
+    )
+    stored_identity, stored_failure = (
+        magemin._MAGEMIN_ENGINE_VERSION_CACHE[version_key]
+    )
+    assert stored_identity == first_identity
+    assert isinstance(stored_failure, magemin._MAGEMinEngineLifecycleError)
+    assert stored_failure.exception_type == 'MAGEMinSubprocessSlotTimeout'
 
 
 def test_version_probe_repeats_when_binary_changes_at_same_path(

@@ -3853,29 +3853,39 @@ def test_parallel_composition_target_stub_study_completes(
                 "resinter_threshold_ungrounded"
             )
             assert summary["has_positive_qualified_fouling"] is True
+            # Receipt ab6a568b at b7a91af39c, held by 68053ef6 on the
+            # restored shared residual (160 passed). 6.181281691758682e-12
+            # -> 3.600782827250454e-08 kg. Native Fe precipitates on the
+            # Fe line (d-469 8f174cc807) and that dust reaches the cold
+            # wall. Dropping the full-ceiling oxide booking left this
+            # mass in place.
             assert summary["wall_deposit_kg_by_species"]["Fe"] == pytest.approx(
-                6.181281691758682e-12,
+                3.600782827250454e-08,
                 rel=1e-9,
             )
+            # Same receipt f527cd9f. The cumulative is the per-campaign
+            # deposit times the 24/35 campaign fraction this run covers:
+            # 3.600782827250454e-08 * 24 / 35 = 2.4691082244003112e-08 kg.
             assert summary["wall_deposit_cumulative_kg_by_species"]["Fe"] == (
-                pytest.approx(4.238593160063097e-12, rel=1e-9)
+                pytest.approx(2.4691082244003112e-08, rel=1e-9)
             )
-            # Derivation (kg/run): the direct congruent JANAF pressure for
-            # FeO(cr)=FeO(g) enters the 24-hour activity-1 Hertz-Knudsen
-            # supply integral, sum(alpha * P_eq * sqrt(M/(2*pi*R*T)) *
-            # area * 3600 * duration), giving FeO_association_gas
-            # 4.4945768446829577e-5 kg. The same integral books K
-            # (2.0788664676353697e-6), MnO_gas (6.645065401993441e-9),
-            # Na (3.616923154680258e-5), and SiO2_gas
-            # (6.489072371783856e-11) kg. They have no located refusal
-            # segments, so their sum U=8.320057641739323e-5 kg is the
-            # unlocated bound. Adding the committed Fe deposit
-            # (4.207683789812068e-12 kg) makes stage_0_to_stage_1 in the
-            # Hottest zone the governing segment. The 24-hour C3 run spans
-            # 24/35 of a campaign, so (U + Fe) / (24/35) = 0.000121334180078237
-            # kg/campaign, rendered to 12 significant digits below.
+            # Receipt d0f75638. Governing load, kg/campaign, rendered at
+            # 12 significant digits. FeO_association_gas is
+            # 6.554591231829313e-05, identical to the old 24 h integral
+            # 4.4945768446829577e-5 kg/run times 35/24. Congruent
+            # FeO(cr)=FeO(g) does not depend on pO2, so that bound is the
+            # control. Na is 1.388888992479475e-05 (0.263 of its old
+            # campaign bound) and K is 8.457297588374643e-07 (0.279).
+            # M2O = 2 M(g) + 1/2 O2, so p_M falls as pO2^-0.25. Ledger
+            # fO2 (a95942989e) and the d-469 floor (8f174cc807) put the
+            # melt on the Fe line, and the alkali bounds fall. MnO_gas
+            # and SiO2_gas stay under 1e-8. The residual after
+            # FeO+K+Na plus the pinned Fe deposit 3.600782827250454e-08
+            # equals the old MnO and SiO2 integrals (6.645065401993441e-9
+            # and 6.489072371783856e-11 kg/run) times 35/24, to 4e-13
+            # relative. The sum is 8.03263251828e-05 kg/campaign.
             ungrounded_lifetime = (
-                "resinter_threshold_kg / 0.000121334180078"
+                "resinter_threshold_kg / 8.03263251828e-05"
             )
             assert summary["campaigns_to_resinter"] == ungrounded_lifetime
             assert summary["campaigns_to_resinter_worst_segment"] == (

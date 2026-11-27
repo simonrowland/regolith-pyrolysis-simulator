@@ -354,6 +354,32 @@ def _equilibrium_path_from_cooling(
     )
 
 
+def _finite_warm_hint(value: object) -> Optional[float]:
+    """Ignore a missing or unusable previous bound. Never refuse the search."""
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return None
+    number = float(value)
+    if not math.isfinite(number):
+        return None
+    return number
+
+
+def _grid_floor_index(
+    grid: Tuple[float, ...],
+    temperature_C: float,
+) -> Optional[int]:
+    """Greatest grid index at or below ``temperature_C``, else None."""
+    if temperature_C < grid[0] or temperature_C > grid[-1]:
+        return None
+    floor_index = 0
+    for index, point in enumerate(grid):
+        if point <= temperature_C:
+            floor_index = index
+        else:
+            break
+    return floor_index
+
+
 def find_liquidus_solidus_by_fraction(
     sample_fraction: Callable[..., float],
     *,
@@ -367,6 +393,8 @@ def find_liquidus_solidus_by_fraction(
     monotone_smoothing_max: float = 5.0e-1,
     max_bisection_iterations: int = 32,
     budget_s: Optional[float] = None,
+    warm_solidus_T_C: Optional[float] = None,
+    warm_liquidus_T_C: Optional[float] = None,
 ) -> LiquidusSolidusResult:
     """Bracket and bisect solidus/liquidus on monotone melt fraction.
 
@@ -374,6 +402,14 @@ def find_liquidus_solidus_by_fraction(
     guard, checked between samples; its residual is never passed to the
     engine. The search work is bounded by the scan grid and the two
     tolerance-bounded bisections.
+
+    ``warm_solidus_T_C`` and ``warm_liquidus_T_C`` are optional previous
+    bounds. A finite in-window hint probes those cells first, so a
+    refusal inside the previous bracket raises before the cold tail.
+    The published root is still the ascending grid walk: the lowest
+    crossing, with the same monotone lift and the same out-of-cell
+    refusal as a cold scan. A missing, non-finite, or out-of-window
+    hint skips the probe. Callers that omit the hints are unchanged.
     """
     from engines.alphamelts.thermoengine import (
         DECLARED_THERMOENGINE_FAILURE_TYPES,
@@ -530,40 +566,167 @@ def find_liquidus_solidus_by_fraction(
         check_budget()
         return point
 
-    try:
-        grid_points = [sample(T) for T in grid]
+    def _already_sampled(temperature_C: float) -> Optional[MeltFractionSample]:
+        matched = [
+            point for point in samples
+            if point.temperature_C == temperature_C
+        ]
+        if len(matched) != 1:
+            return None
+        return matched[0]
 
+    def _sample_grid_point(index: int) -> MeltFractionSample:
+        existing = _already_sampled(grid[index])
+        if existing is not None:
+            return existing
+        return sample(grid[index])
+
+    def _unmelted(point: MeltFractionSample, *, liquid: bool) -> bool:
+        if liquid:
+            return point.frac_M < liquid_threshold
+        return point.frac_M <= solid_threshold
+
+    def _crossed(
+        low: MeltFractionSample,
+        high: MeltFractionSample,
+        *,
+        liquid: bool,
+    ) -> bool:
+        if liquid:
+            return (
+                low.frac_M < liquid_threshold
+                and high.frac_M >= liquid_threshold
+            )
+        return low.frac_M <= solid_threshold and high.frac_M > solid_threshold
+
+    def _lazy_bound_bracket(
+        floor_index: int,
+        *,
+        liquid: bool,
+    ) -> Optional[tuple[MeltFractionSample, MeltFractionSample]]:
+        # i is the greatest grid point at or below the previous bound.
+        # Sample that point first. The same cell is [i, i+1] when i is
+        # still unmelted. One cell up is [i+1, i+2]. One cell down is
+        # [i-1, i] when i is already melted. Anything farther full-scans.
+        if floor_index < 0 or floor_index >= len(grid):
+            return None
+        floor_point = _sample_grid_point(floor_index)
+        if _unmelted(floor_point, liquid=liquid):
+            lower_point = floor_point
+            for step in (1, 2):
+                upper_index = floor_index + step
+                if upper_index >= len(grid):
+                    return None
+                upper_point = _sample_grid_point(upper_index)
+                if _crossed(lower_point, upper_point, liquid=liquid):
+                    return (lower_point, upper_point)
+                if not _unmelted(upper_point, liquid=liquid):
+                    return None
+                lower_point = upper_point
+            return None
+        lower_index = floor_index - 1
+        if lower_index < 0:
+            return None
+        lower_point = _sample_grid_point(lower_index)
+        if _crossed(lower_point, floor_point, liquid=liquid):
+            return (lower_point, floor_point)
+        return None
+
+    try:
         solidus_bracket = None
         liquidus_bracket = None
-        previous = grid_points[0]
-        for current in grid_points[1:]:
-            if (
-                solidus_bracket is None
-                and previous.frac_M <= solid_threshold
-                and current.frac_M > solid_threshold
-            ):
-                solidus_bracket = (previous, current)
-                _annotate_renormalised_threshold(
-                    (previous, current),
-                    previous,
-                    current,
-                    tolerance,
-                    closure_notices,
-                )
-            if (
-                liquidus_bracket is None
-                and previous.frac_M < liquid_threshold
-                and current.frac_M >= liquid_threshold
-            ):
-                liquidus_bracket = (previous, current)
-                _annotate_renormalised_threshold(
-                    (previous, current),
-                    previous,
-                    current,
-                    tolerance,
-                    closure_notices,
-                )
-            previous = current
+        # Warm probe, then the same ascending walk as a cold scan.
+        #
+        # Premise: one melt-fraction curve has one lowest solidus and
+        # one lowest liquidus. frac_M is accepted only when each grid
+        # step drops by at most monotonicity_tolerance (0.02). A larger
+        # drop refuses. A smaller drop is lifted to the lower
+        # neighbour, and that lift can move which cell first crosses
+        # solid_epsilon. The previous hour's cell is a hint about
+        # where the crossing sits. It is not a second root.
+        #
+        # Algebra: probe grid cell i of each hint first, where
+        # i = max {i : grid[i] <= T_prev}. A sample error in that cell
+        # raises before the cold tail is touched. The probe's smoothed
+        # samples are then discarded, raw fractions kept. The grid is
+        # walked from min_T to max_T, low to high, and the first
+        # crossing of each threshold is the bracket that is bisected.
+        # That is the cold scan. A hinted cell that does not bracket a
+        # sign change is the same walk: the probe brackets are not
+        # published either way.
+        #
+        # Unit check: both entries bisect the same two grid neighbours,
+        # so five halvings of a 50 C cell land on the same 1.5625 C
+        # dyadic (50/2^5 = 1.5625, which is inside the 2 C tolerance;
+        # 50/2^4 = 3.125 is still outside it).
+        #
+        # Limits: no hint, a non-finite hint, or a hint off the grid
+        # skips the probe. A dip of more than 0.02 on a grid point the
+        # probe did not sample, including a point between the hinted
+        # cells or a grid endpoint, refuses on the walk. A dip of at
+        # most 0.02 is lifted before the first-crossing test, so the
+        # warm root stays on the cold scan's cell.
+        warm_solidus = _finite_warm_hint(warm_solidus_T_C)
+        warm_liquidus = _finite_warm_hint(warm_liquidus_T_C)
+        if warm_solidus is not None and warm_liquidus is not None:
+            solidus_floor = _grid_floor_index(grid, warm_solidus)
+            liquidus_floor = _grid_floor_index(grid, warm_liquidus)
+            if solidus_floor is not None and liquidus_floor is not None:
+                # Probe for an in-cell sample refusal only. A sign
+                # change inside the hinted cell is not the root: the
+                # walk below is, because it applies the lower-neighbour
+                # lift and keeps the lowest crossing. The probe can
+                # also compare non-adjacent grid points and refuse a
+                # chain of dips the ascending walk would lift. That
+                # refusal is not the full scan's, so it is dropped and
+                # the walk decides. A LiquidusSampleError still
+                # propagates here, before the cold tail is sampled.
+                try:
+                    _lazy_bound_bracket(
+                        solidus_floor,
+                        liquid=False,
+                    )
+                    _lazy_bound_bracket(
+                        liquidus_floor,
+                        liquid=True,
+                    )
+                except _LiquidusNonMonotoneError:
+                    pass
+                samples.clear()
+                solidus_bracket = None
+                liquidus_bracket = None
+
+        if solidus_bracket is None:
+            grid_points = [sample(T) for T in grid]
+            previous = grid_points[0]
+            for current in grid_points[1:]:
+                if (
+                    solidus_bracket is None
+                    and previous.frac_M <= solid_threshold
+                    and current.frac_M > solid_threshold
+                ):
+                    solidus_bracket = (previous, current)
+                    _annotate_renormalised_threshold(
+                        (previous, current),
+                        previous,
+                        current,
+                        tolerance,
+                        closure_notices,
+                    )
+                if (
+                    liquidus_bracket is None
+                    and previous.frac_M < liquid_threshold
+                    and current.frac_M >= liquid_threshold
+                ):
+                    liquidus_bracket = (previous, current)
+                    _annotate_renormalised_threshold(
+                        (previous, current),
+                        previous,
+                        current,
+                        tolerance,
+                        closure_notices,
+                    )
+                previous = current
 
         missing = []
         if solidus_bracket is None:

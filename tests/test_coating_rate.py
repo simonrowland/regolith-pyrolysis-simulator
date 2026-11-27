@@ -635,9 +635,17 @@ def test_lunar_payload_preserves_extrapolated_mg_wall_pressure(
     pareto = payload["run_metadata"]["pressure_coating_pareto_diagnostic"]
     magnesium = pareto["by_species"]["Mg"]
     assert magnesium["status"] == "unavailable"
-    # Mg is present in the latest vapor-series diagnostic, but this run has no
-    # current committed wall-deposition quantity.
-    assert magnesium["reason"] == "current_wall_deposition_quantity_unavailable"
+    # Receipt fb31fdbcdc314368 on the restored shared residual. The
+    # debit-era reason was species_absent_from_latest_evaporation_series_diagnostic:
+    # partner O2 from the full Fe ceiling lowered p_Mg (MgO, p_Mg ∝ pO2^-0.5)
+    # to a computed zero, and the series writer emitted no row. With that
+    # partner O2 unbooked, Mg is back in the series. Status stays
+    # unavailable because the wall deposition quantity is not available.
+    # Both include_diagnostics values take this branch. The saturation
+    # extrapolation is attached after it.
+    assert magnesium["reason"] == (
+        "current_wall_deposition_quantity_unavailable"
+    )
     assert magnesium["authority_level"] == "extrapolated"
     records = magnesium["wall_saturation_pressure_extrapolations"]
     assert records

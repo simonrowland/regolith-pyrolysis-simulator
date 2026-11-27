@@ -352,17 +352,40 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
         # With c679673f5/85fedcb8e band-integrated capture across collector
         # and saturation thresholds, the unavailable-MAGEMin run measured
         # 5.12945178146e-06 kg at 1050 C under the Psat = 0 backstop.
-        # b-1188 removes the Psat = 0 backstop. Re-running this unavailable-
-        # MAGEMin report deposits 0 kg of wall Si+SiO2 at 1050 C. The trace
-        # was not a supersaturated wall-law capture.
+        # b-1188 removes the Psat = 0 backstop. The unavailable-MAGEMin
+        # report then deposited 0 kg because the trace was not supersaturated.
+        # 2026-11-26 b274. The SiO wall ladder is unchanged since green
+        # 0ef47e3c09. At the 1e-9 bar oxygen floor the oxidative leg
+        # (SiO + 1/2 O2 -> SiO2) has Psat 5.67e-11 Pa at 1050 C and
+        # 1.93e-4 Pa at 1400 C, so a booked oxidative capture is the
+        # supply, not a dew point. Disproportionation cannot explain equal
+        # deposits: its Psat is 1.145 Pa at 1050 C and 754 Pa at 1400 C.
+        # Receipt 760753a1 measured 1.3825809621333287e-05 kg at 1050 C.
+        # Receipt 72fbe252 measured 1.3800219536e-05 kg at 1400 C.
+        # Receipt 9fcc3329 measured 1.35194903715e-05 kg at 1500 C.
+        # Oxidative Psat at 1500 C is 4.67e-3 Pa, still negligible, so
+        # the same supply books there too. Disproportionation Psat is
+        # 2731 Pa at 1500 C and cannot make the three masses agree.
+        # The hour-path oxygen clip (60a659627a) equals the inventory at
+        # dt_h = 1, which is this report's step. Receipts 89a03741 and
+        # 00b11dee, restored shared residual. One p_Fe, so one Langmuir
+        # ceiling: pool vapour at the ceiling books no oxide Fe(g) and
+        # no partner O2. The three masses stay supply-capped and nearly
+        # flat. They do not return to 0, and disproportionation Psat
+        # (1.145 / 754 / 2731 Pa) still cannot order them:
+        #   1050 C 1.3825809621333287e-05 -> 1.3825826395036143e-05
+        #   1400 C 1.3800219536e-05 -> 1.38002353167e-05
+        #   1500 C 1.35194903715e-05 -> 1.35266747792e-05
+        # Relative shifts are 1.213e-6, 1.144e-6, and 5.314e-4. The oxygen
+        # that arms the leg is the hour's inventory, not the partner O2.
         assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
-            0.0, abs=1e-24
+            1.3825826395036143e-05, rel=1e-9
         )
         assert _sio_wall_product_deposit_kg(1400.0) == pytest.approx(
-            0.0, rel=1e-9
+            1.38002353167e-05, rel=1e-9
         )
         assert _sio_wall_product_deposit_kg(1500.0) == pytest.approx(
-            0.0, rel=1e-9
+            1.35266747792e-05, rel=1e-9
         )
     finally:
         _report_at_wall_T.cache_clear()

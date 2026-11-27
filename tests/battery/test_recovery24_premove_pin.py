@@ -136,14 +136,28 @@ def test_kress_fe_redox_output_is_bit_identical():
         identity=replace(rows["row4"].identity, fO2_Pa=None),
     )
     missing_prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, missing)
-    assert missing_prediction.value is None
-    assert missing_prediction.authority is Authority.REFUSED
-    assert missing_prediction.execution.state is ExecutionState.NOT_PROBED
-    assert missing_prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
-    assert missing_prediction.refusal_detail == {
-        "reason": "missing_input",
-        "input": "printed_fO2",
-    }
+    # b274 dd5f6b7a0c routes IA Kress redox through the shared fO2 ladder.
+    # With no point-level fO2, the shared ladder supplies a typed source or
+    # borrowed-default notice; the old pre-ladder refusal pin is stale.
+    # Frozen from the live ladder on Mac-Studio-256-1 at 014552f998 (2026-11-25):
+    # a bit pin, so drift in the borrowed default or the Kress path fails here.
+    assert missing_prediction.value == Decimal("0.047922045339031896")
+    assert missing_prediction.authority is Authority.BRIDGE
+    assert missing_prediction.execution.state is ExecutionState.PRODUCED
+    assert missing_prediction.refusal_reason is None
+    oxygen_notices = [
+        notice
+        for notice in missing_prediction.notices
+        if notice.origin == "fo2_ladder"
+        or (notice.policy is not None and notice.policy.id == "DP-010")
+    ]
+    assert len(oxygen_notices) == 1
+    assert oxygen_notices[0].origin == "score:DP-010"
+    assert oxygen_notices[0].reason == (
+        "DP-010 physics_rung=4: original_missing_evidence=no printed fO2, applicable "
+        "buffer, or air-composition evidence; commanded_default_log10_bar=-8.761098780384755; "
+        "fo2_tier=4; route=intrinsic_melt_fO2; borrowed"
+    )
     assert missing_prediction.coefficient_sources == _KRESS_SOURCES
 
 

@@ -207,7 +207,10 @@ _MAGEMIN_SUBPROCESS_LOCK_DIR = Path(
 _MAGEMIN_SUBPROCESS_LOCK = _MAGEMIN_SUBPROCESS_LOCK_DIR / (
     f'magemin-subprocess-{os.getuid()}.lock'
 )
-_MAGEMIN_ENGINE_VERSION_CACHE: Dict[Tuple[str, int, int, int], str] = {}
+_MAGEMIN_ENGINE_VERSION_CACHE: Dict[
+    Tuple[str, int, int, int],
+    Tuple[str, Optional[BaseException]],
+] = {}
 _MAGEMIN_ENGINE_VERSION_CACHE_LOCK = threading.Lock()
 
 
@@ -2294,6 +2297,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         projected_retry: bool = False,
         projected_oxide_wt_pct: Optional[Mapping[str, float]] = None,
         redox_state: RedoxState | None = None,
+        warm_solidus_T_C: Optional[float] = None,
+        warm_liquidus_T_C: Optional[float] = None,
     ) -> LiquidusSolidusResult:
         """Find solidus/liquidus by repeated MAGEMin single-point frac_M."""
         fO2_log, redox_state = normalize_redox_state(fO2_log, redox_state)
@@ -2435,6 +2440,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             scan_step_C=scan_step_C,
             tolerance_C=tolerance_C,
             budget_s=budget_s,
+            warm_solidus_T_C=warm_solidus_T_C,
+            warm_liquidus_T_C=warm_liquidus_T_C,
         )
         warnings_out = [*result.warnings, *sample_warnings[:6]]
         diagnostics = dict(result.diagnostics or {})
@@ -2493,6 +2500,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 projected_oxide_wt_pct=(
                     dict(folded_wt) if isinstance(folded_wt, Mapping) else None
                 ),
+                warm_solidus_T_C=warm_solidus_T_C,
+                warm_liquidus_T_C=warm_liquidus_T_C,
             )
             diagnostics['projected_liquidus_status'] = projected.status
             diagnostics['projected_liquidus_diagnostics'] = dict(
@@ -2622,44 +2631,72 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 binary_stat.st_size,
                 binary_stat.st_mtime_ns,
             )
+        # The memo identity is the first probe outcome for this binary
+        # signature, stored in _MAGEMIN_ENGINE_VERSION_CACHE. A failed
+        # probe stores the path fallback and keeps the typed exception
+        # beside it. Later calls return that identity and do not enter
+        # the 300 s slot wait again. Wait is the host-wide launch bound,
+        # the same bound an equilibrium launch uses before a typed
+        # refusal. The subprocess itself stays on a 5 s clock once a
+        # slot is held. The cache lock is not held across that wait: a
+        # caller that already owns a slot must still be able to read a
+        # cached identity.
         with _MAGEMIN_ENGINE_VERSION_CACHE_LOCK:
-            legacy = (
+            cached = (
                 _MAGEMIN_ENGINE_VERSION_CACHE.get(version_key)
                 if version_key is not None
                 else None
             )
-            if legacy is None:
-                try:
-                    with (
-                        _magemin_subprocess_slot(5),
-                        tempfile.TemporaryDirectory() as tmpdir,
-                    ):
-                        result = subprocess.run(
-                            [
-                                str(resolved_binary_path),
-                                '--version',
-                                '--db',
-                            self._effective_database(),
-                            ],
-                            cwd=tmpdir,
-                            capture_output=True,
-                            text=True,
-                            timeout=5,
-                            env=_magemin_subprocess_env(),
-                        )
-                    lines = (result.stdout or result.stderr).strip().splitlines()
-                    if result.returncode == 0 and lines:
-                        legacy = lines[0].strip()
-                        if version_key is not None:
-                            _MAGEMIN_ENGINE_VERSION_CACHE[version_key] = legacy
-                    else:
-                        legacy = f'MAGEMin subprocess ({resolved_binary_path})'
-                except (
-                    _MAGEMinEngineLifecycleError,
-                    OSError,
-                    subprocess.TimeoutExpired,
+        if cached is not None:
+            legacy = cached[0]
+        else:
+            probed: Optional[str] = None
+            probe_failure: Optional[BaseException] = None
+            try:
+                with (
+                    _magemin_subprocess_slot(
+                        _MAGEMIN_SUBPROCESS_SLOT_WAIT_LIMIT_S
+                    ),
+                    tempfile.TemporaryDirectory() as tmpdir,
                 ):
-                    legacy = f'MAGEMin subprocess ({resolved_binary_path})'
+                    result = subprocess.run(
+                        [
+                            str(resolved_binary_path),
+                            '--version',
+                            '--db',
+                            self._effective_database(),
+                        ],
+                        cwd=tmpdir,
+                        capture_output=True,
+                        text=True,
+                        timeout=5,
+                        env=_magemin_subprocess_env(),
+                    )
+                lines = (result.stdout or result.stderr).strip().splitlines()
+                if result.returncode == 0 and lines:
+                    probed = lines[0].strip()
+            except (
+                _MAGEMinEngineLifecycleError,
+                OSError,
+                subprocess.TimeoutExpired,
+            ) as exc:
+                probe_failure = exc
+            if probed:
+                candidate = (probed, None)
+            else:
+                candidate = (
+                    f'MAGEMin subprocess ({resolved_binary_path})',
+                    probe_failure,
+                )
+            if version_key is not None:
+                with _MAGEMIN_ENGINE_VERSION_CACHE_LOCK:
+                    # First stored outcome wins, including a failed probe.
+                    legacy = _MAGEMIN_ENGINE_VERSION_CACHE.setdefault(
+                        version_key,
+                        candidate,
+                    )[0]
+            else:
+                legacy = candidate[0]
         warn_legacy_once(
             'magemin',
             'engines.local.toml absent; using legacy MAGEMin '

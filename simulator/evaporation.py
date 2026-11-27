@@ -351,6 +351,39 @@ def evaporation_flux_refusal_from_configuration_error(
     )
 
 
+def shared_fe_hkl_residual_kg_hr(
+    residual_capacity_mol_hr: float | None,
+    *,
+    molar_mass_kg_mol: float,
+) -> float | None:
+    """Leftover of the one Fe(g) Langmuir ceiling, in kg/h, or None.
+
+    Premise: a Fe-saturated melt has one equilibrium iron pressure.
+    At the Fe line, ``FeO = Fe(g) + 1/2 O2`` and the native pool at
+    ``a_Fe = 1`` both set ``p_Fe = P_sat(Fe)``. One pressure is one
+    Hertz-Knudsen-Langmuir ceiling ``C``, in mol/h. The oxide route
+    does not get a second ceiling.
+
+    Algebra: the pool books ``n_vapor = min(n_pool, C * dt)`` on this
+    step. The leftover rate is ``max(0, C - n_vapor/dt)``, in mol/h,
+    which the native split already stored. Oxide Fe(g) may take only
+    that leftover, ``min(raw_kg_hr, leftover_mol_hr * M_Fe)``. None
+    means this hour stored no residual, and the caller does not invent
+    a cap.
+
+    Unit check: mol/h * kg/mol = kg/h.
+
+    Limit: pool vapour at or above ``C`` leaves leftover 0, so oxide
+    Fe(g) is 0. No FeO debit and no partner O2 are booked for it.
+    """
+
+    if residual_capacity_mol_hr is None:
+        return None
+    return max(0.0, float(residual_capacity_mol_hr)) * float(
+        molar_mass_kg_mol
+    )
+
+
 def _vapour_debit_floor_kg_hr() -> float:
     """Publisher nontrivial-flux threshold, the melt-debit floor.
 
@@ -2844,32 +2877,25 @@ class EvaporationMixin:
             raw_below = below_payload.get('fluxes_kg_hr')
             if isinstance(raw_below, Mapping):
                 below_fluxes = raw_below
-        # Fe in either publisher bucket shares the residual cap. The
-        # allocation record stays on the published bucket only, which is
-        # what project_publisher_vapour_rates records.
+        # Fe in either publisher bucket shares the one Langmuir ceiling
+        # with the native pool. The allocation record stays on the
+        # published bucket only.
         fe_in_publisher = (
             (isinstance(flux_kg_hr, Mapping) and 'Fe' in flux_kg_hr)
             or 'Fe' in below_fluxes
         )
         fe_residual_kg_hr = None
         if fe_in_publisher:
-            residual_capacity_mol = getattr(
-                self,
-                '_native_fe_vapor_residual_capacity_mol_this_hr',
-                None,
+            fe_residual_kg_hr = shared_fe_hkl_residual_kg_hr(
+                getattr(
+                    self,
+                    '_native_fe_vapor_residual_capacity_mol_this_hr',
+                    None,
+                ),
+                molar_mass_kg_mol=float(
+                    molar_masses_kg_mol.get('Fe', 0.0) or 0.0
+                ),
             )
-            if residual_capacity_mol is not None:
-                fe_molar_mass = float(molar_masses_kg_mol.get('Fe', 0.0) or 0.0)
-                # Explicit scheduling policy, not an activity calculation:
-                # native-pool Fe claims the shared transport capacity first,
-                # then melt-derived Fe is capped at the residual molar
-                # capacity times M_Fe [kg/mol], yielding kg/h. No pool or
-                # melt activity is an operand here. Limiting cases: zero
-                # residual gives zero melt-derived Fe; residual >= raw
-                # rate/M_Fe leaves the raw melt-derived rate unchanged.
-                fe_residual_kg_hr = (
-                    max(0.0, float(residual_capacity_mol)) * fe_molar_mass
-                )
         projected = project_publisher_vapour_rates(
             diagnostic,
             liquid_fraction_factor=liquid_fraction_factor,

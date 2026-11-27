@@ -60,6 +60,23 @@ def test_missing_starting_oxide_refuses_after_mutation() -> None:
     assert exc_info.value.reason == "missing_starting_oxide"
 
 
+def test_hashimoto_numeric_inputs_use_shared_finite_owner(monkeypatch) -> None:
+    def refuse_from_shared_owner(_value, _label):
+        raise ValueError("shared finite-number owner reached")
+
+    monkeypatch.setattr(hashimoto, "require_finite_float", refuse_from_shared_owner)
+    composition = {
+        oxide: 20.0 for oxide in hashimoto.REQUIRED_STARTING_OXIDES
+    }
+
+    with pytest.raises(Hashimoto1983Refusal) as exc_info:
+        hashimoto.validate_starting_composition(
+            {"starting_composition_wt_pct": composition}
+        )
+
+    assert exc_info.value.reason == "invalid_numeric_input"
+
+
 def test_runtime_pressure_floor_is_reported_when_area_is_available() -> None:
     preset = load_hashimoto_preset(DEFAULT_PRESET_PATH)
     mutated = dict(preset)
@@ -153,6 +170,17 @@ def test_admitted_rows_have_pinned_record_count_and_skip_superseded_rows() -> No
     with pytest.raises(Hashimoto1983Refusal) as exc_info:
         score_hashimoto_1983(observations=changed)
     assert exc_info.value.reason == "admitted_record_count_mismatch"
+
+
+def test_loader_uses_shared_residue_source_scope(monkeypatch) -> None:
+    monkeypatch.setattr(
+        hashimoto, "declared_residue_predictor", lambda _source_id: None
+    )
+
+    with pytest.raises(Hashimoto1983Refusal) as exc_info:
+        load_admitted_observations(DEFAULT_OBSERVATIONS_PATH)
+
+    assert exc_info.value.reason == "unexpected_source_id"
 
 
 def test_same_count_duplicate_override_refuses_after_mutation() -> None:

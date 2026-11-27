@@ -104,7 +104,19 @@ SIO_ANCHOR_HOUR = 6
 # mass-balance artifact (AtomLedger closes). Pin = executed probe value;
 # never hand-pasted. See docs-private/research/2026-08-09-b151-disposition/.
 # b-850: alkali composite vapour rows now use the parent-oxide activity.
-EXPECTED_SIO_DECADE_DRIFT = 0.2090602025512069
+# 2026-11-26 b274 fold 3. Receipt 89a03741 on the restored shared Fe
+# Langmuir residual (23c5bd4436). One equilibrium p_Fe at the Fe line
+# is one Hertz-Knudsen-Langmuir ceiling. When the native pool fills
+# that ceiling, oxide Fe(g) is 0 and no partner O2 is booked.
+# The debit-era pin 0.23295293140555928 is |log10(1.08/0.6314)|.
+# This hour returns to 0.2172763760591016, |log10(1.08/0.6546)|,
+# the pre-debit candidate. The finite leg stays on the vacuum floor
+# (~1.08 Pa). The IW leg is _compute_intrinsic_melt_fO2.
+# p_SiO ∝ pO2^-0.5. IW p_SiO 0.6314 → 0.6546 is
+# Δlog10(p_SiO) = log10(0.6546/0.6314) = +0.01567, so
+# Δlog10(pO2) = -2 * that = -0.0313 dex (the partner O2 is gone).
+# The older green anchor 0.2090602025512069 is not this hour.
+EXPECTED_SIO_DECADE_DRIFT = 0.2172763760591016
 
 
 def test_vaporock_sio_iw_vs_vacuum_floor_hot_c2a_anchor():
@@ -157,6 +169,15 @@ def test_pn2_sweep_sio_provider_uses_transport_floor_not_holdup_reservoir():
     sim.melt.pO2_mbar = requested_transport_pO2_bar * 1000.0
     sim.melt.p_total_mbar = 10.0
 
+    # r20 caps an over-P_total exchange target and still equilibrates.
+    # A reduced melt with redox capacity absorbs a 1e-3 mol holdup down
+    # to the numerical floor, so planting that holdup before the
+    # exchange leaves the ledger on the floor. The claim is the refresh
+    # split: ledger pO2 is the planted inventory, and inert-sweep
+    # transport pO2 is the sweep floor after the hour's bleed. Load the
+    # holdup once the absorbing steps have run.
+    sim._apply_oxygen_reservoir_exchange()
+    sim._apply_native_fe_saturation_split(sample_time_h=0.0)
     holdup_o2_mol = 1.0e-3
     sim.atom_ledger.load_external_mol(
         "process.overhead_gas",
@@ -164,9 +185,6 @@ def test_pn2_sweep_sio_provider_uses_transport_floor_not_holdup_reservoir():
         source="test PN2 holdup O2 must not drive SiO transport pO2",
         material_origin="feedstock",
     )
-
-    sim._apply_oxygen_reservoir_exchange()
-    sim._apply_native_fe_saturation_split(sample_time_h=0.0)
     reservoir = sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
     assert reservoir.headspace_ledger_pO2_bar > requested_transport_pO2_bar * 1.0e5
     assert requested_transport_pO2_bar * 1.0e5 == pytest.approx(1.0e-4)

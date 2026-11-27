@@ -49,6 +49,7 @@ from simulator.evaporation import (
     _load_evaporation_alpha_by_species,
     _pre_rg_effective_pressure_source,
     refuse_viscous_p_bulk_out_of_domain,
+    shared_fe_hkl_residual_kg_hr,
     viscous_p_bulk_out_of_domain_diagnostic,
 )
 from simulator.state import (
@@ -188,6 +189,20 @@ def _series_resistance_reference_flux(
             * sim.melt.melt_surface_area_m2
             * 3600.0
         )
+        if species == 'Fe':
+            # Same leftover the kernel applies. The pool and the oxide
+            # route share one p_Fe, so a pool that already filled C
+            # leaves oxide Fe(g) at 0 here too.
+            residual_kg_hr = shared_fe_hkl_residual_kg_hr(
+                getattr(
+                    sim,
+                    '_native_fe_vapor_residual_capacity_mol_this_hr',
+                    None,
+                ),
+                molar_mass_kg_mol=M_kg_mol,
+            )
+            if residual_kg_hr is not None:
+                rate_kg_hr = min(rate_kg_hr, residual_kg_hr)
         if rate_kg_hr > 1e-12:
             flux[species] = rate_kg_hr
     return flux

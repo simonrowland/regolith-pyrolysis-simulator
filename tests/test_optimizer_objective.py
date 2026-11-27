@@ -11432,10 +11432,17 @@ def test_sso2_owner_execution_uses_certified_na_dose_and_partition_path() -> Non
         surface["pO2_mbar"]
     )
     assert partition_basis["status"] == "available"
-    assert partition_basis["native_fe_source_account"] == "process.metal_phase"
+    # Receipt ab6a568b. Saturation extent now precipitates above 1e-12 mol,
+    # so core.py keeps the FeO split on process.cleaned_melt instead of
+    # falling through to a pre-existing metal-phase tap. d-469
+    # (8f174cc807) is that precipitation.
+    assert partition_basis["native_fe_source_account"] == "process.cleaned_melt"
     assert partition_basis["native_fe_split_commit_status"] == "ok"
     assert partition_basis["native_fe_vapor_route_status"] == "committed"
-    assert partition["native_fe_saturation_split_count"] == 0
+    # Receipt f527cd9f. The same precipitation commits five saturation
+    # splits. The old pin expected none because the metal-phase tap was
+    # the only Fe path.
+    assert partition["native_fe_saturation_split_count"] == 5
     assert partition["native_fe_metal_partition_count"] >= 1
     assert partition["native_fe_partition_transition_count"] >= 1
     assert partition["tap_basis"]["status"] == "available"
@@ -11446,11 +11453,18 @@ def test_sso2_owner_execution_uses_certified_na_dose_and_partition_path() -> Non
     assert evidence["metal_product_path"]["Fe_kg"] == pytest.approx(0.0)
     assert evidence["metal_product_path"]["product_ledger_Fe_kg"] > 0.0
     fallback = evidence["prototype_alpha_fallback_provenance"]
-    # CrO2 is predicted using the Cr proxy, but 0.5 Cr2O3 + 0.25 O2 -> CrO2
-    # consumes overhead O2. With no O2 inventory, depletion commits no CrO2;
-    # provider fallback warnings and committed-run authority have distinct scopes.
-    assert "CrO2" not in execution.simulator._alpha_authority_status_by_species_engaged
-    assert not any(
+    # Receipt faba7dd0 on the restored shared residual, and d0f75638
+    # before it. 0.5 Cr2O3(l) + 0.25 O2 -> CrO2(g), so O2_per_product_kg
+    # is negative. The depletion gate reads process.overhead_gas O2 and
+    # drops the rate only while that account is at or below 1e-12 kg.
+    # The account stays above the gate after the pool and the oxide route
+    # share one Langmuir ceiling, so the full-ceiling debit is not the
+    # oxygen this commit needs. Authority stays proxy/bridge.
+    assert (
+        execution.simulator._alpha_authority_status_by_species_engaged.get("CrO2")
+        == "proxy/bridge"
+    )
+    assert any(
         transition.reason == "evaporate_CrO2"
         for transition in execution.simulator.atom_ledger.transitions
     )
@@ -11474,14 +11488,23 @@ def test_sso2_owner_execution_uses_certified_na_dose_and_partition_path() -> Non
     assert "engaged_species=`CrO2`" in report
     assert f"engagement_count=`{fallback['total_engagement_count']}`" in report
 
-    # Legacy opt-in controls cannot remove a flagged CrO2 prediction.
+    # Receipt faba7dd0 on the restored shared residual, and a2016cb1
+    # before it. CrO2's stored alpha is the metals-Cr broad proxy
+    # (0.9, authority proxy/bridge). b-1195 does not let the legacy
+    # opt-in withhold that flux. The depletion gate drops it only while
+    # process.overhead_gas O2 is at or below 1e-12 kg. That account stays
+    # above the gate with the shared residual cap, so the opt-in-off path
+    # still commits the same vapor. CrO2 stays out of missing_alpha.
     default_sim, missing_by_hour = _sso2_sim_alpha_fallback_disabled(hours=3)
     assert all("CrO2" not in hourly for hourly in missing_by_hour)
-    assert not any(
+    assert any(
         transition.reason == "evaporate_CrO2"
         for transition in default_sim.atom_ledger.transitions
     )
-    assert "CrO2" not in default_sim._alpha_authority_status_by_species_engaged
+    assert (
+        default_sim._alpha_authority_status_by_species_engaged.get("CrO2")
+        == "proxy/bridge"
+    )
 
 
 def test_sso2_owner_gate_timeout_uses_flagged_floor_and_completes(monkeypatch):

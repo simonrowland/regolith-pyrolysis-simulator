@@ -200,9 +200,17 @@ def test_lunar_mare_c2a_hot_cro2_trace_closes_chromium_atoms():
     )
     assert stage_cr2o3 == pytest.approx(terminal_chromia["Cr2O3"])
     # CrO2 reacts into chromia. d-402's solid-standard-state wall equilibrium
-    # also carries elemental Cr onto colder collectors: 1.03396984e-5 kg on
-    # Stage 1 as an impurity, 1.30930814e-7 kg on Stage 2, and 5.82146862e-5 kg
-    # on Stage 4. The colder Stage-4 surface captures more Cr-bearing vapour.
+    # also carries elemental Cr onto colder collectors. The colder Stage-4
+    # surface captures more Cr-bearing vapour.
+    # 2026-11-26 b274, receipt 760753a1 at b7a91af39c. The ledger melt-fO2
+    # publish (a95942989e) and the d-469 native-Fe floor (8f174cc807) hold
+    # this analytical C2A melt on the Fe line, so it is more reducing than
+    # the pin. Elemental Cr capture rises on every cold stage. The oxide-Fe
+    # debit is the wrong direction (Fe leaves, oxygen stays) and is not this
+    # increase. Cr atoms still close on the same receipt.
+    # stage1 1.0339698354445707e-5 -> 1.1909190423957114e-05 kg
+    # stage2 1.3093081434769078e-7 -> 2.1869512470244872e-07 kg
+    # stage4 5.821468620201194e-5 -> 1.4695151642570516e-04 kg
     captured_cr_by_stage = {
         stage.stage_number: stage.collected_kg["Cr"]
         for stage in sim.train.stages
@@ -210,9 +218,9 @@ def test_lunar_mare_c2a_hot_cro2_trace_closes_chromium_atoms():
     }
     assert captured_cr_by_stage == pytest.approx(
         {
-            1: 1.0339698354445707e-5,
-            2: 1.3093081434769078e-7,
-            4: 5.821468620201194e-5,
+            1: 1.1909190423957114e-05,
+            2: 2.1869512470244872e-07,
+            4: 1.4695151642570516e-04,
         },
         rel=1e-9,
         abs=0.0,

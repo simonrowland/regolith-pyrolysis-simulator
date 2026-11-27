@@ -10,7 +10,8 @@
     "magemin_fullrun_b": 16709.486,
     "magemin_fullrun_c": 5112.176,
     "magemin_fullrun_d": 1999.277,
-    "serial": 4278.223
+    "serial": 4278.223,
+    "t1745-parsed-store": 600.0
   },
   "schema": 1,
   "source_files": [
@@ -21,6 +22,7 @@
     "serial 2136.098 -> 4278.223 (+2142.125s, 2026-11-10): nightly b-549 committed-store regeneration joined the chain after ci-train-tip2.xml was measured; +2142.125s is its successful byte-comparison wall duration on Mac-Studio-256-3. Supersede with a measured group total at the next hint regeneration.",
     "hashimoto_real_cohort 854.0 -> 1800.0 (2026-11-12): provisional lower bound from three whole-file remote runs that reached the 1800 s per-test wall timeout; no completed duration was measured. Three cpu_budget(1) probes produced no receipt within 75 min. Replace after a completed remote run.",
     "migration-series-census 250.0 -> 499.049 (+249.049s, 2026-11-13): the current remote gate cannot emit JUnit XML (the profile refuses --junitxml); interim hand estimate is the sum of the latest measured member process-CPU durations, J01 230.693s and K04 268.356s. Supersede with a measured JUnit group total at the next hint regeneration.",
-    "magemin_golden removed (2026-11-23): the global golden-producer serial group added about 2 h of serial chain once its mark actually applied on xdist workers, and the b271 nightly hit the 21600 s wall. Evidence, with its limits: timeout-attempt digest stripping makes a RECOVERED retry digest-neutral when the retry reproduces the same final result (injected proof on tree 2398a3dba0: two single recovered socket-trace timeouts, stripped trace byte-identical). An exhausted retry fails loudly (environment-tagged refusal or EvaporationFluxRefusal), and a provider step-down shows up as exact-compare drift, not as a silent pass. The scheduling receipt (run f3b7f1ab1ecd43abb805deea47af5090, studio-2, -n 6, 1009 passed / 0 failed) had the nine producer files effectively ungrouped but the cost-ledger consumer still on @magemin_golden; the fully ungrouped schedule is proven by the train run on this commit. Ungrouped, runner_golden_loader consumers rebuild the session capture once per worker that runs one (more CPU, less wall), as on every nightly before b271."
+    "magemin_golden removed (2026-11-23): the global golden-producer serial group added about 2 h of serial chain once its mark actually applied on xdist workers, and the b271 nightly hit the 21600 s wall. Evidence, with its limits: timeout-attempt digest stripping makes a RECOVERED retry digest-neutral when the retry reproduces the same final result (injected proof on tree 2398a3dba0: two single recovered socket-trace timeouts, stripped trace byte-identical). An exhausted retry fails loudly (environment-tagged refusal or EvaporationFluxRefusal), and a provider step-down shows up as exact-compare drift, not as a silent pass. The scheduling receipt (run f3b7f1ab1ecd43abb805deea47af5090, studio-2, -n 6, 1009 passed / 0 failed) had the nine producer files effectively ungrouped but the cost-ledger consumer still on @magemin_golden; the fully ungrouped schedule is proven by the train run on this commit. Ungrouped, runner_golden_loader consumers rebuild the session capture once per worker that runs one (more CPU, less wall), as on every nightly before b271.",
+    "t1745-parsed-store 600.0 (2026-11-26): provisional candidate hint from a 351.5s median cold-parse overhead (cold minus warm medians across four guards) plus 96.6s summed warm medians and headroom; full migration file ran in 375s, though that is not the group-only wall duration."
   ]
 }

@@ -392,6 +392,51 @@ def test_liquidus_finder_forwards_normalized_redox_state():
     assert calls[0]['fO2_log'] == pytest.approx(
         state.log_fO2_at(REDOX_STATE_REFERENCE_T_K)
     )
+    assert 'warm_solidus_T_C' not in calls[0]
+    assert 'warm_liquidus_T_C' not in calls[0]
+
+
+def test_liquidus_finder_remembers_published_brackets_only():
+    from types import SimpleNamespace
+
+    request = IntentRequest(
+        intent=ChemistryIntent.SILICATE_LIQUIDUS,
+        account_view=ProviderAccountView(accounts={}, species_formula_registry={}),
+        temperature_C=1400.0,
+        pressure_bar=1.0,
+    )
+    calls = []
+    returns = [
+        SimpleNamespace(status='ok', solidus_T_C=910.0, liquidus_T_C=1360.0),
+        SimpleNamespace(
+            status='not_converged',
+            solidus_T_C=None,
+            liquidus_T_C=None,
+        ),
+        SimpleNamespace(status='ok', solidus_T_C=912.0, liquidus_T_C=1362.0),
+    ]
+
+    class FakeBackend:
+        def find_liquidus_solidus(self, **kwargs):
+            calls.append(kwargs)
+            return returns[len(calls) - 1]
+
+    provider = MAGEMinShadowProvider(backend=FakeBackend())
+    composition = {'process.cleaned_melt': {'SiO2': 1.0}}
+    for _ in range(3):
+        provider._run_liquidus_finder(
+            provider._backend,
+            request,
+            composition_mol_by_account=composition,
+        )
+
+    assert 'warm_solidus_T_C' not in calls[0]
+    assert calls[1]['warm_solidus_T_C'] == 910.0
+    assert calls[1]['warm_liquidus_T_C'] == 1360.0
+    assert calls[2]['warm_solidus_T_C'] == 910.0
+    assert calls[2]['warm_liquidus_T_C'] == 1360.0
+    assert provider._warm_solidus_T_C == 912.0
+    assert provider._warm_liquidus_T_C == 1362.0
 
 
 def test_liquidus_finder_keyerror_propagates():

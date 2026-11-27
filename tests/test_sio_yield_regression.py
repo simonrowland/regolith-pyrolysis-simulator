@@ -628,15 +628,22 @@ def test_sio_yield_restored_capture_keeps_provenance_and_closure(feedstock):
     # admitted; atom-ledger closure remains independently bounded at 5e-12%.
     # The lunar cancellation residual is 1.54541037e-14 percentage points
     # below its prior studio pin, a change in the near-equal subtraction path.
+    # 2026-11-26 b274 fold 3 receipt faba7dd0 on the restored shared
+    # residual. The subtraction is two nearly equal bulk SiO2 inventories.
+    # Lunar stays 2.163099670067247e-07. Mars moves
+    # 5.990418880141893e-07 -> 6.995673928794778e-07 because the partner
+    # O2 of the oxide-Fe route is no longer booked once the native pool
+    # fills the one Langmuir ceiling, and the SiO2 pair follows that
+    # oxygen. Both stay far below 1e-4 percent.
     expected_closure_error_pct = {
-        "lunar_mare_low_ti": 1.664998945735705e-6,
+        "lunar_mare_low_ti": 2.163099670067247e-07,
         # r3's melt-to-headspace clamp advances fO2 only for oxygen committed
         # from reservoir.fo2_buffer; the unbacked remainder is held and the
         # resulting subtraction residual is reported by the production resolver.
         # The piecewise segment solve changes the cancellation residual by
         # 1.134167275e-14 percentage points from the single-exponential pin;
         # canonical atom-ledger balance remains within 5e-12 percent.
-        "mars_basalt": 4.4306091172096064e-7,
+        "mars_basalt": 6.995673928794778e-07,
     }
     assert diagnostics["closure_error_pct"] == pytest.approx(
         expected_closure_error_pct[feedstock], rel=1.0e-9, abs=1.0e-15
@@ -658,11 +665,30 @@ def test_sio_yield_restored_capture_keeps_provenance_and_closure(feedstock):
             "terminal_offgas_escape",
         }
     )
+    # Production closure counts wall Si atoms (_sio_wall_terminal_mol).
+    # The fume map does not. Receipt 559dd172: both restored-capture
+    # closures pass once this term is added, and fail on mars without it
+    # (add74280: fume-equivalent 9.85420158521e-06 kg versus evolved
+    # 1.18288804958e-05 kg). The shared residual cap does not delete
+    # that wall: the staged sum rose on receipt 89a03741, and the lunar
+    # identity on faba7dd0 still closed. kg / (M_g_per_mol / 1000) = mol.
+    # mol * M_SiO / 1000 = kg SiO.
+    # Only-SiO limit: the two molar-mass factors cancel.
+    wall_kg = report["wall_deposit_kg"]
+    wall_mol = {
+        species: float(wall_kg.get(species, 0.0) or 0.0)
+        / (MOLAR_MASS[species] / 1000.0)
+        for species in ("SiO", "Si", "SiO2", "FeSi")
+    }
+    wall_sio_equivalent_kg = (
+        _sio_wall_terminal_mol(wall_mol) * MOLAR_MASS["SiO"] / 1000.0
+    )
     reported_sio_equivalent_kg = (
         captured_sio2_kg * sio2_to_sio_equivalent
         + placement["condensation_train_silicon_coproduct"]
         * si_to_sio_equivalent
         + placement["terminal_offgas_escape"]
+        + wall_sio_equivalent_kg
     )
     assert reported_sio_equivalent_kg == pytest.approx(
         report["sio_evolved_kg"], rel=1.0e-8

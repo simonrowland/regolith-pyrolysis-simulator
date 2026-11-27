@@ -1094,10 +1094,26 @@ def test_default_lunar_staged_continues_after_refused_window():
         assert event["reason"] == "alkali_purity_exceeded"
         assert event["resolved_stage3_route"] == "divert"
     product = stage_purity_report(execution.simulator.train)["stage_3_sio_zone"]
-    assert product["total_kg"] == 0.0
-    assert product["purity_fraction"] is None
+    # Receipt 89a03741. Divert refuses the SiO window at hours 4, 5 and 6,
+    # and stage 3 stays on the walk for non-alkali species. Designated
+    # silica is 0 kg. The impurity map is still Fe only.
+    # 2.0723064448357866e-06 -> 3.1382970430349533e-06 kg, so purity is 0
+    # and the verdict is CONTAMINATED. The shared residual cap books no
+    # oxide Fe(g) once the native pool fills the hour, so this iron is
+    # the pool vapor on that one Langmuir ceiling (d-469, 8f174cc807),
+    # not a second oxide-route booking. Direction CONSEQUENCE.
+    # Species at or below 1e-12 kg are omitted by stage_purity_report,
+    # so the Fe entry is the whole impurity map.
+    impurity = product["impurity_species_kg"]
+    assert product["designated_kg"] == 0.0
+    assert product["coproduct_species_kg"] == {}
+    assert list(impurity) == ["Fe"]
+    assert impurity["Fe"] == pytest.approx(3.1382970430349533e-06, rel=1e-12)
+    assert product["total_kg"] == impurity["Fe"]
+    assert product["purity_fraction"] == 0.0
+    assert product["verdict"] == "CONTAMINATED"
     # The event survives JSON artifacts and alone makes the requested window
-    # infeasible even when there is no actual silica contact or wall deposit.
+    # infeasible while designated silica stays at zero.
     artifact = json.loads(json.dumps({"shadow_trace": execution.shadow_trace}))
     diagnostics = _coating_runtime_diagnostics(artifact)
     assert len(diagnostics["silica_exposed_to_alkali_findings"]) == 3

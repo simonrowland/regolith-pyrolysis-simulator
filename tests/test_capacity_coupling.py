@@ -12,12 +12,14 @@ import yaml
 import simulator.capacity_coupling as capacity_coupling
 import simulator.chemistry.melt_activity as melt_activity
 from engines.builtin.evaporation_flux import _NONTRIVIAL_FLUX_KG_HR
+from engines.builtin.evaporation_transition import _NUMERICAL_FLOOR_KG
 from engines.builtin.overhead_bleed import (
     BuiltinOverheadBleedProvider,
     OXYGEN_SPECIES,
     compressible_pressure_capacity_fraction,
 )
 from simulator.accounting import resolve_species_formula
+from simulator.accounting.lots import EMPTY_KG_TOLERANCE
 from simulator.alpha_kinetics import ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
 from simulator.capacity_coupling import (
     CapacityCouplingRefusalError,
@@ -1040,14 +1042,29 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     pins = capacity_pin_values(snapshot)
     # 5a7121241, brought in by bef9af1e7 (last old first-parent: 4b6555249),
     # executes flagged broad-proxy alphas instead of the unmeasured fallback
-    # of 1. At this 1400 C step CrO and AlO equilibrium pressure, activity,
-    # and pO2 are unchanged. The executed alphas are the declared proxies:
-    # CrO 0.9 and AlO 0.3. Series flux is J = dP / (r_interface + r_gas),
-    # with r_interface = 1/(alpha * k_HK) and r_gas independent of alpha
+    # of 1. The executed alphas are the declared proxies: CrO 0.9 and
+    # AlO 0.3. Series flux is J = dP / (r_interface + r_gas), with
+    # r_interface = 1/(alpha * k_HK) and r_gas independent of alpha
     # (engines/builtin/evaporation_flux.py), so the rates do not scale by
-    # those alpha ratios. Saturation and melt mass move with the two rates.
+    # those alpha ratios.
+    #
+    # The hour publishes the Kress inverse of the loaded Fe3+/ΣFe,
+    # log10(fO2/bar) = -10.95393128857757. The condensed-metal floor
+    # does not bind. Na and K both read that melt oxygen
+    # (MO0.5 → M(g) + 0.25 O2, ν = -1/4, reference 1 bar). Against the
+    # old -9 seed the pressure ratio is
+    # 10^(0.25 × 1.95393128857757) = 3.079518533436423.
+    # The total is not that ratio applied to Na alone. Na is
+    # 0.18138877088440097 kg/h of 0.19308943834122952 kg/h. Backing Na
+    # out of the old 0.06423669542196676 kg/h total by the same ratio
+    # leaves 0.00533502981582087 kg/h of other flux. Replacing only the
+    # Na term predicts 0.18672380070022185 kg/h. The measured total is
+    # 0.00636563764100767 kg/h higher. K shares ν = -1/4, so that gap
+    # is the rest of the family. Transport pO2 stays 1e-9 bar, so SiO
+    # does not follow the melt oxygen. The 1 mbar Ar film is unchanged,
+    # and saturation moves with the flux. At the -9 seed the ratio is 1.
     assert pins["non_phosphorus_kg_hr"] == pytest.approx(
-        0.06423669542196676, rel=1e-12, abs=1e-12
+        0.19308943834122952, rel=1e-12, abs=1e-12
     )
     assert ceiling_flux_species <= set(
         snapshot.evap_flux.alpha_authority_status_by_species
@@ -1075,14 +1092,17 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
             "melt_mass_kg",
         )
     ) == pytest.approx(
-        # Same proxy-alpha step as the non-phosphorus pin above. Hour and
+        # Same melt-oxygen step as the non-phosphorus pin above. Hour and
         # temperature stay on the d-252 1 mbar Ar, 200 C/h ramp.
+        # Melt mass is the executed residue, not old mass minus the
+        # extra vapour: the Fe split and the overhead bleed move mass
+        # the vapour total does not include.
         (
             1,
             1400.0,
-            0.06423669542196676,
-            2.4701307118784706,
-            998.7072055627636,
+            0.19308943834122952,
+            7.44196736902761,
+            998.578352542956,
         ),
         rel=1.0e-12,
         abs=1.0e-12,
@@ -1119,6 +1139,7 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         "alkali cartridge accumulates this hour of condensate",
         "melt-out returns liquid alkali to the train",
         "evaporate_AlO",
+        "condense_AlO",
         "evaporate_Ca",
         "condense_Ca",
         "evaporate_CaO_gas",
@@ -1142,14 +1163,25 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         "fe_redox_respeciation",
         "overhead_bleed",
     )
-    # d-402 adds accounted wall holdup for reactive vapours. The established
-    # evaporation/condensation order remains intact around those transitions.
+    # d-402 retains a reactive vapour while a coupled baffle product is
+    # at or below 1e-12 kg. AlO disproportionates as 3 AlO -> Al + Al2O3.
+    # AlO reads the melt oxygen at one-quarter power, the same channel as
+    # Na, so this hour's ledger fO2 raises the vapour. The Al leg then
+    # clears the floor and the route books condense_AlO. At the old -9
+    # seed that leg stayed under the floor and the parcel was holdup.
     actual_order = iter(transition_reasons)
     assert all(
         any(actual == expected for actual in actual_order)
         for expected in expected_transition_order
     )
-    assert "retain_condensation_holdup_AlO" in transition_reasons
+    alo_metal_kg = 0.0
+    for transition in sim.atom_ledger.transitions:
+        if transition.reason != "condense_AlO":
+            continue
+        for lot in transition.credits:
+            alo_metal_kg += float(lot.species_kg.get("Al", 0.0))
+    assert alo_metal_kg > EMPTY_KG_TOLERANCE
+    assert "retain_condensation_holdup_AlO" not in transition_reasons
     assert sim.atom_ledger.project_account_kg("terminal.offgas").get(
         "Ca", 0.0
     ) > 0.0
@@ -1213,7 +1245,45 @@ def test_default_off_c0_pipe_cap_preserves_hot_fe_redox_split_head_result(monkey
         for species, rate in snapshot.evap_flux.species_kg_hr.items()
         if float(rate) > 0.0
     }
-    assert abs(released_kg_hr - capacity_kg_hr) <= _NONTRIVIAL_FLUX_KG_HR
+    # The pipe scale is capacity/demand, so the scaled carrier rates sum
+    # to capacity. The transition provider then refuses a carrier before
+    # booking it. Premise: the floor is 1e-12 kg on the tick mass
+    # (engines/builtin/evaporation_transition.py), and dt_hr is this step.
+    # Algebra: leg_kg = rate_kg_hr * dt_hr * stoich_kg_per_kg. The parent
+    # debit at or below the floor returns no transition. A parent that
+    # clears it still returns none when the O2 coproduct is positive and
+    # at or below the floor, so a small coproduct cannot accumulate an
+    # oxygen deficit across carriers. The refused tail is those vapor
+    # rates in kg/h. Unit check: both stoich ratios are kg/kg, so the
+    # legs are kg and the tail stays kg/h. Limiting case: no refused
+    # carrier leaves the tail at 0 and requires released == capacity.
+    # TiO is the carrier whose parent clears the floor and whose O2 leg
+    # does not. Oxide vapor with a zero O2 coproduct fails on the parent
+    # debit instead. The closure uses the existing flux floor because
+    # the tail is that sum, not a measured gap.
+    scale = capacity_kg_hr / demand_kg_hr
+    dt_hr = float(sim.process_dt_hr())
+    refused_terms: list[float] = []
+    for species, demand_i in demand_species.items():
+        scaled_kg_hr = float(demand_i) * scale
+        if scaled_kg_hr <= 0.0:
+            continue
+        sp_data = sim.vapor_pressures.get("metals", {}).get(species) or (
+            sim.vapor_pressures.get("oxide_vapors", {}).get(species) or {}
+        )
+        stoich = sim._evaporation_stoich(species, sp_data)
+        oxide_kg = scaled_kg_hr * dt_hr * float(stoich["oxide_per_product_kg"])
+        o2_kg = scaled_kg_hr * dt_hr * float(stoich["O2_per_product_kg"])
+        if (
+            oxide_kg <= _NUMERICAL_FLOOR_KG
+            or 0.0 < abs(o2_kg) <= _NUMERICAL_FLOOR_KG
+        ):
+            refused_terms.append(scaled_kg_hr)
+    refused_tail_kg_hr = math.fsum(refused_terms)
+    assert refused_tail_kg_hr > 0.0
+    assert abs(
+        released_kg_hr + refused_tail_kg_hr - capacity_kg_hr
+    ) <= _NONTRIVIAL_FLUX_KG_HR
     assert demand_kg_hr - capacity_kg_hr > _NONTRIVIAL_FLUX_KG_HR
 
     def _committed_vapor_kg(species: str) -> float:
@@ -1700,7 +1770,8 @@ def test_loop3_renders_live_binding_cause(
         turbine_limited=False,
     )
     sim.campaign_mgr = SimpleNamespace(
-        get_temp_target=lambda *_args: (1600.0, 100.0)
+        get_temp_target=lambda *_args: (1600.0, 100.0),
+        _lab_schedule=lambda *_args: None,
     )
 
     sim._update_temperature()

@@ -627,6 +627,29 @@ def test_freeze_gate_cache_key_distinguishes_nio_coo_moles(
     )
 
 
+def _curve_pin_mismatch(observed, expected):
+    """First rows that differ, so a studio failure is readable without -vv."""
+    parts = []
+    for key in sorted(set(observed) | set(expected)):
+        got = list(observed.get(key) or [])
+        want = list(expected.get(key) or [])
+        if got == want:
+            continue
+        parts.append(f'{key}: got {len(got)} want {len(want)}')
+        shown = 0
+        for index in range(max(len(got), len(want))):
+            got_row = got[index] if index < len(got) else None
+            want_row = want[index] if index < len(want) else None
+            if got_row == want_row:
+                continue
+            parts.append(f'  [{index}] got {got_row!r}')
+            parts.append(f'  [{index}] want {want_row!r}')
+            shown += 1
+            if shown >= 6:
+                break
+    return '\n'.join(parts)
+
+
 # Full 24 h / 12 h / 12 h runner campaigns: review call 294.56 s;
 # base run timed out at 310.90 s total under the unchanged 300 s test limit.
 @pytest.mark.nightly
@@ -674,6 +697,44 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
                 1370.3125,
                 ((918.75, 0.0), (1370.3125, 1.0)),
             ),
+            # 2026-11-26 receipt 84f613c8. Ledger fO2 (a95942989e) and the
+            # d-469 floor (8f174cc807) move melt Fe redox, so the liquidus
+            # cache misses on more lunar hours. C0B stays 918.75/1370.3125.
+            # The old 921.875/1368.75 rows are gone. Adjacent 1.5625 C cells
+            # appear (915.625, 917.1875, 920.3125, 1371.875), and 1045.3125 C
+            # and 1050 C miss the memo. Mars is unchanged. Each row keeps
+            # the magemin-shadow composition_projected source and the
+            # two-point path. Receipt 84f613c8 also recorded a third C4
+            # curve at hour 22, the same 1050.0/1370.3125 brackets as
+            # hour 21: Na2O stepped from 0.0041 to 0.004, across the 1e-4
+            # composition quantum, so the core memo missed. 23c5bd4436
+            # leaves oxide Fe only the leftover of the one Langmuir
+            # ceiling after the native pool. Less Fe leaves the melt
+            # (hour 14 FeO is 0.1456; hour 21 FeO is 0.1436 and Na2O
+            # stays 0.0041). Hour 22 hits that memo, so
+            # _freeze_gate_curve_record does not run and the lunar list
+            # is 11.
+            (
+                'C2A_STAGED',
+                'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
+                1045.3125,
+                1371.875,
+                ((1045.3125, 0.0), (1371.875, 1.0)),
+            ),
+            (
+                'C2A_STAGED',
+                'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
+                915.625,
+                1371.875,
+                ((915.625, 0.0), (1371.875, 1.0)),
+            ),
+            (
+                'C2A_STAGED',
+                'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
+                917.1875,
+                1370.3125,
+                ((917.1875, 0.0), (1370.3125, 1.0)),
+            ),
             (
                 'C2A_STAGED',
                 'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
@@ -689,25 +750,39 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
                 ((920.3125, 0.0), (1370.3125, 1.0)),
             ),
             (
-                'C2A_STAGED',
+                'C3_NA',
                 'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
-                921.875,
-                1368.75,
-                ((921.875, 0.0), (1368.75, 1.0)),
+                920.3125,
+                1370.3125,
+                ((920.3125, 0.0), (1370.3125, 1.0)),
             ),
             (
                 'C3_NA',
                 'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
-                921.875,
-                1368.75,
-                ((921.875, 0.0), (1368.75, 1.0)),
+                1050.0,
+                1370.3125,
+                ((1050.0, 0.0), (1370.3125, 1.0)),
             ),
             (
                 'C3_NA',
                 'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
-                921.875,
-                1368.75,
-                ((921.875, 0.0), (1368.75, 1.0)),
+                1050.0,
+                1370.3125,
+                ((1050.0, 0.0), (1370.3125, 1.0)),
+            ),
+            (
+                'C4',
+                'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
+                920.3125,
+                1370.3125,
+                ((920.3125, 0.0), (1370.3125, 1.0)),
+            ),
+            (
+                'C4',
+                'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
+                1050.0,
+                1370.3125,
+                ((1050.0, 0.0), (1370.3125, 1.0)),
             ),
         ],
         'mars_basalt_C2A_12h': [
@@ -1015,7 +1090,7 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
         for curves in logical_gate_reads.values()
         for curve in curves
     )
-    assert observed == expected
+    assert observed == expected, _curve_pin_mismatch(observed, expected)
 
 
 def test_native_fe_no_commit_split_suppresses_vapor_route(

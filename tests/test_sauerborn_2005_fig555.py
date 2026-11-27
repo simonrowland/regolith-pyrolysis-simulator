@@ -18,7 +18,13 @@ from simulator.diagnostic_helpers.sauerborn_2005 import (
     compare_sauerborn_o2_partial_pressure_time_series,
     load_sauerborn_fig555_path_series,
 )
-from simulator.lab_schedule import LabScheduleValidationError, normalize_lab_schedule
+from simulator.core import Atmosphere
+from simulator.lab_schedule import (
+    LAB_SCHEDULE_DEFAULT_GAS_BOUNDARY,
+    LabScheduleValidationError,
+    normalize_lab_schedule,
+)
+from simulator.runner import PyrolysisRun
 
 
 def _require_corpus_files() -> None:
@@ -101,8 +107,8 @@ def test_sauerborn_comparison_refuses_missing_runtime_pressure_series() -> None:
     assert refusal.value.reason_code == "qms_po2_series_missing"
 
 
-def test_blank_chamber_pressure_remains_below_implemented_floor() -> None:
-    schedule = {
+def _sauerborn_blank_schedule() -> dict[str, object]:
+    return {
         "id": "sauerborn_blank_pressure_floor",
         "duration_h": 1.0,
         "interpolation": "piecewise_linear",
@@ -118,9 +124,61 @@ def test_blank_chamber_pressure_remains_below_implemented_floor() -> None:
         ],
     }
 
+
+def test_blank_chamber_pressure_below_floor_runs_with_default_boundary() -> None:
+    # 08e7129868 made the sub-floor schedule a domain notice; d-460 says a
+    # printed chamber pressure remains callable with the vacuum/free-molecular
+    # default when the source does not print a gas boundary.
+    schedule = _sauerborn_blank_schedule()
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C2A",
+        hours=1,
+        mass_kg=1.0,
+        backend_name="internal-analytical",
+        runtime_campaign_overrides={"C2A": {"lab_schedule": schedule}},
+        force_builtin_vapor_pressure=True,
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+    )
+    session = run._start_session()
+
+    assert session.simulator.melt.atmosphere is Atmosphere.HARD_VACUUM
+    assert session.simulator.melt.p_total_mbar == pytest.approx(1.7e-4)
+    assert session.simulator.melt.background_gas_species == ""
+    runtime_schedule = session.simulator.campaign_mgr._lab_schedule(
+        session.simulator.melt.campaign
+    )
+    assert runtime_schedule["gas_boundary"]["default_boundary"] == (
+        LAB_SCHEDULE_DEFAULT_GAS_BOUNDARY
+    )
+
+    result = run._run_session(session)
+    assert result["status"] == "ok"
+    enforcement = result["per_hour_summary"][0]["pO2_enforcement"]
+    pressure_notices = enforcement["pressure_domain_notices"]
+    assert len(pressure_notices) == 2
+    assert all(
+        notice["reason"] == "lab_schedule_pressure_below_implemented_floor"
+        for notice in pressure_notices
+    )
+    gas_boundary_notices = enforcement["gas_boundary_notices"]
+    assert len(gas_boundary_notices) == 2
+    assert all(
+        notice["reason"] == "lab_schedule_gas_boundary_default_unprinted"
+        and notice["pressure_mbar"] == pytest.approx(1.7e-4)
+        and notice["default_boundary"] == LAB_SCHEDULE_DEFAULT_GAS_BOUNDARY
+        for notice in gas_boundary_notices
+    )
+
+
+def test_missing_gas_boundary_without_printed_pressure_still_refuses() -> None:
+    schedule = _sauerborn_blank_schedule()
+    schedule.pop("chamber_pressure_mbar")
+
     with pytest.raises(
         LabScheduleValidationError,
-        match="lab_schedule_pressure_below_implemented_floor",
+        match="lab_schedule_missing_gas_boundary",
     ):
         normalize_lab_schedule(schedule)
 

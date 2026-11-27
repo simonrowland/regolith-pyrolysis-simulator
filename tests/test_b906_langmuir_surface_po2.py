@@ -540,10 +540,14 @@ def test_subfloor_cao_closes_at_5_3423_pa_even_with_buffer() -> None:
 def test_buffered_melt_keeps_green_in_band_pressure() -> None:
     """Fe2+/Fe3+ melt at fO2_log -9 keeps the mass-action Ca pressure.
 
-    The Kress derivative at this fO2 is nonzero, so both ferric and
-    ferrous iron are in the couple and ``C_m`` is above the noop
-    threshold. Eval pO2 is 1e-9 bar, above the physical floor. d-376
-    amendment 1 leaves the flux map on green's published pressure.
+    The Kress derivative at the planted -9 is nonzero, so both ferric
+    and ferrous iron are in the couple and ``C_m`` is above the noop
+    threshold. d-469 then raises the evaluator pO2 onto the Fe line:
+    at 2200 C, Holzheid gamma times the ferrous fraction exceeds 1, so
+    a_FeO sits on the pure-FeO ceiling and the line is that floor.
+    The planted log stays on ``source_reaction_fO2_log10``. d-376
+    amendment 1 leaves the flux map on the pressure published at the
+    floored pO2. The 1e-30 envelope floor is a different gate.
     """
 
     comp_wt, fe_atom_mol = _buffered_melt()
@@ -570,7 +574,13 @@ def test_buffered_melt_keeps_green_in_band_pressure() -> None:
     answer = _cao_answer(-9.0, _BUFFERED_KG)
     diagnostic = answer.diagnostic
     published, published_ca, p_ref_bar = _published_ca(diagnostic)
-    assert diagnostic["source_reaction_fO2_bar"] == pytest.approx(1.0e-9)
+    floor_notice = diagnostic["melt_metal_saturation_floor_notice"]
+    assert floor_notice["metal"] == "Fe"
+    assert floor_notice["unfloored_log10_fO2_bar"] == pytest.approx(-9.0)
+    assert diagnostic["source_reaction_fO2_log10"] == pytest.approx(-9.0)
+    assert diagnostic["source_reaction_fO2_bar"] == pytest.approx(
+        10.0 ** float(floor_notice["floor_log10_fO2_bar"])
+    )
     assert not _pO2_is_melt_dissociation_floor(
         diagnostic["source_reaction_fO2_bar"]
     )

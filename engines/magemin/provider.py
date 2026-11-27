@@ -195,6 +195,11 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         self._backend_initialised: bool = backend is not None
         self._backend_initialization_error: Optional[Exception] = None
         self._parity_comparator: MAGEMinParityComparator = MAGEMinParityComparator()
+        # Last published solidus/liquidus. The provider is one instance for
+        # the run; the backend must not remember brackets, because a caller
+        # that omits the hint is a full-grid search.
+        self._warm_solidus_T_C: Optional[float] = None
+        self._warm_liquidus_T_C: Optional[float] = None
 
     def capability_profile(self) -> CapabilityProfile:
         return CapabilityProfile(
@@ -622,13 +627,26 @@ class MAGEMinShadowProvider(ChemistryProvider, RealBackendAuthority):
         species_registry = dict(
             request.account_view.species_formula_registry or {}
         )
-        return finder(
-            pressure_bar=float(request.pressure_bar),
-            fO2_log=(float(fO2_log) if fO2_log is not None else -9.0),
-            redox_state=redox_state,
-            composition_mol_by_account=composition_mol_by_account,
-            species_formula_registry=species_registry,
-        )
+        finder_kwargs = {
+            'pressure_bar': float(request.pressure_bar),
+            'fO2_log': (float(fO2_log) if fO2_log is not None else -9.0),
+            'redox_state': redox_state,
+            'composition_mol_by_account': composition_mol_by_account,
+            'species_formula_registry': species_registry,
+        }
+        if (
+            self._warm_solidus_T_C is not None
+            and self._warm_liquidus_T_C is not None
+        ):
+            finder_kwargs['warm_solidus_T_C'] = self._warm_solidus_T_C
+            finder_kwargs['warm_liquidus_T_C'] = self._warm_liquidus_T_C
+        result = finder(**finder_kwargs)
+        solidus_T_C = _safe_attr_float(result, 'solidus_T_C')
+        liquidus_T_C = _safe_attr_float(result, 'liquidus_T_C')
+        if solidus_T_C is not None and liquidus_T_C is not None:
+            self._warm_solidus_T_C = solidus_T_C
+            self._warm_liquidus_T_C = liquidus_T_C
+        return result
 
     @staticmethod
     def _mode_label(backend: Any) -> str:

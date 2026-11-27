@@ -2544,8 +2544,12 @@ def _index_neighbour_cells(
     """Point each coarse cell at this exact key. The first store wins until replaced.
 
     A later store in the same cell replaces the pointer so an expired key
-    does not stick. The exact row is already in this transaction. A failure
-    here rolls back only the index.
+    does not stick. The exact row is already in this transaction. A SQLite
+    failure here rolls back only the index and returns False (the caller
+    counts ``neighbour_index_error``). Only ``sqlite3.Error`` is caught: the
+    block runs nothing but SQL, so any other exception is a programming
+    error and must propagate instead of being counted as an index miss
+    (SC-388: no broad handler publishing a literal result).
     """
 
     _lookup, cells = _scope_neighbour_cells(request)
@@ -2563,7 +2567,7 @@ def _index_neighbour_cells(
             ],
         )
         connection.execute("RELEASE engine_neighbour")
-    except Exception:
+    except sqlite3.Error:
         try:
             connection.execute("ROLLBACK TO engine_neighbour")
             connection.execute("RELEASE engine_neighbour")

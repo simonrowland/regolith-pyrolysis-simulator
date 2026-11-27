@@ -111,8 +111,12 @@ def test_short_run_payload_and_ledger_match_rollback_baseline_golden():
     # 9666fc129 plus the de32c69ca runner regen). Mars runs diverge between
     # the laptop and studio-3, so this digest is not a laptop re-run.
     # constack merge: repin on gate box
+    # 2026-11-26 b274 receipt 66d482b2 at b7a91af39c. The deterministic
+    # payload moved with the evaporation-stack publish (a95942989e) and
+    # the oxide-Fe debit (f187184015). The ledger digest is still the
+    # assert below; this receipt did not reach it.
     assert hashlib.sha256(payload_bytes).hexdigest() == (
-        "718ffcf58809ccc9d85d8f125a7e418b19e711a61d8b6f22ec9279b251d4c751"
+        "15af17bf60d709093a1964b867cb2375f92af855e6aecb9d4f12bba0ceb75b9f"
     )
     assert hashlib.sha256(ledger_bytes).hexdigest() == (
         "c366b84c33ed81fb2a2c3c376df6cd20ac8366a5ae8e279d1679ba143a9bc4a3"
@@ -1197,30 +1201,41 @@ def test_finite_capacity_in_domain_rates_match_parent_nonbinding_baseline(
     assert not sim._last_evaporation_flux_diagnostic.get(
         "continuum_extrapolation_notice"
     )
-    # Re-pinned from the production resolver after c3's clamp-order change;
-    # the four changed rates move by at most 1.4%.
+    # 2026-11-26 fold 3 receipt 00b11dee on the restored shared residual.
+    # Fe is absent below 1e-12 kg/h. One equilibrium p_Fe is one Langmuir
+    # ceiling. The native pool fills the hour, the leftover is 0, and
+    # oxide Fe(g) is 0. The debit-era 3.3904576358450609e-07 kg/h was
+    # that second booking. SiO stays 8.6442356840838498e-08 kg/h
+    # (7.769179203709372e-09 on the older pin). It does not fall when
+    # the partner O2 is unbooked. SiO2 = SiO(g) + 1/2 O2, so
+    # p_SiO ∝ pO2^-0.5 and oxygen left behind would lower p_SiO.
+    # log10(8.6442356840838498e-08 / 7.769179203709372e-09)
+    # = 1.0463514603711137 dex in p_SiO, so Δlog10(pO2) = −2.0927029207422274.
+    # That is the reducing direction, the same way the hot C0 publish
+    # moves (−9 → −10.95).
+    # The other in-domain rates held at the debit-era pins.
     expected_rates = {
-        "Al": 1.776974630811854e-10,
-        "AlO": 2.5868512647895485e-10,
-        "Ca": 6.00143229355403e-09,
-        "CaO_gas": 2.067737447801073e-11,
-        "Cr": 4.3552191736308734e-05,
-        "CrO": 9.129280757927083e-06,
-        "CrO2": 3.170453002929102e-06,
-        "CrO3": 9.294384109563237e-10,
-        "K": 1.8395070246088384e-04,
-        "K2": 1.6813544178336032e-11,
-        "Mg": 7.23266209617007e-05,
-        "MgO_gas": 1.0307259466430569e-07,
-        "Mn": 2.2585292315558916e-05,
-        "Na": 5.142690508092712e-03,
-        "Na2": 3.013634463408095e-08,
-        "Na2O_gas": 3.0031933641137976e-11,
-        "Si": 1.2046947950628297e-10,
-        "SiO": 7.769179203709372e-09,
-        "SiO2_gas": 4.598894711291365e-06,
-        "TiO": 2.8635316467141483e-09,
-        "TiO2_gas": 4.788176871001818e-08,
+        "Al": 1.789269763883407e-10,
+        "AlO": 2.4971541382164936e-10,
+        "Ca": 5.9168308552594104e-09,
+        "CaO_gas": 1.9543796520004764e-11,
+        "Cr": 4.3853613062064352e-05,
+        "CrO": 8.8127454105578785e-06,
+        "CrO2": 2.9337358745904382e-06,
+        "CrO3": 8.2451709834535378e-10,
+        "K": 0.00017763926333385068,
+        "K2": 1.567366908980952e-11,
+        "Mg": 7.1307107081973212e-05,
+        "MgO_gas": 9.7422023636948713e-08,
+        "Mn": 2.226713318587091e-05,
+        "Na": 0.0049798191341988585,
+        "Na2": 2.8170051809863292e-08,
+        "Na2O_gas": 2.6912848304714164e-11,
+        "Si": 1.238887834600154e-10,
+        "SiO": 8.6442356840838498e-08,
+        "SiO2_gas": 4.346773521329708e-06,
+        "TiO": 2.8231648246199435e-09,
+        "TiO2_gas": 4.5256787981332239e-08,
     }
     actual_rates = {
         str(species): float(rate)

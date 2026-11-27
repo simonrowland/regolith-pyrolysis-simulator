@@ -419,13 +419,23 @@ def test_successful_openimcc_physics_is_bit_identical() -> None:
         exclude_b813_temperature_notices=True,
     )
     # Numeric-only hash captured from the green 4b95c7176 engine on studio-2.
+    # 2026-11-26 b274 receipt 5abafffc at b7a91af39c. vapor_pressures_Pa
+    # and activities at 2400.65 K moved. The 1800 K constant-gamma
+    # numeric hash below did not, so this is the openimcc map on the
+    # evaporation-stack merge a95942989e, remeasured after the floor fixes.
     assert hashlib.sha256(
         json.dumps(numeric_payload, sort_keys=True).encode()
-    ).hexdigest() == "3d1181198c3ed5425d44a1d1c4fb3f96d1d4a36f3ceff918eb7d7a0d7ecdc8e5"
-    # Projected metadata digest captured from merged green cb20fb3d4 on studio-2.
+    ).hexdigest() == "d0e6be0b136271284b56fa387dfc0a8977455951c25b7981c85fde05fffdf6f9"
+    # Combined digest embeds numeric_payload. Receipt 5abafffc moved
+    # vapor_pressures_Pa and activities at 2400.65 K (evaporation-stack
+    # publish a95942989e, remeasured after the d-469 floor); that numeric
+    # pin is the assert above and it passed again on receipt e1976c37.
+    # The combined digest was still the pre-move green value, so it moves
+    # with the numeric payload it contains. Sources, numerator provenance
+    # and warnings ride along; this receipt does not separate them.
     assert hashlib.sha256(
         json.dumps((*numeric_payload, *metadata_payload), sort_keys=True).encode()
-    ).hexdigest() == "1064588935496b5f0ff99e1ff6e2908bc62f20e1845520ebe8aa321a91c76582"
+    ).hexdigest() == "1aa8934529adcfe6ee1ad603e736107bb57ccccf8b1666931d891bb299502145"
 
 
 def test_1800_k_pre_switch_physics_pin() -> None:
@@ -442,9 +452,13 @@ def test_1800_k_pre_switch_physics_pin() -> None:
         json.dumps(numeric_payload, sort_keys=True).encode()
     ).hexdigest() == "f82b65f10ddba00cbfdeaee41ac19406e2d81fc91a2e55518a2b5388a2137d01"
     # Projected metadata digest captured from merged green cb20fb3d4 on studio-2.
+    # 2026-11-26 b274 receipt 5abafffc. The numeric assert above passed,
+    # so vapor pressures and activities at 1800 K are unchanged. The
+    # provenance/warnings digest moved with the evaporation-stack publish
+    # (a95942989e).
     assert hashlib.sha256(
         json.dumps((*numeric_payload, *metadata_payload), sort_keys=True).encode()
-    ).hexdigest() == "4557c916600edd636d29d482a0772385440fa4daf68a9d5a6d54139c5b344fdd"
+    ).hexdigest() == "603dfe3472ba3bf6be94c8b14b2cd7fa3953372b223785904390b52e301cfbb7"
 
 
 @pytest.mark.parametrize("temperature_K, expected", [(1650.0, False), (1800.0, True)])

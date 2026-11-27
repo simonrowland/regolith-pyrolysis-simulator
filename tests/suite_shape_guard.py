@@ -162,6 +162,18 @@ HEAVY_ROSTER = frozenset({
     # is established. Nightly-only while the cohort call volume is reduced.
     ("tests/battery/test_hashimoto_residue_predictions.py",
      "test_hashimoto_openimcc_primary_numeric_output_is_pinned"),
+    # Owner-ratified b274 steer (2026-11-26). The full lunar capture pin
+    # calls the C0->C6 fixture body itself, so that Python is on the
+    # worker. Receipt b5022121 measured 370.948 s of process_time after
+    # the maps matched. process_time excludes child MAGEMin, and the
+    # campaign finished, so this is not a hung engine scan and not a
+    # warm-start bypass: the hint still narrows a same-cell hour, and a
+    # wider move full-scans on purpose (liquidus.py). The extra worker
+    # Python is the d-469 Fe-line root, the ledger-fO2 publish, and the
+    # oxide-Fe debit's wall booking. 500 s is one third over that one
+    # sample, not the 5400 s sibling ceiling (measured 1728 s elsewhere).
+    ("tests/chemistry/test_condensation_green_pins.py",
+     "test_green_full_lunar_capture_pin"),
 })
 
 # b-586: these campaign-length yield nodes must stay out of the PR tier. They

@@ -549,17 +549,11 @@ def _run_gate_shape(
 
     def alternate(request):
         calls.append('alphamelts')
-        if shape.startswith('recovered') and calls.count('alphamelts') == 1:
-            return IntentResult(
-                intent=request.intent, status='not_converged', diagnostic={
-                    'backend_status_reason': 'incomplete_cooling_path',
-                    'backend_diagnostics': {
-                        'physical_overhead_pressure_bar': .009,
-                        'condensed_phase_reference_pressure_bar': 1,
-                        'numerical_path_warning': 'abandoned path',
-                    },
-                },
-            )
+        # 608263b0b3 stops the planner on a primary timeout, and 68958d0da1
+        # dropped that abandoned AlphaMELTS call from the recovered list.
+        # The only AlphaMELTS call left is the post-retry step-down. It is
+        # the clean success the stripped curve is compared with, not the
+        # old incomplete_cooling_path continuation.
         return IntentResult(
             intent=request.intent, status='ok', diagnostic={
                 'solidus_T_C': 1100, 'liquidus_T_C': 1400,

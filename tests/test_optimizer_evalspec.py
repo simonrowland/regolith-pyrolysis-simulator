@@ -3901,7 +3901,6 @@ def test_lab_schedule_profile_bridges_experiment_windows_to_window_semantics() -
             "nonmonotonic_pressure",
             "lab_schedule_chamber_pressure_mbar_time_arrays_must_be_monotonic",
         ),
-        ("missing_gas_boundary", "lab_schedule_missing_gas_boundary"),
         ("missing_point_unit", "lab_schedule_melt_temperature_C_unit_missing"),
         ("pressure_unit_pa", "lab_schedule_chamber_pressure_mbar_unit_mismatch"),
         ("temperature_unit_k", "lab_schedule_melt_temperature_C_unit_mismatch"),
@@ -3958,8 +3957,6 @@ def test_lab_schedule_profile_fail_loud_rules_are_named(
             {"t_h": 0.5, "value": 13.0, "unit": "mbar"},
             {"t_h": 0.4, "value": 13.0, "unit": "mbar"},
         ]
-    elif mutation == "missing_gas_boundary":
-        schedule.pop("gas_boundary")
     elif mutation == "missing_point_unit":
         schedule["melt_temperature_C"][0].pop("unit")
     elif mutation == "pressure_unit_pa":

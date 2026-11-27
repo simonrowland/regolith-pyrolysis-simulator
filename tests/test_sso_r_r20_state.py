@@ -1006,6 +1006,61 @@ def test_o2_bubbler_capacity_floor_refuses_without_fo2_move_or_transition(
     )
 
 
+def test_o2_bubbler_at_effervescence_ceiling_skips_unloaded_dose(
+    monkeypatch,
+) -> None:
+    sim = _make_sim()
+    ceiling = -2.0  # log10(10 mbar / 1000 mbar per bar)
+    sim.melt.temperature_C = 1600.0
+    sim.melt.p_total_mbar = 10.0
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = ceiling - 5.0e-10
+    sim.melt.oxygen_reservoir.reference_T_K = 1600.0 + 273.15
+    sim._sync_oxygen_reservoir_mirror()
+    _configure_o2_bubbler(
+        sim,
+        rate_kg_per_hr=0.01,
+        eta_absorb=1.0,
+        target_fO2_log=-1.0,
+    )
+    monkeypatch.setattr(
+        sim,
+        "_melt_redox_source_capacity_mol_per_ln_fO2",
+        lambda **_kwargs: 0.0,
+    )
+    monkeypatch.setattr(sim, "_solid_char_carbon_mol", lambda: 0.0)
+    sim._reset_redox_source_diagnostics_for_hour()
+    before_atoms = math.fsum(
+        sim.atom_ledger.atom_moles_by_account(account).get("O", 0.0)
+        for account in sim.atom_ledger.mol_by_account()
+    )
+    before_buffer_o2 = sim.atom_ledger.mol_by_account(
+        "reservoir.fo2_buffer"
+    ).get("O2", 0.0)
+    before_transitions = len(sim.atom_ledger.transitions)
+
+    diagnostic = sim._apply_o2_bubbler()
+
+    after_atoms = math.fsum(
+        sim.atom_ledger.atom_moles_by_account(account).get("O", 0.0)
+        for account in sim.atom_ledger.mol_by_account()
+    )
+    assert diagnostic["status"] == "skipped"
+    assert diagnostic["reason"] == "at_effervescence_ceiling"
+    assert diagnostic["absorption_respeciation"]["status"] == "skipped"
+    assert diagnostic["absorption_respeciation"]["reason"] == (
+        "at_effervescence_ceiling"
+    )
+    assert diagnostic["injected_mol"] == pytest.approx(0.0)
+    assert sim.atom_ledger.mol_by_account("reservoir.fo2_buffer").get(
+        "O2",
+        0.0,
+    ) == pytest.approx(before_buffer_o2)
+    assert len(sim.atom_ledger.transitions) == before_transitions
+    assert after_atoms == pytest.approx(before_atoms)
+    assert sim._redox_source_terms_this_hr == {}
+    assert sim._redox_source_applied_terms_this_hr == {}
+
+
 def test_o2_bubbler_cap_prevents_overoxidation_and_overhead_transition() -> None:
     sim = _make_sim()
     sim.melt.p_total_mbar = 10.0  # Keep the seed and target below the gas ceiling.

@@ -262,10 +262,16 @@ def _rail_request(
     process_phase: str | None = None,
 ) -> IntentRequest:
     oxygen_bar = 10.0**fo2_log10_bar
+    # One printed log for both sides. VapoRock equilibrated at
+    # fo2_log10_bar. The Fe saturation floor would replace the 1950 K,
+    # log10(fO2/bar) = -9 cell with a value 0.075286 dex more oxidizing,
+    # and oxide-metal vapour would follow that other pO2. Production
+    # evaporation does not set this flag, so its floor stays.
     control_inputs: dict[str, Any] = {
         "pO2_bar": oxygen_bar,
         "pO2_admission": "observation",
         "intrinsic_fO2_log": fo2_log10_bar,
+        "dissociation_at_printed_fO2": True,
     }
     if process_phase is not None:
         control_inputs["process_phase"] = process_phase

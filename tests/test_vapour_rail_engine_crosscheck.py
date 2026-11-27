@@ -173,6 +173,79 @@ def test_rail_observation_oxygen_reaches_transport_unchanged():
     assert math.log10(result.diagnostic['pO2_bar']) == grid[0]
 
 
+# Crosscheck melt at the cell where the Fe floor binds. Moles are the
+# stored engine-crosscheck composition, not a reduced stand-in.
+_FLOOR_BINDING_COMPOSITION_MOL = {
+    "Al2O3": 132.4047646609761,
+    "CaO": 196.15885300568857,
+    "Cr2O3": 2.302795198606217,
+    "FeO": 229.664272590613,
+    "K2O": 1.061620712644752,
+    "MgO": 223.30289797538705,
+    "MnO": 2.8194013835704803,
+    "Na2O": 6.453846916909297,
+    "P2O5": 0.7045105102035387,
+    "SiO2": 740.6421117454188,
+    "TiO2": 18.781694108808615,
+}
+_FE_FLOOR_LOG_AT_1950_K = -8.924713987633552
+
+
+def test_rail_comparison_dissociates_at_the_printed_fo2():
+    """The reference and the rail cell share the printed log.
+
+    At 1950 K and log10(fO2/bar) = -9 the Fe saturation floor is
+    0.075286 dex more oxidizing for this melt. Leaving the floor on
+    evaluates Al (p ∝ pO2^(-3/4)) and Ti (p ∝ pO2^(-1)) at a different
+    oxygen potential from VapoRock. The harness flag keeps the printed
+    log. Dropping the flag still floors, so production's bound is intact.
+    """
+
+    import math
+    from dataclasses import replace
+
+    from simulator.vapour_rail.engine_crosscheck import (
+        _rail_request,
+        load_rail_provider,
+    )
+
+    printed = -9.0
+    provider, _payload = load_rail_provider()
+    request = _rail_request(
+        composition_mol=_FLOOR_BINDING_COMPOSITION_MOL,
+        temperature_K=1950.0,
+        fo2_log10_bar=printed,
+        pressure_bar=1.0e-6,
+    )
+    assert request.control_inputs["dissociation_at_printed_fO2"] is True
+    compared = provider.dispatch(request)
+    assert compared.status == "ok"
+    compared_log = math.log10(compared.diagnostic["source_reaction_fO2_bar"])
+    assert compared_log == pytest.approx(printed, abs=1.0e-12)
+
+    floored_request = replace(
+        request,
+        control_inputs={
+            key: value
+            for key, value in request.control_inputs.items()
+            if key != "dissociation_at_printed_fO2"
+        },
+    )
+    floored = provider.dispatch(floored_request)
+    assert floored.status == "ok"
+    floored_log = math.log10(floored.diagnostic["source_reaction_fO2_bar"])
+    assert floored_log == pytest.approx(_FE_FLOOR_LOG_AT_1950_K, abs=1.0e-12)
+    delta = floored_log - printed
+    compared_p = compared.diagnostic["vapor_pressures_Pa"]
+    floored_p = floored.diagnostic["vapor_pressures_Pa"]
+    assert math.log10(floored_p["Al"] / compared_p["Al"]) == pytest.approx(
+        -0.75 * delta, abs=1.0e-9
+    )
+    assert math.log10(floored_p["Ti"] / compared_p["Ti"]) == pytest.approx(
+        -delta, abs=1.0e-9
+    )
+
+
 def test_runner_hard_requires_vr5_warm_pool():
     with pytest.raises(Exception, match="warm pool"):
         run_engine_crosscheck(

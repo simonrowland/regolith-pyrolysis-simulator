@@ -513,12 +513,23 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(hours):
     if hours == 24:
         assert not any(record.get("refusal_type") == "DepositionInputRefusal"
                        for records in refused.values() for record in records.values())
-        transport = wall["evaporation_transport_notices_by_species"]
-        assert transport["SiO"]["evaporation"]["authority_level"] == "extrapolated"
-        assert "Kn < 0.01" in transport["SiO"]["evaporation"]["model_domain"]
-        # b-858 restores the sourced Svehla Si Lennard-Jones row (t-1369), so
-        # this channel is a flagged prediction rather than a missing-input refusal.
-        assert transport["Si"]["evaporation"]["authority_level"] == "extrapolated"
+        # The out-of-domain transport notice is public only when Kn is
+        # transitional. This schedule commands 13 mbar for the whole
+        # window (fixture diameter 0.02 m). At 2473.15 K that Kn is
+        # 0.00236, below VISCOUS_KNUDSEN_MAX (0.01), so the map is empty
+        # and diagnostics.py omits the key.
+        #
+        # Green published the notice because C2A's soft endpoint
+        # (total flux below 0.1 kg/h after 18 h) handed the last hours
+        # to C3_K, whose default total pressure is 1.0 mbar. Kn there is
+        # 0.00236 * (13/1) = 0.0307, inside (0.01, 10). The published
+        # melt fO2 keeps the C2A Fe and Mg flux above 0.1 kg/h, so the
+        # run never takes that 1.0 mbar step. Algebra check: the same
+        # mean free path at 100 Pa and 1300 Pa scales with 1/P.
+        # The Svehla Si Lennard-Jones row (b-858) is what makes that
+        # channel a flagged prediction once the domain refusal fires.
+        # It is not reached while this hour stays viscous.
+        assert "evaporation_transport_notices_by_species" not in wall
     pareto = document["run_metadata"]["pressure_coating_pareto_diagnostic"]["by_species"]
     assert pareto["Mg"]["authority_level"] == "extrapolated"
     # The cold wall flags Na. The coating pareto does not promote an
@@ -532,8 +543,8 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(hours):
     assert pareto["Al2"]["status"] == "unavailable"
     assert pareto["SiO"]["vapour_pressure_extrapolation_notice"]["authority_level"] == "extrapolated"
     if hours == 24:
-        assert pareto["SiO"]["evaporation_transport_notices"] == transport["SiO"]
-        assert pareto["Si"]["evaporation_transport_notices"] == transport["Si"]
+        assert "evaporation_transport_notices" not in pareto["SiO"]
+        assert "evaporation_transport_notices" not in pareto["Si"]
 
 
 @pytest.mark.parametrize("all_missing", [False, True], ids=["partial", "all"])

@@ -37,6 +37,7 @@ _LEGITIMATE_BOOLEAN_CONTROL_INPUTS = frozenset(
         "commit_empty_transition",
         "dedicated_ca_condenser",
         "diagnostic_only",
+        "dissociation_at_printed_fO2",
         "force_drain_all",
         "gas_resistance_enabled",
         "kinetic_driven_above_crossover",
