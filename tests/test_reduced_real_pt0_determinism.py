@@ -4542,6 +4542,86 @@ def test_pt1_ladder_subnormal_key_is_wrapped_by_row_admission(
     assert isinstance(raised.value.__cause__, ZeroDivisionError)
 
 
+@pytest.mark.parametrize(
+    ("control_name", "invalid_value"),
+    (("T_K", 1.0e160), ("pressure_bar", -1.0)),
+    ids=("temperature-overflow-domain", "negative-pressure-domain"),
+)
+def test_pt1_ladder_rejects_out_of_domain_controls_before_rederivation(
+    tmp_path: Path,
+    control_name: str,
+    invalid_value: float,
+) -> None:
+    db_path = tmp_path / f"pt1-invalid-{control_name}-ladder-key.sqlite"
+    key = _c3a_ladder_key(
+        "domain-source",
+        feo_fraction=0.123456,
+        temperature_K=1234.5678,
+    )
+    _put_c3a_payload(db_path, key, "domain-source")
+
+    original_key_hash = _key_hash(key)
+    corrupt_key = copy.deepcopy(rrd._json_ready(key))
+    corrupt_key["controls"][control_name] = invalid_value
+    corrupt_key_bytes = canonical_json_bytes(corrupt_key)
+    corrupt_key_hash = rrd._sha256(corrupt_key_bytes)
+    bucket_key = canonical_physics_bucket_key_from_replay_key(corrupt_key)
+    bucket_bytes = canonical_json_bytes(bucket_key)
+    ladder_values = rrd._physics_ladder_values_from_replay_key(corrupt_key)
+    assignments = [
+        "key_hash = ?",
+        "key_sha256 = ?",
+        "key_bytes = ?",
+        "physics_bucket_sha256 = ?",
+        "replay_scope_sha256 = ?",
+        "physics_key_bytes = ?",
+    ]
+    values: list[object] = [
+        corrupt_key_hash,
+        corrupt_key_hash,
+        sqlite3.Binary(corrupt_key_bytes),
+        rrd._sha256(bucket_bytes),
+        rrd._replay_scope_hash(bucket_key),
+        sqlite3.Binary(bucket_bytes),
+    ]
+    for rung_tag, _sig_figs in rrd.PHYSICS_BUCKET_ALL_LADDER_RUNGS:
+        assignments.extend(
+            (
+                f"{rrd._physics_ladder_hash_column(rung_tag)} = ?",
+                f"{rrd._physics_ladder_distance_column(rung_tag)} = ?",
+            )
+        )
+        values.extend(
+            (
+                ladder_values[rung_tag]["sha256"],
+                ladder_values[rung_tag]["distance"],
+            )
+        )
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+            f"SET {', '.join(assignments)} WHERE key_hash = ?",
+            (*values, original_key_hash),
+        )
+
+    rung_tag = rrd.PHYSICS_BUCKET_LADDER_RUNGS[0][0]
+    rung_key = rrd.canonical_physics_ladder_bucket_key_from_replay_key(
+        corrupt_key,
+        rung_tag,
+    )
+    with pytest.raises(
+        PT1PersistentStoreCorrupt,
+        match=rf"controls\.{control_name}",
+    ):
+        PT1PersistentEquilibriumStore(db_path)._get_by_physics_ladder_bucket(
+            artifact="equilibrium_post_record",
+            rung_tag=rung_tag,
+            rung_key=rung_key,
+            rung_hash=rrd._sha256(canonical_json_bytes(rung_key)),
+            query_key=corrupt_key,
+        )
+
+
 def test_pt1_shard_merge_wraps_nested_stored_repair_notices(
     tmp_path: Path,
 ) -> None:
@@ -7919,18 +7999,25 @@ def test_pt1_verify_on_hit_fails_loudly(
 
 
 @pytest.mark.parametrize(
-    ("index_kind", "distance_corruption"),
+    ("index_kind", "distance_corruption", "corrupt_payload_bytes"),
     (
-        ("bucket", None),
-        ("ladder", "missing"),
-        ("ladder", "incorrect"),
+        ("bucket", None, False),
+        ("ladder", "missing", False),
+        ("ladder", "incorrect", False),
+        ("ladder", "missing", True),
     ),
-    ids=("bucket-key-bytes", "ladder-distance-missing", "ladder-distance-wrong"),
+    ids=(
+        "bucket-key-bytes",
+        "ladder-distance-missing",
+        "ladder-distance-wrong",
+        "ladder-distance-missing-before-invalid-payload-bytes",
+    ),
 )
 def test_pt1_bucket_and_ladder_integrity_precedes_stale_codec_admission(
     tmp_path: Path,
     index_kind: str,
     distance_corruption: str | None,
+    corrupt_payload_bytes: bool,
 ) -> None:
     db_path = tmp_path / f"pt1-{index_kind}-{distance_corruption}.sqlite"
     capture = PT0DeterminismStore("capture", db_path=db_path)
@@ -7969,15 +8056,23 @@ def test_pt1_bucket_and_ladder_integrity_precedes_stale_codec_admission(
                     )
                     + 0.01
                 )
+            payload_bytes_assignment = (
+                ", payload_bytes = ?" if corrupt_payload_bytes else ""
+            )
+            update_values: tuple[object, ...] = (0, corrupted_distance)
+            if corrupt_payload_bytes:
+                update_values += (-1,)
             conn.execute(
                 f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
-                f"SET payload_codec_version = ?, {distance_column} = ? "
+                f"SET payload_codec_version = ?, {distance_column} = ?"
+                f"{payload_bytes_assignment} "
                 "WHERE key_hash = ?",
-                (0, corrupted_distance, key_hash),
+                (*update_values, key_hash),
             )
 
     persistent = PT1PersistentEquilibriumStore(db_path)
-    with pytest.raises(PT1PersistentStoreCorrupt):
+    expected_message = "distance is missing" if corrupt_payload_bytes else None
+    with pytest.raises(PT1PersistentStoreCorrupt, match=expected_message):
         if index_kind == "bucket":
             persistent._get_by_physics_bucket(
                 artifact="freeze_gate_curve",

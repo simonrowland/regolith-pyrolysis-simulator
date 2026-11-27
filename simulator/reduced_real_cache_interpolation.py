@@ -31,6 +31,20 @@ INTERPOLATION_COORDINATE_EPS = 1.0e-12
 INTERPOLATION_ERROR_TERM = "cached_interpolated_neighbor_disagreement"
 
 
+def _interpolation_control_names(key: Mapping[str, Any]) -> list[str]:
+    control_names = ["T_K"]
+    controls = key.get("controls", {})
+    if not isinstance(controls, Mapping):
+        return control_names
+    if controls.get("pressure_bar") is not None:
+        control_names.append("pressure_bar")
+    if _physics_bucket_consumes_pO2_bar(key) and controls.get("pO2_bar") is not None:
+        control_names.append("pO2_bar")
+    if _physics_bucket_consumes_log_fO2(key) and controls.get("log_fO2") is not None:
+        control_names.append("log_fO2")
+    return control_names
+
+
 def interpolation_feature_spec(key: Mapping[str, Any]) -> tuple[list[str], list[str]]:
     species = sorted(
         {
@@ -40,16 +54,70 @@ def interpolation_feature_spec(key: Mapping[str, Any]) -> tuple[list[str], list[
             )
         }
     )
-    control_names: list[str] = ["T_K"]
-    controls = key.get("controls", {})
-    if isinstance(controls, Mapping):
-        if controls.get("pressure_bar") is not None:
-            control_names.append("pressure_bar")
-        if _physics_bucket_consumes_pO2_bar(key) and controls.get("pO2_bar") is not None:
-            control_names.append("pO2_bar")
-        if _physics_bucket_consumes_log_fO2(key) and controls.get("log_fO2") is not None:
-            control_names.append("log_fO2")
-    return species, control_names
+    return species, _interpolation_control_names(key)
+
+
+def interpolation_key_domain_violation(
+    key: Mapping[str, Any],
+    *,
+    query_keys: Sequence[Mapping[str, Any]] = (),
+) -> str | None:
+    """Return the first interpolation/ladder coordinate outside its domain."""
+
+    composition = key.get("composition_mol_fraction")
+    if not isinstance(composition, (list, tuple)) or not composition:
+        return "composition_mol_fraction"
+    for component in composition:
+        if isinstance(component, Mapping):
+            fraction = component.get("mol_fraction")
+        elif isinstance(component, (list, tuple)) and len(component) == 2:
+            fraction = component[1]
+        else:
+            return "composition_mol_fraction"
+        if not is_declared_real_scalar(fraction):
+            return "composition_mol_fraction"
+        try:
+            numeric_fraction = float(fraction)
+        except (OverflowError, TypeError, ValueError):
+            return "composition_mol_fraction"
+        if not math.isfinite(numeric_fraction) or not 0.0 <= numeric_fraction <= 1.0:
+            return "composition_mol_fraction"
+
+    controls = key.get("controls")
+    if not isinstance(controls, Mapping):
+        return "controls"
+    control_names = set(_interpolation_control_names(key))
+    for query_key in query_keys:
+        control_names.update(_interpolation_control_names(query_key))
+
+    # These broad physical bounds also keep squared interpolation deltas safe.
+    domains = {
+        "T_K": (0.0, 10_000.0),
+        "pressure_bar": (0.0, 1_000_000.0),
+        "pO2_bar": (0.0, 1_000_000.0),
+        "log_fO2": (-300.0, 300.0),
+    }
+    for control_name in sorted(control_names):
+        value = controls.get(control_name)
+        if not is_declared_real_scalar(value):
+            return f"controls.{control_name}"
+        try:
+            numeric_value = float(value)
+        except (OverflowError, TypeError, ValueError):
+            return f"controls.{control_name}"
+        low, high = domains[control_name]
+        below_domain = (
+            numeric_value <= low
+            if control_name == "T_K"
+            else numeric_value < low
+        )
+        if (
+            not math.isfinite(numeric_value)
+            or below_domain
+            or numeric_value > high
+        ):
+            return f"controls.{control_name}"
+    return None
 
 
 def interpolation_coordinate_vector(
@@ -83,6 +151,8 @@ def greedy_nearest_neighbors(
 ) -> list[dict[str, Any]]:
     if not candidates:
         return []
+    if interpolation_key_domain_violation(query_key) is not None:
+        return []
     species_order, control_names = interpolation_feature_spec(query_key)
     query_vector = interpolation_coordinate_vector(
         query_key,
@@ -96,6 +166,11 @@ def greedy_nearest_neighbors(
             query_key,
             candidate_key,
         ):
+            continue
+        if interpolation_key_domain_violation(
+            candidate_key,
+            query_keys=(query_key,),
+        ) is not None:
             continue
         candidate_vector = interpolation_coordinate_vector(
             candidate_key,

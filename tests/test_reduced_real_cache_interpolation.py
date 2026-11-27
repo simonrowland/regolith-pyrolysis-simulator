@@ -188,6 +188,19 @@ def test_greedy_nn_prefers_along_trajectory_neighbors() -> None:
     assert [neighbor["label"] for neighbor in neighbors] == ["same-near", "same-far"]
 
 
+def test_greedy_nn_rejects_extreme_candidate_controls_before_distance_math() -> None:
+    query = _interpolation_key("query", feo_fraction=0.20, temperature_K=1500.0)
+    candidate_key = _interpolation_key(
+        "extreme", feo_fraction=0.20, temperature_K=1.0e160
+    )
+    candidate = _candidate(
+        candidate_key,
+        _interpolation_payload(liquid_fraction=0.8, sio_pa=8.0),
+    )
+
+    assert rci.greedy_nearest_neighbors(query, [candidate]) == []
+
+
 def test_interpolation_refuses_dependency_vector_mismatch() -> None:
     query = _interpolation_key("query", feo_fraction=0.20, temperature_K=1500.0)
     candidate_key = copy.deepcopy(query)

@@ -2230,6 +2230,7 @@ class PT0DeterminismStore:
                 physics_bucket_key=physics_bucket_key,
                 physics_bucket_bytes=physics_bucket_bytes,
                 physics_bucket_hash=physics_bucket_hash,
+                validate_interpolation_domain=True,
             )
             if admitted is not None and admitted.decoded_payload is not None:
                 return admitted.entry, admitted.decoded_payload
@@ -2246,6 +2247,7 @@ class PT0DeterminismStore:
                 physics_bucket_key=physics_bucket_key,
                 physics_bucket_bytes=physics_bucket_bytes,
                 physics_bucket_hash=physics_bucket_hash,
+                validate_interpolation_domain=True,
             )
             if admitted is not None and admitted.decoded_payload is not None:
                 return admitted.entry, admitted.decoded_payload
@@ -2529,6 +2531,7 @@ def _admit_stored_row(
     strict_source_validation: bool = False,
     validate_source_provenance: bool = False,
     approved_sources: frozenset[str] = APPROVED_LIVE_VAPOR_SOURCES,
+    validate_interpolation_domain: bool = False,
 ) -> _AdmittedStoredRow | None:
     """Validate one complete stored row inside its store's error boundary."""
 
@@ -2566,6 +2569,16 @@ def _admit_stored_row(
                 raise PT0CacheCollision(
                     f"PT-0 stored key is not a mapping for {artifact}: {key_hash}"
                 )
+            if validate_interpolation_domain:
+                from simulator.reduced_real_cache_interpolation import (
+                    interpolation_key_domain_violation,
+                )
+
+                if interpolation_key_domain_violation(
+                    stored_key,
+                    query_keys=admission_keys or (),
+                ) is not None:
+                    return None
             stored_key_bytes = raw_row.get("key_bytes")
             if isinstance(stored_key_bytes, str):
                 stored_key_bytes = stored_key_bytes.encode("utf-8")
@@ -2672,9 +2685,6 @@ def _admit_stored_row(
         row_artifact = str(row["artifact"])
         row_key_bytes = _pt1_row_bytes(
             row["key_bytes"], field="key", key_hash=row_hash
-        )
-        row_payload_bytes = _pt1_row_bytes(
-            row["payload_bytes"], field="payload", key_hash=row_hash
         )
         store_schema_version = row["store_schema_version"]
         if store_schema_version not in PT1_SUPPORTED_STORE_SCHEMA_VERSIONS:
@@ -2793,12 +2803,47 @@ def _admit_stored_row(
                 f"PT-1 row replay scope hash mismatch: {row_hash}"
             )
 
-        indexed_query = physics_bucket_hash is not None or rung_tag is not None
-        if not indexed_query:
-            verify_key_hashes()
+        # Indexed metadata has precedence; byte integrity then precedes admission.
+        verify_key_hashes()
+
+        row_payload_bytes = _pt1_row_bytes(
+            row["payload_bytes"], field="payload", key_hash=row_hash
+        )
+        if _sha256(row_payload_bytes) != row["payload_sha256"]:
+            raise PT1PersistentStoreCorrupt(
+                "PT-1 row payload hash mismatch (stored payload bytes): "
+                f"{row_artifact}: {row_hash}"
+            )
+        row_payload = _pt1_row_json(
+            row_payload_bytes, field="payload", key_hash=row_hash
+        )
+        if _payload_integrity_bytes(row_payload) != row_payload_bytes:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row non-canonical payload bytes: {row_hash}"
+            )
+
         row_key = _pt1_row_key(row_key_bytes, key_hash=row_hash)
-        if not indexed_query:
-            verify_canonical_key(row_key)
+        verify_canonical_key(row_key)
+
+        if validate_interpolation_domain:
+            from simulator.reduced_real_cache_interpolation import (
+                interpolation_key_domain_violation,
+            )
+
+            domain_violation = interpolation_key_domain_violation(
+                row_key,
+                query_keys=admission_keys or (),
+            )
+            if domain_violation is not None:
+                section = (
+                    "composition"
+                    if domain_violation == "composition_mol_fraction"
+                    else "controls"
+                )
+                raise PT1PersistentStoreCorrupt(
+                    "PT-1 row invalid stored equilibrium replay key "
+                    f"{section} ({domain_violation}): {row_hash}"
+                )
 
         derived_bucket_key = canonical_physics_bucket_key_from_replay_key(row_key)
         derived_bucket_bytes = canonical_json_bytes(derived_bucket_key)
@@ -2837,10 +2882,6 @@ def _admit_stored_row(
             raise PT1PersistentStoreCorrupt(
                 f"PT-1 row exact key does not reproduce physics bucket: {physics_bucket_hash}"
             )
-        if physics_bucket_hash is not None:
-            verify_key_hashes()
-            verify_canonical_key(row_key)
-
         ladder_values = _physics_ladder_values_from_replay_key(row_key)
         for stored_rung_tag, _sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS:
             hash_column = _physics_ladder_hash_column(stored_rung_tag)
@@ -2872,9 +2913,6 @@ def _admit_stored_row(
                 raise PT1PersistentStoreCorrupt(
                     f"PT-1 row exact key does not reproduce {rung_tag} index: {rung_hash}"
                 )
-            if physics_bucket_hash is None:
-                verify_key_hashes()
-                verify_canonical_key(row_key)
 
         all_index_columns = (
             "physics_bucket_schema_version",
@@ -2907,19 +2945,6 @@ def _admit_stored_row(
                     "distance"
                 ]
 
-        if _sha256(row_payload_bytes) != row["payload_sha256"]:
-            raise PT1PersistentStoreCorrupt(
-                "PT-1 row payload hash mismatch (stored payload bytes): "
-                f"{row_artifact}: {row_hash}"
-            )
-
-        row_payload = _pt1_row_json(
-            row_payload_bytes, field="payload", key_hash=row_hash
-        )
-        if _payload_integrity_bytes(row_payload) != row_payload_bytes:
-            raise PT1PersistentStoreCorrupt(
-                f"PT-1 row non-canonical payload bytes: {row_hash}"
-            )
         repair_notices_json = _row_repair_notices(row)
         validate_repair_notices_json(repair_notices_json)
         law_disclosures = _law_disclosures_from_json(
@@ -3024,59 +3049,6 @@ def _admit_stored_row(
                 stale_payload_codec=True,
             )
         if row_artifact == "equilibrium_post_record":
-            controls = row_key.get("controls")
-            if not isinstance(controls, Mapping):
-                raise PT1PersistentStoreCorrupt(
-                    "PT-1 row invalid stored equilibrium replay key controls: "
-                    f"{row_hash}"
-                )
-            required_control_fields = {"T_K"}
-            for admission_key in admission_keys or ():
-                query_controls = admission_key.get("controls")
-                if not isinstance(query_controls, Mapping):
-                    continue
-                if query_controls.get("pressure_bar") is not None:
-                    required_control_fields.add("pressure_bar")
-                if (
-                    _physics_bucket_consumes_log_fO2(admission_key)
-                    and query_controls.get("log_fO2") is not None
-                ):
-                    required_control_fields.add("log_fO2")
-                if (
-                    _physics_bucket_consumes_pO2_bar(admission_key)
-                    and query_controls.get("pO2_bar") is not None
-                ):
-                    required_control_fields.add("pO2_bar")
-            if any(
-                field not in controls
-                or not _is_finite_cache_number(controls[field])
-                for field in required_control_fields
-            ):
-                raise PT1PersistentStoreCorrupt(
-                    "PT-1 row invalid stored equilibrium replay key controls: "
-                    f"{row_hash}"
-                )
-            composition = row_key.get("composition_mol_fraction")
-            if not isinstance(composition, list) or not composition:
-                raise PT1PersistentStoreCorrupt(
-                    "PT-1 row invalid stored equilibrium replay key composition: "
-                    f"{row_hash}"
-                )
-            for component in composition:
-                if isinstance(component, Mapping):
-                    fraction = component.get("mol_fraction")
-                elif isinstance(component, (list, tuple)) and len(component) == 2:
-                    fraction = component[1]
-                else:
-                    fraction = None
-                if (
-                    not _is_finite_cache_number(fraction)
-                    or not 0.0 <= float(fraction) <= 1.0
-                ):
-                    raise PT1PersistentStoreCorrupt(
-                        "PT-1 row invalid stored equilibrium replay key composition: "
-                        f"{row_hash}"
-                    )
             if (
                 not isinstance(row_key.get("namespace_id"), str)
                 or not row_key["namespace_id"]
@@ -3588,6 +3560,7 @@ class PT1PersistentEquilibriumStore:
                         artifact=artifact,
                         expected_replay_scope_sha256=replay_scope_sha256,
                         admission_keys=(query_key,) if query_key is not None else (),
+                        validate_interpolation_domain=True,
                     )
                     assert admitted is not None
                     if admitted.stale_payload_codec:
@@ -3685,6 +3658,7 @@ class PT1PersistentEquilibriumStore:
                         rung_key=rung_key,
                         rung_hash=rung_hash,
                         admission_keys=(query_key,) if query_key is not None else (),
+                        validate_interpolation_domain=True,
                     )
                     assert admitted is not None
                     entry, decoded = admitted.entry, admitted.decoded_payload
@@ -4112,6 +4086,7 @@ class PT1PersistentEquilibriumStore:
             physics_bucket_key=physics_bucket_key,
             physics_bucket_bytes=physics_bucket_bytes,
             physics_bucket_hash=physics_bucket_hash,
+            validate_interpolation_domain=True,
         )
         assert admitted is not None
         return admitted.entry, admitted.decoded_payload

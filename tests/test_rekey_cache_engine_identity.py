@@ -205,10 +205,6 @@ def test_rekey_preserves_repair_notice_values(
     _write_rekeyable_rows(db_path, ("one",))
     with sqlite3.connect(db_path) as conn:
         conn.execute(
-            f"ALTER TABLE {rekey.PT1_EQUILIBRIUM_TABLE} "
-            "ADD COLUMN repair_notices_json TEXT"
-        )
-        conn.execute(
             f"UPDATE {rekey.PT1_EQUILIBRIUM_TABLE} "
             "SET repair_notices_json = ? WHERE engine_version = 'one'",
             (repair_notices_json,),

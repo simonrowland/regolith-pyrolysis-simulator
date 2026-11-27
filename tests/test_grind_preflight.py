@@ -14,6 +14,7 @@ from simulator.backends import (
     requires_stage0_subprocess,
 )
 from simulator.config import load_config_bundle
+from simulator.melt_backend.base import EquilibriumResult
 from simulator.grind_preflight import (
     GRIND_STAGE0_NOT_APPLICABLE_FEEDSTOCK_IDS,
     GrindSourceGateError,
@@ -695,6 +696,52 @@ def test_strict_vapor_pt1_preflight_passes_caller_approved_sources(
     db_path = tmp_path / "strict-pt1-custom-approved-source.sqlite"
     approved_source = "custom-certified-vapor"
     _write_pt1_store(db_path, source=approved_source)
+    with sqlite3.connect(db_path) as conn:
+        (key_hash,) = conn.execute(
+            f"SELECT key_hash FROM {rrd.PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+        (payload_bytes,) = conn.execute(
+            f"SELECT payload_bytes FROM {rrd.PT1_EQUILIBRIUM_TABLE} "
+            "WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()
+        payload = json.loads(payload_bytes)
+        result = EquilibriumResult(
+            status="ok",
+            temperature_C=1200.0,
+            pressure_bar=0.001,
+            liquid_fraction=1.0,
+            phases_present=["liquid"],
+            phase_masses_kg={"liquid": 1.0},
+            liquid_composition_wt_pct={"SiO2": 45.0},
+            vapor_pressures_Pa={"Na": 1.0, "SiO": 1.0},
+            vapor_pressures_source={"Na": approved_source, "SiO": approved_source},
+            fO2_log=-8.0,
+            warnings=[],
+        )
+        result_payload = {
+            field.name: rrd._json_ready(getattr(result, field.name))
+            for field in rrd._equilibrium_result_payload_fields()
+            if not (
+                field.name in rrd._EQUILIBRIUM_RESULT_FIELDS_OMITTED_WHEN_NONE
+                and getattr(result, field.name) is None
+            )
+        }
+        payload["equilibrium_result"] = result_payload
+        payload["last_vapor_pressures_source"] = dict(
+            result_payload["vapor_pressures_source"]
+        )
+        payload["last_vapor_pressure_diagnostic"] = {}
+        replayable_payload_bytes = rrd.canonical_json_bytes(payload)
+        conn.execute(
+            f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} "
+            "SET payload_bytes = ?, payload_sha256 = ? WHERE key_hash = ?",
+            (
+                sqlite3.Binary(replayable_payload_bytes),
+                rrd._sha256(replayable_payload_bytes),
+                key_hash,
+            ),
+        )
 
     summary = assert_strict_vapor_result_store(
         db_path,
