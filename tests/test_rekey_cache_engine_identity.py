@@ -1,11 +1,14 @@
 import hashlib
+import json
 import sqlite3
 from pathlib import Path
 
 import pytest
 
 from simulator import corpus_version
+from simulator import reduced_real_determinism as rrd
 from scripts import rekey_cache_engine_identity as rekey
+from tests.cache_rekey_fixtures import put_rekey_gate_row
 
 
 @pytest.fixture
@@ -23,32 +26,15 @@ def _write_rekeyable_rows(
     db_path: Path,
     engine_versions: tuple[str, ...] = ("one", "two"),
 ) -> None:
-    conn = sqlite3.connect(db_path)
-    conn.execute(
-        f"""
-        CREATE TABLE {rekey.PT1_EQUILIBRIUM_TABLE} (
-            key_hash TEXT PRIMARY KEY,
-            key_sha256 TEXT,
-            key_bytes BLOB,
-            engine_version TEXT,
-            corpus_version TEXT
-        )
-        """
-    )
     for engine_version in engine_versions:
-        key_bytes = rekey.canonical_json_bytes(
+        put_rekey_gate_row(
+            db_path,
             {
                 "backend": {"backend_name": "alphamelts"},
                 "engine_version": engine_version,
-            }
+            },
+            engine_version=engine_version,
         )
-        key_hash = hashlib.sha256(key_bytes).hexdigest()
-        conn.execute(
-            f"INSERT INTO {rekey.PT1_EQUILIBRIUM_TABLE} VALUES (?, ?, ?, ?, ?)",
-            (key_hash, key_hash, key_bytes, engine_version, None),
-        )
-    conn.commit()
-    conn.close()
 
 
 def test_failed_rekey_retry_reuses_content_addressed_backup(
@@ -144,7 +130,66 @@ def test_rekey_locks_identity_decision_before_backup(
         (backup_key_bytes,) = backup_conn.execute(
             f"SELECT key_bytes FROM {rekey.PT1_EQUILIBRIUM_TABLE}"
         ).fetchone()
-    assert rekey._json_loads(bytes(backup_key_bytes))["engine_version"] == "one"
+    assert json.loads(bytes(backup_key_bytes))["engine_version"] == "one"
+
+
+def test_rekey_deep_stored_key_fails_through_admission(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    target_corpus_version: str,
+) -> None:
+    db_path = tmp_path / "deep-key-cache.db"
+    original_hash, _payload_bytes = put_rekey_gate_row(
+        db_path,
+        {
+            "backend": {"backend_name": "alphamelts"},
+            "engine_version": "one",
+        },
+        engine_version="one",
+    )
+    with sqlite3.connect(db_path) as conn:
+        (key_bytes,) = conn.execute(
+            f"SELECT key_bytes FROM {rekey.PT1_EQUILIBRIUM_TABLE} "
+            "WHERE key_hash = ?",
+            (original_hash,),
+        ).fetchone()
+        deeply_nested_key = (
+            bytes(key_bytes)[:-1]
+            + b',"unread":'
+            + b"[" * 1100
+            + b"0"
+            + b"]" * 1100
+            + b"}"
+        )
+        new_hash = hashlib.sha256(deeply_nested_key).hexdigest()
+        conn.execute(
+            f"UPDATE {rekey.PT1_EQUILIBRIUM_TABLE} "
+            "SET key_hash = ?, key_sha256 = ?, key_bytes = ? "
+            "WHERE key_hash = ?",
+            (
+                new_hash,
+                new_hash,
+                sqlite3.Binary(deeply_nested_key),
+                original_hash,
+            ),
+        )
+
+    admission_calls: list[dict[str, object]] = []
+    original_admission = rekey._admit_stored_row
+
+    def record_admission(row: object, **kwargs: object) -> object:
+        admission_calls.append(dict(kwargs))
+        return original_admission(row, **kwargs)  # type: ignore[arg-type]
+
+    monkeypatch.setattr(rekey, "_admit_stored_row", record_admission)
+    with pytest.raises(rrd.PT1PersistentStoreCorrupt):
+        rekey.rekey_cache(
+            db_path,
+            target_corpus_version=target_corpus_version,
+            dry_run=True,
+        )
+    assert admission_calls
+    assert admission_calls[0]["store_kind"] == "pt1"
 
 
 @pytest.mark.parametrize(

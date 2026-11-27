@@ -533,7 +533,10 @@ def _strict_vapor_pt1_store_summary(
     approved_sources: frozenset[str],
     strict_vapor_gate: bool,
 ) -> dict[str, int]:
-    from simulator.reduced_real_determinism import _admit_stored_row
+    from simulator.reduced_real_determinism import (
+        PT1PersistentStoreCorrupt,
+        _admit_stored_row,
+    )
 
     rows = conn.execute(
         f"""
@@ -552,7 +555,16 @@ def _strict_vapor_pt1_store_summary(
     vapor_active_rows = 0
     source_reports = 0
     for row in rows:
-        admitted = _admit_stored_row(row, store_kind="pt1")
+        try:
+            admitted = _admit_stored_row(
+                row,
+                store_kind="pt1",
+                strict_source_validation=True,
+            )
+        except PT1PersistentStoreCorrupt as exc:
+            raise GrindSourceGateError(
+                f"{context}: PT-1 source row is corrupt"
+            ) from exc
         if admitted is None or admitted.decoded_payload is None:
             raise GrindSourceGateError(
                 f"{context}: PT-1 row rejected by cache admission"

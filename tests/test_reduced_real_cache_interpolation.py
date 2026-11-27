@@ -765,6 +765,29 @@ def test_interpolation_admission_rejects_null_stored_controls(
         replay._lookup_interpolated("equilibrium_post_record", query)
 
 
+def test_interpolation_admission_rejects_out_of_range_composition_fraction(
+    tmp_path: Path,
+) -> None:
+    query = _interpolation_key("query", feo_fraction=0.20, temperature_K=1500.0)
+    malformed_key = copy.deepcopy(query)
+    malformed_key["composition_mol_fraction"][0][1] = 1.0e160
+    db_path = tmp_path / "out-of-range-interpolation-composition.sqlite"
+    # The PT1 writer stamps matching hashes and indexes for this malformed row.
+    _put_interpolation_row(
+        db_path,
+        malformed_key,
+        liquid_fraction=0.7,
+        sio_pa=7.0,
+    )
+
+    replay = PT0DeterminismStore("replay", db_path=db_path)
+    with pytest.raises(
+        rrd.PT1PersistentStoreCorrupt,
+        match="stored equilibrium replay key composition",
+    ):
+        replay._lookup_interpolated("equilibrium_post_record", query)
+
+
 @pytest.mark.parametrize("reader", ("bucket", "ladder", "interpolation"))
 @pytest.mark.parametrize(
     "row_version",

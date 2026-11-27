@@ -33,10 +33,10 @@ from simulator.engine_local_config import (
 from simulator.melt_backend.alphamelts import AlphaMELTSBackend
 from simulator.reduced_real_determinism import (
     PT1_EQUILIBRIUM_TABLE,
-    canonical_json_bytes,
 )
 from simulator.corpus_version import current_corpus_version
 from scripts.rekey_cache_engine_identity import rekey_cache
+from tests.cache_rekey_fixtures import put_rekey_gate_row
 
 
 def _sample_config(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> EngineLocalConfig:
@@ -626,7 +626,7 @@ def test_rekey_migration_round_trip_and_idempotency(
     target = current_corpus_version()
     key = {
         "schema_version": "test",
-        "artifact": "equilibrium_post_record",
+        "artifact": "freeze_gate_curve",
         "engine_version": legacy_version,
         "code_version": "legacy-app-version",
         "source_module_digest": {"module_set_id": "old"},
@@ -636,6 +636,7 @@ def test_rekey_migration_round_trip_and_idempotency(
             "backend_version": legacy_version,
         },
         "provider": {
+            "resolved_provider_id": "alphamelts-diagnostic",
             "engine_version": legacy_version,
         },
     }
@@ -648,84 +649,23 @@ def test_rekey_migration_round_trip_and_idempotency(
             "backend_version": "vaporock 0.1.0 (/tmp/vaporock)",
         },
         "provider": {
+            "resolved_provider_id": "vaporock-diagnostic",
             "engine_version": "vaporock 0.1.0 (/tmp/vaporock)",
         },
     }
-    key_bytes = canonical_json_bytes(key)
-    key_hash = __import__("hashlib").sha256(key_bytes).hexdigest()
-    other_key_bytes = canonical_json_bytes(other_key)
-    other_key_hash = __import__("hashlib").sha256(other_key_bytes).hexdigest()
-    payload_bytes = b'{"payload": true}'
-
+    key_hash, payload_bytes = put_rekey_gate_row(
+        db_path,
+        key,
+        engine_version=legacy_version,
+    )
+    put_rekey_gate_row(
+        db_path,
+        other_key,
+        engine_version=other_key["engine_version"],
+    )
     with sqlite3.connect(db_path) as conn:
         conn.execute(
-            f"""
-            CREATE TABLE {PT1_EQUILIBRIUM_TABLE} (
-                key_hash TEXT PRIMARY KEY,
-                artifact TEXT NOT NULL,
-                store_schema_version TEXT NOT NULL,
-                request_schema_version TEXT NOT NULL,
-                key_sha256 TEXT NOT NULL,
-                payload_sha256 TEXT NOT NULL,
-                key_bytes BLOB NOT NULL,
-                payload_bytes BLOB NOT NULL,
-                code_version TEXT NOT NULL,
-                engine_version TEXT,
-                data_digests_json TEXT NOT NULL,
-                created_at TEXT NOT NULL,
-                git_dirty INTEGER NOT NULL
-            )
-            """
-        )
-        conn.execute(
-            f"""
-            INSERT INTO {PT1_EQUILIBRIUM_TABLE} (
-                key_hash, artifact, store_schema_version,
-                request_schema_version, key_sha256, payload_sha256,
-                key_bytes, payload_bytes, code_version, engine_version,
-                data_digests_json, created_at, git_dirty
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """,
-            (
-                key_hash,
-                "equilibrium_post_record",
-                "pt1",
-                "req",
-                key_hash,
-                "payload",
-                key_bytes,
-                payload_bytes,
-                "code-v1",
-                legacy_version,
-                "{}",
-                "now",
-                0,
-            ),
-        )
-        conn.execute(
-            f"""
-            INSERT INTO {PT1_EQUILIBRIUM_TABLE} (
-                key_hash, artifact, store_schema_version,
-                request_schema_version, key_sha256, payload_sha256,
-                key_bytes, payload_bytes, code_version, engine_version,
-                data_digests_json, created_at, git_dirty
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """,
-            (
-                other_key_hash,
-                "equilibrium_post_record",
-                "pt1",
-                "req",
-                other_key_hash,
-                "payload-2",
-                other_key_bytes,
-                b'{"other": true}',
-                "code-v1",
-                other_key["engine_version"],
-                "{}",
-                "now",
-                0,
-            ),
+            f"ALTER TABLE {PT1_EQUILIBRIUM_TABLE} DROP COLUMN corpus_version"
         )
 
     before_dry_run_bytes = db_path.read_bytes()

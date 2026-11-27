@@ -2984,13 +2984,16 @@ def _admit_stored_row(
                 row_key,
                 row_payload,
             )
-            assert_strict_vapor_pt1_row(
-                artifact=row_artifact,
-                key=row_key,
-                key_hash=row_hash,
-                payload=row_payload,
-                context=f"PT-1 cache shard {row_artifact}:{row_hash}",
-            )
+            # A non-mapping payload carries no source fields to validate; let
+            # codec admission report its shape rejection below.
+            if isinstance(row_payload, Mapping):
+                assert_strict_vapor_pt1_row(
+                    artifact=row_artifact,
+                    key=row_key,
+                    key_hash=row_hash,
+                    payload=row_payload,
+                    context=f"PT-1 cache shard {row_artifact}:{row_hash}",
+                )
         payload_codec_version = row.get("payload_codec_version")
         expected_codec_version = _payload_codec_version(row_artifact)
         if not _payload_codec_stamp_matches(
@@ -3019,12 +3022,23 @@ def _admit_stored_row(
                     "PT-1 row invalid stored equilibrium replay key controls: "
                     f"{row_hash}"
                 )
-            required_control_fields = (
-                "T_K",
-                "pressure_bar",
-                "log_fO2",
-                "pO2_bar",
-            )
+            required_control_fields = {"T_K"}
+            for admission_key in admission_keys or ():
+                query_controls = admission_key.get("controls")
+                if not isinstance(query_controls, Mapping):
+                    continue
+                if query_controls.get("pressure_bar") is not None:
+                    required_control_fields.add("pressure_bar")
+                if (
+                    _physics_bucket_consumes_log_fO2(admission_key)
+                    and query_controls.get("log_fO2") is not None
+                ):
+                    required_control_fields.add("log_fO2")
+                if (
+                    _physics_bucket_consumes_pO2_bar(admission_key)
+                    and query_controls.get("pO2_bar") is not None
+                ):
+                    required_control_fields.add("pO2_bar")
             if any(
                 field not in controls
                 or not _is_finite_cache_number(controls[field])
@@ -3040,6 +3054,21 @@ def _admit_stored_row(
                     "PT-1 row invalid stored equilibrium replay key composition: "
                     f"{row_hash}"
                 )
+            for component in composition:
+                if isinstance(component, Mapping):
+                    fraction = component.get("mol_fraction")
+                elif isinstance(component, (list, tuple)) and len(component) == 2:
+                    fraction = component[1]
+                else:
+                    fraction = None
+                if (
+                    not _is_finite_cache_number(fraction)
+                    or not 0.0 <= float(fraction) <= 1.0
+                ):
+                    raise PT1PersistentStoreCorrupt(
+                        "PT-1 row invalid stored equilibrium replay key composition: "
+                        f"{row_hash}"
+                    )
             if (
                 not isinstance(row_key.get("namespace_id"), str)
                 or not row_key["namespace_id"]

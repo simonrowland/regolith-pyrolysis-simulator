@@ -647,6 +647,7 @@ def test_strict_vapor_result_store_pt1_strict_on_rejects_vaporock(
 
 def test_strict_vapor_pt1_preflight_uses_stored_row_admission(
     tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     db_path = tmp_path / "strict-pt1-deep-key.sqlite"
     _write_pt1_store(db_path, source="builtin-vapor-pressure")
@@ -669,15 +670,23 @@ def test_strict_vapor_pt1_preflight_uses_stored_row_admission(
             (key_hash, key_hash, sqlite3.Binary(deeply_nested_key)),
         )
 
-    with pytest.raises(
-        rrd.PT1PersistentStoreCorrupt,
-        match="invalid key JSON bytes",
-    ):
+    admission_calls: list[dict[str, object]] = []
+    original_admission = rrd._admit_stored_row
+
+    def record_admission(row: object, **kwargs: object) -> object:
+        admission_calls.append(dict(kwargs))
+        return original_admission(row, **kwargs)  # type: ignore[arg-type]
+
+    monkeypatch.setattr(rrd, "_admit_stored_row", record_admission)
+    with pytest.raises(GrindSourceGateError) as exc_info:
         assert_strict_vapor_result_store(
             db_path,
             _decode_result_payload,
             strict_vapor_gate=True,
         )
+    assert isinstance(exc_info.value.__cause__, rrd.PT1PersistentStoreCorrupt)
+    assert admission_calls
+    assert admission_calls[0]["strict_source_validation"] is True
 
 
 def test_strict_vapor_preflight_rejects_admission_payload_rejection(

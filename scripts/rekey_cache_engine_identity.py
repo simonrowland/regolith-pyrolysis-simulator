@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import argparse
 import hashlib
-import json
 import os
 import sqlite3
 import sys
@@ -21,6 +20,8 @@ if str(REPO_ROOT) not in sys.path:
 from simulator.reduced_real_determinism import (  # noqa: E402
     PHYSICS_BUCKET_SCHEMA_VERSION,
     PT1_EQUILIBRIUM_TABLE,
+    PT1PersistentStoreCorrupt,
+    _admit_stored_row,
     _physics_ladder_values_from_replay_key,
     _replay_scope_hash,
     cache_row_needs_rekey,
@@ -44,11 +45,13 @@ class RekeyResult:
         yield self.rows_updated
 
 
-def _json_loads(raw: bytes) -> dict[str, Any]:
-    loaded = json.loads(raw.decode("utf-8"))
-    if not isinstance(loaded, dict):
-        raise ValueError("cache key root must be a JSON object")
-    return loaded
+def _key_from_stored_row(row: sqlite3.Row) -> dict[str, Any]:
+    admitted = _admit_stored_row(row, store_kind="pt1")
+    if admitted is None:
+        raise PT1PersistentStoreCorrupt(
+            f"PT-1 cache row rejected during rekey: {row['key_hash']}"
+        )
+    return admitted.entry["key"]
 
 
 def _ensure_corpus_column(conn: sqlite3.Connection) -> None:
@@ -93,10 +96,8 @@ def _count_rows_needing_rekey(
     target_corpus_version: str,
 ) -> int:
     count = 0
-    for (key_bytes,) in conn.execute(
-        f"SELECT key_bytes FROM {PT1_EQUILIBRIUM_TABLE}"
-    ):
-        key = _json_loads(bytes(key_bytes))
+    for row in conn.execute(f"SELECT * FROM {PT1_EQUILIBRIUM_TABLE}"):
+        key = _key_from_stored_row(row)
         if not rekey_row_matches_engine(key, engine):
             continue
         if cache_row_needs_rekey(key, target_corpus_version):
@@ -187,11 +188,11 @@ def rekey_cache(
         table_columns = _table_columns(conn)
         for row in conn.execute(
             f"""
-            SELECT key_hash, key_bytes, engine_version
+            SELECT *
             FROM {PT1_EQUILIBRIUM_TABLE}
             """
         ):
-            key = _json_loads(bytes(row["key_bytes"]))
+            key = _key_from_stored_row(row)
             if not rekey_row_matches_engine(key, engine):
                 continue
             if not cache_row_needs_rekey(key, target):

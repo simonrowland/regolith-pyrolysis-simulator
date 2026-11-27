@@ -1475,10 +1475,7 @@ def test_epoch_seed_key_decode_uses_stored_row_admission(
         return original_admission(row, **kwargs)  # type: ignore[arg-type]
 
     monkeypatch.setattr(epoch_grind, "_admit_stored_row", record_admission)
-    with pytest.raises(
-        PT1PersistentStoreCorrupt,
-        match="invalid key JSON bytes",
-    ):
+    with pytest.raises(PT1PersistentStoreCorrupt):
         epoch_grind.seed_job_cache(
             tmp_path / "deep-key-shard.sqlite",
             base,
