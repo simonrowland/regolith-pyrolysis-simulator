@@ -132,60 +132,6 @@ def test_vacuum_oxygen_root_pin_before_flux_refactor():
     assert result.pO2_bar == pytest.approx(0.0000020188591846109878, rel=1e-10)
 
 
-def test_vacuum_oxygen_root_warm_start_preserves_root_and_shortens_brent_bracket(
-    monkeypatch,
-):
-    import simulator.battery.oxygen_balance as oxygen_balance
-
-    channels = (
-        oxygen_balance._VacuumOxygenChannel(
-            "Mg", 0.024305, 0.0, 1.0, -0.5, 0.5, "synthetic anchor"
-        ),
-        oxygen_balance._VacuumOxygenChannel(
-            "O2", 0.0319988, 2.0, 0.0, 1.0, 1.0, "oxygen coproduct"
-        ),
-    )
-    root_iterations = []
-    production_brentq = oxygen_balance.brentq
-
-    def count_brentq(function, *args, **kwargs):
-        evaluations = 0
-
-        def counted(value):
-            nonlocal evaluations
-            evaluations += 1
-            return function(value)
-
-        result = production_brentq(counted, *args, **kwargs)
-        root_iterations.append(evaluations)
-        return result
-
-    monkeypatch.setattr(oxygen_balance, "brentq", count_brentq)
-    pressure_calls = []
-
-    def pressure(logp):
-        pressure_calls.append(float(logp))
-        return {
-            "Mg": 0.001 / (10.0**logp) ** 0.5,
-            "O2": 100000.0 * 10.0**logp,
-        }
-
-    cold = oxygen_balance._solve_vacuum_oxygen_balance(
-        pressure, channels, temperature_K=2073.15,
-    )
-    cold_pressure_calls = len(pressure_calls)
-    warm = oxygen_balance._solve_vacuum_oxygen_balance(
-        pressure,
-        channels,
-        temperature_K=2073.15,
-        warm_start_log10_pO2_bar=math.log10(cold.pO2_bar) + 0.02,
-    )
-
-    assert warm.pO2_bar == pytest.approx(cold.pO2_bar, rel=1e-12)
-    assert root_iterations[1] < root_iterations[0]
-    assert len(pressure_calls) - cold_pressure_calls < cold_pressure_calls
-
-
 def test_molar_flux_coefficient_cache_uses_exact_temperature_and_channels():
     from simulator.battery.oxygen_balance import _cached_molar_flux_denominators
 

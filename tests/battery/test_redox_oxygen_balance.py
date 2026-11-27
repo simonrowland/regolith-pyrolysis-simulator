@@ -429,7 +429,7 @@ def test_knudsen_defers_redox_diagnostic_probes_without_changing_result(
     assert deferred.evaporated_mol == immediate.evaporated_mol
     assert deferred.retained_oxygen_atoms_mol == immediate.retained_oxygen_atoms_mol
     assert deferred.atom_closure_mol == immediate.atom_closure_mol
-    assert deferred.pO2_steps == immediate.pO2_steps
+    assert deferred.pO2_bar_by_step == immediate.pO2_bar_by_step
     assert deferred.pressure_law_diagnostics == immediate.pressure_law_diagnostics
     assert deferred_calls < immediate_calls
 

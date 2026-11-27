@@ -44,11 +44,6 @@ OXYGEN_BALANCE_EFFUSION_ENGINES: frozenset[Engine] = frozenset(
 OXYGEN_BALANCE_NOTICE_PREFIX = "fo2_oxygen_balance_effusion_solved:"
 _MODELLED_REACTIVE_CELL = frozenset({CellMaterial.W, CellMaterial.MO})
 _CHROMIUM_OXYGEN_PER_CR_CANDIDATES = (1.0, 1.5, 3.0)
-# Neighboring RHS inventories should move the monotone root locally; starting
-# at a quarter-decade and doubling preserves the original full bracket as the
-# fallback when a depletion event moves the root farther than that. brentq
-# keeps its original xtol/rtol below, so only the starting bracket changes.
-_WARM_ROOT_INITIAL_HALF_WIDTH_LOG10 = 0.25
 
 
 @lru_cache(maxsize=256)
@@ -180,7 +175,6 @@ def _solve_vacuum_oxygen_balance(
     temperature_K: float,
     background_pressure_Pa: float = 0.0,
     bracket_log10_pO2_bar: tuple[float, float] = (-30.0, 0.0),
-    warm_start_log10_pO2_bar: float | None = None,
     on_accepted_evaluation: Callable[[float], None] | None = None,
     defer_pressure_law_diagnostics: Callable[
         [Callable[[], tuple[PressureLawChannelDiagnostic, ...]], tuple[str, ...]], None
@@ -373,15 +367,6 @@ def _solve_vacuum_oxygen_balance(
         channel.pO2_exponent > 0.0
         for channel in active_channels if channel.parent_oxygen_demand == 0.0
     )
-    warm_start = None
-    if warm_start_log10_pO2_bar is not None:
-        try:
-            candidate = float(warm_start_log10_pO2_bar)
-        except (TypeError, ValueError, OverflowError):
-            candidate = math.nan
-        if math.isfinite(candidate) and low < candidate < high:
-            warm_start = candidate
-
     if zero_oxygen_boundary:
         # Without an oxygen supplier the root is pO2=0. Neutral oxide gases
         # retain their pressures; oxygen-consuming gases and free O/O2 vanish.
@@ -402,63 +387,6 @@ def _solve_vacuum_oxygen_balance(
         bracket_boundary = "lower"
     elif f_low < 0.0 and f_high < 0.0:
         raise ValueError("vacuum oxygen balance has no root in the declared pO2 bracket")
-    elif warm_start is not None:
-        f_warm = evaluate(warm_start)[0]
-        if f_warm == 0.0:
-            root = warm_start
-        elif f_warm < 0.0:
-            # The residual is monotone increasing, so search right from the
-            # preceding RHS root. Grow the local bracket geometrically until
-            # it encloses the new root or reaches the original upper bound.
-            left = warm_start
-            width = min(_WARM_ROOT_INITIAL_HALF_WIDTH_LOG10, high - warm_start)
-            right = min(high, warm_start + width)
-            f_right = f_high if right == high else evaluate(right)[0]
-            while f_right < 0.0 and right < high:
-                width = min(width * 2.0, high - warm_start)
-                right = min(high, warm_start + width)
-                f_right = f_high if right == high else evaluate(right)[0]
-            if f_right < 0.0:
-                raise ValueError(
-                    "vacuum oxygen balance has no root in the declared pO2 bracket"
-                )
-            if f_right == 0.0:
-                root = right
-                if right == high:
-                    bracket_boundary = "upper"
-            else:
-                root = brentq(
-                    lambda value: evaluate(value)[0],
-                    left,
-                    right,
-                    xtol=1.0e-12,
-                    rtol=1.0e-12,
-                    maxiter=200,
-                )
-        else:
-            # Symmetric search toward the original lower bound. Reuse its
-            # already evaluated residual when the geometric bracket reaches it.
-            right = warm_start
-            width = min(_WARM_ROOT_INITIAL_HALF_WIDTH_LOG10, warm_start - low)
-            left = max(low, warm_start - width)
-            f_left = f_low if left == low else evaluate(left)[0]
-            while f_left > 0.0 and left > low:
-                width = min(width * 2.0, warm_start - low)
-                left = max(low, warm_start - width)
-                f_left = f_low if left == low else evaluate(left)[0]
-            if f_left == 0.0:
-                root = left
-                if left == low:
-                    bracket_boundary = "lower"
-            else:
-                root = brentq(
-                    lambda value: evaluate(value)[0],
-                    left,
-                    right,
-                    xtol=1.0e-12,
-                    rtol=1.0e-12,
-                    maxiter=200,
-                )
     else:
         root = brentq(
             lambda value: evaluate(value)[0],
