@@ -7955,6 +7955,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         from simulator.reduced_real_cache_interpolation import (
             is_interpolated_equilibrium,
         )
+        from simulator.melt_regime import legacy_raw_liquid_fraction_is_zero
         from simulator.thermal_train import (
             FiniteCapacity,
             thermal_train_parameters_from_mapping,
@@ -7978,7 +7979,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             volume_m3=headspace_volume_m3,
         )
         temperature_K = float(self.melt.temperature_C) + 273.15
-        if is_interpolated_equilibrium(
+        liquid_fraction = getattr(equilibrium, 'liquid_fraction', None)
+        zero_liquid = (
+            liquid_fraction is not None
+            and legacy_raw_liquid_fraction_is_zero(liquid_fraction)
+        )
+        if zero_liquid:
+            self._last_vapour_batch = None
+            self._last_vapour_batch_report = None
+            self._last_vapour_batch_flux_overlay = {}
+            self._last_vapour_batch_resolve_error = {}
+        if not zero_liquid and is_interpolated_equilibrium(
             equilibrium,
             vapor_pressure_diagnostic=getattr(
                 self, '_last_vapor_pressure_diagnostic', {}
@@ -8009,14 +8020,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
         ledger_before = self.atom_ledger.mol_by_account()
         transition_count_before = len(self.atom_ledger.transitions)
-        # Same species the live path will price. The 400 K floor and a proven
-        # zero liquid return before that dispatch, so those hours keep the
-        # shadow's existing molar-mass order. Above those gates the batch map
-        # includes extrapolated species and the capacity solve prices that map
-        # with the extrapolation flag attached.
-        from simulator.melt_regime import legacy_raw_liquid_fraction_is_zero
-
-        liquid_fraction = getattr(equilibrium, 'liquid_fraction', None)
+        # Same species the live path will price. The 400 K floor keeps its
+        # empty flux map after interpolation admission; proven zero liquid
+        # returns before that guard. Above these gates the batch map includes
+        # extrapolated species and the capacity solve carries its flag.
         batch_flux_pressures = None
         batch_flux_overlay: dict[str, Any] = {}
         selection_flux_overlay: dict[str, Any] = {}
@@ -8065,8 +8072,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         else:
             capacity_flux_overlay = {}
             capacity_bound_notice = None
+        control_equilibrium = None if zero_liquid else equilibrium
         controls, provider_molar_masses = self._evaporation_flux_control_inputs(
-            equilibrium,
+            control_equilibrium,
             overhead_partials_Pa=initial_partials,
             vapour_batch_flux_pressures_Pa=batch_flux_pressures,
             vapour_batch_report=(
@@ -8190,7 +8198,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
             iteration_controls, _provider_masses = (
                 self._evaporation_flux_control_inputs(
-                    equilibrium,
+                    control_equilibrium,
                     overhead_partials_Pa=partials_Pa,
                     vapour_batch_flux_pressures_Pa=iteration_flux_pressures,
                     vapour_batch_report=(

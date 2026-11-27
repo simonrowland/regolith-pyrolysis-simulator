@@ -785,7 +785,7 @@ def test_sio_vapor_requires_explicit_stoich_metadata():
     assert all("SiO" not in stage.collected_kg for stage in sim.train.stages)
 
 
-def test_vapor_species_without_parent_oxide_fails_before_flux():
+def test_vapor_species_without_parent_oxide_stays_unavailable():
     backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(
@@ -806,8 +806,17 @@ def test_vapor_species_without_parent_oxide_fails_before_flux():
     sim.melt.temperature_C = 1000.0
     equilibrium = types.SimpleNamespace(vapor_pressures_Pa={"Fe": 1.0e5})
 
-    with pytest.raises(AccountingError, match="parent_oxide"):
+    with pytest.raises(evaporation_module.EvaporationFluxRefusal) as refusal:
         sim._calculate_evaporation(equilibrium)
+
+    assert refusal.value.reason == "vapour_batch_no_debiting_pressure_outcome"
+    overlay = refusal.value.diagnostic["vapour_batch_flux_overlay"]
+    assert overlay["notices"] == [{
+        "kind": "vapour_batch_unresolved",
+        "species": "Fe",
+        "hour": 0,
+        "reason": "missing_evaporation_stoichiometry",
+    }]
 
 
 def test_sio_vapor_explicit_stoich_must_mass_close():

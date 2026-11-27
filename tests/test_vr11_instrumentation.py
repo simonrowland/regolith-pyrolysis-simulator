@@ -845,6 +845,29 @@ def test_in_domain_effective_pressure_set_mismatch_fails_closed() -> None:
     assert report["catalog_continuation_flux_species"] == []
 
 
+def test_in_domain_pressure_gap_preserves_resolved_peer() -> None:
+    batch = _toy_batch(
+        {"Na", "SiO"},
+        pressures={"Na": 1.0, "SiO": 2.0},
+    )
+
+    pressures, report = _flux_with_live_shadow(
+        batch,
+        {"Na": 10.0, "SiO": 20.0},
+        effective={"Na": 10.0},
+    )
+
+    assert pressures == {"Na": 10.0}
+    assert report["unresolved_missing_effective_pressure_species"] == ["SiO"]
+    assert report["batch_channel_states"]["Na"] == "eligible"
+    assert report["batch_channel_states"]["SiO"] == (
+        "typed_failure_effective_pressure_species_set_mismatch"
+    )
+    assert report["selection_source"] == (
+        "typed_failure_effective_pressure_species_set_mismatch"
+    )
+
+
 def test_evaporation_effective_pressure_mismatch_publishes_notice(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

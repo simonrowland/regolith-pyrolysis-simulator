@@ -2679,10 +2679,17 @@ def resolve_vapour_batch(
             and not answers[species_id].is_refused
             and not answers[species_id].is_flux_active
         )
-        refused_claims = frozenset(
-            species_id
-            for species_id in claimed
-            if species_id in answers and answers[species_id].is_refused
+        # A missing global temperature is not a species-local catalog
+        # refusal. Preserve the whole-request pre-RG guard in that case;
+        # with usable state, an individual refusal stays local to its channel.
+        refused_claims = (
+            frozenset(
+                species_id
+                for species_id in claimed
+                if species_id in answers and answers[species_id].is_refused
+            )
+            if state is not None and state.temperature_K is not None
+            else frozenset()
         )
         required_debit_claims = (
             claimed - demoted_non_debiting - refused_claims

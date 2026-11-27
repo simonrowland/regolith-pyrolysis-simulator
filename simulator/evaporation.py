@@ -1396,8 +1396,10 @@ def _append_vapour_batch_unresolved_notice(
 def _provider_resolved_flux_species(
     diagnostic: Mapping[str, Any],
     flux_overlay: Mapping[str, Any] | None = None,
+    *,
+    flux_pressures: Mapping[str, Any] | None = None,
 ) -> frozenset[str]:
-    """Return computed provider channels plus selector-proven physical zeros."""
+    """Return computed provider channels plus resolved selector outcomes."""
     below = diagnostic.get('below_threshold_evaporation_flux', {})
     below_rates = below.get('fluxes_kg_hr', {}) if isinstance(below, Mapping) else {}
     resolved: set[str] = set()
@@ -1417,6 +1419,16 @@ def _provider_resolved_flux_species(
             str(species)
             for species, state in channel_states.items()
             if state == 'zero_by_physics'
+        )
+    if isinstance(flux_pressures, Mapping) and isinstance(channel_states, Mapping):
+        resolved.update(
+            str(species)
+            for species, pressure in flux_pressures.items()
+            if channel_states.get(species) == 'eligible'
+            and isinstance(pressure, Real)
+            and not isinstance(pressure, bool)
+            and math.isfinite(float(pressure))
+            and float(pressure) > 0.0
         )
     return frozenset(resolved)
 
@@ -1573,15 +1585,17 @@ def _provider_flux_outcome_refusal(
         flux_overlay,
     )
     if provider_unavailable and not resolved_species:
-        return EvaporationMixin._vapour_batch_resolution_refusal(
+        refusal = EvaporationMixin._vapour_batch_resolution_refusal(
             host,
-            {
-                **diagnostic,
-                'reason': _VAPOUR_BATCH_NO_DEBITING_PRESSURE_OUTCOME,
-            },
+            {},
             flux_overlay,
             selector_overlay=selector_overlay,
+            include_unresolved_notices=True,
         )
+        if refusal is not None:
+            refusal.diagnostic.update(diagnostic)
+            refusal.diagnostic['reason'] = refusal.reason
+        return refusal
     return None
 
 
@@ -2102,22 +2116,19 @@ class EvaporationMixin:
         if not error and not include_unresolved_notices:
             return None
         if not error:
-            states = overlay.get('batch_channel_states', {})
             pressures = flux_pressures if isinstance(flux_pressures, Mapping) else {}
-            resolved_species = {
-                str(species)
-                for species, state in states.items()
-                if state == 'zero_by_physics'
-                or (
-                    state == 'eligible'
-                    and species in pressures
-                    and isinstance(pressures[species], Real)
-                    and not isinstance(pressures[species], bool)
-                    and math.isfinite(float(pressures[species]))
-                    and float(pressures[species]) > 0.0
-                )
-            } if isinstance(states, Mapping) else set()
+            resolved_species = _provider_resolved_flux_species(
+                {}, overlay, flux_pressures=pressures
+            )
             if not notices or resolved_species:
+                return None
+            if (
+                overlay.get('effective_pressure_zero_reason')
+                and bool(overlay.get('batch_pa_by_species'))
+            ):
+                # Preserve the live 900 C empty-source continuation when the
+                # catalog has a finite diagnostic answer. The source still
+                # supplies no flux pressure; this is not priced as a debit.
                 return None
         from simulator.langmuir_surface_oxygen import (
             LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED,
@@ -2860,12 +2871,7 @@ class EvaporationMixin:
             flux_pressures=vapor_pressures,
             include_unresolved_notices=True,
         )
-        pre_rg_empty_source_with_catalog_answer = (
-            refusal is not None
-            and effective_pressure_source.physical_zero_reason is not None
-            and bool(flux_overlay_report.get('batch_pa_by_species'))
-        )
-        if refusal is not None and not pre_rg_empty_source_with_catalog_answer:
+        if refusal is not None:
             self._last_evaporation_flux_diagnostic = refusal.diagnostic
             raise refusal
         channel_states = dict(
@@ -5967,10 +5973,10 @@ class EvaporationMixin:
         validation.
 
         Side effects: This method invokes :meth:`_evaporation_stoich` for each
-        species and raises ``AccountingError`` on missing or inconsistent
-        metadata. ``_evaporation_flux_control_inputs`` maps that internal
-        validation error to the module's typed terminal physics refusal before
-        it can escape the evaporation boundary.
+        species with parent-oxide metadata. Missing parent-oxide metadata omits
+        that species' auxiliary entries so the flux owner can flag it as
+        unavailable while peers proceed. Missing molar mass and inconsistent
+        stoichiometry still raise ``AccountingError``.
         """
 
         molar_masses_kg_mol: dict[str, float] = {}
@@ -6004,10 +6010,11 @@ class EvaporationMixin:
 
             parent_oxide = sp_data.get('parent_oxide', '')
             if not parent_oxide:
-                raise AccountingError(
-                    f"vapor species {species!r} requires parent_oxide "
-                    "metadata before evaporation flux can be emitted"
-            )
+                # The provider cannot emit or debit this species without a
+                # parent oxide. Leave its stoich and inventory maps absent;
+                # the shared provider-outcome classifier will publish the
+                # species-local unresolved notice after dispatch.
+                continue
             stoich = self._evaporation_stoich(species, sp_data)
             stoich_by_species[species] = dict(stoich)
             # Mirrors core.py::_project_cleaned_melt_from_atom_ledger:
@@ -6358,20 +6365,6 @@ class EvaporationMixin:
             live_reporting = dict(
                 getattr(equilibrium, 'vapor_pressures_Pa', {}) or {}
             )
-        # An AccountingError from here PROPAGATES, deliberately. A 2026-08-22 fix
-        # re-raised it as EvaporationFluxRefusal('invalid_evaporation_auxiliary_inputs')
-        # so the run executor would recognise it as a typed physics refusal, and
-        # that broke four tests which passed before it: the accounting error is
-        # the specific, actionable one ("vapor species 'Fe' requires parent_oxide
-        # metadata before evaporation"), and re-typing it here discards that for a
-        # generic transport reason. test_vapor_species_without_parent_oxide_fails_
-        # before_flux exists to assert exactly this ordering.
-        #
-        # The concern behind that change is real and is NOT fixed here: AccountingError
-        # is absent from run_executor._ALL_TYPED_PHYSICS_REFUSALS while
-        # EvaporationFluxRefusal is present. The right repair is to register the type
-        # there, not to launder it at one call site — a local re-type cannot know
-        # which distant contracts depend on the original. Tracked in t-728.
         (
             molar_masses_kg_mol,
             stoich_by_species,

@@ -1211,19 +1211,19 @@ def flux_pressures_from_batch(
     )
     report["effective_pressure_species_not_batch_active"] = extra_source_species
     # Only OOD point answers may bridge a genuine seam absence with their
-    # catalog continuation. An in-domain seam gap remains a typed failure:
-    # accepting its catalog point would be an implicit RG-1 value cutover.
+    # catalog continuation. An in-domain seam gap remains unavailable: keep
+    # other values the source did publish, and do not accept this species'
+    # catalog point as an implicit RG-1 value cutover.
     if unresolved_missing_source_species:
         report["selection_source"] = (
             TYPED_FAILURE_EFFECTIVE_PRESSURE_SPECIES_SET_MISMATCH
         )
-        return {}, report
-    # Source extras that the batch marks as genuine upper bounds are expected
-    # and must not empty the whole flux map.
+    else:
+        report["selection_source"] = effective_pressure_source.source_id
+    # Source extras that the batch marks as genuine upper bounds are expected.
     if extra_source_species:
         report["demoted_effective_pressure_species"] = list(extra_source_species)
 
-    report["selection_source"] = effective_pressure_source.source_id
     flux_pressures: dict[str, float] = {}
     batch_pa_by_species: dict[str, float] = {}
     selected_runtime_pa_by_species: dict[str, float] = {}
@@ -1246,6 +1246,11 @@ def flux_pressures_from_batch(
         gate_state = _channel_flux_gate_state(answer)
         if gate_state == "eligible" and species_id not in batch_active_species_ids:
             channel_states[species_id] = "dormant_by_epoch"
+            continue
+        if species_id in unresolved_missing_source_species:
+            channel_states[species_id] = (
+                TYPED_FAILURE_EFFECTIVE_PRESSURE_SPECIES_SET_MISMATCH
+            )
             continue
         selected_pa, state = _channel_flux_pressure_pa(
             answer,
