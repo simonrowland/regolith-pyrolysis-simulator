@@ -180,6 +180,30 @@ def _assert_activity_consumer(inputs, formula: str, quantity: Quantity) -> None:
     assert inputs.measured_species == formula
 
 
+def _assert_omori_derivation(sample: dict, *, mole_role: str) -> None:
+    assert sample["reviewed_by"] == "w1127derivatt2"
+    assert sample["reviewed_on"] == "2026-11-27"
+    verification = sample["verification"]
+    assert verification["method"] == "derivation"
+    assert verification["closure"] == "by_difference"
+    parents = verification["parents"]
+    roles = [parent["role"] for parent in parents]
+    assert roles.count(mole_role) == 1
+    assert "mass_percent" in roles
+    assert any(
+        parent["role"] == "copied" and str(parent["path"]).endswith(".values.T_C")
+        for parent in parents
+    )
+    if mole_role == "mole_percent":
+        assert any(
+            parent["role"] == "copied"
+            and str(parent["path"]).endswith("N_Al2O3_mole_fraction_as_read")
+            for parent in parents
+        )
+    else:
+        assert "mole_percent" not in roles
+
+
 def test_rendered_figure_reads_standard_states_and_validator_coverage() -> None:
     document = _document()
     _figure_audit_rows(document)
@@ -220,12 +244,12 @@ def test_rendered_figure_reads_standard_states_and_validator_coverage() -> None:
         figure = sample["locator"]["figure"]
         assert figure in {"3", "5"}
         if figure == "3" and str(sample["path"]).endswith(".values"):
-            # Independent render check (w1127omoriat3). Point-condition pins stay unattested.
+            # Independent render check (w1127omoriat3).
             assert sample["reviewed_by"] == "w1127omoriat3 (grok)"
             assert sample["reviewed_on"] == "2026-11-27"
             assert sample["verification"] == {"method": "render", "dpi": 350}
         elif figure == "3":
-            assert {"reviewed_by", "reviewed_on", "verification"}.isdisjoint(sample)
+            _assert_omori_derivation(sample, mole_role="mole_fraction")
         elif (
             figure == "5"
             and str(sample["path"]).endswith(".values")
@@ -244,7 +268,7 @@ def test_rendered_figure_reads_standard_states_and_validator_coverage() -> None:
             assert sample["reviewed_on"] == "2026-11-27"
             assert sample["verification"] == {"method": "render", "dpi": 350}
         elif figure == "5" and not str(sample["path"]).endswith(".values"):
-            assert {"reviewed_by", "reviewed_on", "verification"}.isdisjoint(sample)
+            _assert_omori_derivation(sample, mole_role="mole_percent")
 
     for row_id, (activity, px, py, n_sio2, mgo_wt) in FIG5_READS.items():
         row = rows[row_id]
@@ -323,6 +347,8 @@ def test_rendered_figure_reads_standard_states_and_validator_coverage() -> None:
     )
     assert errors == []
     assert not [warning for warning in fidelity_warnings if warning.kind == "uncovered_observation"]
+    assert not [warning for warning in fidelity_warnings if warning.kind == "unattested_sample"]
+    assert not [warning for warning in fidelity_warnings if warning.kind == "source_blind_pin"]
 
 
 def test_migration_preserves_temperatures_compositions_and_typed_activity_requests(

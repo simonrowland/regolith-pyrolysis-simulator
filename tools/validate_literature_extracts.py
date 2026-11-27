@@ -247,6 +247,8 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
+from simulator.accounting.exceptions import AccountingError, UnknownSpeciesError
+from simulator.battery.composition import _formula_molar_mass
 from simulator.battery.extract_context import (
     SUPPORTED_EXTRACT_CONTEXT_PATH,
     iter_unsupported_context_container_paths,
@@ -4187,6 +4189,729 @@ def _locator_source_blind_reason(
     return None
 
 
+_DERIVATION_ROLES = frozenset(
+    {"mole_fraction", "mole_percent", "mass_percent", "copied"}
+)
+_DERIVATION_MOLE_ROLES = frozenset({"mole_fraction", "mole_percent"})
+
+
+def _stored_half_ulp(spelling: str) -> Decimal:
+    """Half a unit in the last place of a stored decimal spelling.
+
+    ``19.81460152`` has eight digits after the decimal point, so one ulp
+    is ``1e-8`` and half an ulp is ``5e-9``. An integer spelling such as
+    ``1630`` has no decimal digits, so one ulp is ``1`` and half an ulp
+    is ``0.5``. A leading sign is not a digit. An exponent scales that
+    place: ``1.5e-3`` has one decimal digit and exponent ``-3``, so one
+    ulp is ``1e-4`` and half an ulp is ``5e-5``.
+    """
+    text = spelling.strip()
+    if text[:1] in "+-":
+        text = text[1:]
+    exponent = 0
+    significand = text
+    if re.search(r"[eE]", text):
+        significand, exponent_text = re.split(r"[eE]", text, maxsplit=1)
+        exponent = int(exponent_text)
+    if "." in significand:
+        places = len(significand.split(".", 1)[1])
+    else:
+        places = 0
+    return Decimal("0.5") * (Decimal(10) ** (exponent - places))
+
+
+def _decimal_spelling(value: Any) -> str | None:
+    """Stored spelling of one finite number, or None when it is not one."""
+    if isinstance(value, bool) or value is None:
+        return None
+    if isinstance(value, int):
+        return str(value)
+    if isinstance(value, str):
+        text = value.strip()
+        if _finite_decimal(text) is None:
+            return None
+        return text
+    if isinstance(value, float):
+        if not math.isfinite(value):
+            return None
+        text = format(value, ".16g")
+        if _finite_decimal(text) is None:
+            return None
+        return text
+    return None
+
+
+def _derivation_molar_mass(formula: str) -> Decimal | None:
+    """Decimal g/mol from the composition molar-mass owner.
+
+    ``composition._formula_molar_mass`` sums ``Decimal(str(weight))`` times
+    the parsed count. The float oxide-mass helper stringifies a binary sum,
+    and CaO's float sum is ``56.077000000000005``, which moves an 8-decimal
+    closure. A missing formula is None, not a zero.
+    """
+    try:
+        mass = _formula_molar_mass(formula)
+    except (KeyError, AccountingError, UnknownSpeciesError):
+        return None
+    if not isinstance(mass, Decimal) or not mass.is_finite() or mass <= 0:
+        return None
+    return mass
+
+
+def _by_difference_masses(
+    mole_fraction: Decimal,
+    mole_component: str,
+    closure_component: str,
+    fixed: tuple[tuple[str, Decimal], ...],
+) -> dict[str, Decimal] | None:
+    """Mass percent of each oxide from one mole fraction and the fixed masses.
+
+    ``N = n_mole / (n_mole + n_closure + sum n_fixed)`` with
+    ``n_i = w_i / M_i`` and ``w_closure = 100 - w_mole - sum w_fixed``.
+    Solving for the two unknown masses gives
+
+    ``K = (100 - W_fixed) / M_closure + sum(w_fixed / M_fixed)``
+    ``denom = (1 - N) / M_mole + N / M_closure``
+    ``w_mole = N * K / denom``.
+
+    None means a molar mass is missing or the denominator is zero.
+    """
+    names = [mole_component, closure_component]
+    names.extend(name for name, _mass in fixed)
+    molar: dict[str, Decimal] = {}
+    for name in names:
+        if name in molar:
+            continue
+        mass = _derivation_molar_mass(name)
+        if mass is None:
+            return None
+        molar[name] = mass
+    fixed_total = sum((mass for _name, mass in fixed), Decimal(0))
+    fixed_moles = sum((mass / molar[name] for name, mass in fixed), Decimal(0))
+    closure_mass = molar[closure_component]
+    mole_mass = molar[mole_component]
+    k = (Decimal(100) - fixed_total) / closure_mass + fixed_moles
+    denominator = (Decimal(1) - mole_fraction) / mole_mass + mole_fraction / closure_mass
+    if denominator == 0:
+        return None
+    solved_mole = mole_fraction * k / denominator
+    solved_closure = Decimal(100) - solved_mole - fixed_total
+    masses = {name: mass for name, mass in fixed}
+    masses[mole_component] = solved_mole
+    masses[closure_component] = solved_closure
+    return masses
+
+
+def _value_at_address(value: Any, address: tuple[Any, ...]) -> Any:
+    current = value
+    for part in address:
+        if isinstance(part, int):
+            if not isinstance(current, (list, tuple)) or not 0 <= part < len(current):
+                return None
+            current = current[part]
+        else:
+            if not isinstance(current, Mapping) or part not in current:
+                return None
+            current = current[part]
+    return current
+
+
+def _component_slot(address: tuple[Any, ...]) -> int | None:
+    """1 for a component amount, 0 for a component name, else None."""
+    if (
+        len(address) >= 3
+        and address[-3] == "components"
+        and isinstance(address[-2], int)
+        and address[-1] in (0, 1)
+    ):
+        return address[-1]
+    return None
+
+
+def _within_tighter_half_ulp(stored: Any, parent: Any) -> bool:
+    """True when both spellings agree inside the tighter stored half-ulp."""
+    stored_spelling = _decimal_spelling(stored)
+    parent_spelling = _decimal_spelling(parent)
+    if stored_spelling is None or parent_spelling is None:
+        return False
+    tolerance = min(
+        _stored_half_ulp(stored_spelling),
+        _stored_half_ulp(parent_spelling),
+    )
+    return abs(Decimal(stored_spelling) - Decimal(parent_spelling)) <= tolerance
+
+
+def _composition_state(sample_value: Any) -> Mapping[str, Any] | None:
+    if not isinstance(sample_value, Mapping):
+        return None
+    composition = sample_value.get("composition")
+    if not isinstance(composition, Mapping):
+        return None
+    state = composition.get("state")
+    if not isinstance(state, Mapping):
+        return None
+    return state
+
+
+def _state_tag(state: Mapping[str, Any]) -> str | None:
+    tag = state.get("tag")
+    if isinstance(tag, StateTag):
+        return tag.value
+    if isinstance(tag, str) and tag.strip():
+        return tag.strip()
+    return None
+
+
+def _derivation_recompute_defects(
+    doc: Mapping[str, Any],
+    sample: Mapping[str, Any],
+    observation: Mapping[str, Any],
+) -> list[str]:
+    """Recompute a by-difference composition and compare it to the stored pin.
+
+    Solved oxides (the mole-fraction component and the closure component)
+    use the wider of two precisions. The stored spelling contributes its
+    own half-ulp. The mole parent contributes the mass change when that
+    parent moves by half its own last place: ``0.3587`` moves by ``5e-5``
+    mole fraction, and ``38.7`` percent moves by ``0.05`` percent, which
+    is ``5e-4`` mole fraction. The tolerance is the larger of those two.
+    A parent coarser than the stored 8th digit cannot certify that digit,
+    so the comparison does not pretend it can.
+
+    A fixed mass-percent parent is an exact input. Its stored amount is
+    compared at the stored spelling's half-ulp only. An integer series
+    label does not widen that check to ``0.5``.
+
+    A negative closure mass requires ``tag: unknown`` and no numeric
+    components. The sign used is the mass at the stated parent, not the
+    edge of the parent band.
+    """
+    values = observation.get("values") if isinstance(observation, Mapping) else None
+    closure = (
+        values.get("composition_closure") if isinstance(values, Mapping) else None
+    )
+    if not isinstance(closure, Mapping):
+        return ["derivation recompute failed: composition_closure is missing"]
+    closure_component = closure.get("component")
+    if not isinstance(closure_component, str) or not closure_component.strip():
+        return ["derivation recompute failed: composition_closure component is missing"]
+    closure_component = closure_component.strip()
+    verification = sample.get("verification")
+    parents = verification.get("parents") if isinstance(verification, Mapping) else None
+    if not isinstance(parents, list):
+        return ["derivation recompute failed: parents are missing"]
+
+    mole_component: str | None = None
+    mole_fraction: Decimal | None = None
+    mole_step: Decimal | None = None
+    fixed: list[tuple[str, Decimal]] = []
+    parent_values: list[Any] = []
+    for parent in parents:
+        if not isinstance(parent, Mapping):
+            return ["derivation recompute failed: parent is not a mapping"]
+        path = parent.get("path")
+        role = parent.get("role")
+        if not isinstance(path, str):
+            return ["derivation recompute failed: parent path is missing"]
+        try:
+            resolved = resolve_field_path(doc, path)
+        except KeyError:
+            return [f"derivation parent path does not resolve: {path}"]
+        parent_values.append(resolved)
+        if role == "copied":
+            continue
+        spelling = _decimal_spelling(resolved)
+        if spelling is None or not isinstance(role, str):
+            return ["derivation recompute failed: parent is not numeric"]
+        number = Decimal(spelling)
+        component = parent.get("component")
+        if not isinstance(component, str) or not component.strip():
+            return ["derivation recompute failed: parent component is missing"]
+        component = component.strip()
+        if role == "mole_percent":
+            mole_component = component
+            mole_fraction = number / Decimal(100)
+            mole_step = _stored_half_ulp(spelling) / Decimal(100)
+        elif role == "mole_fraction":
+            mole_component = component
+            mole_fraction = number
+            mole_step = _stored_half_ulp(spelling)
+        elif role == "mass_percent":
+            if number < 0:
+                return ["derivation recompute failed: mass_percent parent is negative"]
+            fixed.append((component, number))
+        else:
+            return ["derivation recompute failed: parent role is not a closure role"]
+    if (
+        mole_component is None
+        or mole_fraction is None
+        or mole_step is None
+    ):
+        return ["derivation recompute failed: mole parent is missing"]
+
+    fixed_pairs = tuple(fixed)
+    center = _by_difference_masses(
+        mole_fraction, mole_component, closure_component, fixed_pairs
+    )
+    if center is None:
+        return ["derivation recompute failed: closure is undefined"]
+    shifted = [
+        _by_difference_masses(
+            mole_fraction + mole_step,
+            mole_component,
+            closure_component,
+            fixed_pairs,
+        ),
+        _by_difference_masses(
+            mole_fraction - mole_step,
+            mole_component,
+            closure_component,
+            fixed_pairs,
+        ),
+    ]
+    # Parent last-place floor. Each solved oxide takes the largest mass
+    # change among the shifts that stay defined. A missing band is a
+    # failed recompute, not a pass at the stored half-ulp alone.
+    band: dict[str, Decimal] = {}
+    for component in (mole_component, closure_component):
+        deltas = [
+            abs(masses[component] - center[component])
+            for masses in shifted
+            if masses is not None
+        ]
+        if not deltas:
+            return [
+                "derivation recompute failed: parent precision band is undefined"
+            ]
+        band[component] = max(deltas)
+
+    defects: list[str] = []
+    state = _composition_state(sample.get("value"))
+    if state is None:
+        return ["recomputed value differs from stored: composition state is missing"]
+    tag = _state_tag(state)
+    state_value = state.get("value")
+    has_components = isinstance(state_value, Mapping) and "components" in state_value
+    if center[closure_component] < 0:
+        if tag != StateTag.UNKNOWN.value or has_components:
+            defects.append(
+                "recomputed value differs from stored: closure component "
+                f"{closure_component} is negative and the stored composition "
+                "is not an unknown state without numeric components"
+            )
+        _certify_derivation_leaves(
+            sample.get("value"),
+            parent_values,
+            center,
+            defects,
+            match_components=False,
+        )
+        return defects
+
+    if tag != StateTag.VALUE.value or not has_components:
+        defects.append(
+            "recomputed value differs from stored: closure component "
+            f"{closure_component} is non-negative and the stored composition "
+            "is not a numeric value"
+        )
+        return defects
+    components = state_value.get("components") if isinstance(state_value, Mapping) else None
+    if not isinstance(components, list):
+        return [
+            "recomputed value differs from stored: composition components are missing"
+        ]
+    seen: set[str] = set()
+    stored_amounts: dict[str, tuple[str, int]] = {}
+    for index, pair in enumerate(components):
+        if not isinstance(pair, (list, tuple)) or len(pair) != 2:
+            defects.append(
+                "recomputed value differs from stored: "
+                f"components[{index}] is not a name and amount"
+            )
+            continue
+        name = pair[0]
+        if not isinstance(name, str) or not name.strip() or name in seen:
+            defects.append(
+                "recomputed value differs from stored: "
+                f"components[{index}] name {name!r} is not a closure component"
+            )
+            continue
+        seen.add(name)
+        spelling = _decimal_spelling(pair[1])
+        if spelling is None:
+            defects.append(
+                "recomputed value differs from stored: "
+                f"components[{index}] amount is not numeric"
+            )
+            continue
+        stored_amounts[name] = (spelling, index)
+    for name, recomputed in center.items():
+        stored = stored_amounts.get(name)
+        if stored is None:
+            defects.append(
+                "recomputed value differs from stored: "
+                f"component {name} is absent"
+            )
+            continue
+        spelling, index = stored
+        half_ulp = _stored_half_ulp(spelling)
+        # Fixed oxides stay at the stored half-ulp. Solved oxides also
+        # accept the mass change from the mole parent's own last place.
+        tolerance = max(half_ulp, band.get(name, Decimal(0)))
+        if abs(Decimal(spelling) - recomputed) > tolerance:
+            defects.append(
+                "recomputed value differs from stored at "
+                f"components[{index}][1]: stored {spelling} "
+                f"recomputed {recomputed}"
+            )
+    for name in stored_amounts:
+        if name not in center:
+            defects.append(
+                "recomputed value differs from stored: "
+                f"component {name} is not produced by the closure"
+            )
+    _certify_derivation_leaves(
+        sample.get("value"),
+        parent_values,
+        center,
+        defects,
+        match_components=True,
+    )
+    return defects
+
+
+def _certify_derivation_leaves(
+    sample_value: Any,
+    parent_values: Sequence[Any],
+    masses: Mapping[str, Decimal],
+    defects: list[str],
+    *,
+    match_components: bool,
+) -> None:
+    """Certify measured leaves that are not the recomputed amounts.
+
+    Component amounts are checked by ``_derivation_recompute_defects``
+    when the closure is non-negative. Component names that contain digits
+    are leaves; they are certified when they name an oxide the closure
+    produces. Every other measured leaf must equal an attested parent
+    inside the tighter of the two stored half-ulps. That is how ``T_C``
+    and printed coordinates are attested without a text token.
+    """
+    leaves, _non_finite = _classify_measured_leaves(
+        sample_value, skip_keys=_CONDITION_PROVENANCE_KEYS
+    )
+    for address in leaves:
+        slot = _component_slot(address)
+        if slot is not None and match_components:
+            continue
+        stored = _value_at_address(sample_value, address)
+        if slot == 0 and isinstance(stored, str) and stored in masses:
+            continue
+        if slot is not None:
+            defects.append(
+                "recomputed value differs from stored at "
+                f"{address}: {stored!r}"
+            )
+            continue
+        if any(_within_tighter_half_ulp(stored, parent) for parent in parent_values):
+            continue
+        defects.append(
+            "recomputed value differs from stored at "
+            f"{address}: {stored!r} is not an attested parent"
+        )
+
+
+def _derivation_shape_defects(
+    sample: Mapping[str, Any],
+    observation: Mapping[str, Any] | None,
+) -> list[str]:
+    """Structural requirements of a derivation pin. These are not a recompute."""
+    defects: list[str] = []
+    verification = sample.get("verification")
+    if not isinstance(verification, Mapping):
+        return ["derivation verification is required"]
+    declared = verification.get("closure")
+    values = observation.get("values") if isinstance(observation, Mapping) else None
+    closure = (
+        values.get("composition_closure") if isinstance(values, Mapping) else None
+    )
+    observed = closure.get("method") if isinstance(closure, Mapping) else None
+    component = closure.get("component") if isinstance(closure, Mapping) else None
+    if declared is not None and observed is not None and declared != observed:
+        defects.append("derivation closure disagrees with composition_closure")
+    method = declared if declared is not None else observed
+    if method != "by_difference":
+        defects.append("derivation closure must be by_difference")
+    if not isinstance(component, str) or not component.strip():
+        defects.append("composition_closure component is required")
+    else:
+        component = component.strip()
+    parents = verification.get("parents")
+    if not isinstance(parents, list) or not parents:
+        defects.append("derivation parents are required")
+        return defects
+    mole_roles = 0
+    seen_paths: set[str] = set()
+    mass_components: list[str] = []
+    mole_component: str | None = None
+    for parent in parents:
+        if not isinstance(parent, Mapping):
+            defects.append("derivation parent must be a mapping")
+            continue
+        path = parent.get("path")
+        role = parent.get("role")
+        if not isinstance(path, str) or not path.strip():
+            defects.append("derivation parent path is required")
+            continue
+        if path in seen_paths:
+            defects.append("derivation parent path is repeated")
+        seen_paths.add(path)
+        if role not in _DERIVATION_ROLES:
+            defects.append(
+                "derivation parent role must be mole_fraction, mole_percent, "
+                "mass_percent, or copied"
+            )
+            continue
+        if role == "copied":
+            continue
+        name = parent.get("component")
+        if not isinstance(name, str) or not name.strip():
+            defects.append("derivation parent component is required")
+            continue
+        name = name.strip()
+        if role in _DERIVATION_MOLE_ROLES:
+            mole_roles += 1
+            mole_component = name
+        else:
+            mass_components.append(name)
+    if mole_roles != 1:
+        defects.append(
+            "derivation requires exactly one mole_fraction or mole_percent parent"
+        )
+    if isinstance(component, str) and mole_component == component:
+        defects.append("derivation mole parent cannot be the closure component")
+    if isinstance(component, str) and component in mass_components:
+        defects.append(
+            "derivation mass_percent parent cannot be the closure component"
+        )
+    if mole_component is not None and mole_component in mass_components:
+        defects.append("derivation mass_percent parent cannot be the mole parent")
+    if len(mass_components) != len(set(mass_components)):
+        defects.append("derivation mass_percent component is repeated")
+    return defects
+
+
+def _sample_cover(
+    doc: Mapping[str, Any], sample: Mapping[str, Any]
+) -> tuple[tuple[str, str], tuple[Any, ...]] | None:
+    key = _fidelity_sample_observation_key(doc, sample)
+    address = _sample_evidence_address(doc, sample)
+    if key is None or address is None:
+        return None
+    return key, address
+
+
+def _derivation_parent_status(
+    doc: Mapping[str, Any],
+    path: str,
+    base_covers: Sequence[tuple[tuple[str, str], tuple[Any, ...]]],
+    derivation_covers: Sequence[tuple[int, tuple[str, str], tuple[Any, ...]]],
+) -> tuple[str, tuple[int, ...]]:
+    try:
+        resolve_field_path(doc, path)
+    except KeyError:
+        return "unresolved", ()
+    address = _path_evidence_address(doc, path)
+    key = _fidelity_sample_observation_key(doc, {"path": path})
+    if address is None or key is None:
+        return "unresolved", ()
+    base_hit = False
+    for cover_key, cover_address in base_covers:
+        if cover_key == key and address[: len(cover_address)] == cover_address:
+            base_hit = True
+            break
+    derivation_hits = [
+        index
+        for index, cover_key, cover_address in derivation_covers
+        if cover_key == key and address[: len(cover_address)] == cover_address
+    ]
+    if base_hit:
+        return "base", ()
+    if derivation_hits:
+        return "derivation", tuple(derivation_hits)
+    return "unattested", ()
+
+
+def _derivation_cycle_indexes(graph: Mapping[int, set[int]]) -> set[int]:
+    """Indexes that sit on a cycle, including a self-cover."""
+    color = {node: 0 for node in graph}
+    cycles: set[int] = set()
+    stack: list[int] = []
+
+    def visit(node: int) -> None:
+        color[node] = 1
+        stack.append(node)
+        for nxt in graph.get(node, ()):
+            if nxt not in color:
+                continue
+            state = color[nxt]
+            if state == 1:
+                cycles.update(stack[stack.index(nxt) :])
+            elif state == 0:
+                visit(nxt)
+        stack.pop()
+        color[node] = 2
+
+    for node in list(graph):
+        if color[node] == 0:
+            visit(node)
+    return cycles
+
+
+def _derivation_pass_defects(
+    doc: Mapping[str, Any],
+    samples: Sequence[Any],
+    derivation_indexes: Sequence[int],
+    base_attested_indexes: Sequence[int],
+    sample_match_errors: Mapping[int, Sequence[str]],
+    observation_map: Mapping[tuple[str, str], Mapping[str, Any]],
+    *,
+    extractor_id: Any,
+) -> list[tuple[int, list[str]]]:
+    """Attestation defects for derivation samples.
+
+    A parent path is attested when a base-attested sample covers it, or
+    when a derivation sample that itself attests covers it. Coverage is
+    the evidence-tree ancestor rule, on the same observation. The numeric
+    recompute is ``_derivation_recompute_defects`` and is not called for
+    a cycle, an unattested parent, or a shape defect.
+    """
+    if not derivation_indexes:
+        return []
+    base_covers: list[tuple[tuple[str, str], tuple[Any, ...]]] = []
+    for index in base_attested_indexes:
+        sample = samples[index]
+        if not isinstance(sample, Mapping):
+            continue
+        cover = _sample_cover(doc, sample)
+        if cover is not None:
+            base_covers.append(cover)
+    derivation_covers: list[tuple[int, tuple[str, str], tuple[Any, ...]]] = []
+    for index in derivation_indexes:
+        sample = samples[index]
+        if not isinstance(sample, Mapping):
+            continue
+        cover = _sample_cover(doc, sample)
+        if cover is not None:
+            derivation_covers.append((index, cover[0], cover[1]))
+
+    graph: dict[int, set[int]] = {index: set() for index in derivation_indexes}
+    groups: dict[int, list[set[int]]] = {index: [] for index in derivation_indexes}
+    prepared: dict[int, dict[str, Any]] = {}
+    for index in derivation_indexes:
+        sample = samples[index]
+        defects: list[str] = []
+        observation: Mapping[str, Any] | None = None
+        if not isinstance(sample, Mapping):
+            defects.append("each sample must be a mapping")
+        else:
+            defects.extend(
+                _sample_attestation_defects(
+                    sample,
+                    figure_read_sample=False,
+                    extractor_id=extractor_id,
+                )
+            )
+            if sample_match_errors.get(index):
+                defects.append(
+                    "derivation sample does not match its addressed extract value"
+                )
+            key = _fidelity_sample_observation_key(doc, sample)
+            if key is None or key not in observation_map:
+                defects.append(
+                    "derivation sample does not address a scored observation"
+                )
+            else:
+                observation = observation_map[key]
+            defects.extend(_derivation_shape_defects(sample, observation))
+            verification = sample.get("verification")
+            parents = (
+                verification.get("parents")
+                if isinstance(verification, Mapping)
+                else None
+            )
+            if isinstance(parents, list):
+                for parent in parents:
+                    if not isinstance(parent, Mapping):
+                        continue
+                    path = parent.get("path")
+                    if not isinstance(path, str) or not path.strip():
+                        continue
+                    status, hits = _derivation_parent_status(
+                        doc, path, base_covers, derivation_covers
+                    )
+                    if status == "unresolved":
+                        defects.append(
+                            f"derivation parent path does not resolve: {path}"
+                        )
+                    elif status == "unattested":
+                        defects.append(
+                            f"derivation parent is not attested: {path}"
+                        )
+                    elif status == "derivation":
+                        hit_set = set(hits)
+                        groups[index].append(hit_set)
+                        graph[index].update(hit_set)
+        prepared[index] = {
+            "defects": defects,
+            "sample": sample,
+            "observation": observation,
+        }
+
+    cycles = _derivation_cycle_indexes(graph)
+    for index in cycles:
+        prepared[index]["defects"].append("derivation cycle")
+
+    failed = {
+        index for index, item in prepared.items() if item["defects"]
+    }
+    attested: set[int] = set()
+    pending = [index for index in derivation_indexes if index not in failed]
+    changed = True
+    while pending and changed:
+        changed = False
+        for index in list(pending):
+            parent_groups = groups[index]
+            if any(group and group <= failed for group in parent_groups):
+                prepared[index]["defects"].append(
+                    "derivation parent is not attested"
+                )
+                failed.add(index)
+                pending.remove(index)
+                changed = True
+                continue
+            if any(not (group & attested) for group in parent_groups):
+                continue
+            item = prepared[index]
+            item["defects"].extend(
+                _derivation_recompute_defects(
+                    doc, item["sample"], item["observation"]
+                )
+            )
+            if item["defects"]:
+                failed.add(index)
+            else:
+                attested.add(index)
+            pending.remove(index)
+            changed = True
+    for index in pending:
+        prepared[index]["defects"].append("derivation cycle")
+    return [
+        (index, list(prepared[index]["defects"]))
+        for index in derivation_indexes
+    ]
+
+
 def fidelity_source_warnings(
     doc: Mapping[str, Any],
     *,
@@ -4361,7 +5086,12 @@ def fidelity_source_warnings(
     that token). A pinned value marked ``evidence_class: figure_only`` with
     a ``figure_read`` record instead needs an independent reviewer, a
     page-and-figure locator, stated digitization uncertainty, and render
-    verification with DPI. The extract document and program source are not
+    verification with DPI. A sample whose verification method is
+    ``derivation`` is attested only when its named parents are attested,
+    the parent graph has no cycle, and the stored composition equals the
+    by-difference recompute from those parents within a tolerance derived
+    from the stored precision. That sample does not open the cited text.
+    The extract document and program source are not
     artifacts.
     Drift stays a match error. For text-backed samples, ``source_blind_pin``
     counts unopened artifacts or resolved extract leaves the cited text
@@ -4410,6 +5140,9 @@ def fidelity_source_warnings(
     corpus_root = (
         Path(configured_corpus_root).expanduser() if configured_corpus_root else None
     )
+    derivation_indexes: list[int] = []
+    base_attested_indexes: list[int] = []
+    sample_match_errors: dict[int, list[str]] = {}
     for index, sample in enumerate(samples):
         sample_label = f"{label}:fidelity_samples[{index}]"
         if not isinstance(sample, Mapping):
@@ -4420,6 +5153,8 @@ def fidelity_source_warnings(
                 f"{sample_label}: each sample must be a mapping",
             )
             continue
+        match_errors = check_fidelity_sample_matches(doc, sample, label=sample_label)
+        sample_match_errors[index] = match_errors
         if sample.get("note") == _PILOT_MIGRATION_NOTE:
             pilot += 1
             _note_reason(
@@ -4428,50 +5163,70 @@ def fidelity_source_warnings(
                 f"{sample_label}: auto-migrated pilot sample cannot be "
                 "source-attested; replace it with a source-reviewed sample",
             )
+        verification = sample.get("verification")
+        is_derivation = (
+            isinstance(verification, Mapping)
+            and verification.get("method") == "derivation"
+        )
         sample_value = sample.get("value")
         figure_read_sample = False
         figure_read = None
-        if _is_figure_read_leaf(sample_value):
-            try:
-                resolved_value = resolve_fidelity_sample(doc, sample)
-            except KeyError:
-                resolved_value = None
-            figure_read_sample = _is_figure_read_leaf(resolved_value)
-            if figure_read_sample:
-                figure_read = resolved_value.get("figure_read")
-        defects = _sample_attestation_defects(
-            sample,
-            figure_read_sample=figure_read_sample,
-            figure_read=figure_read,
-            extractor_id=extractor_id,
-        )
-        if defects:
-            unattested += 1
-            for defect in defects:
-                _note_reason(
-                    unattested_reasons,
-                    unattested_extra,
-                    f"{sample_label}: {defect}",
-                )
-        elif not figure_read_sample:
-            # Attestation-complete pins are the ones that would otherwise certify
-            # without opening the text source. Unattested pins stay on that count.
-            blind = _locator_source_blind_reason(
+        defects: list[str] = []
+        blind = None
+        if is_derivation:
+            # Parent attestation can depend on a later sample. Count this
+            # pin in the second pass. Do not open the cited text: a derived
+            # mass has no token there, and a text search would be source-blind
+            # even when the recompute holds.
+            derivation_indexes.append(index)
+        else:
+            if _is_figure_read_leaf(sample_value):
+                try:
+                    resolved_value = resolve_fidelity_sample(doc, sample)
+                except KeyError:
+                    resolved_value = None
+                figure_read_sample = _is_figure_read_leaf(resolved_value)
+                if figure_read_sample:
+                    figure_read = resolved_value.get("figure_read")
+            defects = _sample_attestation_defects(
                 sample,
-                artifact_root=root,
-                corpus_root=corpus_root,
-                doc=doc,
-                corpus_mount=corpus_mount,
+                figure_read_sample=figure_read_sample,
+                figure_read=figure_read,
+                extractor_id=extractor_id,
             )
-            if blind:
-                source_blind += 1
-                source_blind_reason_codes.append(blind.reason_codes)
-                _note_reason(
-                    source_blind_reasons,
-                    source_blind_extra,
-                    f"{sample_label}: {blind.detail}",
+            if defects:
+                unattested += 1
+                for defect in defects:
+                    _note_reason(
+                        unattested_reasons,
+                        unattested_extra,
+                        f"{sample_label}: {defect}",
+                    )
+            elif not figure_read_sample:
+                # Attestation-complete pins are the ones that would otherwise certify
+                # without opening the text source. Unattested pins stay on that count.
+                blind = _locator_source_blind_reason(
+                    sample,
+                    artifact_root=root,
+                    corpus_root=corpus_root,
+                    doc=doc,
+                    corpus_mount=corpus_mount,
                 )
-        match_errors = check_fidelity_sample_matches(doc, sample, label=sample_label)
+                if blind:
+                    source_blind += 1
+                    source_blind_reason_codes.append(blind.reason_codes)
+                    _note_reason(
+                        source_blind_reasons,
+                        source_blind_extra,
+                        f"{sample_label}: {blind.detail}",
+                    )
+            if (
+                not defects
+                and blind is None
+                and not match_errors
+                and sample.get("note") != _PILOT_MIGRATION_NOTE
+            ):
+                base_attested_indexes.append(index)
         observation_key = _fidelity_sample_observation_key(doc, sample)
         if (
             not match_errors
@@ -4487,6 +5242,26 @@ def fidelity_source_warnings(
             for leaf in needed_addresses[observation_key]:
                 if leaf[: len(pin_address)] == pin_address:
                     covered_addresses[observation_key].add(leaf)
+
+    for sample_index, derivation_defects in _derivation_pass_defects(
+        doc,
+        samples,
+        derivation_indexes,
+        base_attested_indexes,
+        sample_match_errors,
+        observation_map,
+        extractor_id=extractor_id,
+    ):
+        if not derivation_defects:
+            continue
+        unattested += 1
+        sample_label = f"{label}:fidelity_samples[{sample_index}]"
+        for defect in derivation_defects:
+            _note_reason(
+                unattested_reasons,
+                unattested_extra,
+                f"{sample_label}: {defect}",
+            )
 
     # Invariant: an observation is covered only when every digit-bearing
     # leaf of its evidence has a pin of that address or an ancestor. A
@@ -4699,7 +5474,9 @@ def certify_extract_source_fidelity(
     Repeating a pin of one address does not cover a sibling, even when the
     numbers are equal, and a ``values`` pin does not cover a sibling
     condition. A descriptive label does not stand in for a number it does
-    not contain. The extract itself and program source do not qualify.
+    not contain. A derivation sample is attested by recomputing its
+    closure from attested parents, and it does not open the cited text.
+    The extract itself and program source do not qualify.
     Equipment pins, unopened locators, and copied values that are absent
     from the artifact refuse. ``warnings`` is accepted for existing callers
     and is not the decision: a supplied empty list cannot hide a hole.

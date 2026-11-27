@@ -2879,6 +2879,243 @@ def test_render_verification_does_not_attest_a_non_figure_leaf():
     assert "unattested_sample" not in by_kind
 
 
+def _derivation_extract() -> dict:
+    """Fig. 3 first-point closure: N_SiO2 0.3587, Al2O3 10, MgO 30.
+
+    The stored SiO2 and CaO strings are the Omori point_conditions spellings.
+    The derivation pin must recompute them; the test does not paste a formula.
+    """
+    doc = _minimal_extract()
+    _strip_scored_conditions(doc)
+    doc["extraction"]["worker"] = "figure-extractor"
+    values = {
+        "evidence_class": "figure_only",
+        "figure_read": {
+            "read_uncertainty": {
+                "x": "0.006",
+                "y": "0.06",
+                "unit_x": "mole fraction",
+                "unit_y": "log10 activity",
+            }
+        },
+        "T_C": "1630",
+        "composition_as_plotted": {
+            "N_SiO2_mole_fraction": "0.3587",
+            "Al2O3_mass_percent_as_series": 10,
+            "MgO_mass_percent_as_series": 30,
+        },
+        "composition_closure": {
+            "method": "by_difference",
+            "component": "CaO",
+        },
+    }
+    point = {
+        "T_C": {"state": {"tag": "value", "value": "1630"}},
+        "composition": {
+            "state": {
+                "tag": "value",
+                "value": {
+                    "basis": "oxide_weight_percent_by_difference_from_plot",
+                    "amount_basis": "mass_percent",
+                    "components": [
+                        ["CaO", "19.81460152"],
+                        ["MgO", "30.00000000"],
+                        ["SiO2", "40.18539848"],
+                        ["Al2O3", "10.00000000"],
+                    ],
+                },
+            },
+            "printed_coordinates": {
+                "N_SiO2_mole_fraction": "0.3587",
+                "Al2O3_mass_percent_as_series": 10,
+                "MgO_mass_percent_as_series": 30,
+            },
+        },
+    }
+    observation = doc["species"]["Fe"]["observations"][0]
+    observation["values"] = copy.deepcopy(values)
+    observation["point_conditions"] = copy.deepcopy(point)
+    prefix = "species.Fe.observations[fe_alpha_1]"
+    doc["fidelity_samples"] = [
+        {
+            "path": f"{prefix}.values",
+            "value": copy.deepcopy(values),
+            "reviewed_by": "independent figure checker",
+            "reviewed_on": "2026-11-26",
+            "locator": {"page": 2, "figure": "3"},
+            "verification": {"method": "render", "dpi": 350},
+        },
+        {
+            "path": f"{prefix}.point_conditions",
+            "value": copy.deepcopy(point),
+            "reviewed_by": "derivation checker",
+            "reviewed_on": "2026-11-27",
+            "locator": {"page": 2, "figure": "3"},
+            "verification": {
+                "method": "derivation",
+                "closure": "by_difference",
+                "parents": [
+                    {
+                        "path": (
+                            f"{prefix}.values.composition_as_plotted"
+                            ".N_SiO2_mole_fraction"
+                        ),
+                        "role": "mole_fraction",
+                        "component": "SiO2",
+                    },
+                    {
+                        "path": (
+                            f"{prefix}.values.composition_as_plotted"
+                            ".Al2O3_mass_percent_as_series"
+                        ),
+                        "role": "mass_percent",
+                        "component": "Al2O3",
+                    },
+                    {
+                        "path": (
+                            f"{prefix}.values.composition_as_plotted"
+                            ".MgO_mass_percent_as_series"
+                        ),
+                        "role": "mass_percent",
+                        "component": "MgO",
+                    },
+                    {"path": f"{prefix}.values.T_C", "role": "copied"},
+                ],
+            },
+        },
+    ]
+    return doc
+
+
+def _set_derived_cao(point: dict, amount: str) -> None:
+    point["composition"]["state"]["value"]["components"][0][1] = amount
+
+
+def test_derivation_recompute_attests_a_closed_composition():
+    doc = _derivation_extract()
+
+    warnings = vle.fidelity_source_warnings(doc, label="derivation")
+    by_kind = {warning.kind: warning.count for warning in warnings}
+
+    assert "unattested_sample" not in by_kind, warnings
+    assert "source_blind_pin" not in by_kind, warnings
+    assert "uncovered_observation" not in by_kind, warnings
+    assert vle.certify_extract_source_fidelity(doc, label="derivation") == []
+
+
+def test_derivation_rejects_a_wrong_stored_value():
+    doc = _derivation_extract()
+    _set_derived_cao(doc["species"]["Fe"]["observations"][0]["point_conditions"], "30.00000000")
+    _set_derived_cao(doc["fidelity_samples"][1]["value"], "30.00000000")
+
+    warnings = vle.fidelity_source_warnings(doc, label="wrong-derivation")
+    by_kind = {warning.kind: warning for warning in warnings}
+
+    assert "source_blind_pin" not in by_kind
+    assert "uncovered_observation" not in by_kind
+    detail = by_kind["unattested_sample"].detail if "unattested_sample" in by_kind else ""
+    assert "recomputed value differs from stored" in detail, (
+        "recomputed value differs from stored"
+    )
+
+
+def test_derivation_rejects_an_unattested_parent():
+    doc = _derivation_extract()
+    del doc["fidelity_samples"][0]["reviewed_by"]
+
+    warnings = vle.fidelity_source_warnings(doc, label="unattested-parent")
+    detail = " ".join(
+        warning.detail
+        for warning in warnings
+        if warning.kind == "unattested_sample"
+    )
+
+    assert "derivation parent is not attested" in detail, detail
+
+
+def test_derivation_rejects_a_parent_sample_that_does_not_match_its_path():
+    doc = _derivation_extract()
+    doc["fidelity_samples"][0]["value"]["T_C"] = "1631"
+
+    warnings = vle.fidelity_source_warnings(doc, label="mismatched-parent")
+    detail = " ".join(
+        warning.detail
+        for warning in warnings
+        if warning.kind == "unattested_sample"
+    )
+
+    assert "derivation parent is not attested" in detail, detail
+
+
+def test_derivation_rejects_a_cycle():
+    doc = _minimal_extract()
+    _strip_scored_conditions(doc)
+    observations = doc["species"]["Fe"]["observations"]
+    observations[0]["values"] = {
+        "composition_closure": {"method": "by_difference", "component": "CaO"}
+    }
+    observations.append(
+        {
+            "observation_id": "fe_alpha_2",
+            "type": "alpha",
+            "locator": {"table": "1", "page": 2},
+            "phase": "silicate_melt",
+            "values": {
+                "composition_closure": {
+                    "method": "by_difference",
+                    "component": "CaO",
+                }
+            },
+            "point_conditions": {"marker": "2"},
+        }
+    )
+    observations[0]["point_conditions"] = {"marker": "1"}
+    prefixes = (
+        "species.Fe.observations[fe_alpha_1]",
+        "species.Fe.observations[fe_alpha_2]",
+    )
+    doc["fidelity_samples"] = []
+    for index, prefix in enumerate(prefixes):
+        other = prefixes[1 - index]
+        doc["fidelity_samples"].append(
+            {
+                "path": f"{prefix}.point_conditions",
+                "value": {"marker": str(index + 1)},
+                "reviewed_by": "derivation checker",
+                "reviewed_on": "2026-11-27",
+                "locator": {"page": 2, "figure": "3"},
+                "verification": {
+                    "method": "derivation",
+                    "closure": "by_difference",
+                    "parents": [
+                        {
+                            "path": f"{other}.point_conditions",
+                            "role": "mole_fraction",
+                            "component": "SiO2",
+                        }
+                    ],
+                },
+            }
+        )
+
+    warnings = vle.fidelity_source_warnings(doc, label="derivation-cycle")
+    detail = " ".join(
+        warning.detail
+        for warning in warnings
+        if warning.kind == "unattested_sample"
+    )
+
+    assert "derivation cycle" in detail, detail
+    assert "recomputed value differs from stored" not in detail
+
+
+def test_derivation_recompute_mutation_turns_wrong_value_red(monkeypatch):
+    monkeypatch.setattr(vle, "_derivation_recompute_defects", lambda *args, **kwargs: [])
+
+    with pytest.raises(AssertionError, match="recomputed value differs from stored"):
+        test_derivation_rejects_a_wrong_stored_value()
+
+
 def test_independence_mutation_turns_same_extractor_rejection_red(monkeypatch):
     original = vle._sample_attestation_defects
 
@@ -6142,6 +6379,8 @@ def test_fidelity_source_warning_ratchet(monkeypatch, tmp_path, record_property)
         f"{unattested_samples} ceiling={_UNATTESTED_SAMPLES_CEILING} "
         f"omori-sanbongi-jjim-25-sio2-al2o3-activity={omori_unattested}"
     )
+    record_property("unattested_samples", unattested_samples)
+    record_property("omori_unattested_samples", omori_unattested)
     assert pilot_pins <= _PILOT_PINS_CEILING, pilot_pins
     assert pilot_extracts <= _PILOT_PIN_EXTRACTS_CEILING, pilot_extracts
     non_mount_dependent_source_blind = source_blind_pins - mount_dependent_pins
