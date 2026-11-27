@@ -8,6 +8,7 @@ import runpy
 import sqlite3
 from contextlib import closing
 from pathlib import Path
+from types import SimpleNamespace
 from threading import Thread
 
 import pytest
@@ -142,7 +143,15 @@ def test_apply_interrupt_reports_previously_committed_store(
     def interrupt_during_lock_wait(_seconds):
         raise KeyboardInterrupt
 
-    monkeypatch.setattr(results_store_module.time, "sleep", interrupt_during_lock_wait)
+    monkeypatch.setattr(
+        results_store_module,
+        "time",
+        SimpleNamespace(
+            monotonic=results_store_module.time.monotonic,
+            time=results_store_module.time.time,
+            sleep=interrupt_during_lock_wait,
+        ),
+    )
     second_lock = study_results_write_lock_path(second.path.parent)
     with ResultStoreWriteLock(second_lock, timeout_ms=1):
         with pytest.raises(KeyboardInterrupt):
