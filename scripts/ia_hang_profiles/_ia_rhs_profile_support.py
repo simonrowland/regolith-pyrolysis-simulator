@@ -239,6 +239,27 @@ def profile_ia_residue_source(
         rhs_metrics_path = Path(tempfile.gettempdir()) / f"{profile_stem}_metrics.json"
         profile_path = Path(tempfile.gettempdir()) / f"{profile_stem}_cprofile.txt"
 
+        def cprofile_views():
+            stats = pstats.Stats(profiler).strip_dirs()
+            tottime = io.StringIO()
+            stats.stream = tottime
+            stats.sort_stats("tottime").print_stats(25)
+            rooted = io.StringIO()
+            stats.stream = rooted
+            stats.sort_stats("cumulative")
+            root = next(
+                key for key in stats.stats
+                if key[0].endswith("vapor_pressure.py")
+                and key[1] == 2888
+                and key[2] == "dispatch"
+            )
+            # pstats string restrictions are regular expressions; parentheses
+            # in this rendered name otherwise turn into a capture group and
+            # silently produce no match. Select the exact key to root the view.
+            stats.fcn_list = [root]
+            stats.print_callees()
+            return tottime.getvalue(), rooted.getvalue()
+
         def persist_snapshot(*, resume_profiler=False):
             if profiler is not None:
                 profiler.disable()
@@ -275,12 +296,12 @@ def profile_ia_residue_source(
                     stream.flush()
                     os.fsync(stream.fileno())
                 if profiler is not None:
-                    stream = io.StringIO()
-                    pstats.Stats(profiler, stream=stream).strip_dirs().sort_stats(
-                        "cumulative"
-                    ).print_stats(20)
+                    tottime_text, rooted_text = cprofile_views()
                     with profile_path.open("w", encoding="utf-8") as output:
-                        output.write(stream.getvalue())
+                        output.write("TOP 25 BY TOTTIME\n")
+                        output.write(tottime_text)
+                        output.write("\nCUMULATIVE VIEW ROOTED AT DISPATCH\n")
+                        output.write(rooted_text)
                         output.flush()
                         os.fsync(output.fileno())
             except OSError:
@@ -487,13 +508,10 @@ def profile_ia_residue_source(
             record["raw_rhs_metrics_path"] = str(rhs_metrics_path)
             if cprofile_target:
                 persist_snapshot()
-                stream = io.StringIO()
-                pstats.Stats(profiler, stream=stream).strip_dirs().sort_stats(
-                    "cumulative"
-                ).print_stats(20)
-                profile_text = stream.getvalue()
+                tottime_text, rooted_text = cprofile_views()
                 record["cprofile_path"] = str(profile_path)
-                record["cprofile_top20"] = profile_text
+                record["cprofile_top25_tottime"] = tottime_text
+                record["cprofile_vapor_pressure_dispatch_callees"] = rooted_text
             integration_records.append(record)
             active_record.reset(record_token)
 
