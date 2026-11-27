@@ -813,24 +813,41 @@ def _silicate_equilibrium_key(
 
 def _pt0_equilibrium_capture_context(
     store: PT0DeterminismStore,
+    *,
+    backend_family: RealBackendFamily = RealBackendFamily.ALPHAMELTS,
 ) -> tuple[Any, EquilibriumResult]:
-    class AlphaMELTSBackend(RealBackendAuthority):
-        real_backend_family = RealBackendFamily.ALPHAMELTS
-
-        def equilibrate(self, *, composition_mol_by_account=None):
-            raise AssertionError(
-                "the registered equilibrium fixture provider must handle the solve"
-            )
-
-        def get_engine_version(self) -> str:
-            return "non-stub-test"
-
-    provider = _CountingSilicateEquilibriumProvider(
-        provider_id="alphamelts-diagnostic",
-        engine_version="alpha-v1",
-    )
     sim = _build_pt0_sim(store)
-    sim.backend = AlphaMELTSBackend()
+    if backend_family is RealBackendFamily.ALPHAMELTS:
+        class AlphaMELTSBackend(RealBackendAuthority):
+            real_backend_family = RealBackendFamily.ALPHAMELTS
+
+            def equilibrate(self, *, composition_mol_by_account=None):
+                raise AssertionError(
+                    "the registered equilibrium fixture provider must handle the solve"
+                )
+
+            def get_engine_version(self) -> str:
+                return "non-stub-test"
+
+        provider = _CountingSilicateEquilibriumProvider(
+            provider_id="alphamelts-diagnostic",
+            engine_version="alpha-v1",
+        )
+        sim.backend = AlphaMELTSBackend()
+    elif backend_family is RealBackendFamily.THERMOENGINE:
+        class ThermoEngineBackend(RealBackendAuthority):
+            real_backend_family = RealBackendFamily.THERMOENGINE
+            _model = "thermoengine-test"
+            _mode = None
+
+            def is_available(self) -> bool:
+                return True
+
+        backend = ThermoEngineBackend()
+        provider = AlphaMELTSProvider(backend=backend)
+        sim.backend = backend
+    else:
+        raise ValueError(f"unsupported test backend family: {backend_family!r}")
     sim._chem_registry.register(
         provider,
         [ChemistryIntent.SILICATE_EQUILIBRIUM],
@@ -4493,8 +4510,67 @@ def test_pt1_nonfinite_stored_key_is_typed_on_every_reader(
     assert isinstance(raised.value.__cause__, PT0NonFinitePayload)
 
 
+def _rewrite_pt1_key_and_derived_indexes(
+    db_path: Path,
+    original_key_hash: str,
+    replacement_key: Mapping[str, Any],
+    *,
+    payload_sha256: str | None = None,
+) -> tuple[bytes, str, dict[str, Any], bytes]:
+    key_bytes = canonical_json_bytes(replacement_key)
+    key_hash = rrd._sha256(key_bytes)
+    bucket_key = canonical_physics_bucket_key_from_replay_key(replacement_key)
+    bucket_bytes = canonical_json_bytes(bucket_key)
+    ladder_values = rrd._physics_ladder_values_from_replay_key(replacement_key)
+    assignments = [
+        "key_hash = ?",
+        "key_sha256 = ?",
+        "key_bytes = ?",
+        "physics_bucket_sha256 = ?",
+        "replay_scope_sha256 = ?",
+        "physics_key_bytes = ?",
+    ]
+    values: list[object] = [
+        key_hash,
+        key_hash,
+        sqlite3.Binary(key_bytes),
+        rrd._sha256(bucket_bytes),
+        rrd._replay_scope_hash(bucket_key),
+        sqlite3.Binary(bucket_bytes),
+    ]
+    for rung_tag, _sig_figs in rrd.PHYSICS_BUCKET_ALL_LADDER_RUNGS:
+        assignments.extend(
+            (
+                f"{rrd._physics_ladder_hash_column(rung_tag)} = ?",
+                f"{rrd._physics_ladder_distance_column(rung_tag)} = ?",
+            )
+        )
+        values.extend(
+            (
+                ladder_values[rung_tag]["sha256"],
+                ladder_values[rung_tag]["distance"],
+            )
+        )
+    if payload_sha256 is not None:
+        assignments.append("payload_sha256 = ?")
+        values.append(payload_sha256)
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+            f"SET {', '.join(assignments)} WHERE key_hash = ?",
+            (*values, original_key_hash),
+        )
+    return key_bytes, key_hash, bucket_key, bucket_bytes
+
+
+@pytest.mark.parametrize(
+    "bad_payload_checksum",
+    (False, True),
+    ids=("valid-payload-is-not-a-neighbor", "bad-payload-checksum-is-corrupt"),
+)
 def test_pt1_ladder_subnormal_key_is_wrapped_by_row_admission(
     tmp_path: Path,
+    bad_payload_checksum: bool,
 ) -> None:
     db_path = tmp_path / "pt1-subnormal-ladder-key.sqlite"
     key = _freeze_gate_key()
@@ -4504,43 +4580,44 @@ def test_pt1_ladder_subnormal_key_is_wrapped_by_row_admission(
     original_key_hash = _key_hash(key)
     corrupt_key = copy.deepcopy(rrd._json_ready(key))
     corrupt_key["controls"]["T_K"] = 5e-324
-    corrupt_key_bytes = canonical_json_bytes(corrupt_key)
-    corrupt_key_hash = rrd._sha256(corrupt_key_bytes)
-    corrupt_bucket = canonical_physics_bucket_key_from_replay_key(corrupt_key)
-    corrupt_bucket_bytes = canonical_json_bytes(corrupt_bucket)
-    corrupt_bucket_hash = rrd._sha256(corrupt_bucket_bytes)
-    with sqlite3.connect(db_path) as conn:
-        conn.execute(
-            f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
-            "SET key_hash = ?, key_sha256 = ?, key_bytes = ?, "
-            "physics_bucket_sha256 = ?, replay_scope_sha256 = ?, "
-            "physics_key_bytes = ? WHERE key_hash = ?",
-            (
-                corrupt_key_hash,
-                corrupt_key_hash,
-                sqlite3.Binary(corrupt_key_bytes),
-                corrupt_bucket_hash,
-                rrd._replay_scope_hash(corrupt_bucket),
-                sqlite3.Binary(corrupt_bucket_bytes),
-                original_key_hash,
-            ),
+    _corrupt_key_bytes, _corrupt_key_hash, _bucket, _bucket_bytes = (
+        _rewrite_pt1_key_and_derived_indexes(
+            db_path,
+            original_key_hash,
+            corrupt_key,
+            payload_sha256="0" * 64 if bad_payload_checksum else None,
         )
+    )
 
     rung_tag = rrd.PHYSICS_BUCKET_LADDER_RUNGS[0][0]
     assert math.isinf(
         rrd.physics_ladder_bucket_distance_from_replay_key(corrupt_key, rung_tag)
     )
     rung_key = rrd.canonical_physics_ladder_bucket_key_from_replay_key(
-        key,
+        corrupt_key,
         rung_tag,
     )
-    assert PT1PersistentEquilibriumStore(db_path)._get_by_physics_ladder_bucket(
-        artifact="freeze_gate_curve",
-        rung_tag=rung_tag,
-        rung_key=rung_key,
-        rung_hash=rrd._sha256(canonical_json_bytes(rung_key)),
-        query_key=key,
-    ) is None
+    rung_hash = rrd._sha256(canonical_json_bytes(rung_key))
+    if bad_payload_checksum:
+        with pytest.raises(
+            PT1PersistentStoreCorrupt,
+            match="payload hash mismatch",
+        ):
+            PT1PersistentEquilibriumStore(db_path)._get_by_physics_ladder_bucket(
+                artifact="freeze_gate_curve",
+                rung_tag=rung_tag,
+                rung_key=rung_key,
+                rung_hash=rung_hash,
+                query_key=key,
+            )
+    else:
+        assert PT1PersistentEquilibriumStore(db_path)._get_by_physics_ladder_bucket(
+            artifact="freeze_gate_curve",
+            rung_tag=rung_tag,
+            rung_key=rung_key,
+            rung_hash=rung_hash,
+            query_key=key,
+        ) is None
 
 
 @pytest.mark.parametrize(
@@ -4569,46 +4646,13 @@ def test_pt1_ladder_rejects_out_of_domain_controls_before_rederivation(
     original_key_hash = _key_hash(key)
     corrupt_key = copy.deepcopy(rrd._json_ready(key))
     corrupt_key["controls"][control_name] = invalid_value
-    corrupt_key_bytes = canonical_json_bytes(corrupt_key)
-    corrupt_key_hash = rrd._sha256(corrupt_key_bytes)
-    bucket_key = canonical_physics_bucket_key_from_replay_key(corrupt_key)
-    bucket_bytes = canonical_json_bytes(bucket_key)
-    ladder_values = rrd._physics_ladder_values_from_replay_key(corrupt_key)
-    assignments = [
-        "key_hash = ?",
-        "key_sha256 = ?",
-        "key_bytes = ?",
-        "physics_bucket_sha256 = ?",
-        "replay_scope_sha256 = ?",
-        "physics_key_bytes = ?",
-    ]
-    values: list[object] = [
-        corrupt_key_hash,
-        corrupt_key_hash,
-        sqlite3.Binary(corrupt_key_bytes),
-        rrd._sha256(bucket_bytes),
-        rrd._replay_scope_hash(bucket_key),
-        sqlite3.Binary(bucket_bytes),
-    ]
-    for rung_tag, _sig_figs in rrd.PHYSICS_BUCKET_ALL_LADDER_RUNGS:
-        assignments.extend(
-            (
-                f"{rrd._physics_ladder_hash_column(rung_tag)} = ?",
-                f"{rrd._physics_ladder_distance_column(rung_tag)} = ?",
-            )
+    corrupt_key_bytes, corrupt_key_hash, bucket_key, bucket_bytes = (
+        _rewrite_pt1_key_and_derived_indexes(
+            db_path,
+            original_key_hash,
+            corrupt_key,
         )
-        values.extend(
-            (
-                ladder_values[rung_tag]["sha256"],
-                ladder_values[rung_tag]["distance"],
-            )
-        )
-    with sqlite3.connect(db_path) as conn:
-        conn.execute(
-            f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
-            f"SET {', '.join(assignments)} WHERE key_hash = ?",
-            (*values, original_key_hash),
-        )
+    )
 
     rung_tag = rrd.PHYSICS_BUCKET_LADDER_RUNGS[0][0]
     rung_key = rrd.canonical_physics_ladder_bucket_key_from_replay_key(
@@ -6949,15 +6993,28 @@ def test_equilibrium_codec_row_version_misses_and_is_replaceable(
 
 
 @pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))
+@pytest.mark.parametrize(
+    "backend_family",
+    (RealBackendFamily.ALPHAMELTS, RealBackendFamily.THERMOENGINE),
+    ids=("alphamelts", "thermoengine"),
+)
 def test_current_equilibrium_capture_hits_after_admission(
     tmp_path: Path,
     persistent: bool,
+    backend_family: RealBackendFamily,
 ) -> None:
     db_path = tmp_path / "current-equilibrium-hit.sqlite" if persistent else None
     capture = PT0DeterminismStore("capture", db_path=db_path)
-    sim, result = _pt0_equilibrium_capture_context(capture)
+    sim, result = _pt0_equilibrium_capture_context(
+        capture,
+        backend_family=backend_family,
+    )
     capture.capture_equilibrium(sim, result)
     key = capture._equilibrium_key(sim)
+    assert any(
+        float(component[1]) > 1.0
+        for component in key["composition_mol_fraction"]
+    )
     current_payload = capture._entries[_key_hash(key)]["payload"]
 
     replay = (

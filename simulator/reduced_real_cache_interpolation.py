@@ -83,7 +83,7 @@ def interpolation_key_domain_violation(
             numeric_fraction = float(fraction)
         except (OverflowError, TypeError, ValueError):
             return "composition_mol_fraction"
-        if not math.isfinite(numeric_fraction) or not 0.0 <= numeric_fraction <= 1.0:
+        if not math.isfinite(numeric_fraction) or numeric_fraction < 0.0:
             return "composition_mol_fraction"
 
     controls = key.get("controls")

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import hashlib
+import math
 import sqlite3
 from pathlib import Path
 from types import SimpleNamespace
@@ -19,9 +20,11 @@ from simulator.reduced_real_determinism import (
 )
 from tests.test_reduced_real_pt0_determinism import (
     _CountingSilicateEquilibriumProvider,
+    _alphamelts_silicate_equilibrium_key,
     _c3a_ladder_key,
     _lookup_c3a_payload,
     _put_c3a_payload,
+    _rewrite_pt1_key_and_derived_indexes,
     _silicate_equilibrium_key,
 )
 
@@ -194,6 +197,15 @@ def test_standardized_distance_retains_current_numeric_output() -> None:
     )
 
 
+def test_standardized_distance_retains_compensated_sum_output() -> None:
+    left = [1.0] * 9
+    right = [0.0] + [1.0 - 2.0**-27] * 8
+
+    assert rci._standardized_distance(left, right).hex() == (
+        "0x1.0000000000001p+0"
+    )
+
+
 def test_greedy_nn_rejects_extreme_candidate_controls_before_distance_math() -> None:
     query = _interpolation_key("query", feo_fraction=0.20, temperature_K=1500.0)
     candidate_key = _interpolation_key(
@@ -222,12 +234,16 @@ def test_greedy_nn_rejects_extreme_candidate_controls_before_distance_math() -> 
 def test_greedy_nn_accepts_temperature_above_old_domain_cap(
     tmp_path: Path,
 ) -> None:
-    query = _interpolation_key("query", feo_fraction=0.20, temperature_K=12_000.0)
-    nearby = _interpolation_key(
-        "nearby", feo_fraction=0.20, temperature_K=12_001.0
-    )
+    query = _alphamelts_silicate_equilibrium_key()
+    nearby = copy.deepcopy(query)
+    query["controls"]["T_K"] = 12_000.0
+    nearby["controls"]["T_K"] = 12_001.0
     query["controls"].update(pressure_bar=1_000_001.0, log_fO2=301.0)
     nearby["controls"].update(pressure_bar=1_000_002.0, log_fO2=302.0)
+    assert any(
+        float(component[1]) > 1.0
+        for component in query["composition_mol_fraction"]
+    )
     db_path = tmp_path / "above-old-temperature-cap.sqlite"
     _put_interpolation_row(
         db_path,
@@ -248,6 +264,102 @@ def test_greedy_nn_accepts_temperature_above_old_domain_cap(
     assert neighbors[0]["key_hash"] == hashlib.sha256(
         canonical_json_bytes(nearby)
     ).hexdigest()
+
+
+def test_large_finite_composition_is_admitted_but_not_a_neighbor(
+    tmp_path: Path,
+) -> None:
+    query = _interpolation_key("query", feo_fraction=0.20, temperature_K=1500.0)
+    candidate_key = copy.deepcopy(query)
+    candidate_key["composition_mol_fraction"] = [
+        ["FeO", 1.0e160],
+        ["SiO2", 0.8],
+    ]
+    db_path = tmp_path / "large-composition-not-neighbor.sqlite"
+    _put_interpolation_row(
+        db_path,
+        candidate_key,
+        liquid_fraction=0.8,
+        sio_pa=8.0,
+    )
+
+    assert rci.interpolation_key_domain_violation(
+        candidate_key,
+        query_keys=(query,),
+    ) is None
+    store = rrd.PT1PersistentEquilibriumStore(db_path)
+    candidates = store._list_interpolation_candidates(
+        artifact="equilibrium_post_record",
+        replay_scope_sha256=rci.replay_scope_for_interpolation(query),
+        query_key=query,
+    )
+    assert len(candidates) == 1
+    assert rci.greedy_nearest_neighbors(query, candidates) == []
+
+
+def test_subnormal_composition_is_not_a_ladder_neighbor_and_put_is_typed(
+    tmp_path: Path,
+) -> None:
+    artifact = "equilibrium_post_record"
+    key = _interpolation_key("subnormal", feo_fraction=0.20, temperature_K=1500.0)
+    key["composition_mol_fraction"] = [["FeO", 5e-324], ["SiO2", 0.8]]
+    payload = _interpolation_payload(liquid_fraction=0.8, sio_pa=8.0)
+    assert rci.interpolation_key_domain_violation(key) is None
+
+    memory_capture = PT0DeterminismStore("capture")
+    with pytest.raises(ValueError, match="cannot be represented"):
+        memory_capture._store(artifact, key, payload, law_disclosures=[])
+
+    db_path = tmp_path / "subnormal-composition-not-neighbor.sqlite"
+    with pytest.raises(ValueError, match="cannot be represented"):
+        _put_interpolation_row(
+            db_path,
+            key,
+            liquid_fraction=0.8,
+            sio_pa=8.0,
+        )
+
+    source_key = copy.deepcopy(key)
+    source_key["composition_mol_fraction"] = [["FeO", 0.2], ["SiO2", 0.8]]
+    _put_interpolation_row(
+        db_path,
+        source_key,
+        liquid_fraction=0.8,
+        sio_pa=8.0,
+    )
+    source_hash = hashlib.sha256(canonical_json_bytes(source_key)).hexdigest()
+    key_bytes, key_hash, _bucket_key, _bucket_bytes = (
+        _rewrite_pt1_key_and_derived_indexes(
+            db_path,
+            source_hash,
+            key,
+        )
+    )
+
+    persistent = rrd.PT1PersistentEquilibriumStore(db_path)
+    assert persistent._get_with_decoded(
+        artifact=artifact,
+        key=key,
+        key_bytes=key_bytes,
+        key_hash=key_hash,
+        return_decoded=True,
+    ) is not None
+    rung_tag = rrd.PHYSICS_BUCKET_LADDER_RUNGS[0][0]
+    rung_key = rrd.canonical_physics_ladder_bucket_key_from_replay_key(
+        key,
+        rung_tag,
+    )
+    rung_hash = hashlib.sha256(canonical_json_bytes(rung_key)).hexdigest()
+    assert math.isinf(
+        rrd.physics_ladder_bucket_distance_from_replay_key(key, rung_tag)
+    )
+    assert persistent._get_by_physics_ladder_bucket(
+        artifact=artifact,
+        rung_tag=rung_tag,
+        rung_key=rung_key,
+        rung_hash=rung_hash,
+        query_key=key,
+    ) is None
 
 
 def test_interpolation_refuses_dependency_vector_mismatch() -> None:

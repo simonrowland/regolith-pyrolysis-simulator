@@ -1855,6 +1855,8 @@ class PT0DeterminismStore:
                 effective_notices_json = repair_notices_json
         else:
             effective_notices_json = repair_notices_json
+        if self.persistent_store is None:
+            _require_ladder_indexable_composition(key)
         if self.persistent_store is not None:
             self.persistent_store.put(
                 artifact=artifact,
@@ -2733,6 +2735,24 @@ def _admit_stored_row(
                     f"PT-1 row canonical request mismatch: {row_hash}"
                 )
 
+        def verify_payload_integrity() -> tuple[bytes, Any]:
+            payload_bytes = _pt1_row_bytes(
+                row["payload_bytes"], field="payload", key_hash=row_hash
+            )
+            if _sha256(payload_bytes) != row["payload_sha256"]:
+                raise PT1PersistentStoreCorrupt(
+                    "PT-1 row payload hash mismatch (stored payload bytes): "
+                    f"{row_artifact}: {row_hash}"
+                )
+            payload_value = _pt1_row_json(
+                payload_bytes, field="payload", key_hash=row_hash
+            )
+            if _payload_integrity_bytes(payload_value) != payload_bytes:
+                raise PT1PersistentStoreCorrupt(
+                    f"PT-1 row non-canonical payload bytes: {row_hash}"
+                )
+            return payload_bytes, payload_value
+
         def finite_ladder_distance(
             value: Any,
             tag: str,
@@ -2797,35 +2817,16 @@ def _admit_stored_row(
             raise PT1PersistentStoreCorrupt(
                 f"PT-1 row replay scope hash mismatch: {row_hash}"
             )
+        if rung_tag is not None and indexed_distance is None:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row {rung_tag} distance is missing: {rung_hash}"
+            )
 
-        # Indexed metadata has precedence; byte integrity then precedes admission.
+        # Query index metadata and key-byte integrity precede key admission.
         verify_key_hashes()
 
         row_key = _pt1_row_key(row_key_bytes, key_hash=row_hash)
         verify_canonical_key(row_key)
-
-        if validate_interpolation_domain:
-            from simulator.reduced_real_cache_interpolation import (
-                interpolation_key_domain_violation,
-            )
-
-            domain_violation = interpolation_key_domain_violation(
-                row_key,
-                query_keys=(
-                    tuple(admission_keys or ())
-                    + ((key,) if key is not None else ())
-                ),
-            )
-            if domain_violation is not None:
-                section = (
-                    "composition"
-                    if domain_violation == "composition_mol_fraction"
-                    else "controls"
-                )
-                raise PT1PersistentStoreCorrupt(
-                    "PT-1 row invalid stored equilibrium replay key "
-                    f"{section} ({domain_violation}): {row_hash}"
-                )
 
         derived_bucket_key = canonical_physics_bucket_key_from_replay_key(row_key)
         derived_bucket_bytes = canonical_json_bytes(derived_bucket_key)
@@ -2865,17 +2866,14 @@ def _admit_stored_row(
                 f"PT-1 row exact key does not reproduce physics bucket: {physics_bucket_hash}"
             )
         ladder_values = _physics_ladder_values_from_replay_key(row_key)
+        nonfinite_requested_rung = False
         if rung_tag is not None:
             derived_rung_distance = float(ladder_values[rung_tag]["distance"])
-            if not math.isfinite(derived_rung_distance):
-                return None
-            if indexed_distance is None:
-                raise PT1PersistentStoreCorrupt(
-                    f"PT-1 row {rung_tag} distance is missing: {rung_hash}"
+            nonfinite_requested_rung = not math.isfinite(derived_rung_distance)
+            if not nonfinite_requested_rung:
+                indexed_distance = finite_ladder_distance(
+                    indexed_distance, rung_tag, rung_hash
                 )
-            indexed_distance = finite_ladder_distance(
-                indexed_distance, rung_tag, rung_hash
-            )
         for stored_rung_tag, _sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS:
             hash_column = _physics_ladder_hash_column(stored_rung_tag)
             distance_column = _physics_ladder_distance_column(stored_rung_tag)
@@ -2900,30 +2898,44 @@ def _admit_stored_row(
                 row_key,
                 rung_tag,
             )
-            if (
-                derived_rung_key != _json_ready(rung_key)
-                or ladder_values[rung_tag]["sha256"] != rung_hash
-                or ladder_values[rung_tag]["distance"] != indexed_distance
+            if derived_rung_key != _json_ready(rung_key) or (
+                ladder_values[rung_tag]["sha256"] != rung_hash
+            ):
+                raise PT1PersistentStoreCorrupt(
+                    f"PT-1 row exact key does not reproduce {rung_tag} index: {rung_hash}"
+                )
+            if not nonfinite_requested_rung and (
+                ladder_values[rung_tag]["distance"] != indexed_distance
             ):
                 raise PT1PersistentStoreCorrupt(
                     f"PT-1 row exact key does not reproduce {rung_tag} index: {rung_hash}"
                 )
 
-        row_payload_bytes = _pt1_row_bytes(
-            row["payload_bytes"], field="payload", key_hash=row_hash
-        )
-        if _sha256(row_payload_bytes) != row["payload_sha256"]:
-            raise PT1PersistentStoreCorrupt(
-                "PT-1 row payload hash mismatch (stored payload bytes): "
-                f"{row_artifact}: {row_hash}"
+        row_payload_bytes, row_payload = verify_payload_integrity()
+        if validate_interpolation_domain:
+            from simulator.reduced_real_cache_interpolation import (
+                interpolation_key_domain_violation,
             )
-        row_payload = _pt1_row_json(
-            row_payload_bytes, field="payload", key_hash=row_hash
-        )
-        if _payload_integrity_bytes(row_payload) != row_payload_bytes:
-            raise PT1PersistentStoreCorrupt(
-                f"PT-1 row non-canonical payload bytes: {row_hash}"
+
+            domain_violation = interpolation_key_domain_violation(
+                row_key,
+                query_keys=(
+                    tuple(admission_keys or ())
+                    + ((key,) if key is not None else ())
+                ),
             )
+            if domain_violation is not None:
+                section = (
+                    "composition"
+                    if domain_violation == "composition_mol_fraction"
+                    else "controls"
+                )
+                raise PT1PersistentStoreCorrupt(
+                    "PT-1 row invalid stored equilibrium replay key "
+                    f"{section} ({domain_violation}): {row_hash}"
+                )
+        if nonfinite_requested_rung:
+            return None
 
         all_index_columns = (
             "physics_bucket_schema_version",
@@ -3194,7 +3206,6 @@ class PT1PersistentEquilibriumStore:
             physics_bucket_bytes = canonical_json_bytes(physics_bucket_key)
         if physics_bucket_hash is None:
             physics_bucket_hash = _sha256(physics_bucket_bytes)
-        ladder_values = _physics_ladder_values_from_replay_key(key)
         incoming_disclosures = _resolve_law_disclosures(law_disclosures)
         with self._connect() as conn:
             self._initialize(conn)
@@ -3211,6 +3222,8 @@ class PT1PersistentEquilibriumStore:
                     key_bytes=key_bytes,
                     key_hash=key_hash,
                 )
+            _require_ladder_indexable_composition(key)
+            ladder_values = _physics_ladder_values_from_replay_key(key)
             if existing is not None:
                 assert existing_admission is not None
                 entry = existing_admission.entry
@@ -5458,8 +5471,19 @@ def physics_ladder_bucket_distance_from_replay_key(
     rung_bucket = rung_key.get("physics_bucket", {})
     if not isinstance(rung_bucket, Mapping):
         rung_bucket = {}
+    snapped_composition_rows = rung_bucket.get("composition_mol_fraction", [])
+    if any(
+        (
+            component.get("mol_fraction")
+            if isinstance(component, Mapping)
+            else component[1]
+        )
+        is None
+        for component in snapped_composition_rows
+    ):
+        return math.inf
     snapped_composition = _composition_items(
-        rung_bucket.get("composition_mol_fraction", [])
+        snapped_composition_rows
     )
     distance = 0.0
     for species, snapped_fraction in snapped_composition:
@@ -6946,6 +6970,20 @@ def _physics_ladder_values_from_replay_key(
             ),
         }
     return values
+
+
+def _require_ladder_indexable_composition(key: Mapping[str, Any]) -> None:
+    composition = _composition_items(
+        key.get("composition_mol_fraction", [])
+    )
+    if any(
+        _sigfig_snap(fraction, sig_figs) is None
+        for _species, fraction in composition
+        for _rung_tag, sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS
+    ):
+        raise ValueError(
+            "PT-0 composition cannot be represented at a physics-ladder precision"
+        )
 
 
 def _physics_ladder_sig_figs(rung_tag: str) -> float:
