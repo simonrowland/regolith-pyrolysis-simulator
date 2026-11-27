@@ -30,10 +30,9 @@ from simulator.reduced_real_determinism import (  # noqa: E402
     PT1_EQUILIBRIUM_TABLE,
     _admit_stored_row,
     assert_strict_vapor_pt1_row,
-    canonical_physics_ladder_bucket_key_from_replay_key,
     canonical_json_bytes,
     canonical_physics_bucket_key_from_replay_key,
-    physics_ladder_bucket_distance_from_replay_key,
+    _require_cacheable_ladder_values,
     validate_reduced_real_equilibrium_record_key,
 )
 
@@ -337,19 +336,7 @@ def _physics_values_from_replay_key(key: Mapping[str, Any]) -> PhysicsBucketValu
     physics_key = canonical_physics_bucket_key_from_replay_key(key)
     physics_key_bytes = canonical_json_bytes(physics_key)
     replay_scope = physics_key.get("replay_scope", {})
-    ladder_values = {}
-    for rung_tag, _sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS:
-        rung_key = canonical_physics_ladder_bucket_key_from_replay_key(
-            key,
-            rung_tag,
-        )
-        ladder_values[rung_tag] = {
-            "sha256": _sha256(canonical_json_bytes(rung_key)),
-            "distance": physics_ladder_bucket_distance_from_replay_key(
-                key,
-                rung_tag,
-            ),
-        }
+    ladder_values = _require_cacheable_ladder_values(key)
     return PhysicsBucketValues(
         schema_version=str(
             physics_key.get("schema_version", PHYSICS_BUCKET_SCHEMA_VERSION)

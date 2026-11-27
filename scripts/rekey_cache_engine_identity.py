@@ -22,7 +22,7 @@ from simulator.reduced_real_determinism import (  # noqa: E402
     PT1_EQUILIBRIUM_TABLE,
     PT1PersistentStoreCorrupt,
     _admit_stored_row,
-    _physics_ladder_values_from_replay_key,
+    _require_cacheable_ladder_values,
     _replay_scope_hash,
     cache_row_needs_rekey,
     canonical_json_bytes,
@@ -72,7 +72,7 @@ def _table_columns(conn: sqlite3.Connection) -> set[str]:
 def _physics_columns(key: dict[str, Any]) -> dict[str, Any]:
     physics_key = canonical_physics_bucket_key_from_replay_key(key)
     physics_bytes = canonical_json_bytes(physics_key)
-    ladder_values = _physics_ladder_values_from_replay_key(key)
+    ladder_values = _require_cacheable_ladder_values(key)
     return {
         "physics_bucket_schema_version": PHYSICS_BUCKET_SCHEMA_VERSION,
         "physics_bucket_sha256": hashlib.sha256(physics_bytes).hexdigest(),

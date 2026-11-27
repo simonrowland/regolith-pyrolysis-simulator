@@ -35,9 +35,9 @@ def _interpolation_control_names(key: Mapping[str, Any]) -> list[str]:
     controls = key.get("controls", {})
     if not isinstance(controls, Mapping):
         return []
-    # Exact-only replay keys may omit interpolation coordinates. Once a key
-    # carries controls, interpolation reads T_K along with any selected axes.
-    control_names = ["T_K"] if controls else []
+    # Exact-only replay keys may omit interpolation coordinates, including
+    # T_K. Include only axes the key actually carries.
+    control_names = ["T_K"] if controls.get("T_K") is not None else []
     if controls.get("pressure_bar") is not None:
         control_names.append("pressure_bar")
     if _physics_bucket_consumes_pO2_bar(key) and controls.get("pO2_bar") is not None:

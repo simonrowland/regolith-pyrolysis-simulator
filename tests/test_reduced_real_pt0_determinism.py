@@ -4565,22 +4565,24 @@ def _rewrite_pt1_key_and_derived_indexes(
 
 
 @pytest.mark.parametrize(
-    "include_controls",
-    (True, False),
-    ids=("with-T-K", "exact-only-without-T-K"),
+    "control_shape",
+    ("with-T-K", "exact-only-without-controls", "pressure-only"),
 )
 def test_pt1_writer_ladder_distances_admit_supported_key_shapes(
     tmp_path: Path,
-    include_controls: bool,
+    control_shape: str,
 ) -> None:
     source_db = tmp_path / "writer-ladder-source.sqlite"
     target_db = tmp_path / "writer-ladder-seed.sqlite"
     key = _freeze_gate_key()
-    if not include_controls:
+    if control_shape == "exact-only-without-controls":
         key.pop("controls")
+    elif control_shape == "pressure-only":
+        key["controls"] = {"pressure_bar": 1.0}
     payload = _valid_test_gate_payload()
 
-    PT0DeterminismStore("capture", db_path=source_db)._store(
+    capture = PT0DeterminismStore("capture", db_path=source_db)
+    capture._store(
         "freeze_gate_curve",
         key,
         payload,
@@ -4591,6 +4593,78 @@ def test_pt1_writer_ladder_distances_admit_supported_key_shapes(
     key_hash = rrd._sha256(key_bytes)
     bucket_key = canonical_physics_bucket_key_from_replay_key(key)
     bucket_bytes = canonical_json_bytes(bucket_key)
+
+    def independent_expected_distance(rung_tag: str) -> float:
+        sig_figs = float(
+            dict(rrd.PHYSICS_BUCKET_ALL_LADDER_RUNGS)[rung_tag]
+        )
+
+        def snap(value: float) -> float:
+            if value == 0.0:
+                return 0.0
+            quantum = 10.0 ** (
+                math.floor(math.log10(abs(value))) + 1.0 - sig_figs
+            )
+            rounded_center = round(value / quantum) * quantum
+            if rounded_center == 0.0:
+                return 0.0
+            decimal_places = max(
+                0,
+                int(
+                    math.ceil(
+                        sig_figs
+                        - math.floor(math.log10(abs(rounded_center)))
+                        - 1.0
+                    )
+                ),
+            )
+            return round(rounded_center, decimal_places)
+
+        def normalized_square(exact: float, center: float) -> float:
+            reference = exact if exact != 0.0 else center
+            quantum = (
+                10.0 ** (
+                    math.floor(math.log10(abs(reference)))
+                    + 1.0
+                    - sig_figs
+                )
+                if reference != 0.0
+                else 10.0 ** (1.0 - sig_figs)
+            )
+            return ((exact - center) / quantum) ** 2
+
+        # Green's documented index distance is the ordered sum of squared
+        # offsets from each raw coordinate to its significant-figure center,
+        # divided by that coordinate's decade quantum. Recompute those centers
+        # here without calling the production ladder-distance functions.
+        total = 0.0
+        components = []
+        for component in key["composition_mol_fraction"]:
+            if isinstance(component, Mapping):
+                species = str(component["species"])
+                exact = float(component["mol_fraction"])
+            else:
+                raw_species, raw_fraction = component
+                species = str(raw_species)
+                exact = float(raw_fraction)
+            components.append((species, exact))
+        for _species, exact in sorted(components):
+            total += normalized_square(exact, snap(exact))
+        controls = key.get("controls", {})
+        temperature = float(controls.get("T_K", 0.0) or 0.0)
+        total += normalized_square(temperature, snap(temperature))
+        if rung_tag in {
+            tag for tag, _precision in rrd.PHYSICS_BUCKET_CONTROL_LADDER_RUNGS
+        }:
+            for control_name in ("pressure_bar", "pO2_bar"):
+                if control_name not in controls:
+                    continue
+                control_value = float(controls[control_name])
+                total += normalized_square(
+                    control_value,
+                    snap(control_value),
+                )
+        return float(round(total, 15))
 
     def assert_all_readers_admit(db_path: Path) -> None:
         persistent = PT1PersistentEquilibriumStore(db_path)
@@ -4620,11 +4694,111 @@ def test_pt1_writer_ladder_distances_admit_supported_key_shapes(
                 rung_hash=rrd._sha256(rung_bytes),
                 query_key=key,
             ) is not None
+        with sqlite3.connect(db_path) as conn:
+            indexed_distances = conn.execute(
+                "SELECT "
+                + ", ".join(
+                    rrd._physics_ladder_distance_column(rung_tag)
+                    for rung_tag, _sig_figs in rrd.PHYSICS_BUCKET_ALL_LADDER_RUNGS
+                )
+                + f" FROM {PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
+                (key_hash,),
+            ).fetchone()
+        assert indexed_distances is not None
+        assert tuple(indexed_distances) == tuple(
+            independent_expected_distance(rung_tag)
+            for rung_tag, _sig_figs in rrd.PHYSICS_BUCKET_ALL_LADDER_RUNGS
+        )
 
+    pt0_reader = PT0DeterminismStore("replay", db_path=source_db)
+    assert pt0_reader._lookup(
+        "freeze_gate_curve",
+        key,
+    ) == payload
+    assert pt0_reader.hits == 1
     assert_all_readers_admit(source_db)
     seeded = seed_cache(target_db, [source_db])
     assert seeded["inserted_rows"] == 1
     assert_all_readers_admit(target_db)
+
+
+def test_uncacheable_subnormal_temperature_capture_skips_pt1_write(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    db_path = tmp_path / "uncacheable-temperature-capture.sqlite"
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    sim, result = _pt0_equilibrium_capture_context(capture)
+    key = copy.deepcopy(capture._equilibrium_key(sim))
+    key["controls"]["T_K"] = 5e-324
+    monkeypatch.setattr(capture, "_equilibrium_key", lambda _sim: key)
+    monkeypatch.setattr(
+        sim,
+        "_refresh_vapor_pressures_from_kernel",
+        lambda _result, **_kwargs: None,
+    )
+
+    returned = sim._record_equilibrium_status(
+        result,
+        run_post_equilibrium_sulfsat=False,
+    )
+
+    assert returned is result
+    assert _persistent_artifact_count(db_path, "equilibrium_post_record") == 0
+    assert not any(
+        entry.get("artifact") == "equilibrium_post_record"
+        for entry in capture._entries.values()
+    )
+    notices = getattr(sim, rrd.REPAIR_NOTICE_COLLECTOR_ATTRIBUTE)
+    assert len(notices) == 1
+    assert notices[0]["kind"] == "reduced_real_cache_write_skipped"
+    assert notices[0]["category"] == "invalid-input"
+    assert "controls.T_K" in notices[0]["reason"]
+    assert "physics ladder rung" in notices[0]["reason"]
+
+
+def test_unsnappable_pressure_is_not_written_or_a_coarsened_ladder_neighbor(
+    tmp_path: Path,
+) -> None:
+    artifact = "freeze_gate_curve"
+    payload = _valid_test_gate_payload()
+    bad_key = _freeze_gate_key()
+    bad_key["controls"]["pressure_bar"] = 5e-324
+    write_db = tmp_path / "unsnappable-pressure-write.sqlite"
+    writer = PT0DeterminismStore("capture", db_path=write_db)
+    with pytest.raises(rrd.UncacheableKey) as write_error:
+        writer._store(artifact, bad_key, payload, law_disclosures=[])
+    assert write_error.value.category == "invalid-input"
+    assert write_error.value.rung_tag == "h40c"
+    assert "controls.pressure_bar" in write_error.value.reason
+    assert _persistent_artifact_count(write_db, artifact) == 0
+
+    read_db = tmp_path / "unsnappable-pressure-read.sqlite"
+    source_key = _freeze_gate_key()
+    capture = PT0DeterminismStore("capture", db_path=read_db)
+    capture._store(artifact, source_key, payload, law_disclosures=[])
+    source_hash = _key_hash(source_key)
+    with_pt1_indexes = copy.deepcopy(source_key)
+    with_pt1_indexes["controls"]["pressure_bar"] = 5e-324
+    _rewrite_pt1_key_and_derived_indexes(
+        read_db,
+        source_hash,
+        with_pt1_indexes,
+    )
+
+    persistent = PT1PersistentEquilibriumStore(read_db)
+    for rung_tag in ("h40c", "h30c"):
+        rung_key = rrd.canonical_physics_ladder_bucket_key_from_replay_key(
+            with_pt1_indexes,
+            rung_tag,
+        )
+        assert persistent.get_by_physics_ladder_bucket(
+            artifact=artifact,
+            rung_tag=rung_tag,
+            rung_key=rung_key,
+            rung_hash=rrd._sha256(canonical_json_bytes(rung_key)),
+            query_key=with_pt1_indexes,
+        ) is None
 
 
 @pytest.mark.parametrize(

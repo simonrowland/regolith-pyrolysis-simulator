@@ -344,17 +344,23 @@ def test_subnormal_composition_is_not_a_ladder_neighbor_and_put_is_typed(
     assert rci.interpolation_key_domain_violation(key) is None
 
     memory_capture = PT0DeterminismStore("capture")
-    with pytest.raises(ValueError, match="cannot be represented"):
+    with pytest.raises(rrd.UncacheableKey) as memory_error:
         memory_capture._store(artifact, key, payload, law_disclosures=[])
+    assert memory_error.value.category == "invalid-input"
+    assert memory_error.value.rung_tag == "h40"
+    assert "composition_mol_fraction.FeO" in memory_error.value.reason
 
     db_path = tmp_path / "subnormal-composition-not-neighbor.sqlite"
-    with pytest.raises(ValueError, match="cannot be represented"):
+    with pytest.raises(rrd.UncacheableKey) as pt1_error:
         _put_interpolation_row(
             db_path,
             key,
             liquid_fraction=0.8,
             sio_pa=8.0,
         )
+    assert pt1_error.value.category == "invalid-input"
+    assert pt1_error.value.rung_tag == "h40"
+    assert "composition_mol_fraction.FeO" in pt1_error.value.reason
 
     source_key = copy.deepcopy(key)
     source_key["composition_mol_fraction"] = [["FeO", 0.2], ["SiO2", 0.8]]

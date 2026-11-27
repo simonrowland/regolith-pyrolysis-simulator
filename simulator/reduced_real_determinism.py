@@ -974,6 +974,20 @@ class PT0NonFinitePayload(ValueError):
     """PT-0 payload canonicalization received a non-finite value."""
 
 
+class UncacheableKey(ValueError):
+    """A replay key cannot be indexed at every physics-ladder rung."""
+
+    category = "invalid-input"
+
+    def __init__(self, rung_tag: str, field: str) -> None:
+        self.rung_tag = rung_tag
+        self.field = field
+        self.reason = (
+            f"physics ladder rung {rung_tag} has no finite distance for {field}"
+        )
+        super().__init__(self.reason)
+
+
 def _authoritative_melt_fO2_log(sim: Any) -> float:
     reader = getattr(sim, "_current_melt_redox_fO2_log", None)
     if callable(reader):
@@ -1339,13 +1353,17 @@ class PT0DeterminismStore:
         payload = canonical_replay_output_projection(
             "equilibrium_post_record", sim, result
         )
-        self._store(
-            "equilibrium_post_record",
-            key,
-            payload,
-            engine_version_provenance=_engine_version_provenance(sim, intent),
-            repair_notices=_repair_notices_for_capture(sim, repair_notices),
-        )
+        try:
+            self._store(
+                "equilibrium_post_record",
+                key,
+                payload,
+                engine_version_provenance=_engine_version_provenance(sim, intent),
+                repair_notices=_repair_notices_for_capture(sim, repair_notices),
+            )
+        except UncacheableKey as exc:
+            self._mark_uncacheable_capture(sim, reason=exc)
+            return
         sim._last_reduced_real_cache_state = self.last_cache_state
 
     def cached_equilibrium(self, sim: Any) -> EquilibriumResult | None:
@@ -1598,23 +1616,41 @@ class PT0DeterminismStore:
         ):
             self._mark_uncacheable_capture(sim)
             return
-        self._store(
-            "freeze_gate_curve",
-            key,
-            {"curve": _curve_payload(curve)},
-            engine_version_provenance=_engine_version_provenance(
-                sim,
-                ChemistryIntent.GATE_LIQUID_FRACTION,
-                provider_role=provider_role,
-            ),
-            repair_notices=_repair_notices_for_capture(sim, repair_notices),
-            law_disclosures=law_disclosures,
-        )
+        try:
+            self._store(
+                "freeze_gate_curve",
+                key,
+                {"curve": _curve_payload(curve)},
+                engine_version_provenance=_engine_version_provenance(
+                    sim,
+                    ChemistryIntent.GATE_LIQUID_FRACTION,
+                    provider_role=provider_role,
+                ),
+                repair_notices=_repair_notices_for_capture(sim, repair_notices),
+                law_disclosures=law_disclosures,
+            )
+        except UncacheableKey as exc:
+            self._mark_uncacheable_capture(sim, reason=exc)
+            return
         sim._last_reduced_real_cache_state = self.last_cache_state
 
-    def _mark_uncacheable_capture(self, sim: Any) -> None:
+    def _mark_uncacheable_capture(
+        self,
+        sim: Any,
+        *,
+        reason: UncacheableKey | None = None,
+    ) -> None:
         self.last_cache_state = None
         sim._last_reduced_real_cache_state = None
+        if reason is not None:
+            record_repair_notice(
+                sim,
+                {
+                    "kind": "reduced_real_cache_write_skipped",
+                    "category": reason.category,
+                    "reason": reason.reason,
+                },
+            )
 
     def replay_gate_curve(
         self,
@@ -1804,6 +1840,8 @@ class PT0DeterminismStore:
         law_disclosures: Any = _FROM_COMPUTATION,
     ) -> None:
         validate_reduced_real_equilibrium_record_key(artifact, key, payload)
+        if self.persistent_store is None:
+            _require_cacheable_ladder_values(key)
         incoming_disclosures = _resolve_law_disclosures(law_disclosures)
         key_bytes = canonical_json_bytes(key)
         payload_bytes = canonical_json_bytes(payload)
@@ -1856,8 +1894,6 @@ class PT0DeterminismStore:
                 effective_notices_json = repair_notices_json
         else:
             effective_notices_json = repair_notices_json
-        if self.persistent_store is None:
-            _require_ladder_indexable_composition(key)
         if self.persistent_store is not None:
             self.persistent_store.put(
                 artifact=artifact,
@@ -3255,6 +3291,7 @@ class PT1PersistentEquilibriumStore:
         if physics_bucket_hash is None:
             physics_bucket_hash = _sha256(physics_bucket_bytes)
         incoming_disclosures = _resolve_law_disclosures(law_disclosures)
+        ladder_values = _require_cacheable_ladder_values(key)
         with self._connect() as conn:
             self._initialize(conn)
             existing = self._fetch(conn, key_hash)
@@ -3270,8 +3307,6 @@ class PT1PersistentEquilibriumStore:
                     key_bytes=key_bytes,
                     key_hash=key_hash,
                 )
-            _require_ladder_indexable_composition(key)
-            ladder_values = _physics_ladder_values_from_replay_key(key)
             if existing is not None:
                 assert existing_admission is not None
                 entry = existing_admission.entry
@@ -4283,6 +4318,7 @@ def _copy_pt1_equilibrium_rows(
                     incoming_admission is not None
                     and incoming_admission.stored_columns is not None
                 )
+                _require_cacheable_ladder_values(incoming_admission.entry["key"])
                 incoming_row = incoming_admission.stored_columns
                 key_hash = str(incoming_admission.entry["key_hash"])
                 incoming_admitted = incoming_admission.decoded_payload is not None
@@ -5587,7 +5623,7 @@ def physics_ladder_bucket_distance_from_replay_key(
             exact_value = controls.get(control_name)
             snapped_value = rung_controls.get(control_name)
             if exact_value is None or snapped_value is None:
-                continue
+                return math.inf
             try:
                 control_distance = _normalized_sigfig_distance(
                     float(exact_value),
@@ -7037,18 +7073,61 @@ def _physics_ladder_values_from_replay_key(
     return values
 
 
-def _require_ladder_indexable_composition(key: Mapping[str, Any]) -> None:
-    composition = _composition_items(
+def _nonfinite_ladder_distance_field(
+    key: Mapping[str, Any],
+    rung_tag: str,
+) -> str:
+    sig_figs = _physics_ladder_sig_figs(rung_tag)
+    for species, fraction in _composition_items(
         key.get("composition_mol_fraction", [])
-    )
-    if any(
-        _sigfig_snap(fraction, sig_figs) is None
-        for _species, fraction in composition
-        for _rung_tag, sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS
     ):
-        raise ValueError(
-            "PT-0 composition cannot be represented at a physics-ladder precision"
-        )
+        try:
+            if _sigfig_snap(fraction, sig_figs) is None:
+                return f"composition_mol_fraction.{species}"
+        except (OverflowError, TypeError, ValueError):
+            return f"composition_mol_fraction.{species}"
+
+    controls = key.get("controls", {})
+    if not isinstance(controls, Mapping):
+        controls = {}
+    rung_key = canonical_physics_ladder_bucket_key_from_replay_key(
+        key,
+        rung_tag,
+    )
+    rung_bucket = rung_key.get("physics_bucket", {})
+    rung_controls = (
+        rung_bucket.get("controls", {})
+        if isinstance(rung_bucket, Mapping)
+        else {}
+    )
+    control_names = ["T_K"]
+    if _physics_ladder_coarsens_controls(rung_tag):
+        control_names.extend(("pressure_bar", "pO2_bar"))
+    for control_name in control_names:
+        if control_name not in controls or controls[control_name] is None:
+            continue
+        if control_name != "T_K" and control_name not in rung_controls:
+            continue
+        try:
+            if _sigfig_snap(controls[control_name], sig_figs) is None:
+                return f"controls.{control_name}"
+        except (OverflowError, TypeError, ValueError):
+            return f"controls.{control_name}"
+    return "distance"
+
+
+def _require_cacheable_ladder_values(
+    key: Mapping[str, Any],
+) -> dict[str, dict[str, float | str]]:
+    values = _physics_ladder_values_from_replay_key(key)
+    for rung_tag, _sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS:
+        distance = values[rung_tag]["distance"]
+        if not isinstance(distance, (int, float)) or not math.isfinite(distance):
+            raise UncacheableKey(
+                rung_tag,
+                _nonfinite_ladder_distance_field(key, rung_tag),
+            )
+    return values
 
 
 def _physics_ladder_sig_figs(rung_tag: str) -> float:
