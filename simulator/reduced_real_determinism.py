@@ -39,6 +39,7 @@ from simulator.config import (
     resolve_alphamelts_subprocess_model,
 )
 from simulator.grind_preflight import (
+    APPROVED_LIVE_VAPOR_SOURCES,
     GrindSourceGateError,
     assert_strict_vapor_pt1_row,
 )
@@ -2527,6 +2528,7 @@ def _admit_stored_row(
     output_columns: Sequence[str] | None = None,
     strict_source_validation: bool = False,
     validate_source_provenance: bool = False,
+    approved_sources: frozenset[str] = APPROVED_LIVE_VAPOR_SOURCES,
 ) -> _AdmittedStoredRow | None:
     """Validate one complete stored row inside its store's error boundary."""
 
@@ -2684,12 +2686,6 @@ def _admit_stored_row(
             raise PT1PersistentStoreCorrupt(
                 f"PT-1 row artifact mismatch for {artifact}: {row_hash}"
             )
-        if _sha256(row_payload_bytes) != row["payload_sha256"]:
-            raise PT1PersistentStoreCorrupt(
-                "PT-1 row payload hash mismatch (stored payload bytes): "
-                f"{row_artifact}: {row_hash}"
-            )
-
         def verify_key_hashes() -> None:
             if (
                 row["key_hash"] != row["key_sha256"]
@@ -2911,6 +2907,12 @@ def _admit_stored_row(
                     "distance"
                 ]
 
+        if _sha256(row_payload_bytes) != row["payload_sha256"]:
+            raise PT1PersistentStoreCorrupt(
+                "PT-1 row payload hash mismatch (stored payload bytes): "
+                f"{row_artifact}: {row_hash}"
+            )
+
         row_payload = _pt1_row_json(
             row_payload_bytes, field="payload", key_hash=row_hash
         )
@@ -2970,6 +2972,13 @@ def _admit_stored_row(
         row["payload_bytes"] = row_payload_bytes
 
         if strict_source_validation:
+            if row_artifact == "freeze_gate_curve" and not isinstance(
+                row_payload, Mapping
+            ):
+                raise PT1PersistentStoreCorrupt(
+                    "PT-1 cache source gate curve payload must be a mapping: "
+                    f"{row_hash}"
+                )
             if validate_source_provenance:
                 source_mismatches: list[str] = []
                 if "artifact" in row_key and row_key["artifact"] != row_artifact:
@@ -2984,8 +2993,6 @@ def _admit_stored_row(
                 row_key,
                 row_payload,
             )
-            # A non-mapping payload carries no source fields to validate; let
-            # codec admission report its shape rejection below.
             if isinstance(row_payload, Mapping):
                 assert_strict_vapor_pt1_row(
                     artifact=row_artifact,
@@ -2993,6 +3000,7 @@ def _admit_stored_row(
                     key_hash=row_hash,
                     payload=row_payload,
                     context=f"PT-1 cache shard {row_artifact}:{row_hash}",
+                    approved_sources=approved_sources,
                 )
         payload_codec_version = row.get("payload_codec_version")
         expected_codec_version = _payload_codec_version(row_artifact)

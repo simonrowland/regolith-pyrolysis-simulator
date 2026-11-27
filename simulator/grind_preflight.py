@@ -560,6 +560,7 @@ def _strict_vapor_pt1_store_summary(
                 row,
                 store_kind="pt1",
                 strict_source_validation=True,
+                approved_sources=approved_sources,
             )
         except PT1PersistentStoreCorrupt as exc:
             raise GrindSourceGateError(

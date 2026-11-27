@@ -8030,8 +8030,18 @@ def test_pt1_bucket_and_ladder_integrity_precedes_stale_codec_admission(
             PT1PersistentStoreCorrupt,
         ),
         (
+            "pt1_bucket",
+            "compound_payload_checksum_physics_key_bytes",
+            PT1PersistentStoreCorrupt,
+        ),
+        (
             "pt1_ladder",
             "compound_key_json_ladder_distance",
+            PT1PersistentStoreCorrupt,
+        ),
+        (
+            "pt1_ladder",
+            "compound_payload_checksum_ladder_distance",
             PT1PersistentStoreCorrupt,
         ),
         (
@@ -8063,7 +8073,9 @@ def test_pt1_bucket_and_ladder_integrity_precedes_stale_codec_admission(
         "pt1-replace-malformed-payload-json",
         "pt1-replace-key-hash",
         "pt1-bucket-key-json-before-physics-index",
+        "pt1-bucket-metadata-before-payload-checksum",
         "pt1-ladder-key-json-before-distance",
+        "pt1-ladder-distance-before-payload-checksum",
         "pt1-interpolation-scope-before-payload-json",
     ),
 )
@@ -8169,6 +8181,14 @@ def test_stale_codec_integrity_checks_precede_admission_for_every_reader(
                     "SET key_bytes = ?, physics_key_bytes = ? WHERE key_hash = ?",
                     (sqlite3.Binary(b"{"), sqlite3.Binary(b"{}"), key_hash),
                 )
+        elif corruption == "compound_payload_checksum_physics_key_bytes":
+            with sqlite3.connect(db_path) as conn:
+                conn.execute(
+                    f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+                    "SET payload_sha256 = ?, physics_key_bytes = ? "
+                    "WHERE key_hash = ?",
+                    ("0" * 64, sqlite3.Binary(b"{}"), key_hash),
+                )
         elif corruption == "compound_key_json_ladder_distance":
             distance_column = rrd._physics_ladder_distance_column(rung_tag)
             with sqlite3.connect(db_path) as conn:
@@ -8177,6 +8197,15 @@ def test_stale_codec_integrity_checks_precede_admission_for_every_reader(
                     f"SET key_bytes = ?, {distance_column} = NULL "
                     "WHERE key_hash = ?",
                     (sqlite3.Binary(b"{"), key_hash),
+                )
+        elif corruption == "compound_payload_checksum_ladder_distance":
+            distance_column = rrd._physics_ladder_distance_column(rung_tag)
+            with sqlite3.connect(db_path) as conn:
+                conn.execute(
+                    f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+                    f"SET payload_sha256 = ?, {distance_column} = NULL "
+                    "WHERE key_hash = ?",
+                    ("0" * 64, key_hash),
                 )
         elif corruption == "compound_replay_scope_malformed_payload_json":
             malformed_payload = sqlite3.Binary(b"{")
@@ -8351,7 +8380,11 @@ def test_stale_codec_integrity_checks_precede_admission_for_every_reader(
     assert type(raised.value) is error_type
     if corruption == "compound_key_json_physics_key_bytes":
         assert "physics bucket bytes mismatch" in str(raised.value)
+    elif corruption == "compound_payload_checksum_physics_key_bytes":
+        assert "physics bucket bytes mismatch" in str(raised.value)
     elif corruption == "compound_key_json_ladder_distance":
+        assert "distance is missing" in str(raised.value)
+    elif corruption == "compound_payload_checksum_ladder_distance":
         assert "distance is missing" in str(raised.value)
     elif corruption == "compound_replay_scope_malformed_payload_json":
         assert "exact key replay scope mismatch" in str(raised.value)

@@ -68,6 +68,20 @@ def _put_cache_row(db_path: Path, *, tag: str) -> None:
     )
 
 
+def _replace_gate_payload_with_null(db_path: Path) -> None:
+    payload_bytes = canonical_json_bytes(None)
+    with sqlite3.connect(db_path) as con:
+        con.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+            "SET payload_bytes = ?, payload_sha256 = ?, payload_codec_version = ?",
+            (
+                sqlite3.Binary(payload_bytes),
+                hashlib.sha256(payload_bytes).hexdigest(),
+                rrd._payload_codec_version("freeze_gate_curve"),
+            ),
+        )
+
+
 def _put_real_equilibrium_cache_row(db_path: Path) -> None:
     key = {
         "schema_version": SCHEMA_VERSION,
@@ -498,6 +512,32 @@ def test_seed_cache_refuses_invalid_later_source_without_mutating_target(
 
     with pytest.raises(RuntimeError, match="internal-analytical"):
         seed_cache(target, [valid, invalid])
+
+    assert target.read_bytes() == before
+    assert payload_count(target) == 1
+
+
+@pytest.mark.parametrize("operation", ("seed", "merge"))
+def test_seed_and_merge_reject_null_gate_payload_before_copy(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    operation: str,
+) -> None:
+    target = tmp_path / f"{operation}-target.db"
+    source = tmp_path / f"{operation}-source.db"
+    _put_cache_row(target, tag="existing")
+    _put_cache_row(source, tag="incoming")
+    _replace_gate_payload_with_null(source)
+    before = target.read_bytes()
+
+    if operation == "seed":
+        with pytest.raises(CacheSourceRowInvalid, match="gate curve payload"):
+            seed_cache(target, [source])
+    else:
+        rc = merge_grind_cache.main([str(target), str(source)])
+        captured = capsys.readouterr()
+        assert rc == 2
+        assert "gate curve payload" in captured.err
 
     assert target.read_bytes() == before
     assert payload_count(target) == 1

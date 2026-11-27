@@ -689,6 +689,23 @@ def test_strict_vapor_pt1_preflight_uses_stored_row_admission(
     assert admission_calls[0]["strict_source_validation"] is True
 
 
+def test_strict_vapor_pt1_preflight_passes_caller_approved_sources(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "strict-pt1-custom-approved-source.sqlite"
+    approved_source = "custom-certified-vapor"
+    _write_pt1_store(db_path, source=approved_source)
+
+    summary = assert_strict_vapor_result_store(
+        db_path,
+        _decode_result_payload,
+        approved_sources=frozenset({approved_source}),
+        strict_vapor_gate=True,
+    )
+
+    assert summary == {"rows": 1, "vapor_active_rows": 1, "source_reports": 1}
+
+
 def test_strict_vapor_preflight_rejects_admission_payload_rejection(
     tmp_path: Path,
 ) -> None:
@@ -714,7 +731,7 @@ def test_strict_vapor_preflight_rejects_admission_payload_rejection(
 
     with pytest.raises(
         GrindSourceGateError,
-        match="PT-1 row rejected by cache admission",
+        match="PT-1 source row is corrupt",
     ):
         assert_strict_vapor_result_store(
             db_path,
