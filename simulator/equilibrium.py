@@ -63,6 +63,32 @@ _O2_CONTROLLED_ATMOSPHERES = frozenset({
 _ELLINGHAM_STANDARD_PRESSURE_PA = PA_PER_BAR
 
 
+def _mgo_liquid_standard_log10_factor_per_oxide(temperature_K: float) -> float:
+    """Return log10(K_liquid/K_crystal) for one MgO formula unit.
+
+    Premise: the active Mg equilibrium uses MgO(cr), while melt activities are
+    Raoultian on MgO(l). JANAF Mg-008/Mg-009 supplies
+    ΔG_fus° = G°(MgO,l) - G°(MgO,cr). For a reaction consuming n oxide units,
+    ΔG°_liq = ΔG°_cr + n(G°_cr - G°_liq), so
+    log10(K_liq/K_cr) = n ΔG_fus°/(R T ln 10). Unit check: kJ/mol is
+    converted to J/mol before division by R T; the result is dimensionless.
+    Sanity: at 2156.15 K JANAF gives +0.54 dex per MgO, so the liquid-standard
+    Mg pressure is about 3.5 times the crystal-standard pressure at fixed
+    activity and pO2; as T approaches the fusion crossing, the correction
+    tends to zero.
+    """
+    from simulator.reference_data.janaf import janaf_fusion_energy
+
+    delta_g_fus_kj_per_mol = float(
+        janaf_fusion_energy("MgO", temperature_K).delta_g_fus_kJ_per_mol
+    )
+    return (
+        delta_g_fus_kj_per_mol
+        * 1000.0
+        / (GAS_CONSTANT * float(temperature_K) * math.log(10.0))
+    )
+
+
 def _internal_analytical_control_refusal(
     temperature_C: object,
     p_total_mbar: object,
@@ -555,10 +581,6 @@ class EquilibriumMixin:
                 pseudo_warning_seen,
             )
 
-        # SSO-R keeps intrinsic melt fO2 and headspace transport pO2 as
-        # coupled but distinct channels: Fe redox reads the melt reservoir;
-        # SiO suppression reads the headspace reservoir.
-        pO2_bar = self._headspace_transport_pO2_bar()
         vacuum_floor_bar = self._oxygen_numerical_floor_bar()
         reservoir = getattr(self.melt, "oxygen_reservoir", None)
         intrinsic_fO2_value = getattr(
@@ -641,6 +663,66 @@ class EquilibriumMixin:
         melt_dissociation_pO2_bar, melt_pO2_clamped = (
             physical_melt_dissociation_pO2_bar(dissociation_fO2_log)
         )
+        # Premise: all gas laws formed on this evaporating surface consume the
+        # one pO2 represented by the congruent oxygen-balance solution; the
+        # headspace transport reservoir is not a second surface potential.
+        # Algebra: p_i = K_i a_i^alpha (pO2_surface/pO2_ref)^nu, so equal nu
+        # channels share the same factor and it cancels in their pressure
+        # ratio. Unit check: pO2_surface/pO2_ref is dimensionless and each
+        # resulting channel pressure remains Pa. Sanity: SiO and Mg both have
+        # nu=-1/2, so changing fO2 alone cannot split them when this value is
+        # identical; changing headspace pO2 alone has no effect on either law.
+        surface_pO2_bar = melt_dissociation_pO2_bar
+        surface_pO2_inputs_bar: dict[str, float] = {}
+
+        def _surface_pO2_for_channel(channel: str) -> float:
+            surface_pO2_inputs_bar[channel] = surface_pO2_bar
+            return surface_pO2_bar
+
+        activity_standard_state_flags: dict[str, dict[str, Any]] = {}
+
+        def _refuse_unresolved_activity_standard_state(
+            channel: str,
+            *,
+            parent_oxide: str,
+            K_reference_phase: str,
+            reason: str,
+        ) -> None:
+            activity_standard_state_flags[channel] = {
+                'type': 'typed_notice',
+                'kind': 'standard_state_mismatch_unresolved',
+                'K_reference_phase': K_reference_phase,
+                'activity_reference_phase': (
+                    f'{parent_oxide}(l), Raoultian pure-liquid'
+                ),
+                'temperature_K': T_K,
+                'reason': reason,
+                'conversion_applied': False,
+            }
+            _sz_omit(
+                channel,
+                ZeroBecause.MISSING_THERMO,
+                field='liquid_standard_state_conversion',
+                detail=reason,
+                category=CATEGORY_REFUSE,
+            )
+
+        try:
+            mgo_liquid_standard_log10_factor = (
+                _mgo_liquid_standard_log10_factor_per_oxide(T_K)
+            )
+        except ValueError as exc:
+            mgo_liquid_standard_log10_factor = None
+            activity_standard_state_flags['Mg'] = {
+                'type': 'typed_notice',
+                'kind': 'standard_state_mismatch_unresolved',
+                'K_reference_phase': 'MgO(cr), Ellingham Mg-010',
+                'activity_reference_phase': 'MgO(l), JANAF Mg-009',
+                'conversion_source': 'JANAF Mg-008/Mg-009',
+                'temperature_K': T_K,
+                'reason': str(exc),
+                'conversion_applied': False,
+            }
         if melt_pO2_clamped:
             # b-148: do not feed the 1e300 float sentinel into mass action.
             warnings.append(
@@ -699,6 +781,23 @@ class EquilibriumMixin:
                         'vapor_pressures_Pa while status=ok'
                     ),
                     category=CATEGORY_REFUSE,
+                )
+                continue
+
+            if parent_oxide == 'CaO':
+                _refuse_unresolved_activity_standard_state(
+                    species,
+                    parent_oxide='CaO',
+                    K_reference_phase=(
+                        'CaO(cr); liquid-standard conversion unresolved '
+                        '(JANAF Ca-027/Ca-028)'
+                    ),
+                    reason=(
+                        'JANAF Ca-027/Ca-028 has an unresolved glass/liquid '
+                        'assignment and crosses at 3200 K versus the accepted '
+                        '2886 K CaO melting point; no liquid-standard K is '
+                        'grounded, so the channel is omitted rather than guessed'
+                    ),
                 )
                 continue
 
@@ -912,16 +1011,14 @@ class EquilibriumMixin:
                 )
                 pO2_exponent = float(sp_data.get("pO2_exponent", 0.0) or 0.0)
                 if pO2_exponent:
-                    # Melt-dissolved non-FeO oxide dissociation sees the
-                    # melt's oxygen chemical potential; headspace pO2 is only
-                    # the transport/backpressure channel.
+                    channel_pO2_bar = _surface_pO2_for_channel(species)
                     pO2_reference_bar = max(
                         1e-30,
                         float(sp_data.get("pO2_reference_bar", 1.0) or 1.0),
                     )
                     P_effective_Pa = _require_finite_vapor_value(
                         P_effective_Pa
-                        * (melt_dissociation_pO2_bar / pO2_reference_bar)
+                        * (channel_pO2_bar / pO2_reference_bar)
                         ** pO2_exponent,
                         species=species,
                         field="P_effective_pO2",
@@ -1023,7 +1120,7 @@ class EquilibriumMixin:
                 # envelope-clamped) — bit-identical linear form.
                 o2_term, o2_potential = _o2_channel_term_and_potential(
                     pO2_exponent=pO2_exponent,
-                    pO2_bar=melt_dissociation_pO2_bar,
+                    pO2_bar=_surface_pO2_for_channel(species),
                     pO2_reference_bar=pO2_reference_bar,
                     temperature_K=T_K,
                     reaction_plane=REACTION_PLANE_MELT_INTERFACE,
@@ -1152,7 +1249,7 @@ class EquilibriumMixin:
                 # envelope-clamped) — bit-identical linear form.
                 o2_term, o2_potential = _o2_channel_term_and_potential(
                     pO2_exponent=pO2_exponent,
-                    pO2_bar=melt_dissociation_pO2_bar,
+                    pO2_bar=_surface_pO2_for_channel(species),
                     pO2_reference_bar=pO2_reference_bar,
                     temperature_K=T_K,
                     reaction_plane=REACTION_PLANE_MELT_INTERFACE,
@@ -1297,22 +1394,38 @@ class EquilibriumMixin:
             # ΔG_f in kJ, R in J/(mol·K) → multiply by 1000
             K_decomp = math.exp(dG_f_kJ * 1000.0 / (GAS_CONSTANT * T_K))
 
+            if parent_oxide == 'MgO':
+                if mgo_liquid_standard_log10_factor is None:
+                    _sz_omit(
+                        species,
+                        ZeroBecause.MISSING_THERMO,
+                        field='MgO_liquid_standard_conversion',
+                        detail=(
+                            'JANAF Mg-008/Mg-009 does not cover this temperature; '
+                            'MgO(cr) K cannot be paired with the liquid-standard '
+                            'activity, so this channel is omitted rather than guessed'
+                        ),
+                        category=CATEGORY_REFUSE,
+                    )
+                    continue
+                # Mg-010 K is a two-MgO dissociation reaction; convert both
+                # oxide standard chemical potentials before combining it with
+                # the liquid-standard activity.
+                K_decomp *= 10.0 ** (
+                    n_ox * mgo_liquid_standard_log10_factor
+                )
+
             # a_M(row basis) = (K × a_oxide^n_ox / pO₂_bar)^(1/n_M)
-            dissociation_pO2_bar = (
-                pO2_bar if parent_oxide == 'FeO' else melt_dissociation_pO2_bar
-            )
-            # Premise: this fallback solves the melt-supported source pressure;
-            # the later surface-flux layer owns overhead species backpressure.
-            # For MgO(l) -> Mg(g) + 1/2 O2,
-            # K1=(f_Mg/p0)*(fO2/p0)^1/2/a_MgO. The per-mol-O2 JANAF row uses
-            # K2=K1**2=(f_Mg/p0)**2*(fO2/p0)/a_MgO**2, therefore
-            # root=(K2*a_oxide**n_ox/fO2_bar)**(1/n_M), n_ox=n_M=2.
-            # Unit check: K, activity, and reduced fugacities are dimensionless;
-            # the gas/condensed pressure rail supplies Pa below. Sanity/limit:
-            # fO2 down by 100 raises Mg by 10; fO2 -> infinity suppresses Mg.
-            # Thus non-FeO uses intrinsic melt fO2, while overhead pO2 remains
-            # available to transport/backpressure. FeO already carries melt
-            # redox through Kress91 activity and is intentionally unchanged.
+            dissociation_pO2_bar = _surface_pO2_for_channel(species)
+            # Premise: the Ellingham basis is the reverse oxidation reaction
+            # n_ox M_xO_y -> n_M M + O2, with K_decomp defined as
+            # a_M^n_M (pO2/1 bar) / a_oxide^n_ox. Algebra gives
+            # a_M=(K_decomp*a_oxide^n_ox/(pO2_surface/1 bar))^(1/n_M).
+            # Unit check: K_decomp, activities, and reduced pO2 are
+            # dimensionless; the selected metal pressure rail returns Pa.
+            # Sanity: lowering shared pO2 by 100 raises a divalent-metal
+            # pressure by 10; increasing it suppresses that pressure. No
+            # channel substitutes a headspace reservoir.
             numerator = K_decomp * (a_oxide ** n_ox) / dissociation_pO2_bar
 
             if numerator <= 0:
@@ -1429,14 +1542,44 @@ class EquilibriumMixin:
         # These evaporate as oxide gases, not as metals. Fe is intentionally
         # modeled through the metallic-Fe path above, not as FeO vapor.
         # SiO₂(melt) → SiO(g) + ½O₂(g). Mass action at the calibration
-        # reference is p(SiO) ∝ 1/√pO₂, but this loop applies that
-        # square-root factor only when pO2_bar > the SiO row's
-        # pO2_reference_bar. At and below that reference the pressure is
-        # not enhanced; it is flat in pO₂. See the SiO branch below.
+        # reference is p(SiO) ∝ 1/√pO₂; the same surface pO2 drives every
+        # channel, while the SiO row's calibration reference still controls
+        # its existing floor behavior.
 
         oxide_vapors_data = self.vapor_pressures.get('oxide_vapors', {})
 
         for name, data in oxide_vapors_data.items():
+            parent_oxide = data.get('parent_oxide', '')
+            if parent_oxide == 'CaO':
+                _refuse_unresolved_activity_standard_state(
+                    name,
+                    parent_oxide='CaO',
+                    K_reference_phase=(
+                        'CaO(cr); liquid-standard conversion unresolved '
+                        '(JANAF Ca-027/Ca-028)'
+                    ),
+                    reason=(
+                        'JANAF Ca-027/Ca-028 has an unresolved glass/liquid '
+                        'assignment and crosses at 3200 K versus the accepted '
+                        '2886 K CaO melting point; no liquid-standard K is '
+                        'grounded, so the channel is omitted rather than guessed'
+                    ),
+                )
+                continue
+            if parent_oxide == 'CoO':
+                _refuse_unresolved_activity_standard_state(
+                    name,
+                    parent_oxide='CoO',
+                    K_reference_phase='CoO(cr), CEA CoO standard-reaction rows',
+                    reason=(
+                        'The CoO(cr) to CoO(g) source reaction has no JANAF '
+                        'solid/liquid fusion pair for conversion to the '
+                        'liquid-standard activity; the channel is omitted '
+                        'rather than guessed'
+                    ),
+                )
+                continue
+
             antoine = data.get('antoine', {})
             try:
                 A, B, C = _read_antoine_coefficients(antoine)
@@ -1476,7 +1619,6 @@ class EquilibriumMixin:
                     f"valid_range_K {valid} at {T_K:.2f} K"
                 )
 
-            parent_oxide = data.get('parent_oxide', '')
             if parent_oxide:
                 activity_exponent = float(
                     data.get('oxide_activity_exponent', 1.0)
@@ -1505,11 +1647,13 @@ class EquilibriumMixin:
 
             pO2_exponent = float(data.get('pO2_exponent', 0.0) or 0.0)
             if pO2_exponent:
+                channel_pO2_bar = _surface_pO2_for_channel(name)
                 pO2_reference_bar = max(
                     1e-30, float(data.get('pO2_reference_bar', 1.0) or 1.0)
                 )
                 P_sat = _require_finite_vapor_value(
-                    P_sat * (pO2_bar / pO2_reference_bar) ** pO2_exponent,
+                    P_sat
+                    * (channel_pO2_bar / pO2_reference_bar) ** pO2_exponent,
                     species=name,
                     field="P_sat_pO2",
                 )
@@ -1528,7 +1672,11 @@ class EquilibriumMixin:
             ):
                 from simulator.chemistry.ellingham_graph import _sio_oxygen_pressure_factor
 
-                suppression = _sio_oxygen_pressure_factor(pO2_bar, sio_reference_bar)
+                channel_pO2_bar = _surface_pO2_for_channel(name)
+                suppression = _sio_oxygen_pressure_factor(
+                    channel_pO2_bar,
+                    sio_reference_bar,
+                )
                 P_sat = _require_finite_vapor_value(
                     P_sat * suppression,
                     species=name,
@@ -1568,6 +1716,9 @@ class EquilibriumMixin:
                 'component_basis': 'raoultian_pure_endmember',
             },
             'activity_provenance': activity_provenance,
+            'activity_standard_state_flags': activity_standard_state_flags,
+            'surface_oxygen_potential_bar': surface_pO2_bar,
+            'surface_oxygen_potential_inputs_bar': dict(surface_pO2_inputs_bar),
             'extrapolated_beyond_valid_range_K': {**metal_extrapolations, **oxide_vapor_extrapolations},
             'a_FeO_calphad': feo_activity_diagnostic,
             'ellingham_authority': ellingham_authority_diagnostic(

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from types import SimpleNamespace
 
 import pytest
@@ -94,6 +95,150 @@ def test_internal_analytical_zero_mbar_is_admitted_vacuum():
     )
     assert result.status == "ok"
     assert result.pressure_bar == 0.0
+
+
+def _markova_surface_equilibrium(fO2_log: float):
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _new_internal_analytical_core,
+    )
+
+    core = _new_internal_analytical_core()
+    composition_kg = {
+        "SiO2": 0.4402,
+        "Al2O3": 0.0456,
+        "FeO": 0.0804,
+        "MgO": 0.3644,
+        "CaO": 0.0695,
+    }
+    core.atom_ledger = core._new_atom_ledger()
+    core._load_ledger_account(
+        "process.cleaned_melt",
+        composition_kg,
+        source="Markova VI surface-potential invariant",
+    )
+    core.melt.composition_kg = dict(composition_kg)
+    core.melt.update_total_mass()
+    core.melt.temperature_C = 1883.0
+    core.melt.p_total_mbar = 100.0
+    core.melt.fO2_log = fO2_log
+    core.melt.melt_fO2_log = fO2_log
+    core.melt.oxygen_reservoir.melt_intrinsic_fO2_log = fO2_log
+    core.melt.oxygen_reservoir.headspace_transport_pO2_bar = (
+        43.7 * 10.0**fO2_log
+    )
+    core.melt.oxygen_reservoir.headspace_ledger_pO2_bar = (
+        43.7 * 10.0**fO2_log
+    )
+    return EquilibriumMixin._internal_analytical_equilibrium(core)
+
+
+def test_internal_analytical_channels_share_exactly_one_surface_pO2():
+    result = _markova_surface_equilibrium(-5.344)
+    inputs = result.diagnostics["surface_oxygen_potential_inputs_bar"]
+    surface_pO2_bar = result.diagnostics["surface_oxygen_potential_bar"]
+
+    assert "SiO" in inputs
+    assert "Mg" in inputs
+    assert set(inputs.values()) == {surface_pO2_bar}
+    assert surface_pO2_bar != 43.7 * 10.0**-5.344
+
+
+def test_internal_analytical_mg_pressure_uses_liquid_standard_conversion(
+    monkeypatch,
+):
+    import simulator.equilibrium as equilibrium_module
+
+    temperature_K = 2156.15
+    log10_factor = (
+        equilibrium_module._mgo_liquid_standard_log10_factor_per_oxide(
+            temperature_K
+        )
+    )
+    assert log10_factor == pytest.approx(0.542275, abs=1e-6)
+
+    converted_pressure = _markova_surface_equilibrium(-5.344).vapor_pressures_Pa[
+        "Mg"
+    ]
+    with monkeypatch.context() as patch:
+        patch.setattr(
+            equilibrium_module,
+            "_mgo_liquid_standard_log10_factor_per_oxide",
+            lambda _temperature_K: 0.0,
+        )
+        crystal_standard_pressure = (
+            _markova_surface_equilibrium(-5.344).vapor_pressures_Pa["Mg"]
+        )
+
+    # Mg-010's decomposition K contains two MgO units and the gas pressure
+    # takes the square root, so the JANAF per-MgO correction survives once.
+    assert converted_pressure / crystal_standard_pressure == pytest.approx(
+        10.0**log10_factor,
+        rel=1e-12,
+    )
+
+
+def test_internal_analytical_unresolved_cao_standard_state_is_typed_and_omitted():
+    result = _markova_surface_equilibrium(-5.344)
+    flag = result.diagnostics["activity_standard_state_flags"]["Ca"]
+
+    assert flag["type"] == "typed_notice"
+    assert flag["kind"] == "standard_state_mismatch_unresolved"
+    assert flag["conversion_applied"] is False
+    assert "Ca" not in result.vapor_pressures_Pa
+
+
+def test_internal_analytical_unresolved_cao_coo_vapors_are_typed_and_omitted(
+    monkeypatch,
+):
+    sim = _typed_omission_sim(
+        oxide_vapors={
+            "CaO": {"parent_oxide": "CaO"},
+            "CoO": {"parent_oxide": "CoO"},
+        }
+    )
+
+    result = _run_typed_omission_sim(sim, monkeypatch)
+
+    assert result.status == "ok"
+    assert result.vapor_pressures_Pa == {}
+    for species in ("CaO", "CoO"):
+        flag = result.diagnostics["activity_standard_state_flags"][species]
+        assert flag["type"] == "typed_notice"
+        assert flag["kind"] == "standard_state_mismatch_unresolved"
+        assert flag["conversion_applied"] is False
+
+
+def test_internal_analytical_unresolved_mgo_standard_state_is_typed_and_omitted(
+    monkeypatch,
+):
+    from simulator.reference_data import janaf
+
+    def missing_mgo_fusion_pair(*_args, **_kwargs):
+        raise ValueError("MgO JANAF liquid/crystal pair is unavailable")
+
+    monkeypatch.setattr(janaf, "janaf_fusion_energy", missing_mgo_fusion_pair)
+    result = _markova_surface_equilibrium(-5.344)
+    flag = result.diagnostics["activity_standard_state_flags"]["Mg"]
+
+    assert flag["type"] == "typed_notice"
+    assert flag["kind"] == "standard_state_mismatch_unresolved"
+    assert flag["conversion_applied"] is False
+    assert "Mg" not in result.vapor_pressures_Pa
+
+
+def test_internal_analytical_equal_exponent_sio_mg_ratio_cancels_fO2():
+    lower_fO2 = _markova_surface_equilibrium(-5.344)
+    higher_fO2 = _markova_surface_equilibrium(-4.344)
+    lower_ratio = (
+        lower_fO2.vapor_pressures_Pa["SiO"]
+        / lower_fO2.vapor_pressures_Pa["Mg"]
+    )
+    higher_ratio = (
+        higher_fO2.vapor_pressures_Pa["SiO"]
+        / higher_fO2.vapor_pressures_Pa["Mg"]
+    )
+
+    assert lower_ratio == pytest.approx(higher_ratio, rel=1e-12, abs=0.0)
 
 
 @pytest.mark.parametrize(
@@ -278,7 +423,12 @@ def test_internal_analytical_oxide_vapor_outside_fit_retains_flagged_value(
     result = _run_typed_omission_sim(sim, monkeypatch)
 
     assert result.status == "ok"
-    assert result.vapor_pressures_Pa["SiO"] == pytest.approx(10.)
+    # SiO is now evaluated at the 1e-9 bar surface potential. Its -1/2 law
+    # scales the 10 Pa reference by sqrt(1e-12 / 1e-9), instead of using the
+    # fixture's 1e-12 bar headspace value and leaving that reference unchanged.
+    assert result.vapor_pressures_Pa["SiO"] == pytest.approx(
+        10.0 * math.sqrt(1e-12 / 1e-9)
+    )
     notice = result.diagnostics["extrapolated_beyond_valid_range_K"]["SiO"]
     assert notice["reason"] == "out_of_domain_marked"
     assert notice["authority_level"] == "extrapolated"
