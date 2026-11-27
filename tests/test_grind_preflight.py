@@ -680,6 +680,40 @@ def test_strict_vapor_pt1_preflight_uses_stored_row_admission(
         )
 
 
+def test_strict_vapor_preflight_rejects_admission_payload_rejection(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "strict-pt1-null-gate-payload.sqlite"
+    _write_pt1_store(db_path, source="builtin-vapor-pressure")
+    null_payload_bytes = rrd.canonical_json_bytes(None)
+    with sqlite3.connect(db_path) as conn:
+        (key_hash,) = conn.execute(
+            f"SELECT key_hash FROM {rrd.PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+        conn.execute(
+            f"UPDATE {rrd.PT1_EQUILIBRIUM_TABLE} "
+            "SET artifact = ?, payload_bytes = ?, payload_sha256 = ?, "
+            "payload_codec_version = ? WHERE key_hash = ?",
+            (
+                "freeze_gate_curve",
+                sqlite3.Binary(null_payload_bytes),
+                rrd._sha256(null_payload_bytes),
+                rrd._payload_codec_version("freeze_gate_curve"),
+                key_hash,
+            ),
+        )
+
+    with pytest.raises(
+        GrindSourceGateError,
+        match="PT-1 row rejected by cache admission",
+    ):
+        assert_strict_vapor_result_store(
+            db_path,
+            _decode_result_payload,
+            strict_vapor_gate=True,
+        )
+
+
 def test_strict_vapor_result_payload_rejects_nested_vaporock_provider_id() -> None:
     payload = {
         "result_blob": {

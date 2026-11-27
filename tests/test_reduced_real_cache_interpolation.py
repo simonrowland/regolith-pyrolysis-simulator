@@ -742,6 +742,29 @@ def test_interpolation_candidates_refuse_corrupt_replay_scope(
         )
 
 
+def test_interpolation_admission_rejects_null_stored_controls(
+    tmp_path: Path,
+) -> None:
+    query = _interpolation_key("query", feo_fraction=0.20, temperature_K=1500.0)
+    malformed_key = copy.deepcopy(query)
+    malformed_key["controls"] = None
+    db_path = tmp_path / "null-interpolation-controls.sqlite"
+    # The real PT1 writer gives this malformed key matching hashes and indexes.
+    _put_interpolation_row(
+        db_path,
+        malformed_key,
+        liquid_fraction=0.7,
+        sio_pa=7.0,
+    )
+
+    replay = PT0DeterminismStore("replay", db_path=db_path)
+    with pytest.raises(
+        rrd.PT1PersistentStoreCorrupt,
+        match="stored equilibrium replay key controls",
+    ):
+        replay._lookup_interpolated("equilibrium_post_record", query)
+
+
 @pytest.mark.parametrize("reader", ("bucket", "ladder", "interpolation"))
 @pytest.mark.parametrize(
     "row_version",

@@ -553,7 +553,10 @@ def _strict_vapor_pt1_store_summary(
     source_reports = 0
     for row in rows:
         admitted = _admit_stored_row(row, store_kind="pt1")
-        assert admitted is not None
+        if admitted is None or admitted.decoded_payload is None:
+            raise GrindSourceGateError(
+                f"{context}: PT-1 row rejected by cache admission"
+            )
         row_context = f"{context}:{admitted.entry['key_hash']}"
         row_summary = assert_strict_vapor_pt1_row(
             artifact=str(admitted.entry["artifact"]),

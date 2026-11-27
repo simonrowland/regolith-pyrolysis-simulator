@@ -3012,6 +3012,49 @@ def _admit_stored_row(
                 stored_columns=row,
                 stale_payload_codec=True,
             )
+        if row_artifact == "equilibrium_post_record":
+            controls = row_key.get("controls")
+            if not isinstance(controls, Mapping):
+                raise PT1PersistentStoreCorrupt(
+                    "PT-1 row invalid stored equilibrium replay key controls: "
+                    f"{row_hash}"
+                )
+            required_control_fields = (
+                "T_K",
+                "pressure_bar",
+                "log_fO2",
+                "pO2_bar",
+            )
+            if any(
+                field not in controls
+                or not _is_finite_cache_number(controls[field])
+                for field in required_control_fields
+            ):
+                raise PT1PersistentStoreCorrupt(
+                    "PT-1 row invalid stored equilibrium replay key controls: "
+                    f"{row_hash}"
+                )
+            composition = row_key.get("composition_mol_fraction")
+            if not isinstance(composition, list) or not composition:
+                raise PT1PersistentStoreCorrupt(
+                    "PT-1 row invalid stored equilibrium replay key composition: "
+                    f"{row_hash}"
+                )
+            if (
+                not isinstance(row_key.get("namespace_id"), str)
+                or not row_key["namespace_id"]
+                or (
+                    row_key.get("vapor_pressure_provider_selection") is not None
+                    and not isinstance(
+                        row_key.get("vapor_pressure_provider_selection"), str
+                    )
+                )
+                or dependency_vector_from_replay_key(row_key) is None
+            ):
+                raise PT1PersistentStoreCorrupt(
+                    "PT-1 row invalid stored equilibrium replay key dependency "
+                    f"fields: {row_hash}"
+                )
 
         entry = {
             "artifact": row_artifact,
