@@ -8036,6 +8036,15 @@ def _run_interpolation_class_guard_hour(
     publish_live_backend_admission(backend)
     sim.start_campaign(CampaignPhase.C2A_STAGED)
     sim.melt.temperature_C = 1500.0
+    seed_gate_curve_memo_record(
+        sim,
+        {
+            "source": "unit-test:interpolation-class-guard",
+            "solidus_T_C": 1000.0,
+            "liquidus_T_C": 1600.0,
+            "path": ((1000.0, 0.0), (1600.0, 1.0)),
+        },
+    )
     assert store._cached_real_binding_eligible(sim)
     if interpolation_source is not None:
         def candidates(**kwargs: Any) -> list[dict[str, Any]]:
@@ -8083,9 +8092,7 @@ def _run_interpolation_class_guard_hour(
             )
 
         monkeypatch.setattr(store, "_lookup_interpolated", unguarded_flux_lookup)
-    with pytest.MonkeyPatch.context() as gate_monkeypatch:
-        _install_magemin_subprocess_gate(sim, gate_monkeypatch)
-        snapshot = sim.step()
+    snapshot = sim.step()
     return sim, snapshot, backend.calls
 
 

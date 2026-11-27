@@ -338,6 +338,12 @@ class EvaporationFluxRefusal(ProviderUnavailableError):
         super().__init__(self.reason)
 
 
+class _VapourBatchResolutionOutcome(NamedTuple):
+    resolved_species: frozenset[str]
+    empty_continuation: bool
+    refusal: EvaporationFluxRefusal | None
+
+
 def evaporation_flux_refusal_from_configuration_error(
     exc: BaseException,
 ) -> EvaporationFluxRefusal:
@@ -1369,6 +1375,33 @@ def _pre_rg_effective_pressure_source(
     )
 
 
+def _evaporation_parent_oxide(
+    vapor_pressure_data: Mapping[str, Any] | None,
+    species: str,
+) -> str | None:
+    """Return the parent oxide required by the evaporation debit owner."""
+    if not isinstance(vapor_pressure_data, Mapping):
+        return None
+    row = (vapor_pressure_data.get('metals', {}) or {}).get(species, {})
+    if not row:
+        row = (vapor_pressure_data.get('oxide_vapors', {}) or {}).get(
+            species, {}
+        )
+    if not isinstance(row, Mapping):
+        return None
+    parent_oxide = row.get('parent_oxide')
+    return str(parent_oxide) if parent_oxide else None
+
+
+def _zero_liquid_precedes_interpolation(equilibrium: Any) -> bool:
+    """Share the physical-zero precedence used before cache-flux admission."""
+    liquid_fraction = getattr(equilibrium, 'liquid_fraction', None)
+    return (
+        liquid_fraction is not None
+        and legacy_raw_liquid_fraction_is_zero(liquid_fraction)
+    )
+
+
 def _append_vapour_batch_unresolved_notice(
     host: Any,
     overlay: dict[str, Any],
@@ -1389,6 +1422,13 @@ def _append_vapour_batch_unresolved_notice(
         "hour": hour,
         "reason": str(reason),
     }
+    if any(
+        isinstance(existing, Mapping)
+        and existing.get("kind") == "vapour_batch_unresolved"
+        and existing.get("species") == notice["species"]
+        for existing in notices
+    ):
+        return
     if notice not in notices:
         notices.append(notice)
 
@@ -1414,17 +1454,27 @@ def _provider_resolved_flux_species(
     if isinstance(below_rates, Mapping):
         resolved.update(str(species) for species in below_rates)
     channel_states = (flux_overlay or {}).get('batch_channel_states', {})
+    unavailable_species = {
+        str(notice.get('species'))
+        for notice in (flux_overlay or {}).get('notices', ()) or ()
+        if isinstance(notice, Mapping)
+        and notice.get('kind') == 'vapour_batch_unresolved'
+        and notice.get('species') is not None
+    }
+    resolved.difference_update(unavailable_species)
     if isinstance(channel_states, Mapping):
         resolved.update(
             str(species)
             for species, state in channel_states.items()
             if state == 'zero_by_physics'
+            and str(species) not in unavailable_species
         )
     if isinstance(flux_pressures, Mapping) and isinstance(channel_states, Mapping):
         resolved.update(
             str(species)
             for species, pressure in flux_pressures.items()
-            if channel_states.get(species) == 'eligible'
+            if str(species) not in unavailable_species
+            and channel_states.get(species) == 'eligible'
             and isinstance(pressure, Real)
             and not isinstance(pressure, bool)
             and math.isfinite(float(pressure))
@@ -1579,19 +1629,29 @@ def _provider_flux_outcome_refusal(
                 if status
                 else 'evaporation_flux_refused'
             )
-        return EvaporationFluxRefusal(reason, diagnostic)
-    resolved_species = _provider_resolved_flux_species(
-        diagnostic,
-        flux_overlay,
-    )
-    if provider_unavailable and not resolved_species:
-        refusal = EvaporationMixin._vapour_batch_resolution_refusal(
+        outcome = EvaporationMixin._vapour_batch_resolution_outcome(
+            host,
+            {**diagnostic, 'reason': reason},
+            flux_overlay,
+            selector_overlay=selector_overlay,
+            provider_diagnostic=diagnostic,
+            include_unresolved_notices=True,
+        )
+        refusal = outcome.refusal
+        if refusal is not None:
+            refusal.diagnostic.update(diagnostic)
+            refusal.diagnostic['reason'] = refusal.reason
+        return refusal
+    if provider_unavailable:
+        outcome = EvaporationMixin._vapour_batch_resolution_outcome(
             host,
             {},
             flux_overlay,
             selector_overlay=selector_overlay,
+            provider_diagnostic=diagnostic,
             include_unresolved_notices=True,
         )
+        refusal = outcome.refusal
         if refusal is not None:
             refusal.diagnostic.update(diagnostic)
             refusal.diagnostic['reason'] = refusal.reason
@@ -1602,8 +1662,23 @@ def _provider_flux_outcome_refusal(
 def _append_capacity_solve_exclusion_notice(
     host: Any,
     overlay: dict[str, Any],
+    *,
+    resolved_species: Iterable[str],
 ) -> dict[str, Any] | None:
     """Disclose excluded species and the finite-capacity bound directions."""
+    resolved_species = frozenset(resolved_species)
+    notices = overlay.get('notices')
+    if isinstance(notices, list):
+        notices[:] = [
+            notice for notice in notices
+            if not (
+                isinstance(notice, Mapping)
+                and notice.get('kind')
+                == 'capacity_solve_excludes_unavailable_species'
+            )
+        ]
+    if not resolved_species:
+        return None
     unavailable = sorted(
         {
             (str(notice.get('species')), str(notice.get('reason') or 'unavailable'))
@@ -1611,6 +1686,7 @@ def _append_capacity_solve_exclusion_notice(
             if isinstance(notice, Mapping)
             and notice.get('kind') == 'vapour_batch_unresolved'
             and notice.get('species') is not None
+            and str(notice.get('species')) not in resolved_species
         }
     )
     if not unavailable:
@@ -1633,13 +1709,6 @@ def _append_capacity_solve_exclusion_notice(
         },
     }
     notices = overlay.setdefault('notices', [])
-    notices[:] = [
-        notice for notice in notices
-        if not (
-            isinstance(notice, Mapping)
-            and notice.get('kind') == 'capacity_solve_excludes_unavailable_species'
-        )
-    ]
     notices.append(flag)
     return flag
 
@@ -2092,20 +2161,25 @@ class EvaporationMixin:
             return full
         return capacity
 
-    def _vapour_batch_resolution_refusal(
+    def _vapour_batch_resolution_outcome(
         self,
         resolve_error: Mapping[str, Any] | None,
         flux_overlay: Mapping[str, Any] | None,
         *,
         selector_overlay: Mapping[str, Any] | None = None,
         flux_pressures: Mapping[str, float] | None = None,
+        provider_diagnostic: Mapping[str, Any] | None = None,
         include_unresolved_notices: bool = False,
-    ) -> EvaporationFluxRefusal | None:
-        """Return the owner-typed refusal when no resolved channel can proceed."""
+    ) -> _VapourBatchResolutionOutcome:
+        """Own the shared resolved, empty-source, and refusal decision."""
         error = dict(resolve_error or {})
         overlay = dict(flux_overlay or {})
         selector = dict(
             selector_overlay if selector_overlay is not None else overlay
+        )
+        pressures = flux_pressures if isinstance(flux_pressures, Mapping) else {}
+        resolved_species = _provider_resolved_flux_species(
+            provider_diagnostic or {}, overlay, flux_pressures=pressures
         )
         notices = [
             notice
@@ -2113,23 +2187,36 @@ class EvaporationMixin:
             if isinstance(notice, Mapping)
             and notice.get('kind') == 'vapour_batch_unresolved'
         ]
-        if not error and not include_unresolved_notices:
-            return None
-        if not error:
-            pressures = flux_pressures if isinstance(flux_pressures, Mapping) else {}
-            resolved_species = _provider_resolved_flux_species(
-                {}, overlay, flux_pressures=pressures
+        if resolved_species:
+            return _VapourBatchResolutionOutcome(
+                resolved_species, False, None
             )
-            if not notices or resolved_species:
-                return None
+        if not error and not include_unresolved_notices:
+            return _VapourBatchResolutionOutcome(
+                resolved_species, False, None
+            )
+        if not error:
             if (
                 overlay.get('effective_pressure_zero_reason')
                 and bool(overlay.get('batch_pa_by_species'))
             ):
-                # Preserve the live 900 C empty-source continuation when the
-                # catalog has a finite diagnostic answer. The source still
-                # supplies no flux pressure; this is not priced as a debit.
-                return None
+                # A finite catalog answer is diagnostic at an empty physical
+                # source. Both live and capacity consume this typed empty
+                # continuation; it is never a debit or an exclusion bound.
+                return _VapourBatchResolutionOutcome(
+                    resolved_species, True, None
+                )
+            channel_states = overlay.get('batch_channel_states', {})
+            if not notices and (
+                not channel_states
+                or all(
+                    state in _TYPED_NON_DEBIT_VAPOUR_CHANNEL_STATES
+                    for state in channel_states.values()
+                )
+            ):
+                return _VapourBatchResolutionOutcome(
+                    resolved_species, True, None
+                )
         from simulator.langmuir_surface_oxygen import (
             LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED,
         )
@@ -2160,15 +2247,44 @@ class EvaporationMixin:
             reason = str(
                 selection_source or _VAPOUR_BATCH_NO_DEBITING_PRESSURE_OUTCOME
             )
-        return EvaporationFluxRefusal(
+        refusal = EvaporationFluxRefusal(
             reason,
             {
                 **error,
                 'reason': reason,
                 'evaporation_flux_kg_hr': {},
+                'batch_channel_states': dict(
+                    overlay.get('batch_channel_states', {}) or {}
+                ),
+                'net_driving_force_by_species': dict(
+                    overlay.get('net_driving_force_by_species', {}) or {}
+                ),
                 'vapour_batch_flux_overlay': overlay,
             },
         )
+        return _VapourBatchResolutionOutcome(
+            resolved_species, False, refusal
+        )
+
+    def _vapour_batch_resolution_refusal(
+        self,
+        resolve_error: Mapping[str, Any] | None,
+        flux_overlay: Mapping[str, Any] | None,
+        *,
+        selector_overlay: Mapping[str, Any] | None = None,
+        flux_pressures: Mapping[str, float] | None = None,
+        provider_diagnostic: Mapping[str, Any] | None = None,
+        include_unresolved_notices: bool = False,
+    ) -> EvaporationFluxRefusal | None:
+        """Compatibility projection of the shared terminal outcome owner."""
+        return self._vapour_batch_resolution_outcome(
+            resolve_error,
+            flux_overlay,
+            selector_overlay=selector_overlay,
+            flux_pressures=flux_pressures,
+            provider_diagnostic=provider_diagnostic,
+            include_unresolved_notices=include_unresolved_notices,
+        ).refusal
 
     def _record_langmuir_refusal_notices(
         self,
@@ -2411,14 +2527,6 @@ class EvaporationMixin:
             effective_pressure_source=effective_pressure_source,
             resolution_error=resolve_error or None,
         )
-        flux_overlay_report.update(
-            compare_live_shadow_to_batch_flux(
-                batch=vapour_batch,
-                live_pressures_Pa=live_vapor_pressures,
-                batch_flux_pressures_Pa=vapor_pressures,
-                resolution_error=resolve_error or None,
-            )
-        )
         requested_species_ids = frozenset(
             getattr(vapour_batch, "requested_species_ids", ()) or ()
         )
@@ -2479,6 +2587,41 @@ class EvaporationMixin:
                             or reason
                         )
                     unresolved_notice_reasons[str(species)] = reason
+        missing_parent_species = []
+        for species in tuple(vapor_pressures):
+            if _evaporation_parent_oxide(self.vapor_pressures, species):
+                continue
+            vapor_pressures.pop(species, None)
+            missing_parent_species.append(str(species))
+            unresolved_notice_reasons.setdefault(
+                str(species), 'missing_evaporation_stoichiometry'
+            )
+        for key in (
+            'selected_runtime_pa_by_species',
+            'selected_pressure_source_by_species',
+        ):
+            selected = flux_overlay_report.get(key)
+            if isinstance(selected, dict):
+                for species in missing_parent_species:
+                    selected.pop(species, None)
+        extrapolated = flux_overlay_report.get('extrapolated_flux_species')
+        if isinstance(extrapolated, list) and missing_parent_species:
+            flux_overlay_report['extrapolated_flux_species'] = [
+                species for species in extrapolated
+                if species not in missing_parent_species
+            ]
+            flux_overlay_report['n_extrapolated_flux_species'] = len(
+                flux_overlay_report['extrapolated_flux_species']
+            )
+        flux_overlay_report['n_flux_pressures'] = len(vapor_pressures)
+        flux_overlay_report.update(
+            compare_live_shadow_to_batch_flux(
+                batch=vapour_batch,
+                live_pressures_Pa=live_vapor_pressures,
+                batch_flux_pressures_Pa=vapor_pressures,
+                resolution_error=resolve_error or None,
+            )
+        )
         # Shadow equality is the unadjusted provider seam. The surface
         # balance below is the flux boundary both consumers must share.
         if hasattr(self, "_last_langmuir_surface_oxygen"):
@@ -2770,10 +2913,7 @@ class EvaporationMixin:
         # governs only when liquid exists (or liquid_fraction is unset
         # and the path cannot prove physical zero).
         liquid_fraction = getattr(equilibrium, 'liquid_fraction', None)
-        if (
-            liquid_fraction is not None
-            and legacy_raw_liquid_fraction_is_zero(liquid_fraction)
-        ):
+        if _zero_liquid_precedes_interpolation(equilibrium):
             self._last_vapour_batch = None
             self._last_vapour_batch_report = None
             self._last_vapour_batch_flux_overlay = {}
@@ -2847,15 +2987,17 @@ class EvaporationMixin:
             )
 
         if resolve_error:
-            refusal = EvaporationMixin._vapour_batch_resolution_refusal(
+            outcome = EvaporationMixin._vapour_batch_resolution_outcome(
                 self,
                 resolve_error,
                 flux_overlay_report,
                 selector_overlay=selector_flux_overlay,
+                flux_pressures=vapor_pressures,
             )
-            assert refusal is not None
-            self._last_evaporation_flux_diagnostic = refusal.diagnostic
-            raise refusal
+            refusal = outcome.refusal
+            if refusal is not None:
+                self._last_evaporation_flux_diagnostic = refusal.diagnostic
+                raise refusal
 
         driving_forces = EvaporationMixin._classify_proven_zero_langmuir_channels(
             self,
@@ -2863,7 +3005,7 @@ class EvaporationMixin:
             vapor_pressure_diagnostic,
             flux=flux,
         )
-        refusal = EvaporationMixin._vapour_batch_resolution_refusal(
+        outcome = EvaporationMixin._vapour_batch_resolution_outcome(
             self,
             {},
             flux_overlay_report,
@@ -2871,9 +3013,17 @@ class EvaporationMixin:
             flux_pressures=vapor_pressures,
             include_unresolved_notices=True,
         )
-        if refusal is not None:
+        if outcome.refusal is not None:
+            refusal = outcome.refusal
             self._last_evaporation_flux_diagnostic = refusal.diagnostic
             raise refusal
+        if outcome.empty_continuation:
+            self._last_evaporation_flux_diagnostic = {
+                'reason': 'pre_rg_empty_source_continuation',
+                'evaporation_flux_kg_hr': {},
+                'vapour_batch_flux_overlay': flux_overlay_report,
+            }
+            return flux
         channel_states = dict(
             flux_overlay_report.get('batch_channel_states', {}) or {}
         )
@@ -2996,12 +3146,8 @@ class EvaporationMixin:
                 or equilibrium_diagnostic.get('vapor_pressure_zero_reason')
             )
             liquid_fraction = getattr(equilibrium, 'liquid_fraction', None)
-            no_liquid_fraction = False
             regime_diagnostic: dict[str, Any] = {}
             if liquid_fraction is not None:
-                no_liquid_fraction = legacy_raw_liquid_fraction_is_zero(
-                    liquid_fraction
-                )
                 try:
                     melt_regime(
                         liquid_fraction=liquid_fraction,
@@ -3074,10 +3220,7 @@ class EvaporationMixin:
                 'net_driving_force_by_species': driving_forces,
             }
             self._last_evaporation_flux_diagnostic = diagnostic
-            raise EvaporationFluxRefusal(
-                reason,
-                diagnostic,
-            )
+            return flux
         if T_K < 400:  # Catalog pressure exists; thermal physical zero.
             note_wall_supply_interval_physical_zero(
                 flux,
@@ -6008,13 +6151,18 @@ class EvaporationMixin:
                 )
             molar_masses_kg_mol[species] = M_g_mol / 1000.0
 
-            parent_oxide = sp_data.get('parent_oxide', '')
+            parent_oxide = _evaporation_parent_oxide(
+                self.vapor_pressures, species
+            )
             if not parent_oxide:
                 # The provider cannot emit or debit this species without a
                 # parent oxide. Leave its stoich and inventory maps absent;
                 # the shared provider-outcome classifier will publish the
                 # species-local unresolved notice after dispatch.
                 continue
+            # Missing-parent channels took the unavailable branch above, so
+            # only a flux-resolved species can reach the stoich owner.
+            assert parent_oxide
             stoich = self._evaporation_stoich(species, sp_data)
             stoich_by_species[species] = dict(stoich)
             # Mirrors core.py::_project_cleaned_melt_from_atom_ledger:
@@ -6485,6 +6633,10 @@ class EvaporationMixin:
                 or (self.vapor_pressures.get('oxide_vapors', {}) or {}).get(species, {})
             )
             if sp_data:
+                # The auxiliary-map owner omits missing-parent species and
+                # the provider marks them unavailable; a positive rate for
+                # one would violate that contract before ledger projection.
+                assert sp_data.get('parent_oxide')
                 resolved_stoich[species] = self._evaporation_stoich(species, sp_data)
         return _project_evaporation_overhead_source_mol_hr(
             rates_kg_hr, resolved_stoich, self.species_formula_registry)

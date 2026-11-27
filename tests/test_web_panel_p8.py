@@ -268,7 +268,7 @@ def test_capacity_bound_on_product_price_is_visible() -> None:
     )
 
     assert "capacity_solve_excludes_unavailable_species" in products
-    assert "headspace_pressure" in products
+    assert "headspace pressure lower" in products
     assert "lower" in products
 
 

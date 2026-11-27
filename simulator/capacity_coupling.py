@@ -186,6 +186,38 @@ def _headspace_partial_pressures_Pa(
     }
 
 
+def _zero_load_capacity_shadow(
+    *,
+    capacity: NoColdTrain | FiniteCapacity,
+    pre_holdup_mol: Mapping[str, float],
+    temperature_K: float,
+    volume_m3: float,
+) -> CapacityShadowResult:
+    """Project a typed empty-flux hour without running the Picard solve."""
+    species_order = tuple(sorted(pre_holdup_mol))
+    partials = _headspace_partial_pressures_Pa(
+        pre_holdup_mol,
+        species=species_order,
+        temperature_K=temperature_K,
+        volume_m3=volume_m3,
+    )
+    oxygen_saturation = 0.0 if isinstance(capacity, FiniteCapacity) else None
+    return CapacityShadowResult(
+        capacity=capacity,
+        partial_pressures_Pa=partials,
+        evaporation_flux_kg_hr={},
+        bled_species_mol={},
+        terminal_offgas_mol={},
+        oxygen=OxygenShadowPartition(0.0, 0.0, 0.0, 0.0, 0.0),
+        saturation=SaturationShadow(
+            0.0, oxygen_saturation, 0.0, "pipe"
+        ),
+        iterations=0,
+        max_delta_history_Pa=(),
+        mass_closure_error_pct=0.0,
+    )
+
+
 def solve_capacity_shadow(
     *,
     pre_holdup_mol: Mapping[str, float],
@@ -427,13 +459,12 @@ def solve_capacity_shadow(
             )
             for species in species_order
         }
-        next_partials = {
-            species: final_residual[species]
-            * GAS_CONSTANT
-            * temperature_K
-            / volume_m3
-            for species in species_order
-        }
+        next_partials = _headspace_partial_pressures_Pa(
+            final_residual,
+            species=species_order,
+            temperature_K=temperature_K,
+            volume_m3=volume_m3,
+        )
         max_delta = max(
             (abs(next_partials[s] - partials[s]) for s in species_order),
             default=0.0,

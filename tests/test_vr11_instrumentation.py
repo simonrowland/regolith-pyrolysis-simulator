@@ -1196,6 +1196,10 @@ def test_unclosed_surface_requires_nonpositive_capped_drive_for_empty_flux(
                 "raw_metal_activity_root": 2.0, "P_reference_Antoine_Pa": 1.0,
             }}},
             SimpleNamespace(physical_zero_reason=None),
+            {
+                "batch_channel_states": {"Fe": "eligible"},
+                "selected_runtime_pa_by_species": {"Fe": 1.0},
+            },
         )
 
     model._resolve_evaporation_batch_flux_state = resolve

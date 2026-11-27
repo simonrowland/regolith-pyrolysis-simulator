@@ -1467,10 +1467,10 @@ def _solve_or_refuse(
         str(species): float(value)
         for species, value in dict(conductance_mol_s_m2_Pa or {}).items()
     }
-    try:
-        law: dict[str, tuple[float, float]] = {}
-        for channel in channels:
-            bulk = partials.get(channel.species, 0.0)
+    law: dict[str, tuple[float, float]] = {}
+    for channel in channels:
+        bulk = partials.get(channel.species, 0.0)
+        try:
             if channel.species in override:
                 conductance = override[channel.species]
                 if not math.isfinite(conductance) or conductance < 0.0:
@@ -1478,15 +1478,48 @@ def _solve_or_refuse(
                         f"conductance override invalid for {channel.species!r}"
                     )
                 law[channel.species] = (conductance, bulk)
-                continue
-            law[channel.species] = publisher_net_law(
-                species=channel.species,
-                alpha=channel.alpha,
-                molar_mass_kg_per_mol=channel.molar_mass_kg_per_mol,
-                bulk_pressure_Pa=bulk,
-                temperature_K=temperature_K,
-                transport=transport,
-            )
+            else:
+                law[channel.species] = publisher_net_law(
+                    species=channel.species,
+                    alpha=channel.alpha,
+                    molar_mass_kg_per_mol=channel.molar_mass_kg_per_mol,
+                    bulk_pressure_Pa=bulk,
+                    temperature_K=temperature_K,
+                    transport=transport,
+                )
+        except ValueError as exc:
+            # Publisher conductance is carrier-local. Exclude only the
+            # channel whose transport input failed; valid peers still close.
+            refused[channel.species] = str(exc)
+    if "O2" in refused:
+        # O2 is the balancing channel for the shared surface root. Unlike a
+        # vapor carrier, it cannot be removed while still claiming closure.
+        return _refuse_unclosed_surface(
+            pressures_Pa,
+            carriers,
+            persisted,
+            detail=refused["O2"],
+            extra_refused=refused,
+            capacity_negligible=capacity_negligible,
+            eval_pO2_below_physical_floor=eval_pO2_below_physical_floor,
+        )
+    channels = [channel for channel in channels if channel.species in law]
+    surviving_species = {channel.species for channel in channels}
+    coupled = [
+        carrier for carrier in coupled if carrier.species in surviving_species
+    ]
+    if not any(channel.pO2_exponent < 0.0 for channel in channels):
+        return _refuse_unclosed_surface(
+            pressures_Pa,
+            carriers,
+            persisted,
+            detail="no oxygen-coupled carrier could enter the balance",
+            extra_refused=refused,
+            capacity_negligible=capacity_negligible,
+            eval_pO2_below_physical_floor=eval_pO2_below_physical_floor,
+        )
+
+    try:
         balance, continuations = _solve_net_surface_balance(
             coupled,
             channels,

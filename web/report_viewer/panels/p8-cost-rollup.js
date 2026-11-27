@@ -1,7 +1,10 @@
 "use strict";
 
 (function registerCostRollupPanel(root) {
-  const { fmtNum, prettySpecies, speciesColor, accountLabel, esc } = root.ReportLabels;
+  const {
+    fmtNum, prettySpecies, speciesColor, accountLabel, esc,
+    capacitySolveBoundSummary,
+  } = root.ReportLabels;
 
   const COST_VECTOR_FIELDS = [
     ["electrical_kWh", "Electrical energy", "kWh"],
@@ -347,11 +350,22 @@
   function renderProductEntry(rawKey, entry, path) {
     if (!isRecord(entry)) return structuredProblem(entry, path, "an object");
     const known = new Set(["quantity_kg", "accumulated_cost", "owner_ratify_money_projection"]);
-    const extras = Object.fromEntries(Object.entries(entry).filter(([key]) => !known.has(key)));
+    const flag = isRecord(entry.flag) ? entry.flag : null;
+    const capacityBounds = flag?.capacity_solve_excludes_unavailable_species;
+    const otherFlags = flag
+      ? Object.fromEntries(Object.entries(flag).filter(([key]) => key !== "capacity_solve_excludes_unavailable_species"))
+      : null;
+    const extras = Object.fromEntries(Object.entries(entry).filter(([key]) => !known.has(key) && key !== "flag"));
     return `<details class="sec-p8-map-entry"><summary>${mapEntrySummary(rawKey)}</summary>` +
       expectedLeaf(entry, "quantity_kg", "Product quantity", "kg", path) +
       `<div class="sec-p8-subhead">Accumulated physical cost vector</div>${costVector(entry.accumulated_cost, `${path}.accumulated_cost`)}` +
       expectedLeaf(entry, "owner_ratify_money_projection", MONEY_PROJECTION_LABEL, "USD", path) +
+      (Array.isArray(capacityBounds)
+        ? `<div class="sec-p8-field"><span>Capacity solve bound</span><b>${esc(capacitySolveBoundSummary(capacityBounds))}</b></div>`
+        : "") +
+      (otherFlags && Object.keys(otherFlags).length
+        ? renderTree(otherFlags, `${path}.flag`)
+        : (!flag && hasOwn(entry, "flag") ? renderTree(entry.flag, `${path}.flag`) : "")) +
       (Object.keys(extras).length ? renderTree(extras, path) : "") + `</details>`;
   }
 
