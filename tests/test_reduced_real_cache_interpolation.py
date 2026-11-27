@@ -188,6 +188,12 @@ def test_greedy_nn_prefers_along_trajectory_neighbors() -> None:
     assert [neighbor["label"] for neighbor in neighbors] == ["same-near", "same-far"]
 
 
+def test_standardized_distance_retains_current_numeric_output() -> None:
+    assert rci._standardized_distance([2.0, 4.0], [3.0, 6.0]) == (
+        0.7071067811865476
+    )
+
+
 def test_greedy_nn_rejects_extreme_candidate_controls_before_distance_math() -> None:
     query = _interpolation_key("query", feo_fraction=0.20, temperature_K=1500.0)
     candidate_key = _interpolation_key(
