@@ -35,10 +35,12 @@ INTERPOLATION_ERROR_TERM = "cached_interpolated_neighbor_disagreement"
 
 
 def _interpolation_control_names(key: Mapping[str, Any]) -> list[str]:
-    control_names = ["T_K"]
     controls = key.get("controls", {})
     if not isinstance(controls, Mapping):
-        return control_names
+        return []
+    # Exact-only replay keys may omit interpolation coordinates. Once a key
+    # carries controls, interpolation reads T_K along with any selected axes.
+    control_names = ["T_K"] if controls else []
     if controls.get("pressure_bar") is not None:
         control_names.append("pressure_bar")
     if _physics_bucket_consumes_pO2_bar(key) and controls.get("pO2_bar") is not None:
@@ -65,17 +67,26 @@ def interpolation_key_domain_violation(
     *,
     query_keys: Sequence[Mapping[str, Any]] = (),
 ) -> str | None:
-    """Return the first malformed or non-finite replay coordinate."""
+    """Validate stored coordinates that interpolation or its query consumes."""
 
+    composition_present = "composition_mol_fraction" in key
     composition = key.get("composition_mol_fraction")
-    if not isinstance(composition, (list, tuple)) or not composition:
+    if composition_present and not isinstance(composition, (list, tuple)):
         return "composition_mol_fraction"
-    for component in composition:
+    if not composition_present and any(
+        "composition_mol_fraction" in query_key for query_key in query_keys
+    ):
+        return "composition_mol_fraction"
+    for component in composition or ():
         if isinstance(component, Mapping):
+            species = component.get("species")
             fraction = component.get("mol_fraction")
         elif isinstance(component, (list, tuple)) and len(component) == 2:
+            species = component[0]
             fraction = component[1]
         else:
+            return "composition_mol_fraction"
+        if not isinstance(species, str) or not species:
             return "composition_mol_fraction"
         if not is_declared_real_scalar(fraction):
             return "composition_mol_fraction"
@@ -86,9 +97,16 @@ def interpolation_key_domain_violation(
         if not math.isfinite(numeric_fraction) or numeric_fraction < 0.0:
             return "composition_mol_fraction"
 
+    controls_present = "controls" in key
     controls = key.get("controls")
-    if not isinstance(controls, Mapping):
+    if controls_present and not isinstance(controls, Mapping):
         return "controls"
+    if not controls_present and any(
+        "controls" in query_key for query_key in query_keys
+    ):
+        return "controls"
+    if not isinstance(controls, Mapping):
+        controls = {}
     for control_name, value in controls.items():
         control_path = (
             f"controls.{control_name}"
@@ -145,7 +163,12 @@ def greedy_nearest_neighbors(
 ) -> list[dict[str, Any]]:
     if not candidates:
         return []
-    if interpolation_key_domain_violation(query_key) is not None:
+    query_controls = query_key.get("controls")
+    if (
+        not isinstance(query_controls, Mapping)
+        or "T_K" not in query_controls
+        or interpolation_key_domain_violation(query_key) is not None
+    ):
         return []
     species_order, control_names = interpolation_feature_spec(query_key)
     query_vector = interpolation_coordinate_vector(
@@ -810,18 +833,18 @@ def _operating_point_differs(
 
 
 def _euclidean_distance(left: Sequence[float], right: Sequence[float]) -> float:
-    squared_distance = 0.0
-    for left_value, right_value in zip(left, right, strict=False):
-        delta = float(left_value) - float(right_value)
-        if not math.isfinite(delta):
-            return math.inf
-        squared_delta = delta * delta
-        if not math.isfinite(squared_delta):
-            return math.inf
-        squared_distance += squared_delta
-        if not math.isfinite(squared_distance):
-            return math.inf
-    return math.sqrt(squared_distance)
+    try:
+        squared_distance = sum(
+            (float(a) - float(b)) ** 2
+            for a, b in zip(left, right, strict=False)
+        )
+    except OverflowError:
+        return math.inf
+    return (
+        math.sqrt(squared_distance)
+        if math.isfinite(squared_distance)
+        else math.inf
+    )
 
 
 def _axis_aligned_bracketed(

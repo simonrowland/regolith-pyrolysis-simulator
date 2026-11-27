@@ -29,6 +29,15 @@ from tests.test_reduced_real_pt0_determinism import (
 )
 
 
+def test_composition_distance_keeps_base_compensated_sum_rounding() -> None:
+    distance = rci._euclidean_distance(
+        [0.0] * 9,
+        [1.0, *([2.0**-27] * 8)],
+    )
+
+    assert distance.hex() == "0x1.0000000000001p+0"
+
+
 def _interpolation_key(
     label: str,
     *,
@@ -954,12 +963,23 @@ def test_interpolation_admission_rejects_out_of_range_composition_fraction(
         sio_pa=7.0,
     )
 
+    # The retained test name predates the no-upper-bound ruling: this finite
+    # value is shape-valid, and only its overflowing distance excludes it.
+    assert rci.interpolation_key_domain_violation(
+        malformed_key,
+        query_keys=(query,),
+    ) is None
+    store = rrd.PT1PersistentEquilibriumStore(db_path)
+    candidates = store._list_interpolation_candidates(
+        artifact="equilibrium_post_record",
+        replay_scope_sha256=rci.replay_scope_for_interpolation(query),
+        query_key=query,
+    )
+    assert len(candidates) == 1
+    assert rci.greedy_nearest_neighbors(query, candidates) == []
+
     replay = PT0DeterminismStore("replay", db_path=db_path)
-    with pytest.raises(
-        rrd.PT1PersistentStoreCorrupt,
-        match="stored equilibrium replay key composition",
-    ):
-        replay._lookup_interpolated("equilibrium_post_record", query)
+    assert replay._lookup_interpolated("equilibrium_post_record", query) is None
 
 
 @pytest.mark.parametrize("reader", ("bucket", "ladder", "interpolation"))

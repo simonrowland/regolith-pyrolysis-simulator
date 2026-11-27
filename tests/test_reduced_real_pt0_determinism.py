@@ -4564,13 +4564,18 @@ def _rewrite_pt1_key_and_derived_indexes(
 
 
 @pytest.mark.parametrize(
-    "bad_payload_checksum",
-    (False, True),
-    ids=("valid-payload-is-not-a-neighbor", "bad-payload-checksum-is-corrupt"),
+    ("bad_payload_checksum", "bad_repair_notices"),
+    ((False, False), (True, False), (False, True)),
+    ids=(
+        "valid-row-is-not-a-neighbor",
+        "bad-payload-checksum-is-corrupt",
+        "bad-notices-still-corrupt",
+    ),
 )
 def test_pt1_ladder_subnormal_key_is_wrapped_by_row_admission(
     tmp_path: Path,
     bad_payload_checksum: bool,
+    bad_repair_notices: bool,
 ) -> None:
     db_path = tmp_path / "pt1-subnormal-ladder-key.sqlite"
     key = _freeze_gate_key()
@@ -4588,6 +4593,13 @@ def test_pt1_ladder_subnormal_key_is_wrapped_by_row_admission(
             payload_sha256="0" * 64 if bad_payload_checksum else None,
         )
     )
+    if bad_repair_notices:
+        with sqlite3.connect(db_path) as conn:
+            conn.execute(
+                f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+                "SET repair_notices_json = '[' WHERE key_hash = ?",
+                (_corrupt_key_hash,),
+            )
 
     rung_tag = rrd.PHYSICS_BUCKET_LADDER_RUNGS[0][0]
     assert math.isinf(
@@ -4602,6 +4614,18 @@ def test_pt1_ladder_subnormal_key_is_wrapped_by_row_admission(
         with pytest.raises(
             PT1PersistentStoreCorrupt,
             match="payload hash mismatch",
+        ):
+            PT1PersistentEquilibriumStore(db_path)._get_by_physics_ladder_bucket(
+                artifact="freeze_gate_curve",
+                rung_tag=rung_tag,
+                rung_key=rung_key,
+                rung_hash=rung_hash,
+                query_key=key,
+            )
+    elif bad_repair_notices:
+        with pytest.raises(
+            PT1PersistentStoreCorrupt,
+            match="repair_notices_json is invalid JSON",
         ):
             PT1PersistentEquilibriumStore(db_path)._get_by_physics_ladder_bucket(
                 artifact="freeze_gate_curve",
@@ -5374,6 +5398,38 @@ def test_pt1_recapture_hydrates_effective_notices_for_same_instance(
     _key, expected_payload = _repair_notice_test_record()
     assert same_instance_entry == reopened_entry == expected_payload
     assert same_instance_notices == reopened_notices == [notice_a, notice_b]
+
+
+@pytest.mark.parametrize("persistent_backing", (False, True), ids=("memory", "pt1"))
+def test_pt0_recapture_updates_live_entry_with_merged_notices(
+    tmp_path: Path,
+    persistent_backing: bool,
+) -> None:
+    db_path = (
+        tmp_path / "same-instance-notice-recapture.sqlite"
+        if persistent_backing
+        else None
+    )
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    notice_a = {"kind": "repair_a"}
+    notice_b = {"kind": "repair_b"}
+
+    _store_repair_notice_test_record(capture, notices=[notice_a])
+    _store_repair_notice_test_record(capture, notices=[notice_a, notice_b])
+
+    same_instance_entry, same_instance_notices = (
+        _replay_repair_notice_test_record(capture)
+    )
+    _key, expected_payload = _repair_notice_test_record()
+    assert same_instance_entry == expected_payload
+    assert same_instance_notices == [notice_a, notice_b]
+
+    if persistent_backing:
+        reopened_entry, reopened_notices = _replay_repair_notice_test_record(
+            PT0DeterminismStore("replay", db_path=db_path)
+        )
+        assert reopened_entry == same_instance_entry
+        assert reopened_notices == same_instance_notices
 
 
 @pytest.mark.parametrize(
@@ -8655,6 +8711,120 @@ def test_stale_codec_integrity_checks_precede_admission_for_every_reader(
         assert "distance is missing" in str(raised.value)
     elif corruption == "compound_replay_scope_malformed_payload_json":
         assert "exact key replay scope mismatch" in str(raised.value)
+
+
+_PT1_LADDER_ORDER_TEST_RUNG = rrd.PHYSICS_BUCKET_LADDER_RUNGS[0][0]
+_PT1_LADDER_OTHER_ROW_DEFECTS = tuple(
+    defect
+    for rung_tag, _sig_figs in rrd.PHYSICS_BUCKET_ALL_LADDER_RUNGS
+    if rung_tag != _PT1_LADDER_ORDER_TEST_RUNG
+    for defect in (
+        (f"ladder_hash:{rung_tag}", f"does not reproduce {rung_tag} hash"),
+        (f"ladder_distance:{rung_tag}", f"row {rung_tag} distance mismatch"),
+    )
+)
+_PT1_LADDER_ROW_DEFECT_ORDER = (
+    ("ladder_hash", "physics bucket hash mismatch"),
+    ("replay_scope", "replay scope hash mismatch"),
+    ("ladder_distance", "distance is invalid"),
+    ("key_hash", "key hash mismatch"),
+    ("key_bytes", "key bytes hash mismatch"),
+    ("bucket_schema", "does not reproduce physics bucket"),
+    ("bucket_hash", "does not reproduce physics bucket"),
+    ("bucket_bytes", "does not reproduce physics bucket"),
+    *_PT1_LADDER_OTHER_ROW_DEFECTS,
+    ("payload_checksum", "payload hash mismatch"),
+    ("repair_notices", "repair_notices_json is invalid JSON"),
+    ("provenance", "canonical/provenance mismatch"),
+)
+_PT1_LADDER_ROW_PRECEDENCE_PAIRS = tuple(
+    (earlier[0], later[0], earlier[1])
+    for earlier_index, earlier in enumerate(_PT1_LADDER_ROW_DEFECT_ORDER)
+    for later in _PT1_LADDER_ROW_DEFECT_ORDER[earlier_index + 1 :]
+)
+
+
+@pytest.mark.parametrize(
+    ("earlier_defect", "later_defect", "expected_error"),
+    _PT1_LADDER_ROW_PRECEDENCE_PAIRS,
+    ids=lambda value: str(value),
+)
+def test_pt1_ladder_row_admission_keeps_base_field_check_order(
+    tmp_path: Path,
+    earlier_defect: str,
+    later_defect: str,
+    expected_error: str,
+) -> None:
+    """Earlier ladder row integrity defects win over every later field."""
+    db_path = tmp_path / f"ladder-order-{earlier_defect}-{later_defect}.sqlite"
+    key = _freeze_gate_key()
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    capture._store(
+        "freeze_gate_curve",
+        key,
+        _valid_test_gate_payload(),
+        law_disclosures=[],
+    )
+    key_hash = _key_hash(key)
+    rung_tag = _PT1_LADDER_ORDER_TEST_RUNG
+    rung_key = rrd.canonical_physics_ladder_bucket_key_from_replay_key(
+        key,
+        rung_tag,
+    )
+    rung_hash = rrd._sha256(canonical_json_bytes(rung_key))
+    defects = {
+        "ladder_hash": (
+            rrd._physics_ladder_hash_column(rung_tag),
+            "0" * 64,
+        ),
+        "replay_scope": ("replay_scope_sha256", "0" * 64),
+        "ladder_distance": (
+            rrd._physics_ladder_distance_column(rung_tag),
+            "bad",
+        ),
+        "key_hash": ("key_sha256", "0" * 64),
+        "key_bytes": ("key_bytes", sqlite3.Binary(b"{")),
+        "bucket_schema": ("physics_bucket_schema_version", -1),
+        "bucket_hash": ("physics_bucket_sha256", "0" * 64),
+        "bucket_bytes": ("physics_key_bytes", sqlite3.Binary(b"{}")),
+        "payload_checksum": ("payload_sha256", "0" * 64),
+        "repair_notices": ("repair_notices_json", "["),
+        "provenance": ("created_at", "bad"),
+    }
+    for stored_rung_tag, _sig_figs in rrd.PHYSICS_BUCKET_ALL_LADDER_RUNGS:
+        if stored_rung_tag == _PT1_LADDER_ORDER_TEST_RUNG:
+            continue
+        defects[f"ladder_hash:{stored_rung_tag}"] = (
+            rrd._physics_ladder_hash_column(stored_rung_tag),
+            "0" * 64,
+        )
+        defects[f"ladder_distance:{stored_rung_tag}"] = (
+            rrd._physics_ladder_distance_column(stored_rung_tag),
+            -1.0,
+        )
+    with sqlite3.connect(db_path) as conn:
+        for defect in (earlier_defect, later_defect):
+            column, value = defects[defect]
+            conn.execute(
+                f"UPDATE {PT1_EQUILIBRIUM_TABLE} SET {column} = ? "
+                "WHERE key_hash = ?",
+                (value, key_hash),
+            )
+
+    persistent = PT1PersistentEquilibriumStore(db_path)
+    with persistent._connect() as conn:
+        row = persistent._fetch(conn, key_hash)
+    assert row is not None
+    with pytest.raises(PT1PersistentStoreCorrupt) as raised:
+        rrd._admit_stored_row(
+            row,
+            store_kind="pt1",
+            artifact="freeze_gate_curve",
+            rung_tag=rung_tag,
+            rung_key=rung_key,
+            rung_hash=rung_hash,
+        )
+    assert expected_error in str(raised.value)
 
 
 @pytest.mark.parametrize("reader", ("exact", "ladder"))

@@ -1894,6 +1894,7 @@ class PT0DeterminismStore:
                 existing.get("law_disclosures"),
                 incoming_disclosures,
             )
+            self._entries[key_hash] = existing
             self.physics_bucket_entries.setdefault(physics_bucket_hash, key_hash)
             return
         self._entries[key_hash] = {
@@ -1953,10 +1954,10 @@ class PT0DeterminismStore:
                 key_hash,
                 return_decoded=True,
             )
-            if entry is None or not replay_dependency_vectors_match(
-                key,
-                entry.get("key", {}),
-            ):
+            # This path already matched the complete canonical request key.
+            # Dependency-vector completeness is required only when comparing
+            # different keys for interpolation neighbors.
+            if entry is None:
                 continue
             decoded = admission_decoded
             if decoded is None:
@@ -2757,6 +2758,8 @@ def _admit_stored_row(
             value: Any,
             tag: str,
             distance_hash: str = row_hash,
+            *,
+            allow_positive_infinity: bool = False,
         ) -> float:
             if isinstance(value, bool):
                 raise PT1PersistentStoreCorrupt(
@@ -2768,7 +2771,11 @@ def _admit_stored_row(
                 raise PT1PersistentStoreCorrupt(
                     f"PT-1 row {tag} distance is invalid: {distance_hash}"
                 ) from exc
-            if not math.isfinite(distance):
+            if not math.isfinite(distance) and not (
+                allow_positive_infinity
+                and isinstance(value, float)
+                and distance == math.inf
+            ):
                 raise PT1PersistentStoreCorrupt(
                     f"PT-1 row {tag} distance is invalid: {distance_hash}"
                 )
@@ -2820,6 +2827,13 @@ def _admit_stored_row(
         if rung_tag is not None and indexed_distance is None:
             raise PT1PersistentStoreCorrupt(
                 f"PT-1 row {rung_tag} distance is missing: {rung_hash}"
+            )
+        if rung_tag is not None:
+            indexed_distance = finite_ladder_distance(
+                indexed_distance,
+                rung_tag,
+                rung_hash,
+                allow_positive_infinity=True,
             )
 
         # Query index metadata and key-byte integrity precede key admission.
@@ -2934,9 +2948,6 @@ def _admit_stored_row(
                     "PT-1 row invalid stored equilibrium replay key "
                     f"{section} ({domain_violation}): {row_hash}"
                 )
-        if nonfinite_requested_rung:
-            return None
-
         all_index_columns = (
             "physics_bucket_schema_version",
             "physics_bucket_sha256",
@@ -3014,7 +3025,6 @@ def _admit_stored_row(
                 "PT-1 cache source row canonical/provenance mismatch: "
                 f"fields={','.join(provenance_mismatches)}"
             )
-
         # Copy paths consume normalized bytes and validated provenance values.
         row["key_bytes"] = row_key_bytes
         row["payload_bytes"] = row_payload_bytes
@@ -3050,6 +3060,9 @@ def _admit_stored_row(
                     context=f"PT-1 cache shard {row_artifact}:{row_hash}",
                     approved_sources=approved_sources,
                 )
+        if nonfinite_requested_rung:
+            return None
+
         payload_codec_version = row.get("payload_codec_version")
         expected_codec_version = _payload_codec_version(row_artifact)
         if not _payload_codec_stamp_matches(
@@ -3083,7 +3096,14 @@ def _admit_stored_row(
                         row_key.get("vapor_pressure_provider_selection"), str
                     )
                 )
-                or dependency_vector_from_replay_key(row_key) is None
+                or (
+                    "sulfur_side" in row_key
+                    and not isinstance(row_key["sulfur_side"], Mapping)
+                )
+                or (
+                    "model" in row_key
+                    and not isinstance(row_key["model"], Mapping)
+                )
             ):
                 raise PT1PersistentStoreCorrupt(
                     "PT-1 row invalid stored equilibrium replay key dependency "
