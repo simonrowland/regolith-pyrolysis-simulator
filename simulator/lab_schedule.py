@@ -640,20 +640,10 @@ def _normalize_gas_boundary(
             ),
             "default_boundary": LAB_SCHEDULE_DEFAULT_GAS_BOUNDARY,
         }
-        notices = tuple(
-            MappingProxyType(
-                {
-                    "kind": "lab_schedule_gas_boundary_notice",
-                    "reason": "lab_schedule_gas_boundary_default_unprinted",
-                    "authority": "assumed",
-                    "pressure_mbar": float(point["value"]),
-                    "t_h": float(point["t_h"]),
-                    "default_boundary": LAB_SCHEDULE_DEFAULT_GAS_BOUNDARY,
-                }
-            )
-            for point in chamber_pressure_mbar
+        return (
+            MappingProxyType(normalized),
+            _default_gas_boundary_notices(chamber_pressure_mbar),
         )
-        return MappingProxyType(normalized), notices
     normalized: dict[str, Any] = {}
     normalized["background_gas"] = _normalize_gas_boundary_field(
         raw.get("background_gas"),
@@ -670,7 +660,33 @@ def _normalize_gas_boundary(
         field="pressure_control",
         required=("mode",),
     )
+    if raw.get("default_boundary") == LAB_SCHEDULE_DEFAULT_GAS_BOUNDARY:
+        # Runtime campaign setup normalizes an already-normalized schedule.
+        # Preserve its inferred boundary and regenerate the pressure notices.
+        normalized["default_boundary"] = LAB_SCHEDULE_DEFAULT_GAS_BOUNDARY
+        return (
+            MappingProxyType(normalized),
+            _default_gas_boundary_notices(chamber_pressure_mbar),
+        )
     return MappingProxyType(normalized), ()
+
+
+def _default_gas_boundary_notices(
+    chamber_pressure_mbar: Sequence[Mapping[str, Any]],
+) -> tuple[Mapping[str, Any], ...]:
+    return tuple(
+        MappingProxyType(
+            {
+                "kind": "lab_schedule_gas_boundary_notice",
+                "reason": "lab_schedule_gas_boundary_default_unprinted",
+                "authority": "assumed",
+                "pressure_mbar": float(point["value"]),
+                "t_h": float(point["t_h"]),
+                "default_boundary": LAB_SCHEDULE_DEFAULT_GAS_BOUNDARY,
+            }
+        )
+        for point in chamber_pressure_mbar
+    )
 
 
 def _normalize_gas_boundary_field(
