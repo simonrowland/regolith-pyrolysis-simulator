@@ -144,9 +144,8 @@ def _pt1_cache_point_id(tag: str, **kwargs: object) -> str:
     return hashlib.sha256(canonical_json_bytes(_pt1_cache_key(tag, **kwargs))).hexdigest()
 
 
-def _put_pt1_cache_row(db_path: Path, tag: str, **kwargs: object) -> str:
-    key = _pt1_cache_key(tag, **kwargs)
-    payload = {
+def _gate_curve_payload(tag: str) -> dict[str, object]:
+    return {
         "curve": {
             "source": "gate_liquid_fraction",
             "solidus_T_C": 1200.0,
@@ -159,6 +158,11 @@ def _put_pt1_cache_row(db_path: Path, tag: str, **kwargs: object) -> str:
             "tag": tag,
         },
     }
+
+
+def _put_pt1_cache_row(db_path: Path, tag: str, **kwargs: object) -> str:
+    key = _pt1_cache_key(tag, **kwargs)
+    payload = _gate_curve_payload(tag)
     key_bytes = canonical_json_bytes(key)
     payload_bytes = canonical_json_bytes(payload)
     key_hash = hashlib.sha256(key_bytes).hexdigest()
@@ -1406,6 +1410,89 @@ def test_merge_epoch_shards_preserves_seed_source_labels_in_base_cache(tmp_path:
     assert rows == [(point_id, "ladder_polish", "job-a")]
 
 
+def test_epoch_merge_uses_admitted_rows_for_duplication_labels_and_cleanup(
+    tmp_path: Path,
+) -> None:
+    base = tmp_path / "base.sqlite"
+    shard = tmp_path / "epoch" / "shards" / "job-a.sqlite"
+    current_id = _put_pt1_cache_row(shard, "current-output")
+    stale_id = _put_pt1_cache_row(shard, "stale-output")
+    with sqlite3.connect(shard) as conn:
+        conn.execute(
+            f"UPDATE {epoch_grind.PT1_EQUILIBRIUM_TABLE} "
+            "SET payload_codec_version = ?, key_bytes = ? WHERE key_hash = ?",
+            (
+                PT0_GATE_CURVE_CODEC_VERSION - 1,
+                sqlite3.Binary(b"not-json"),
+                stale_id,
+            ),
+        )
+        epoch_grind._ensure_seed_source_table(conn)
+        conn.executemany(
+            f"""
+            INSERT INTO {epoch_grind.SEED_SOURCE_TABLE} (
+                key_hash, point_id, source, job_id, source_index,
+                metadata_json, schema_version, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            [
+                (
+                    current_id,
+                    current_id,
+                    "ladder_polish",
+                    "job-a",
+                    0,
+                    "{}",
+                    "test",
+                    "2026-01-01T00:00:00Z",
+                ),
+                (
+                    stale_id,
+                    stale_id,
+                    "calibration_uniform",
+                    "job-a",
+                    1,
+                    "{}",
+                    "test",
+                    "2026-01-01T00:00:00Z",
+                ),
+            ],
+        )
+
+    admitted_rows_by_source = epoch_grind._admitted_epoch_shard_rows([shard])
+    merge_summary = epoch_grind.merge_epoch_shards(
+        base,
+        [shard],
+        admitted_rows_by_source=admitted_rows_by_source,
+    )
+
+    assert merge_summary["sources"][0]["source_rows"] == 1
+    assert merge_summary["sources"][0]["superseded_rows"] == 1
+    assert epoch_grind.duplication_rate_from_merge(merge_summary) == 0.0
+    assert epoch_grind.prune_merged_shards(
+        [shard],
+        base,
+        merge_summary=merge_summary,
+        admitted_rows_by_source=admitted_rows_by_source,
+    ) == [str(shard)]
+    assert not shard.exists()
+    with sqlite3.connect(base) as conn:
+        payload_hashes = {
+            str(row[0])
+            for row in conn.execute(
+                f"SELECT key_hash FROM {epoch_grind.PT1_EQUILIBRIUM_TABLE}"
+            )
+        }
+        seed_source_hashes = {
+            str(row[0])
+            for row in conn.execute(
+                f"SELECT key_hash FROM {epoch_grind.SEED_SOURCE_TABLE}"
+            )
+        }
+    assert payload_hashes == {current_id}
+    assert seed_source_hashes == {current_id}
+
+
 @pytest.mark.parametrize(
     "base_layout",
     ("fresh", "migrated", "unmigrated"),
@@ -1743,7 +1830,12 @@ def test_epoch_child_cache_gate_receives_profile_strict_vapor_flag(
         lambda *args, **kwargs: epoch_grind.ChildOutcome(kind="completed", returncode=0),
     )
 
-    def record_cache_gate(db_path: Path, **kwargs: object) -> dict[str, int]:
+    def record_cache_gate(
+        db_path: Path,
+        decode_result_payload: object,
+        **kwargs: object,
+    ) -> dict[str, int]:
+        del decode_result_payload
         calls.append({"db_path": db_path, **kwargs})
         return {"rows": 0, "vapor_active_rows": 0, "source_reports": 0}
 
@@ -2285,7 +2377,7 @@ def _put_shard_row(shard_db: Path, *, tag: str, base_db: Path | None = None) -> 
         "schema_version": "test",
         "tag": tag,
     }
-    payload = {"curve": {"status": "in_range", "tag": tag}}
+    payload = _gate_curve_payload(tag)
     key_bytes = canonical_json_bytes(key)
     payload_bytes = canonical_json_bytes(payload)
     PT1PersistentEquilibriumStore(

@@ -4680,7 +4680,11 @@ def test_epoch_seed_migrates_b265_columns_and_legacy_row_still_misses(
         job_id="job-a",
     )
 
-    assert summary["seed_rows"] == 1
+    # Removing the codec column makes this intentionally legacy; epoch seeding
+    # must count it as superseded rather than copying a row that replay rejects.
+    assert summary["seed_rows"] == 0
+    assert summary["rejected_seed_rows"] == 1
+    assert summary["superseded_seed_rows"] == 1
     with sqlite3.connect(base_db) as conn:
         columns = {
             str(row[1])
@@ -4693,13 +4697,13 @@ def test_epoch_seed_migrates_b265_columns_and_legacy_row_still_misses(
             for row in conn.execute(f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})")
         }
         assert {"payload_codec_version", "law_disclosures_json"} <= shard_columns
-        (shard_codec, shard_disclosures) = conn.execute(
+        shard_row = conn.execute(
             f"SELECT payload_codec_version, law_disclosures_json "
             f"FROM {PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
             (key_hash,),
         ).fetchone()
     assert hashlib.sha256(base_db.read_bytes()).hexdigest() == base_sha256
-    assert (shard_codec, shard_disclosures) == (None, None)
+    assert shard_row is None
 
     replay = PT0DeterminismStore(
         "replay",
