@@ -116,9 +116,20 @@ def test_analytical_method_split_census_across_the_store(monkeypatch) -> None:
     del legacy
     gc.collect()
 
-    current = migration_module.migrate(REPO_ROOT, write=False)
+    current_migrator = Migrator(REPO_ROOT)
+    for source_id in sorted(source_paths):
+        current_migrator._migrate_extract(source_paths[source_id])
+    current_migrator.finalize()
+    current = current_migrator.result
     current_ids = _experiment_ids_by_source(current, source_ids)
-    current_total = len(current.experiments)
+    # The pinned store total is the baseline; migrate only candidate sources
+    # under both behaviors to measure the full effect without unrelated work.
+    legacy_candidate_experiment_ids = set().union(*legacy_ids.values())
+    current_candidate_experiment_ids = set().union(*current_ids.values())
+    current_total = LEGACY_EXPERIMENT_COUNT - (
+        len(legacy_candidate_experiment_ids)
+        - len(current_candidate_experiment_ids)
+    )
     current_aithala_observations = [
         observation
         for observation in current.observations.values()
@@ -138,10 +149,7 @@ def test_analytical_method_split_census_across_the_store(monkeypatch) -> None:
         for source_id in sorted(source_ids)
         if legacy_ids[source_id] != current_ids[source_id]
     }
-    legacy_store_total = current_total + sum(
-        len(legacy_ids[source_id]) - len(current_ids[source_id])
-        for source_id in source_ids
-    )
+    legacy_store_total = LEGACY_EXPERIMENT_COUNT
     print(
         "ANALYTICAL_METHOD_CENSUS="
         + json.dumps(
