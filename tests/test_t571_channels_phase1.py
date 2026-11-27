@@ -1172,7 +1172,18 @@ def test_builtin_linear_rail_o2_bit_identity_differential():
         legacy_view = vapor_pressure_legacy_view(payload)
         metals = legacy_view["metals"]
         oxides = legacy_view["oxide_vapors"]
-        melt_pO2, _clamped = physical_melt_dissociation_pO2_bar(fO2_log)
+        # b274 53b1d191dc floors dissociation fO2 at the binding condensed-
+        # metal couple. Recompute the legacy scalar rails from that admitted
+        # floor so the differential keeps the intended melt state.
+        floor_notice = diag.get("melt_metal_saturation_floor_notice")
+        dissociation_fO2_log = (
+            float(floor_notice["floor_log10_fO2_bar"])
+            if floor_notice is not None
+            else fO2_log
+        )
+        melt_pO2, _clamped = physical_melt_dissociation_pO2_bar(
+            dissociation_fO2_log
+        )
 
         def record(species_id, recomputed, label):
             key = (species_id, T_C, fO2_log, transport_pO2)

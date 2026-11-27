@@ -190,12 +190,19 @@ def test_l5_thermoengine_mismatch_keeps_kernel_value(
     sim.start_campaign(CampaignPhase.C2A)
     sim.melt.temperature_C = 1700.0
 
+    # b274 53b1d191dc floors the live reservoir fO2 on the binding
+    # condensed-metal couple before dissociation pressure is computed. Mirror
+    # the production input; _compute_intrinsic_melt_fO2() is only the load seed.
+    intrinsic_fO2_log = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
     kernel = sim._chem_kernel.dispatch(
         ChemistryIntent.VAPOR_PRESSURE,
         temperature_C=sim.melt.temperature_C,
         pressure_bar=sim.melt.p_total_mbar / 1000.0,
-        control_inputs={"pO2_bar": sim._vapor_pressure_dispatch_pO2_bar()},
-        fO2_log=sim._compute_intrinsic_melt_fO2(),
+        control_inputs={
+            "pO2_bar": sim._vapor_pressure_dispatch_pO2_bar(),
+            "intrinsic_fO2_log": intrinsic_fO2_log,
+        },
+        fO2_log=intrinsic_fO2_log,
     )
     kernel_vp = dict((kernel.diagnostic or {}).get("vapor_pressures_Pa") or {})
     kernel_provenance = dict(

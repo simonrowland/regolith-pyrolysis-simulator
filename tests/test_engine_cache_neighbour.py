@@ -730,3 +730,30 @@ def test_coarse_evaluate_stamps_the_score_and_a_fine_run_reexecutes(
     assert _exact_recipe_winner((neighbour_row, exact_row)).candidate_id == "exact"
     assert _exact_recipe_winner((neighbour_row,)) is None
     assert _exact_recipe_winner((exact_row,)).candidate_id == "exact"
+
+
+def test_neighbour_index_failure_is_sqlite_only(monkeypatch) -> None:
+    """SC-388: only a SQLite failure becomes an index miss; others propagate."""
+    connection = sqlite3.connect(":memory:")
+    monkeypatch.setattr(
+        engine_cache, "_scope_neighbour_cells",
+        lambda request: ("coarse", {"coarse": b"cell"}),
+    )
+
+    def sqlite_failure(_connection):
+        raise sqlite3.OperationalError("forced index failure")
+
+    monkeypatch.setattr(engine_cache, "_ensure_neighbour_table", sqlite_failure)
+    assert engine_cache._index_neighbour_cells(
+        connection, "engine", 1, b"key", object(),
+    ) is False
+
+    def programming_error(_connection):
+        raise RuntimeError("forced programming error")
+
+    monkeypatch.setattr(engine_cache, "_ensure_neighbour_table", programming_error)
+    with pytest.raises(RuntimeError, match="forced programming error"):
+        engine_cache._index_neighbour_cells(
+            connection, "engine", 1, b"key", object(),
+        )
+    connection.close()
