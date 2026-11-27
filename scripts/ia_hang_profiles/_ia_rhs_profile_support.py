@@ -3,6 +3,7 @@ from __future__ import annotations
 from contextvars import ContextVar
 from decimal import Decimal
 import cProfile
+from dataclasses import asdict
 import hashlib
 from itertools import count
 import io
@@ -13,6 +14,40 @@ import signal
 import tempfile
 import time
 from pathlib import Path
+
+
+def clear_ia_profile_caches(monkeypatch):
+    """Start one IA profile with parsed, catalog, and engine caches cold."""
+
+    monkeypatch.setenv("REGOLITH_PARSED_YAML_CACHE", "off")
+
+    from simulator import engine_cache
+    from simulator.battery import migrate, oxygen_balance, residue, score
+    from simulator.chemistry import offgas_fo2
+    from simulator.melt_backend import openimcc_bridge
+    from simulator.vapour_rail import catalog
+
+    for module in (migrate, score):
+        for value in vars(module).values():
+            clear = getattr(value, "cache_clear", None)
+            if callable(clear):
+                clear()
+    for name in ("_load_cea_source_text", "_load_cea_polynomials_from_text"):
+        clear = getattr(getattr(offgas_fo2, name, None), "cache_clear", None)
+        if callable(clear):
+            clear()
+    catalog.clear_vapor_pressure_view_caches()
+    for function in (
+        getattr(oxygen_balance, "_cached_molar_flux_denominators", None),
+        getattr(openimcc_bridge, "_load_pack", None),
+    ):
+        clear = getattr(function, "cache_clear", None)
+        if callable(clear):
+            clear()
+    engine_cache._MEMORY_CACHE.clear()
+    engine_cache._string_bytes.cache_clear()
+    engine_cache._key_float_bytes.cache_clear()
+    residue._close_openimcc_evaluation_worker()
 
 
 def profile_ia_residue_source(
@@ -781,11 +816,12 @@ def profile_ia_residue_source(
         score_loadavg_started = None
     if direct_compile_residual:
         assert len(rows) == 1, "direct residual profiling requires one observation"
-        residual, _candidate = score.compile_residual(
+        residual, direct_candidate = score.compile_residual(
             rows[0], Engine.INTERNAL_ANALYTICAL, context=context
         )
         residuals = (residual,)
     else:
+        direct_candidate = None
         residuals, _candidates = score.score_store(
             context, engines=(Engine.INTERNAL_ANALYTICAL,), include_diagnostics=False,
         )
@@ -821,6 +857,28 @@ def profile_ia_residue_source(
         for row in rows_payload
     )
     digest = hashlib.sha256(payload.encode()).hexdigest()
+    selected_row_output = None
+    if direct_candidate is not None:
+        selected_row_output = {
+            "candidate_value": str(direct_candidate.value.point),
+            "candidate_provenance": dict(direct_candidate.provenance),
+            "residual_notices": [
+                asdict(notice)
+                for notice in residuals[0].notices
+            ],
+        }
+    selected_output_digest = (
+        hashlib.sha256(
+            json.dumps(
+                selected_row_output,
+                sort_keys=True,
+                separators=(",", ":"),
+                default=str,
+            ).encode()
+        ).hexdigest()
+        if selected_row_output is not None
+        else None
+    )
     score_cpu_seconds = time.process_time() - score_started
     score_wall_seconds = time.perf_counter() - score_wall_started
     try:
@@ -838,6 +896,10 @@ def profile_ia_residue_source(
     }
     numeric_rows = sum(row["numeric"] is not None for row in rows_payload)
     typed_refusal_rows = sum(row["refusal"] is not None for row in rows_payload)
+    budget_refusal_reasons = {
+        "residue_integration_budget_exceeded",
+        "knudsen_extent_evaluation_limit",
+    }
     report = {
         "study": label,
         "row_count": len(rows_payload),
@@ -845,13 +907,15 @@ def profile_ia_residue_source(
         "typed_refusal_rows": typed_refusal_rows,
         "residual_digest": digest,
         "budget_refusal_rows": sum(
-            row["refusal"] == "residue_integration_budget_exceeded"
+            row["refusal"] in budget_refusal_reasons
             for row in rows_payload
         ),
         "budget_refusal_integrations": sum(
-            record.get("refusal_reason") == "residue_integration_budget_exceeded"
+            record.get("refusal_reason") in budget_refusal_reasons
             for record in integration_records
         ),
+        "selected_row_output": selected_row_output,
+        "selected_row_output_digest": selected_output_digest,
         "integration_count": len(integration_records),
         "scoring_process_cpu_seconds": score_cpu_seconds,
         "scoring_process_cpu_seconds_per_residual": score_cpu_seconds / len(rows_payload),

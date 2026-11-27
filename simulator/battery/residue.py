@@ -1015,6 +1015,7 @@ def _residue_oxygen_balance(
     background_pressure_Pa=0.0,
     on_accepted_evaluation=None,
     warm_start_log10_pO2_bar=None,
+    defer_pressure_law_diagnostics=None,
 ):
     """The shared channel stoichiometry and pressure-root call for both paths."""
     try:
@@ -1025,6 +1026,10 @@ def _residue_oxygen_balance(
             root_kwargs["on_accepted_evaluation"] = on_accepted_evaluation
         if warm_start_log10_pO2_bar is not None:
             root_kwargs["warm_start_log10_pO2_bar"] = warm_start_log10_pO2_bar
+        if defer_pressure_law_diagnostics is not None:
+            root_kwargs["defer_pressure_law_diagnostics"] = (
+                defer_pressure_law_diagnostics
+            )
         return _solve_vacuum_oxygen_balance(
             pressure_at,
             _residue_oxygen_channels(terms, inventory),
@@ -1457,6 +1462,14 @@ def integrate_knudsen_residue_inventory(
         # step-hold prediction.
         if not linear_temperature:
             evaluations = 0
+        deferred_pressure_law_diagnostics: list[
+            tuple[Callable[[], tuple], tuple[str, ...]]
+        ] = []
+
+        def defer_pressure_law_diagnostics(calculate, possible_species):
+            deferred_pressure_law_diagnostics.append(
+                (calculate, possible_species)
+            )
 
         def derivative(extent, amounts):
             nonlocal evaluations
@@ -1502,6 +1515,9 @@ def integrate_knudsen_residue_inventory(
                         current_temperature,
                         warm_start_log10_pO2_bar=previous_root_log10_pO2_bar,
                         on_accepted_evaluation=remember_accepted_root,
+                        defer_pressure_law_diagnostics=(
+                            defer_pressure_law_diagnostics
+                        ),
                     )
                 except ResidueInventoryRefusal:
                     raise
@@ -1585,6 +1601,34 @@ def integrate_knudsen_residue_inventory(
                         else:
                             state[index] = 0.0
             state = [max(0.0, v) for v in state]
+        # The pressure-law slopes only feed residue notices. Reproduce the
+        # latest diagnostic per species after solve_ivp accepts the interval,
+        # instead of probing every trial RHS state.
+        first_seen_species_order = tuple(dict.fromkeys(
+            species
+            for _calculate, possible_species in deferred_pressure_law_diagnostics
+            for species in possible_species
+        ))
+        unresolved_species = set(first_seen_species_order)
+        latest_diagnostics: dict[str, PressureLawChannelDiagnostic] = {}
+        for calculate, _possible_species in reversed(
+            deferred_pressure_law_diagnostics
+        ):
+            try:
+                diagnostics = calculate()
+            except ValueError as exc:
+                raise _residue_oxygen_balance_failure(exc) from exc
+            if diagnostics:
+                for diagnostic in diagnostics:
+                    if diagnostic.species in unresolved_species:
+                        latest_diagnostics[diagnostic.species] = diagnostic
+                        unresolved_species.remove(diagnostic.species)
+            if not unresolved_species:
+                break
+        for species in first_seen_species_order:
+            diagnostic = latest_diagnostics.get(species)
+            if diagnostic is not None:
+                pressure_law_diagnostics[species] = diagnostic
         previous_endpoint, previous_temperature = endpoint, temperature
         if xi >= target:
             break
