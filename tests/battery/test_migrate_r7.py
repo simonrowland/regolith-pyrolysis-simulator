@@ -1854,6 +1854,22 @@ def test_declared_experiment_method_conflicts_split_and_reject_legacy_sharing(
     shared_method_rows = rows_for(result, shared_method_id)
     assert row_method_rows
     assert shared_method_rows
+    if filename == "kems-184-behrens-1979.yaml":
+        # The series declares knudsen effusion. The second-law row's unmapped
+        # model text is UNSPECIFIED, which is not a second method, so both
+        # groups keep the named experiment.
+        shared_ids = {row.experiment_id for row in shared_method_rows}
+        assert {row.experiment_id for row in row_method_rows} == shared_ids
+        assert all(
+            result.experiments[row.experiment_id].method == State.of(shared_method)
+            for row in (*row_method_rows, *shared_method_rows)
+        )
+        assert not any("::method:" in experiment_id for experiment_id in shared_ids)
+        return
+
+    # Mysen declares no method. Wet chemistry does not map, so it stays on
+    # the named experiment as UNSPECIFIED. Mössbauer is a printed method and
+    # still splits. Wet does not move onto the Mössbauer id.
     assert all(
         result.experiments[row.experiment_id].method == State.of(row_method)
         for row in row_method_rows
@@ -1865,53 +1881,35 @@ def test_declared_experiment_method_conflicts_split_and_reject_legacy_sharing(
     assert {row.experiment_id for row in row_method_rows}.isdisjoint(
         row.experiment_id for row in shared_method_rows
     )
-
     experiment_ids = {
         row.experiment_id for row in (*row_method_rows, *shared_method_rows)
     }
     staying = {
         experiment_id
         for experiment_id in experiment_ids
-        if "::declared:" not in experiment_id
+        if "::method:" not in experiment_id
     }
-    if filename == "mysen-1985-cmas-redox.yaml":
-        # The registry experiment declares no method. Every typed row method
-        # is split onto its own declared-method id, so neither group keeps
-        # the bare experiment id (the pre-37ad375 "first method stays" shape).
-        assert not staying
-        declared_ids = set()
-        for experiment_id in experiment_ids:
-            marker = "::declared:"
-            start = experiment_id.index(marker) + len(marker)
-            end = experiment_id.index("::method:", start)
-            declared_ids.add(experiment_id[start:end])
-        assert len(declared_ids) == 1
-        shared_experiment_id = next(iter(declared_ids))
-        assert shared_experiment_id.endswith(
-            "::experiment::mysen_1985_table1_method_comparison_samples"
+    assert len(staying) == 1
+    shared_experiment_id = next(iter(staying))
+    assert shared_experiment_id.endswith(
+        "::experiment::mysen_1985_table1_method_comparison_samples"
+    )
+    assert {row.experiment_id for row in row_method_rows} == staying
+    assert {row.experiment_id for row in shared_method_rows} == {
+        experiment_id
+        for experiment_id in experiment_ids
+        if experiment_id.endswith(f"::method:{shared_method.value}")
+    }
+    assert all(
+        sum(
+            1
+            for notice in row.notices
+            if notice.kind is NoticeKind.METHOD_UNSTATED
+            and notice.reason.startswith("method_unstated:")
         )
-        assert {row.experiment_id for row in row_method_rows} == {
-            experiment_id
-            for experiment_id in experiment_ids
-            if experiment_id.endswith(f"::method:{row_method.value}")
-        }
-        assert {row.experiment_id for row in shared_method_rows} == {
-            experiment_id
-            for experiment_id in experiment_ids
-            if experiment_id.endswith(f"::method:{shared_method.value}")
-        }
-        assert all(
-            sum(
-                1
-                for notice in row.notices
-                if notice.kind is NoticeKind.METHOD_UNSTATED
-                and notice.reason.startswith("method_unstated:")
-            )
-            == 1
-            for row in row_method_rows
-        )
-    else:
-        shared_experiment_id = next(iter(staying))
+        == 1
+        for row in row_method_rows
+    )
     original = Migrator._experiment_id
 
     def legacy_shared_experiment(

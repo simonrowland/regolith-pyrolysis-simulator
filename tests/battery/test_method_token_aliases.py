@@ -62,6 +62,10 @@ def test_new_method_tokens_round_trip(token: MethodToken) -> None:
             MethodToken.XANES_SPECTROSCOPY,
         ),
         (
+            "Fe K-edge XANES",
+            MethodToken.XANES_SPECTROSCOPY,
+        ),
+        (
             "Modified indirect potentiometric redox titration; numerator is all reduced Ti, reported as Ti3+, and Ti4+ is total Ti minus reduced Ti",
             MethodToken.WET_CHEMICAL_ANALYSIS,
         ),

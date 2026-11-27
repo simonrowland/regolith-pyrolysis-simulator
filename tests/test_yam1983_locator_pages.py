@@ -25,7 +25,8 @@ def test_na2o_activity_range_locator_binds_to_english_abstract() -> None:
         736,
     )
 
-    page1 = source_page_text(document["source_id"], locator["page"])
+    page1 = " ".join(source_page_text(document["source_id"], locator["page"]).split())
     assert "736" in page1
+    # pdftotext -layout pads words. The English abstract is on this page.
     assert "extremely large negative deviation" in page1
     assert "10−10 to 10−3" in page1

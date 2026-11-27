@@ -8,7 +8,8 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.enums import NoticeKind
+import simulator.battery.migrate as migration_module
+from simulator.battery.enums import MethodToken, NoticeKind
 from simulator.battery.input_provenance import (
     PRINTED_STARTING_BULK,
     SCORED_PHASE_ANALYSIS,
@@ -30,6 +31,19 @@ AITHALA_ALLF_RUNS = {
     "aithala-2026-2000-120",
     "aithala-2026-2100-30",
 }
+
+
+def _named_run(experiment_id: str, names: set[str]) -> str | None:
+    """The source run id inside an experiment id.
+
+    A printed analytical method (XANES, Mössbauer) splits off the quench
+    run, so the run is a segment, not always the last one.
+    """
+
+    for part in experiment_id.split("::"):
+        if part in names:
+            return part
+    return None
 JAYASURIYA = REPO / "data/literature/extracts/jayasuriya-2004-iron-mossbauer.yaml"
 
 
@@ -44,6 +58,19 @@ def _composition(observation):
     state = observation.identity.composition
     assert state is not None and state.is_value
     return state.value
+
+
+def _sossi_experiments(result):
+    work_ids = {
+        work.work_id
+        for work in result.works.values()
+        if "sossi-2020-magma-ocean-redox" in work.source_ids
+    }
+    return {
+        experiment_id: experiment
+        for experiment_id, experiment in result.experiments.items()
+        if experiment.work_id in work_ids
+    }
 
 
 def test_kress_table1_redox_rows_project_printed_conditions() -> None:
@@ -145,7 +172,19 @@ def test_kress_table1_redox_rows_project_printed_conditions() -> None:
     assert observed_runs == set(by_run)
 
 
-def test_sossi_redox_row_projects_its_printed_glass_analysis() -> None:
+def test_sossi_redox_row_projects_its_printed_glass_analysis(monkeypatch) -> None:
+    resolved_methods = {}
+    resolve_method = Migrator._resolve_method_for_observation
+
+    def record_row_method(migrator, *args, **kwargs):
+        resolved, notice = resolve_method(migrator, *args, **kwargs)
+        if kwargs.get("commit", True):
+            resolved_methods.setdefault(kwargs["observation_id"], resolved)
+        return resolved, notice
+
+    monkeypatch.setattr(
+        Migrator, "_resolve_method_for_observation", record_row_method
+    )
     result = _migrate(SOSS)
     observation = result.observations[
         "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_1_xanes"
@@ -208,6 +247,57 @@ def test_sossi_redox_row_projects_its_printed_glass_analysis() -> None:
         assert f_o2.state.is_value
         assert f_o2.state.value == printed_logs[row_id]
 
+    experiments = _sossi_experiments(result)
+    rows_by_experiment = {}
+    for row in redox_rows:
+        rows_by_experiment.setdefault(row.experiment_id, []).append(row)
+    assert len(experiments) == 12
+    assert set(rows_by_experiment) == set(experiments)
+    assert all(len(rows) == 1 for rows in rows_by_experiment.values())
+    assert all(
+        experiment.method.is_value
+        and experiment.method.value
+        is MethodToken.AERODYNAMIC_LEVITATION_LASER_HEATING
+        for experiment in experiments.values()
+    )
+    assert all(
+        resolved_methods[row.observation_id].is_value
+        and resolved_methods[row.observation_id].value
+        is MethodToken.XANES_SPECTROSCOPY
+        for row in redox_rows
+    )
+    assert not any(
+        "method_unstated:" in notice.reason
+        for row in redox_rows
+        for notice in row.notices
+    )
+
+
+def test_sossi_analytical_method_split_mutation_restores_24_experiments(
+    monkeypatch,
+) -> None:
+    method_claim_fields = migration_module._method_claim_fields
+
+    def restore_analytical_method_split(obs, values, **_kwargs):
+        return method_claim_fields(
+            obs, values, include_analytical_method=True
+        )
+
+    monkeypatch.setattr(
+        migration_module,
+        "_method_claim_fields",
+        restore_analytical_method_split,
+    )
+    result = _migrate(SOSS)
+    experiments = _sossi_experiments(result)
+    split_ids = [
+        experiment_id
+        for experiment_id in experiments
+        if "::method:xanes_spectroscopy" in experiment_id
+    ]
+    assert len(experiments) == 24
+    assert len(split_ids) == 12
+
 
 def test_aithala_redox_row_projects_experiment_glass_analysis_and_f_o2() -> None:
     result = _migrate(AITHALA)
@@ -239,7 +329,7 @@ def test_aithala_redox_row_projects_experiment_glass_analysis_and_f_o2() -> None
         row
         for row in result.observations.values()
         if row.source_id == "aithala-2026-magmatic-iron-redox-to-2100c"
-        and row.experiment_id.rsplit("::", 1)[-1] in AITHALA_ALLF_RUNS
+        and _named_run(row.experiment_id, AITHALA_ALLF_RUNS) is not None
         and row.observation_id.rsplit("::", 1)[-1].endswith("_xanes")
         and row.identity.quantity.is_value
         and row.identity.quantity.value.value == "fe3_fe2_ratio"
@@ -348,14 +438,15 @@ def test_aithala_vf_redox_rows_project_printed_sample_compositions() -> None:
         if row.source_id == "aithala-2026-magmatic-iron-redox-to-2100c"
         and row.identity.quantity.is_value
         and row.identity.quantity.value.value == "fe3_fe2_ratio"
-        and row.experiment_id.rsplit("::", 1)[-1] in printed
+        and _named_run(row.experiment_id, set(printed)) is not None
     ]
     assert len(redox_rows) == 10
-    assert {row.experiment_id.rsplit("::", 1)[-1] for row in redox_rows} == set(
+    assert {_named_run(row.experiment_id, set(printed)) for row in redox_rows} == set(
         printed
     )
     for row in redox_rows:
-        run_id = row.experiment_id.rsplit("::", 1)[-1]
+        run_id = _named_run(row.experiment_id, set(printed))
+        assert run_id is not None
         sample = printed[run_id]
         source = source_rows[row.observation_id.rsplit("::", 1)[-1]]
         assert source["values"]["sample_id"] == sample["sample_id"]
