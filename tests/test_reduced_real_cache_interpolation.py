@@ -215,6 +215,20 @@ def test_standardized_distance_retains_compensated_sum_output() -> None:
     )
 
 
+def test_standardized_distance_squares_deltas_with_base_multiplication() -> None:
+    candidate = -7.970971849244846e-80
+    for _ in range(8):
+        left = candidate * 1.0e-9
+        delta = left / 1.0e-9
+        if delta**2 != delta * delta:
+            break
+        candidate = math.nextafter(candidate, math.inf)
+    else:
+        pytest.fail("the short delta search found no pow/multiply rounding edge")
+
+    assert rci._standardized_distance([left], [0.0]) == math.sqrt(delta * delta)
+
+
 def test_greedy_nn_rejects_extreme_candidate_controls_before_distance_math() -> None:
     query = _interpolation_key("query", feo_fraction=0.20, temperature_K=1500.0)
     candidate_key = _interpolation_key(
@@ -351,7 +365,6 @@ def test_subnormal_composition_is_not_a_ladder_neighbor_and_put_is_typed(
         key=key,
         key_bytes=key_bytes,
         key_hash=key_hash,
-        return_decoded=True,
     ) is not None
     rung_tag = rrd.PHYSICS_BUCKET_LADDER_RUNGS[0][0]
     rung_key = rrd.canonical_physics_ladder_bucket_key_from_replay_key(

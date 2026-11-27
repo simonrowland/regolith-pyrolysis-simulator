@@ -77,6 +77,7 @@ PT1_SUPPORTED_STORE_SCHEMA_VERSIONS = (
     PT1_LEGACY_STORE_SCHEMA_VERSION,
     PT1_STORE_SCHEMA_VERSION,
 )
+_PT1_ROW_KEY_MAX_NESTING = 1000
 PT1_EQUILIBRIUM_TABLE = "reduced_real_equilibrium_payloads"
 PT1_METADATA_TABLE = "reduced_real_metadata"
 PT1_READ_ONLY_BASE_ALIAS = "pt1_read_only_base"
@@ -2510,6 +2511,17 @@ def _pt1_row_key(raw: bytes, *, key_hash: str) -> Mapping[str, Any]:
         raise PT1PersistentStoreCorrupt(
             f"PT-1 row request key is not a mapping: {key_hash}"
         )
+    pending = [(value, 1)]
+    while pending:
+        nested, depth = pending.pop()
+        if depth > _PT1_ROW_KEY_MAX_NESTING:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row request key nesting is too deep: {key_hash}"
+            )
+        if isinstance(nested, Mapping):
+            pending.extend((item, depth + 1) for item in nested.values())
+        elif isinstance(nested, list):
+            pending.extend((item, depth + 1) for item in nested)
     return value
 
 
@@ -2521,14 +2533,13 @@ def _admit_stored_row(
     key: Mapping[str, Any] | None = None,
     key_bytes: bytes | None = None,
     key_hash: str | None = None,
+    decoded_row_key: Mapping[str, Any] | None = None,
     admission_keys: Sequence[Mapping[str, Any]] | None = None,
     expected_replay_scope_sha256: str | None = None,
     physics_bucket_key: Mapping[str, Any] | None = None,
     physics_bucket_bytes: bytes | None = None,
     physics_bucket_hash: str | None = None,
-    rung_tag: str | None = None,
-    rung_key: Mapping[str, Any] | None = None,
-    rung_hash: str | None = None,
+    prevalidated_rung_tag: str | None = None,
     output_columns: Sequence[str] | None = None,
     strict_source_validation: bool = False,
     validate_source_provenance: bool = False,
@@ -2549,7 +2560,7 @@ def _admit_stored_row(
                 else None
             )
             if artifact is not None and stored_artifact != artifact:
-                if physics_bucket_hash is not None or rung_tag is not None:
+                if physics_bucket_hash is not None:
                     return None
                 raise PT0CacheCollision(
                     f"PT-0 stored artifact mismatch for {artifact}: {key_hash}"
@@ -2627,16 +2638,6 @@ def _admit_stored_row(
                     stored_bucket != _json_ready(physics_bucket_key)
                     or stored_bucket_bytes != physics_bucket_bytes
                     or _sha256(stored_bucket_bytes) != physics_bucket_hash
-                ):
-                    return None
-            if rung_tag is not None:
-                stored_rung = canonical_physics_ladder_bucket_key_from_replay_key(
-                    stored_key, rung_tag
-                )
-                if (
-                    rung_key is None
-                    or stored_rung != _json_ready(rung_key)
-                    or _sha256(canonical_json_bytes(stored_rung)) != rung_hash
                 ):
                     return None
             if not _payload_codec_stamp_matches(
@@ -2758,8 +2759,6 @@ def _admit_stored_row(
             value: Any,
             tag: str,
             distance_hash: str = row_hash,
-            *,
-            allow_positive_infinity: bool = False,
         ) -> float:
             if isinstance(value, bool):
                 raise PT1PersistentStoreCorrupt(
@@ -2771,11 +2770,7 @@ def _admit_stored_row(
                 raise PT1PersistentStoreCorrupt(
                     f"PT-1 row {tag} distance is invalid: {distance_hash}"
                 ) from exc
-            if not math.isfinite(distance) and not (
-                allow_positive_infinity
-                and isinstance(value, float)
-                and distance == math.inf
-            ):
+            if not math.isfinite(distance):
                 raise PT1PersistentStoreCorrupt(
                     f"PT-1 row {tag} distance is invalid: {distance_hash}"
                 )
@@ -2807,39 +2802,21 @@ def _admit_stored_row(
                 raise PT1PersistentStoreCorrupt(
                     f"PT-1 row physics bucket bytes mismatch: {physics_bucket_hash}"
                 )
-        if rung_tag is not None:
-            expected_rung_scope = _replay_scope_hash(rung_key)
-            if row[_physics_ladder_hash_column(rung_tag)] != rung_hash:
-                raise PT1PersistentStoreCorrupt(
-                    f"PT-1 row {rung_tag} physics bucket hash mismatch: {rung_hash}"
-                )
-            if row["replay_scope_sha256"] != expected_rung_scope:
-                raise PT1PersistentStoreCorrupt(
-                    f"PT-1 row {rung_tag} replay scope hash mismatch: {rung_hash}"
-                )
-            indexed_distance = row[_physics_ladder_distance_column(rung_tag)]
         if expected_replay_scope_sha256 is not None and (
             row["replay_scope_sha256"] != expected_replay_scope_sha256
         ):
             raise PT1PersistentStoreCorrupt(
                 f"PT-1 row replay scope hash mismatch: {row_hash}"
             )
-        if rung_tag is not None and indexed_distance is None:
-            raise PT1PersistentStoreCorrupt(
-                f"PT-1 row {rung_tag} distance is missing: {rung_hash}"
-            )
-        if rung_tag is not None:
-            indexed_distance = finite_ladder_distance(
-                indexed_distance,
-                rung_tag,
-                rung_hash,
-                allow_positive_infinity=True,
-            )
 
         # Query index metadata and key-byte integrity precede key admission.
         verify_key_hashes()
 
-        row_key = _pt1_row_key(row_key_bytes, key_hash=row_hash)
+        row_key = (
+            decoded_row_key
+            if decoded_row_key is not None
+            else _pt1_row_key(row_key_bytes, key_hash=row_hash)
+        )
         verify_canonical_key(row_key)
 
         derived_bucket_key = canonical_physics_bucket_key_from_replay_key(row_key)
@@ -2880,50 +2857,43 @@ def _admit_stored_row(
                 f"PT-1 row exact key does not reproduce physics bucket: {physics_bucket_hash}"
             )
         ladder_values = _physics_ladder_values_from_replay_key(row_key)
-        nonfinite_requested_rung = False
-        if rung_tag is not None:
-            derived_rung_distance = float(ladder_values[rung_tag]["distance"])
-            nonfinite_requested_rung = not math.isfinite(derived_rung_distance)
-            if not nonfinite_requested_rung:
-                indexed_distance = finite_ladder_distance(
-                    indexed_distance, rung_tag, rung_hash
-                )
         for stored_rung_tag, _sig_figs in PHYSICS_BUCKET_ALL_LADDER_RUNGS:
+            if stored_rung_tag == prevalidated_rung_tag:
+                continue
             hash_column = _physics_ladder_hash_column(stored_rung_tag)
             distance_column = _physics_ladder_distance_column(stored_rung_tag)
-            if row.get(hash_column) is not None and (
-                row[hash_column] != ladder_values[stored_rung_tag]["sha256"]
+            stored_rung_hash = row.get(hash_column)
+            stored_distance = row.get(distance_column)
+            if stored_bucket_schema is not None and stored_rung_hash is None:
+                raise PT1PersistentStoreCorrupt(
+                    f"PT-1 row {stored_rung_tag} physics bucket hash is missing: {row_hash}"
+                )
+            if stored_bucket_schema is not None and stored_distance is None:
+                raise PT1PersistentStoreCorrupt(
+                    f"PT-1 row {stored_rung_tag} distance is missing: {row_hash}"
+                )
+            if stored_rung_hash is not None and (
+                stored_rung_hash != ladder_values[stored_rung_tag]["sha256"]
             ):
                 raise PT1PersistentStoreCorrupt(
                     f"PT-1 row exact key does not reproduce {stored_rung_tag} hash: {row_hash}"
                 )
-            if not math.isfinite(float(ladder_values[stored_rung_tag]["distance"])):
-                continue
-            if row.get(distance_column) is not None:
-                row_distance = finite_ladder_distance(
-                    row[distance_column], stored_rung_tag
-                )
-                if row_distance != ladder_values[stored_rung_tag]["distance"]:
+            if stored_distance is not None:
+                derived_distance = float(ladder_values[stored_rung_tag]["distance"])
+                if (
+                    isinstance(stored_distance, float)
+                    and stored_distance == math.inf
+                    and not math.isfinite(derived_distance)
+                ):
+                    row_distance = stored_distance
+                else:
+                    row_distance = finite_ladder_distance(
+                        stored_distance, stored_rung_tag
+                    )
+                if row_distance != derived_distance:
                     raise PT1PersistentStoreCorrupt(
                         f"PT-1 row {stored_rung_tag} distance mismatch: {row_hash}"
                     )
-        if rung_tag is not None:
-            derived_rung_key = canonical_physics_ladder_bucket_key_from_replay_key(
-                row_key,
-                rung_tag,
-            )
-            if derived_rung_key != _json_ready(rung_key) or (
-                ladder_values[rung_tag]["sha256"] != rung_hash
-            ):
-                raise PT1PersistentStoreCorrupt(
-                    f"PT-1 row exact key does not reproduce {rung_tag} index: {rung_hash}"
-                )
-            if not nonfinite_requested_rung and (
-                ladder_values[rung_tag]["distance"] != indexed_distance
-            ):
-                raise PT1PersistentStoreCorrupt(
-                    f"PT-1 row exact key does not reproduce {rung_tag} index: {rung_hash}"
-                )
 
         row_payload_bytes, row_payload = verify_payload_integrity()
         if validate_interpolation_domain:
@@ -3060,9 +3030,6 @@ def _admit_stored_row(
                     context=f"PT-1 cache shard {row_artifact}:{row_hash}",
                     approved_sources=approved_sources,
                 )
-        if nonfinite_requested_rung:
-            return None
-
         payload_codec_version = row.get("payload_codec_version")
         expected_codec_version = _payload_codec_version(row_artifact)
         if not _payload_codec_stamp_matches(
@@ -3093,7 +3060,8 @@ def _admit_stored_row(
                 or (
                     row_key.get("vapor_pressure_provider_selection") is not None
                     and not isinstance(
-                        row_key.get("vapor_pressure_provider_selection"), str
+                        row_key.get("vapor_pressure_provider_selection"),
+                        (str, Mapping),
                     )
                 )
                 or (
@@ -3683,19 +3651,14 @@ class PT1PersistentEquilibriumStore:
             for table in tables:
                 rows = conn.execute(query.format(table=table), params)
                 for row in rows:
-                    admitted = _admit_stored_row(
+                    entry, decoded = self._entry_from_physics_ladder_bucket_row(
                         row,
-                        store_kind="pt1",
                         artifact=artifact,
                         rung_tag=rung_tag,
                         rung_key=rung_key,
                         rung_hash=rung_hash,
-                        admission_keys=(query_key,) if query_key is not None else (),
-                        validate_interpolation_domain=True,
+                        query_key=query_key,
                     )
-                    if admitted is None:
-                        continue
-                    entry, decoded = admitted.entry, admitted.decoded_payload
                     if decoded is None:
                         continue
                     if query_key is not None and _physics_ladder_coarsens_controls(
@@ -3709,10 +3672,7 @@ class PT1PersistentEquilibriumStore:
                         )
                         if not bool(budget["accepted"]):
                             continue
-                    assert admitted.physics_ladder_values is not None
-                    row_distance = float(
-                        admitted.physics_ladder_values[rung_tag]["distance"]
-                    )
+                    row_distance = float(row[distance_column])
                     sort_key = (row_distance, str(entry["key_hash"]))
                     if best_sort is None or sort_key < best_sort:
                         best_sort = sort_key
@@ -3721,6 +3681,97 @@ class PT1PersistentEquilibriumStore:
             if return_decoded and best_entry is not None:
                 return best_entry, best_decoded
             return best_entry
+
+    def _entry_from_physics_ladder_bucket_row(
+        self,
+        row: sqlite3.Row,
+        *,
+        artifact: str,
+        rung_tag: str,
+        rung_key: Mapping[str, Any],
+        rung_hash: str,
+        query_key: Mapping[str, Any] | None = None,
+    ) -> tuple[dict[str, Any], Any]:
+        row_hash = row[_physics_ladder_hash_column(rung_tag)]
+        if row_hash != rung_hash:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row {rung_tag} physics bucket hash mismatch: {rung_hash}"
+            )
+        if row["replay_scope_sha256"] != _replay_scope_hash(rung_key):
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row {rung_tag} replay scope hash mismatch: {rung_hash}"
+            )
+        row_distance = row[_physics_ladder_distance_column(rung_tag)]
+        if row_distance is None:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row {rung_tag} distance is missing: {rung_hash}"
+            )
+        try:
+            indexed_distance = float(row_distance)
+        except (TypeError, ValueError, OverflowError) as exc:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row {rung_tag} distance is invalid: {rung_hash}"
+            ) from exc
+        # Extreme but shape-valid keys can persist +inf; defer exclusion until
+        # the derived distance and every other stored field have been checked.
+        if not math.isfinite(indexed_distance) and indexed_distance != math.inf:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row {rung_tag} distance is invalid: {rung_hash}"
+            )
+        row_key_hash = str(row["key_hash"])
+        row_key_bytes = _pt1_row_bytes(
+            row["key_bytes"],
+            field="key",
+            key_hash=row_key_hash,
+        )
+        row_key = _pt1_row_key(row_key_bytes, key_hash=row_key_hash)
+        try:
+            row_rung_key = canonical_physics_ladder_bucket_key_from_replay_key(
+                row_key,
+                rung_tag,
+            )
+            row_rung_hash = _sha256(canonical_json_bytes(row_rung_key))
+            expected_distance = physics_ladder_bucket_distance_from_replay_key(
+                row_key,
+                rung_tag,
+            )
+        except (
+            AttributeError,
+            KeyError,
+            TypeError,
+            ValueError,
+            OverflowError,
+            RecursionError,
+        ) as exc:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row exact key cannot reproduce {rung_tag} index: {rung_hash}"
+            ) from exc
+        if row_rung_hash != rung_hash:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row exact key does not reproduce {rung_tag} hash: {rung_hash}"
+            )
+        if indexed_distance != expected_distance:
+            raise PT1PersistentStoreCorrupt(
+                f"PT-1 row {rung_tag} distance mismatch: {rung_hash}"
+            )
+        entry, decoded = self._entry_from_row(
+            row,
+            artifact=artifact,
+            key=row_key,
+            key_bytes=row_key_bytes,
+            key_hash=str(row["key_hash"]),
+            return_decoded=True,
+            decoded_row_key=row_key,
+            admission_keys=(
+                (row_key, query_key)
+                if query_key is not None
+                else (row_key,)
+            ),
+            prevalidated_rung_tag=rung_tag,
+        )
+        if not math.isfinite(expected_distance):
+            return entry, None
+        return entry, decoded
 
     def _connect(self) -> sqlite3.Connection:
         timeout_sec = self._shard_busy_timeout_ms / 1000.0
@@ -4081,9 +4132,11 @@ class PT1PersistentEquilibriumStore:
         key: Mapping[str, Any] | None = None,
         key_bytes: bytes | None = None,
         key_hash: str | None = None,
+        decoded_row_key: Mapping[str, Any] | None = None,
         return_decoded: bool = False,
         admission_keys: Sequence[Mapping[str, Any]] | None = None,
         expected_replay_scope_sha256: str | None = None,
+        prevalidated_rung_tag: str | None = None,
     ) -> Any:
         admitted = _admit_stored_row(
             row,
@@ -4092,8 +4145,10 @@ class PT1PersistentEquilibriumStore:
             key=key,
             key_bytes=key_bytes,
             key_hash=key_hash,
+            decoded_row_key=decoded_row_key,
             admission_keys=admission_keys,
             expected_replay_scope_sha256=expected_replay_scope_sha256,
+            prevalidated_rung_tag=prevalidated_rung_tag,
             validate_interpolation_domain=True,
         )
         assert admitted is not None

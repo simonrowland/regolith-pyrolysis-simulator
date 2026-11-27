@@ -4644,6 +4644,59 @@ def test_pt1_ladder_subnormal_key_is_wrapped_by_row_admission(
         ) is None
 
 
+def test_pt1_ladder_subnormal_row_validates_sibling_distance_before_miss(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "pt1-subnormal-sibling-distance.sqlite"
+    key = _freeze_gate_key()
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    capture._store(
+        "freeze_gate_curve",
+        key,
+        _valid_test_gate_payload(),
+        law_disclosures=[],
+    )
+    corrupt_key = copy.deepcopy(rrd._json_ready(key))
+    corrupt_key["controls"]["T_K"] = 5e-324
+    _row_key_bytes, _row_key_hash, _bucket, _bucket_bytes = (
+        _rewrite_pt1_key_and_derived_indexes(
+            db_path,
+            _key_hash(key),
+            corrupt_key,
+        )
+    )
+    selected_rung = rrd.PHYSICS_BUCKET_LADDER_RUNGS[0][0]
+    sibling_rung = next(
+        rung_tag
+        for rung_tag, _sig_figs in rrd.PHYSICS_BUCKET_ALL_LADDER_RUNGS
+        if rung_tag != selected_rung
+    )
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+            f"SET {rrd._physics_ladder_distance_column(sibling_rung)} = ? "
+            "WHERE key_hash = ?",
+            ("bad", _key_hash(corrupt_key)),
+        )
+
+    rung_key = rrd.canonical_physics_ladder_bucket_key_from_replay_key(
+        corrupt_key,
+        selected_rung,
+    )
+    rung_hash = rrd._sha256(canonical_json_bytes(rung_key))
+    with pytest.raises(
+        PT1PersistentStoreCorrupt,
+        match=f"{sibling_rung} distance is invalid",
+    ):
+        PT1PersistentEquilibriumStore(db_path)._get_by_physics_ladder_bucket(
+            artifact="freeze_gate_curve",
+            rung_tag=selected_rung,
+            rung_key=rung_key,
+            rung_hash=rung_hash,
+            query_key=key,
+        )
+
+
 @pytest.mark.parametrize(
     ("control_name", "invalid_value"),
     (("T_K", True), ("pressure_bar", True)),
@@ -8714,49 +8767,231 @@ def test_stale_codec_integrity_checks_precede_admission_for_every_reader(
 
 
 _PT1_LADDER_ORDER_TEST_RUNG = rrd.PHYSICS_BUCKET_LADDER_RUNGS[0][0]
-_PT1_LADDER_OTHER_ROW_DEFECTS = tuple(
-    defect
-    for rung_tag, _sig_figs in rrd.PHYSICS_BUCKET_ALL_LADDER_RUNGS
-    if rung_tag != _PT1_LADDER_ORDER_TEST_RUNG
-    for defect in (
-        (f"ladder_hash:{rung_tag}", f"does not reproduce {rung_tag} hash"),
-        (f"ladder_distance:{rung_tag}", f"row {rung_tag} distance mismatch"),
+
+
+def _pt1_ladder_defects(
+    field: str,
+    column: str,
+    variants: tuple[tuple[str, Any, str], ...],
+) -> tuple[tuple[str, str, Any, str], ...]:
+    return tuple(
+        (f"{field}:{variant}", column, value, expected_error)
+        for variant, value, expected_error in variants
     )
-)
-_PT1_LADDER_ROW_DEFECT_ORDER = (
-    ("ladder_hash", "physics bucket hash mismatch"),
-    ("replay_scope", "replay scope hash mismatch"),
-    ("ladder_distance", "distance is invalid"),
-    ("key_hash", "key hash mismatch"),
-    ("key_bytes", "key bytes hash mismatch"),
-    ("bucket_schema", "does not reproduce physics bucket"),
-    ("bucket_hash", "does not reproduce physics bucket"),
-    ("bucket_bytes", "does not reproduce physics bucket"),
-    *_PT1_LADDER_OTHER_ROW_DEFECTS,
-    ("payload_checksum", "payload hash mismatch"),
-    ("repair_notices", "repair_notices_json is invalid JSON"),
-    ("provenance", "canonical/provenance mismatch"),
+
+
+_PT1_LADDER_ROW_DEFECT_GROUPS = (
+    (
+        "selected-rung-hash",
+        _pt1_ladder_defects(
+            "selected-rung-hash",
+            rrd._physics_ladder_hash_column(_PT1_LADDER_ORDER_TEST_RUNG),
+            (
+                ("missing", None, "physics bucket hash mismatch"),
+                ("invalid", "bad", "physics bucket hash mismatch"),
+                ("finite-wrong", "0" * 64, "physics bucket hash mismatch"),
+            ),
+        ),
+    ),
+    (
+        "replay-scope",
+        _pt1_ladder_defects(
+            "replay-scope",
+            "replay_scope_sha256",
+            (
+                ("missing", None, "replay scope hash mismatch"),
+                ("invalid", "bad", "replay scope hash mismatch"),
+                ("finite-wrong", "0" * 64, "replay scope hash mismatch"),
+            ),
+        ),
+    ),
+    (
+        "selected-rung-distance",
+        _pt1_ladder_defects(
+            "selected-rung-distance",
+            rrd._physics_ladder_distance_column(_PT1_LADDER_ORDER_TEST_RUNG),
+            (
+                ("missing", None, "distance is missing"),
+                ("invalid", "bad", "distance is invalid"),
+                ("finite-wrong", -1.0, "distance mismatch"),
+            ),
+        ),
+    ),
+    (
+        "key-bytes-decode",
+        _pt1_ladder_defects(
+            "key-bytes-decode",
+            "key_bytes",
+            (
+                ("invalid-storage-type", -1, "invalid key bytes"),
+                (
+                    "invalid-json",
+                    sqlite3.Binary(b"{"),
+                    "invalid key JSON bytes",
+                ),
+            ),
+        ),
+    ),
+    (
+        "key-hash",
+        _pt1_ladder_defects(
+            "key-hash",
+            "key_sha256",
+            (
+                ("invalid", "bad", "key hash mismatch"),
+                ("finite-wrong", "0" * 64, "key hash mismatch"),
+            ),
+        ),
+    ),
+    (
+        "key-bytes-hash",
+        _pt1_ladder_defects(
+            "key-bytes-hash",
+            "key_bytes",
+            (
+                (
+                    "finite-wrong",
+                    "canonical-key-with-whitespace",
+                    "key bytes hash mismatch",
+                ),
+            ),
+        ),
+    ),
+    (
+        "bucket-bytes-decode",
+        _pt1_ladder_defects(
+            "bucket-bytes-decode",
+            "physics_key_bytes",
+            (
+                ("missing", None, "invalid physics bucket key bytes"),
+                ("invalid-storage-type", -1, "invalid physics bucket key bytes"),
+            ),
+        ),
+    ),
+    (
+        "bucket-schema",
+        _pt1_ladder_defects(
+            "bucket-schema",
+            "physics_bucket_schema_version",
+            (
+                ("invalid", "bad", "does not reproduce physics bucket"),
+                ("finite-wrong", -1, "does not reproduce physics bucket"),
+            ),
+        ),
+    ),
+    (
+        "bucket-hash",
+        _pt1_ladder_defects(
+            "bucket-hash",
+            "physics_bucket_sha256",
+            (
+                ("missing", None, "does not reproduce physics bucket"),
+                ("invalid", "bad", "does not reproduce physics bucket"),
+                ("finite-wrong", "0" * 64, "does not reproduce physics bucket"),
+            ),
+        ),
+    ),
+    (
+        "bucket-bytes-reproduction",
+        _pt1_ladder_defects(
+            "bucket-bytes-reproduction",
+            "physics_key_bytes",
+            (
+                (
+                    "finite-wrong",
+                    sqlite3.Binary(b"{}"),
+                    "does not reproduce physics bucket",
+                ),
+            ),
+        ),
+    ),
+    *tuple(
+        group
+        for rung_tag, _sig_figs in rrd.PHYSICS_BUCKET_ALL_LADDER_RUNGS
+        if rung_tag != _PT1_LADDER_ORDER_TEST_RUNG
+        for group in (
+            (
+                f"sibling-rung-hash:{rung_tag}",
+                _pt1_ladder_defects(
+                    f"sibling-rung-hash:{rung_tag}",
+                    rrd._physics_ladder_hash_column(rung_tag),
+                    (
+                        ("missing", None, "physics bucket hash is missing"),
+                        ("invalid", "bad", f"does not reproduce {rung_tag} hash"),
+                        (
+                            "finite-wrong",
+                            "0" * 64,
+                            f"does not reproduce {rung_tag} hash",
+                        ),
+                    ),
+                ),
+            ),
+            (
+                f"sibling-rung-distance:{rung_tag}",
+                _pt1_ladder_defects(
+                    f"sibling-rung-distance:{rung_tag}",
+                    rrd._physics_ladder_distance_column(rung_tag),
+                    (
+                        ("missing", None, "distance is missing"),
+                        ("invalid", "bad", "distance is invalid"),
+                        ("finite-wrong", -1.0, f"row {rung_tag} distance mismatch"),
+                    ),
+                ),
+            ),
+        )
+    ),
+    (
+        "payload-checksum",
+        _pt1_ladder_defects(
+            "payload-checksum",
+            "payload_sha256",
+            (
+                ("invalid", "bad", "payload hash mismatch"),
+                ("finite-wrong", "0" * 64, "payload hash mismatch"),
+            ),
+        ),
+    ),
+    (
+        "repair-notices",
+        _pt1_ladder_defects(
+            "repair-notices",
+            "repair_notices_json",
+            (
+                ("invalid-json", "[", "repair_notices_json"),
+                ("wrong-shape", "{}", "repair_notices_json"),
+            ),
+        ),
+    ),
+    (
+        "provenance",
+        _pt1_ladder_defects(
+            "provenance",
+            "created_at",
+            (
+                ("invalid-timestamp", "bad", "canonical/provenance mismatch"),
+                ("invalid-short-timestamp", "123", "canonical/provenance mismatch"),
+            ),
+        ),
+    ),
 )
 _PT1_LADDER_ROW_PRECEDENCE_PAIRS = tuple(
-    (earlier[0], later[0], earlier[1])
-    for earlier_index, earlier in enumerate(_PT1_LADDER_ROW_DEFECT_ORDER)
-    for later in _PT1_LADDER_ROW_DEFECT_ORDER[earlier_index + 1 :]
+    (earlier, later)
+    for earlier_index, (_earlier_field, earlier_variants) in enumerate(
+        _PT1_LADDER_ROW_DEFECT_GROUPS
+    )
+    for _later_field, later_variants in _PT1_LADDER_ROW_DEFECT_GROUPS[
+        earlier_index + 1 :
+    ]
+    for earlier in earlier_variants
+    for later in later_variants
 )
 
 
-@pytest.mark.parametrize(
-    ("earlier_defect", "later_defect", "expected_error"),
-    _PT1_LADDER_ROW_PRECEDENCE_PAIRS,
-    ids=lambda value: str(value),
-)
 def test_pt1_ladder_row_admission_keeps_base_field_check_order(
     tmp_path: Path,
-    earlier_defect: str,
-    later_defect: str,
-    expected_error: str,
 ) -> None:
-    """Earlier ladder row integrity defects win over every later field."""
-    db_path = tmp_path / f"ladder-order-{earlier_defect}-{later_defect}.sqlite"
+    """Earlier ladder row defects win each later field's stored defect forms."""
+    db_path = tmp_path / "ladder-order-matrix.sqlite"
     key = _freeze_gate_key()
     capture = PT0DeterminismStore("capture", db_path=db_path)
     capture._store(
@@ -8772,59 +9007,64 @@ def test_pt1_ladder_row_admission_keeps_base_field_check_order(
         rung_tag,
     )
     rung_hash = rrd._sha256(canonical_json_bytes(rung_key))
-    defects = {
-        "ladder_hash": (
-            rrd._physics_ladder_hash_column(rung_tag),
-            "0" * 64,
-        ),
-        "replay_scope": ("replay_scope_sha256", "0" * 64),
-        "ladder_distance": (
-            rrd._physics_ladder_distance_column(rung_tag),
-            "bad",
-        ),
-        "key_hash": ("key_sha256", "0" * 64),
-        "key_bytes": ("key_bytes", sqlite3.Binary(b"{")),
-        "bucket_schema": ("physics_bucket_schema_version", -1),
-        "bucket_hash": ("physics_bucket_sha256", "0" * 64),
-        "bucket_bytes": ("physics_key_bytes", sqlite3.Binary(b"{}")),
-        "payload_checksum": ("payload_sha256", "0" * 64),
-        "repair_notices": ("repair_notices_json", "["),
-        "provenance": ("created_at", "bad"),
-    }
-    for stored_rung_tag, _sig_figs in rrd.PHYSICS_BUCKET_ALL_LADDER_RUNGS:
-        if stored_rung_tag == _PT1_LADDER_ORDER_TEST_RUNG:
-            continue
-        defects[f"ladder_hash:{stored_rung_tag}"] = (
-            rrd._physics_ladder_hash_column(stored_rung_tag),
-            "0" * 64,
-        )
-        defects[f"ladder_distance:{stored_rung_tag}"] = (
-            rrd._physics_ladder_distance_column(stored_rung_tag),
-            -1.0,
-        )
-    with sqlite3.connect(db_path) as conn:
-        for defect in (earlier_defect, later_defect):
-            column, value = defects[defect]
-            conn.execute(
-                f"UPDATE {PT1_EQUILIBRIUM_TABLE} SET {column} = ? "
-                "WHERE key_hash = ?",
-                (value, key_hash),
-            )
-
     persistent = PT1PersistentEquilibriumStore(db_path)
     with persistent._connect() as conn:
-        row = persistent._fetch(conn, key_hash)
-    assert row is not None
-    with pytest.raises(PT1PersistentStoreCorrupt) as raised:
-        rrd._admit_stored_row(
-            row,
-            store_kind="pt1",
-            artifact="freeze_gate_curve",
-            rung_tag=rung_tag,
-            rung_key=rung_key,
-            rung_hash=rung_hash,
+        base_row = conn.execute(
+            f"SELECT * FROM {PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()
+    assert base_row is not None
+    columns = tuple(
+        sorted(
+            {
+                column
+                for _field, variants in _PT1_LADDER_ROW_DEFECT_GROUPS
+                for _name, column, _value, _expected_error in variants
+            }
         )
-    assert expected_error in str(raised.value)
+    )
+    original_values = {column: base_row[column] for column in columns}
+    reset_sql = ", ".join(f"{column} = ?" for column in columns)
+
+    for earlier_defect, later_defect in _PT1_LADDER_ROW_PRECEDENCE_PAIRS:
+        with persistent._connect() as conn:
+            conn.execute(
+                f"UPDATE {PT1_EQUILIBRIUM_TABLE} SET {reset_sql} "
+                "WHERE key_hash = ?",
+                (*(original_values[column] for column in columns), key_hash),
+            )
+            for defect in (earlier_defect, later_defect):
+                _, column, value, _expected_error = defect
+                if value == "canonical-key-with-whitespace":
+                    value = sqlite3.Binary(
+                        b" " + bytes(original_values["key_bytes"])
+                    )
+                conn.execute(
+                    f"UPDATE {PT1_EQUILIBRIUM_TABLE} SET {column} = ? "
+                    "WHERE key_hash = ?",
+                    (value, key_hash),
+                )
+            row = conn.execute(
+                f"SELECT * FROM {PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
+                (key_hash,),
+            ).fetchone()
+        assert row is not None
+        try:
+            persistent._entry_from_physics_ladder_bucket_row(
+                row,
+                artifact="freeze_gate_curve",
+                rung_tag=rung_tag,
+                rung_key=rung_key,
+                rung_hash=rung_hash,
+            )
+        except PT1PersistentStoreCorrupt as exc:
+            assert earlier_defect[3] in str(exc), (
+                f"{earlier_defect[0]} before {later_defect[0]}: {exc}"
+            )
+        else:
+            pytest.fail(
+                f"{earlier_defect[0]} did not reject before {later_defect[0]}"
+            )
 
 
 @pytest.mark.parametrize("reader", ("exact", "ladder"))

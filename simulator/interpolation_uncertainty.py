@@ -580,10 +580,11 @@ def _coordinate_vector(key: Mapping[str, Any]) -> list[float]:
 def _standardized_distance(left: Sequence[float], right: Sequence[float]) -> float:
     scales = [max(abs(value), 1.0e-9) for value in left]
     try:
-        squared_distance = sum(
-            ((float(a) - float(b)) / scale) ** 2
+        deltas = [
+            (float(a) - float(b)) / scale
             for a, b, scale in zip(left, right, scales, strict=False)
-        )
+        ]
+        squared_distance = sum(delta * delta for delta in deltas)
     except OverflowError:
         return math.inf
     return (
