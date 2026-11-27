@@ -241,6 +241,37 @@ def test_present_rollup_renders_emitted_depth_and_escapes() -> None:
     assert "<warning>" not in html
 
 
+def test_capacity_bound_on_product_price_is_visible() -> None:
+    artifact = _full_artifact()
+    product = artifact["terminal"]["run_metadata"]["cost_rollup_diagnostic"][
+        "product_costs"
+    ]["process.cleaned_melt:SiO2"]
+    product["flag"] = {
+        "capacity_solve_excludes_unavailable_species": [{
+            "kind": "capacity_solve_excludes_unavailable_species",
+            "excluded_species": [{
+                "species": "Si",
+                "reason": "missing Chapman-Enskog transport data",
+            }],
+            "bound_direction": {
+                "resolved_fluxes": "upper",
+                "headspace_pressure": "lower",
+            },
+        }],
+    }
+
+    html = _render_panel(artifact)["html"]
+    products = _between(
+        html,
+        "<summary>Product allocations</summary>",
+        "<summary>Active inventory allocations</summary>",
+    )
+
+    assert "capacity_solve_excludes_unavailable_species" in products
+    assert "headspace_pressure" in products
+    assert "lower" in products
+
+
 def test_partial_product_allocations_render_status_and_exclusions() -> None:
     artifact = _full_artifact()
     allocation = artifact["terminal"]["run_metadata"][

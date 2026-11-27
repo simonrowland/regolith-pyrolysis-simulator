@@ -7948,11 +7948,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         from simulator.chemistry.kernel.dto import IntentRequest
         from simulator.evaporation import (
-            EvaporationFluxRefusal,
             _append_capacity_solve_exclusion_notice,
-            _provider_has_resolved_flux_channels,
+            _provider_flux_outcome_refusal,
             _record_unavailable_provider_flux_channels,
-            _transport_only_unavailable_result,
         )
         from simulator.reduced_real_cache_interpolation import (
             is_interpolated_equilibrium,
@@ -8238,30 +8236,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._last_vapour_batch_flux_overlay = copy.deepcopy(
                 capacity_flux_overlay
             )
-            transport_only_unavailable = _transport_only_unavailable_result(
+            provider_refusal = _provider_flux_outcome_refusal(
+                self,
                 result.status,
                 diagnostic,
+                provider_unavailable,
+                iteration_overlay,
+                selector_overlay=selection_flux_overlay,
             )
-            if str(result.status) != 'ok':
-                if not transport_only_unavailable:
-                    raise EvaporationFluxRefusal(
-                        str(diagnostic.get('reason') or result.status),
-                        diagnostic,
-                    )
-            if provider_unavailable and not _provider_has_resolved_flux_channels(
-                diagnostic
-            ):
-                refusal = EvaporationMixin._vapour_batch_resolution_refusal(
-                    self,
-                    {
-                        **diagnostic,
-                        'reason': 'vapour_batch_no_debiting_pressure_outcome',
-                    },
-                    iteration_overlay,
-                    selector_overlay=selection_flux_overlay,
-                )
-                assert refusal is not None
-                raise refusal
+            if provider_refusal is not None:
+                raise provider_refusal
             # Debit vector only. Rates at or below the 1e-12 kg/h floor
             # stay out of this solve so the partials stay on the published
             # flux closure. Wall supply reads the live publisher diagnostic

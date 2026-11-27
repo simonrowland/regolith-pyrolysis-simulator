@@ -509,6 +509,52 @@ def test_run_input_allocation_uses_existing_species_product_row():
     assert co.thermal_flux_h == pytest.approx(1273.15)
 
 
+def test_capacity_bound_is_carried_on_price_line_for_bounded_flux():
+    from simulator.state import EvaporationFlux
+
+    ledger = CostLedger()
+    ledger.apply_mass_allocated_event(
+        process_step="evaporation",
+        outputs_kg={
+            ("terminal.product", "Na"): 2.0,
+            ("terminal.product", "Fe"): 2.0,
+        },
+        processing_cost=CostVector(external_reagent_kg=1.0),
+    )
+    bound = {
+        "kind": "capacity_solve_excludes_unavailable_species",
+        "hour": 4,
+        "excluded_species": [{"species": "Si", "reason": "missing transport"}],
+        "bound_direction": {
+            "resolved_fluxes": "upper",
+            "headspace_pressure": "lower",
+        },
+    }
+    snapshot = SimpleNamespace(
+        evap_flux=EvaporationFlux(
+            species_kg_hr={"Na": 0.2},
+            carrier_authority_by_species={
+                "Na": {
+                    "capacity_solve_excludes_unavailable_species": bound,
+                },
+            },
+        )
+    )
+
+    diagnostic = build_cost_rollup_diagnostic(
+        sim=None,
+        cost_ledger=ledger,
+        per_hour=({"T_C": 1000.0},),
+        products_kg={"Na": 2.0, "Fe": 2.0},
+        snapshots=(snapshot,),
+    )
+
+    assert diagnostic["product_costs"]["terminal.product:Na"]["flag"][
+        "capacity_solve_excludes_unavailable_species"
+    ] == [bound]
+    assert "flag" not in diagnostic["product_costs"]["terminal.product:Fe"]
+
+
 def test_run_input_allocation_reports_terminal_mass_basis_not_cost_lot_mass():
     ledger = CostLedger()
     ledger.apply_mass_allocated_event(

@@ -1731,6 +1731,53 @@ def test_provider_refuses_missing_species_transport_parameters(monkeypatch):
 
 
 @pytest.mark.xdist_group("serial")
+def test_provider_keeps_computed_zero_when_peer_lacks_transport(monkeypatch):
+    from types import SimpleNamespace
+
+    from simulator.condensation import _LENNARD_JONES_PARAMS
+    from simulator.evaporation import _record_unavailable_provider_flux_channels
+    from simulator.state import EvaporationFlux
+
+    monkeypatch.delitem(_LENNARD_JONES_PARAMS, "Si", raising=False)
+    stoich = {
+        "Fe": {"parent_oxide": "FeO", "oxide_per_product_kg": 1.286},
+        "Si": {"parent_oxide": "SiO2", "oxide_per_product_kg": 2.139},
+    }
+    result = _w3_result_with_controls(
+        1.0,
+        overhead_pressure_pa=1000.0,
+        vapour_batch_flux_pressures_Pa={"Fe": 0.0, "Si": 100.0},
+        molar_mass_kg_mol={"Fe": 0.055845, "Si": 0.028085},
+        stoich_by_species=stoich,
+        available_oxide_kg={"Fe": 10.0, "Si": 10.0},
+        alpha={"Fe": 0.5, "Si": 0.5},
+    )
+
+    assert result.status == "unavailable"
+    assert result.diagnostic["zero_net_evaporation_flux"] == {"Fe": 0.0}
+    assert set(result.diagnostic["missing_transport_parameters"]) == {"Si"}
+    overlay = {}
+    flux = EvaporationFlux()
+    unavailable = _record_unavailable_provider_flux_channels(
+        SimpleNamespace(melt=SimpleNamespace(hour=4)),
+        result.diagnostic,
+        overlay,
+        expected_species=("Fe", "Si"),
+        stoich_by_species=stoich,
+        flux=flux,
+    )
+    assert set(unavailable) == {"Si"}
+    assert "missing Chapman-Enskog" in unavailable["Si"]
+    assert overlay["notices"] == [{
+        "kind": "vapour_batch_unresolved",
+        "species": "Si",
+        "hour": 4,
+        "reason": unavailable["Si"],
+    }]
+    assert "Fe" not in flux.carrier_authority_by_species
+
+
+@pytest.mark.xdist_group("serial")
 def test_missing_transport_channel_is_unavailable_downstream(
     monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
 ):

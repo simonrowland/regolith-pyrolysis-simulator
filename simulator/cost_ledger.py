@@ -1040,6 +1040,42 @@ def _build_cost_rollup_diagnostic(
             reason,
             entire_vector=True,
         )
+    capacity_bounds_by_species: dict[str, list[dict[str, Any]]] = {}
+    for snapshot in snapshots or ():
+        flux = getattr(snapshot, "evap_flux", None)
+        rates = getattr(flux, "species_kg_hr", {}) or {}
+        authorities = getattr(flux, "carrier_authority_by_species", {}) or {}
+        if not isinstance(rates, Mapping) or not isinstance(authorities, Mapping):
+            continue
+        for species, rate in rates.items():
+            if _finite(rate) <= 0.0:
+                continue
+            authority = authorities.get(str(species))
+            bound = (
+                authority.get("capacity_solve_excludes_unavailable_species")
+                if isinstance(authority, Mapping)
+                else None
+            )
+            if (
+                not isinstance(bound, Mapping)
+                or bound.get("kind")
+                != "capacity_solve_excludes_unavailable_species"
+            ):
+                continue
+            flags = capacity_bounds_by_species.setdefault(str(species), [])
+            flag = dict(bound)
+            if flag not in flags:
+                flags.append(flag)
+    for key, entry in tuple(product_costs.items()):
+        species = str(key).rsplit(":", 1)[-1]
+        bounds = capacity_bounds_by_species.get(species)
+        if not bounds or not isinstance(entry, Mapping):
+            continue
+        updated = dict(entry)
+        flag = dict(updated.get("flag") or {})
+        flag["capacity_solve_excludes_unavailable_species"] = bounds
+        updated["flag"] = flag
+        product_costs[key] = updated
     allocation_status = (
         "allocated_by_product_mass"
         if product_inputs else "unallocated_no_product_mass"

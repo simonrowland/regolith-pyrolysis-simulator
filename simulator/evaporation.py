@@ -1540,6 +1540,51 @@ def _provider_has_resolved_flux_channels(
     )
 
 
+def _provider_flux_outcome_refusal(
+    host: Any,
+    status: Any,
+    diagnostic: Mapping[str, Any],
+    provider_unavailable: Mapping[str, str],
+    flux_overlay: dict[str, Any],
+    *,
+    selector_overlay: Mapping[str, Any] | None = None,
+) -> EvaporationFluxRefusal | None:
+    """Classify provider status and resolved channels for live and capacity."""
+    if str(status) != 'ok' and not _transport_only_unavailable_result(
+        status,
+        diagnostic,
+    ):
+        reason = str(diagnostic.get('reason') or '').strip()
+        if 'missing_transport_parameters' in diagnostic and not reason:
+            missing = ', '.join(
+                sorted(diagnostic['missing_transport_parameters'])
+            )
+            reason = (
+                'missing Chapman-Enskog transport parameters for sampled '
+                f'species: {missing}'
+            )
+        if not reason:
+            reason = (
+                f'evaporation_flux_{status}'
+                if status
+                else 'evaporation_flux_refused'
+            )
+        return EvaporationFluxRefusal(reason, diagnostic)
+    if provider_unavailable and not _provider_has_resolved_flux_channels(
+        diagnostic
+    ):
+        return EvaporationMixin._vapour_batch_resolution_refusal(
+            host,
+            {
+                **diagnostic,
+                'reason': _VAPOUR_BATCH_NO_DEBITING_PRESSURE_OUTCOME,
+            },
+            flux_overlay,
+            selector_overlay=selector_overlay,
+        )
+    return None
+
+
 def _append_capacity_solve_exclusion_notice(
     host: Any,
     overlay: dict[str, Any],
@@ -2745,15 +2790,16 @@ class EvaporationMixin:
             temperature_K=T_K,
             overhead_partials_Pa=overhead_partials_override_Pa,
         )
+        capacity_bound = None
         if (
             isinstance(capacity_bound_notice, Mapping)
             and capacity_bound_notice.get('kind')
             == 'capacity_solve_excludes_unavailable_species'
         ):
+            capacity_bound = dict(capacity_bound_notice)
             notices = flux_overlay_report.setdefault('notices', [])
-            notice = dict(capacity_bound_notice)
-            if notice not in notices:
-                notices.append(notice)
+            if capacity_bound not in notices:
+                notices.append(capacity_bound)
         batch_report = serialize_vapour_batch(vapour_batch)
         if isinstance(batch_report, Mapping):
             channels = batch_report.get('channels_by_species')
@@ -2763,6 +2809,11 @@ class EvaporationMixin:
                     for species, record in channels.items()
                     if isinstance(record, Mapping)
                 }
+        if capacity_bound is not None:
+            for authority in flux.carrier_authority_by_species.values():
+                authority['capacity_solve_excludes_unavailable_species'] = (
+                    dict(capacity_bound)
+                )
         self._last_vapour_batch = vapour_batch
         self._last_vapour_batch_report = batch_report
         self._last_vapour_batch_flux_overlay = flux_overlay_report
@@ -3213,47 +3264,18 @@ class EvaporationMixin:
                 'unmeasured_alpha_evaporation_fallback',
                 count=len(unmeasured_alpha_species),
             )
-        # A typed missing-transport channel remains local to that species; keep
-        # the rest of the run available even when every requested channel is
-        # excluded. Other non-OK flux outcomes still fail as a run-level refusal.
-        transport_only_unavailable = _transport_only_unavailable_result(
+        provider_refusal = _provider_flux_outcome_refusal(
+            self,
             kernel_result.status,
             diagnostic,
+            provider_unavailable,
+            flux_overlay_report,
+            selector_overlay=selector_flux_overlay,
         )
-        if str(kernel_result.status) != 'ok' and not transport_only_unavailable:
-            reason = str(diagnostic.get('reason') or '').strip()
-            # A primary refusal wins; secondary records remain diagnostic context.
-            if 'missing_transport_parameters' in diagnostic and not reason:
-                missing = ', '.join(
-                    sorted(diagnostic['missing_transport_parameters'])
-                )
-                reason = (
-                    'missing Chapman-Enskog transport parameters for sampled '
-                    f'species: {missing}'
-                )
-            if not reason:
-                reason = (
-                    f"evaporation_flux_{kernel_result.status}"
-                    if kernel_result.status
-                    else "evaporation_flux_refused"
-                )
-            raise EvaporationFluxRefusal(reason, diagnostic)
+        if provider_refusal is not None:
+            self._last_evaporation_flux_diagnostic = provider_refusal.diagnostic
+            raise provider_refusal
         flux_kg_hr = diagnostic.get('evaporation_flux_kg_hr') or {}
-        if provider_unavailable and not _provider_has_resolved_flux_channels(
-            diagnostic
-        ):
-            refusal = EvaporationMixin._vapour_batch_resolution_refusal(
-                self,
-                {
-                    **diagnostic,
-                    'reason': _VAPOUR_BATCH_NO_DEBITING_PRESSURE_OUTCOME,
-                },
-                flux_overlay_report,
-                selector_overlay=selector_flux_overlay,
-            )
-            assert refusal is not None
-            self._last_evaporation_flux_diagnostic = refusal.diagnostic
-            raise refusal
         liquid_fraction_factor = 1.0
         if flux_kg_hr and self._freeze_gate_enabled():
             if gate_authority is _RESOLVE_EVAPORATION_GATE_AUTHORITY:

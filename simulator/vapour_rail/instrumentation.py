@@ -1244,10 +1244,7 @@ def flux_pressures_from_batch(
             if math.isfinite(catalog_pa):
                 batch_pa_by_species[species_id] = catalog_pa
         gate_state = _channel_flux_gate_state(answer)
-        if (
-            gate_state in {"eligible", "zero_by_physics"}
-            and species_id not in batch_active_species_ids
-        ):
+        if gate_state == "eligible" and species_id not in batch_active_species_ids:
             channel_states[species_id] = "dormant_by_epoch"
             continue
         selected_pa, state = _channel_flux_pressure_pa(

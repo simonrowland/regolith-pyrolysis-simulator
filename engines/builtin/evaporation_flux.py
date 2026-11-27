@@ -1993,17 +1993,20 @@ class BuiltinEvaporationFluxProvider(ChemistryProvider):
                 below_threshold_flux_kg_hr[species] = rate_kg_hr
 
         if missing_transport_parameters and not computable_transport_species:
+            diagnostic = {
+                "evaporation_flux_kg_hr": {},
+                "missing_transport_parameters": missing_transport_parameters,
+                "temperature_C": T_C,
+                "evaporation_series_resistance": series_flux_diagnostics,
+            }
+            if zero_net_flux_kg_hr:
+                diagnostic["zero_net_evaporation_flux"] = zero_net_flux_kg_hr
             return IntentResult(
                 intent=ChemistryIntent.EVAPORATION_FLUX,
                 status="unavailable",
                 transition=None,
                 control_audit=control_audit,
-                diagnostic={
-                    "evaporation_flux_kg_hr": {},
-                    "missing_transport_parameters": missing_transport_parameters,
-                    "temperature_C": T_C,
-                    "evaporation_series_resistance": series_flux_diagnostics,
-                },
+                diagnostic=diagnostic,
                 warnings=(
                     "missing Chapman-Enskog transport parameters for sampled species: "
                     + ", ".join(sorted(missing_transport_parameters)),

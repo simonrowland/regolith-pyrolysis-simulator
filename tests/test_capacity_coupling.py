@@ -334,6 +334,7 @@ def test_live_and_capacity_keep_unresolved_k_unavailable_with_fe_zero(
         "Fe": "zero_by_physics",
         "K": "refusal",
     }
+    assert overlay["selected_runtime_pa_by_species"] == {"Fe": 0.0}
     unresolved = [
         notice
         for notice in overlay["notices"]
@@ -608,45 +609,108 @@ def test_two_species_binding_fixture_preserves_non_o2_head_partition(dt_hr):
     assert result.mass_closure_error_pct <= 5.0e-12
 
 
+@pytest.mark.xdist_group("serial")
 def test_excluding_unavailable_species_bounds_resolved_capacity_flux():
-    def solve(*, supply_si):
-        def flux_at_partials(partials):
-            total_pressure = sum(partials.values())
-            pressure_limited_rate = max(
-                0.0,
-                1.0e-9 - 3.0e-12 * total_pressure,
+    from simulator.condensation import _LENNARD_JONES_PARAMS
+
+    def solve(*, exclude_si):
+        sim = _real_capacity_sim()
+        sim.melt.temperature_C = 1600.0
+        sim._freeze_gate_enabled = lambda: False
+        with pytest.MonkeyPatch.context() as local:
+            equilibrium = _install_na_si_transport_batch(local, sim)
+            capacity = FiniteCapacity(0.05)
+            cold_train = SimpleNamespace(
+                accumulator_enabled=False,
+                relief={
+                    "k_relief_kg_hr_Pa": 1.0e-30,
+                    "p_open_Pa": 1.0e9,
+                    "vessel_rating_Pa": 1.0e12,
+                },
             )
-            rates = {"Na": pressure_limited_rate}
-            if supply_si:
-                rates["Si"] = pressure_limited_rate
-            return rates
+            local.setattr(
+                sim,
+                "_cold_train_capacity_policy",
+                lambda: (capacity, cold_train),
+            )
+            if exclude_si:
+                local.delitem(_LENNARD_JONES_PARAMS, "Si", raising=False)
+            result = PyrolysisSimulator._compute_capacity_coupling_shadow_impl(
+                sim,
+                equilibrium,
+            )
+            assert isinstance(result, CapacityShadowResult)
+            if exclude_si:
+                assert "Si" not in result.evaporation_flux_kg_hr
+                bound = next(
+                    notice
+                    for notice in sim._last_vapour_batch_flux_overlay["notices"]
+                    if notice["kind"]
+                    == "capacity_solve_excludes_unavailable_species"
+                )
+                before_transitions = len(sim.atom_ledger.transitions)
+                raw_flux = sim._calculate_evaporation(
+                    equilibrium,
+                    overhead_partials_override_Pa=(
+                        result.partial_pressures_Pa
+                    ),
+                    capacity_bound_notice=bound,
+                )
+                assert raw_flux.species_kg_hr["Na"] > 0.0
+                assert "Si" not in raw_flux.species_kg_hr
+                assert raw_flux.carrier_authority_by_species["Na"][
+                    "capacity_solve_excludes_unavailable_species"
+                ] == bound
+                actual_flux = sim._apply_analytic_evaporation_depletion(
+                    raw_flux
+                )
+                sim._route_to_condensation(actual_flux)
+                committed = sim.atom_ledger.transitions[before_transitions:]
+                assert all(
+                    not (
+                        debit.account == "process.cleaned_melt"
+                        and debit.species == "SiO2"
+                    )
+                    for transition in committed
+                    for debit in transition.debits
+                )
+                assert all(
+                    lot.species not in {"Si", "SiO"}
+                    for transition in committed
+                    for lot in (*transition.debits, *transition.credits)
+                )
+            return sim, result
 
-        return solve_capacity_shadow(
-            pre_holdup_mol={},
-            molar_mass_kg_mol={"Na": 0.023, "Si": 0.028085},
-            flux_kg_hr_at_partials=flux_at_partials,
-            capacity=FiniteCapacity(0.05),
-            head_bled_species_mol={},
-            external_o2_holdup_mol=0.0,
-            temperature_K=300.0,
-            volume_m3=1.0e-6,
-            dt_hr=1.0,
-            bleed_conductance_kg_s=0.2e-9 / 3600.0,
-            downstream_pressure_Pa=100.0,
-            k_relief_kg_hr_Pa=0.0,
-            p_open_Pa=1.0e12,
-            vessel_rating_Pa=1.0e12,
-        )
-
-    excluded = solve(supply_si=False)
-    supplied = solve(supply_si=True)
+    excluded_sim, excluded = solve(exclude_si=True)
+    _supplied_sim, supplied = solve(exclude_si=False)
 
     assert isinstance(excluded, CapacityShadowResult)
     assert isinstance(supplied, CapacityShadowResult)
+    assert excluded.evaporation_flux_kg_hr["Na"] > 0.0
     assert supplied.evaporation_flux_kg_hr["Si"] > 0.0
     assert excluded.evaporation_flux_kg_hr["Na"] >= (
         supplied.evaporation_flux_kg_hr["Na"]
     )
+    assert sum(excluded.partial_pressures_Pa.values()) <= sum(
+        supplied.partial_pressures_Pa.values()
+    )
+    excluded_flag = next(
+        notice
+        for notice in excluded_sim._last_vapour_batch_flux_overlay["notices"]
+        if notice["kind"] == "capacity_solve_excludes_unavailable_species"
+    )
+    assert excluded_flag["excluded_species"] == [{
+        "species": "Si",
+        "reason": next(
+            notice["reason"]
+            for notice in excluded_sim._last_vapour_batch_flux_overlay["notices"]
+            if notice["kind"] == "vapour_batch_unresolved"
+            and notice["species"] == "Si"
+        ),
+    }]
+    assert "missing Chapman-Enskog" in excluded_flag["excluded_species"][0][
+        "reason"
+    ]
 
 
 def test_relief_is_capped_by_post_admission_remainder():
@@ -893,18 +957,20 @@ def test_core_refusal_leaves_record_and_ledger_close_report_unchanged(
 def test_capacity_shadow_refuses_unresolved_vapour_before_empty_source_solve(
     monkeypatch,
 ):
-    sim = object.__new__(PyrolysisSimulator)
-    sim._langmuir_flux_closure_context = None
+    sim = _real_capacity_sim()
+    sim.melt.temperature_C = 1600.0
     sim._cold_train_capacity_policy = lambda: (
         FiniteCapacity(1.0),
-        SimpleNamespace(accumulator_enabled=False),
-    )
-    sim.atom_ledger = SimpleNamespace(
-        mol_by_account=lambda: {},
-        transitions=[],
+        SimpleNamespace(
+            accumulator_enabled=False,
+            relief={
+                "k_relief_kg_hr_Pa": 1.0e-30,
+                "p_open_Pa": 1.0e9,
+                "vessel_rating_Pa": 1.0e12,
+            },
+        ),
     )
     sim._overhead_holdup_mol = lambda: {}
-    sim.melt = SimpleNamespace(temperature_C=1600.0)
     overlay = {
         "selection_source": TYPED_FAILURE_EFFECTIVE_PRESSURE_SPECIES_SET_MISMATCH,
         "notices": [{
