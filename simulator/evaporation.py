@@ -2591,6 +2591,17 @@ class EvaporationMixin:
             vapor_pressure_diagnostic,
             flux=flux,
         )
+        refusal = EvaporationMixin._vapour_batch_resolution_refusal(
+            self,
+            {},
+            flux_overlay_report,
+            selector_overlay=selector_flux_overlay,
+            flux_pressures=vapor_pressures,
+            include_unresolved_notices=True,
+        )
+        if refusal is not None:
+            self._last_evaporation_flux_diagnostic = refusal.diagnostic
+            raise refusal
         channel_states = dict(
             flux_overlay_report.get('batch_channel_states', {}) or {}
         )
@@ -2958,6 +2969,12 @@ class EvaporationMixin:
                     'extra': extra,
                 })
                 flux.carrier_authority_by_species[str(species)] = channel
+                _append_vapour_batch_unresolved_notice(
+                    self,
+                    flux_overlay_report,
+                    species=str(species),
+                    reason=reason,
+                )
         continuum_notice = diagnostic.get('continuum_extrapolation_notice')
         condensation_model = getattr(self, 'condensation_model', None)
         if continuum_notice and condensation_model is not None:

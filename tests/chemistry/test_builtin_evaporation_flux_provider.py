@@ -1862,6 +1862,53 @@ def test_missing_transport_channel_is_unavailable_downstream(
     report = target_species_yield_report(sim, target_species=("SiO",))
     assert report["targets"]["SiO"]["yield_fraction"] is None
 
+    # This provider-backed hour has a positive Na peer and a typed unavailable
+    # Si transport channel. In C2B, Si is the monitored species for this
+    # fixture; the real simulator endpoint must hold instead of reading the
+    # absent rate as a depleted zero.
+    import copy
+
+    from simulator.campaigns import CampaignManager
+    from simulator.state import BatchRecord, EvaporationFlux, HourSnapshot
+
+    endpoint_setpoints = copy.deepcopy(sim.setpoints)
+    c2b_soft_endpoint = endpoint_setpoints["campaigns"]["C2B"]["soft_endpoint"]
+    c2b_soft_endpoint.update({
+        "species": "Si",
+        "threshold_kg_hr": 0.1,
+        "min_hold_hr": 1,
+    })
+    sim.campaign_mgr = CampaignManager(endpoint_setpoints)
+    sim.melt.campaign = CampaignPhase.C2B
+    sim.melt.campaign_hour = 8
+    sim.melt.hour = 8
+    flux = sim._calculate_evaporation(equilibrium)
+    sim.record = BatchRecord(snapshots=[
+        HourSnapshot(
+            campaign=CampaignPhase.C2B,
+            evap_flux=EvaporationFlux(
+                total_kg_hr=0.2,
+                species_kg_hr={"Si": 0.2},
+            ),
+        ),
+    ])
+    assert sim.campaign_mgr._evap_species_signal_armed(
+        sim.record,
+        CampaignPhase.C2B,
+        "Si",
+        0.1,
+        current_rate=None,
+    )
+    si_notice = next(
+        notice
+        for notice in sim._last_vapour_batch_flux_overlay["notices"]
+        if notice.get("species") == "Si"
+    )
+    assert si_notice["kind"] == "vapour_batch_unresolved"
+    assert si_notice["hour"] == 8
+    assert flux.species_kg_hr["Na"] > 0.0
+    assert sim._check_campaign_endpoint(flux) is False
+
 
 @pytest.mark.parametrize(
     ("species_id", "parent_oxide", "molar_mass"),

@@ -43,7 +43,15 @@ from simulator.evaporation import (
 from simulator.physical_constants import GAS_CONSTANT
 from simulator.state import CampaignPhase, EvaporationFlux
 from simulator.vapour_rail.activity import ActivityVerdictKind
-from simulator.vapour_rail.batch import FluxEligible, PressureRefusal, PressureValue
+from simulator.vapour_rail.batch import (
+    FluxEligible,
+    FluxRefusal,
+    PressureRefusal,
+    PressureValue,
+    VapourAnswer,
+    VapourBatch,
+    ZeroByPhysics,
+)
 from simulator.vapour_rail.catalog import OUT_OF_RANGE_STATUS
 from simulator.vapour_rail.instrumentation import (
     EffectivePressureSource,
@@ -79,6 +87,177 @@ def _real_capacity_sim():
         _load_yaml("feedstocks.yaml"),
         _load_yaml("setpoints.yaml"),
     )
+
+
+def _fe_k_refusal_batch(*, catalog_zero_fe: bool = False) -> VapourBatch:
+    """Production-shaped selector input with K refused and Fe selectable."""
+    fe_pressure = (
+        ZeroByPhysics("b1318-catalog-proven-zero")
+        if catalog_zero_fe
+        else PressureValue(1.0)
+    )
+    return VapourBatch(
+        requested_species_ids=frozenset({"Fe", "K"}),
+        channels_by_species={
+            "Fe": VapourAnswer(
+                species_id="Fe",
+                pressure=fe_pressure,
+                selected_runtime_pressure=fe_pressure,
+                flux=FluxEligible(alpha_ref="alpha:Fe"),
+                source_label="b1318-selector-fixture",
+                formula_id="Fe",
+                source_account="process.cleaned_melt",
+                solve_group_id="b1318-selector-fixture",
+                state_fingerprint="state:b1318-selector-fixture",
+                validation_status="pending_validation",
+            ),
+            "K": VapourAnswer(
+                species_id="K",
+                pressure=PressureRefusal(
+                    code="k_catalog_channel_refused",
+                    detail="K catalog channel is refused",
+                ),
+                selected_runtime_pressure=PressureRefusal(
+                    code="k_catalog_channel_refused",
+                    detail="K catalog channel is refused",
+                ),
+                flux=FluxRefusal(
+                    code="k_catalog_channel_refused",
+                    detail="K catalog channel is refused",
+                ),
+                source_label="b1318-selector-fixture",
+                formula_id="K",
+                source_account="process.cleaned_melt",
+                solve_group_id="b1318-selector-fixture",
+                state_fingerprint="state:b1318-selector-fixture",
+                validation_status="pending_validation",
+                refusal_code="k_catalog_channel_refused",
+            ),
+        },
+        flux_active_species_ids=frozenset({"Fe"}),
+    )
+
+
+def _install_fe_k_refusal_selector(
+    monkeypatch,
+    sim,
+    *,
+    catalog_zero_fe: bool = False,
+):
+    """Use the real batch selector on the typed Fe/K test channels."""
+    import simulator.evaporation as evaporation_module
+
+    batch = _fe_k_refusal_batch(catalog_zero_fe=catalog_zero_fe)
+    monkeypatch.setattr(
+        evaporation_module,
+        "_pre_rg_effective_pressure_source",
+        lambda *_args, **_kwargs: EffectivePressureSource(
+            PRE_RG_EFFECTIVE_PRESSURE_SOURCE_ID,
+            {"Fe": 1.0},
+        ),
+    )
+    monkeypatch.setattr(
+        sim,
+        "_resolve_evaporation_vapour_batch",
+        lambda *_args, **_kwargs: batch,
+    )
+    monkeypatch.setattr(
+        evaporation_module,
+        "compare_live_shadow_to_batch_flux",
+        lambda **_kwargs: {
+            "shadow_equal": True,
+            "shadow_outcome": "shadow_proved",
+        },
+    )
+    sim._last_vapor_pressure_diagnostic = {
+        "vapor_pressure_numerator_provenance": {
+            "Fe": {
+                "pressure_rail": "condensed_raoult_psat",
+                "activity_factor": 1.0,
+                "raw_metal_activity_root": 2.0,
+                "P_reference_Antoine_Pa": 1.0,
+            },
+        },
+    }
+
+
+@pytest.mark.parametrize("path", ["live", "capacity"])
+def test_live_and_capacity_refuse_k_when_fe_is_catalog_proven_zero(
+    path,
+    monkeypatch,
+):
+    sim = _real_capacity_sim()
+    sim.melt.temperature_C = 1600.0
+    _install_fe_k_refusal_selector(
+        monkeypatch,
+        sim,
+        catalog_zero_fe=True,
+    )
+    equilibrium = SimpleNamespace(
+        temperature_C=1600.0,
+        vapor_pressures_Pa={"Fe": 1.0},
+        vapor_pressures_source={},
+        activity_coefficients={},
+        liquid_fraction=1.0,
+        diagnostics={},
+    )
+
+    def preserve_catalog_zero(_self, pressures, **_kwargs):
+        return SimpleNamespace(
+            applied=False,
+            surface_pO2_bar=None,
+            pressures_Pa=dict(pressures),
+            refused_species={},
+            refusal_codes_by_species={},
+            as_diagnostic=lambda: {},
+        )
+
+    monkeypatch.setattr(
+        EvaporationMixin,
+        "_closed_langmuir_pressures_for_partials",
+        preserve_catalog_zero,
+    )
+    sim._last_vapour_batch_resolve_error = {}
+    if path == "live":
+        evaluate = lambda: sim._calculate_evaporation(
+            equilibrium,
+            overhead_partials_override_Pa={},
+        )
+    else:
+        capacity = FiniteCapacity(0.05)
+        cold_train = SimpleNamespace(
+            accumulator_enabled=False,
+            relief={
+                "k_relief_kg_hr_Pa": 1.0e-30,
+                "p_open_Pa": 1.0e9,
+                "vessel_rating_Pa": 1.0e12,
+            },
+        )
+        monkeypatch.setattr(
+            sim,
+            "_cold_train_capacity_policy",
+            lambda: (capacity, cold_train),
+        )
+        evaluate = lambda: PyrolysisSimulator._compute_capacity_coupling_shadow_impl(
+            sim,
+            equilibrium,
+        )
+
+    with pytest.raises(EvaporationFluxRefusal) as refusal:
+        evaluate()
+
+    assert refusal.value.reason == "vapour_batch_no_debiting_pressure_outcome"
+    overlay = refusal.value.diagnostic["vapour_batch_flux_overlay"]
+    assert overlay["batch_channel_states"] == {
+        "Fe": "zero_by_physics",
+        "K": "refusal",
+    }
+    assert overlay["notices"] == [{
+        "kind": "vapour_batch_unresolved",
+        "species": "K",
+        "hour": int(sim.melt.hour),
+        "reason": "k_catalog_channel_refused",
+    }]
 
 
 def _record_transport_estimates(sim):
@@ -1043,6 +1222,7 @@ def test_capacity_picard_accounts_for_fe_recovered_after_initial_refusal(
         volume_m3=volume_m3,
     )
     pressure_targets = {"Na": current_partials["Na"] + 0.1, "Fe": 900.0}
+    source_response_gain = 0.1
     dispatch_pressure_maps = []
 
     def dispatch(_provider, request):
@@ -1054,7 +1234,7 @@ def test_capacity_picard_accounts_for_fe_recovered_after_initial_refusal(
         for species in pressure_map:
             target = pressure_targets[species]
             source_mol_hr = (
-                0.9
+                source_response_gain
                 * max(0.0, target - float(partials.get(species, 0.0)))
                 * volume_m3
                 / (GAS_CONSTANT * temperature_K)
@@ -1088,6 +1268,13 @@ def test_capacity_picard_accounts_for_fe_recovered_after_initial_refusal(
     assert isinstance(
         result, CapacityShadowResult
     ), "the tuned Na target must converge before accounting is checked"
+    # The Fe fixed-point map has slope -gain. With a 900 Pa target and zero
+    # initial Fe partial pressure, the first update is 0.1 * 900 = 90 Pa;
+    # each following update residual contracts by 0.1. After 8 further
+    # trials, it is at most 90 * 0.1**8 = 9e-7 Pa, below the solver's 1e-6 Pa
+    # absolute tolerance, well inside the 50-trial limit.
+    assert result.iterations < 20
+    assert result.iterations < 50
     assert reclose_calls >= 2
     assert dispatch_pressure_maps[0] == {"Na": 2.0}
     assert any("Fe" in pressure_map for pressure_map in dispatch_pressure_maps[1:])
@@ -2795,7 +2982,6 @@ def test_overhead_model_leaves_provider_partition_mirrors_unset(
 def test_picard_keeps_persistent_batch_notice_when_peer_proves_zero(
     monkeypatch,
 ):
-    import simulator.evaporation as evaporation_module
     from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
     from simulator.langmuir_surface_oxygen import (
         LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED,
@@ -2804,17 +2990,7 @@ def test_picard_keeps_persistent_batch_notice_when_peer_proves_zero(
     sim = _real_capacity_sim()
     sim.melt.temperature_C = 1600.0
     sim._last_langmuir_surface_oxygen = {}
-    pressure_diagnostic = {
-        "vapor_pressure_numerator_provenance": {
-            "Fe": {
-                "pressure_rail": "condensed_raoult_psat",
-                "activity_factor": 1.0,
-                "raw_metal_activity_root": 2.0,
-                "P_reference_Antoine_Pa": 1.0,
-            },
-        },
-    }
-    sim._last_vapor_pressure_diagnostic = pressure_diagnostic
+    _install_fe_k_refusal_selector(monkeypatch, sim)
     equilibrium = SimpleNamespace(
         temperature_C=1600.0,
         vapor_pressures_Pa={"Fe": 1.0},
@@ -2822,38 +2998,6 @@ def test_picard_keeps_persistent_batch_notice_when_peer_proves_zero(
         activity_coefficients={},
         liquid_fraction=1.0,
         diagnostics={},
-    )
-    batch = SimpleNamespace(
-        requested_species_ids=frozenset({"Fe", "K"}),
-        channels_by_species={},
-    )
-    monkeypatch.setattr(
-        sim,
-        "_resolve_evaporation_vapour_batch",
-        lambda *_args, **_kwargs: batch,
-    )
-    selection_report = {
-        "selection_source": PRE_RG_EFFECTIVE_PRESSURE_SOURCE_ID,
-        "unresolved_missing_effective_pressure_species": ["K"],
-        "batch_channel_states": {"Fe": "eligible", "K": "refusal"},
-        "selected_runtime_pa_by_species": {"Fe": 1.0},
-        "notices": [],
-    }
-    monkeypatch.setattr(
-        evaporation_module,
-        "flux_pressures_from_batch",
-        lambda *_args, **_kwargs: (
-            {"Fe": 1.0},
-            copy.deepcopy(selection_report),
-        ),
-    )
-    monkeypatch.setattr(
-        evaporation_module,
-        "compare_live_shadow_to_batch_flux",
-        lambda **_kwargs: {
-            "shadow_equal": True,
-            "shadow_outcome": "shadow_proved",
-        },
     )
     monkeypatch.setattr(
         EvaporationMixin,
@@ -2878,11 +3022,16 @@ def test_picard_keeps_persistent_batch_notice_when_peer_proves_zero(
         "kind": "vapour_batch_unresolved",
         "species": "K",
         "hour": int(sim.melt.hour),
-        "reason": "refusal",
+        "reason": "k_catalog_channel_refused",
     }]
     assert selection_overlay["selection_source"] == (
         PRE_RG_EFFECTIVE_PRESSURE_SOURCE_ID
     )
+    assert selection_overlay["unresolved_missing_effective_pressure_species"] == []
+    assert selection_overlay["batch_channel_states"] == {
+        "Fe": "eligible",
+        "K": "refusal",
+    }
     assert selection_overlay["shadow_equal"] is True
     assert selection_overlay["shadow_outcome"] == "shadow_proved"
 
@@ -2891,7 +3040,7 @@ def test_picard_keeps_persistent_batch_notice_when_peer_proves_zero(
     sim._resolve_evaporation_batch_flux_state = lambda *_args, **_kwargs: (
         resolved[0],
         copy.deepcopy(initial_overlay),
-        None,
+        resolved[2],
         resolved[3],
         resolved[4],
         resolved[5],
