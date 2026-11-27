@@ -16,7 +16,7 @@ import os
 import sqlite3
 import subprocess
 from collections import Counter
-from collections.abc import Iterable, Iterator, Mapping, Sequence
+from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
 from datetime import datetime
 from datetime import timezone
 from decimal import Decimal
@@ -917,6 +917,20 @@ class PT1PersistentStoreCorrupt(PT0CacheCollision):
     """Persistent PT-1 row failed verify-on-hit integrity checks."""
 
 
+def _pt1_stored_fields_or_corrupt(
+    key_hash: str,
+    read_fields: Callable[[], Any],
+) -> Any:
+    try:
+        return read_fields()
+    except (sqlite3.Error, PT1PersistentStoreCorrupt):
+        raise
+    except Exception as exc:
+        raise PT1PersistentStoreCorrupt(
+            f"PT-1 row contains invalid stored fields: {key_hash}"
+        ) from exc
+
+
 class _PT1CacheMergeCollision(RuntimeError):
     """Two current PT-1 rows share a key but disagree on row identity."""
 
@@ -1810,10 +1824,15 @@ class PT0DeterminismStore:
                     f"PT-0 {artifact} key collision with different payload: "
                     f"{key_hash}"
                 )
-            effective_notices_json = monotonic_repair_notices_json(
-                existing.get("repair_notices_json"),
-                repair_notices_json,
-            )
+            try:
+                effective_notices_json = monotonic_repair_notices_json(
+                    existing.get("repair_notices_json"),
+                    repair_notices_json,
+                )
+            except Exception:
+                if not stale_payload:
+                    raise
+                effective_notices_json = repair_notices_json
         else:
             effective_notices_json = repair_notices_json
         if self.persistent_store is not None:
@@ -2612,7 +2631,7 @@ class PT1PersistentEquilibriumStore:
                     raise PT1PersistentStoreCorrupt(
                         f"PT-1 payload collision for {artifact}: {key_hash}"
                     )
-                existing_notices_json = _row_repair_notices(existing)
+                existing_notices_json = entry["repair_notices_json"]
                 effective_notices_json = monotonic_repair_notices_json(
                     existing_notices_json,
                     repair_notices_json,
@@ -2656,11 +2675,7 @@ class PT1PersistentEquilibriumStore:
                         incoming_disclosures
                         if stale_payload
                         else _prefer_law_disclosures(
-                            _law_disclosures_from_json(
-                                existing["law_disclosures_json"]
-                                if "law_disclosures_json" in existing.keys()
-                                else None
-                            ),
+                            entry["law_disclosures"],
                             incoming_disclosures,
                         ),
                     )
@@ -2670,11 +2685,7 @@ class PT1PersistentEquilibriumStore:
                 elif effective_notices_json == existing_notices_json:
                     # A read-only row with no disclosure field is not a usable
                     # hit. Copy it locally once this computation measured one.
-                    base_disclosures = _law_disclosures_from_json(
-                        existing["law_disclosures_json"]
-                        if "law_disclosures_json" in existing.keys()
-                        else None
-                    )
+                    base_disclosures = entry["law_disclosures"]
                     preferred = _prefer_law_disclosures(
                         base_disclosures,
                         incoming_disclosures,
@@ -2685,48 +2696,48 @@ class PT1PersistentEquilibriumStore:
                 else:
                     insert_source = existing
             source = insert_source
-            source_key_bytes = (
-                _sqlite_bytes(source["key_bytes"]) if source is not None else key_bytes
-            )
-            source_payload_bytes = (
-                _sqlite_bytes(source["payload_bytes"])
-                if source is not None
-                else payload_bytes
-            )
-            source_payload_hash = (
-                str(source["payload_sha256"])
-                if source is not None
-                else payload_hash
-            )
-            source_request_schema = (
-                str(source["request_schema_version"])
-                if source is not None
-                else SCHEMA_VERSION
-            )
-            source_code_version = (
-                str(source["code_version"]) if source is not None else _code_version()
-            )
-            source_corpus_version = (
-                source["corpus_version"] if source is not None else None
-            )
-            source_engine_version = (
-                source["engine_version"]
-                if source is not None
-                else _none_or_str(engine_version_provenance)
-            )
-            source_data_digests_json = (
-                str(source["data_digests_json"]) if source is not None else "{}"
-            )
-            source_created_at = (
-                str(source["created_at"])
-                if source is not None
-                else datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
-            )
-            source_git_dirty = (
-                int(source["git_dirty"])
-                if source is not None
-                else self._epoch_git_dirty
-            )
+            if source is None:
+                source_key_bytes = key_bytes
+                source_payload_bytes = payload_bytes
+                source_payload_hash = payload_hash
+                source_request_schema = SCHEMA_VERSION
+                source_code_version = _code_version()
+                source_corpus_version = None
+                source_engine_version = _none_or_str(engine_version_provenance)
+                source_data_digests_json = "{}"
+                source_created_at = (
+                    datetime.now(timezone.utc)
+                    .isoformat()
+                    .replace("+00:00", "Z")
+                )
+                source_git_dirty = self._epoch_git_dirty
+            else:
+                def source_metadata() -> tuple[Any, ...]:
+                    return (
+                        _sqlite_bytes(source["key_bytes"]),
+                        _sqlite_bytes(source["payload_bytes"]),
+                        str(source["payload_sha256"]),
+                        str(source["request_schema_version"]),
+                        str(source["code_version"]),
+                        source["corpus_version"],
+                        source["engine_version"],
+                        str(source["data_digests_json"]),
+                        str(source["created_at"]),
+                        int(source["git_dirty"]),
+                    )
+
+                (
+                    source_key_bytes,
+                    source_payload_bytes,
+                    source_payload_hash,
+                    source_request_schema,
+                    source_code_version,
+                    source_corpus_version,
+                    source_engine_version,
+                    source_data_digests_json,
+                    source_created_at,
+                    source_git_dirty,
+                ) = _pt1_stored_fields_or_corrupt(key_hash, source_metadata)
             conn.execute(
                 f"""
                 INSERT INTO {PT1_EQUILIBRIUM_TABLE} (
@@ -2791,18 +2802,16 @@ class PT1PersistentEquilibriumStore:
                     source_git_dirty,
                 ),
             )
-            stored = None
-            if (
-                existing is not None
-                and not stale_payload
-                and "law_disclosures_json" in existing.keys()
-            ):
-                stored = existing["law_disclosures_json"]
+            stored = (
+                entry["law_disclosures"]
+                if existing is not None and not stale_payload
+                else None
+            )
             self._write_law_disclosures(
                 conn,
                 key_hash,
                 _prefer_law_disclosures(
-                    _law_disclosures_from_json(stored),
+                    stored,
                     incoming_disclosures,
                 ),
             )
@@ -3451,8 +3460,7 @@ class PT1PersistentEquilibriumStore:
         expected_replay_scope_sha256: str | None = None,
         decoded_row_key: Mapping[str, Any] | None = None,
     ) -> Any:
-        expected_key = _json_ready(key)
-        try:
+        def decode_row() -> Any:
             return self._decode_entry_from_row_fields(
                 row,
                 artifact=artifact,
@@ -3463,14 +3471,9 @@ class PT1PersistentEquilibriumStore:
                 admission_keys=admission_keys,
                 expected_replay_scope_sha256=expected_replay_scope_sha256,
                 decoded_row_key=decoded_row_key,
-                expected_key=expected_key,
             )
-        except (sqlite3.Error, PT1PersistentStoreCorrupt):
-            raise
-        except Exception as exc:
-            raise PT1PersistentStoreCorrupt(
-                f"PT-1 row contains invalid stored fields: {key_hash}"
-            ) from exc
+
+        return _pt1_stored_fields_or_corrupt(key_hash, decode_row)
 
     def _decode_entry_from_row_fields(
         self,
@@ -3484,7 +3487,6 @@ class PT1PersistentEquilibriumStore:
         admission_keys: Sequence[Mapping[str, Any]] | None = None,
         expected_replay_scope_sha256: str | None = None,
         decoded_row_key: Mapping[str, Any] | None = None,
-        expected_key: Any,
     ) -> Any:
         row_key_bytes = _pt1_row_bytes(
             row["key_bytes"],
@@ -3536,6 +3538,7 @@ class PT1PersistentEquilibriumStore:
             raise PT1PersistentStoreCorrupt(
                 f"PT-1 row non-canonical request bytes: {key_hash}"
             )
+        expected_key = _json_ready(key)
         if row_key != expected_key:
             raise PT1PersistentStoreCorrupt(
                 f"PT-1 row canonical request mismatch: {key_hash}"
@@ -3836,15 +3839,21 @@ def _copy_pt1_equilibrium_rows(
                 f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})"
             )
         )
-        original_target_rows = {
-            str(row["key_hash"]): dict(row)
-            for row in target_conn.execute(
-                f"SELECT * FROM {PT1_EQUILIBRIUM_TABLE}"
+        original_target_rows: dict[str, dict[str, Any]] = {}
+        for row in target_conn.execute(
+            f"SELECT * FROM {PT1_EQUILIBRIUM_TABLE}"
+        ):
+            key_hash, stored_fields = _pt1_stored_fields_or_corrupt(
+                "<unknown>",
+                lambda row=row: (str(row["key_hash"]), dict(row)),
             )
-        }
+            original_target_rows[key_hash] = stored_fields
         planned_rows = dict(original_target_rows)
         planned_admission = {
-            key_hash: _pt1_row_admission(row)
+            key_hash: _pt1_stored_fields_or_corrupt(
+                key_hash,
+                lambda row=row: _pt1_row_admission(row),
+            )
             for key_hash, row in original_target_rows.items()
         }
         changed_rows: dict[str, dict[str, Any]] = {}
@@ -3886,13 +3895,24 @@ def _copy_pt1_equilibrium_rows(
             inserted = 0
             replaced = 0
             for source_row in source_rows:
-                key_hash = str(source_row["key_hash"])
-                incoming_row = {
-                    column: source_row[column] if column in source_columns else None
-                    for column in target_columns
-                }
+                key_hash, source_fields = _pt1_stored_fields_or_corrupt(
+                    "<unknown>",
+                    lambda: (str(source_row["key_hash"]), dict(source_row)),
+                )
+                incoming_row = _pt1_stored_fields_or_corrupt(
+                    key_hash,
+                    lambda: {
+                        column: source_fields[column]
+                        if column in source_columns
+                        else None
+                        for column in target_columns
+                    },
+                )
                 incoming_row["store_schema_version"] = PT1_STORE_SCHEMA_VERSION
-                incoming_admitted = _pt1_row_admission(incoming_row)
+                incoming_admitted = _pt1_stored_fields_or_corrupt(
+                    key_hash,
+                    lambda: _pt1_row_admission(incoming_row),
+                )
                 existing_row = planned_rows.get(key_hash)
                 if existing_row is None:
                     planned_rows[key_hash] = incoming_row
@@ -3903,27 +3923,43 @@ def _copy_pt1_equilibrium_rows(
 
                 existing_admitted = planned_admission[key_hash]
                 if existing_admitted and incoming_admitted:
-                    if _pt1_cache_merge_identity(
-                        existing_row,
-                        require_capture_epoch_match=require_capture_epoch_match,
-                    ) != _pt1_cache_merge_identity(
-                        incoming_row,
-                        require_capture_epoch_match=require_capture_epoch_match,
-                    ):
+                    existing_identity = _pt1_stored_fields_or_corrupt(
+                        key_hash,
+                        lambda: _pt1_cache_merge_identity(
+                            existing_row,
+                            require_capture_epoch_match=require_capture_epoch_match,
+                        ),
+                    )
+                    incoming_identity = _pt1_stored_fields_or_corrupt(
+                        key_hash,
+                        lambda: _pt1_cache_merge_identity(
+                            incoming_row,
+                            require_capture_epoch_match=require_capture_epoch_match,
+                        ),
+                    )
+                    if existing_identity != incoming_identity:
                         raise _PT1CacheMergeCollision(
                             f"PT-1 cache collision while merging {key_hash}"
                         )
-                    merged_row = dict(incoming_row)
-                    merged_row["repair_notices_json"] = monotonic_repair_notices_json(
-                        existing_row.get("repair_notices_json"),
-                        incoming_row.get("repair_notices_json"),
-                    )
-                    merged_disclosures = _prefer_law_disclosures(
-                        existing_row.get("law_disclosures_json"),
-                        incoming_row.get("law_disclosures_json"),
-                    )
-                    merged_row["law_disclosures_json"] = _law_disclosures_json(
-                        merged_disclosures
+
+                    def merge_stored_sidecars() -> dict[str, Any]:
+                        merged = dict(incoming_row)
+                        merged["repair_notices_json"] = monotonic_repair_notices_json(
+                            existing_row.get("repair_notices_json"),
+                            incoming_row.get("repair_notices_json"),
+                        )
+                        merged_disclosures = _prefer_law_disclosures(
+                            existing_row.get("law_disclosures_json"),
+                            incoming_row.get("law_disclosures_json"),
+                        )
+                        merged["law_disclosures_json"] = _law_disclosures_json(
+                            merged_disclosures
+                        )
+                        return merged
+
+                    merged_row = _pt1_stored_fields_or_corrupt(
+                        key_hash,
+                        merge_stored_sidecars,
                     )
                     planned_rows[key_hash] = merged_row
                     planned_admission[key_hash] = True
