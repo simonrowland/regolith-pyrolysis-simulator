@@ -399,6 +399,7 @@ def test_lookup_optional_returns_cached_interpolated(tmp_path: Path) -> None:
     )
 
     assert payload is not None
+    assert rci.is_interpolated_equilibrium(payload)
     assert store.hits == 1
     assert store.last_cache_state == "cached_interpolated"
     assert store.replay_sequence[-1]["cache_state"] == "cached_interpolated"
@@ -408,6 +409,66 @@ def test_lookup_optional_returns_cached_interpolated(tmp_path: Path) -> None:
     payload_bytes = canonical_json_bytes(payload)
     assert b"interpolation_uncertainty" in canonical_json_bytes(store.replay_sequence[-1])
     assert b"interpolation_uncertainty" not in payload_bytes
+    neighbor_hashes = sorted(
+        hashlib.sha256(canonical_json_bytes(key)).hexdigest()
+        for key in (low, high)
+    )
+    requested_temperature_C = (
+        query["controls"]["T_K"] - 273.15
+    )
+    requested_pressure_bar = query["controls"]["pressure_bar"]
+    requested_fO2_log = query["controls"].get("log_fO2")
+    vapor_pressures = {"O2": 0.7025, "SiO": 7.025}
+    vapor_pressure_sources = {
+        species: "cached_interpolated" for species in vapor_pressures
+    }
+    expected_payload = {
+        "equilibrium_result": {
+            "diagnostics": {
+                "operating_point_clamped": True,
+                "operating_point_transport": "reduced_real_cache_interpolation",
+                "temperature_clamped": True,
+                "pressure_clamped": False,
+                "fO2_clamped": False,
+                "requested_temperature_C": requested_temperature_C,
+                "requested_pressure_bar": requested_pressure_bar,
+                "requested_fO2_log": requested_fO2_log,
+                "solved_temperature_C": 1000.0,
+                "solved_pressure_bar": 0.01,
+                "solved_fO2_log": -9.0,
+                "authoritative_for_requested_conditions": False,
+                "authoritative_for_solved_conditions": False,
+                "backend_status": "out_of_domain",
+                "backend_status_reason": "clamped_operating_point",
+            },
+            "phase_assemblage_available": False,
+            "status": "out_of_domain",
+            "temperature_C": 1000.0,
+            "requested_temperature_C": requested_temperature_C,
+            "pressure_bar": 0.01,
+            "fO2_log": -9.0,
+            "liquid_fraction": 0.705,
+            "vapor_pressures_Pa": vapor_pressures,
+            "phase_masses_kg": {
+                "liquid": 0.705,
+                "solid": 0.5 * (1.0 - 0.7) + 0.5 * (1.0 - 0.71),
+            },
+            "liquid_composition_wt_pct": {"SiO2": 45.0, "FeO": 10.0},
+            "activity_coefficients": {"SiO2": 1.0},
+            "vapor_pressures_source": vapor_pressure_sources,
+            "warnings": ["cached_interpolated_linear_estimate"],
+        },
+        "last_vapor_pressures_source": vapor_pressure_sources,
+        "last_vapor_pressure_diagnostic": {
+            "source": "served_not_executed",
+            "served_from": {
+                "source": "cached_interpolated",
+                "interpolation_mode": "linear",
+                "interpolation_neighbor_key_hashes": neighbor_hashes,
+            },
+        },
+    }
+    assert payload_bytes == canonical_json_bytes(expected_payload)
     without_diagnostics = rci.interpolate_equilibrium_payload(
         query,
         [
@@ -440,10 +501,13 @@ def test_lookup_optional_returns_cached_interpolated(tmp_path: Path) -> None:
     assert "cached_interpolated_linear_estimate" in payload["equilibrium_result"]["warnings"]
     assert "requested_fO2_log" not in payload["equilibrium_result"]
     assert "printed_fO2_echo_log" not in payload["equilibrium_result"]
-    # The expected bytes intentionally changed when interpolation stopped
-    # copying neighbor engine rows. Pin the query-owned shape: only the
-    # weighted fields and explicit interpolation disclosures survive, while
-    # requested_temperature_C belongs to this query.
+    # The full expected payload below intentionally drops neighbor-owned
+    # phase assemblage/species/composition rows, phase thermodynamics and
+    # instances, system thermodynamic scalars, engine density/viscosity/
+    # liquidus values, sulfur/ledger transitions, and engine diagnostics.
+    # Those values describe another state point. The query temperature is
+    # explicitly recorded as requested_temperature_C; only the named scalar
+    # and map fields are interpolated.
     result = payload["equilibrium_result"]
     assert result["requested_temperature_C"] == pytest.approx(
         query["controls"]["T_K"] - 273.15

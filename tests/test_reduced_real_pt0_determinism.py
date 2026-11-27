@@ -87,6 +87,26 @@ from tests.binding_admission_fixtures import (
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 
 
+def _install_interpolation_test_binding_receipt(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.engine_binding_admission import BindingIdentity
+    from tests.binding_admission_fixtures import install_synthetic_binding_receipt
+
+    install_synthetic_binding_receipt(
+        tmp_path,
+        monkeypatch,
+        bind_direct_backend=True,
+        identity_override=BindingIdentity(
+            "magemin",
+            "ig",
+            "magemin-ig-r1",
+            "subprocess",
+        ),
+    )
+
+
 @pytest.fixture(autouse=True)
 def _synthetic_binding_receipt_for_pt0_store_tests(
     tmp_path: Path,
@@ -99,25 +119,10 @@ def _synthetic_binding_receipt_for_pt0_store_tests(
     if request.node.name == 'test_pt0_real_magemin_capped_replay_contract':
         source = DATA_DIR.parent / 'engines' / 'engines.local.toml'
         (tmp_path / source.name).write_bytes(source.read_bytes())
-    direct_magemin_test = request.node.name in {
-        "test_interpolated_equilibrium_cache_miss_keeps_campaign_flux_and_ledger",
-        "test_interpolated_flux_replay_mutation_cannot_finish_campaign_hour",
-    }
-    identity_override = None
-    if direct_magemin_test:
-        from simulator.engine_binding_admission import BindingIdentity
-
-        identity_override = BindingIdentity(
-            "magemin",
-            "ig",
-            "magemin-ig-r1",
-            "subprocess",
-        )
     install_synthetic_binding_receipt(
         tmp_path,
         monkeypatch,
-        bind_direct_backend=direct_magemin_test,
-        identity_override=identity_override,
+        bind_direct_backend=False,
     )
 
 
@@ -8081,6 +8086,7 @@ def test_interpolated_equilibrium_cache_miss_keeps_campaign_flux_and_ledger(
     """A production-eligible interpolation candidate still runs the live engine."""
     import simulator.reduced_real_cache_interpolation as interpolation
 
+    _install_interpolation_test_binding_receipt(tmp_path, monkeypatch)
     cold_store = PT0DeterminismStore(
         "capture",
         db_path=tmp_path / "interpolation-class-cold.sqlite",
@@ -8178,6 +8184,7 @@ def test_interpolated_flux_replay_mutation_cannot_finish_campaign_hour(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    _install_interpolation_test_binding_receipt(tmp_path, monkeypatch)
     cold_store = PT0DeterminismStore(
         "capture",
         db_path=tmp_path / "interpolation-mutation-cold.sqlite",
@@ -8193,13 +8200,19 @@ def test_interpolated_flux_replay_mutation_cannot_finish_campaign_hour(
         db_path=tmp_path / "interpolation-mutation-warm.sqlite",
     )
     from simulator.core import PyrolysisSimulator
+    from simulator.reduced_real_cache_interpolation import (
+        is_interpolated_equilibrium,
+    )
 
     original_builder = PyrolysisSimulator.build_vapour_batch
     interpolated_builder_inputs = []
 
     def observe_interpolated_batch_build(self, *args, **kwargs):
         diagnostic = getattr(self, "_last_vapor_pressure_diagnostic", {}) or {}
-        if diagnostic.get("source") == "cached_interpolated":
+        if is_interpolated_equilibrium(
+            self,
+            vapor_pressure_diagnostic=diagnostic,
+        ):
             interpolated_builder_inputs.append((args, kwargs))
         return original_builder(self, *args, **kwargs)
 
@@ -8930,7 +8943,7 @@ def _exercise_equilibrium_consumers_from_result(
             float(result.temperature_C) + CELSIUS_TO_KELVIN_OFFSET
         ),
     )
-    assert isinstance(resolved, tuple) and len(resolved) == 6
+    assert isinstance(resolved, tuple) and len(resolved) == 7
     if not allow_typed_batch_failure:
         assert resolved[3].get("status") != "unavailable"
     assert isinstance(

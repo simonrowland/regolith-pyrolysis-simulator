@@ -1846,12 +1846,16 @@ class EvaporationMixin:
         resolve_error: Mapping[str, Any] | None,
         flux_overlay: Mapping[str, Any] | None,
         *,
+        selector_overlay: Mapping[str, Any] | None = None,
         flux_pressures: Mapping[str, float] | None = None,
         include_unresolved_notices: bool = False,
     ) -> EvaporationFluxRefusal | None:
         """Return the owner-typed refusal when no resolved channel can proceed."""
         error = dict(resolve_error or {})
         overlay = dict(flux_overlay or {})
+        selector = dict(
+            selector_overlay if selector_overlay is not None else overlay
+        )
         notices = [
             notice
             for notice in overlay.get('notices', ()) or ()
@@ -1870,25 +1874,10 @@ class EvaporationMixin:
             } if isinstance(states, Mapping) else set()
             if not notices or resolved_species:
                 return None
-        notice_reason = next(
-            (notice.get('reason') for notice in notices if notice.get('reason')),
-            None,
-        )
         from simulator.langmuir_surface_oxygen import (
             LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED,
         )
 
-        # A closure's free-form diagnostic remains in its per-species notice;
-        # it is not a stable public terminal reason.
-        stable_notice_reason = (
-            notice_reason
-            if isinstance(notice_reason, str) and notice_reason.isidentifier()
-            and notice_reason not in {
-                TYPED_FAILURE_EFFECTIVE_PRESSURE_SPECIES_SET_MISMATCH,
-                LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED,
-            }
-            else None
-        )
         error_reason = error.get('reason')
         if error_reason in {
             TYPED_FAILURE_EFFECTIVE_PRESSURE_SPECIES_SET_MISMATCH,
@@ -1898,9 +1887,17 @@ class EvaporationMixin:
         if error_reason:
             reason = str(error_reason)
         elif notices:
+            # Selector state can carry a typed source reason. Closure notices
+            # are downstream detail and never become a terminal code, even
+            # when their free-form text happens to be identifier-shaped.
+            selector_source = selector.get('selection_source')
+            if selector_source in {
+                TYPED_FAILURE_EFFECTIVE_PRESSURE_SPECIES_SET_MISMATCH,
+                LANGMUIR_SURFACE_OXYGEN_BALANCE_NOT_CLOSED,
+            }:
+                selector_source = None
             reason = str(
-                stable_notice_reason
-                or _VAPOUR_BATCH_NO_DEBITING_PRESSURE_OUTCOME
+                selector_source or _VAPOUR_BATCH_NO_DEBITING_PRESSURE_OUTCOME
             )
         else:
             selection_source = overlay.get('selection_source')
@@ -2085,6 +2082,7 @@ class EvaporationMixin:
         dict[str, Any],
         dict[str, Any],
         Any,
+        dict[str, Any],
     ]:
         """Batch-gated flux pressures shared by live evaporation and capacity.
 
@@ -2115,25 +2113,12 @@ class EvaporationMixin:
         vapor_pressure_diagnostic = dict(
             getattr(self, '_last_vapor_pressure_diagnostic', {}) or {}
         )
-        served_from = vapor_pressure_diagnostic.get('served_from')
-        source_map = (
-            getattr(self, '_last_vapor_pressures_source', {})
-            or getattr(equilibrium, 'vapor_pressures_source', {})
-            or {}
+        from simulator.reduced_real_cache_interpolation import (
+            is_interpolated_equilibrium,
         )
-        warnings = getattr(equilibrium, 'warnings', ()) or ()
-        interpolated_provenance = (
-            vapor_pressure_diagnostic.get('source') == 'cached_interpolated'
-            or (
-                vapor_pressure_diagnostic.get('source') == 'served_not_executed'
-                and isinstance(served_from, Mapping)
-                and served_from.get('source') == 'cached_interpolated'
-            )
-            or (
-                isinstance(source_map, Mapping)
-                and any(source == 'cached_interpolated' for source in source_map.values())
-            )
-            or 'cached_interpolated_linear_estimate' in warnings
+        interpolated_provenance = is_interpolated_equilibrium(
+            equilibrium,
+            vapor_pressure_diagnostic=vapor_pressure_diagnostic,
         )
         if interpolated_provenance:
             # Reject provenance before reading cached pressure/activity inputs
@@ -2172,6 +2157,7 @@ class EvaporationMixin:
             effective_pressure_source=effective_pressure_source,
             resolution_error=resolve_error or None,
         )
+        selector_flux_overlay = copy.deepcopy(flux_overlay_report)
         flux_overlay_report.update(
             compare_live_shadow_to_batch_flux(
                 batch=vapour_batch,
@@ -2372,6 +2358,7 @@ class EvaporationMixin:
             resolve_error,
             vapor_pressure_diagnostic,
             effective_pressure_source,
+            selector_flux_overlay,
         )
 
     def _evaporation_publisher_film(
@@ -2550,6 +2537,7 @@ class EvaporationMixin:
             resolve_error,
             vapor_pressure_diagnostic,
             effective_pressure_source,
+            selector_flux_overlay,
         ) = self._resolve_evaporation_batch_flux_state(
             equilibrium,
             temperature_K=T_K,
@@ -2590,6 +2578,7 @@ class EvaporationMixin:
                 self,
                 resolve_error,
                 flux_overlay_report,
+                selector_overlay=selector_flux_overlay,
             )
             assert refusal is not None
             self._last_evaporation_flux_diagnostic = refusal.diagnostic

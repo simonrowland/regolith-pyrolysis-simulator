@@ -7939,12 +7939,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             BuiltinEvaporationFluxProvider,
         )
         from simulator.accounting.formulas import resolve_species_formula
-        from simulator.capacity_coupling import solve_capacity_shadow
+        from simulator.capacity_coupling import (
+            _headspace_partial_pressures_Pa,
+            solve_capacity_shadow,
+        )
         from simulator.chemistry.kernel.account_filters import (
             build_provider_account_view,
         )
         from simulator.chemistry.kernel.dto import IntentRequest
         from simulator.evaporation import EvaporationFluxRefusal
+        from simulator.reduced_real_cache_interpolation import (
+            is_interpolated_equilibrium,
+        )
         from simulator.thermal_train import (
             FiniteCapacity,
             thermal_train_parameters_from_mapping,
@@ -7958,13 +7964,47 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             getattr(cold_train, 'accumulator_enabled', False)
         )
 
+        pre_holdup = self._overhead_holdup_mol()
+        headspace_temperature_K = self._headspace_temperature_K()
+        headspace_volume_m3 = self._headspace_volume_m3()
+        initial_partials = _headspace_partial_pressures_Pa(
+            pre_holdup,
+            species=pre_holdup,
+            temperature_K=headspace_temperature_K,
+            volume_m3=headspace_volume_m3,
+        )
+        temperature_K = float(self.melt.temperature_C) + 273.15
+        if is_interpolated_equilibrium(
+            equilibrium,
+            vapor_pressure_diagnostic=getattr(
+                self, '_last_vapor_pressure_diagnostic', {}
+            ),
+        ):
+            (
+                _pressures,
+                unresolved_overlay,
+                _batch,
+                unresolved_error,
+                _diagnostic,
+                _source,
+                selector_overlay,
+            ) = self._resolve_evaporation_batch_flux_state(
+                equilibrium,
+                temperature_K=temperature_K,
+                overhead_partials_Pa=initial_partials,
+            )
+            refusal = EvaporationMixin._vapour_batch_resolution_refusal(
+                self,
+                unresolved_error,
+                unresolved_overlay,
+                selector_overlay=selector_overlay,
+                include_unresolved_notices=True,
+            )
+            assert refusal is not None
+            raise refusal
+
         ledger_before = self.atom_ledger.mol_by_account()
         transition_count_before = len(self.atom_ledger.transitions)
-        pre_holdup = self._overhead_holdup_mol()
-        initial_partials = {
-            species: 0.0
-            for species in dict(equilibrium.vapor_pressures_Pa or {})
-        }
         # Same species the live path will price. The 400 K floor and a proven
         # zero liquid return before that dispatch, so those hours keep the
         # shadow's existing molar-mass order. Above those gates the batch map
@@ -7973,7 +8013,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         from simulator.melt_regime import legacy_raw_liquid_fraction_is_zero
 
         liquid_fraction = getattr(equilibrium, 'liquid_fraction', None)
-        temperature_K = float(self.melt.temperature_C) + 273.15
         batch_flux_pressures = None
         batch_flux_overlay: dict[str, Any] = {}
         selection_flux_overlay: dict[str, Any] = {}
@@ -7991,49 +8030,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 resolve_error,
                 vapor_pressure_diagnostic,
                 _effective_pressure_source,
+                selection_flux_overlay,
             ) = (
                 self._resolve_evaporation_batch_flux_state(
                     equilibrium,
                     temperature_K=temperature_K,
+                    overhead_partials_Pa=initial_partials,
                 )
             )
-            # Closure notices belong to this trial, not the selector baseline.
-            selection_flux_overlay = copy.deepcopy(batch_flux_overlay)
-            initial_surface = getattr(
-                self, '_last_langmuir_surface_oxygen', {}
-            ) or {}
-            initial_surface_diagnostic = getattr(
-                initial_surface, 'as_diagnostic', None
-            )
-            if callable(initial_surface_diagnostic):
-                initial_surface = initial_surface_diagnostic()
-            initial_refused = (
-                initial_surface.get('refused_species', {})
-                if isinstance(initial_surface, Mapping)
-                else {}
-            )
-            initial_refused_species = (
-                set(initial_refused)
-                if isinstance(initial_refused, Mapping)
-                else set()
-            )
-            initial_selection_states = selection_flux_overlay.get(
-                'batch_channel_states', {}
-            )
-            if initial_refused_species:
-                selection_flux_overlay['notices'] = [
-                    notice
-                    for notice in selection_flux_overlay.get('notices', ()) or ()
-                    if not (
-                        isinstance(notice, Mapping)
-                        and notice.get('kind') == 'vapour_batch_unresolved'
-                        and notice.get('species') in initial_refused_species
-                        and isinstance(initial_selection_states, Mapping)
-                        and initial_selection_states.get(
-                            notice.get('species')
-                        ) == 'eligible'
-                    )
-                ]
             EvaporationMixin._classify_proven_zero_langmuir_channels(
                 self,
                 batch_flux_overlay,
@@ -8043,6 +8047,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self,
                 resolve_error,
                 batch_flux_overlay,
+                selector_overlay=selection_flux_overlay,
                 flux_pressures=batch_flux_pressures,
                 include_unresolved_notices=True,
             )
@@ -8062,6 +8067,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ),
         )
         solver_molar_masses = dict(provider_molar_masses)
+        selector_channel_states = selection_flux_overlay.get(
+            'batch_channel_states', {}
+        )
+        if isinstance(selector_channel_states, Mapping):
+            for species, state in selector_channel_states.items():
+                if state != 'eligible' or species in solver_molar_masses:
+                    continue
+                solver_molar_masses[str(species)] = resolve_species_formula(
+                    str(species),
+                    self.species_formula_registry,
+                ).molar_mass_kg_per_mol()
         for species in pre_holdup:
             solver_molar_masses.setdefault(
                 species,
@@ -8100,6 +8116,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
 
         rates_cache = {}
+        trial_stoich_by_partials = {}
 
         def flux_at_partials(partials_Pa):
             cache_key = tuple(sorted(
@@ -8142,6 +8159,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     self,
                     {},
                     iteration_overlay,
+                    selector_overlay=selection_flux_overlay,
                     flux_pressures=reclosed_pressures,
                     include_unresolved_notices=True,
                 )
@@ -8167,6 +8185,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         else None
                     ),
                 )
+            )
+            trial_stoich_by_partials[cache_key] = dict(
+                iteration_controls.get('stoich_by_species', {}) or {}
             )
             iteration_controls['surface_oxygen_bound'] = owns_oxygen_drive
             request = IntentRequest(
@@ -8217,9 +8238,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return rates
 
         def overhead_source_at_partials(partials_Pa):
+            cache_key = tuple(sorted(
+                (str(species), float(pressure))
+                for species, pressure in partials_Pa.items()
+            ))
+            rates = flux_at_partials(partials_Pa)
             return self._project_evaporation_overhead_source_mol_hr(
-                flux_at_partials(partials_Pa),
-                controls['stoich_by_species'],
+                rates,
+                trial_stoich_by_partials.get(
+                    cache_key,
+                    controls['stoich_by_species'],
+                ),
             )
 
         try:
@@ -8236,8 +8265,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         0.0,
                     ) or 0.0
                 ),
-                temperature_K=self._headspace_temperature_K(),
-                volume_m3=self._headspace_volume_m3(),
+                temperature_K=headspace_temperature_K,
+                volume_m3=headspace_volume_m3,
                 dt_hr=1.0,
                 bleed_conductance_kg_s=self._headspace_bleed_conductance_kg_s(
                     species_kg_for_M_avg=self._overhead_holdup_species_kg(

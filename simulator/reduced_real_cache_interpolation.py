@@ -31,6 +31,34 @@ INTERPOLATION_COORDINATE_EPS = 1.0e-12
 INTERPOLATION_ERROR_TERM = "cached_interpolated_neighbor_disagreement"
 
 
+def is_interpolated_equilibrium(
+    equilibrium: Any,
+    *,
+    vapor_pressure_diagnostic: Mapping[str, Any] | None = None,
+) -> bool:
+    """Recognize the producer's nested disclosure for a synthesized row."""
+    if vapor_pressure_diagnostic is None:
+        if isinstance(equilibrium, Mapping):
+            vapor_pressure_diagnostic = equilibrium.get(
+                "last_vapor_pressure_diagnostic"
+            )
+        else:
+            vapor_pressure_diagnostic = getattr(
+                equilibrium, "last_vapor_pressure_diagnostic", None
+            )
+    if not isinstance(vapor_pressure_diagnostic, Mapping):
+        return False
+    source = vapor_pressure_diagnostic.get("source")
+    if source == "cached_interpolated":
+        return True
+    served_from = vapor_pressure_diagnostic.get("served_from")
+    return (
+        source == "served_not_executed"
+        and isinstance(served_from, Mapping)
+        and served_from.get("source") == "cached_interpolated"
+    )
+
+
 def interpolation_feature_spec(key: Mapping[str, Any]) -> tuple[list[str], list[str]]:
     species = sorted(
         {

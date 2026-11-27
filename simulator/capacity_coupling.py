@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import math
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass
 from types import MappingProxyType
 
@@ -169,6 +169,23 @@ def combined_saturation(
     return SaturationShadow(pipe, oxygen, oxygen, "oxygen")
 
 
+def _headspace_partial_pressures_Pa(
+    holdup_mol: Mapping[str, float],
+    *,
+    species: Iterable[str],
+    temperature_K: float,
+    volume_m3: float,
+) -> dict[str, float]:
+    """Convert one current holdup snapshot to ideal-gas partial pressures."""
+    return {
+        name: max(0.0, float(holdup_mol.get(name, 0.0)))
+        * GAS_CONSTANT
+        * temperature_K
+        / volume_m3
+        for name in species
+    }
+
+
 def solve_capacity_shadow(
     *,
     pre_holdup_mol: Mapping[str, float],
@@ -260,13 +277,12 @@ def solve_capacity_shadow(
         )
 
     species_order = tuple(sorted(set(pre_holdup_mol) | set(molar_mass_kg_mol)))
-    partials = {
-        species: max(0.0, float(pre_holdup_mol.get(species, 0.0)))
-        * GAS_CONSTANT
-        * temperature_K
-        / volume_m3
-        for species in species_order
-    }
+    partials = _headspace_partial_pressures_Pa(
+        pre_holdup_mol,
+        species=species_order,
+        temperature_K=temperature_K,
+        volume_m3=volume_m3,
+    )
     delta_history: list[float] = []
     final_bled: dict[str, float] = {}
     final_offgas: dict[str, float] = {}
