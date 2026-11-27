@@ -10,10 +10,14 @@ import yaml
 
 from simulator.battery import consumer_inputs
 from simulator.battery.consumer_inputs import collect_consumer_inputs
-from simulator.battery.enums import AmountBasis, Phase, Quantity
+from simulator.battery.enums import AmountBasis, Engine, NoticeKind, Phase, Quantity
 from simulator.battery.generators.bench import melt_activity_requests
 from simulator.battery.migrate import Migrator
-from simulator.battery.waypoints import GapReason, ReadinessStatus
+from simulator.battery.score import (
+    _classify_flagged_notice_facts,
+    predict_with_engine,
+)
+from simulator.battery.waypoints import GapReason
 from tests.literature_extract_test_utils import activity_test_bench, isolated_root
 from tools.validate_literature_extracts import (
     check_all_fidelity_samples_match,
@@ -420,13 +424,58 @@ def test_migration_preserves_temperatures_compositions_and_typed_activity_reques
         assert {request.readiness.engine for request in requests} == {
             "alphamelts", "thermoengine", "openimcc", "internal-analytical", "magemin"
         }
-        assert all(request.payload is None for request in requests)
-        assert all(request.readiness.status is ReadinessStatus.NOT_APPLICABLE for request in requests)
-        assert all(
-            any(gap.waypoint == "reference_state" and gap.reason is GapReason.MISSING_EVIDENCE
-                and gap.missing == ("identity.reference_state",) for gap in request.readiness.gaps)
-            for request in requests
+        if row_id == UNCLOSED_COMPOSITION_ID:
+            assert all(request.payload is None for request in requests)
+            assert all(
+                any(gap.waypoint == "normalized_composition" for gap in request.readiness.gaps)
+                for request in requests
+            )
+            continue
+
+        callable_requests = [request for request in requests if request.payload is not None]
+        assert {request.readiness.engine for request in callable_requests} == {
+            "alphamelts", "thermoengine", "openimcc", "internal-analytical"
+        }
+        for request in callable_requests:
+            assert request.payload["reference_state"] in {
+                "raoultian_pure_liquid_endmember",
+                "raoultian_pure_liquid_oxide_parent",
+            }
+            assert any(
+                flag["authority"] == "assumed"
+                and flag["flag_id"] == "registered_raoultian_pure_liquid_target"
+                and "phase and convention unknown" in flag["notice"]
+                for flag in request.readiness.flags
+            )
+        magemin = next(request for request in requests if request.readiness.engine == "magemin")
+        assert magemin.payload is None
+        assert any(
+            gap.waypoint == "reference_state"
+            and gap.reason is GapReason.REFERENCE_STATE_MISMATCH
+            for gap in magemin.readiness.gaps
         )
+
+    prediction_row = migrated["omori_fig3_al10_mg30_01"]
+    prediction_experiment = result.experiments[prediction_row.experiment_id]
+    prediction_bench = activity_test_bench(prediction_experiment.work_id)
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        prediction_row,
+        experiment=prediction_experiment,
+        bench=prediction_bench,
+        handles={},
+        isolated=False,
+    )
+    assert prediction.value is not None, prediction.refusal_detail
+    assert any(
+        notice.kind is NoticeKind.KNOB_DEFAULTED
+        and "phase and convention unknown" in notice.reason
+        for notice in prediction.notices
+    )
+    flagged_strata = _classify_flagged_notice_facts(
+        tuple((notice.kind.value, notice.reason) for notice in prediction.notices)
+    )
+    assert NoticeKind.KNOB_DEFAULTED.value in flagged_strata
 
     assert float(migrated["omori_fig3_al10_mg30_01"].value.point) == pytest.approx(0.0914745)
     for row_id, (_, _, _, _, _) in FIG5_READS.items():

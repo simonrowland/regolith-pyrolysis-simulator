@@ -13,6 +13,7 @@ from simulator.battery.enums import (
     ValueKind,
 )
 from simulator.battery.records import (
+    Species,
     StandardState,
     Value,
     phase_token,
@@ -27,6 +28,7 @@ from simulator.battery.waypoints import (
 )
 from simulator.physical_constants import BAR_PA_DECIMAL
 from simulator.melt_backend.base import multivalent_components
+from simulator.policy.enums import NoticeKind
 
 
 _FLAGGED_AUTHORITIES = {"assumed", "bound", "extrapolated"}
@@ -456,14 +458,55 @@ def melt_activity_requests(
         return tuple(_not_applicable(provenance, engine, (gap,)) for engine in MELT_ACTIVITY_ENGINES)
     if not inputs.melt_activity:
         return tuple(_not_applicable(provenance, engine) for engine in MELT_ACTIVITY_ENGINES)
+    defaulted_reference_route = None
     if not inputs.reference_state_known or not isinstance(inputs.reference_state, StandardState):
-        # A vapour-referenced or untyped standard state is not a(oxide).
-        # Excluded, not run with a guessed convention.
-        gap = ReadinessGap(
-            "reference_state", GapReason.MISSING_EVIDENCE, ("identity.reference_state",),
+        # The registry owns the activity target. Use it as the named default
+        # for an otherwise callable row, and carry the source ambiguity as a
+        # typed knob-defaulted prediction notice.
+        if not inputs.measured_species:
+            gap = ReadinessGap(
+                "reference_state", GapReason.MISSING_EVIDENCE, ("identity.reference_state",),
+            )
+            return tuple(_not_applicable(provenance, engine, (gap,)) for engine in MELT_ACTIVITY_ENGINES)
+        from simulator.vapour_rail.melt_activity_resolver import MeltActivityRegistry
+
+        target = MeltActivityRegistry.load().target_standard_state(
+            inputs.measured_species
         )
-        return tuple(_not_applicable(provenance, engine, (gap,)) for engine in MELT_ACTIVITY_ENGINES)
-    state = inputs.reference_state
+        if (
+            target.convention != ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER.value
+            or target.phase != Phase.L.value
+            or target.component_basis != "raoultian_pure_endmember"
+        ):
+            gap = ReadinessGap(
+                "reference_state", GapReason.MISSING_EVIDENCE,
+                ("identity.reference_state", "registered_raoultian_pure_liquid_target"),
+            )
+            return tuple(_not_applicable(provenance, engine, (gap,)) for engine in MELT_ACTIVITY_ENGINES)
+        source_reference = getattr(
+            getattr(getattr(observation, "identity", None), "reference_state", None),
+            "reason",
+            None,
+        )
+        if not isinstance(source_reference, str) or not source_reference.strip():
+            source_reference = "source standard-state convention and phase are unknown"
+        state = StandardState(
+            convention=ReferenceStateConvention(target.convention),
+            endmember=Species(target.component_id or inputs.measured_species, Phase(target.phase)),
+            component_basis=target.component_basis,
+            reference_pressure_bar=Decimal(str(target.reference_pressure_bar)),
+        )
+        defaulted_reference_route = {
+            "authority": "assumed",
+            "flag_id": "registered_raoultian_pure_liquid_target",
+            "notice_kind": NoticeKind.KNOB_DEFAULTED.value,
+            "notice": (
+                f"{source_reference}; phase and convention unknown; used "
+                f"registered target {target.identity_id}"
+            ),
+        }
+    else:
+        state = inputs.reference_state
     composition = _melt_composition(inputs)
     gaps: list[ReadinessGap] = []
     if composition.selected is not None and len(composition.selected.value) == 1:
@@ -677,6 +720,8 @@ def melt_activity_requests(
                     "engine_reports": reported,
                 },
             }
+            if defaulted_reference_route is not None:
+                routes["reference_state"].update(defaulted_reference_route)
             if shared is not None:
                 payload["fO2_log"] = shared.log10_fO2_bar
                 payload["fO2_tier"] = shared.tier

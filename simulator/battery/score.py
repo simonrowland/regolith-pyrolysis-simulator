@@ -15442,6 +15442,29 @@ def _predict_with_engine(
         if contract_refusal is not None:
             return contract_refusal
         assert generated is not None and generated.payload is not None
+        reference_state_route = (
+            (generated.provenance.get("output_routes") or {}).get(
+                "reference_state"
+            )
+            if isinstance(generated.provenance, Mapping)
+            else None
+        )
+        if (
+            isinstance(reference_state_route, Mapping)
+            and reference_state_route.get("notice_kind")
+            == NoticeKind.KNOB_DEFAULTED.value
+        ):
+            input_notices.append(
+                Notice(
+                    kind=NoticeKind.KNOB_DEFAULTED,
+                    affected_quantities=(quantity,),
+                    reason=str(reference_state_route.get("notice") or ""),
+                    origin=str(
+                        reference_state_route.get("waypoint")
+                        or "simulator.battery.generators.bench.melt_activity_requests"
+                    ),
+                )
+            )
         # Malformed composition is INVALID_SOURCE above. A crystal sample
         # with a valid request is still not a melt observable.
         if sample_phase_detail is not None:
