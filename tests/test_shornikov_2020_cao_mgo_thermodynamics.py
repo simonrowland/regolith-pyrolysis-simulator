@@ -96,6 +96,35 @@ def _figure_markers(document):
     ]
 
 
+def _figure_read_rows(document):
+    markers = _figure_markers(document)
+    gaps = [
+        row
+        for row in document["species"]["CaO-MgO"]["context"]
+        if row["type"] == "figure_boundary_schema_gap"
+    ]
+    return markers + gaps
+
+
+def _half_stored_rounding_step(value) -> Decimal:
+    stored = Decimal(str(value))
+    return Decimal(1).scaleb(stored.as_tuple().exponent) / 2
+
+
+def _assert_figure_read_uncertainty_bounds(document) -> None:
+    temperature_pixel_floor = Decimal("0.7329")
+    composition_pixel_floor = Decimal("0.05995")
+    for row in _figure_read_rows(document):
+        values = row["values"]
+        assert Decimal(values["read_uncertainty_K"]) >= max(
+            _half_stored_rounding_step(values["T_K"]), temperature_pixel_floor
+        )
+        assert Decimal(values["read_uncertainty_mol_pct"]) >= max(
+            _half_stored_rounding_step(values["cao_mol_pct_read"]),
+            composition_pixel_floor,
+        )
+
+
 def _assert_figure_reads(document) -> None:
     markers = _figure_markers(document)
     assert len(markers) == 27
@@ -184,6 +213,7 @@ def _assert_figure_reads(document) -> None:
     assert cao_solvus["values"]["T_K_read_1"] == "2609.5"
     assert cao_solvus["values"]["page_600dpi_px_read_2"] == [1938.5, 3015.5]
     assert "regions I and II contain no liquid" in cao_solvus["values"]["schema_gap"]
+    _assert_figure_read_uncertainty_bounds(document)
     apex = next(
         item for item in markers if item["observation_id"] == "shornikov_2020_fig1_s3_01"
     )
@@ -275,6 +305,23 @@ def test_table_and_figure_reads_are_pinned():
     assert "78.65 kJ/mol" in powell["values"]["value_as_printed"]
     assert "36.82 J/mol/K" in powell["values"]["value_as_printed"]
     assert "Lvov & Ugolkov, 2003" in powell["values"]["source_criticism"]
+
+
+def test_figure_read_uncertainty_floor_fails_when_mutated_below_pixel() -> None:
+    document = _load()
+    row = next(
+        row
+        for row in _figure_read_rows(document)
+        if row["observation_id"] == "shornikov_2020_fig1_s1_01"
+    )
+    row["values"]["read_uncertainty_K"] = "0.9"
+    with pytest.raises(AssertionError):
+        _assert_figure_read_uncertainty_bounds(document)
+
+    row["values"]["read_uncertainty_K"] = "5"
+    row["values"]["read_uncertainty_mol_pct"] = "0.01"
+    with pytest.raises(AssertionError):
+        _assert_figure_read_uncertainty_bounds(document)
 
 
 def test_mutating_the_consumed_gibbs_value_or_deleting_a_row_fails_the_pin():

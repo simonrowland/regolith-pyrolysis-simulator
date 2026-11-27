@@ -10,7 +10,9 @@ extraction:
     prose ranges remain context with their numbers. Figure 1 and 2 marker centers were digitized from 600 dpi
     renders with independent fresh-crop reads; all 110 plotted marker rows retain their printed values but are
     typed-refused because mol % has no supported composition basis. Unkeyed Figure 3 and 4a markers and
-    unsupported Figure 3 and 4b curves remain unscored in species context.
+    unsupported Figure 3 and 4b curves remain unscored in species context. For Figure 1/2, FeO-axis
+    read_uncertainty is max(stated width, half the stored FeO rounding step, 0.06297 mol% per pixel at
+    600 dpi); the pixel floor is (100 mol% / 926.5 px) × (350/600), using the widest calibrated FeO axis.
   date: '2026-10-18'
   worker: trial-lxh-1018
   dispatch_id: trial-lxh-1018
@@ -625,7 +627,7 @@ species:
           locator: *id001_2
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05064
-        read_uncertainty_FeO_mol_pct: 0.01258
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s1_marker_02
       type: activity_coefficient
@@ -700,7 +702,7 @@ species:
           locator: *id002_2
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05064
-        read_uncertainty_FeO_mol_pct: 0.01887
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s1_marker_03
       type: activity_coefficient
@@ -775,7 +777,7 @@ species:
           locator: *id003_2
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05071
-        read_uncertainty_FeO_mol_pct: 0.00314
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s1_marker_04
       type: activity_coefficient
@@ -850,7 +852,7 @@ species:
           locator: *id004_2
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05080
-        read_uncertainty_FeO_mol_pct: 0.00314
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s1_marker_05
       type: activity_coefficient
@@ -925,7 +927,7 @@ species:
           locator: *id005
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05092
-        read_uncertainty_FeO_mol_pct: 0.01572
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s1_marker_06
       type: activity_coefficient
@@ -1000,7 +1002,7 @@ species:
           locator: *id006
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05118
-        read_uncertainty_FeO_mol_pct: 0.06918
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s1_marker_07
       type: activity_coefficient
@@ -1075,7 +1077,7 @@ species:
           locator: *id007
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05118
-        read_uncertainty_FeO_mol_pct: 0.06918
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s2_marker_01
       type: activity_coefficient
@@ -1150,7 +1152,7 @@ species:
           locator: *id008
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05071
-        read_uncertainty_FeO_mol_pct: 0.00314
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s2_marker_02
       type: activity_coefficient
@@ -1225,7 +1227,7 @@ species:
           locator: *id009
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05064
-        read_uncertainty_FeO_mol_pct: 0.03145
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s2_marker_03
       type: activity_coefficient
@@ -1300,7 +1302,7 @@ species:
           locator: *id010
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05076
-        read_uncertainty_FeO_mol_pct: 0.00943
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s2_marker_04
       type: activity_coefficient
@@ -1375,7 +1377,7 @@ species:
           locator: *id011
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05092
-        read_uncertainty_FeO_mol_pct: 0.00943
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s2_marker_05
       type: activity_coefficient
@@ -1450,7 +1452,7 @@ species:
           locator: *id012
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05108
-        read_uncertainty_FeO_mol_pct: 0.04403
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s2_marker_06
       type: activity_coefficient
@@ -1525,7 +1527,7 @@ species:
           locator: *id013
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05118
-        read_uncertainty_FeO_mol_pct: 0.07862
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s2_marker_07
       type: activity_coefficient
@@ -1600,7 +1602,7 @@ species:
           locator: *id014
       uncertainty:
         read_uncertainty_gamma_FeO: 0.00502
-        read_uncertainty_FeO_mol_pct: 0.03145
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s2_marker_08
       type: activity_coefficient
@@ -1675,7 +1677,7 @@ species:
           locator: *id015
       uncertainty:
         read_uncertainty_gamma_FeO: 0.01022
-        read_uncertainty_FeO_mol_pct: 0.02201
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s2_marker_09
       type: activity_coefficient
@@ -1750,7 +1752,7 @@ species:
           locator: *id016
       uncertainty:
         read_uncertainty_gamma_FeO: 0.00502
-        read_uncertainty_FeO_mol_pct: 0.01258
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s3_marker_01
       type: activity_coefficient
@@ -1825,7 +1827,7 @@ species:
           locator: *id017
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05056
-        read_uncertainty_FeO_mol_pct: 0.01258
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s3_marker_02
       type: activity_coefficient
@@ -1900,7 +1902,7 @@ species:
           locator: *id018
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05080
-        read_uncertainty_FeO_mol_pct: 0.01258
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s3_marker_03
       type: activity_coefficient
@@ -1975,7 +1977,7 @@ species:
           locator: *id019
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05099
-        read_uncertainty_FeO_mol_pct: 0.01258
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s3_marker_04
       type: activity_coefficient
@@ -2050,7 +2052,7 @@ species:
           locator: *id020
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05118
-        read_uncertainty_FeO_mol_pct: 0.00314
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s3_marker_05
       type: activity_coefficient
@@ -2125,7 +2127,7 @@ species:
           locator: *id021
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05118
-        read_uncertainty_FeO_mol_pct: 0.01572
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s5_marker_01
       type: activity_coefficient
@@ -2200,7 +2202,7 @@ species:
           locator: *id022
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05086
-        read_uncertainty_FeO_mol_pct: 0.00943
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s5_marker_02
       type: activity_coefficient
@@ -2275,7 +2277,7 @@ species:
           locator: *id023
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05099
-        read_uncertainty_FeO_mol_pct: 0.00943
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s5_marker_03
       type: activity_coefficient
@@ -2350,7 +2352,7 @@ species:
           locator: *id024
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05108
-        read_uncertainty_FeO_mol_pct: 0.02516
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s5_marker_04
       type: activity_coefficient
@@ -2425,7 +2427,7 @@ species:
           locator: *id025
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05118
-        read_uncertainty_FeO_mol_pct: 0.05031
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s5_marker_05
       type: activity_coefficient
@@ -2500,7 +2502,7 @@ species:
           locator: *id026
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05118
-        read_uncertainty_FeO_mol_pct: 0.00629
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s6_marker_01
       type: activity_coefficient
@@ -2575,7 +2577,7 @@ species:
           locator: *id027
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05046
-        read_uncertainty_FeO_mol_pct: 0.00629
+        read_uncertainty_FeO_mol_pct: 0.06297
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s6_marker_02
       type: activity_coefficient
@@ -2650,7 +2652,7 @@ species:
           locator: *id028
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05051
-        read_uncertainty_FeO_mol_pct: 0.03459
+        read_uncertainty_FeO_mol_pct: 0.06297
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s6_marker_03
       type: activity_coefficient
@@ -2725,7 +2727,7 @@ species:
           locator: *id029
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05061
-        read_uncertainty_FeO_mol_pct: 0.00943
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s6_marker_04
       type: activity_coefficient
@@ -2800,7 +2802,7 @@ species:
           locator: *id030
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05086
-        read_uncertainty_FeO_mol_pct: 0.01572
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s6_marker_05
       type: activity_coefficient
@@ -2875,7 +2877,7 @@ species:
           locator: *id031
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05099
-        read_uncertainty_FeO_mol_pct: 0.00629
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s6_marker_06
       type: activity_coefficient
@@ -2950,7 +2952,7 @@ species:
           locator: *id032
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05108
-        read_uncertainty_FeO_mol_pct: 0.00629
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s6_marker_07
       type: activity_coefficient
@@ -3025,7 +3027,7 @@ species:
           locator: *id033
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05118
-        read_uncertainty_FeO_mol_pct: 0.0283
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s8_marker_01
       type: activity_coefficient
@@ -3100,7 +3102,7 @@ species:
           locator: *id034
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05051
-        read_uncertainty_FeO_mol_pct: 0.1195
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s8_marker_02
       type: activity_coefficient
@@ -3175,7 +3177,7 @@ species:
           locator: *id035
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05064
-        read_uncertainty_FeO_mol_pct: 0.12579
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s8_marker_03
       type: activity_coefficient
@@ -3250,7 +3252,7 @@ species:
           locator: *id036
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05076
-        read_uncertainty_FeO_mol_pct: 0.10692
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s8_marker_04
       type: activity_coefficient
@@ -3325,7 +3327,7 @@ species:
           locator: *id037
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05086
-        read_uncertainty_FeO_mol_pct: 0.03145
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s8_marker_05
       type: activity_coefficient
@@ -3400,7 +3402,7 @@ species:
           locator: *id038
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05099
-        read_uncertainty_FeO_mol_pct: 0.12264
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s8_marker_06
       type: activity_coefficient
@@ -3475,7 +3477,7 @@ species:
           locator: *id039
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05108
-        read_uncertainty_FeO_mol_pct: 0.06289
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s8_marker_07
       type: activity_coefficient
@@ -3550,7 +3552,7 @@ species:
           locator: *id040
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05118
-        read_uncertainty_FeO_mol_pct: 0.08176
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s8_marker_08
       type: activity_coefficient
@@ -3625,7 +3627,7 @@ species:
           locator: *id041
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05118
-        read_uncertainty_FeO_mol_pct: 0.08176
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s9_marker_01
       type: activity_coefficient
@@ -3700,7 +3702,7 @@ species:
           locator: *id042
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05067
-        read_uncertainty_FeO_mol_pct: 0.13836
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s9_marker_02
       type: activity_coefficient
@@ -3775,7 +3777,7 @@ species:
           locator: *id043
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05118
-        read_uncertainty_FeO_mol_pct: 0.11321
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s9_marker_03
       type: activity_coefficient
@@ -3850,7 +3852,7 @@ species:
           locator: *id044
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05130
-        read_uncertainty_FeO_mol_pct: 0.0566
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2a_s9_marker_04
       type: activity_coefficient
@@ -3925,7 +3927,7 @@ species:
           locator: *id045
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05130
-        read_uncertainty_FeO_mol_pct: 0.09119
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s4_marker_01
       type: activity_coefficient
@@ -4000,7 +4002,7 @@ species:
           locator: *id046
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05056
-        read_uncertainty_FeO_mol_pct: 0.03145
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s4_marker_02
       type: activity_coefficient
@@ -4075,7 +4077,7 @@ species:
           locator: *id047
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05064
-        read_uncertainty_FeO_mol_pct: 0.00315
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s4_marker_03
       type: activity_coefficient
@@ -4150,7 +4152,7 @@ species:
           locator: *id048
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05118
-        read_uncertainty_FeO_mol_pct: 0.00944
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s5_marker_01
       type: activity_coefficient
@@ -4225,7 +4227,7 @@ species:
           locator: *id049
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05080
-        read_uncertainty_FeO_mol_pct: 0.00944
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s5_marker_02
       type: activity_coefficient
@@ -4300,7 +4302,7 @@ species:
           locator: *id050
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05092
-        read_uncertainty_FeO_mol_pct: 0.07867
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s5_marker_03
       type: activity_coefficient
@@ -4375,7 +4377,7 @@ species:
           locator: *id051
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05108
-        read_uncertainty_FeO_mol_pct: 0.00629
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s5_marker_04
       type: activity_coefficient
@@ -4450,7 +4452,7 @@ species:
           locator: *id052
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05118
-        read_uncertainty_FeO_mol_pct: 0.00629
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s7_marker_01
       type: activity_coefficient
@@ -4525,7 +4527,7 @@ species:
           locator: *id053
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05076
-        read_uncertainty_FeO_mol_pct: 0.09755
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s7_marker_02
       type: activity_coefficient
@@ -4600,7 +4602,7 @@ species:
           locator: *id054
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05092
-        read_uncertainty_FeO_mol_pct: 0.06923
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s7_marker_03
       type: activity_coefficient
@@ -4675,7 +4677,7 @@ species:
           locator: *id055
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05298
-        read_uncertainty_FeO_mol_pct: 0.05979
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s7_marker_04
       type: activity_coefficient
@@ -4750,7 +4752,7 @@ species:
           locator: *id056
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05108
-        read_uncertainty_FeO_mol_pct: 0.08811
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s7_marker_05
       type: activity_coefficient
@@ -4825,7 +4827,7 @@ species:
           locator: *id057
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05323
-        read_uncertainty_FeO_mol_pct: 0.02203
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s7_marker_06
       type: activity_coefficient
@@ -4900,7 +4902,7 @@ species:
           locator: *id058
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05130
-        read_uncertainty_FeO_mol_pct: 0.25173
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s10_marker_01
       type: activity_coefficient
@@ -4975,7 +4977,7 @@ species:
           locator: *id059
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05071
-        read_uncertainty_FeO_mol_pct: 0.03145
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s10_marker_02
       type: activity_coefficient
@@ -5050,7 +5052,7 @@ species:
           locator: *id060
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05080
-        read_uncertainty_FeO_mol_pct: 0.0944
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s10_marker_03
       type: activity_coefficient
@@ -5125,7 +5127,7 @@ species:
           locator: *id061
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05092
-        read_uncertainty_FeO_mol_pct: 0.03145
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s10_marker_04
       type: activity_coefficient
@@ -5200,7 +5202,7 @@ species:
           locator: *id062
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05099
-        read_uncertainty_FeO_mol_pct: 0.03145
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s10_marker_05
       type: activity_coefficient
@@ -5275,7 +5277,7 @@ species:
           locator: *id063
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05118
-        read_uncertainty_FeO_mol_pct: 0.01573
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s10_marker_06
       type: activity_coefficient
@@ -5350,7 +5352,7 @@ species:
           locator: *id064
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05118
-        read_uncertainty_FeO_mol_pct: 0.03145
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s10_marker_07
       type: activity_coefficient
@@ -5425,7 +5427,7 @@ species:
           locator: *id065
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05130
-        read_uncertainty_FeO_mol_pct: 0.0944
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s11_marker_01
       type: activity_coefficient
@@ -5500,7 +5502,7 @@ species:
           locator: *id066
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05047
-        read_uncertainty_FeO_mol_pct: 0.00944
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s11_marker_02
       type: activity_coefficient
@@ -5575,7 +5577,7 @@ species:
           locator: *id067
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05056
-        read_uncertainty_FeO_mol_pct: 0.00944
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s11_marker_03
       type: activity_coefficient
@@ -5650,7 +5652,7 @@ species:
           locator: *id068
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05080
-        read_uncertainty_FeO_mol_pct: 0.03145
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s11_marker_04
       type: activity_coefficient
@@ -5725,7 +5727,7 @@ species:
           locator: *id069
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05092
-        read_uncertainty_FeO_mol_pct: 0.01573
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s11_marker_05
       type: activity_coefficient
@@ -5800,7 +5802,7 @@ species:
           locator: *id070
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05108
-        read_uncertainty_FeO_mol_pct: 0.01573
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s11_marker_06
       type: activity_coefficient
@@ -5875,7 +5877,7 @@ species:
           locator: *id071
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05108
-        read_uncertainty_FeO_mol_pct: 0.03776
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s11_marker_07
       type: activity_coefficient
@@ -5950,7 +5952,7 @@ species:
           locator: *id072
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05130
-        read_uncertainty_FeO_mol_pct: 0.00629
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig2b_s11_marker_08
       type: activity_coefficient
@@ -6025,7 +6027,7 @@ species:
           locator: *id073
       uncertainty:
         read_uncertainty_gamma_FeO: 0.05130
-        read_uncertainty_FeO_mol_pct: 0.02203
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig4a_series5_feo_activity_curve
       type: activity_coefficient
@@ -6748,7 +6750,7 @@ species:
             figure: '1'
       uncertainty:
         read_uncertainty_K: 50.00
-        read_uncertainty_FeO_mol_pct: 0.00623
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_solidus_marker_02
       type: transition_point
@@ -6813,7 +6815,7 @@ species:
             figure: '1'
       uncertainty:
         read_uncertainty_K: 50.00
-        read_uncertainty_FeO_mol_pct: 0.02804
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_solidus_marker_03
       type: transition_point
@@ -6878,7 +6880,7 @@ species:
             figure: '1'
       uncertainty:
         read_uncertainty_K: 50.00
-        read_uncertainty_FeO_mol_pct: 0.03145
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_solidus_marker_04
       type: transition_point
@@ -6943,7 +6945,7 @@ species:
             figure: '1'
       uncertainty:
         read_uncertainty_K: 50.00
-        read_uncertainty_FeO_mol_pct: 0.00312
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_solidus_marker_05
       type: transition_point
@@ -7008,7 +7010,7 @@ species:
             figure: '1'
       uncertainty:
         read_uncertainty_K: 50.00
-        read_uncertainty_FeO_mol_pct: 0.00623
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_solidus_marker_06
       type: transition_point
@@ -7073,7 +7075,7 @@ species:
             figure: '1'
       uncertainty:
         read_uncertainty_K: 50.00
-        read_uncertainty_FeO_mol_pct: 0.02804
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_solidus_marker_07
       type: transition_point
@@ -7138,7 +7140,7 @@ species:
             figure: '1'
       uncertainty:
         read_uncertainty_K: 50.00
-        read_uncertainty_FeO_mol_pct: 0.00623
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_solidus_marker_08
       type: transition_point
@@ -7203,7 +7205,7 @@ species:
             figure: '1'
       uncertainty:
         read_uncertainty_K: 50.00
-        read_uncertainty_FeO_mol_pct: 0.01558
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_solidus_marker_09
       type: transition_point
@@ -7268,7 +7270,7 @@ species:
             figure: '1'
       uncertainty:
         read_uncertainty_K: 50.00
-        read_uncertainty_FeO_mol_pct: 0.01558
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_solidus_marker_10
       type: transition_point
@@ -7333,7 +7335,7 @@ species:
             figure: '1'
       uncertainty:
         read_uncertainty_K: 50.00
-        read_uncertainty_FeO_mol_pct: 0.01558
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_solidus_marker_11
       type: transition_point
@@ -7398,7 +7400,7 @@ species:
             figure: '1'
       uncertainty:
         read_uncertainty_K: 50.00
-        read_uncertainty_FeO_mol_pct: 0.02492
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_solidus_marker_12
       type: transition_point
@@ -7463,7 +7465,7 @@ species:
             figure: '1'
       uncertainty:
         read_uncertainty_K: 50.00
-        read_uncertainty_FeO_mol_pct: 0.081
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_solidus_marker_13
       type: transition_point
@@ -7528,7 +7530,7 @@ species:
             figure: '1'
       uncertainty:
         read_uncertainty_K: 50.00
-        read_uncertainty_FeO_mol_pct: 0.0405
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_solidus_marker_14
       type: transition_point
@@ -7593,7 +7595,7 @@ species:
             figure: '1'
       uncertainty:
         read_uncertainty_K: 50.00
-        read_uncertainty_FeO_mol_pct: 0.01246
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_liquidus_marker_01
       type: transition_point
@@ -7658,7 +7660,7 @@ species:
             figure: '1'
       uncertainty:
         read_uncertainty_K: 50.00
-        read_uncertainty_FeO_mol_pct: 0.02804
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_liquidus_marker_02
       type: transition_point
@@ -7723,7 +7725,7 @@ species:
             figure: '1'
       uncertainty:
         read_uncertainty_K: 50.00
-        read_uncertainty_FeO_mol_pct: 0.00623
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_liquidus_marker_03
       type: transition_point
@@ -7788,7 +7790,7 @@ species:
             figure: '1'
       uncertainty:
         read_uncertainty_K: 50.00
-        read_uncertainty_FeO_mol_pct: 0.03145
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_liquidus_marker_04
       type: transition_point
@@ -7853,7 +7855,7 @@ species:
             figure: '1'
       uncertainty:
         read_uncertainty_K: 50.00
-        read_uncertainty_FeO_mol_pct: 0.00935
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_liquidus_marker_05
       type: transition_point
@@ -7918,7 +7920,7 @@ species:
             figure: '1'
       uncertainty:
         read_uncertainty_K: 50.00
-        read_uncertainty_FeO_mol_pct: 0.00312
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_liquidus_marker_06
       type: transition_point
@@ -7983,7 +7985,7 @@ species:
             figure: '1'
       uncertainty:
         read_uncertainty_K: 50.00
-        read_uncertainty_FeO_mol_pct: 0.00623
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_liquidus_marker_07
       type: transition_point
@@ -8048,7 +8050,7 @@ species:
             figure: '1'
       uncertainty:
         read_uncertainty_K: 50.00
-        read_uncertainty_FeO_mol_pct: 0.00623
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_liquidus_marker_08
       type: transition_point
@@ -8113,7 +8115,7 @@ species:
             figure: '1'
       uncertainty:
         read_uncertainty_K: 50.00
-        read_uncertainty_FeO_mol_pct: 0.03427
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_liquidus_marker_09
       type: transition_point
@@ -8178,7 +8180,7 @@ species:
             figure: '1'
       uncertainty:
         read_uncertainty_K: 50.00
-        read_uncertainty_FeO_mol_pct: 0.00935
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_liquidus_marker_10
       type: transition_point
@@ -8243,7 +8245,7 @@ species:
             figure: '1'
       uncertainty:
         read_uncertainty_K: 50.00
-        read_uncertainty_FeO_mol_pct: 0.00312
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s2_liquidus_marker_11
       type: transition_point
@@ -8308,7 +8310,7 @@ species:
             figure: '1'
       uncertainty:
         read_uncertainty_K: 50.00
-        read_uncertainty_FeO_mol_pct: 0.00623
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s3_liquidus_marker_01
       type: transition_point
@@ -8373,7 +8375,7 @@ species:
             figure: '1'
       uncertainty:
         read_uncertainty_K: 50.00
-        read_uncertainty_FeO_mol_pct: 0.00312
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s3_liquidus_marker_02
       type: transition_point
@@ -8438,7 +8440,7 @@ species:
             figure: '1'
       uncertainty:
         read_uncertainty_K: 50.00
-        read_uncertainty_FeO_mol_pct: 0.00312
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s3_liquidus_marker_03
       type: transition_point
@@ -8503,7 +8505,7 @@ species:
             figure: '1'
       uncertainty:
         read_uncertainty_K: 51.61
-        read_uncertainty_FeO_mol_pct: 0.00312
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s3_liquidus_marker_04
       type: transition_point
@@ -8568,7 +8570,7 @@ species:
             figure: '1'
       uncertainty:
         read_uncertainty_K: 50.00
-        read_uncertainty_FeO_mol_pct: 0.00935
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s3_liquidus_marker_05
       type: transition_point
@@ -8633,7 +8635,7 @@ species:
             figure: '1'
       uncertainty:
         read_uncertainty_K: 50.00
-        read_uncertainty_FeO_mol_pct: 0.00312
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s3_liquidus_marker_06
       type: transition_point
@@ -8698,7 +8700,7 @@ species:
             figure: '1'
       uncertainty:
         read_uncertainty_K: 50.00
-        read_uncertainty_FeO_mol_pct: 0.00623
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s3_liquidus_marker_07
       type: transition_point
@@ -8763,7 +8765,7 @@ species:
             figure: '1'
       uncertainty:
         read_uncertainty_K: 50.00
-        read_uncertainty_FeO_mol_pct: 0.00623
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s3_liquidus_marker_08
       type: transition_point
@@ -8828,7 +8830,7 @@ species:
             figure: '1'
       uncertainty:
         read_uncertainty_K: 50.00
-        read_uncertainty_FeO_mol_pct: 0.03145
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s3_liquidus_marker_09
       type: transition_point
@@ -8893,7 +8895,7 @@ species:
             figure: '1'
       uncertainty:
         read_uncertainty_K: 50.00
-        read_uncertainty_FeO_mol_pct: 0.03427
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s3_liquidus_marker_10
       type: transition_point
@@ -8958,7 +8960,7 @@ species:
             figure: '1'
       uncertainty:
         read_uncertainty_K: 50.00
-        read_uncertainty_FeO_mol_pct: 0.02492
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s3_liquidus_marker_11
       type: transition_point
@@ -9023,7 +9025,7 @@ species:
             figure: '1'
       uncertainty:
         read_uncertainty_K: 50.00
-        read_uncertainty_FeO_mol_pct: 0.03145
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_s3_liquidus_marker_12
       type: transition_point
@@ -9088,7 +9090,7 @@ species:
             figure: '1'
       uncertainty:
         read_uncertainty_K: 50.00
-        read_uncertainty_FeO_mol_pct: 0.00935
+        read_uncertainty_FeO_mol_pct: 0.5
         note: Uncertainty covers the two-significant-figure rounding half-bin and independent page-pixel reads.
     - observation_id: shornikov_2020_fig1_series1_solidus_curve
       type: transition_point
@@ -9496,9 +9498,9 @@ species:
     - observation_id: shornikov_2020_fig3_panel_a_unkeyed_black_markers
       type: thermodynamic_context
       locator:
-        page: 3
-        published_page: 76
-        pdf_page_index: 2
+        page: 2
+        published_page: 75
+        pdf_page_index: 1
         figure: '3'
         panel: a
         note: 'Figure 3 caption: enthalpy of solid-solution formation / partial enthalpy
@@ -9512,9 +9514,9 @@ species:
     - observation_id: shornikov_2020_fig3_panel_a_series_1-3_curve
       type: thermodynamic_context
       locator:
-        page: 3
-        published_page: 76
-        pdf_page_index: 2
+        page: 2
+        published_page: 75
+        pdf_page_index: 1
         figure: '3'
         panel: a
         series: 1–3
@@ -9529,9 +9531,9 @@ species:
     - observation_id: shornikov_2020_fig3_panel_a_series_4-6_curve
       type: thermodynamic_context
       locator:
-        page: 3
-        published_page: 76
-        pdf_page_index: 2
+        page: 2
+        published_page: 75
+        pdf_page_index: 1
         figure: '3'
         panel: a
         series: 4–6
@@ -9546,9 +9548,9 @@ species:
     - observation_id: shornikov_2020_fig3_panel_a_series_7_curve
       type: thermodynamic_context
       locator:
-        page: 3
-        published_page: 76
-        pdf_page_index: 2
+        page: 2
+        published_page: 75
+        pdf_page_index: 1
         figure: '3'
         panel: a
         series: '7'
@@ -9563,9 +9565,9 @@ species:
     - observation_id: shornikov_2020_fig3_panel_b_unkeyed_black_markers
       type: thermodynamic_context
       locator:
-        page: 3
-        published_page: 76
-        pdf_page_index: 2
+        page: 2
+        published_page: 75
+        pdf_page_index: 1
         figure: '3'
         panel: b
         note: 'Figure 3 caption: entropy of solid-solution formation / partial entropy
@@ -9579,9 +9581,9 @@ species:
     - observation_id: shornikov_2020_fig3_panel_b_series_1-3_curve
       type: thermodynamic_context
       locator:
-        page: 3
-        published_page: 76
-        pdf_page_index: 2
+        page: 2
+        published_page: 75
+        pdf_page_index: 1
         figure: '3'
         panel: b
         series: 1–3
@@ -9596,9 +9598,9 @@ species:
     - observation_id: shornikov_2020_fig3_panel_b_series_4-6_curve
       type: thermodynamic_context
       locator:
-        page: 3
-        published_page: 76
-        pdf_page_index: 2
+        page: 2
+        published_page: 75
+        pdf_page_index: 1
         figure: '3'
         panel: b
         series: 4–6
@@ -9613,9 +9615,9 @@ species:
     - observation_id: shornikov_2020_fig3_panel_b_series_7_curve
       type: thermodynamic_context
       locator:
-        page: 3
-        published_page: 76
-        pdf_page_index: 2
+        page: 2
+        published_page: 75
+        pdf_page_index: 1
         figure: '3'
         panel: b
         series: '7'

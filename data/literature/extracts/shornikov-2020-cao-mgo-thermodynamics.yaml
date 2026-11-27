@@ -5,7 +5,11 @@
     \ vol. 26, no. 1, pp. 77–80."
   "year": 2020
 "extraction":
-  "method": "mineru_table_draft emit"
+  "method": >-
+    mineru_table_draft emit. Figure 1 read_uncertainty_K and read_uncertainty_mol_pct are each max(stated
+    width, half the stored rounding step, and one 600-dpi pixel converted through the rendered axes):
+    0.7329 K/pixel = (800 K / 636.799 px) × (350/600), and 0.05995 mol%/pixel = (100 mol% / 973.07 px)
+    × (350/600).
   "date": "2026-10-18"
   "worker": "trial-grok-1018"
 "review_status": "draft"
@@ -1711,7 +1715,7 @@
         "page_600dpi_px_read_2":
         - 928.0
         - 2536.5
-        "read_uncertainty_K": "0.9"
+        "read_uncertainty_K": "5"
         "read_uncertainty_mol_pct": "0.10"
         "read_1_method": "jpeg_vertical_diameter"
         "read_2_method": "visual_page_grid"
@@ -1777,7 +1781,7 @@
         "page_600dpi_px_read_2":
         - 1092.5
         - 2675.5
-        "read_uncertainty_K": "1.2"
+        "read_uncertainty_K": "5"
         "read_uncertainty_mol_pct": "0.10"
         "read_1_method": "jpeg_vertical_diameter"
         "read_2_method": "visual_page_grid"
@@ -1843,7 +1847,7 @@
         "page_600dpi_px_read_2":
         - 1178.0
         - 2782.5
-        "read_uncertainty_K": "0.2"
+        "read_uncertainty_K": "5"
         "read_uncertainty_mol_pct": "0.10"
         "read_1_method": "jpeg_vertical_diameter"
         "read_2_method": "visual_page_grid"
@@ -1909,7 +1913,7 @@
         "page_600dpi_px_read_2":
         - 1261.0
         - 2859.0
-        "read_uncertainty_K": "4.0"
+        "read_uncertainty_K": "5"
         "read_uncertainty_mol_pct": "0.10"
         "read_1_method": "jpeg_vertical_diameter"
         "read_2_method": "visual_page_grid"
@@ -1975,7 +1979,7 @@
         "page_600dpi_px_read_2":
         - 1345.0
         - 2981.0
-        "read_uncertainty_K": "4.4"
+        "read_uncertainty_K": "5"
         "read_uncertainty_mol_pct": "0.10"
         "read_1_method": "jpeg_vertical_diameter"
         "read_2_method": "visual_page_grid"
@@ -2041,7 +2045,7 @@
         "page_600dpi_px_read_2":
         - 1594.5
         - 2732.5
-        "read_uncertainty_K": "3.1"
+        "read_uncertainty_K": "5"
         "read_uncertainty_mol_pct": "0.10"
         "read_1_method": "jpeg_vertical_diameter"
         "read_2_method": "visual_page_grid"
@@ -2107,7 +2111,7 @@
         "page_600dpi_px_read_2":
         - 1763.0
         - 2623.5
-        "read_uncertainty_K": "3.2"
+        "read_uncertainty_K": "5"
         "read_uncertainty_mol_pct": "0.10"
         "read_1_method": "jpeg_vertical_diameter"
         "read_2_method": "visual_page_grid"
@@ -2173,8 +2177,8 @@
         "page_600dpi_px_read_2":
         - 1259.5
         - 2955.5
-        "read_uncertainty_K": "3.1"
-        "read_uncertainty_mol_pct": "0.03"
+        "read_uncertainty_K": "5"
+        "read_uncertainty_mol_pct": "0.05995"
         "read_1_method": "jpeg_hole_centroid"
         "read_2_method": "visual_page_grid"
         "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
@@ -2239,7 +2243,7 @@
         "page_600dpi_px_read_2":
         - 1301.5
         - 2980.0
-        "read_uncertainty_K": "4.9"
+        "read_uncertainty_K": "5"
         "read_uncertainty_mol_pct": "0.10"
         "read_1_method": "jpeg_hole_centroid"
         "read_2_method": "visual_page_grid"
@@ -2305,8 +2309,8 @@
         "page_600dpi_px_read_2":
         - 1134.0
         - 2630.0
-        "read_uncertainty_K": "2.3"
-        "read_uncertainty_mol_pct": "0.03"
+        "read_uncertainty_K": "5"
+        "read_uncertainty_mol_pct": "0.05995"
         "read_1_method": "jpeg_interior_centroid"
         "read_2_method": "visual_page_grid"
         "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
@@ -2371,8 +2375,8 @@
         "page_600dpi_px_read_2":
         - 1582.5
         - 2969.5
-        "read_uncertainty_K": "2.9"
-        "read_uncertainty_mol_pct": "0.03"
+        "read_uncertainty_K": "5"
+        "read_uncertainty_mol_pct": "0.05995"
         "read_1_method": "jpeg_interior_centroid"
         "read_2_method": "visual_page_grid"
         "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
@@ -2437,8 +2441,8 @@
         "page_600dpi_px_read_2":
         - 925.5
         - 2443.0
-        "read_uncertainty_K": "0.4"
-        "read_uncertainty_mol_pct": "0.01"
+        "read_uncertainty_K": "5"
+        "read_uncertainty_mol_pct": "0.05995"
         "read_1_method": "jpeg_horizontal_diameter"
         "read_2_method": "visual_page_grid"
         "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
@@ -2503,8 +2507,8 @@
         "page_600dpi_px_read_2":
         - 1092.5
         - 2606.0
-        "read_uncertainty_K": "1.1"
-        "read_uncertainty_mol_pct": "0.01"
+        "read_uncertainty_K": "5"
+        "read_uncertainty_mol_pct": "0.05995"
         "read_1_method": "jpeg_horizontal_diameter"
         "read_2_method": "visual_page_grid"
         "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
@@ -2570,7 +2574,7 @@
         - 1259.5
         - 2736.0
         "read_uncertainty_K": "5.7"
-        "read_uncertainty_mol_pct": "0.03"
+        "read_uncertainty_mol_pct": "0.05995"
         "read_1_method": "jpeg_horizontal_diameter"
         "read_2_method": "visual_page_grid"
         "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
@@ -2635,8 +2639,8 @@
         "page_600dpi_px_read_2":
         - 1426.5
         - 2896.5
-        "read_uncertainty_K": "3.6"
-        "read_uncertainty_mol_pct": "0.03"
+        "read_uncertainty_K": "5"
+        "read_uncertainty_mol_pct": "0.05995"
         "read_1_method": "jpeg_horizontal_diameter"
         "read_2_method": "visual_page_grid"
         "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
@@ -2701,8 +2705,8 @@
         "page_600dpi_px_read_2":
         - 1592.5
         - 2863.5
-        "read_uncertainty_K": "1.5"
-        "read_uncertainty_mol_pct": "0.02"
+        "read_uncertainty_K": "5"
+        "read_uncertainty_mol_pct": "0.05995"
         "read_1_method": "jpeg_horizontal_diameter"
         "read_2_method": "visual_page_grid"
         "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
@@ -2833,7 +2837,7 @@
         "page_600dpi_px_read_2":
         - 1927.0
         - 2522.0
-        "read_uncertainty_K": "2.9"
+        "read_uncertainty_K": "5"
         "read_uncertainty_mol_pct": "0.10"
         "read_1_method": "jpeg_horizontal_diameter"
         "read_2_method": "visual_page_grid"
@@ -2899,8 +2903,8 @@
         "page_600dpi_px_read_2":
         - 2094.5
         - 2364.5
-        "read_uncertainty_K": "2.8"
-        "read_uncertainty_mol_pct": "0.01"
+        "read_uncertainty_K": "5"
+        "read_uncertainty_mol_pct": "0.05995"
         "read_1_method": "jpeg_horizontal_diameter"
         "read_2_method": "visual_page_grid"
         "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
@@ -2965,8 +2969,8 @@
         "page_600dpi_px_read_2":
         - 591.5
         - 2384.0
-        "read_uncertainty_K": "3.0"
-        "read_uncertainty_mol_pct": "0.05"
+        "read_uncertainty_K": "5"
+        "read_uncertainty_mol_pct": "0.05995"
         "read_1_method": "jpeg_hole_centroid"
         "read_2_method": "visual_page_grid"
         "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
@@ -3031,8 +3035,8 @@
         "page_600dpi_px_read_2":
         - 758.5
         - 2484.5
-        "read_uncertainty_K": "1.1"
-        "read_uncertainty_mol_pct": "0.01"
+        "read_uncertainty_K": "5"
+        "read_uncertainty_mol_pct": "0.05995"
         "read_1_method": "jpeg_hole_centroid"
         "read_2_method": "visual_page_grid"
         "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
@@ -3097,8 +3101,8 @@
         "page_600dpi_px_read_2":
         - 1593.0
         - 2814.0
-        "read_uncertainty_K": "3.2"
-        "read_uncertainty_mol_pct": "0.01"
+        "read_uncertainty_K": "5"
+        "read_uncertainty_mol_pct": "0.05995"
         "read_1_method": "jpeg_hole_centroid"
         "read_2_method": "visual_page_grid"
         "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
@@ -3163,8 +3167,8 @@
         "page_600dpi_px_read_2":
         - 586.0
         - 2342.5
-        "read_uncertainty_K": "3.8"
-        "read_uncertainty_mol_pct": "0.01"
+        "read_uncertainty_K": "5"
+        "read_uncertainty_mol_pct": "0.05995"
         "read_1_method": "jpeg_interior_centroid"
         "read_2_method": "visual_page_grid"
         "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
@@ -3229,8 +3233,8 @@
         "page_600dpi_px_read_2":
         - 661.0
         - 2608.5
-        "read_uncertainty_K": "2.0"
-        "read_uncertainty_mol_pct": "0.02"
+        "read_uncertainty_K": "5"
+        "read_uncertainty_mol_pct": "0.05995"
         "read_1_method": "jpeg_interior_centroid"
         "read_2_method": "visual_page_grid"
         "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
@@ -3295,8 +3299,8 @@
         "page_600dpi_px_read_2":
         - 684.0
         - 2748.0
-        "read_uncertainty_K": "4.5"
-        "read_uncertainty_mol_pct": "0.02"
+        "read_uncertainty_K": "5"
+        "read_uncertainty_mol_pct": "0.05995"
         "read_1_method": "jpeg_interior_centroid"
         "read_2_method": "visual_page_grid"
         "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
@@ -3361,8 +3365,8 @@
         "page_600dpi_px_read_2":
         - 845.5
         - 2479.5
-        "read_uncertainty_K": "3.2"
-        "read_uncertainty_mol_pct": "0.03"
+        "read_uncertainty_K": "5"
+        "read_uncertainty_mol_pct": "0.05995"
         "read_1_method": "jpeg_interior_centroid"
         "read_2_method": "visual_page_grid"
         "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
@@ -3427,8 +3431,8 @@
         "page_600dpi_px_read_2":
         - 1998.5
         - 2884.0
-        "read_uncertainty_K": "4.4"
-        "read_uncertainty_mol_pct": "0.01"
+        "read_uncertainty_K": "5"
+        "read_uncertainty_mol_pct": "0.05995"
         "read_1_method": "jpeg_interior_centroid"
         "read_2_method": "visual_page_grid"
         "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
@@ -3683,8 +3687,8 @@
         "page_600dpi_px_read_2":
         - 925.5
         - 2616.5
-        "read_uncertainty_K": "2.2"
-        "read_uncertainty_mol_pct": "0.03"
+        "read_uncertainty_K": "5"
+        "read_uncertainty_mol_pct": "0.05995"
         "read_1_method": "jpeg_hole_centroid"
         "read_2_method": "visual_page_grid"
         "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
@@ -3736,8 +3740,8 @@
         "page_600dpi_px_read_2":
         - 1092.5
         - 2791.0
-        "read_uncertainty_K": "4.2"
-        "read_uncertainty_mol_pct": "0.01"
+        "read_uncertainty_K": "5"
+        "read_uncertainty_mol_pct": "0.05995"
         "read_1_method": "jpeg_hole_centroid"
         "read_2_method": "visual_page_grid"
         "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
@@ -3789,8 +3793,8 @@
         "page_600dpi_px_read_2":
         - 1175.5
         - 2880.5
-        "read_uncertainty_K": "1.8"
-        "read_uncertainty_mol_pct": "0.03"
+        "read_uncertainty_K": "5"
+        "read_uncertainty_mol_pct": "0.05995"
         "read_1_method": "jpeg_hole_centroid"
         "read_2_method": "visual_page_grid"
         "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
@@ -3842,8 +3846,8 @@
         "page_600dpi_px_read_2":
         - 1351.5
         - 3027.5
-        "read_uncertainty_K": "0.4"
-        "read_uncertainty_mol_pct": "0.03"
+        "read_uncertainty_K": "5"
+        "read_uncertainty_mol_pct": "0.05995"
         "read_1_method": "jpeg_hole_centroid"
         "read_2_method": "visual_page_grid"
         "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
@@ -3895,7 +3899,7 @@
         "page_600dpi_px_read_2":
         - 1426.0
         - 2914.0
-        "read_uncertainty_K": "3.6"
+        "read_uncertainty_K": "5"
         "read_uncertainty_mol_pct": "0.10"
         "read_1_method": "jpeg_ring_centre"
         "read_2_method": "visual_page_grid"
@@ -3948,8 +3952,8 @@
         "page_600dpi_px_read_2":
         - 1760.0
         - 2751.5
-        "read_uncertainty_K": "2.9"
-        "read_uncertainty_mol_pct": "0.02"
+        "read_uncertainty_K": "5"
+        "read_uncertainty_mol_pct": "0.05995"
         "read_1_method": "jpeg_hole_centroid"
         "read_2_method": "visual_page_grid"
         "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
@@ -4001,8 +4005,8 @@
         "page_600dpi_px_read_2":
         - 1926.5
         - 2723.0
-        "read_uncertainty_K": "4.0"
-        "read_uncertainty_mol_pct": "0.03"
+        "read_uncertainty_K": "5"
+        "read_uncertainty_mol_pct": "0.05995"
         "read_1_method": "jpeg_hole_centroid"
         "read_2_method": "visual_page_grid"
         "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
@@ -4054,8 +4058,8 @@
         "page_600dpi_px_read_2":
         - 2094.0
         - 2705.5
-        "read_uncertainty_K": "3.3"
-        "read_uncertainty_mol_pct": "0.03"
+        "read_uncertainty_K": "5"
+        "read_uncertainty_mol_pct": "0.05995"
         "read_1_method": "jpeg_hole_centroid"
         "read_2_method": "visual_page_grid"
         "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
@@ -4107,8 +4111,8 @@
         "page_600dpi_px_read_2":
         - 2260.5
         - 2697.0
-        "read_uncertainty_K": "3.1"
-        "read_uncertainty_mol_pct": "0.04"
+        "read_uncertainty_K": "5"
+        "read_uncertainty_mol_pct": "0.5"
         "read_1_method": "jpeg_hole_centroid"
         "read_2_method": "visual_page_grid"
         "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
@@ -4160,8 +4164,8 @@
         "page_600dpi_px_read_2":
         - 699.5
         - 3022.0
-        "read_uncertainty_K": "4.2"
-        "read_uncertainty_mol_pct": "0.05"
+        "read_uncertainty_K": "5"
+        "read_uncertainty_mol_pct": "0.05995"
         "read_1_method": "jpeg_interior_centroid"
         "read_2_method": "visual_page_grid"
         "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
@@ -4213,7 +4217,7 @@
         "page_600dpi_px_read_2":
         - 1830.0
         - 2833.5
-        "read_uncertainty_K": "3.1"
+        "read_uncertainty_K": "5"
         "read_uncertainty_mol_pct": "0.10"
         "read_1_method": "jpeg_interior_centroid"
         "read_2_method": "visual_page_grid"
@@ -4266,8 +4270,8 @@
         "page_600dpi_px_read_2":
         - 1938.5
         - 3015.5
-        "read_uncertainty_K": "1.0"
-        "read_uncertainty_mol_pct": "0.03"
+        "read_uncertainty_K": "5"
+        "read_uncertainty_mol_pct": "0.05995"
         "read_1_method": "jpeg_interior_centroid"
         "read_2_method": "visual_page_grid"
         "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\
@@ -4319,8 +4323,8 @@
         "page_600dpi_px_read_2":
         - 2260.5
         - 2622.0
-        "read_uncertainty_K": "1.9"
-        "read_uncertainty_mol_pct": "0.03"
+        "read_uncertainty_K": "5"
+        "read_uncertainty_mol_pct": "0.5"
         "read_1_method": "jpeg_interior_centroid"
         "read_2_method": "visual_page_grid"
         "attribution": "Figure 1 caption: symbols 1-4 correspond to the data obtained in (Ruff et al., 1933;\

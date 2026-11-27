@@ -48,6 +48,41 @@ def _figure_marker_rows(document: dict) -> list[dict]:
     ]
 
 
+def _half_stored_rounding_step(value: object) -> Decimal:
+    stored = Decimal(str(value))
+    return Decimal(1).scaleb(stored.as_tuple().exponent) / 2
+
+
+def _assert_feo_read_uncertainty(rows: list[dict]) -> None:
+    pixel_floor = Decimal("0.06297")
+    for row in rows:
+        stored = Decimal(row["values"]["FeO_mol_pct_as_plotted"])
+        uncertainty = Decimal(str(row["uncertainty"]["read_uncertainty_FeO_mol_pct"]))
+        assert uncertainty >= max(_half_stored_rounding_step(stored), pixel_floor)
+
+
+def _figure3_rows(document: dict) -> list[dict]:
+    return [
+        row
+        for row in document["species"]["MgO-FeO_melt"]["context"]
+        if str(row.get("locator", {}).get("figure")) == "3"
+    ]
+
+
+def _assert_figure3_locator(document: dict) -> None:
+    rows = _figure3_rows(document)
+    assert len(rows) == 8
+    assert all(
+        (
+            row["locator"]["page"],
+            row["locator"]["published_page"],
+            row["locator"]["pdf_page_index"],
+        )
+        == (2, 75, 1)
+        for row in rows
+    )
+
+
 def _gamma_read(row: dict, page_y: float) -> float:
     locator = row["locator"]
     tick_y = 1403 if locator["panel"] == "a" else 1405
@@ -146,6 +181,7 @@ def _figure_pins(document: dict) -> None:
 def _figure_bands_and_compositions(document: dict) -> None:
     rows = _figure_marker_rows(document)
     assert len(rows) == 110
+    _assert_feo_read_uncertainty(rows)
     fig2_rows = [
         row
         for row in _observations(document)
@@ -233,6 +269,26 @@ def test_figure_pins_fail_when_a_digitized_value_is_mutated() -> None:
     )["values"]["gamma"] = "2.1"
     with pytest.raises(AssertionError):
         _figure_pins(document)
+
+
+def test_feo_read_uncertainty_floor_fails_when_mutated_below_rounding() -> None:
+    document = deepcopy(_document())
+    row = _observation_by_id(document, "shornikov_2020_fig2a_s1_marker_01")
+    row["uncertainty"]["read_uncertainty_FeO_mol_pct"] = 0.01258
+    with pytest.raises(AssertionError):
+        _assert_feo_read_uncertainty([row])
+
+
+def test_figure3_locator_is_pinned_to_pdf_page_two() -> None:
+    _assert_figure3_locator(_document())
+
+
+def test_figure3_locator_pin_fails_when_mutated_to_page_three() -> None:
+    document = deepcopy(_document())
+    row = _figure3_rows(document)[0]
+    row["locator"].update(page=3, published_page=76, pdf_page_index=2)
+    with pytest.raises(AssertionError):
+        _assert_figure3_locator(document)
 
 
 def test_figure_pins_fail_when_fig1_temperature_or_figure_phase_is_mutated() -> None:
